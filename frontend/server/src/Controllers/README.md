@@ -3118,16 +3118,16 @@ and the number of solutions already seen
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `assignment`      | `string` |             |
-| `contest_alias`   | `string` |             |
-| `course`          | `string` |             |
-| `interview_alias` | `string` |             |
-| `problemset_id`   | `int`    |             |
-| `auth_token`      | `mixed`  |             |
-| `token`           | `mixed`  |             |
-| `tokens`          | `mixed`  |             |
+| Name              | Type           | Description |
+| ----------------- | -------------- | ----------- |
+| `assignment`      | `string`       |             |
+| `contest_alias`   | `string`       |             |
+| `course`          | `string`       |             |
+| `interview_alias` | `string`       |             |
+| `problemset_id`   | `int`          |             |
+| `auth_token`      | `mixed`        |             |
+| `token`           | `null\|string` |             |
+| `tokens`          | `mixed`        |             |
 
 ### Returns
 
@@ -4395,7 +4395,7 @@ contest updates with an access token.
 | `auth_token`    | `null\|string` |             |
 | `contest_admin` | `null\|string` |             |
 | `contest_alias` | `null\|string` |             |
-| `token`         | `mixed`        |             |
+| `token`         | `null\|string` |             |
 | `tokens`        | `mixed`        |             |
 
 ### Returns

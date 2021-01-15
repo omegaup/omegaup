@@ -109,7 +109,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $course
      * @omegaup-request-param string $interview_alias
      * @omegaup-request-param int $problemset_id
-     * @omegaup-request-param mixed $token
+     * @omegaup-request-param null|string $token
      * @omegaup-request-param mixed $tokens
      */
     public static function apiDetails(\OmegaUp\Request $r) {
@@ -241,7 +241,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param int $problemset_id
-     * @omegaup-request-param mixed $token
+     * @omegaup-request-param null|string $token
      * @omegaup-request-param mixed $tokens
      */
     public static function wrapRequest(\OmegaUp\Request $r): array {
@@ -267,15 +267,15 @@ class Problemset extends \OmegaUp\Controllers\Controller {
                     'problemsetNotFound'
                 );
             }
+            $token = $r->ensureOptionalString('token');
             $request = new \OmegaUp\Request([
-                'token' => $r['token'],
+                'token' => $token,
                 'problemset_id' => $r['problemset_id'],
                 'contest_alias' => $problemset['contest_alias'],
             ]);
             if (isset($r['auth_token']) && is_string($r['auth_token'])) {
                 $request['auth_token'] = $r['auth_token'];
             }
-            $token = null;
             /** @psalm-suppress MixedArgument $r['tokens'] is definitely an array here. */
             if (
                 isset($r['tokens']) &&

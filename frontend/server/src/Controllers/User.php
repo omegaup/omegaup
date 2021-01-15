@@ -2736,7 +2736,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $contest_alias
      * @omegaup-request-param string $filter
      * @omegaup-request-param int $problemset_id
-     * @omegaup-request-param mixed $token
+     * @omegaup-request-param null|string $token
      * @omegaup-request-param mixed $tokens
      */
     public static function apiValidateFilter(\OmegaUp\Request $r): array {
