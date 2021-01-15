@@ -1,14 +1,14 @@
 {
   "es": {
-    "name": "Usuario Experto en Java",
-    "description": "El usuario ha resuelto más de 10 problemas en Java."
+    "name": "Especialista en Java",
+    "description": "Otorgado a personas que han resuelto más de 10 problemas en Java."
   },
   "en": {
     "name": "Java Expert User",
     "description": "The user has solved more than 10 problems in Java."
   },
   "pt": {
-    "name": "Usuário Especialista em Java",
-    "description": "O usuário tem resolvido mais de 10 problemas em Java."
+    "name": "Especialista em Java",
+    "description": "Concedido a pessoas que resolveram mais de 10 problemas em Java."
   }
 }
