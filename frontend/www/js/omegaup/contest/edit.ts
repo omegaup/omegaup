@@ -16,7 +16,9 @@ OmegaUp.on('ready', () => {
       'omegaup-contest-edit': contest_Edit,
     },
     data: () => ({
+      admins: payload.admins,
       details: payload.details,
+      groupAdmins: payload.group_admins,
       problems: payload.problems,
       requests: payload.requests,
       users: payload.users,
@@ -72,14 +74,32 @@ OmegaUp.on('ready', () => {
           })
           .catch(ui.apiError);
       },
+      refreshAdmins: (): void => {
+        api.Contest.admins({
+          contest_alias: payload.details.alias,
+        })
+          .then((response) => {
+            contestEdit.admins = response.admins;
+          })
+          .catch(ui.apiError);
+      },
+      refreshGroupAdmins: (): void => {
+        api.Contest.admins({
+          contest_alias: payload.details.alias,
+        })
+          .then((response) => {
+            contestEdit.groupAdmins = response.group_admins;
+          })
+          .catch(ui.apiError);
+      },
     },
     render: function (createElement) {
       return createElement('omegaup-contest-edit', {
         props: {
-          admins: payload.admins,
+          admins: this.admins,
           details: this.details,
           groups: payload.groups,
-          groupAdmins: payload.group_admins,
+          groupAdmins: this.groupAdmins,
           problems: this.problems,
           requests: this.requests,
           users: this.users,
@@ -234,6 +254,50 @@ OmegaUp.on('ready', () => {
           },
           'deny-request': (username: string) => {
             this.arbitrateRequest(username, false);
+          },
+          'add-admin': (username: string) => {
+            api.Contest.addAdmin({
+              contest_alias: payload.details.alias,
+              usernameOrEmail: username,
+            })
+              .then(() => {
+                ui.success(T.adminAdded);
+                this.refreshAdmins();
+              })
+              .catch(ui.apiError);
+          },
+          'remove-admin': (username: string) => {
+            api.Contest.removeAdmin({
+              contest_alias: payload.details.alias,
+              usernameOrEmail: username,
+            })
+              .then(() => {
+                ui.success(T.adminRemoved);
+                this.refreshAdmins();
+              })
+              .catch(ui.apiError);
+          },
+          'add-group-admin': (groupAlias: string) => {
+            api.Contest.addGroupAdmin({
+              contest_alias: payload.details.alias,
+              group: groupAlias,
+            })
+              .then(() => {
+                ui.success(T.groupAdminAdded);
+                this.refreshGroupAdmins();
+              })
+              .catch(ui.apiError);
+          },
+          'remove-group-admin': (groupAlias: string) => {
+            api.Contest.removeGroupAdmin({
+              contest_alias: payload.details.alias,
+              group: groupAlias,
+            })
+              .then(() => {
+                ui.success(T.groupAdminRemoved);
+                this.refreshGroupAdmins();
+              })
+              .catch(ui.apiError);
           },
         },
       });

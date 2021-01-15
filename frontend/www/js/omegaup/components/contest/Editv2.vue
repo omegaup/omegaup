@@ -167,6 +167,25 @@
         ></omegaup-common-requests>
       </div>
     </div>
+    <div v-if="showTab === 'admins'" class="tab-pane active">
+      <omegaup-contest-admins
+        :admins="admins"
+        :has-parent-component="true"
+        @emit-add-admin="(username) => $emit('add-admin', username)"
+        @emit-remove-admin="(username) => $emit('remove-admin', username)"
+      ></omegaup-contest-admins>
+      <div class="mt-2"></div>
+      <omegaup-contest-group-admins
+        :group-admins="groupAdmins"
+        :has-parent-component="true"
+        @emit-add-group-admin="
+          (groupAlias) => $emit('add-group-admin', groupAlias)
+        "
+        @emit-remove-group-admin="
+          (groupAlias) => $emit('remove-group-admin', groupAlias)
+        "
+      ></omegaup-contest-group-admins>
+    </div>
   </div>
 </template>
 
@@ -178,11 +197,11 @@ import * as ui from '../../ui';
 
 import contest_AddProblem from './AddProblemv2.vue';
 import contest_AddContestant from './AddContestant.vue';
-import contest_Admins from '../common/Admins.vue';
+import contest_Admins from '../common/Adminsv2.vue';
 import contest_Clone from './Clone.vue';
 import common_Requests from '../common/Requestsv2.vue';
 import contest_Groups from './Groups.vue';
-import contest_GroupAdmins from '../common/GroupAdmins.vue';
+import contest_GroupAdmins from '../common/GroupAdminsv2.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
 import common_Publish from '../common/Publishv2.vue';
