@@ -1,7 +1,7 @@
 {
   "es": {
     "name": "100 Problemas resueltos",
-    "description": "El usuario ha resuelto 100 problemas o más."
+    "description": "Otorgado a personas que han resuelto 100 problemas o más."
   },
   "en": {
     "name": "100 solved Problems",
@@ -9,6 +9,6 @@
   },
   "pt": {
     "name": "100 Problemas Resolvidos",
-    "description": "O usuário tem resolvido 100 ou mais problemas."
+    "description": "Concedido a pessoas que resolveram 100 ou mais problemas."
   }
 }

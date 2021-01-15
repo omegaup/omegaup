@@ -1,7 +1,7 @@
 {
   "es": {
     "name": "Creador de Problemas",
-    "description": "El usuario ha creado al menos un problema."
+    "description": "Otorgado a personas que han creado al menos un problema."
   },
   "en": {
     "name": "Problem Setter",
@@ -9,6 +9,6 @@
   },
   "pt": {
     "name": "Criador de Problemas",
-    "description": "O usuário tem criado pelo menos um problema."
+    "description": "Concedido a pessoas que criaram pelo menos um problema."
   }
 }
