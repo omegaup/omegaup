@@ -1,9 +1,7 @@
 <template>
   <div class="summary main">
     <h1>{{ ui.contestTitle(contest) }}</h1>
-    <omegaup-markdown
-      :markdown="(contest && contest.description) || ''"
-    ></omegaup-markdown>
+    <omegaup-markdown :markdown="contestDescription"></omegaup-markdown>
     <table class="table table-bordered mx-auto w-50 mb-0">
       <tr v-if="showDeadlines">
         <td>
@@ -102,6 +100,10 @@ export default class ContestSummary extends Vue {
       return time.formatDelta(this.contest.window_length);
     }
     return time.formatDelta(this.duration);
+  }
+
+  get contestDescription(): string {
+    return this.contest?.description || '';
   }
 }
 </script>
