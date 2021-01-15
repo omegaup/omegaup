@@ -291,6 +291,14 @@ export enum PopupDisplayed {
   Reviewer,
 }
 
+export enum ArenaMode {
+  OnlyProblem,
+  Practice,
+  Course,
+  Contest,
+  Interview,
+}
+
 const numericSort = <T extends { [key: string]: any }>(key: string) => {
   const isDigit = (ch: string) => '0' <= ch && ch <= '9';
   return (x: T, y: T) => {
