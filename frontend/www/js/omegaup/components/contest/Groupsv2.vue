@@ -56,17 +56,15 @@ import Autocomplete from '../Autocomplete.vue';
   },
 })
 export default class Groups extends Vue {
-  @Prop() data!: types.ContestGroup[];
+  @Prop() groups!: types.ContestGroup[];
 
   T = T;
   typeahead = typeahead;
   groupName = '';
-  groups = this.data;
   selected: types.ContestGroup | null = null;
 
-  @Watch('data')
-  onDataChange(newGroups: types.ContestGroup[]): void {
-    this.groups = newGroups;
+  @Watch('groups')
+  onGroupsChange(): void {
     this.groupName = '';
     this.selected = null;
   }
