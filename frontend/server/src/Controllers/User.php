@@ -2817,14 +2817,15 @@ class User extends \OmegaUp\Controllers\Controller {
                     if (isset($r['auth_token'])) {
                         $r2['auth_token'] = $r['auth_token'];
                     }
+                    $token = null;
                     if (count($tokens) >= 4) {
-                        $r2['token'] = $tokens[3];
+                        $token = $tokens[3];
+                        $r2['token'] = $token;
                     }
-                    /** @psalm-suppress MixedArgument should be a string here */
                     $contestResponse = \OmegaUp\Controllers\Contest::validateDetails(
                         $tokens[2],
                         $identity,
-                        $r2['token']
+                        $token
                     );
                     if ($contestResponse['contest_admin']) {
                         $response['contest_admin'][] = $contestResponse['contest_alias'];
