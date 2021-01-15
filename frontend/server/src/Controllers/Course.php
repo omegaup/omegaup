@@ -3028,11 +3028,18 @@ class Course extends \OmegaUp\Controllers\Controller {
             'problemTitles' => $problemTitles,
         ] = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
-            "{$courseAlias}",
-            fn () => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
-                $course->course_id,
-                $course->group_id
-            ),
+            "$courseAlias",
+            function () use ($course) {
+                if (is_null($course->course_id) || is_null($course->group_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'courseNotFound'
+                    );
+                }
+                return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+                    $course->course_id,
+                    $course->group_id
+                );
+            },
             60 * 60 * 12 // 12 hours
         );
 
@@ -3080,13 +3087,20 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $studentsProgress = \OmegaUp\Cache::getFromCacheOrSet(
+        ['allProgress' => $studentsProgress] = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
-            "{$courseAlias}",
-            fn () => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
-                $course->course_id,
-                $course->group_id
-            ),
+            "$courseAlias",
+            function () use ($course) {
+                if (is_null($course->course_id) || is_null($course->group_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'courseNotFound'
+                    );
+                }
+                return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+                    $course->course_id,
+                    $course->group_id
+                );
+            },
             60 * 60 * 12 // 12 hours
         );
         return [
@@ -3097,7 +3111,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $r->identity
                     ),
                     // TODO: Get progress only for the given student, rather than every student.
-                    'students' => $studentsProgress['allProgress'],
+                    'students' => $studentsProgress,
                     'student' => $r['student']
                 ],
                 'title' => new \OmegaUp\TranslationString(
