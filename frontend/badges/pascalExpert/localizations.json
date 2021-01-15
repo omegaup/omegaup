@@ -1,14 +1,14 @@
 {
   "es": {
-    "name": "Usuario Experto en Pascal",
-    "description": "El usuario ha resuelto más de 10 problemas en Pascal."
+    "name": "Especialista en Pascal",
+    "description": "Otorgado a personas que han resuelto más de 10 problemas en Pascal."
   },
   "en": {
     "name": "Pascal Expert User",
     "description": "The user has solved more than 10 problems in Pascal."
   },
   "pt": {
-    "name": "Usuário Especialista em Pascal",
-    "description": "O usuário tem resolvido mais de 10 problemas em Pascal."
+    "name": "Especialista em Pascal",
+    "description": "Concedido a pessoas que resolveram mais de 10 problemas em Pascal."
   }
 }
