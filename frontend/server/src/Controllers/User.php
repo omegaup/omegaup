@@ -2736,7 +2736,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $contest_alias
      * @omegaup-request-param string $filter
      * @omegaup-request-param int $problemset_id
-     * @omegaup-request-param mixed $token
+     * @omegaup-request-param null|string $token
      * @omegaup-request-param mixed $tokens
      */
     public static function apiValidateFilter(\OmegaUp\Request $r): array {
@@ -2817,11 +2817,15 @@ class User extends \OmegaUp\Controllers\Controller {
                     if (isset($r['auth_token'])) {
                         $r2['auth_token'] = $r['auth_token'];
                     }
+                    $token = null;
                     if (count($tokens) >= 4) {
-                        $r2['token'] = $tokens[3];
+                        $token = $tokens[3];
+                        $r2['token'] = $token;
                     }
                     $contestResponse = \OmegaUp\Controllers\Contest::validateDetails(
-                        $r2
+                        $tokens[2],
+                        $identity,
+                        $token
                     );
                     if ($contestResponse['contest_admin']) {
                         $response['contest_admin'][] = $contestResponse['contest_alias'];
