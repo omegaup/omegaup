@@ -1,7 +1,7 @@
 {
   "es": {
     "name": "Proveedor de Feedback",
-    "description": "El usuario ha enviado la calificación de al menos un problema."
+    "description": "Otorgado a personas que han enviado la calificación de al menos un problema."
   },
   "en": {
     "name": "Feedback Provider",
@@ -9,6 +9,6 @@
   },
   "pt": {
     "name": "Provedor de Feedback",
-    "description": "O usuário tem enviado a qualificação de pelo menos um problema."
+    "description": "Concedido a pessoas que enviaram uma classificação para pelo menos um problema."
   }
 }

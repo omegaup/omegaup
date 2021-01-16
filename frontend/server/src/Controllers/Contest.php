@@ -3292,6 +3292,17 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $token = $r->ensureOptionalString('token');
 
         // Get the current user
+        try {
+            $r->ensureidentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing.
+            $r->identity = null;
+        }
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $token = $r->ensureOptionalString('token');
         $response = self::validateDetails($contestAlias, $r->identity, $token);
 
         $params = \OmegaUp\ScoreboardParams::fromContest($response['contest']);
