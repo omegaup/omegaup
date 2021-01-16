@@ -406,6 +406,21 @@ export namespace types {
       );
     }
 
+    export function ContestPracticePayload(
+      elementId: string = 'payload',
+    ): types.ContestPracticePayload {
+      return ((x) => {
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function CourseCloneDetailsPayload(
       elementId: string = 'payload',
     ): types.CourseCloneDetailsPayload {
@@ -1636,6 +1651,12 @@ export namespace types {
 
   export interface ContestNewPayload {
     languages: { [key: string]: string };
+  }
+
+  export interface ContestPracticePayload {
+    contest: types.ContestPublicDetails;
+    problems?: types.NavbarContestProblem[];
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
   export interface ContestProblem {
