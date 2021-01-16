@@ -610,7 +610,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: ContestPracticePayload, title: \OmegaUp\TranslationString}}
      *
-     * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param null|string $token
      */
@@ -641,58 +640,46 @@ class Contest extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
-        $shouldShowIntro = \OmegaUp\Controllers\Contest::shouldShowIntro(
-            $r->identity,
-            $contest
+        $problemset = self::getContestDetails(
+            $contestAlias,
+            $contest,
+            $contestAdmin,
+            $r->identity
         );
+        /** @var list<NavbarContestProblem> */
+        $problems = [];
+        foreach ($problemset['problems'] as $problem) {
+            array_push($problems, [
+                    'alias' => $problem['alias'],
+                    'text' => "{$problem['letter']}. {$problem['title']}",
+                    'acceptsSubmissions' => $problem['languages'] !== '',
+                    'bestScore' => 0,
+                    'maxScore' => $problem['points'],
+                    'hasRuns' => false,
+                ]);
+        }
 
-        // Half-authenticate, in case there is no session in place.
-        $session = \OmegaUp\Controllers\Session::getCurrentSession($r);
-        $result = [
+        return [
             'smartyProperties' => [
                 'payload' => [
-                    'shouldShowFirstAssociatedIdentityRunWarning' => false,
+                    'shouldShowFirstAssociatedIdentityRunWarning' =>
+                        !is_null($r->identity) &&
+                        !is_null($r->user) &&
+                        !\OmegaUp\Controllers\User::isMainIdentity(
+                            $r->user,
+                            $r->identity
+                        ) &&
+                        \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
+                            $r->user
+                        ),
                     'contest' => self::getPublicDetails($contest, $r->identity),
+                    'problems' => $problems,
                 ],
-                'fullWidth' => false,
+                'fullWidth' => true,
                 'title' => new \OmegaUp\TranslationString('enterContest'),
             ],
-            'entrypoint' => 'contest_intro',
+            'entrypoint' => 'arena_contest_practice',
         ];
-        if (!$shouldShowIntro) {
-            $result['smartyProperties']['payload']['shouldShowFirstAssociatedIdentityRunWarning'] =
-                !is_null($r->identity) &&
-                !is_null($r->user) &&
-                !\OmegaUp\Controllers\User::isMainIdentity(
-                    $r->user,
-                    $r->identity
-                ) &&
-                \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
-                    $r->user
-                );
-            $result['entrypoint'] = 'arena_contest_practice';
-            $result['smartyProperties']['fullWidth'] = true;
-            $problemset = self::getContestDetails(
-                $contestAlias,
-                $contest,
-                $contestAdmin,
-                $r->identity
-            );
-            /** @var list<NavbarContestProblem> */
-            $problems = [];
-            foreach ($problemset['problems'] as $problem) {
-                array_push($problems, [
-                        'alias' => $problem['alias'],
-                        'text' => "{$problem['letter']}. {$problem['title']}",
-                        'acceptsSubmissions' => $problem['languages'] !== '',
-                        'bestScore' => 0,
-                        'maxScore' => $problem['points'],
-                        'hasRuns' => false,
-                    ]);
-            }
-            $result['smartyProperties']['payload']['problems'] = $problems;
-        }
-        return $result;
     }
 
     /**

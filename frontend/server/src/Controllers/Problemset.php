@@ -109,7 +109,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $course
      * @omegaup-request-param string $interview_alias
      * @omegaup-request-param int $problemset_id
-     * @omegaup-request-param mixed $token
+     * @omegaup-request-param null|string $token
      * @omegaup-request-param mixed $tokens
      */
     public static function apiDetails(\OmegaUp\Request $r) {
@@ -241,7 +241,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param int $problemset_id
-     * @omegaup-request-param mixed $token
+     * @omegaup-request-param null|string $token
      * @omegaup-request-param mixed $tokens
      */
     public static function wrapRequest(\OmegaUp\Request $r): array {
@@ -267,8 +267,9 @@ class Problemset extends \OmegaUp\Controllers\Controller {
                     'problemsetNotFound'
                 );
             }
+            $token = $r->ensureOptionalString('token');
             $request = new \OmegaUp\Request([
-                'token' => $r['token'],
+                'token' => $token,
                 'problemset_id' => $r['problemset_id'],
                 'contest_alias' => $problemset['contest_alias'],
             ]);
@@ -282,13 +283,13 @@ class Problemset extends \OmegaUp\Controllers\Controller {
                 count($r['tokens']) >= 4
             ) {
                 /** @psalm-suppress MixedArrayAccess $r['tokens'] is definitely an array here. */
-                $request['token'] = strval($r['tokens'][3]);
+                $token = strval($r['tokens'][3]);
+                $request['token'] = $token;
             }
-            /** @psalm-suppress MixedArgument should be a string here */
             $response = \OmegaUp\Controllers\Contest::validateDetails(
                 $problemset['contest_alias'],
                 $r->identity,
-                $request['token']
+                $token
             );
             $request['contest_alias'] = $response['contest_alias'];
             $request['contest_admin'] = $response['contest_admin'];
