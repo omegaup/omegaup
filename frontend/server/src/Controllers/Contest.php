@@ -3280,17 +3280,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $token
      */
     public static function apiScoreboardEvents(\OmegaUp\Request $r): array {
-        try {
-            $r->ensureidentity();
-        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            $r->identity = null;
-        }
-        $contestAlias = $r->ensureString(
-            'contest_alias',
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
-        $token = $r->ensureOptionalString('token');
-
         // Get the current user
         try {
             $r->ensureidentity();
