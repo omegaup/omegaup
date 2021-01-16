@@ -2760,7 +2760,23 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseCloneDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: array{}}, template: string}
+     *
+     */
+    public static function getCoursesHomepageForSmarty(\OmegaUp\Request $r): array {
+        return [
+            'smartyProperties' => [
+                'payload' => [],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCourses'
+                ),
+            ],
+            'entrypoint' => 'course_clone',
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: [], title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param string $token
@@ -2788,14 +2804,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         return [
             'smartyProperties' => [
-                'payload' => [
-                    'creator' => $creator,
-                    'details' => self::getCommonCourseDetails(
-                        $course,
-                        $r->identity
-                    ),
-                    'token' => $token,
-                ],
+                'payload' => [],
                 'title' => new \OmegaUp\TranslationString('wordsCloneCourse'),
             ],
             'entrypoint' => 'course_clone',
