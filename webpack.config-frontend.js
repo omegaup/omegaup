@@ -69,6 +69,8 @@ module.exports = {
     group_edit: './frontend/www/js/omegaup/group/edit.ts',
     group_list: './frontend/www/js/omegaup/group/list.ts',
     group_new: './frontend/www/js/omegaup/group/new.ts',
+    group_scoreboard_contests:
+      './frontend/www/js/omegaup/group/scoreboard_contests.ts',
     login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
     login_signin: './frontend/www/js/omegaup/login/signin.ts',
@@ -80,25 +82,15 @@ module.exports = {
       './frontend/www/js/omegaup/problem/collection_list_by_author.ts',
     problem_edit: './frontend/www/js/omegaup/problem/edit.ts',
     problem_details: './frontend/www/js/omegaup/problem/details.ts',
-    problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
     problem_list: './frontend/www/js/omegaup/problem/list.ts',
     problem_mine: './frontend/www/js/omegaup/problem/mine.ts',
     problem_new: './frontend/www/js/omegaup/problem/new.ts',
     problem_print: './frontend/www/js/omegaup/problem/print.ts',
     problem_statement: './frontend/www/js/omegaup/problem/statement.ts',
-    problem_solution: './frontend/www/js/omegaup/problem/solution.ts',
-    problem_settings_summary:
-      './frontend/www/js/omegaup/problem/settings_summary.ts',
-    qualitynomination_popup:
-      './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
     qualitynomination_list:
       './frontend/www/js/omegaup/qualitynomination/list.ts',
-    qualitynomination_demotionpopup:
-      './frontend/www/js/omegaup/arena/qualitynomination_demotionpopup.js',
     qualitynomination_details:
       './frontend/www/js/omegaup/qualitynomination/details.js',
-    qualitynomination_qualityreview:
-      './frontend/www/js/omegaup/arena/qualitynomination_qualityreview.js',
     school_of_the_month:
       './frontend/www/js/omegaup/schools/schoolofthemonth.ts',
     school_profile: './frontend/www/js/omegaup/schools/profile.ts',

@@ -241,6 +241,10 @@ export const Contest = {
   >('/api/contest/adminDetails/', (x) => {
     x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    if (x.submission_deadline)
+      x.submission_deadline = ((x: number) => new Date(x * 1000))(
+        x.submission_deadline,
+      );
     return x;
   }),
   adminList: apiCall<

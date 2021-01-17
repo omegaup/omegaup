@@ -1,7 +1,7 @@
 {
   "es": {
     "name": "Usuario Histórico",
-    "description": "El usuario ha realizado algún envío durante tres años seguidos."
+    "description": "Otorgado a personas que realizaron algún envío hace más de 3 años."
   },
   "en": {
     "name": "Legacy User",
@@ -9,6 +9,6 @@
   },
   "pt": {
     "name": "Usuário Histórico",
-    "description": "O usuário tem um embarque por três anos seguidos."
+    "description": "Concedido a pessoas que enviaram uma solução há mais de 3 anos."
   }
 }

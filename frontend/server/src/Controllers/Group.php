@@ -523,7 +523,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $group
      * @omegaup-request-param string $scoreboard
      *
-     * @return array{smartyProperties: array{payload: GroupScoreboardContestsPayload, title: \OmegaUp\TranslationString}, template: string}
+     * @return array{smartyProperties: array{payload: GroupScoreboardContestsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getGroupScoreboardEditForSmarty(
         \OmegaUp\Request $r
@@ -566,8 +566,7 @@ class Group extends \OmegaUp\Controllers\Controller {
                     'omegaupTitleGroupsScoreboardEdit'
                 ),
             ],
-            // Change following line with: 'entrypoint' => 'group_scoreboard_contests',
-            'template' => 'group.scoreboard.edit.tpl',
+            'entrypoint' => 'group_scoreboard_contests',
         ];
     }
 }

@@ -418,7 +418,6 @@ const translations: { [key: string]: string; } = {
   groupEditScoreboardsAdd: "(Cr3a73 5c0r3b0ard)",
   groupEditScoreboardsAddContest: "(Add c0n7357)",
   groupEditScoreboardsAdded: "(Sc0r3b0ard 5ucc355fu11y add3d!)",
-  groupEditScoreboardsContests: "(C0n73575)",
   groupEditScoreboardsContestsAdded: "(C0n7357 5ucc355fu11y add3d!)",
   groupEditScoreboardsContestsRemoved: "(C0n7357 5ucc355fu11y r3m0v3d!)",
   groupEditScoreboardsEdit: "(Edi7 5c0r3b0ard %(scoreboard))",
