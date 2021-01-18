@@ -34,7 +34,7 @@
       >
         <omegaup-problem-settings-summary
           :problem="problem"
-          :show-visibility-indicators="true"
+          :show-visibility-indicators="ArenaMode.OnlyProblem"
           :show-edit-link="user.admin"
         ></omegaup-problem-settings-summary>
 
@@ -79,21 +79,26 @@
               })
             }}
           </div>
-          <div v-if="visibilityOfPromotionButton">
-            <button class="btn btn-link" @click="onNewPromotion">
-              {{ T.qualityNominationRateProblem }}
-            </button>
-          </div>
-          <div v-if="user.loggedIn">
-            <button class="btn btn-link" @click="onReportInappropriateProblem">
-              {{ T.wordsReportProblem }}
-            </button>
-          </div>
-          <div v-if="user.reviewer && !nominationStatus.alreadyReviewed">
-            <button class="btn btn-link" @click="onNewPromotionAsReviewer">
-              {{ T.reviewerNomination }}
-            </button>
-          </div>
+          <template v-if="ArenaMode.OnlyProblem">
+            <div v-if="visibilityOfPromotionButton">
+              <button class="btn btn-link" @click="onNewPromotion">
+                {{ T.qualityNominationRateProblem }}
+              </button>
+            </div>
+            <div v-if="user.loggedIn">
+              <button
+                class="btn btn-link"
+                @click="onReportInappropriateProblem"
+              >
+                {{ T.wordsReportProblem }}
+              </button>
+            </div>
+            <div v-if="user.reviewer && !nominationStatus.alreadyReviewed">
+              <button class="btn btn-link" @click="onNewPromotionAsReviewer">
+                {{ T.reviewerNomination }}
+              </button>
+            </div>
+          </template>
         </template>
         <omegaup-overlay
           v-if="user.loggedIn"
@@ -168,10 +173,13 @@
         <omegaup-problem-feedback
           :quality-histogram="parsedQualityHistogram"
           :difficulty-histogram="parsedDifficultyHistogram"
-          :quality-score="histogram.quality"
-          :difficulty-score="histogram.difficulty"
+          :quality-score="histogramQuality"
+          :difficulty-score="histogramDifficulty"
         ></omegaup-problem-feedback>
-        <omegaup-arena-solvers :solvers="solvers"></omegaup-arena-solvers>
+        <omegaup-arena-solvers
+          v-if="ArenaMode.OnlyProblem"
+          :solvers="solvers"
+        ></omegaup-arena-solvers>
       </div>
       <div
         class="tab-pane fade p-4"
@@ -375,8 +383,10 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop() guid!: string;
   @Prop() isAdmin!: boolean;
+  @Prop({ default: ArenaMode.OnlyProblem }) arenaMode!: ArenaMode;
 
   PopupDisplayed = PopupDisplayed;
+  ArenaMode = ArenaMode;
   T = T;
   ui = ui;
   time = time;
@@ -441,6 +451,14 @@ export default class ProblemDetails extends Vue {
       return null;
     }
     return JSON.parse(difficultyHistogram);
+  }
+
+  get histogramQuality(): number {
+    return this.histogram?.quality ?? 0;
+  }
+
+  get histogramDifficulty(): number {
+    return this.histogram?.difficulty ?? 0;
   }
 
   onNewSubmission(): void {
