@@ -19,6 +19,7 @@ OmegaUp.on('ready', () => {
       admins: payload.admins,
       details: payload.details,
       groupAdmins: payload.group_admins,
+      groups: payload.groups,
       problems: payload.problems,
       requests: payload.requests,
       users: payload.users,
@@ -44,6 +45,15 @@ OmegaUp.on('ready', () => {
         })
           .then((response) => {
             contestEdit.details = response;
+          })
+          .catch(ui.apiError);
+      },
+      refreshGroups: (): void => {
+        api.Contest.users({
+          contest_alias: payload.details.alias,
+        })
+          .then((response) => {
+            contestEdit.groups = response.groups;
           })
           .catch(ui.apiError);
       },
@@ -98,8 +108,8 @@ OmegaUp.on('ready', () => {
         props: {
           admins: this.admins,
           details: this.details,
-          groups: payload.groups,
           groupAdmins: this.groupAdmins,
+          groups: this.groups,
           problems: this.problems,
           requests: this.requests,
           users: this.users,
@@ -296,6 +306,28 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 ui.success(T.groupAdminRemoved);
                 this.refreshGroupAdmins();
+              })
+              .catch(ui.apiError);
+          },
+          'add-group': (groupAlias: string) => {
+            api.Contest.addGroup({
+              contest_alias: payload.details.alias,
+              group: groupAlias,
+            })
+              .then(() => {
+                ui.success(T.contestGroupAdded);
+                this.refreshGroups();
+              })
+              .catch(ui.apiError);
+          },
+          'remove-group': (groupAlias: string) => {
+            api.Contest.removeGroup({
+              contest_alias: payload.details.alias,
+              group: groupAlias,
+            })
+              .then(() => {
+                ui.success(T.contestGroupRemoved);
+                this.refreshGroups();
               })
               .catch(ui.apiError);
           },

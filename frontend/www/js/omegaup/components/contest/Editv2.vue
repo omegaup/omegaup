@@ -165,6 +165,11 @@
           @emit-accept-request="(username) => $emit('accept-request', username)"
           @emit-deny-request="(username) => $emit('deny-request', username)"
         ></omegaup-common-requests>
+        <omegaup-contest-groups
+          :groups="groups"
+          @emit-add-group="(groupAlias) => $emit('add-group', groupAlias)"
+          @emit-remove-group="(groupAlias) => $emit('remove-group', groupAlias)"
+        ></omegaup-contest-groups>
       </div>
     </div>
     <div v-if="showTab === 'admins'" class="tab-pane active">
@@ -200,8 +205,8 @@ import contest_AddContestant from './AddContestant.vue';
 import contest_Admins from '../common/Adminsv2.vue';
 import contest_Clone from './Clone.vue';
 import common_Requests from '../common/Requestsv2.vue';
-import contest_Groups from './Groups.vue';
 import contest_GroupAdmins from '../common/GroupAdminsv2.vue';
+import contest_Groups from './Groupsv2.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
 import common_Publish from '../common/Publishv2.vue';
