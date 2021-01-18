@@ -104,7 +104,7 @@
           {{ T.wordsCopyright }}
         </div>
         <div class="d-none d-md-block">
-          <ul class="m-0">
+          <ul class="m-0 list-unstyled text-right">
             <li>
               <a
                 href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
