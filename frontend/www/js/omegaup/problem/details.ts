@@ -342,7 +342,7 @@ OmegaUp.on('ready', () => {
             window.location.replace(`#${tabName}`);
           },
           'redirect-login-page': () => {
-            window.location.href = `/login/?redirect=${escape(
+            window.location.href = `/login/?redirect=${encodeURIComponent(
               window.location.pathname,
             )}`;
           },
