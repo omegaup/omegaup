@@ -3028,7 +3028,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'problemTitles' => $problemTitles,
         ] = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
-            "$courseAlias",
+            $courseAlias,
             function () use ($course) {
                 if (is_null($course->course_id) || is_null($course->group_id)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
@@ -3089,7 +3089,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         ['allProgress' => $studentsProgress] = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
-            "$courseAlias",
+            $courseAlias,
             function () use ($course) {
                 if (is_null($course->course_id) || is_null($course->group_id)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
