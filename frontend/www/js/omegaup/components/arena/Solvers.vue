@@ -16,17 +16,21 @@
     </thead>
     <tbody>
       <tr v-for="solver in solvers" :key="solver.username">
-        <td>
+        <td data-submission-user>
           <omegaup-username
             :classname="solver.classname"
             :username="solver.username"
             :linkify="true"
           ></omegaup-username>
         </td>
-        <td>{{ solver.language }}</td>
-        <td>{{ (solver.memory / (1024 * 1024)).toFixed(2) }}</td>
-        <td>{{ (solver.runtime / 1000.0).toFixed(2) }}</td>
-        <td>{{ time.formatTimestamp(solver.time) }}</td>
+        <td data-submission-language>{{ solver.language }}</td>
+        <td data-submission-memory>
+          {{ (solver.memory / (1024 * 1024)).toFixed(2) }}
+        </td>
+        <td data-submission-runtime>
+          {{ (solver.runtime / 1000.0).toFixed(2) }}
+        </td>
+        <td data-submission-time>{{ time.formatTimestamp(solver.time) }}</td>
       </tr>
     </tbody>
   </table>
