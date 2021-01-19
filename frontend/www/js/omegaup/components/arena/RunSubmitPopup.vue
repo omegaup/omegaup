@@ -95,7 +95,7 @@ export default class ArenaRunSubmitPopup extends Vue {
 
   T = T;
   omegaup = omegaup;
-  selectedLanguage = '';
+  selectedLanguage = this.preferredLanguage;
   code = '';
   now: number = Date.now();
 
