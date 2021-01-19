@@ -24,8 +24,8 @@
           ></omegaup-username>
         </td>
         <td>{{ solver.language }}</td>
-        <td>{{ (solver.runtime / 1000.0).toFixed(2) }}</td>
         <td>{{ (solver.memory / (1024 * 1024)).toFixed(2) }}</td>
+        <td>{{ (solver.runtime / 1000.0).toFixed(2) }}</td>
         <td>{{ time.formatTimestamp(solver.time) }}</td>
       </tr>
     </tbody>
