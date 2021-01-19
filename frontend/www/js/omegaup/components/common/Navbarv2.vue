@@ -105,7 +105,7 @@
               :class="{ active: navbarSection === 'course' }"
               data-nav-course
             >
-              <a class="nav-link px-2" href="/course/">{{ T.navCourses }}</a>
+              <a class="nav-link px-2" href="/course/home/">{{ T.navCourses }}</a>
             </li>
             <li
               class="nav-item dropdown nav-problems"

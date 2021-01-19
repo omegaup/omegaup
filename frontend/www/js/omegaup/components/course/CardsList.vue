@@ -6,7 +6,7 @@
         :markdown="T.courseCardDescriptionCourses"
       ></omegaup-markdown>
       <div class="text-right align-middle">
-        <a href="https://blog.omegaup.com/cursos-en-omegaup/">{{
+        <a href="/course/home/">{{
           T.wordsReadMore
         }}</a>
       </div>
