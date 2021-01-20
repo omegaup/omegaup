@@ -273,8 +273,6 @@ OmegaUp.on('ready', () => {
             description: string,
             startTime: Date,
           ) => {
-            console.log(startTime);
-            console.log(startTime.getTime() / 1000);
             api.Contest.clone({
               contest_alias: payload.details.alias,
               title: title,

@@ -176,8 +176,8 @@
       </div>
       <div v-if="showTab === 'clone'" class="tab-pane active">
         <omegaup-contest-clone
-          @emit-clone="
-            (title, alias, description, startTime) =>
+          @clone="
+            ({ title, alias, description, startTime }) =>
               $emit('clone-contest', title, alias, description, startTime)
           "
         ></omegaup-contest-clone>

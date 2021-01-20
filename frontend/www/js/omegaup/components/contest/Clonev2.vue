@@ -4,7 +4,7 @@
       <form
         class="form"
         @submit.prevent="
-          $emit('emit-clone', title, alias, description, startTime)
+          $emit('clone', { title, alias, description, startTime })
         "
       >
         <div class="row">
@@ -84,9 +84,5 @@ export default class Clone extends Vue {
   alias = '';
   description = '';
   startTime = new Date();
-
-  onSubmit() {
-    this.$emit('emit-clone', this);
-  }
 }
 </script>
