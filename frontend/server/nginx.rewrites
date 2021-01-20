@@ -38,7 +38,7 @@ rewrite ^/contest/([a-zA-Z0-9_+-]+)/edit/?$ /contests/edit.php?contest=$1 last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/report/?$ /contests/report.php?contest_alias=$1 last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/stats/?$ /contests/stats.php?contest_alias=$1 last;
 rewrite ^/course/?$ /course/list.php last;
-rewrite ^/course/home/?$ /course/homepage.php last;
+rewrite ^/course/home/?$ /course/home.php last;
 rewrite ^/course/mine/?$ /course/mine.php last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/activity/?$ /course/activity.php?course=$1 last;
 rewrite ^/course/new/?$ /course/new.php last;
