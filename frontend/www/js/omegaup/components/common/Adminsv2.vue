@@ -1,7 +1,7 @@
 <template>
   <div class="card mb-3">
     <div class="card-body">
-      <form class="form" @submit.prevent="onSubmit">
+      <form class="form" @submit.prevent="$emit('add-admin', username)">
         <div class="form-group mb-0">
           <label
             >{{ T.wordsAdmin }}
@@ -64,7 +64,7 @@
                 v-if="admin.role === 'admin'"
                 type="button"
                 class="close float-none"
-                @click="onRemove(admin)"
+                @click="$emit('remove-admin', admin.username)"
               >
                 ×
               </button>
@@ -104,28 +104,11 @@ library.add(fas);
 })
 export default class Admins extends Vue {
   @Prop() admins!: types.ContestAdmin[];
-  @Prop({ default: false }) hasParentComponent!: boolean;
 
   T = T;
   typeahead = typeahead;
   username = '';
   showSiteAdmins = false;
-
-  onSubmit(): void {
-    if (this.hasParentComponent) {
-      this.$emit('emit-add-admin', this.username);
-      return;
-    }
-    this.$emit('add-admin', this.username);
-  }
-
-  onRemove(admin: types.ContestAdmin): void {
-    if (this.hasParentComponent) {
-      this.$emit('emit-remove-admin', admin.username);
-      return;
-    }
-    this.$emit('remove-admin', admin.username);
-  }
 
   @Watch('admins')
   onAdminsChange(): void {

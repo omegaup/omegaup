@@ -176,8 +176,8 @@
       <omegaup-contest-admins
         :admins="admins"
         :has-parent-component="true"
-        @emit-add-admin="(username) => $emit('add-admin', username)"
-        @emit-remove-admin="(username) => $emit('remove-admin', username)"
+        @add-admin="(username) => $emit('add-admin', username)"
+        @remove-admin="(username) => $emit('remove-admin', username)"
       ></omegaup-contest-admins>
       <div class="mt-2"></div>
       <omegaup-contest-group-admins
