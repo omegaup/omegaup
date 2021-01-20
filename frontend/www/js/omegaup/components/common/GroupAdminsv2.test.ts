@@ -9,7 +9,6 @@ describe('GroupAdminsv2.vue', () => {
   it('Should handle empty group admins list', () => {
     const wrapper = shallowMount(common_GroupAdmins, {
       propsData: {
-        hasParentComponent: false,
         groupAdmins: [],
       },
     });
@@ -22,7 +21,6 @@ describe('GroupAdminsv2.vue', () => {
   it('Should handle runs', async () => {
     const wrapper = shallowMount(common_GroupAdmins, {
       propsData: {
-        hasParentComponent: false,
         groupAdmins: [
           { role: 'admin', alias: 'group-admin', name: 'group-admin' },
         ],

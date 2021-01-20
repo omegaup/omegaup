@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <form class="form" @submit.prevent="onSubmit">
+      <form class="form" @submit.prevent="$emit('add-group-admin', groupAlias)">
         <div class="form-group mb-0">
           <label
             >{{ T.wordsGroupAdmin }}
@@ -49,7 +49,7 @@
               v-if="groupAdmin.name !== 'admin'"
               class="close float-none"
               type="button"
-              @click="onRemove(groupAdmin)"
+              @click="$emit('remove-group-admin', group.alias)"
             >
               ×
             </button>
@@ -86,7 +86,6 @@ library.add(fas);
 })
 export default class GroupAdmin extends Vue {
   @Prop() groupAdmins!: types.ContestGroupAdmin[];
-  @Prop({ default: false }) hasParentComponent!: boolean;
 
   T = T;
   typeahead = typeahead;
@@ -95,22 +94,6 @@ export default class GroupAdmin extends Vue {
   @Watch('groupAdmins')
   ongroupAdminsChange(): void {
     this.groupAlias = '';
-  }
-
-  onSubmit(): void {
-    if (this.hasParentComponent) {
-      this.$emit('emit-add-group-admin', this.groupAlias);
-      return;
-    }
-    this.$emit('add-group-admin', this.groupAlias);
-  }
-
-  onRemove(group: types.ContestGroupAdmin): void {
-    if (this.hasParentComponent) {
-      this.$emit('emit-remove-group-admin', group.alias);
-      return;
-    }
-    this.$emit('remove-group-admin', group.alias);
   }
 }
 </script>

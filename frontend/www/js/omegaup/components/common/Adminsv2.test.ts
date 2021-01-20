@@ -9,7 +9,6 @@ describe('Admins.vue', () => {
   it('Should handle empty admins list', () => {
     const wrapper = shallowMount(common_Admins, {
       propsData: {
-        hasParentComponent: false,
         admins: [],
       },
     });
@@ -21,7 +20,6 @@ describe('Admins.vue', () => {
   it('Should handle runs', async () => {
     const wrapper = shallowMount(common_Admins, {
       propsData: {
-        hasParentComponent: false,
         admins: [
           { role: 'owner', user_id: 1, username: 'admin-username' },
           { role: 'site-admin', user_id: 2, username: 'site-admin-username' },

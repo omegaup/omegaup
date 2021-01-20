@@ -175,18 +175,14 @@
     <div v-if="showTab === 'admins'" class="tab-pane active">
       <omegaup-contest-admins
         :admins="admins"
-        :has-parent-component="true"
         @add-admin="(username) => $emit('add-admin', username)"
         @remove-admin="(username) => $emit('remove-admin', username)"
       ></omegaup-contest-admins>
       <div class="mt-2"></div>
       <omegaup-contest-group-admins
         :group-admins="groupAdmins"
-        :has-parent-component="true"
-        @emit-add-group-admin="
-          (groupAlias) => $emit('add-group-admin', groupAlias)
-        "
-        @emit-remove-group-admin="
+        @add-group-admin="(groupAlias) => $emit('add-group-admin', groupAlias)"
+        @remove-group-admin="
           (groupAlias) => $emit('remove-group-admin', groupAlias)
         "
       ></omegaup-contest-group-admins>
