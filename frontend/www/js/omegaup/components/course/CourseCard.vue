@@ -1,30 +1,20 @@
 <template>
   <div class="card ml-3 mr-3 mb-3">
-    <div class="m-3">
-      <div class="font-weight-bold float-left">{{ courseName }}</div>
-      <div class="float-right">{{ dueDate }}</div>
+    <div class="m-3 d-flex justify-content-between">
+      <h5 class="font-weight-bold m-0">{{ courseName }}</h5>
+      <div>{{ dueDate }}</div>
     </div>
-    <div class="m-3">
-      <div class="float-left align-middle">
+    <div class="mx-3 d-flex justify-content-between align-items-center">
+      <div>
         <omegaup-markdown :markdown="impartedBy"></omegaup-markdown>
       </div>
-      <div class="float-right">
-        <a :href="`/course/${courseAlias}/`" class="btn btn-primary">{{
-          buttonTitle
-        }}</a>
-      </div>
+      <a :href="`/course/${courseAlias}/`" class="btn btn-primary d-inline-block">{{
+        buttonTitle
+      }}</a>
     </div>
-    <hr class="ml-3 mr-3" />
-    <div class="m-3">
-      <div v-if="progress > 0" class="float-right">
-        {{ T.wordsProgress }}:
-        <progress
-          :title="`${progress}%`"
-          :value="progress"
-          max="100"
-        ></progress>
-      </div>
-      <div v-if="showTopics" class="float-left align-middle">
+    <div class="dropdown-divider"></div>
+    <div class="mx-3 mt-2 mb-3 d-flex justify-content-between">
+      <div v-if="showTopics">
         <details>
           <summary>{{ T.courseCardShowTopics }}</summary>
           <ul>
@@ -33,6 +23,14 @@
             </li>
           </ul>
         </details>
+      </div>
+      <div class="d-flex align-items-center" v-if="true || progress > 0">
+        <div class="pr-1 pb-1">{{ T.wordsProgress }}:</div>
+        <progress
+          :title="`${progress}%`"
+          :value="87"
+          max="100"
+        ></progress>
       </div>
     </div>
   </div>

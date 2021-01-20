@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="card-header mb-3">
-      <h1>{{ T.courseCardAboutCourses }}</h1>
+      <h3>{{ T.courseCardAboutCourses }}</h3>
       <omegaup-markdown
         :markdown="T.courseCardDescriptionCourses"
       ></omegaup-markdown>
@@ -13,7 +13,7 @@
       <template v-for="(typeCourses, accessMode) in courses">
         <div v-if="typeCourses.activeTab !== ''" :key="accessMode" class="row">
           <div class="col-lg-5 p-3 d-flex" :class="accessMode">
-            <h3 class="flex-grow-1">{{ getDescription(accessMode) }}</h3>
+            <h4 class="flex-grow-1 mb-0">{{ getDescription(accessMode) }}</h4>
             <div
               class="d-inline-block"
               tabindex="0"
@@ -23,7 +23,7 @@
               <font-awesome-icon icon="info-circle" />
             </div>
           </div>
-          <div class="col-lg-7 text-right align-middle">
+          <div class="col-lg-7 text-right align-self-center">
             <a :href="`/course/list/${accessMode}/`">{{
               T.courseListSeeAllCourses
             }}</a>
@@ -85,7 +85,7 @@ library.add(fas);
     'omegaup-markdown': omegaup_Markdown,
   },
 })
-export default class CourseList extends Vue {
+export default class CourseCardsList extends Vue {
   @Prop() courses!: types.StudentCourses;
   @Prop() loggedIn!: boolean;
 
