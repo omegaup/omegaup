@@ -34,7 +34,9 @@
       >
         <omegaup-problem-settings-summary
           :problem="problem"
-          :show-visibility-indicators="ArenaMode.OnlyProblem"
+          :show-visibility-indicators="
+            showVisibilityOfSettingsSummaryIndicators
+          "
           :show-edit-link="user.admin"
         ></omegaup-problem-settings-summary>
 
@@ -79,7 +81,7 @@
               })
             }}
           </div>
-          <template v-if="ArenaMode.OnlyProblem">
+          <slot name="quality-nomination-buttons">
             <div v-if="visibilityOfPromotionButton">
               <button class="btn btn-link" @click="onNewPromotion">
                 {{ T.qualityNominationRateProblem }}
@@ -98,7 +100,7 @@
                 {{ T.reviewerNomination }}
               </button>
             </div>
-          </template>
+          </slot>
         </template>
         <omegaup-overlay
           v-if="user.loggedIn"
@@ -176,10 +178,9 @@
           :quality-score="histogramQuality"
           :difficulty-score="histogramDifficulty"
         ></omegaup-problem-feedback>
-        <omegaup-arena-solvers
-          v-if="ArenaMode.OnlyProblem"
-          :solvers="solvers"
-        ></omegaup-arena-solvers>
+        <slot name="best-solvers-list">
+          <omegaup-arena-solvers :solvers="solvers"></omegaup-arena-solvers>
+        </slot>
       </div>
       <div
         class="tab-pane fade p-4"
@@ -299,14 +300,6 @@ export enum PopupDisplayed {
   Reviewer,
 }
 
-export enum ArenaMode {
-  OnlyProblem,
-  Practice,
-  Course,
-  Contest,
-  Interview,
-}
-
 const numericSort = <T extends { [key: string]: any }>(key: string) => {
   const isDigit = (ch: string) => '0' <= ch && ch <= '9';
   return (x: T, y: T) => {
@@ -383,10 +376,9 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop() guid!: string;
   @Prop() isAdmin!: boolean;
-  @Prop({ default: ArenaMode.OnlyProblem }) arenaMode!: ArenaMode;
+  @Prop({ default: false }) showVisibilityOfSettingsSummaryIndicators!: boolean;
 
   PopupDisplayed = PopupDisplayed;
-  ArenaMode = ArenaMode;
   T = T;
   ui = ui;
   time = time;

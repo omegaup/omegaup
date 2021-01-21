@@ -32,7 +32,7 @@ describe('Details.vue', () => {
     title: 'hello omegaUp',
   } as types.ContestPublicDetails;
 
-  const sampleProblem = <types.ProblemInfo>{
+  const sampleProblem = {
     alias: 'triangulos',
     accepts_submissions: true,
     karel_problem: false,
@@ -121,7 +121,7 @@ describe('Details.vue', () => {
       source_name: 'Main.py3',
       source_url: 'blob:http://localhost:8001/url',
     },
-  };
+  } as types.ProblemInfo;
 
   it('Should handle details for a problem in a contest, practice mode', () => {
     const wrapper = mount(arena_ContestPractice, {

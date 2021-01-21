@@ -1,10 +1,5 @@
 {include file='head.tpl' jsfile=$jsfile inContest=$showNavigation inArena=true inline}
 
-{if $admin}
-			<audio id="notification-audio">
-				<source src="/media/notification.mp3" type="audio/mpeg" />
-			</audio>
-{/if}
 			<div id="title">
 				<h1><span class="contest-title"></span><sup class="socket-status" title="WebSocket"></sup></h1>
 				<div class="clock">00:00:00</div>

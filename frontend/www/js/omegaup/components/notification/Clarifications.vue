@@ -1,5 +1,8 @@
 <template>
   <li class="dropdown">
+    <audio v-if="isAdmin" data-notification-audio>
+      <source src="/media/notification.mp3" type="audio/mpeg" />
+    </audio>
     <a
       aria-expanded="false"
       aria-haspopup="true"
@@ -21,7 +24,10 @@
       </li>
       <li v-else>
         <ul class="notification-drawer">
-          <li v-for="clarification in clarifications">
+          <li
+            v-for="clarification in clarifications"
+            :key="clarification.clarification_id"
+          >
             <button
               :aria-label="T.wordsClose"
               class="close"
@@ -63,6 +69,7 @@ import T from '../../lang';
 @Component
 export default class Clarifications extends Vue {
   @Prop() initialClarifications!: types.Clarification[];
+  @Prop() isAdmin!: boolean;
   T = T;
 
   flashInterval: number = 0;
@@ -72,7 +79,7 @@ export default class Clarifications extends Vue {
   onPropertyChanged(newValue: types.Clarification[]): void {
     this.clarifications = newValue;
     const audio = <HTMLMediaElement>(
-      document.getElementById('notification-audio')
+      document.querySelectorAll('[data-notification-audio]')[0]
     );
     if (audio !== null) {
       audio.play();

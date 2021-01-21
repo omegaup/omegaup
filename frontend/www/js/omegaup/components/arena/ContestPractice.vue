@@ -1,8 +1,5 @@
 <template>
   <div data-contest-practice>
-    <audio v-if="admin" class="notification-audio">
-      <source src="/media/notification.mp3" type="audio/mpeg" />
-    </audio>
     <div class="title">
       <h1>
         <span>{{ contest.title }}</span>
@@ -18,7 +15,7 @@
           :in-assignment="false"
           :digits-after-decimal-point="contest.partialScore ? 2 : 0"
           @disable-active-problem="activeProblem = null"
-          @navigate-to-problem="onNavigateProblem"
+          @navigate-to-problem="onNavigateToProblem"
         ></omegaup-arena-navbar-problems>
       </div>
       <omegaup-arena-contest-summary
@@ -32,8 +29,10 @@
           :problem="problem"
           :active-tab="'problems'"
           :runs="runs"
-          :arena-mode="ArenaMode.Practice"
-        ></omegaup-problem-details>
+        >
+          <template #quality-nomination-buttons></template>
+          <template #best-solvers-list></template>
+        </omegaup-problem-details>
       </div>
     </div>
   </div>
@@ -45,7 +44,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_ContestSummary from './ContestSummaryV2.vue';
-import problem_Details, { ArenaMode } from '../problem/Details.vue';
+import problem_Details from '../problem/Details.vue';
 
 @Component({
   components: {
@@ -65,13 +64,16 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: true }) showClarifications!: boolean;
   @Prop({ default: true }) showDeadlines!: boolean;
 
-  ArenaMode = ArenaMode;
   T = T;
   activeProblem: string | null = this.problem?.alias ?? null;
-  runs: types.Run[] | undefined = [];
+  runs: types.Run[] = [];
 
-  onNavigateProblem(problemAlias: string) {
-    this.$emit('navigate-to-problem', this, problemAlias);
+  onNavigateToProblem(problemAlias: string) {
+    this.$emit('navigate-to-problem', {
+      activeProblem: this.activeProblem,
+      runs: this.runs,
+      problemAlias: problemAlias,
+    });
   }
 }
 </script>
