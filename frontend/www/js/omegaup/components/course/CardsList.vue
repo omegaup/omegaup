@@ -49,7 +49,7 @@
                   </div>
                   <div class="modal-body">
                     <omegaup-markdown
-                      :markdown="T[`${accessMode}CoursesModal`]"
+                      :markdown="courseModalByType(acessMode)"
                     ></omegaup-markdown>
                   </div>
                 </div>
@@ -128,6 +128,13 @@ export default class CourseList extends Vue {
     if (admissionMode === 'public') return T.courseListPublicCourses;
     if (admissionMode === 'student') return T.courseListIStudy;
     return '';
+  }
+
+  courseModalByType(accessMode: string): string {
+    if (accessMode === 'public') {
+      return T.publicCoursesModal;
+    }
+    return T.studentCoursesModal;
   }
 }
 </script>
