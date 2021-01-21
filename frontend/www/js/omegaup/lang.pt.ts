@@ -580,6 +580,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleCourseIntro: "Acesse o curso",
   omegaupTitleCourseNew: "Novo curso",
   omegaupTitleCourseStatistics: "Estat\u00edsticas do curso",
+  omegaupTitleCourses: "Cursos",
   omegaupTitleGroups: "Grupos",
   omegaupTitleGroupsEdit: "Editar grupo",
   omegaupTitleGroupsNew: "Novo grupo",
