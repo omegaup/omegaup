@@ -6,9 +6,18 @@ import T from '../../lang';
 import contest_Clone from './Clonev2.vue';
 
 describe('Clonev2.vue', () => {
-  const div = document.createElement('div');
-  div.id = 'root';
-  document.body.appendChild(div);
+  beforeAll(() => {
+    const div = document.createElement('div');
+    div.id = 'root';
+    document.body.appendChild(div);
+  });
+
+  afterAll(() => {
+    const rootDiv = document.getElementById('root');
+    if (rootDiv) {
+      document.removeChild(rootDiv);
+    }
+  });
 
   it('Should display the form', async () => {
     const wrapper = shallowMount(contest_Clone);
@@ -30,5 +39,7 @@ describe('Clonev2.vue', () => {
 
     await wrapper.find('button[type="submit"]').trigger('click');
     expect(wrapper.emitted('clone')).toBeDefined();
+
+    wrapper.destroy();
   });
 });
