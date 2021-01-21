@@ -23,7 +23,7 @@
               <font-awesome-icon icon="info-circle" />
             </div>
           </div>
-          <div class="col-lg-7 text-right align-self-center">
+          <div class="col-lg-7 text-right align-self-center my-2 my-lg-0">
             <a :href="`/course/list/${accessMode}/`">{{
               T.courseListSeeAllCourses
             }}</a>
@@ -36,6 +36,7 @@
                 <omegaup-course-card
                   v-for="course in filteredCourses.courses"
                   :key="course.alias"
+                  :is-public="accessMode === 'public'"
                   :course-name="course.name"
                   :course-alias="course.alias"
                   :school-name="course.school_name"
