@@ -1,7 +1,11 @@
 <template>
   <div class="card ml-3 mr-3 mb-3">
     <div class="m-3">
-      <div class="font-weight-bold float-left">{{ courseName }}</div>
+      <a
+        class="font-weight-bold float-left"
+        :href="`/course/${courseAlias}/`"
+        >{{ courseName }}</a
+      >
       <div class="float-right">{{ dueDate }}</div>
     </div>
     <div class="m-3">

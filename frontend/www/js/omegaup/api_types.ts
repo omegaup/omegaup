@@ -948,16 +948,15 @@ export namespace types {
               return x;
             });
           })(x.runs);
-        if (x.solvers)
-          x.solvers = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              x.time = ((x: number) => new Date(x * 1000))(x.time);
-              return x;
-            });
-          })(x.solvers);
+        x.solvers = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.solvers);
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
@@ -2236,7 +2235,7 @@ export namespace types {
     selectedPrivateTags?: string[];
     selectedPublicTags?: string[];
     solutionStatus?: string;
-    solvers?: types.BestSolvers[];
+    solvers: types.BestSolvers[];
     user: types.UserInfoForProblem;
   }
 

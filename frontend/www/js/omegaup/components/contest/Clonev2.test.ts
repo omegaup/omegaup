@@ -6,6 +6,10 @@ import T from '../../lang';
 import contest_Clone from './Clonev2.vue';
 
 describe('Clonev2.vue', () => {
+  const div = document.createElement('div');
+  div.id = 'root';
+  document.body.appendChild(div);
+
   it('Should display the form', async () => {
     const wrapper = shallowMount(contest_Clone);
 
@@ -13,7 +17,9 @@ describe('Clonev2.vue', () => {
   });
 
   it('Should pass the right arguments to event', async () => {
-    const wrapper = shallowMount(contest_Clone);
+    const wrapper = shallowMount(contest_Clone, {
+      attachTo: '#root',
+    });
 
     const contest = {
       alias: 'contestAlias',

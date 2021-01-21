@@ -33,7 +33,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemVersion=array{author: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, commit: string, committer: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, message?: string, parents?: list<string>, tree: array<string, string>|null, version: null|string}
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
- * @psalm-type ProblemDetailsPayload=array{allRuns?: list<Run>, problemLevel?: null|string, publicTags?: list<string>, levelTags?: list<string>, allowUserAddTags?: bool, selectedPublicTags?: list<string>, selectedPrivateTags?: list<string>,clarifications?: list<Clarification>, histogram: Histogram, nominationStatus?: NominationStatus, problem: ProblemInfo, runs?: list<Run>, solutionStatus?: string, solvers?: list<BestSolvers>, user: UserInfoForProblem}
+ * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, allRuns?: list<Run>, clarifications?: list<Clarification>, histogram: Histogram, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus?: string, solvers: list<BestSolvers>, user: UserInfoForProblem}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemListPayload=array{selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
@@ -4393,6 +4393,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $response = [
             'smartyProperties' => [
                 'payload' => [
+                    'solvers' => \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
+                        intval($problem->problem_id)
+                    ),
                     'histogram' => [
                         'difficultyHistogram' => $problem->difficulty_histogram,
                         'qualityHistogram' => $problem->quality_histogram,
@@ -4512,9 +4515,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     intval($problem->problem_id),
                     /*$problemsetId=*/null,
                     intval($r->identity->identity_id)
-                ),
-                'solvers' => \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
-                    intval($problem->problem_id)
                 ),
                 'solutionStatus' => self::getProblemSolutionStatus(
                     $problem,
