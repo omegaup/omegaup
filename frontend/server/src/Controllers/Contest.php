@@ -1716,8 +1716,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r['description'],
             'description'
         );
-        \OmegaUp\Validators::validateNumber($r['start_time'], 'start_time');
-        $startTime = $r['start_time'];
+        $startTime = $r->ensureTimestamp('start_time');
 
         $length = (
             $originalContest->finish_time->time -
@@ -1735,8 +1734,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'title' => $r['title'],
             'description' => $r['description'],
             'alias' => $alias,
-            'start_time' => $startTime,
-            'finish_time' => $startTime + $length,
+            'start_time' => $startTime->time,
+            'finish_time' => $startTime->time + $length,
             'scoreboard' => $originalContest->scoreboard,
             'points_decay_factor' => $originalContest->points_decay_factor,
             'submissions_gap' => $originalContest->submissions_gap,

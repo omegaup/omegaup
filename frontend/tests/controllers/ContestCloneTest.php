@@ -2,9 +2,23 @@
 
 class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
     /**
-     * Create clone of a contest
+     * A PHPUnit data provider for the test with different valid format dates.
+     *
+     * @return list<list<int|float>>
      */
-    public function testCreateContestClone() {
+    public function dateValueProvider(): array {
+        return [
+            [\OmegaUp\Time::get()],
+            [\OmegaUp\Time::get() + 0.047],
+        ];
+    }
+
+    /**
+     * @dataProvider dateValueProvider
+     * Create clone of a contest
+     * @param int|float $date
+     */
+    public function testCreateContestClone($date) {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
@@ -23,15 +37,17 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Clone the contest
         $login = self::login($contestData['director']);
-        $contestClonedData = \OmegaUp\Controllers\Contest::apiClone(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'title' => \OmegaUp\Test\Utils::createRandomString(),
-            'description' => \OmegaUp\Test\Utils::createRandomString(),
-            'alias' => $contestAlias,
-            'contest' => $contestData['contest'],
-            'start_time' => \OmegaUp\Time::get()
-        ]));
+        $contestClonedData = \OmegaUp\Controllers\Contest::apiClone(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'title' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => $contestAlias,
+                'contest' => $contestData['contest'],
+                'start_time' => $date,
+            ])
+        );
 
         $this->assertEquals($contestAlias, $contestClonedData['alias']);
 
