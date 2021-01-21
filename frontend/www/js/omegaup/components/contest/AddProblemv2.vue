@@ -95,14 +95,14 @@
         </div>
       </form>
     </div>
-    <table class="table table-striped">
+    <table class="table table-striped mb-0">
       <thead>
         <tr>
           <th></th>
-          <th>{{ T.contestAddproblemContestOrder }}</th>
-          <th>{{ T.contestAddproblemProblemName }}</th>
-          <th>{{ T.contestAddproblemProblemPoints }}</th>
-          <th>{{ T.contestAddproblemProblemRemove }}</th>
+          <th class="text-center">{{ T.contestAddproblemContestOrder }}</th>
+          <th class="text-center">{{ T.contestAddproblemProblemName }}</th>
+          <th class="text-center">{{ T.contestAddproblemProblemPoints }}</th>
+          <th class="text-center">{{ T.contestAddproblemProblemRemove }}</th>
         </tr>
       </thead>
       <tbody>
@@ -120,15 +120,17 @@
               ></span>
             </button>
           </td>
-          <td>{{ problem.order }}</td>
+          <td class="text-center">{{ problem.order }}</td>
           <td>
             <a :href="`/arena/problem/${problem.alias}/`">{{
               problem.alias
             }}</a>
           </td>
-          <td>{{ problem.points }}</td>
-          <td>
-            <button class="close" @click="onRemove(problem)">×</button>
+          <td class="text-right">{{ problem.points }}</td>
+          <td class="text-center">
+            <button class="close float-none" @click="onRemove(problem)">
+              ×
+            </button>
           </td>
         </tr>
       </tbody>
