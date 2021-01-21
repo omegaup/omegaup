@@ -1,6 +1,6 @@
 <template>
   <li class="dropdown">
-    <audio v-if="isAdmin" data-notification-audio>
+    <audio v-if="isAdmin" ref="notification-audio" data-notification-audio>
       <source src="/media/notification.mp3" type="audio/mpeg" />
     </audio>
     <a
@@ -78,9 +78,7 @@ export default class Clarifications extends Vue {
   @Watch('initialClarifications')
   onPropertyChanged(newValue: types.Clarification[]): void {
     this.clarifications = newValue;
-    const audio = <HTMLMediaElement>(
-      document.querySelectorAll('[data-notification-audio]')[0]
-    );
+    const audio = <HTMLMediaElement>this.$refs.notificationAudio;
     if (audio !== null) {
       audio.play();
     }

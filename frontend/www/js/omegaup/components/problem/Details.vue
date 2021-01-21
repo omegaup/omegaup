@@ -34,9 +34,7 @@
       >
         <omegaup-problem-settings-summary
           :problem="problem"
-          :show-visibility-indicators="
-            showVisibilityOfSettingsSummaryIndicators
-          "
+          :show-visibility-indicators="showVisibilityIndicators"
           :show-edit-link="user.admin"
         ></omegaup-problem-settings-summary>
 
@@ -376,7 +374,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop() guid!: string;
   @Prop() isAdmin!: boolean;
-  @Prop({ default: false }) showVisibilityOfSettingsSummaryIndicators!: boolean;
+  @Prop({ default: false }) showVisibilityIndicators!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
