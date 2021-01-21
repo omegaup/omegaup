@@ -1,7 +1,9 @@
 <template>
   <div class="card ml-3 mr-3 mb-3">
     <div class="m-3 d-flex justify-content-between">
-      <h5 class="font-weight-bold m-0">{{ courseName }}</h5>
+      <h5 class="font-weight-bold m-0">
+        <a :href="`/course/${courseAlias}/`">{{ courseName }}</a>
+      </h5>
       <div class="font-weight-bold" :class="isPublic ? 'public' : 'student'">
         {{ dueDate }}
       </div>
