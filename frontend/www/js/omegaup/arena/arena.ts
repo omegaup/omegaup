@@ -1602,6 +1602,11 @@ export class Arena {
     if (problemMatch && this.problems[problemMatch[1]]) {
       const newRun = problemMatch[2];
       const problem = (this.currentProblem = this.problems[problemMatch[1]]);
+
+      // Set link to edit problem
+      $('#edit-problem-link').text('Editar este problema');
+      $('#edit-problem-link').attr('href', `/problem/${problem.alias}/edit/`);
+
       // Set as active the selected problem
       if (this.navbarProblems) {
         this.navbarProblems.activeProblem = this.currentProblem.alias;
