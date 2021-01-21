@@ -67,6 +67,7 @@ OmegaUp.on('ready', () => {
           hasBeenNominated: this.hasBeenNominated,
           guid: this.guid,
           isAdmin: commonPayload.isAdmin,
+          showVisibilityIndicators: true,
         },
         on: {
           'show-run': (source: problem_Details, guid: string) => {
