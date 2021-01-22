@@ -4,7 +4,9 @@ import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
-import arena_ContestPractice from '../components/arena/ContestPractice.vue';
+import arena_ContestPractice, {
+  CurrentProblem,
+} from '../components/arena/ContestPractice.vue';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -24,17 +26,10 @@ OmegaUp.on('ready', () => {
           problem: this.problem,
         },
         on: {
-          'navigate-to-problem': (
-            source: {
-              activeProblem: string | null;
-              runs: types.Run[] | undefined;
-              problemAlias: string;
-            },
-            problemAlias: string,
-          ) => {
+          'navigate-to-problem': (source: CurrentProblem) => {
             api.Problem.details({
               contest_alias: payload.contest.alias,
-              problem_alias: problemAlias,
+              problem_alias: source.alias,
               prevent_problemset_open: false,
             })
               .then((problem_ext) => {
@@ -43,9 +38,9 @@ OmegaUp.on('ready', () => {
                   ({ alias }) => alias == problem_ext.alias,
                 );
                 problem_ext.title = currentProblem?.text ?? '';
-                source.activeProblem = problem_ext.alias;
-                source.runs = problem_ext.runs;
-                window.location.hash = `#problems/${problemAlias}`;
+                source.active = problem_ext.alias;
+                source.runs = problem_ext.runs ?? [];
+                window.location.hash = `#problems/${source.alias}`;
               })
               .catch(ui.apiError);
           },

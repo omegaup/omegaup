@@ -207,15 +207,6 @@ export namespace omegaup {
     alias?: string;
   }
 
-  export interface ContestProblem {
-    alias: string;
-    text: string;
-    acceptsSubmissions: boolean;
-    bestScore: number;
-    maxScore: number;
-    hasRuns?: boolean;
-  }
-
   export interface ContestResult {
     data: omegaup.Contest;
     length?: string;

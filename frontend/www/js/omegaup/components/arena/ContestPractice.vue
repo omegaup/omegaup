@@ -11,15 +11,15 @@
       <div class="navbar">
         <omegaup-arena-navbar-problems
           :problems="problems"
-          :active-problem="activeProblem"
+          :active-problem="currentProblem.active"
           :in-assignment="false"
           :digits-after-decimal-point="contest.partialScore ? 2 : 0"
-          @disable-active-problem="activeProblem = null"
+          @disable-active-problem="currentProblem.active = null"
           @navigate-to-problem="onNavigateToProblem"
         ></omegaup-arena-navbar-problems>
       </div>
       <omegaup-arena-contest-summary
-        v-if="activeProblem === null"
+        v-if="currentProblem.active === null"
         :contest="contest"
         :show-ranking="false"
       ></omegaup-arena-contest-summary>
@@ -28,7 +28,7 @@
           :user="{ loggedIn: true, admin: false, reviewer: false }"
           :problem="problem"
           :active-tab="'problems'"
-          :runs="runs"
+          :runs="currentProblem.runs"
         >
           <template #quality-nomination-buttons></template>
           <template #best-solvers-list></template>
@@ -45,6 +45,12 @@ import T from '../../lang';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_ContestSummary from './ContestSummaryV2.vue';
 import problem_Details from '../problem/Details.vue';
+
+export interface CurrentProblem {
+  active: string | null;
+  runs: types.Run[];
+  alias: null | string;
+}
 
 @Component({
   components: {
@@ -65,15 +71,15 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: true }) showDeadlines!: boolean;
 
   T = T;
-  activeProblem: string | null = this.problem?.alias ?? null;
-  runs: types.Run[] = [];
+  currentProblem: CurrentProblem = {
+    active: this.problem?.alias ?? null,
+    runs: [],
+    alias: null,
+  };
 
   onNavigateToProblem(problemAlias: string) {
-    this.$emit('navigate-to-problem', {
-      activeProblem: this.activeProblem,
-      runs: this.runs,
-      problemAlias: problemAlias,
-    });
+    this.currentProblem.alias = problemAlias;
+    this.$emit('navigate-to-problem', this.currentProblem);
   }
 }
 </script>
