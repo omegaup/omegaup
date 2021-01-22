@@ -331,6 +331,24 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'clone-contest': (
+            title: string,
+            alias: string,
+            description: string,
+            startTime: Date,
+          ) => {
+            api.Contest.clone({
+              contest_alias: payload.details.alias,
+              title: title,
+              alias: alias,
+              description: description,
+              start_time: startTime.getTime() / 1000,
+            })
+              .then(() => {
+                ui.success(T.contestEditContestClonedSuccessfully);
+              })
+              .catch(ui.apiError);
+          },
         },
       });
     },
