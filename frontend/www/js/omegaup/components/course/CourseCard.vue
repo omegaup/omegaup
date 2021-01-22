@@ -1,34 +1,28 @@
 <template>
   <div class="card ml-3 mr-3 mb-3">
-    <div class="m-3">
-      <a
-        class="font-weight-bold float-left"
-        :href="`/course/${courseAlias}/`"
-        >{{ courseName }}</a
-      >
-      <div class="float-right">{{ dueDate }}</div>
+    <div class="m-3 d-flex justify-content-between">
+      <h5 class="font-weight-bold m-0">
+        <a :href="`/course/${courseAlias}/`">{{ courseName }}</a>
+      </h5>
+      <div class="font-weight-bold" :class="isPublic ? 'public' : 'student'">
+        {{ dueDate }}
+      </div>
     </div>
-    <div class="m-3">
-      <div class="float-left align-middle">
+    <div class="mx-3 d-flex justify-content-between align-items-center">
+      <div>
         <omegaup-markdown :markdown="impartedBy"></omegaup-markdown>
       </div>
-      <div class="float-right">
-        <a :href="`/course/${courseAlias}/`" class="btn btn-primary">{{
-          buttonTitle
-        }}</a>
-      </div>
+      <a
+        :href="`/course/${courseAlias}/`"
+        class="btn btn-primary d-inline-block text-white"
+        >{{ buttonTitle }}</a
+      >
     </div>
-    <hr class="ml-3 mr-3" />
-    <div class="m-3">
-      <div v-if="progress > 0" class="float-right">
-        {{ T.wordsProgress }}:
-        <progress
-          :title="`${progress}%`"
-          :value="progress"
-          max="100"
-        ></progress>
-      </div>
-      <div v-if="showTopics" class="float-left align-middle">
+    <div class="dropdown-divider"></div>
+    <div
+      class="mx-3 mt-2 mb-3 d-flex justify-content-between align-items-start"
+    >
+      <div v-if="showTopics">
         <details>
           <summary>{{ T.courseCardShowTopics }}</summary>
           <ul>
@@ -37,6 +31,14 @@
             </li>
           </ul>
         </details>
+      </div>
+      <div v-if="progress > 0" class="d-flex align-items-center">
+        <div class="pr-1 pb-1">{{ T.wordsProgress }}:</div>
+        <progress
+          :title="`${progress}%`"
+          :value="progress"
+          max="100"
+        ></progress>
       </div>
     </div>
   </div>
@@ -64,6 +66,7 @@ export default class CourseCard extends Vue {
   @Prop() content!: types.CourseAssignment[];
   @Prop() isOpen!: boolean;
   @Prop() loggedIn!: boolean;
+  @Prop({ default: false }) isPublic!: boolean;
   @Prop({ default: false }) showTopics!: boolean;
 
   T = T;
@@ -92,3 +95,15 @@ export default class CourseCard extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.public {
+  color: $omegaup-pink;
+}
+
+.student {
+  color: $omegaup-blue;
+}
+</style>

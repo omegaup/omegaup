@@ -191,7 +191,7 @@ export default class Markdown extends Vue {
     page-break-inside: avoid;
   }
   p {
-    margin-bottom: 1.5em;
+    margin-bottom: 1em;
   }
 
   ul {
@@ -202,7 +202,7 @@ export default class Markdown extends Vue {
   }
   ul li,
   ol li {
-    margin-left: 2em;
+    margin-left: 0.25em;
   }
 
   pre {
