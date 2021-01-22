@@ -369,7 +369,8 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             0,
             $response['ranking'][0]['problems'][0]['penalty']
         );
-        $this->assertEquals(1, $response['ranking'][0]['problems'][0]['runs']);
+        // Now all the runs should show 0
+        $this->assertEquals(0, $response['ranking'][0]['problems'][0]['runs']);
     }
 
     /**
