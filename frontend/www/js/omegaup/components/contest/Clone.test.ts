@@ -3,9 +3,9 @@ import expect from 'expect';
 
 import T from '../../lang';
 
-import contest_Clone from './Clonev2.vue';
+import contest_Clone from './Clone.vue';
 
-describe('Clonev2.vue', () => {
+describe('Clone.vue', () => {
   beforeAll(() => {
     const div = document.createElement('div');
     div.id = 'root';

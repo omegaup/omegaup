@@ -1,27 +1,33 @@
 <template>
-  <div class="panel panel-primary">
-    <div class="panel-body">
-      <form class="clone_contest_form" @submit.prevent="onSubmit">
+  <div class="card">
+    <div class="card-body">
+      <form
+        class="form"
+        @submit.prevent="
+          $emit('clone', { title, alias, description, startTime })
+        "
+      >
         <div class="row">
           <div class="form-group col-md-6">
-            <label>{{ T.wordsTitle }}</label>
+            <label class="font-weight-bold">{{ T.wordsTitle }}</label>
             <input v-model="title" class="form-control" size="30" type="text" />
           </div>
           <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormShortTitleAlias }}</label>
-            <span
-              aria-hidden="true"
-              class="glyphicon glyphicon-info-sign"
-              data-placement="top"
-              data-toggle="tooltip"
-              :title="T.contestNewFormShortTitleAliasDesc"
-            ></span>
+            <label class="font-weight-bold">
+              {{ T.contestNewFormShortTitleAlias }}
+              <font-awesome-icon
+                :title="T.contestNewFormShortTitleAliasDesc"
+                icon="info-circle"
+              />
+            </label>
             <input v-model="alias" class="form-control" type="text" />
           </div>
         </div>
         <div class="row">
           <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormDescription }}</label>
+            <label class="font-weight-bold">{{
+              T.contestNewFormDescription
+            }}</label>
             <textarea
               v-model="description"
               class="form-control"
@@ -29,15 +35,14 @@
               rows="10"
             ></textarea>
           </div>
-          <div class="form-group col-md-3">
-            <label>{{ T.contestNewFormStartDate }}</label>
-            <span
-              aria-hidden="true"
-              class="glyphicon glyphicon-info-sign"
-              data-placement="top"
-              data-toggle="tooltip"
-              title="T.contestNewFormStartDateDesc"
-            ></span>
+          <div class="form-group col-md-4">
+            <label class="font-weight-bold">
+              {{ T.contestNewFormStartDate }}
+              <font-awesome-icon
+                :title="T.contestNewFormStartDateDesc"
+                icon="info-circle"
+              />
+            </label>
             <omegaup-datetime v-model="startTime"></omegaup-datetime>
           </div>
         </div>
@@ -56,9 +61,21 @@ import { Vue, Component } from 'vue-property-decorator';
 import T from '../../lang';
 import DateTime from '../DateTimePicker.vue';
 
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
 @Component({
   components: {
     'omegaup-datetime': DateTime,
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
 export default class Clone extends Vue {
@@ -67,9 +84,5 @@ export default class Clone extends Vue {
   alias = '';
   description = '';
   startTime = new Date();
-
-  onSubmit() {
-    this.$emit('emit-clone', this);
-  }
 }
 </script>

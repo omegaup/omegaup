@@ -59,7 +59,7 @@
             href="#"
             data-toggle="tab"
             class="dropdown-item"
-            :class="{ active: virtual && showTab === 'contestants' }"
+            :class="{ active: showTab === 'contestants' }"
             @click="showTab = 'contestants'"
             >{{ T.contestAdduserAddContestant }}</a
           >
@@ -171,6 +171,23 @@
           @emit-remove-group="(groupAlias) => $emit('remove-group', groupAlias)"
         ></omegaup-contest-groups>
       </div>
+      <div v-if="showTab === 'admins'" class="tab-pane active">
+        <omegaup-contest-admins
+          :admins="admins"
+          @add-admin="(username) => $emit('add-admin', username)"
+          @remove-admin="(username) => $emit('remove-admin', username)"
+        ></omegaup-contest-admins>
+        <div class="mt-2"></div>
+        <omegaup-contest-group-admins
+          :group-admins="groupAdmins"
+          @add-group-admin="
+            (groupAlias) => $emit('add-group-admin', groupAlias)
+          "
+          @remove-group-admin="
+            (groupAlias) => $emit('remove-group-admin', groupAlias)
+          "
+        ></omegaup-contest-group-admins>
+      </div>
       <div v-if="showTab === 'links'" class="tab-pane active">
         <omegaup-contest-links :data="details"></omegaup-contest-links>
       </div>
@@ -183,21 +200,6 @@
         ></omegaup-contest-clone>
       </div>
     </div>
-    <div v-if="showTab === 'admins'" class="tab-pane active">
-      <omegaup-contest-admins
-        :admins="admins"
-        @add-admin="(username) => $emit('add-admin', username)"
-        @remove-admin="(username) => $emit('remove-admin', username)"
-      ></omegaup-contest-admins>
-      <div class="mt-2"></div>
-      <omegaup-contest-group-admins
-        :group-admins="groupAdmins"
-        @add-group-admin="(groupAlias) => $emit('add-group-admin', groupAlias)"
-        @remove-group-admin="
-          (groupAlias) => $emit('remove-group-admin', groupAlias)
-        "
-      ></omegaup-contest-group-admins>
-    </div>
   </div>
 </template>
 
@@ -207,14 +209,14 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 
-import contest_AddProblem from './AddProblemv2.vue';
+import contest_AddProblem from './AddProblem.vue';
 import contest_AddContestant from './AddContestant.vue';
-import contest_Clone from './Clonev2.vue';
+import contest_Clone from './Clone.vue';
 import contest_Admins from '../common/Adminsv2.vue';
 import common_Requests from '../common/Requestsv2.vue';
 import contest_GroupAdmins from '../common/GroupAdminsv2.vue';
-import contest_Groups from './Groupsv2.vue';
-import contest_Links from './Linksv2.vue';
+import contest_Groups from './Groups.vue';
+import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
 import common_Publish from '../common/Publishv2.vue';
 
