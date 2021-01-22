@@ -250,6 +250,7 @@
 	"contestWillBeginIn": "This contest will begin in ",
 	"contestsCreateNew": "Create a new contest",
 	"contestsJoinScoreboards": "Merge scoreboards",
+	"courseActionScoreboard": "Scoreboard",
 	"courseAddContent": "Add content",
 	"courseAddProblemsAdd": "Add problems",
 	"courseAddProblemsAddAssignmentDesc": "Add all the problems that you want to include. These problems will be stored until you press the Add content button. If you do not want to decide which problems to use right now, you can add them later.",

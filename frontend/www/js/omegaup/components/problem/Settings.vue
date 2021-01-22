@@ -8,8 +8,8 @@
           name="languages"
           class="form-control"
           :class="{ 'is-invalid': errors.includes('languages') }"
-          @change="onLanguagesChange($event)"
           required
+          @change="onLanguagesChange($event)"
         >
           <option
             v-for="(languageText, languageIndex) in validLanguages"
@@ -182,7 +182,7 @@ export default class Settings extends Vue {
 
   @Emit('languages-changed')
   onLanguagesChange(event: Event): string {
-    const newValue = (<HTMLInputElement> event.target).value;
+    const newValue = (<HTMLInputElement>event.target).value;
     return newValue;
   }
 }
