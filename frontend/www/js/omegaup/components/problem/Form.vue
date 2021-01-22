@@ -59,6 +59,7 @@
           :validator-time-limit="validatorTimeLimit"
           :valid-languages="data.validLanguages"
           :validator-types="data.validatorTypes"
+          @languages-changed="languagesChanged"
         ></omegaup-problem-settings>
 
         <div class="row">
@@ -153,6 +154,7 @@
                 name="show_diff"
                 class="form-control"
                 :class="{ 'is-invalid': errors.includes('show_diff') }"
+                :disabled="languages === ''"
               >
                 <option value="none">{{ T.problemVersionDiffModeNone }}</option>
                 <option value="examples">{{ T.wordsOnlyExamples }}</option>
@@ -277,6 +279,10 @@ export default class ProblemForm extends Vue {
   message = '';
   hasFile = false;
   public = false;
+
+  languagesChanged(newValue: string): void {
+    this.languages = newValue;
+  }
 
   get howToWriteProblemLink(): string {
     return 'https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup';
