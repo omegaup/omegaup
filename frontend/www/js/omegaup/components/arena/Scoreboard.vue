@@ -17,7 +17,7 @@
           <th><!-- legend --></th>
           <th><!-- position --></th>
           <th>{{ T.wordsUser }}</th>
-          <th v-for="(problem, index) in problems">
+          <th v-for="(problem, index) in problems" :key="problem.alias">
             <a :href="'#problems/' + problem.alias" :title="problem.alias">{{
               ui.columnName(index)
             }}</a>
@@ -51,6 +51,7 @@
 
             <td
               v-for="(problem, problemIndex) in user.problems"
+              :key="problem.alias"
               :class="problemClass(problem, problems[problemIndex].alias)"
             >
               <template v-if="problem.runs > 0">
@@ -149,68 +150,67 @@ export default class ArenaScoreboard extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 .omegaup-scoreboard {
   max-width: 900px;
   margin: 0 auto;
-}
-.omegaup-scoreboard a {
-  color: #5588dd;
-}
-.omegaup-scoreboard .footer {
-  padding: 1em;
-  text-align: right;
-  font-size: 70%;
-  color: grey;
-}
-
-.omegaup-scoreboard table {
-  border-collapse: collapse;
-  width: 100%;
-}
-.omegaup-scoreboard th {
-  padding: 0.2em;
-  text-align: center;
-}
-.omegaup-scoreboard td {
-  text-align: center;
-  vertical-align: middle;
-  border: 1px solid #000;
-  padding: 0.2em;
-}
-.omegaup-scoreboard td.accepted {
-  background: #dfd;
-}
-.omegaup-scoreboard td.pending {
-  background: #ddf;
-}
-.omegaup-scoreboard td.wrong {
-  background: #fdd;
-}
-.omegaup-scoreboard td.position.recent-event {
-  font-weight: bold;
-  background: #dfd;
-}
-.omegaup-scoreboard td.accepted.recent-event {
-  background: #8f8;
-}
-.omegaup-scoreboard td .points {
-  font-weight: bold;
-}
-.omegaup-scoreboard td .penalty {
-  font-size: 70%;
-}
-.omegaup-scoreboard td.position {
-  width: 3.5em;
-}
-.omegaup-scoreboard td.legend {
-  width: 0.5em;
-}
-.omegaup-scoreboard td[class$='points'] {
-  width: 3.5em;
-  border-right-style: dotted;
-}
-.omegaup-scoreboard td[class$='penalty'] {
-  border-left-width: 0;
+  a {
+    color: #5588dd;
+  }
+  .footer {
+    padding: 1em;
+    text-align: right;
+    font-size: 70%;
+    color: grey;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th {
+    padding: 0.2em;
+    text-align: center;
+  }
+  td {
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #000;
+    padding: 0.2em;
+    .points {
+      font-weight: bold;
+    }
+    .penalty {
+      font-size: 70%;
+    }
+  }
+  td.accepted {
+    background: #dfd;
+  }
+  td.pending {
+    background: #ddf;
+  }
+  td.wrong {
+    background: #fdd;
+  }
+  td.position.recent-event {
+    font-weight: bold;
+    background: #dfd;
+  }
+  td.accepted.recent-event {
+    background: #8f8;
+  }
+  td.position {
+    width: 3.5em;
+  }
+  td.legend {
+    width: 0.5em;
+  }
+  td[class$='points'] {
+    width: 3.5em;
+    border-right-style: dotted;
+  }
+  td[class$='penalty'] {
+    border-left-width: 0;
+  }
 }
 </style>
