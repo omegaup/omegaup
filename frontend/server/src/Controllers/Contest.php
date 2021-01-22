@@ -870,7 +870,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param null|string $token
      */
-    public static function getContestEditv2ForSmarty(
+    public static function getContestEditForSmarty(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -954,24 +954,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 )
             ],
             'entrypoint' => 'contest_edit',
-        ];
-    }
-
-    /**
-     * @return array{smartyProperties: array{LANGUAGES: list<string>, IS_UPDATE: bool}, template: string}
-     */
-    public static function getContestEditForSmarty(
-        \OmegaUp\Request $r
-    ): array {
-        $r->ensureMainUserIdentity();
-        return [
-            'smartyProperties' => [
-                'LANGUAGES' => array_keys(
-                    \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
-                ),
-                'IS_UPDATE' => true,
-            ],
-            'template' => 'contest.edit.tpl',
         ];
     }
 

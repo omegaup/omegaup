@@ -41,7 +41,7 @@ module.exports = {
     common_navbar: './frontend/www/js/omegaup/common/navbar.ts',
     common_navbar_v2: './frontend/www/js/omegaup/common/navbar_v2.ts',
     common_stats: './frontend/www/js/omegaup/common/stats.ts',
-    contest_edit: './frontend/www/js/omegaup/contest/edit.js',
+    contest_edit: './frontend/www/js/omegaup/contest/edit.ts',
     contest_intro: './frontend/www/js/omegaup/contest/intro.ts',
     contest_list: './frontend/www/js/omegaup/contest/list.js',
     contest_list_participant:
