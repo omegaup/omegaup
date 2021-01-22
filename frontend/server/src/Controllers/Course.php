@@ -2760,6 +2760,20 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{entrypoint: string, smartyProperties: array{title: string}}
+     */
+    public static function getCoursesHomepageForSmarty(\OmegaUp\Request $r): array {
+        return [
+            'smartyProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCourses'
+                ),
+            ],
+            'entrypoint' => 'course_homepage',
+        ];
+    }
+
+    /**
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseCloneDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $course_alias
@@ -3026,9 +3040,21 @@ class Course extends \OmegaUp\Controllers\Controller {
         [
             'allProgress' => $allProgress,
             'problemTitles' => $problemTitles,
-        ] = \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
-            $course->course_id,
-            $course->group_id
+        ] = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
+            $courseAlias,
+            function () use ($course) {
+                if (is_null($course->course_id) || is_null($course->group_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'courseNotFound'
+                    );
+                }
+                return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+                    $course->course_id,
+                    $course->group_id
+                );
+            },
+            60 * 60 * 12 // 12 hours
         );
 
         return [
@@ -3075,6 +3101,22 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        ['allProgress' => $studentsProgress] = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
+            $courseAlias,
+            function () use ($course) {
+                if (is_null($course->course_id) || is_null($course->group_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'courseNotFound'
+                    );
+                }
+                return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+                    $course->course_id,
+                    $course->group_id
+                );
+            },
+            60 * 60 * 12 // 12 hours
+        );
         return [
             'smartyProperties' => [
                 'payload' => [
@@ -3083,10 +3125,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $r->identity
                     ),
                     // TODO: Get progress only for the given student, rather than every student.
-                    'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
-                        $course->course_id,
-                        $course->group_id
-                    )['allProgress'],
+                    'students' => $studentsProgress,
                     'student' => $r['student']
                 ],
                 'title' => new \OmegaUp\TranslationString(
