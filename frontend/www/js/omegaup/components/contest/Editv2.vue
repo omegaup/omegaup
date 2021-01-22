@@ -171,6 +171,17 @@
           @emit-remove-group="(groupAlias) => $emit('remove-group', groupAlias)"
         ></omegaup-contest-groups>
       </div>
+      <div v-if="showTab === 'links'" class="tab-pane active">
+        <omegaup-contest-links :data="details"></omegaup-contest-links>
+      </div>
+      <div v-if="showTab === 'clone'" class="tab-pane active">
+        <omegaup-contest-clone
+          @clone="
+            ({ title, alias, description, startTime }) =>
+              $emit('clone-contest', title, alias, description, startTime)
+          "
+        ></omegaup-contest-clone>
+      </div>
     </div>
     <div v-if="showTab === 'admins'" class="tab-pane active">
       <omegaup-contest-admins
@@ -198,12 +209,12 @@ import * as ui from '../../ui';
 
 import contest_AddProblem from './AddProblemv2.vue';
 import contest_AddContestant from './AddContestant.vue';
+import contest_Clone from './Clonev2.vue';
 import contest_Admins from '../common/Adminsv2.vue';
-import contest_Clone from './Clone.vue';
 import common_Requests from '../common/Requestsv2.vue';
 import contest_GroupAdmins from '../common/GroupAdminsv2.vue';
 import contest_Groups from './Groupsv2.vue';
-import contest_Links from './Links.vue';
+import contest_Links from './Linksv2.vue';
 import contest_NewForm from './NewForm.vue';
 import common_Publish from '../common/Publishv2.vue';
 
