@@ -3,7 +3,6 @@ import { types } from '../api_types';
 import Vue from 'vue';
 import T from '../lang';
 import contest_Edit from '../components/contest/Edit.vue';
-import contest_AddProblem from '../components/contest/AddProblemv2.vue';
 import * as ui from '../ui';
 import * as api from '../api';
 
@@ -131,7 +130,12 @@ OmegaUp.on('ready', () => {
           },
           'get-versions': (
             problemAlias: string,
-            addProblemComponent: contest_AddProblem,
+            addProblemComponent: {
+              versionLog: types.ProblemVersion[];
+              problems: types.ContestProblem[];
+              selectedRevision: types.ProblemVersion;
+              publishedRevision: types.ProblemVersion;
+            },
           ) => {
             api.Problem.versions({
               problem_alias: problemAlias,
