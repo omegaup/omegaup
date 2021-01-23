@@ -2821,7 +2821,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
-     * @omegaup-request-param bool|null $is_practice
      */
     public static function getCourseAdminDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();

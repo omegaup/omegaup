@@ -150,7 +150,7 @@ describe('Details.vue', () => {
     });
 
     expect(wrapper.find('.clock').text()).toBe('∞');
-    expect(wrapper.find('.socket-status').text()).toBe('•');
+    expect(wrapper.find('.socket-status').text()).toBe('✗');
     expect(wrapper.find('.problem-list').text()).toContain(
       'A. hello problem omegaUp',
     );
@@ -158,6 +158,6 @@ describe('Details.vue', () => {
       'B. hello other problem omegaUp',
     );
     expect(wrapper.text()).toContain(sampleProblem.points);
-    expect(wrapper.text()).toContain(time.formatDate(date));
+    expect(wrapper.text()).toContain(time.formatDateLocal(date));
   });
 });
