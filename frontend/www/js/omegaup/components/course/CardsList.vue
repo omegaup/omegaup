@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="card-header mb-3">
-      <h1>{{ T.courseCardAboutCourses }}</h1>
+      <h3>{{ T.courseCardAboutCourses }}</h3>
       <omegaup-markdown
         :markdown="T.courseCardDescriptionCourses"
       ></omegaup-markdown>
@@ -56,7 +56,7 @@
               </div>
             </div>
           </div>
-          <div class="col-lg-7 text-right align-middle">
+          <div class="col-lg-7 text-right align-self-center my-2 my-lg-0">
             <a :href="`/course/list/${accessMode}/`">{{
               T.courseListSeeAllCourses
             }}</a>
@@ -69,6 +69,7 @@
                 <omegaup-course-card
                   v-for="course in filteredCourses.courses"
                   :key="course.alias"
+                  :is-public="accessMode === 'public'"
                   :course-name="course.name"
                   :course-alias="course.alias"
                   :school-name="course.school_name"
@@ -118,7 +119,7 @@ library.add(fas);
     'omegaup-markdown': omegaup_Markdown,
   },
 })
-export default class CourseList extends Vue {
+export default class CourseCardsList extends Vue {
   @Prop() courses!: types.StudentCourses;
   @Prop() loggedIn!: boolean;
 
