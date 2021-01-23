@@ -29,6 +29,7 @@
     </ul>
     <div class="tab-content">
       <div
+        v-if="problem"
         class="tab-pane fade p-4"
         :class="{ 'show active': selectedTab === 'problems' }"
       >
@@ -232,14 +233,16 @@
         class="tab-pane fade p-4"
         :class="{ 'show active': selectedTab === 'clarifications' }"
       >
-        <omegaup-arena-clarification-list
-          :clarifications="clarifications"
-          :in-contest="false"
-          @clarification-response="
-            (id, responseText, isPublic) =>
-              $emit('clarification-response', id, responseText, isPublic)
-          "
-        ></omegaup-arena-clarification-list>
+        <slot name="quality-nomination-buttons">
+          <omegaup-arena-clarification-list
+            :clarifications="clarifications"
+            :in-contest="false"
+            @clarification-response="
+              (id, responseText, isPublic) =>
+                $emit('clarification-response', id, responseText, isPublic)
+            "
+          ></omegaup-arena-clarification-list>
+        </slot>
       </div>
     </div>
   </div>
@@ -375,6 +378,8 @@ export default class ProblemDetails extends Vue {
   @Prop() guid!: string;
   @Prop() isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
+  @Prop({ default: false }) shouldShowSolutions!: boolean;
+  @Prop({ default: false }) shouldShowClarifications!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
@@ -398,7 +403,7 @@ export default class ProblemDetails extends Vue {
       {
         name: 'solution',
         text: T.wordsSolution,
-        visible: this.user.loggedIn,
+        visible: this.user.loggedIn && this.shouldShowSolutions,
       },
       {
         name: 'runs',
@@ -408,7 +413,7 @@ export default class ProblemDetails extends Vue {
       {
         name: 'clarifications',
         text: T.wordsClarifications,
-        visible: this.user.admin,
+        visible: this.user.admin || this.shouldShowClarifications,
       },
     ];
     return tabs.filter((tab) => tab.visible);

@@ -2826,7 +2826,6 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function getCourseAdminDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
-        $isPractice = $r->ensureOptionalBool('is_practice') ?? false;
         $courseAlias = $r->ensureString(
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
@@ -2863,7 +2862,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 ],
             ],
             'template' => 'arena.course.admin.tpl',
-            'inContest' => !$isPractice,
+            'inContest' => true,
         ];
     }
 
