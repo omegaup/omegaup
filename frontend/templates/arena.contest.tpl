@@ -49,7 +49,7 @@
 				<div id="problem" class="main">
 					<div id="problem-settings-summary"></div>
 {if $admin}
-					<a id="edit-problem-link"></a>
+					<a id="edit-problem-link">{#omegaupTitleProblemEdit#}</a>
 {/if}
 					<div class="karel-js-link hide">
 						<a href="/karel.js/" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>

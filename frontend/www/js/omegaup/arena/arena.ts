@@ -1604,8 +1604,9 @@ export class Arena {
       const problem = (this.currentProblem = this.problems[problemMatch[1]]);
 
       // Set link to edit problem
-      $('#edit-problem-link').text('Editar este problema');
-      $('#edit-problem-link').attr('href', `/problem/${problem.alias}/edit/`);
+      document
+        .querySelector('#edit-problem-link')
+        ?.setAttribute('href', `/problem/${problem.alias}/edit/`);
 
       // Set as active the selected problem
       if (this.navbarProblems) {
