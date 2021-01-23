@@ -8,7 +8,6 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-course-homepage': course_Homepage,
     },
-    data: () => {},
     render: (createElement) => {
       return createElement('omegaup-course-homepage');
     },
