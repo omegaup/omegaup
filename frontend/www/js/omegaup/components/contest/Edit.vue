@@ -41,7 +41,7 @@
             v-if="!virtual"
             href="#"
             data-toggle="tab"
-            class="dropdown-item problem"
+            class="dropdown-item problems"
             :class="{ active: showTab === 'problems' }"
             @click="showTab = 'problems'"
             >{{ T.wordsAddProblem }}</a
