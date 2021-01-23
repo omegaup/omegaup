@@ -11,8 +11,8 @@ describe('AddStudents.vue', () => {
     const wrapper = shallowMount(course_AddStudents, {
       propsData: {
         courseAlias: 'course_alias',
-        students: <types.CourseStudent[]>[],
-        identityRequests: <types.IdentityRequest[]>[],
+        students: [] as types.CourseStudent[],
+        identityRequests: [] as types.IdentityRequest[],
       },
     });
 
@@ -23,13 +23,13 @@ describe('AddStudents.vue', () => {
     const wrapper = shallowMount(course_AddStudents, {
       propsData: {
         courseAlias: 'course_alias',
-        students: <types.CourseStudent[]>[
+        students: [
           {
             name: 'omegaUp user',
             username: 'user',
           },
-        ],
-        identityRequests: <types.IdentityRequest[]>[
+        ] as types.CourseStudent[],
+        identityRequests: [
           {
             accepted: false,
             country: 'mx',
@@ -37,7 +37,7 @@ describe('AddStudents.vue', () => {
             request_time: new Date(),
             username: 'user_1',
           },
-        ],
+        ] as types.IdentityRequest[],
       },
     });
 

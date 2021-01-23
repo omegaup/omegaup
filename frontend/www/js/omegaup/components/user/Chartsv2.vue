@@ -322,11 +322,11 @@ export default class UserCharts extends Vue {
       },
       series: this.runsForPeriod.map(
         (x) =>
-          <Highcharts.SeriesColumnOptions>{
+          ({
             data: x.data,
             name: x.name,
             type: 'column',
-          },
+          } as Highcharts.SeriesColumnOptions),
       ),
     };
   }

@@ -57,16 +57,16 @@ OmegaUp.on('ready', () => {
           alias: 'problema',
           title: 'Tu problema',
           source: 'fuente',
-          problemsetter: <types.ProblemsetterInfo>{
+          problemsetter: {
             classname: 'user-rank-unranked',
             name: 'tu-usuario',
             username: 'tu_usuario',
-          },
-          statement: <types.ProblemStatement>{
+          } as types.ProblemsetterInfo,
+          statement: {
             markdown: markdownStatement,
             language: 'es',
             images: {},
-          },
+          } as types.ProblemStatement,
           markdownType: 'statements',
           showEditControls: false,
         },

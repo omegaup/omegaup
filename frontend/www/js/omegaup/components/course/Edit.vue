@@ -262,7 +262,7 @@ import common_GroupAdmins from '../common/GroupAdmins.vue';
 import course_Clone from './Clone.vue';
 import course_GenerateLinkClone from './GenerateLinkClone.vue';
 import T from '../../lang';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
 
 const now = new Date();
@@ -334,7 +334,7 @@ export default class CourseEdit extends Vue {
     this.assignmentProblems = [];
     this.$nextTick(() => {
       this.assignmentDetails.$el.scrollIntoView();
-      (<HTMLElement>this.assignmentDetails.$refs.name).focus();
+      (this.assignmentDetails.$refs.name as HTMLElement).focus();
     });
   }
 
@@ -344,7 +344,7 @@ export default class CourseEdit extends Vue {
     this.$emit('select-assignment', this.assignment);
     this.$nextTick(() => {
       this.assignmentDetails.$el.scrollIntoView();
-      (<HTMLElement>this.assignmentDetails.$refs.name).focus();
+      (this.assignmentDetails.$refs.name as HTMLElement).focus();
     });
   }
 

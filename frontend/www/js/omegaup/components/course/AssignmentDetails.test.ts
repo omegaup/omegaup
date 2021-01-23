@@ -10,7 +10,7 @@ describe('AssignmentDetails.vue', () => {
   it('Should handle empty assignments and progress as admin', () => {
     const wrapper = shallowMount(course_AssignmentDetails, {
       propsData: {
-        assignment: <omegaup.Assignment>{},
+        assignment: {} as omegaup.Assignment,
         assignmentFormMode: omegaup.AssignmentFormMode.New,
         finishTimeCourse: new Date(),
         startTimeCourse: new Date(),

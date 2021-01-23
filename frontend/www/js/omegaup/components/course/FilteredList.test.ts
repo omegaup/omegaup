@@ -2,14 +2,14 @@ import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 
 import T from '../../lang';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import course_FilteredList from './FilteredList.vue';
 
 const noop = () => {};
 const baseFilteredCoursesListProps = {
   activeTab: 'past',
-  courses: <types.CoursesByAccessMode>{
+  courses: {
     accessMode: 'public',
     activeTab: 'current',
     filteredCourses: {
@@ -47,7 +47,7 @@ const baseFilteredCoursesListProps = {
         timeType: 'past',
       },
     },
-  },
+  } as types.CoursesByAccessMode,
 };
 Object.defineProperty(window, 'scrollTo', { value: noop, writable: true });
 

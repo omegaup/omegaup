@@ -2,7 +2,7 @@ jest.mock('../../../../third_party/js/diff_match_patch.js');
 
 import { mount } from '@vue/test-utils';
 import expect from 'expect';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 import * as time from '../../time';
 
 import arena_ContestPractice from './ContestPractice.vue';
@@ -85,7 +85,7 @@ describe('Details.vue', () => {
     visibility: 2,
     input_limit: 1000,
     guid: '80bbe93bc01c1d47ff9fb396dfaff741',
-    runDetailsData: <types.RunDetails>{
+    runDetailsData: {
       admin: false,
       alias: 'sumas',
       cases: {},
@@ -120,7 +120,7 @@ describe('Details.vue', () => {
       source_link: false,
       source_name: 'Main.py3',
       source_url: 'blob:http://localhost:8001/url',
-    },
+    } as types.RunDetails,
   } as types.ProblemInfo;
 
   it('Should handle details for a problem in a contest, practice mode', () => {

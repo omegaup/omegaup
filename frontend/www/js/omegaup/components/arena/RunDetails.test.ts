@@ -4,7 +4,7 @@ import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 
 import T from '../../lang';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import arena_RunDetails from './RunDetails.vue';
 
@@ -12,7 +12,7 @@ describe('RunDetails.vue', () => {
   it('Should handle run details', () => {
     const wrapper = shallowMount(arena_RunDetails, {
       propsData: {
-        data: <types.RunDetails>{
+        data: {
           admin: false,
           alias: 'sumas',
           cases: {},
@@ -47,7 +47,7 @@ describe('RunDetails.vue', () => {
           source_link: false,
           source_name: 'Main.py3',
           source_url: 'blob:http://localhost:8001/url',
-        },
+        } as types.RunDetails,
       },
     });
 

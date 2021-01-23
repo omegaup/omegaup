@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import course_CloneWithToken from './CloneWithToken.vue';
 
@@ -10,7 +10,7 @@ describe('CloneWithToken.vue', () => {
     const courseName = 'Test course';
     const wrapper = shallowMount(course_CloneWithToken, {
       propsData: {
-        course: <types.CourseDetails>{
+        course: {
           admission_mode: 'private',
           alias: 'test-course',
           assignments: [],
@@ -27,7 +27,7 @@ describe('CloneWithToken.vue', () => {
           start_time: new Date(),
           student_count: 1,
           unlimited_duration: false,
-        },
+        } as types.CourseDetails,
         username: 'omegaup',
         classname: 'user-rank-unranked',
         token: 'fak3T0k3n',
