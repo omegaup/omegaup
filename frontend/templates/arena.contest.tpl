@@ -49,14 +49,7 @@
 				<div id="problem" class="main">
 					<div id="problem-settings-summary"></div>
 {if $admin}
-					<form enctype="multipart/form-data" action="/api/problem/update" method="post" id="update-problem">
-						<fieldset>
-							<legend>Administrar problema</legend>
-							<input name="problem_alias" type="hidden" />
-							<input name="problem_contents" type="file" />
-							<button type="submit">Actualizar casos/redacci&oacute;n</button>
-						</fieldset>
-					</form>
+					<a id="edit-problem-link">{#omegaupTitleProblemEdit#}</a>
 {/if}
 					<div class="karel-js-link hide">
 						<a href="/karel.js/" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>
