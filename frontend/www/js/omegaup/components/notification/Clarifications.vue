@@ -63,7 +63,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 import T from '../../lang';
 
 @Component
@@ -78,7 +78,7 @@ export default class Clarifications extends Vue {
   @Watch('initialClarifications')
   onPropertyChanged(newValue: types.Clarification[]): void {
     this.clarifications = newValue;
-    const audio = <HTMLMediaElement>this.$refs.notificationAudio;
+    const audio = this.$refs.notificationAudio as HTMLMediaElement;
     if (audio !== null) {
       audio.play();
     }

@@ -27,6 +27,9 @@ module.exports = {
     // functions from being defined.
     '@typescript-eslint/no-empty-function': 'off',
 
+    // Avoid using bracket type assertions, since those are the old syntax.
+    '@typescript-eslint/consistent-type-assertions': 'error',
+
     // TODO: Remove when we migrate to Vue 3, since this syntax doesn't _quite_
     // work all the time in Vue 2.
     'vue/no-deprecated-v-bind-sync': 'off',
@@ -34,7 +37,7 @@ module.exports = {
     // TODO(#4778): Add key to ALL v-for.
     'vue/require-v-for-key': 'off',
 
-    // TODO: Remove when we migrate to Vue 3, beacuse of 
+    // TODO: Remove when we migrate to Vue 3, beacause of
     // https://v3.vuejs.org/guide/migration/key-attribute.html#with-template-v-for
     'vue/no-v-for-template-key-on-child': 'off',
 

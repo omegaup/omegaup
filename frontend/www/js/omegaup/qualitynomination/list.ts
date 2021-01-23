@@ -7,10 +7,10 @@ import { types, messages } from '../api_types';
 
 OmegaUp.on('ready', function () {
   const payload = JSON.parse(
-    (<HTMLElement>document.getElementById('payload')).innerText,
+    (document.getElementById('payload') as HTMLElement).innerText,
   );
   const headerPayload = JSON.parse(
-    (<HTMLElement>document.getElementById('header-payload')).innerText,
+    (document.getElementById('header-payload') as HTMLElement).innerText,
   );
 
   const nominationsList = new Vue({
@@ -19,8 +19,8 @@ OmegaUp.on('ready', function () {
       'omegaup-qualitynomination-list': qualitynomination_List,
     },
     data: () => ({
-      nominations: <types.NominationListItem[]>[],
-      pagerItems: <types.PageItem[]>[],
+      nominations: [] as types.NominationListItem[],
+      pagerItems: [] as types.PageItem[],
       pages: 1,
     }),
     render: function (createElement) {

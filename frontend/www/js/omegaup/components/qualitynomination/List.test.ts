@@ -2,14 +2,14 @@ import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 import T from '../../lang';
 import qualitynomination_List from './List.vue';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 describe('List.vue', () => {
   it('Should handle list of nominations', async () => {
     const wrapper = shallowMount(qualitynomination_List, {
       propsData: {
-        nominations: <types.NominationListItem[]>[
-          <types.NominationListItem>{
+        nominations: [
+          {
             author: {
               name: 'nombre',
               username: 'user',
@@ -32,8 +32,8 @@ describe('List.vue', () => {
             status: 'open',
             time: new Date('2020-06-03 23:46:10'),
             votes: [],
-          },
-        ],
+          } as types.NominationListItem,
+        ] as types.NominationListItem[],
         pagerItems: [
           {
             class: 'disabled',

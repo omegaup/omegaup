@@ -589,9 +589,9 @@ export class Arena {
       },
       data: () => ({
         markdown: '',
-        imageMapping: <markdown.ImageMapping>{},
-        sourceMapping: <markdown.SourceMapping>{},
-        problemSettings: <types.ProblemSettingsDistrib | undefined>undefined,
+        imageMapping: {} as markdown.ImageMapping,
+        sourceMapping: {} as markdown.SourceMapping,
+        problemSettings: undefined as types.ProblemSettingsDistrib | undefined,
       }),
       render: function (createElement) {
         return createElement('omegaup-markdown', {
@@ -623,11 +623,12 @@ export class Arena {
     $('.libinteractive-download form').on('submit', (e: Event) => {
       e.preventDefault();
 
-      const form = <HTMLElement>e.target;
+      const form = e.target as HTMLElement;
       const alias = this.currentProblem.alias;
       const commit = this.currentProblem.commit;
-      const os = (<HTMLInputElement>form.querySelector('.download-os'))?.value;
-      const lang = (<HTMLInputElement>form.querySelector('.download-lang'))
+      const os = (form.querySelector('.download-os') as HTMLInputElement)
+        ?.value;
+      const lang = (form.querySelector('.download-lang') as HTMLInputElement)
         ?.value;
       const extension = os == 'unix' ? '.tar.bz2' : '.zip';
 
@@ -637,7 +638,7 @@ export class Arena {
     });
 
     $('.libinteractive-download .download-lang').on('change', (e: Event) => {
-      let form = <HTMLElement>e.target;
+      let form = e.target as HTMLElement;
       while (!form.classList.contains('libinteractive-download')) {
         if (!form.parentElement) {
           return;
@@ -646,7 +647,7 @@ export class Arena {
       }
       $(form)
         .find('.libinteractive-extension')
-        .html(<string>$(<HTMLElement>e.target).val());
+        .html($(e.target as HTMLElement).val() as string);
     });
 
     $('.output-only-download a').attr(
@@ -812,20 +813,18 @@ export class Arena {
     $('#title .contest-title').text(problemset.title ?? problemset.name ?? '');
     this.updateSummary({
       ...problemset,
-      alias: <string>problemset.alias,
-      title: <string>problemset.title,
-      start_time: <Date>problemset.start_time,
-      admission_mode: <omegaup.AdmissionMode | undefined>(
-        problemset.admission_mode
-      ),
-      requests_user_information: <omegaup.RequestsUserInformation | undefined>(
-        problemset.requests_user_information
-      ),
+      alias: problemset.alias as string,
+      title: problemset.title as string,
+      start_time: problemset.start_time as Date,
+      admission_mode: problemset.admission_mode as
+        | omegaup.AdmissionMode
+        | undefined,
+      requests_user_information: problemset.requests_user_information,
     });
     this.submissionGap = Math.max(0, problemset.submissions_gap ?? 60);
 
     this.initClock(
-      <Date>problemset.start_time,
+      problemset.start_time as Date,
       problemset.finish_time ?? null,
       problemset.submission_deadline ?? null,
     );
@@ -850,7 +849,7 @@ export class Arena {
         $('<option>')
           .val(problem.alias)
           .text(problemName)
-          .appendTo(<Element>problemSelect);
+          .appendTo(problemSelect as Element);
       }
     }
 
@@ -1006,12 +1005,12 @@ export class Arena {
   onVirtualRankingChange(virtualContestData: types.Scoreboard): void {
     // This clones virtualContestData to data so that virtualContestData values
     // won't be overriden by processes below
-    const data = <types.Scoreboard>(
-      JSON.parse(JSON.stringify(virtualContestData.ranking))
-    );
-    const dataRanking = <
-      (types.ScoreboardRankingEntry & { virtual?: boolean })[]
-    >data.ranking;
+    const data = JSON.parse(
+      JSON.stringify(virtualContestData.ranking),
+    ) as types.Scoreboard;
+    const dataRanking: (types.ScoreboardRankingEntry & {
+      virtual?: boolean;
+    })[] = data.ranking;
     const events = this.originalContestScoreboardEvents ?? [];
     const currentDelta =
       (new Date().getTime() - (this.startTime?.getTime() ?? 0)) / (1000 * 60);
@@ -1311,8 +1310,8 @@ export class Arena {
     if (series.length == 0 || !this.elements.ranking) return;
 
     this.rankingChart = Highcharts.stockChart(
-      <HTMLElement>document.getElementById('ranking-chart'),
-      <Highcharts.Options>{
+      document.getElementById('ranking-chart') as HTMLElement,
+      {
         chart: { height: 300, spacingTop: 20 },
 
         colors: scoreboardColors,
@@ -1358,7 +1357,7 @@ export class Arena {
         rangeSelector: { enabled: false },
 
         series: series,
-      },
+      } as Highcharts.Options,
     );
   }
 
@@ -1392,11 +1391,9 @@ export class Arena {
         clarifications.push(clarification);
       }
     } else {
-      r = <HTMLElement | null>(
-        document
-          .querySelector('.clarifications tbody.clarification-list tr.template')
-          ?.cloneNode(true)
-      );
+      r = document
+        .querySelector('.clarifications tbody.clarification-list tr.template')
+        ?.cloneNode(true) as HTMLElement | null;
       if (r) {
         r.classList.remove('template');
         r.classList.add('inserted');
@@ -1452,9 +1449,10 @@ export class Arena {
             api.Clarification.update({
               clarification_id: id,
               answer: responseText,
-              public: (<HTMLInputElement>(
-                $('.create-response-is-public', responseFormNode)[0]
-              )).checked,
+              public: ($(
+                '.create-response-is-public',
+                responseFormNode,
+              )[0] as HTMLInputElement).checked,
             })
               .then(() => {
                 $('pre', answerNode).html(responseText);
@@ -1862,9 +1860,9 @@ export class Arena {
       this.markdownView.sourceMapping = problem.statement.sources;
       this.markdownView.problemSettings = problem.settings;
     }
-    const creationDateElement = <HTMLElement>(
-      document.querySelector('#problem .problem-creation-date')
-    );
+    const creationDateElement = document.querySelector(
+      '#problem .problem-creation-date',
+    ) as HTMLElement;
     if (problem.problemsetter?.creation_date && creationDateElement) {
       creationDateElement.innerText = ui.formatString(T.wordsUploadedOn, {
         date: time.formatDate(problem.problemsetter.creation_date),
@@ -1873,9 +1871,9 @@ export class Arena {
   }
 
   onProblemRendered(): void {
-    const libinteractiveInterfaceNameElement = <HTMLElement>(
-      this.markdownView.$el.querySelector('span.libinteractive-interface-name')
-    );
+    const libinteractiveInterfaceNameElement = this.markdownView.$el.querySelector(
+      'span.libinteractive-interface-name',
+    ) as HTMLElement;
     if (
       libinteractiveInterfaceNameElement &&
       this.currentProblem.settings?.interactive?.module_name
@@ -1976,8 +1974,8 @@ export class Arena {
 
   onCloseSubmit(e: Event): void {
     if (
-      (<HTMLElement>e.target).id !== 'overlay' &&
-      (<HTMLElement>e.target).closest('button.close') === null
+      (e.target as HTMLElement).id !== 'overlay' &&
+      (e.target as HTMLElement).closest('button.close') === null
     ) {
       return;
     }
@@ -2057,7 +2055,8 @@ export class Arena {
         };
         this.updateRun(run);
         if (this.runSubmitView) {
-          const component = <arena_RunSubmit>this.runSubmitView.$refs.component;
+          const component = this.runSubmitView.$refs
+            .component as arena_RunSubmit;
           component.clearForm();
           // Wait until the code view has been cleared before hiding the
           // overlay. Not doing so will sometimes cause the contents of the
@@ -2149,13 +2148,12 @@ export class Arena {
           !this.options.contestAlias || this.options.contestAlias === 'admin'
             ? data.show_diff
             : 'none',
-        feedback: <omegaup.SubmissionFeedback>(
-          ((this.options.contestAlias && this.currentProblemset?.feedback) ||
-            'detailed')
-        ),
+        feedback: ((this.options.contestAlias &&
+          this.currentProblemset?.feedback) ||
+          'detailed') as omegaup.SubmissionFeedback,
       });
-      const runDetailsView = <HTMLElement | null>(
-        document.querySelector('[data-run-details-view]')
+      const runDetailsView: HTMLElement | null = document.querySelector(
+        '[data-run-details-view]',
       );
       if (runDetailsView) runDetailsView.style.display = 'block';
     }
@@ -2308,13 +2306,11 @@ export function GetOptionsFromLocation(
     options.disableSockets = true;
   }
   if (document.getElementById('payload')) {
-    const payload = <
-      types.CommonPayload & {
-        shouldShowFirstAssociatedIdentityRunWarning?: boolean;
-        contest?: omegaup.Contest;
-        preferred_language?: string;
-      }
-    >types.payloadParsers.CommonPayload();
+    const payload = types.payloadParsers.CommonPayload() as types.CommonPayload & {
+      shouldShowFirstAssociatedIdentityRunWarning?: boolean;
+      contest?: omegaup.Contest;
+      preferred_language?: string;
+    };
     if (payload !== null) {
       options.shouldShowFirstAssociatedIdentityRunWarning =
         payload.shouldShowFirstAssociatedIdentityRunWarning || false;
@@ -2416,9 +2412,9 @@ export class EphemeralGrader {
   loaded: boolean;
 
   constructor() {
-    this.ephemeralEmbeddedGraderElement = <null | HTMLIFrameElement>(
-      document.getElementById('ephemeral-embedded-grader')
-    );
+    this.ephemeralEmbeddedGraderElement = document.getElementById(
+      'ephemeral-embedded-grader',
+    ) as null | HTMLIFrameElement;
     this.messageQueue = [];
     this.loaded = false;
 
@@ -2449,7 +2445,7 @@ export class EphemeralGrader {
     if (!this.ephemeralEmbeddedGraderElement) {
       return;
     }
-    (<Window>this.ephemeralEmbeddedGraderElement.contentWindow).postMessage(
+    (this.ephemeralEmbeddedGraderElement.contentWindow as Window).postMessage(
       message,
       `${window.location.origin}/grader/ephemeral/embedded/`,
     );
