@@ -23,7 +23,7 @@ export default class Autocomplete extends Vue {
   @Prop() init!: (el: JQuery<HTMLElement>) => void;
 
   mounted() {
-    this.init($(<HTMLElement>this.$refs.input));
+    this.init($(this.$refs.input as HTMLElement));
   }
 
   @Emit('input')

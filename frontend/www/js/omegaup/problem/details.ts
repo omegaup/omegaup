@@ -27,9 +27,9 @@ OmegaUp.on('ready', () => {
     data: () => ({
       initialClarifications: payload.clarifications,
       initialPopupDisplayed: PopupDisplayed.None,
-      runDetailsData: <types.RunDetails | null>null,
+      runDetailsData: null as types.RunDetails | null,
       solutionStatus: payload.solutionStatus,
-      solution: <types.ProblemStatement | null>null,
+      solution: null as types.ProblemStatement | null,
       availableTokens: 0,
       allTokens: 0,
       activeTab: window.location.hash ? locationHash[0] : 'problems',
@@ -38,7 +38,7 @@ OmegaUp.on('ready', () => {
         payload.nominationStatus?.nominated ||
         (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
-      guid: <null | string>null,
+      guid: null as null | string,
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
@@ -67,6 +67,7 @@ OmegaUp.on('ready', () => {
           hasBeenNominated: this.hasBeenNominated,
           guid: this.guid,
           isAdmin: commonPayload.isAdmin,
+          showVisibilityIndicators: true,
         },
         on: {
           'show-run': (source: problem_Details, guid: string) => {

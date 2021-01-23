@@ -4,13 +4,13 @@ import expect from 'expect';
 import T from '../../lang';
 
 import arena_Solvers from './Solvers.vue';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 describe('Solvers.vue', () => {
   it('Should handle empty solvers list', () => {
     const wrapper = shallowMount(arena_Solvers, {
       propsData: {
-        solvers: <types.BestSolvers[]>[],
+        solvers: [] as types.BestSolvers[],
       },
     });
 
@@ -20,7 +20,7 @@ describe('Solvers.vue', () => {
   it('Should handle solvers list', async () => {
     const wrapper = shallowMount(arena_Solvers, {
       propsData: {
-        solvers: <types.BestSolvers[]>[
+        solvers: [
           {
             classname: 'user-rank-unranked',
             language: 'py3',
@@ -29,7 +29,7 @@ describe('Solvers.vue', () => {
             time: new Date(),
             username: 'username',
           },
-        ],
+        ] as types.BestSolvers[],
       },
     });
 

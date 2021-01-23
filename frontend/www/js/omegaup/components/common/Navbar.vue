@@ -178,6 +178,7 @@
           <omegaup-notifications-clarifications
             v-if="inContest"
             :initial-clarifications="initialClarifications"
+            :is-admin="isAdmin"
           ></omegaup-notifications-clarifications>
           <li
             class="dropdown nav-user"

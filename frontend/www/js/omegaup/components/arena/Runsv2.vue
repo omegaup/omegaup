@@ -524,7 +524,7 @@ export default class Runsv2 extends Vue {
   }
 
   showVerdictHelp(ev: Event): void {
-    $(<HTMLElement>ev.target).popover('show');
+    $(ev.target as HTMLElement).popover('show');
   }
 
   statusColor(run: types.Run): string {

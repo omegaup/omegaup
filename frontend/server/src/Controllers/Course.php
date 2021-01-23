@@ -2760,6 +2760,20 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{entrypoint: string, smartyProperties: array{title: string}}
+     */
+    public static function getCoursesHomepageForSmarty(\OmegaUp\Request $r): array {
+        return [
+            'smartyProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCourses'
+                ),
+            ],
+            'entrypoint' => 'course_homepage',
+        ];
+    }
+
+    /**
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseCloneDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $course_alias

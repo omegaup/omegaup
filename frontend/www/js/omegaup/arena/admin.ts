@@ -52,7 +52,7 @@ OmegaUp.on('ready', () => {
         }
 
         $('#title .contest-title').text(ui.contestTitle(contest));
-        arenaInstance.updateSummary(<omegaup.Contest>contest);
+        arenaInstance.updateSummary(contest as omegaup.Contest);
 
         arenaInstance.submissionGap = contest.submissions_gap;
         if (!(arenaInstance.submissionGap > 0)) arenaInstance.submissionGap = 0;
