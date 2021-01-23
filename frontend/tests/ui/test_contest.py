@@ -481,7 +481,7 @@ def add_students_bulk(driver, users):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             ('li.contestants > a')))).click()
+             ('a.contestants')))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR, 'div.contestants')))
@@ -510,7 +510,7 @@ def add_problem_to_contest(driver, problem):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             'li.problems > a'))).click()
+             'a.problems'))).click()
 
     driver.typeahead_helper('*[contains(@class, "problems-container")]',
                             problem)
@@ -574,7 +574,7 @@ def change_contest_admission_mode(driver, contest_admission_mode):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             'li.admission-mode > a'))).click()
+             'a.admission-mode'))).click()
     Select(driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,

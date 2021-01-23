@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="card">
+    <div class="card contestants-input-area">
       <div class="card-body">
         <form class="form" @submit.prevent="onSubmit">
           <div class="form-group">
@@ -10,7 +10,7 @@
               :init="(el) => typeahead.userTypeahead(el)"
             ></omegaup-autocomplete>
           </div>
-          <button class="btn btn-primary" type="submit">
+          <button class="btn btn-primary user-add-single" type="submit">
             {{ T.contestAdduserAddUser }}
           </button>
           <hr />
@@ -22,12 +22,12 @@
               rows="4"
             ></textarea>
           </div>
-          <button class="btn btn-primary" type="submit">
+          <button class="btn btn-primary user-add-bulk" type="submit">
             {{ T.contestAdduserAddUsers }}
           </button>
         </form>
       </div>
-      <table class="table table-striped mb-0">
+      <table class="table table-striped mb-0 participants">
         <thead>
           <tr>
             <th class="text-center">{{ T.wordsUser }}</th>
