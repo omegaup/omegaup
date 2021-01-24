@@ -520,6 +520,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->identity = null;
             // Request can proceed unauthenticated.
         }
+        [
+            'contest' => $contest,
+            'contest_admin' => $contestAdmin,
+        ] = self::validateDetails($contestAlias, $r->identity, $token);
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
@@ -3367,7 +3371,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
             self::canAccessContest($contest, $identity);
 
-            if (\OmegaUp\Authorization::isContestAdmin($identity, $contest)) {
+            if (
+                \OmegaUp\Authorization::isContestAdmin(
+                    $identity,
+                    $contest
+                )
+            ) {
                 $showAllRuns = true;
             }
         } else {
