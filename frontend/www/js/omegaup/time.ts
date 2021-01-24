@@ -221,7 +221,7 @@ export function remoteDate(date: Date): Date {
  */
 export function remoteTimeAdapter<T>(value: T): T {
   if (value instanceof Date) {
-    return <T>(remoteDate(value) as unknown);
+    return (remoteDate(value) as unknown) as T;
   }
 
   if (Array.isArray(value)) {
@@ -234,7 +234,7 @@ export function remoteTimeAdapter<T>(value: T): T {
   } else if (typeof value === 'object') {
     for (const p in value) {
       if (
-        !Object.prototype.hasOwnProperty.call(<any>value, p) ||
+        !Object.prototype.hasOwnProperty.call(value as any, p) ||
         typeof value[p] !== 'object'
       ) {
         continue;

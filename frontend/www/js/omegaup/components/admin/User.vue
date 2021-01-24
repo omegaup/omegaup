@@ -98,7 +98,7 @@ export default class User extends Vue {
   ): omegaup.Selectable<omegaup.Experiment> {
     return {
       value: experiment,
-      selected: (<HTMLInputElement>ev.target).checked,
+      selected: (ev.target as HTMLInputElement).checked,
     };
   }
 
@@ -109,7 +109,7 @@ export default class User extends Vue {
   ): omegaup.Selectable<omegaup.Role> {
     return {
       value: role,
-      selected: (<HTMLInputElement>ev.target).checked,
+      selected: (ev.target as HTMLInputElement).checked,
     };
   }
 

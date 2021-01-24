@@ -195,7 +195,7 @@ export default class ProblemMine extends Vue {
 
   T = T;
   shouldShowAllProblems = false;
-  selectedProblems = <types.ProblemListItem[]>[];
+  selectedProblems: types.ProblemListItem[] = [];
   allProblemsVisibilityOption = -1;
 
   get statementShowAllProblems(): string {

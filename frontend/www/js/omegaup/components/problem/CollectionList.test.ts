@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils';
 import expect from 'expect';
 
 import T from '../../lang';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import problem_CollectionList from './CollectionList.vue';
 
@@ -12,19 +12,16 @@ describe('CollectionList.vue', () => {
       propsData: {
         data: {
           level: 'problemLevelBasicIntroductionToProgramming',
-          frequentTags: <types.TagWithProblemCount[]>[
+          frequentTags: [
             { name: 'problemTagMatrices', problemCount: 1 },
             { name: 'problemTagDiophantineEquations', problemCount: 1 },
             { name: 'problemTagInputAndOutput', problemCount: 1 },
             { name: 'problemTagArrays', problemCount: 1 },
-          ],
-          publicTags: <string[]>['problemTagConditionals', 'problemTagLoops'],
+          ] as types.TagWithProblemCount[],
+          publicTags: ['problemTagConditionals', 'problemTagLoops'],
         },
         difficulty: 'easy',
-        selectedTags: <string[]>[
-          'problemTagMatrices',
-          'problemTagDiophantineEquations',
-        ],
+        selectedTags: ['problemTagMatrices', 'problemTagDiophantineEquations'],
         problems: [
           {
             alias: 'Problem-1',
@@ -74,24 +71,20 @@ describe('CollectionList.vue', () => {
     );
     expect(wrapper.find('input[value="problemTagLoops"]').exists()).toBe(false);
 
-    const checkboxInput1 = <HTMLInputElement>(
-      wrapper.find('input[value="problemTagMatrices"]').element
-    );
-    const checkboxInput2 = <HTMLInputElement>(
-      wrapper.find('input[value="problemTagDiophantineEquations"]').element
-    );
-    const checkboxInput3 = <HTMLInputElement>(
-      wrapper.find('input[value="problemTagInputAndOutput"]').element
-    );
-    const checkboxInput4 = <HTMLInputElement>(
-      wrapper.find('input[value="problemTagArrays"]').element
-    );
-    const radioInput1 = <HTMLInputElement>(
-      wrapper.find('input[value="all"]').element
-    );
-    const radioInput2 = <HTMLInputElement>(
-      wrapper.find('input[value="easy"]').element
-    );
+    const checkboxInput1 = wrapper.find('input[value="problemTagMatrices"]')
+      .element as HTMLInputElement;
+    const checkboxInput2 = wrapper.find(
+      'input[value="problemTagDiophantineEquations"]',
+    ).element as HTMLInputElement;
+    const checkboxInput3 = wrapper.find(
+      'input[value="problemTagInputAndOutput"]',
+    ).element as HTMLInputElement;
+    const checkboxInput4 = wrapper.find('input[value="problemTagArrays"]')
+      .element as HTMLInputElement;
+    const radioInput1 = wrapper.find('input[value="all"]')
+      .element as HTMLInputElement;
+    const radioInput2 = wrapper.find('input[value="easy"]')
+      .element as HTMLInputElement;
 
     expect(checkboxInput1.checked).toBeTruthy();
     expect(checkboxInput2.checked).toBeTruthy();
@@ -120,7 +113,7 @@ describe('CollectionList.vue', () => {
         data: {
           level: 'problemLevelBasicIntroductionToProgramming',
           frequentTags: [{ alias: 'problemTagMatrices' }],
-          publicTags: <string[]>['problemTagConditionals'],
+          publicTags: ['problemTagConditionals'],
         },
         difficulty: 'all',
       },

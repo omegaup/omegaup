@@ -112,15 +112,15 @@ export default class ArenaAdmin {
         .forEach((input) => input.setAttribute('disabled', 'disabled'));
       api.Clarification.create({
         contest_alias: this.arena.options.contestAlias,
-        problem_alias: (<HTMLInputElement>(
-          clarificationElement.querySelector('select[name="problem"]')
-        )).value,
-        username: (<HTMLInputElement>(
-          clarificationElement.querySelector('select[name="user"]')
-        )).value,
-        message: (<HTMLInputElement>(
-          clarificationElement.querySelector('textarea[name="message"]')
-        )).value,
+        problem_alias: (clarificationElement.querySelector(
+          'select[name="problem"]',
+        ) as HTMLInputElement).value,
+        username: (clarificationElement.querySelector(
+          'select[name="user"]',
+        ) as HTMLInputElement).value,
+        message: (clarificationElement.querySelector(
+          'textarea[name="message"]',
+        ) as HTMLInputElement).value,
       })
         .then(() => {
           this.arena.hideOverlay();
@@ -140,19 +140,19 @@ export default class ArenaAdmin {
   }
 
   refreshRuns(): void {
-    const runsListComponent = <arena_Runs>this.runsList.$children[0];
+    const runsListComponent = this.runsList.$children[0] as arena_Runs;
 
     const options = {
-      assignment_alias: <string | undefined>undefined,
-      contest_alias: <string | undefined>undefined,
-      course_alias: <string | undefined>undefined,
+      assignment_alias: undefined as string | undefined,
+      contest_alias: undefined as string | undefined,
+      course_alias: undefined as string | undefined,
       problem_alias: runsListComponent.filterProblem || undefined,
       offset: runsListComponent.filterOffset * runsListComponent.rowCount,
       rowcount: runsListComponent.rowCount,
       verdict: runsListComponent.filterVerdict || undefined,
       language: runsListComponent.filterLanguage || undefined,
       username: runsListComponent.filterUsername || undefined,
-      show_all: <boolean | undefined>undefined,
+      show_all: undefined as boolean | undefined,
       status: runsListComponent.filterStatus || undefined,
     };
 

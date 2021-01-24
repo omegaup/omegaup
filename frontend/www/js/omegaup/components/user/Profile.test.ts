@@ -9,7 +9,7 @@ describe('Profilev2.vue', () => {
     const badges = ['100SolvedProblems'];
     const wrapper = shallowMount(user_Profile, {
       propsData: {
-        data: <types.UserProfileDetailsPayload>{
+        data: {
           profile: {
             country: 'Mexico',
             country_id: 'MX',
@@ -57,9 +57,9 @@ describe('Profilev2.vue', () => {
           ownedBadges: [],
           programmingLanguages: {},
           userClassname: 'user-rank-unranked',
-        },
-        profileBadges: <Set<string>>new Set(badge_alias),
-        visitorBadges: <Set<string>>new Set(badge_alias),
+        } as types.UserProfileDetailsPayload,
+        profileBadges: new Set(badge_alias) as Set<string>,
+        visitorBadges: new Set(badge_alias) as Set<string>,
       },
     });
     expect(wrapper.find('a[href="/profile/edit/"]').exists()).toBe(true);

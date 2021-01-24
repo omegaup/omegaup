@@ -3,7 +3,7 @@ import expect from 'expect';
 
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import course_ProblemLists from './ProblemList.vue';
 
@@ -11,10 +11,10 @@ describe('ProblemLists.vue', () => {
   it('Should handle empty assignments and problems', () => {
     const wrapper = shallowMount(course_ProblemLists, {
       propsData: {
-        assignmentProblems: <types.ProblemsetProblem[]>[],
-        assignments: <omegaup.Assignment[]>[],
-        selectedAssignment: <omegaup.Assignment>{},
-        taggedProblems: <omegaup.Problem[]>[],
+        assignmentProblems: [] as types.ProblemsetProblem[],
+        assignments: [] as omegaup.Assignment[],
+        selectedAssignment: {} as omegaup.Assignment,
+        taggedProblems: [] as omegaup.Problem[],
         assignmentFormMode: omegaup.AssignmentFormMode.New,
       },
     });
