@@ -47,9 +47,9 @@ class Scoreboard {
         $cache = null;
         // A few scoreboard options are not cacheable.
         if (
-            !$sortByName &&
-            is_null($filterUsersBy) &&
-            !$this->params->only_ac
+            !$sortByName && is_null(
+                $filterUsersBy
+            ) && !$this->params->only_ac
         ) {
             if ($this->params->admin) {
                 $cache = new \OmegaUp\Cache(
@@ -125,6 +125,7 @@ class Scoreboard {
             $this->params->start_time,
             $this->params->finish_time,
             $this->params->admin,
+            $this->params->scoreboard_pct,
             $sortByName,
             $withRunDetails,
             $this->params->auth_token
@@ -332,6 +333,7 @@ class Scoreboard {
             $params->start_time,
             $params->finish_time,
             $params->admin,
+            $params->scoreboard_pct,
             false  /* sortByName */
         );
 
@@ -367,6 +369,7 @@ class Scoreboard {
             $params->start_time,
             $params->finish_time,
             $params->admin,
+            $params->scoreboard_pct,
             false /* sortByName */
         );
         $adminScoreboardCache->set($adminScoreboard, $timeout);
@@ -502,6 +505,7 @@ class Scoreboard {
         \OmegaUp\Timestamp $contestStartTime,
         ?\OmegaUp\Timestamp $contestFinishTime,
         bool $showAllRuns,
+        int $scoreboardPct,
         bool $sortByName,
         bool $withRunDetails = false,
         ?string $authToken = null
@@ -571,7 +575,7 @@ class Scoreboard {
             $testOnly[$identityId] &= $isTest;
             $noRuns[$identityId] = false;
             if (!$showAllRuns) {
-                if ($isTest) {
+                if ($isTest || $scoreboardPct === 0) {
                     continue;
                 }
                 if (
