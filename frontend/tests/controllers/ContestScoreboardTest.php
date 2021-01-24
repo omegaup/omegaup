@@ -342,8 +342,6 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         // Create our contestant
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $runs = 0;
-
         // Create a run
         $runData = \OmegaUp\Test\Factories\Run::createRun(
             $problemData,
@@ -354,6 +352,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         // Grade the run
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
+        $runs = 0;
         if ($percentage !== 0) {
             $runs++;
         }
@@ -379,7 +378,6 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
 
         //Check totals
         $this->assertEquals(0, $response['ranking'][0]['total']['points']);
-        /* 60 because contest started 60 mins ago in the default factory */
         $this->assertEquals(0, $response['ranking'][0]['total']['penalty']);
 
         // Check data per problem
