@@ -15,7 +15,7 @@ OmegaUp.on('ready', () => {
       'omegaup-contest-new': contest_NewForm,
     },
     data: () => ({
-      invalidParameterName: <null | string>null,
+      invalidParameterName: null as null | string,
     }),
     render: function (createElement) {
       return createElement('omegaup-contest-new', {

@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
 import expect from 'expect';
 
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 import T from '../../lang';
 
 import problem_FilterAuthors from './FilterAuthors.vue';
@@ -35,12 +35,10 @@ describe('FilterAuthors.vue', () => {
     expect(wrapper.find('input[value="user1"]').exists()).toBe(true);
     expect(wrapper.find('input[value="user2"]').exists()).toBe(true);
 
-    const checkboxInput1 = <HTMLInputElement>(
-      wrapper.find('input[value="user1"]').element
-    );
-    const checkboxInput2 = <HTMLInputElement>(
-      wrapper.find('input[value="user2"]').element
-    );
+    const checkboxInput1 = wrapper.find('input[value="user1"]')
+      .element as HTMLInputElement;
+    const checkboxInput2 = wrapper.find('input[value="user2"]')
+      .element as HTMLInputElement;
 
     checkboxInput1.click();
     expect(checkboxInput1.checked).toBeTruthy();

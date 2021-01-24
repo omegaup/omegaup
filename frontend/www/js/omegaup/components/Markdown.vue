@@ -71,7 +71,7 @@ export default class Markdown extends Vue {
         if (!preElement.firstChild) {
           return;
         }
-        const inputValue = (<HTMLPreElement>preElement).innerText;
+        const inputValue = (preElement as HTMLElement).innerText;
 
         const clipboardButton = document.createElement('button');
         clipboardButton.appendChild(document.createTextNode('📋'));
@@ -84,7 +84,7 @@ export default class Markdown extends Vue {
           ui.copyToClipboard(inputValue);
         });
 
-        (<HTMLElement>preElement.parentElement).insertBefore(
+        (preElement.parentElement as HTMLElement).insertBefore(
           clipboardButton,
           preElement,
         );
@@ -128,9 +128,9 @@ export default class Markdown extends Vue {
       // Now that the global MathJax config is set, we can lazily load the
       // library. The element to be rendered will be queued up in
       // MathJax.startup.elements.
-      let scriptElement: HTMLScriptElement | null = <HTMLScriptElement | null>(
-        document.getElementById('MathJax-script')
-      );
+      let scriptElement = document.getElementById(
+        'MathJax-script',
+      ) as HTMLScriptElement | null;
       if (!scriptElement) {
         scriptElement = document.createElement('script');
         scriptElement.src = '/third_party/js/mathjax/es5/tex-svg.js';
@@ -191,7 +191,7 @@ export default class Markdown extends Vue {
     page-break-inside: avoid;
   }
   p {
-    margin-bottom: 1.5em;
+    margin-bottom: 1em;
   }
 
   ul {
@@ -202,7 +202,7 @@ export default class Markdown extends Vue {
   }
   ul li,
   ol li {
-    margin-left: 2em;
+    margin-left: 0.25em;
   }
 
   pre {

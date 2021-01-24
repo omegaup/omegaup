@@ -1,10 +1,5 @@
 {include file='head.tpl' jsfile=$jsfile inContest=$showNavigation inArena=true inline}
 
-{if $admin}
-			<audio id="notification-audio">
-				<source src="/media/notification.mp3" type="audio/mpeg" />
-			</audio>
-{/if}
 			<div id="title">
 				<h1><span class="contest-title"></span><sup class="socket-status" title="WebSocket"></sup></h1>
 				<div class="clock">00:00:00</div>
@@ -54,14 +49,7 @@
 				<div id="problem" class="main">
 					<div id="problem-settings-summary"></div>
 {if $admin}
-					<form enctype="multipart/form-data" action="/api/problem/update" method="post" id="update-problem">
-						<fieldset>
-							<legend>Administrar problema</legend>
-							<input name="problem_alias" type="hidden" />
-							<input name="problem_contents" type="file" />
-							<button type="submit">Actualizar casos/redacci&oacute;n</button>
-						</fieldset>
-					</form>
+					<a id="edit-problem-link">{#omegaupTitleProblemEdit#}</a>
 {/if}
 					<div class="karel-js-link hide">
 						<a href="/karel.js/" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>

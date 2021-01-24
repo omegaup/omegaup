@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils';
 import expect from 'expect';
 
 import T from '../../lang';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import course_CourseCard from './CourseCard.vue';
 
@@ -15,7 +15,7 @@ describe('CourseCard.vue', () => {
         schoolName: 'omegaUp',
         finishTime: null,
         progress: 0,
-        content: <types.CourseAssignment[]>[
+        content: [
           {
             alias: 't1',
             assignment_type: 'homework',
@@ -44,7 +44,7 @@ describe('CourseCard.vue', () => {
             scoreboard_url_admin: 'admin_url',
             start_time: new Date(),
           },
-        ],
+        ] as types.CourseAssignment[],
         loggedIn: true,
         isOpen: false,
         showTopics: true,

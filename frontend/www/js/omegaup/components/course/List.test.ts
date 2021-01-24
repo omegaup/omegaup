@@ -2,12 +2,12 @@ import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 
 import T from '../../lang';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import course_List from './List.vue';
 
 const coursesListProps = {
-  courses: <types.StudentCourses>{
+  courses: {
     public: {
       accessMode: 'public',
       activeTab: 'current',
@@ -51,7 +51,7 @@ const coursesListProps = {
         },
       },
     },
-  },
+  } as types.StudentCourses,
 };
 
 describe('List.vue', () => {

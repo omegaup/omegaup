@@ -13,10 +13,10 @@ OmegaUp.on('ready', () => {
       'omegaup-common-navbar': common_NavbarV2,
     },
     data: () => ({
-      notifications: <types.Notification[]>[],
-      graderInfo: <types.GraderStatus | null>null,
+      notifications: [] as types.Notification[],
+      graderInfo: null as types.GraderStatus | null,
       graderQueueLength: -1,
-      errorMessage: <string | null>null,
+      errorMessage: null as string | null,
     }),
     render: function (createElement) {
       return createElement('omegaup-common-navbar', {

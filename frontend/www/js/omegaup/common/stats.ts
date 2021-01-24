@@ -145,7 +145,7 @@ OmegaUp.on('ready', () => {
           events: {
             load: (ev: Event): void => {
               // set up the updating of the chart each second
-              const series = (<Highcharts.Chart>(ev.target as unknown))
+              const series = ((ev.target as unknown) as Highcharts.Chart)
                 .series[0];
               setInterval(() => {
                 const x = new Date().getTime(), // current time

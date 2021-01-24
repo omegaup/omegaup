@@ -3,9 +3,9 @@ import { Arena, GetOptionsFromLocation } from './arena';
 import { OmegaUp } from '../omegaup';
 
 function getInputValue(itemSelector: string): string | undefined {
-  const element = document.querySelector(itemSelector);
+  const element: HTMLInputElement | null = document.querySelector(itemSelector);
   if (element) {
-    return (<HTMLInputElement>element).value;
+    return element.value;
   }
 }
 

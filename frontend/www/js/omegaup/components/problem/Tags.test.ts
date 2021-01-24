@@ -10,7 +10,7 @@ const baseProblemTagsPropsData = {
   canAddNewTags: true,
   initialAllowTags: true,
   isCreate: true,
-  levelTags: <string[]>[
+  levelTags: [
     'problemLevelAdvancedCompetitiveProgramming',
     'problemLevelAdvancedSpecializedTopics',
     'problemLevelBasicIntroductionToProgramming',
@@ -19,9 +19,9 @@ const baseProblemTagsPropsData = {
     'problemLevelIntermediateDataStructuresAndAlgorithms',
     'problemLevelIntermediateMathsInProgramming',
   ],
-  publicTags: <string[]>['some', 'public', 'tags'],
-  selectedPrivateTags: <string[]>[],
-  selectedPublicTags: <string[]>[],
+  publicTags: ['some', 'public', 'tags'],
+  selectedPrivateTags: [] as string[],
+  selectedPublicTags: [] as string[],
   title: '',
 };
 
