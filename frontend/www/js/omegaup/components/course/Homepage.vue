@@ -11,7 +11,6 @@
     </div>
     <div class="dropdown-divider"></div>
     <div class="container-lg">
-      <h4 class="text-center mt-4">{{ T.courseHomepageInOmegaUp }}</h4>
       <div
         class="row p-4 text-center text-md-left justify-content-around align-items-center"
       >

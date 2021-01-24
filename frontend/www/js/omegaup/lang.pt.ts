@@ -313,7 +313,6 @@ const translations: { [key: string]: string; } = {
   courseEditStudents: "Alunos",
   courseExamEmpty: "N\u00e3o tem provas",
   courseGroupNotFound: "Grupo do curso n\u00e3o encontrado",
-  courseHomepageInOmegaUp: "No omegaUp,",
   courseHomepageStudentsSectionContent: "**Alunos**\n\n- Recebem feedback autom\u00e1tico sobre suas solu\u00e7\u00f5es.\n- Aprendem habilidades que ir\u00e3o servi\\-los na sua vida profissional.\n- Accesam cursos online 24/7.\n",
   courseHomepageTeachersSectionContent: "**Professores**\n\n- Accesam e usam mais de 2.000 problemas de qualidade para usar como tarefas e testes.\n- Observam o progresso dos seus alunos.\n- Identificam os problemas que s\u00e3o dif\u00edceis para seus alunos.\n",
   courseHomepageTitle: "Descobrindo e preparando o talento da Latinoam\u00e9rica",
