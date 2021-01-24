@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
 import expect from 'expect';
 
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 import T from '../../lang';
 
 import problem_CollectionListAuthor from './CollectionListAuthor.vue';
@@ -36,7 +36,7 @@ describe('CollectionListAuthor.vue', () => {
           } as types.AuthorsRank,
         } as types.CollectionDetailsByAuthorPayload,
         difficulty: 'easy',
-        selectedAuthors: <string[]>['user3'],
+        selectedAuthors: ['user3'],
         problems: [
           {
             alias: 'Problem-1',
@@ -72,21 +72,16 @@ describe('CollectionListAuthor.vue', () => {
     expect(wrapper.find('input[value="user2"]').exists()).toBe(true);
     expect(wrapper.find('input[value="user3"]').exists()).toBe(true);
 
-    const checkboxInput1 = <HTMLInputElement>(
-      wrapper.find('input[value="user1"]').element
-    );
-    const checkboxInput2 = <HTMLInputElement>(
-      wrapper.find('input[value="user2"]').element
-    );
-    const checkboxInput3 = <HTMLInputElement>(
-      wrapper.find('input[value="user3"]').element
-    );
-    const radioInput1 = <HTMLInputElement>(
-      wrapper.find('input[value="all"]').element
-    );
-    const radioInput2 = <HTMLInputElement>(
-      wrapper.find('input[value="easy"]').element
-    );
+    const checkboxInput1 = wrapper.find('input[value="user1"]')
+      .element as HTMLInputElement;
+    const checkboxInput2 = wrapper.find('input[value="user2"]')
+      .element as HTMLInputElement;
+    const checkboxInput3 = wrapper.find('input[value="user3"]')
+      .element as HTMLInputElement;
+    const radioInput1 = wrapper.find('input[value="all"]')
+      .element as HTMLInputElement;
+    const radioInput2 = wrapper.find('input[value="easy"]')
+      .element as HTMLInputElement;
 
     expect(checkboxInput1.checked).toBeFalsy();
     expect(checkboxInput2.checked).toBeFalsy();

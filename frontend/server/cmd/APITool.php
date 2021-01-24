@@ -705,11 +705,11 @@ class APIGenerator {
                 echo "   export function {$typeName}(elementId: string = 'payload'): types.{$typeName} {\n";
                 if (is_null($conversionResult->conversionFunction)) {
                     echo "     return JSON.parse(\n";
-                    echo "       (<HTMLElement>document.getElementById(elementId)).innerText,\n";
+                    echo "       (document.getElementById(elementId) as HTMLElement).innerText,\n";
                     echo "     );\n\n";
                 } else {
                     echo "     return ({$conversionResult->conversionFunction})(\n";
-                    echo "       JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),\n";
+                    echo "       JSON.parse((document.getElementById(elementId) as HTMLElement).innerText),\n";
                     echo "     );\n\n";
                 }
                 echo "   }\n\n";

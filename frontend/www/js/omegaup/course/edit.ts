@@ -476,5 +476,5 @@ OmegaUp.on('ready', () => {
       });
     },
   });
-  const component = <course_Edit>courseEdit.$refs.component;
+  const component = courseEdit.$refs.component as course_Edit;
 });

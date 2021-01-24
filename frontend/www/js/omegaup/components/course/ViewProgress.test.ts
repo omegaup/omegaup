@@ -9,7 +9,7 @@ import course_ViewProgress, {
   toOds,
   toCsv,
 } from './ViewProgress.vue';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 describe('ViewProgress.vue', () => {
   if (typeof window.URL.createObjectURL === 'undefined') {
@@ -20,11 +20,11 @@ describe('ViewProgress.vue', () => {
     });
   }
   const baseViewProgressProps = {
-    course: <types.CourseDetails>{
+    course: {
       alias: 'hello',
       name: 'Hello course',
-    },
-    assignments: <omegaup.Assignment[]>[
+    } as types.CourseDetails,
+    assignments: [
       {
         alias: 'assignment',
         assignment_type: 'homework',
@@ -37,8 +37,8 @@ describe('ViewProgress.vue', () => {
         scoreboard_url_admin: '',
         max_points: 200,
       } as omegaup.Assignment,
-    ],
-    students: <types.StudentProgress[]>[
+    ] as omegaup.Assignment[],
+    students: [
       {
         name: 'student',
         points: {
@@ -52,7 +52,7 @@ describe('ViewProgress.vue', () => {
         },
         username: 'student',
       } as types.StudentProgress,
-    ],
+    ] as types.StudentProgress[],
   };
   const student = baseViewProgressProps.students[0];
   const assignment = baseViewProgressProps.assignments[0];

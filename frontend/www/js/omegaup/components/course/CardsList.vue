@@ -13,14 +13,47 @@
       <template v-for="(typeCourses, accessMode) in courses">
         <div v-if="typeCourses.activeTab !== ''" :key="accessMode" class="row">
           <div class="col-lg-5 p-3 d-flex" :class="accessMode">
-            <h4 class="flex-grow-1 mb-0">{{ getDescription(accessMode) }}</h4>
-            <div
-              class="d-inline-block"
-              tabindex="0"
-              data-toggle="tooltip"
-              :title="T[`${accessMode}CourseInformationDescription`]"
+            <h3 class="flex-grow-1 text-white">
+              {{ getDescription(accessMode) }}
+            </h3>
+            <a
+              role="button"
+              class="text-white"
+              data-toggle="modal"
+              :data-target="`.${accessMode}-modal`"
             >
-              <font-awesome-icon icon="info-circle" />
+              <font-awesome-icon
+                icon="info-circle"
+                :title="T[`${accessMode}CourseInformationDescription`]"
+              />
+            </a>
+            <div
+              class="modal text-black"
+              :class="`${accessMode}-modal`"
+              tabindex="-1"
+            >
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">
+                      {{ getDescription(accessMode) }}
+                    </h5>
+                    <button
+                      type="button"
+                      class="close"
+                      data-dismiss="modal"
+                      aria-label="Close"
+                    >
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <omegaup-markdown
+                      :markdown="courseModalByType(acessMode)"
+                    ></omegaup-markdown>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="col-lg-7 text-right align-self-center my-2 my-lg-0">
@@ -97,16 +130,18 @@ export default class CourseCardsList extends Vue {
     if (admissionMode === 'student') return T.courseListIStudy;
     return '';
   }
+
+  courseModalByType(accessMode: string): string {
+    if (accessMode === 'public') {
+      return T.publicCoursesModal;
+    }
+    return T.studentCoursesModal;
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-
-.student,
-.public {
-  color: $omegaup-white;
-}
 
 .public {
   background: $omegaup-pink;

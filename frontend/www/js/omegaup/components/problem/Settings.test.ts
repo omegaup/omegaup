@@ -62,15 +62,13 @@ describe('Settings.vue', () => {
       wrapper.find('input[name="validator_time_limit"]').attributes('disabled'),
     ).toBe('disabled');
 
-    const languages = <HTMLInputElement>(
-      wrapper.find('select[name="languages"]').element
-    );
+    const languages = wrapper.find('select[name="languages"]')
+      .element as HTMLInputElement;
     languages.value = 'cat';
     await languages.dispatchEvent(new Event('change'));
 
-    const validator = <HTMLInputElement>(
-      wrapper.find('select[name="validator"]').element
-    );
+    const validator = wrapper.find('select[name="validator"]')
+      .element as HTMLInputElement;
     validator.value = 'custom';
     await validator.dispatchEvent(new Event('change'));
 
@@ -78,11 +76,11 @@ describe('Settings.vue', () => {
       wrapper.find('input[name="validator_time_limit"]').attributes('disabled'),
     ).toBeFalsy();
     expect(
-      (<HTMLInputElement>wrapper.find('select[name="languages"]').element)
+      (wrapper.find('select[name="languages"]').element as HTMLInputElement)
         .value,
     ).toBe('cat');
     expect(
-      (<HTMLInputElement>wrapper.find('select[name="validator"]').element)
+      (wrapper.find('select[name="validator"]').element as HTMLInputElement)
         .value,
     ).toBe('custom');
   });
