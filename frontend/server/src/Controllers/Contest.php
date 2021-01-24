@@ -499,7 +499,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param null|string $token
      */
     public static function getContestDetailsForSmarty(
         \OmegaUp\Request $r
@@ -509,7 +508,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $contest = self::validateContest($contestAlias);
-        $token = $r->ensureOptionalString('token');
+        if (is_null($contest->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
 
         try {
             $r->ensureIdentity();
@@ -519,9 +520,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
             $r->identity = null;
             // Request can proceed unauthenticated.
-        }
-        if (is_null($contest->problemset_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
         $shouldShowIntro = \OmegaUp\Controllers\Contest::shouldShowIntro(
@@ -607,7 +605,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: ContestPracticePayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param null|string $token
      */
     public static function getContestPracticeDetailsForSmarty(
         \OmegaUp\Request $r
@@ -617,7 +614,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $contest = \OmegaUp\Controllers\Contest::validateContest($contestAlias);
-        $token = $r->ensureOptionalString('token');
 
         try {
             $r->ensureIdentity();
@@ -631,7 +627,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         [
             'contest' => $contest,
             'contest_admin' => $contestAdmin,
-        ] = self::validateDetails($contestAlias, $r->identity, $token);
+        ] = self::validateDetails($contestAlias, $r->identity);
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
@@ -864,7 +860,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{payload: ContestEditPayload, title: string}, entrypoint: string}
      *
      * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param null|string $token
      */
     public static function getContestEditv2ForSmarty(
         \OmegaUp\Request $r
@@ -875,16 +870,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $token = $r->ensureOptionalString('token');
         [
             'contest' => $contest,
-        ] = self::validateDetails($contestAlias, $r->identity, $token);
-
-        $contest = self::validateContestAdmin($contestAlias, $r->identity);
-
+            'contest_admin' => $contestAdmin,
+        ] = self::validateDetails($contestAlias, $r->identity);
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'contestNotFound'
+            );
+        }
+        if (!$contestAdmin) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
             );
         }
 
@@ -1024,7 +1021,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function validateDetails(
         string $contestAlias,
         ?\OmegaUp\DAO\VO\Identities $identity,
-        ?string $token
+        ?string $token = null
     ): array {
         [
             'contest' => $contest,
