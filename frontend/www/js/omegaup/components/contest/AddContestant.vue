@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="card contestants-input-area">
+    <div class="card contestants">
       <div class="card-body">
         <form class="form" @submit.prevent="onSubmit">
           <div class="form-group">
