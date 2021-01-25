@@ -150,7 +150,7 @@
           "
         ></omegaup-common-publish>
       </div>
-      <div v-if="showTab === 'contestants'" class="tab-pane active">
+      <div v-if="showTab === 'contestants'" class="tab-pane active contestants">
         <omegaup-contest-add-contestant
           :contest="details"
           :initial-users="users"
