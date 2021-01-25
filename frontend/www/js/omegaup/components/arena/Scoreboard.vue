@@ -178,35 +178,38 @@ export default class ArenaScoreboard extends Vue {
     padding: 0.2em;
     .points {
       font-weight: bold;
-      width: 3.5em;
-      border-right-style: dotted;
     }
     .penalty {
       font-size: 70%;
+    }
+    div[class$='points'] {
+      border-right-style: dotted;
+    }
+    div[class$='penalty'] {
       border-left-width: 0;
     }
-    .accepted {
-      background: #dfd;
-    }
-    .pending {
-      background: #ddf;
-    }
-    .wrong {
-      background: #fdd;
-    }
-    .position.recent-event {
-      font-weight: bold;
-      background: #dfd;
-    }
-    .accepted.recent-event {
-      background: #8f8;
-    }
-    .position {
-      width: 3.5em;
-    }
-    .legend {
-      width: 0.5em;
-    }
+  }
+  .accepted {
+    background: #dfd;
+  }
+  .pending {
+    background: #ddf;
+  }
+  .wrong {
+    background: #fdd;
+  }
+  .position.recent-event {
+    font-weight: bold;
+    background: #dfd;
+  }
+  .accepted.recent-event {
+    background: #8f8;
+  }
+  .position {
+    width: 3.5em;
+  }
+  .legend {
+    width: 0.5em;
   }
 }
 </style>
