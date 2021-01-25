@@ -59,6 +59,7 @@
           <a
             href="#"
             data-toggle="tab"
+            data-nav-contestant
             class="dropdown-item contestants"
             :class="{ active: showTab === 'contestants' }"
             @click="showTab = 'contestants'"
