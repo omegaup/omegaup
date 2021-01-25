@@ -126,7 +126,7 @@ export default class AddContestant extends Vue {
     if (this.contestant !== '') {
       users.push(this.contestant);
     }
-    if (this.users.length) {
+    if (users.length) {
       this.$emit(
         'emit-add-user',
         users.map((user) => user.trim()),

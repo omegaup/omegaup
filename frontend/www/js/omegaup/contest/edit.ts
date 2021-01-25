@@ -40,7 +40,7 @@ OmegaUp.on('ready', () => {
       },
       refreshDetails: (): void => {
         api.Contest.adminDetails({
-          contest: payload.details.alias,
+          contest_alias: payload.details.alias,
         })
           .then((response) => {
             contestEdit.details = response;

@@ -22,6 +22,7 @@
           href="#"
           data-toggle="dropdown"
           role="button"
+          data-nav-contest-edit
           class="nav-link active dropdown-toggle"
           aria-haspopup="true"
           aria-expanded="false"
@@ -59,6 +60,7 @@
             href="#"
             data-toggle="tab"
             class="dropdown-item contestants"
+            data-nav-contestant
             :class="{ active: showTab === 'contestants' }"
             @click="showTab = 'contestants'"
             >{{ T.contestAdduserAddContestant }}</a
