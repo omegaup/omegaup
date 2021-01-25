@@ -49,7 +49,7 @@
                   </div>
                   <div class="modal-body">
                     <omegaup-markdown
-                      :markdown="courseModalByType(acessMode)"
+                      :markdown="courseModalByType(accessMode)"
                     ></omegaup-markdown>
                   </div>
                 </div>
@@ -88,6 +88,11 @@
               </template>
             </template>
           </div>
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+            <omegaup-card></omegaup-card>
+            <omegaup-card></omegaup-card>
+            <omegaup-card></omegaup-card>
+          </div>
         </div>
       </template>
     </div>
@@ -100,6 +105,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import course_CourseCard from './CourseCard.vue';
 import omegaup_Markdown from '../Markdown.vue';
+import omegaup_Card from './Card.vue';
 
 import {
   FontAwesomeIcon,
@@ -117,6 +123,7 @@ library.add(fas);
     'font-awesome-layers-text': FontAwesomeLayersText,
     'omegaup-course-card': course_CourseCard,
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-card': omegaup_Card,
   },
 })
 export default class CourseCardsList extends Vue {
