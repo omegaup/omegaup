@@ -304,19 +304,33 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Set 0% of scoreboard for contestants, should show all 0s
+     * A PHPUnit data provider for all percentages of scoreboard show.
+     *
+     * @return list<list<int>>
      */
-    public function testScoreboardPercentajeForContestant() {
+    public function contestPercentageScoreboardShowProvider(): array {
+        return [
+            [0],
+            [1],
+        ];
+    }
+
+    /**
+     * Set different percentage of scoreboard for contestants
+     *
+     * @dataProvider contestPercentageScoreboardShowProvider
+     */
+    public function testScoreboardPercentajeForContestant(int $percentage) {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
-        // Set 0% of scoreboard show
+        // Set percentage of scoreboard show
         \OmegaUp\Test\Factories\Contest::setScoreboardPercentage(
             $contestData,
-            0
+            $percentage
         );
 
         // Add the problem to the contest
@@ -326,7 +340,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
         $runData = \OmegaUp\Test\Factories\Run::createRun(
@@ -338,15 +352,21 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         // Grade the run
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
+        $runs = 0;
+        if ($percentage !== 0) {
+            $runs++;
+        }
+
         // Create request
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'problemset_id' =>  $contestData['contest']->problemset_id,
-        ]);
 
         // Create API
-        $response = \OmegaUp\Controllers\Problemset::apiScoreboard($r);
+        $response = \OmegaUp\Controllers\Problemset::apiScoreboard(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problemset_id' =>  $contestData['contest']->problemset_id,
+            ])
+        );
 
         // Validate that we have ranking
         $this->assertEquals(1, count($response['ranking']));
@@ -358,7 +378,7 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
 
         //Check totals
         $this->assertEquals(0, $response['ranking'][0]['total']['points']);
-        $this->assertEquals(0, $response['ranking'][0]['total']['penalty']); /* 60 because contest started 60 mins ago in the default factory */
+        $this->assertEquals(0, $response['ranking'][0]['total']['penalty']);
 
         // Check data per problem
         $this->assertEquals(
@@ -369,7 +389,10 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             0,
             $response['ranking'][0]['problems'][0]['penalty']
         );
-        $this->assertEquals(1, $response['ranking'][0]['problems'][0]['runs']);
+        $this->assertEquals(
+            $runs,
+            $response['ranking'][0]['problems'][0]['runs']
+        );
     }
 
     /**
