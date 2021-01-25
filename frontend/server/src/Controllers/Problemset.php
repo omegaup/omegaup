@@ -161,7 +161,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             'request' => $r,
         ] = self::wrapRequest($r);
 
-        if ($problemset['type'] == 'Contest') {
+        if ($problemset['type'] === 'Contest') {
             return \OmegaUp\Controllers\Contest::apiScoreboard(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
@@ -169,7 +169,8 @@ class Problemset extends \OmegaUp\Controllers\Controller {
                     'contest_alias' => $problemset['contest_alias']
                 ])
             );
-        } elseif ($problemset['type'] == 'Assignment') {
+        }
+        if ($problemset['type'] === 'Assignment') {
             return \OmegaUp\Controllers\Course::apiAssignmentScoreboard(
                 new \OmegaUp\Request([
                     'auth_token' => $r['auth_token'],
