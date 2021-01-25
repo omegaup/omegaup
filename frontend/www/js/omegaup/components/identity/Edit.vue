@@ -100,7 +100,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 import T from '../../lang';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
 import * as typeahead from '../../typeahead';
@@ -118,7 +118,7 @@ export default class IdentityEdit extends Vue {
   T = T;
   typeahead = typeahead;
   selectedIdentity = Object.assign(
-    <types.Identity>{
+    {
       username: '',
       classname: '',
       name: '',
@@ -127,7 +127,7 @@ export default class IdentityEdit extends Vue {
       school_id: 0,
       country_id: 'MX',
       state_id: '',
-    },
+    } as types.Identity,
     this.identity,
   );
 

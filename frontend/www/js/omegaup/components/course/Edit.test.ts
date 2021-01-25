@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import course_Edit from './Edit.vue';
 
@@ -13,7 +13,7 @@ describe('Edit.vue', () => {
     const courseName = 'Test course';
     const wrapper = shallowMount(course_Edit, {
       propsData: {
-        data: <types.CourseEditPayload>{
+        data: {
           course: {
             admission_mode: 'registration',
             alias: 'test-course',
@@ -54,7 +54,7 @@ describe('Edit.vue', () => {
           admins: [],
           groupsAdmins: [],
           tags: [],
-        },
+        } as types.CourseEditPayload,
         initialTab: 'course',
       },
     });

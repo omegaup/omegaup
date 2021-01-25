@@ -1,16 +1,16 @@
 import Vue from 'vue';
 
-import { types } from '../api_types';
+import type { types } from '../api_types';
 
 import omegaup_Markdown from '../components/Markdown.vue';
 
 (() => {
-  const problemDetails = <types.ProblemDetails>(
-    JSON.parse((<HTMLElement>document.getElementById('payload')).innerText)
-  );
+  const problemDetails = JSON.parse(
+    (document.getElementById('payload') as HTMLElement).innerText,
+  ) as types.ProblemDetails;
 
   new Vue({
-    el: <HTMLElement>document.querySelector('div.statement'),
+    el: document.querySelector('div.statement') as HTMLElement,
     components: {
       'omegaup-markdown': omegaup_Markdown,
     },

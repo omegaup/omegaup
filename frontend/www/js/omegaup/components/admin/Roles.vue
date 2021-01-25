@@ -62,7 +62,7 @@ export default class AdminRoles extends Vue {
   ): omegaup.Selectable<omegaup.Role> {
     return {
       value: role,
-      selected: (<HTMLInputElement>ev.target).checked,
+      selected: (ev.target as HTMLInputElement).checked,
     };
   }
 
@@ -73,7 +73,7 @@ export default class AdminRoles extends Vue {
   ): omegaup.Selectable<types.Group> {
     return {
       value: group,
-      selected: (<HTMLInputElement>ev.target).checked,
+      selected: (ev.target as HTMLInputElement).checked,
     };
   }
 }

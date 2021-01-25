@@ -3,7 +3,7 @@ import expect from 'expect';
 import { omegaup } from '../../omegaup';
 
 import course_StudentProgress from './StudentProgress.vue';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 describe('StudentProgress.vue', () => {
   it('Should handle scores', async () => {
@@ -12,7 +12,7 @@ describe('StudentProgress.vue', () => {
         course: {
           alias: 'hello',
         },
-        assignments: <omegaup.Assignment[]>[
+        assignments: [
           {
             alias: 'assignment',
             assignment_type: 'homework',
@@ -25,8 +25,8 @@ describe('StudentProgress.vue', () => {
             scoreboard_url_admin: '',
             max_points: 200,
           } as omegaup.Assignment,
-        ],
-        student: <types.StudentProgress>{
+        ] as omegaup.Assignment[],
+        student: {
           name: 'student',
           points: {
             ['assignment']: {
@@ -47,7 +47,7 @@ describe('StudentProgress.vue', () => {
             },
           },
           username: 'student',
-        },
+        } as types.StudentProgress,
         problemTitles: {
           problem1: 'Problem 1',
           problem2: 'Problem 2',

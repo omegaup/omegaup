@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 import expect from 'expect';
 
 import T from '../../lang';
@@ -7,7 +7,7 @@ import T from '../../lang';
 import course_Form from './Form.vue';
 
 const baseCourseFormProps = {
-  course: <types.CourseDetails>{
+  course: {
     admission_mode: 'registration',
     alias: 'Newx',
     assignments: [],
@@ -24,7 +24,7 @@ const baseCourseFormProps = {
     start_time: new Date(),
     student_count: 3,
     unlimited_duration: false,
-  },
+  } as types.CourseDetails,
   update: true,
 };
 const selector = '.omegaup-course-details button.btn-primary';

@@ -203,7 +203,7 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
     driver.register_user(user2, password)
 
     create_contest_admin(driver, alias, problem, [user1, user2],
-                         driver.user_username, scoreboard_time_percent=0)
+                         driver.user_username, scoreboard_time_percent=1)
 
     with driver.login(user1, password):
         create_run_user(driver, alias, problem, 'Main.cpp17-gcc',

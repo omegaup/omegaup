@@ -4,7 +4,7 @@ import Sortable from 'sortablejs';
 
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import course_AssignmentList from './AssignmentList.vue';
 
@@ -12,7 +12,7 @@ describe('AssignmentList.vue', () => {
   it('Should handle empty content list', () => {
     const wrapper = shallowMount(course_AssignmentList, {
       propsData: {
-        content: <types.CourseAssignment[]>[],
+        content: [] as types.CourseAssignment[],
         courseAlias: 'course_alias',
       },
     });
@@ -31,7 +31,7 @@ describe('AssignmentList.vue', () => {
     const wrapper = shallowMount(course_AssignmentList, {
       localVue,
       propsData: {
-        content: <omegaup.Assignment[]>[
+        content: [
           {
             alias: 'CA',
             assignment_type: 'test',
@@ -46,7 +46,7 @@ describe('AssignmentList.vue', () => {
             scoreboard_url_admin: 'sb02',
             start_time: new Date(),
           },
-        ],
+        ] as omegaup.Assignment[],
         courseAlias: 'course_alias',
         assignmentFormMode: omegaup.AssignmentFormMode.Default,
       },

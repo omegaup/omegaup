@@ -57,7 +57,9 @@ export namespace types {
         })(x.events);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -65,7 +67,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.AuthorRankTablePayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -86,7 +88,9 @@ export namespace types {
         })(x.badge);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -112,7 +116,9 @@ export namespace types {
         })(x.ownedBadges);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -120,7 +126,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.CertificateDetailsPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -128,7 +134,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.CoderOfTheMonthPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -136,7 +142,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.CollectionDetailsByAuthorPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -144,7 +150,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.CollectionDetailsByLevelPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -152,7 +158,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.CommonPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -200,7 +206,9 @@ export namespace types {
         })(x.users);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -225,7 +233,9 @@ export namespace types {
           })(x.problemset);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -252,7 +262,9 @@ export namespace types {
         })(x.contests);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -394,7 +406,9 @@ export namespace types {
         })(x.contests);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -402,7 +416,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ContestNewPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -417,7 +431,9 @@ export namespace types {
         })(x.contest);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -449,7 +465,9 @@ export namespace types {
         })(x.details);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -481,7 +499,9 @@ export namespace types {
         })(x.details);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -537,7 +557,9 @@ export namespace types {
           })(x.selectedAssignment);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -622,7 +644,9 @@ export namespace types {
         })(x.courses);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -708,7 +732,9 @@ export namespace types {
         })(x.courses);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -716,7 +742,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.CourseNewPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -748,7 +774,9 @@ export namespace types {
         })(x.course);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -756,7 +784,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.CourseSubmissionsListPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -764,7 +792,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.GroupEditPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -783,7 +811,9 @@ export namespace types {
         })(x.groups);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -819,7 +849,9 @@ export namespace types {
         })(x.contests);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -856,7 +888,9 @@ export namespace types {
         })(x.coderOfTheMonthData);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -891,7 +925,9 @@ export namespace types {
           })(x.details);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -899,7 +935,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.LoginDetailsPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -959,7 +995,9 @@ export namespace types {
         })(x.solvers);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -1005,7 +1043,9 @@ export namespace types {
           })(x.publishedRevision);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -1013,7 +1053,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ProblemFormPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -1021,7 +1061,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ProblemListCollectionPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -1029,7 +1069,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ProblemListPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -1037,7 +1077,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ProblemQualityPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -1045,7 +1085,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ProblemsMineInfoPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -1053,7 +1093,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.SchoolOfTheMonthPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -1061,7 +1101,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.SchoolProfileDetailsPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -1069,7 +1109,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.SchoolRankPayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
 
@@ -1083,7 +1123,9 @@ export namespace types {
           );
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -1115,7 +1157,9 @@ export namespace types {
         })(x.course);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -1147,7 +1191,9 @@ export namespace types {
         })(x.course);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -1166,7 +1212,9 @@ export namespace types {
         })(x.submissions);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -1224,7 +1272,9 @@ export namespace types {
         })(x.profile);
         return x;
       })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -1232,7 +1282,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.UserRankTablePayload {
       return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+        (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
   }
