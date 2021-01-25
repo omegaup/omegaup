@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card problems-container">
     <div class="card-body">
       <form class="form" @submit.prevent="onSubmit">
         <div class="row">
