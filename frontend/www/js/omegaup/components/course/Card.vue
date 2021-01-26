@@ -14,6 +14,18 @@
   </div>
 </template>
 
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { types } from '../../api_types';
+import T from '../../lang';
+
+@Component
+export default class CourseCard extends Vue {
+  @Prop() course!: types.StudentCourses; //TODO: Hacer este un tipo individual.
+}
+
+</script>
+
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
