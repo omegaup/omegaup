@@ -12,7 +12,7 @@ namespace OmegaUp\DAO;
  * @package docs
  *
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  * @psalm-type StudentProgress=array{name: string|null, username: string, progress: list<array{assignment_alias: string, assignment_score: float, problems: list<string, float>}>}
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
@@ -100,6 +100,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     admission_mode,
                     alias,
                     c.course_id,
+                    c.description,
                     finish_time,
                     c.name AS name,
                     s.name AS school_name,
@@ -162,7 +163,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ON c.school_id = s.school_id
                 ORDER BY
                     pr.last_submission_time DESC;';
-        /** @var list<array{accept_teacher: bool|null, admission_mode: string, alias: string, course_id: int, finish_time: \OmegaUp\Timestamp|null, last_submission_time: \OmegaUp\Timestamp|null, name: string, progress: float, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{accept_teacher: bool|null, admission_mode: string, alias: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, last_submission_time: \OmegaUp\Timestamp|null, name: string, progress: float, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId, $identityId]
@@ -191,6 +192,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 course_id,
                 admission_mode,
                 alias,
+                description,
                 finish_time,
                 c.name AS name,
                 s.name AS school_name,
@@ -206,7 +208,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE c.admission_mode = ?;
            ';
 
-        /** @var list<array{accept_teacher: int|null, admission_mode: string, alias: string, course_id: int, finish_time: \OmegaUp\Timestamp|null, is_open: int, name: string, progress: float, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{accept_teacher: int|null, admission_mode: string, alias: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, is_open: int, name: string, progress: float, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [\OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC]

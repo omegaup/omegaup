@@ -21,7 +21,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
- * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, counts: array<string, int>, description: string, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>}
  * @psalm-type CourseCloneDetailsPayload=array{creator: array{classname: string, username: string}, details: CourseDetails, token: string}
  * @psalm-type CoursesByTimeType=array{courses: list<FilteredCourse>, timeType: string}
@@ -1703,11 +1703,12 @@ class Course extends \OmegaUp\Controllers\Controller {
         $relevantColumns = [
             'admission_mode',
             'alias',
+            'description',
             'finish_time',
             'name',
             'start_time',
         ];
-        /** @var array{admission_mode: string, alias: string, assignments: list<CourseAssignment>, finish_time: \OmegaUp\Timestamp|null, name: string, start_time: \OmegaUp\Timestamp} */
+        /** @var array{admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, finish_time: \OmegaUp\Timestamp|null, name: string, start_time: \OmegaUp\Timestamp} */
         $arr = $course->asFilteredArray($relevantColumns);
         $arr['assignments'] = [];
         $arr['school_name'] = null;
