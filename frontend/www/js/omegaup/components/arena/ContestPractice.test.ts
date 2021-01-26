@@ -145,7 +145,7 @@ describe('Details.vue', () => {
             text: 'B. hello other problem omegaUp',
           },
         ] as types.NavbarContestProblem[],
-        problem: sampleProblem,
+        problemInfo: sampleProblem,
       },
     });
 
