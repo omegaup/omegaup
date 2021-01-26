@@ -429,28 +429,6 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
-        if (x.problem)
-          x.problem = ((x) => {
-            if (x.problemsetter)
-              x.problemsetter = ((x) => {
-                if (x.creation_date)
-                  x.creation_date = ((x: number) => new Date(x * 1000))(
-                    x.creation_date,
-                  );
-                return x;
-              })(x.problemsetter);
-            if (x.runs)
-              x.runs = ((x) => {
-                if (!Array.isArray(x)) {
-                  return x;
-                }
-                return x.map((x) => {
-                  x.time = ((x: number) => new Date(x * 1000))(x.time);
-                  return x;
-                });
-              })(x.runs);
-            return x;
-          })(x.problem);
         return x;
       })(
         JSON.parse(
@@ -1736,7 +1714,6 @@ export namespace types {
 
   export interface ContestPracticePayload {
     contest: types.ContestPublicDetails;
-    problem?: types.ProblemInfo;
     problems: types.NavbarContestProblem[];
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }

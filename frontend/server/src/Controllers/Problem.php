@@ -2506,7 +2506,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{problem: null|\OmegaUp\DAO\VO\Problems, problemset: null|\OmegaUp\DAO\VO\Problemsets}
      */
-    public static function getValidProblemAndProblemset(
+    private static function getValidProblemAndProblemset(
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?string $contestAlias,
         string $problemAlias,
@@ -2534,7 +2534,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return ProblemDetails
      */
-    public static function getProblemDetails(
+    private static function getProblemDetails(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Problemsets $problemset,
@@ -4379,7 +4379,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $sampleInput = '';
+        $sampleInput = null;
         if (
             isset($details['settings']['cases']) &&
             isset($details['settings']['cases']['sample']) &&
