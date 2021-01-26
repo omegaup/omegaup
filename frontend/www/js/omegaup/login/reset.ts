@@ -6,7 +6,7 @@ import login_PasswordReset from '../components/login/PasswordReset.vue';
 
 OmegaUp.on('ready', () => {
   const payload = JSON.parse(
-    (<HTMLElement>document.getElementById('payload')).innerText,
+    (document.getElementById('payload') as HTMLElement).innerText,
   );
 
   new Vue({

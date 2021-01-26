@@ -25,7 +25,7 @@ OmegaUp.on('ready', () => {
       'omegaup-course-viewstudent': course_ViewStudent,
     },
     data: () => ({
-      problems: <types.CourseProblem[]>[],
+      problems: [] as types.CourseProblem[],
     }),
     render: function (createElement) {
       return createElement('omegaup-course-viewstudent', {

@@ -57,6 +57,7 @@ module.exports = {
     course_clone: './frontend/www/js/omegaup/course/clone.ts',
     course_details: './frontend/www/js/omegaup/course/details.ts',
     course_edit: './frontend/www/js/omegaup/course/edit.ts',
+    course_homepage: './frontend/www/js/omegaup/course/homepage.ts',
     course_intro: './frontend/www/js/omegaup/course/intro.ts',
     course_list: './frontend/www/js/omegaup/course/list.ts',
     course_mine: './frontend/www/js/omegaup/course/mine.ts',

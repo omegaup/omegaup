@@ -100,6 +100,46 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals('open', $response['events'][0]['event']['name']);
     }
 
+    public function testFutureContestIntro() {
+        // Get a contest
+        $startTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 60 * 60);
+        $finishTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 120 * 60);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'requestsUserInformation' => 'optional',
+                'startTime' => $startTime,
+                'finishTime' => $finishTime,
+            ])
+        );
+        // Create user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add user to our contest
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contestData,
+            $identity
+        );
+
+        $userLogin = self::login($identity);
+        $this->assertTrue(
+            \OmegaUp\Controllers\Contest::shouldShowIntro(
+                $identity,
+                $contestData['contest']
+            )
+        );
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertEquals(
+            $contestDetails['contest']['start_time']->time,
+            $startTime->time
+        );
+    }
+
     public function testContestParticipantsReport() {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([

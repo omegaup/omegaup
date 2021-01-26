@@ -157,9 +157,9 @@ export default class AdminSupport extends Vue {
   }
 
   onCopyToken(): void {
-    let copyText: HTMLInputElement = <HTMLInputElement>(
-      this.$el.querySelector('input[name=link]')
-    );
+    const copyText = this.$el.querySelector(
+      'input[name=link]',
+    ) as HTMLInputElement;
     copyText.select();
     document.execCommand('copy');
     this.$emit('copy-token');

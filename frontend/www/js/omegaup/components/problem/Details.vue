@@ -545,7 +545,7 @@ export default class ProblemDetails extends Vue {
         source_name: `Main.${data.language}`,
         groups: groups,
         show_diff: this.isAdmin ? data.show_diff : 'none',
-        feedback: <omegaup.SubmissionFeedback>omegaup.SubmissionFeedback.None,
+        feedback: omegaup.SubmissionFeedback.None as omegaup.SubmissionFeedback,
       }),
     );
 
