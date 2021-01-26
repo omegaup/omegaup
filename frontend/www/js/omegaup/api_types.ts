@@ -1968,6 +1968,7 @@ export namespace types {
     alias: string;
     assignments: types.CourseAssignment[];
     counts: { [key: string]: number };
+    description: string;
     finish_time?: Date;
     is_open: boolean;
     name: string;
