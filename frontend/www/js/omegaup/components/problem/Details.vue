@@ -233,15 +233,8 @@
         class="tab-pane fade p-4"
         :class="{ 'show active': selectedTab === 'ranking' }"
       >
-        <omegaup-problem-solution
-          :status="solutionStatus"
-          :solution="solution"
-          :available-tokens="availableTokens"
-          :all-tokens="allTokens"
-          @get-solution="$emit('get-solution')"
-          @get-tokens="$emit('get-tokens')"
-          @unlock-solution="$emit('unlock-solution')"
-        ></omegaup-problem-solution>
+        <!-- TODO: Add Scoreboard component when we migrate arena.contest.tpl-->
+        <slot name="arena-scoreboard"></slot>
       </div>
       <div
         class="tab-pane fade p-4"

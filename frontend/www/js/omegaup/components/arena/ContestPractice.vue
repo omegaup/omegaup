@@ -11,15 +11,15 @@
       <div class="navbar">
         <omegaup-arena-navbar-problems
           :problems="problems"
-          :active-problem="activeProblem.alias"
+          :active-problem="activeProblemAlias"
           :in-assignment="false"
           :digits-after-decimal-point="contest.partialScore ? 2 : 0"
-          @disable-active-problem="activeProblem.alias = null"
+          @disable-active-problem="activeProblem = null"
           @navigate-to-problem="onNavigateToProblem"
         ></omegaup-arena-navbar-problems>
       </div>
       <omegaup-arena-contest-summary
-        v-if="activeProblem.alias === null"
+        v-if="activeProblem === null"
         :contest="contest"
         :show-ranking="false"
       ></omegaup-arena-contest-summary>
@@ -33,6 +33,20 @@
         >
           <template #quality-nomination-buttons><div></div></template>
           <template #best-solvers-list><div></div></template>
+          <template #arena-scoreboard>
+            <div class="card">
+              <div class="card-body">
+                <omegaup-markdown
+                  :markdown="
+                    ui.formatString(
+                      T.arenaContestPracticeOriginalScoreboardText,
+                      { contestAlias: contest.alias },
+                    )
+                  "
+                ></omegaup-markdown>
+              </div>
+            </div>
+          </template>
           <template #clarifications-list>
             <omegaup-arena-clarification-list
               :clarifications="clarifications"
@@ -50,12 +64,14 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import * as ui from '../../ui';
 import T from '../../lang';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_ContestSummary from './ContestSummaryV2.vue';
+import omegaup_Markdown from '../Markdown.vue';
 import problem_Details from '../problem/Details.vue';
 
 export interface ActiveProblem {
@@ -68,12 +84,14 @@ export interface ActiveProblem {
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-contest-summary': arena_ContestSummary,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
+    'omegaup-markdown': omegaup_Markdown,
     'omegaup-problem-details': problem_Details,
   },
 })
 export default class ArenaContestPractice extends Vue {
   @Prop() contest!: types.ContestPublicDetails;
   @Prop() problems!: types.NavbarContestProblem[];
+  @Prop({ default: null }) problem!: ActiveProblem | null;
   @Prop() problemInfo!: types.ProblemInfo;
   @Prop({ default: false }) isEphemeralExperimentEnabled!: boolean;
   @Prop({ default: false }) admin!: boolean;
@@ -83,14 +101,25 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: true }) showDeadlines!: boolean;
 
   T = T;
-  activeProblem: ActiveProblem = {
-    runs: [],
-    alias: this.problemInfo?.alias ?? null,
-  };
+  ui = ui;
+  activeProblem: ActiveProblem | null = this.problem;
+
+  get activeProblemAlias(): null | string {
+    return this.activeProblem?.alias ?? null;
+  }
 
   onNavigateToProblem(problemAlias: string) {
-    this.activeProblem.alias = problemAlias;
+    this.activeProblem = { alias: problemAlias, runs: [] };
     this.$emit('navigate-to-problem', this.activeProblem);
+  }
+
+  @Watch('problem')
+  onActiveProblemChanged(newValue: ActiveProblem | null): void {
+    if (!newValue) {
+      this.activeProblem = null;
+      return;
+    }
+    this.onNavigateToProblem(newValue.alias);
   }
 }
 </script>
