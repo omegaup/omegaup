@@ -88,10 +88,51 @@
               </template>
             </template>
           </div>
-          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-            <omegaup-card></omegaup-card>
-            <omegaup-card></omegaup-card>
-            <omegaup-card></omegaup-card>
+          <div class="col-lg-12">
+            <div class="row justify-content-between row-cols-1 row-cols-md-2">
+              <omegaup-card
+                :course="{
+                  admission_mode: 'public',
+                  alias: 'curso-prueba',
+                  description: 'Blablabla blablab blabla blablablabla.',
+                  finish_time: null,
+                  name: 'Curso de prueba',
+                  school_name: 'Escuela curso',
+                  progress: 0,
+                  is_open: false,
+                  accept_teacher: null,
+                }"
+                :type="'finished'"
+              ></omegaup-card>
+              <omegaup-card
+                :course="{
+                  admission_mode: 'public',
+                  alias: 'curso-prueba',
+                  description: 'Blablabla blablab blabla blablablabla.',
+                  finish_time: null,
+                  name: 'Curso de prueba',
+                  school_name: 'Escuela curso',
+                  progress: 0,
+                  is_open: false,
+                  accept_teacher: null,
+                }"
+                :type="'student'"
+              ></omegaup-card>
+              <omegaup-card
+                :course="{
+                  admission_mode: 'public',
+                  alias: 'curso-prueba',
+                  description: 'Blablabla blablab blabla blablablabla.',
+                  finish_time: null,
+                  name: 'Curso de prueba',
+                  school_name: 'Escuela curso',
+                  progress: 0,
+                  is_open: false,
+                  accept_teacher: null,
+                }"
+                :type="'public'"
+              ></omegaup-card>
+            </div>
           </div>
         </div>
       </template>
