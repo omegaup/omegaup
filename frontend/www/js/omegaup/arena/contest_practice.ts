@@ -11,16 +11,18 @@ import arena_ContestPractice, {
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestPracticePayload();
-  const locationHash = window.location.hash.substr(1).split('/');
-  let problemInfo: types.ProblemInfo | null = null;
-  const problem: ActiveProblem = { runs: [], alias: null };
+  const problemInfo = payload.problem;
+  const problem: ActiveProblem | null = payload.problem
+    ? { runs: payload.problem.runs ?? [], alias: payload.problem.alias }
+    : null;
 
   const contestPractice = new Vue({
+    el: '#main-container',
     components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
     data: () => ({
-      problemInfo: <types.ProblemInfo | null>problemInfo,
-      problems: <types.NavbarContestProblem[]>payload.problems,
-      problem: <ActiveProblem>problem,
+      problemInfo: problemInfo as types.ProblemInfo | null,
+      problems: payload.problems as types.NavbarContestProblem[],
+      problem: problem as ActiveProblem,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
@@ -53,31 +55,4 @@ OmegaUp.on('ready', () => {
       });
     },
   });
-
-  const contestPracticeElement = document.querySelector('#main-container');
-  if (locationHash.length > 1) {
-    api.Problem.details({
-      contest_alias: payload.contest.alias,
-      problem_alias: locationHash[1],
-      prevent_problemset_open: false,
-    })
-      .then((problemExt) => {
-        const currentProblem = payload.problems?.find(
-          ({ alias }) => alias == problemExt.alias,
-        );
-        problemExt.title = currentProblem?.text ?? '';
-        problemInfo = problemExt;
-        problem.alias = problemExt.alias;
-        problem.runs = problemExt.runs ?? [];
-        window.location.hash = `#problems/${locationHash[1]}`;
-        if (contestPracticeElement) {
-          contestPractice.$mount(contestPracticeElement);
-        }
-      })
-      .catch(ui.apiError);
-  } else {
-    if (contestPracticeElement) {
-      contestPractice.$mount(contestPracticeElement);
-    }
-  }
 });

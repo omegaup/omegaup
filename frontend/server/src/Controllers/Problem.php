@@ -16,7 +16,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemSettingsDistrib=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettingsDistrib, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, name: string, tolerance?: float}}
  * @psalm-type ProblemsetterInfo=array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}
  * @psalm-type SettingLimits=array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}
- * @psalm-type ProblemInfo=array{accepts_submissions: boolean, commit: string, alias: string, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, points: float, preferred_language: null|string, problem_id: int, problemsetter: ProblemsetterInfo|null, quality_seal: bool, sample_input: null|string, settings: ProblemSettingsDistrib, source: null|string, statement: ProblemStatement, title: string, visibility: int}
+ * @psalm-type ProblemInfo=array{accepts_submissions: bool, commit: string, alias: string, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, points: float, preferred_language: null|string, problem_id: int, problemsetter: ProblemsetterInfo|null, quality_seal: bool, runs?: list<Run>, sample_input?: string, settings: ProblemSettingsDistrib, source: null|string, statement: ProblemStatement, title: string, visibility: int}
  * @psalm-type UserInfoForProblem=array{loggedIn: bool, admin: bool, reviewer: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -2445,7 +2445,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $showSolvers = $r->ensureOptionalBool('show_solvers') ?? false;
-        $preventProblemsetOptin = $r->ensureOptionalBool(
+        $preventProblemsetOption = $r->ensureOptionalBool(
             'prevent_problemset_open'
         ) ?? false;
         $contestAlias = $r->ensureOptionalString(
@@ -2487,7 +2487,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problemset,
             $lang,
             $showSolvers,
-            boolval($r['prevent_problemset_open']),
+            $preventProblemsetOption,
             $contestAlias
         );
         if (is_null($details)) {
@@ -2506,7 +2506,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{problem: null|\OmegaUp\DAO\VO\Problems, problemset: null|\OmegaUp\DAO\VO\Problemsets}
      */
-    private static function getValidProblemAndProblemset(
+    public static function getValidProblemAndProblemset(
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?string $contestAlias,
         string $problemAlias,
@@ -2534,7 +2534,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return ProblemDetails
      */
-    private static function getProblemDetails(
+    public static function getProblemDetails(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Problemsets $problemset,
@@ -4379,7 +4379,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $sampleInput = null;
+        $sampleInput = '';
         if (
             isset($details['settings']['cases']) &&
             isset($details['settings']['cases']['sample']) &&

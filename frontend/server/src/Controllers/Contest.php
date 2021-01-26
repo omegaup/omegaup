@@ -25,11 +25,18 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null}
  * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<ContestProblem>, users: list<ContestUser>, groups: list<ContestGroup>, requests: list<ContestRequest>, admins: list<ContestAdmin>, group_admins: list<ContestGroupAdmin>}
  * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation?: bool, privacyStatement?: PrivacyStatement, problemset?: ContestDetails, requestsUserInformation?: string, shouldShowFirstAssociatedIdentityRunWarning: bool}
- * @psalm-type ContestPracticePayload=array{contest: ContestPublicDetails, problems?: list<NavbarContestProblem>, shouldShowFirstAssociatedIdentityRunWarning: bool}
+ * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
+ * @psalm-type SettingLimits=array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}
+ * @psalm-type ProblemsetterInfo=array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}
+ * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
+ * @psalm-type InteractiveSettingsDistrib=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
+ * @psalm-type ProblemSettingsDistrib=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettingsDistrib, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, name: string, tolerance?: float}}
+ * @psalm-type ProblemStatement=array{images: array<string, string>, sources: array<string, string>, language: string, markdown: string}
+ * @psalm-type ProblemInfo=array{accepts_submissions: bool, commit: string, alias: string, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, points: float, preferred_language: null|string, problem_id: int, problemsetter: ProblemsetterInfo|null, quality_seal: bool, runs?: list<Run>, sample_input?: string, settings: ProblemSettingsDistrib, source: null|string, statement: ProblemStatement, title: string, visibility: int}
+ * @psalm-type ContestPracticePayload=array{contest: ContestPublicDetails, problem?: ProblemInfo, problems: list<NavbarContestProblem>, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestListPayload=array{contests: array{current: list<ContestListItem>, future: list<ContestListItem>, participating?: list<ContestListItem>, past: list<ContestListItem>, public: list<ContestListItem>, recommended_current: list<ContestListItem>, recommended_past: list<ContestListItem>}, isLogged: bool, query: string}
  * @psalm-type ContestNewPayload=array{languages: array<string, string>}
- * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -605,12 +612,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: ContestPracticePayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param null|string $lang
+     * @omegaup-request-param null|string $problem_alias
      */
     public static function getContestPracticeDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
         $contestAlias = $r->ensureString(
             'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $problemAlias = $r->ensureOptionalString(
+            'problem_alias',
+            /*$isRequired=*/false,
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $contest = \OmegaUp\Controllers\Contest::validateContest($contestAlias);
@@ -651,7 +665,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 ]);
         }
 
-        return [
+        $response = [
             'smartyProperties' => [
                 'payload' => [
                     'shouldShowFirstAssociatedIdentityRunWarning' =>
@@ -672,6 +686,62 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ],
             'entrypoint' => 'arena_contest_practice',
         ];
+        if (is_null($problemAlias)) {
+            return $response;
+        }
+        $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
+            $r->identity,
+            $r
+        );
+        [
+            'problem' => $problem,
+            'problemset' => $problemset,
+        ] = \OmegaUp\Controllers\Problem::getValidProblemAndProblemset(
+            $r->identity,
+            $contestAlias,
+            $problemAlias,
+            /*$statementType=*/'',
+            /*$problemsetId=*/null
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+        $details = \OmegaUp\Controllers\Problem::getProblemDetails(
+            $r->identity,
+            $problem,
+            $problemset,
+            $lang,
+            /*$showSolvers=*/false,
+            /*$preventProblemsetOption=*/false,
+            $contestAlias
+        );
+        if (is_null($details)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+        $response['smartyProperties']['payload']['problem'] = [
+            'accepts_submissions' => $details['accepts_submissions'],
+            'commit' => $details['commit'],
+            'alias' => $details['alias'],
+            'input_limit' => $details['input_limit'],
+            'karel_problem' => $details['karel_problem'],
+            'languages' => $details['languages'],
+            'limits' => $details['limits'],
+            'points' => $details['points'],
+            'preferred_language' => $details['preferred_language'] ?? null,
+            'problem_id' => $details['problem_id'],
+            'problemsetter' => $details['problemsetter'] ?? null,
+            'quality_seal' => $details['quality_seal'],
+            'runs' => $details['runs'] ?? [],
+            'settings' => $details['settings'],
+            'source' => $details['source'] ?? null,
+            'statement' => $details['statement'],
+            'title' => $details['title'],
+            'visibility' => $details['visibility'],
+        ];
+        if (isset($details['letter'])) {
+            $response['smartyProperties']['payload']['problem']['letter'] = $details['letter'];
+        }
+        return $response;
     }
 
     /**

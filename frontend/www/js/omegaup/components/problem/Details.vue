@@ -231,6 +231,20 @@
       </div>
       <div
         class="tab-pane fade p-4"
+        :class="{ 'show active': selectedTab === 'ranking' }"
+      >
+        <omegaup-problem-solution
+          :status="solutionStatus"
+          :solution="solution"
+          :available-tokens="availableTokens"
+          :all-tokens="allTokens"
+          @get-solution="$emit('get-solution')"
+          @get-tokens="$emit('get-tokens')"
+          @unlock-solution="$emit('unlock-solution')"
+        ></omegaup-problem-solution>
+      </div>
+      <div
+        class="tab-pane fade p-4"
         :class="{ 'show active': selectedTab === 'clarifications' }"
       >
         <slot name="quality-nomination-buttons">
@@ -379,6 +393,7 @@ export default class ProblemDetails extends Vue {
   @Prop() isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop({ default: false }) shouldShowSolutions!: boolean;
+  @Prop({ default: true }) shouldShowRanking!: boolean;
   @Prop({ default: false }) shouldShowClarifications!: boolean;
 
   PopupDisplayed = PopupDisplayed;
@@ -409,6 +424,11 @@ export default class ProblemDetails extends Vue {
         name: 'runs',
         text: T.wordsRuns,
         visible: this.user.admin,
+      },
+      {
+        name: 'ranking',
+        text: T.wordsRanking,
+        visible: this.shouldShowRanking,
       },
       {
         name: 'clarifications',

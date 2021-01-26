@@ -60,7 +60,7 @@ import problem_Details from '../problem/Details.vue';
 
 export interface ActiveProblem {
   runs: types.Run[];
-  alias: null | string;
+  alias: string;
 }
 
 @Component({
