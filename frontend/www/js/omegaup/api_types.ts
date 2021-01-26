@@ -972,16 +972,6 @@ export namespace types {
                 );
               return x;
             })(x.problemsetter);
-          if (x.runs)
-            x.runs = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                x.time = ((x: number) => new Date(x * 1000))(x.time);
-                return x;
-              });
-            })(x.runs);
           return x;
         })(x.problem);
         if (x.runs)
@@ -2385,7 +2375,6 @@ export namespace types {
     problem_id: number;
     problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
-    runs?: types.Run[];
     sample_input?: string;
     settings: types.ProblemSettingsDistrib;
     source?: string;
