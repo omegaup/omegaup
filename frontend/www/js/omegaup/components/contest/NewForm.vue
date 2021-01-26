@@ -374,6 +374,7 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
+    this.partialScore = true;
   }
 
   fillPreIoi(): void {
@@ -388,6 +389,7 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
+    this.partialScore = true;
   }
 
   fillConacup(): void {
@@ -402,6 +404,7 @@ export default class NewForm extends Vue {
     this.penalty = 20;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
+    this.partialScore = true;
   }
 
   fillIcpc(): void {

@@ -15,8 +15,8 @@ OmegaUp.on('ready', () => {
       'omegaup-problem-mine': problem_Mine,
     },
     data: () => ({
-      problems: <types.ProblemListItem[]>[],
-      pagerItems: <types.PageItem[]>[],
+      problems: [] as types.ProblemListItem[],
+      pagerItems: [] as types.PageItem[],
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-mine', {

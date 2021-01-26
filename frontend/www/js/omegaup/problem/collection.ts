@@ -24,7 +24,7 @@ OmegaUp.on('ready', () => {
           ): void => {
             window.location.replace(
               `/problem/?${ui.buildURLQuery(
-                <{ [key: string]: any }>queryParameters,
+                queryParameters as { [key: string]: any },
               )}`,
             );
           },

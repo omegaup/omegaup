@@ -25,10 +25,10 @@ OmegaUp.on('ready', () => {
       isMainUserIdentity: payload.isMainUserIdentity,
       lockDownImage: payload.lockDownImage,
       navbarSection: payload.navbarSection,
-      notifications: <types.Notification[]>[],
-      graderInfo: <types.GraderStatus | null>null,
+      notifications: [] as types.Notification[],
+      graderInfo: null as types.GraderStatus | null,
       graderQueueLength: -1,
-      errorMessage: <string | null>null,
+      errorMessage: null as string | null,
       initialClarifications: [],
     }),
     render: function (createElement) {

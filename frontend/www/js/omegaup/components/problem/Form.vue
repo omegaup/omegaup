@@ -366,7 +366,7 @@ export default class ProblemForm extends Vue {
   }
 
   onUploadFile(ev: InputEvent): void {
-    const uploadedFile = <HTMLInputElement>ev.target;
+    const uploadedFile = ev.target as HTMLInputElement;
     this.hasFile = uploadedFile.files !== null;
   }
 

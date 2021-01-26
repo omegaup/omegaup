@@ -2,12 +2,12 @@ import { mount } from '@vue/test-utils';
 import expect from 'expect';
 
 import T from '../../lang';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import course_CardsList from './CardsList.vue';
 
 const coursesListProps = {
-  courses: <types.StudentCourses>{
+  courses: {
     admin: {
       accessMode: 'admin',
       activeTab: '',
@@ -50,7 +50,7 @@ const coursesListProps = {
         },
       },
     },
-  },
+  } as types.StudentCourses,
 };
 
 describe('CardsList.vue', () => {
