@@ -1714,7 +1714,7 @@ export namespace types {
 
   export interface ContestPracticePayload {
     contest: types.ContestPublicDetails;
-    problems: types.NavbarContestProblem[];
+    problems?: types.NavbarContestProblem[];
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
