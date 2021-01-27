@@ -203,9 +203,9 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import country_Flag from '../CountryFlag.vue';
-import user_BasicInfo from './BasicInfo.vue';
+import user_BasicInfo from './BasicInfov2.vue';
 import user_Username from './Username.vue';
-import user_Charts from './Charts.vue';
+import user_Charts from './Chartsv2.vue';
 import badge_List from '../badge/List.vue';
 import common_GridPaginator from '../common/GridPaginator.vue';
 import { types } from '../../api_types';
