@@ -182,12 +182,6 @@ export default class ArenaScoreboard extends Vue {
     .penalty {
       font-size: 70%;
     }
-    div[class$='points'] {
-      border-right-style: dotted;
-    }
-    div[class$='penalty'] {
-      border-left-width: 0;
-    }
   }
   .accepted {
     background: #dfd;
