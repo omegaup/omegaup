@@ -184,6 +184,7 @@ describe('Details.vue', () => {
         histogram: histogram,
         showNewRunWindow: false,
         publicTags: [],
+        shouldShowTabs: true,
       },
     });
 
@@ -216,6 +217,7 @@ describe('Details.vue', () => {
         histogram: histogram,
         showNewRunWindow: false,
         publicTags: [],
+        shouldShowTabs: true,
       },
     });
 
