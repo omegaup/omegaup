@@ -69,7 +69,7 @@ interface Tab {
 }
 
 @Component
-export default class ArenaContestWrapper extends Vue {
+export default class Arena extends Vue {
   @Prop({ default: false }) isAdmin!: boolean;
   @Prop() contestTitle!: string;
   @Prop() activeTab!: string;

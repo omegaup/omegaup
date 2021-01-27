@@ -1,11 +1,11 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 
-import arena_ContestWrapper from './ContestWrapper.vue';
+import arena_Arena from './Arena.vue';
 
-describe('ContestWrapper.vue', () => {
+describe('Arena.vue', () => {
   it('Should handle details for a contest', () => {
-    const wrapper = shallowMount(arena_ContestWrapper, {
+    const wrapper = shallowMount(arena_Arena, {
       propsData: {
         contestTitle: 'Hello omegaUp',
         activeTab: 'problems',
