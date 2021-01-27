@@ -22,6 +22,7 @@
           href="#"
           data-toggle="dropdown"
           role="button"
+          data-nav-contest-edit
           class="nav-link active dropdown-toggle"
           aria-haspopup="true"
           aria-expanded="false"
@@ -41,7 +42,7 @@
             v-if="!virtual"
             href="#"
             data-toggle="tab"
-            class="dropdown-item"
+            class="dropdown-item problems"
             :class="{ active: showTab === 'problems' }"
             @click="showTab = 'problems'"
             >{{ T.wordsAddProblem }}</a
@@ -50,7 +51,7 @@
             v-if="!virtual"
             href="#"
             data-toggle="tab"
-            class="dropdown-item"
+            class="dropdown-item admission-mode"
             :class="{ active: showTab === 'publish' }"
             @click="showTab = 'publish'"
             >{{ T.contestNewFormAdmissionMode }}</a
@@ -58,8 +59,9 @@
           <a
             href="#"
             data-toggle="tab"
-            class="dropdown-item"
-            :class="{ active: virtual && showTab === 'contestants' }"
+            data-nav-contestant
+            class="dropdown-item contestants"
+            :class="{ active: showTab === 'contestants' }"
             @click="showTab = 'contestants'"
             >{{ T.contestAdduserAddContestant }}</a
           >
@@ -148,7 +150,7 @@
           "
         ></omegaup-common-publish>
       </div>
-      <div v-if="showTab === 'contestants'" class="tab-pane active">
+      <div v-if="showTab === 'contestants'" class="tab-pane active contestants">
         <omegaup-contest-add-contestant
           :contest="details"
           :initial-users="users"
