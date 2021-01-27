@@ -233,16 +233,14 @@
         class="tab-pane fade p-4"
         :class="{ 'show active': selectedTab === 'clarifications' }"
       >
-        <slot name="quality-nomination-buttons">
-          <omegaup-arena-clarification-list
-            :clarifications="clarifications"
-            :in-contest="false"
-            @clarification-response="
-              (id, responseText, isPublic) =>
-                $emit('clarification-response', id, responseText, isPublic)
-            "
-          ></omegaup-arena-clarification-list>
-        </slot>
+        <omegaup-arena-clarification-list
+          :clarifications="clarifications"
+          :in-contest="false"
+          @clarification-response="
+            (id, responseText, isPublic) =>
+              $emit('clarification-response', id, responseText, isPublic)
+          "
+        ></omegaup-arena-clarification-list>
       </div>
     </div>
   </div>
