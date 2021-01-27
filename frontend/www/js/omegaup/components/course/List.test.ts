@@ -21,6 +21,7 @@ const coursesListProps = {
                 lesson: 2,
                 test: 1,
               },
+              description: 'Test description',
               finish_time: new Date(),
               name: 'Curso de introducción',
               start_time: new Date(),
