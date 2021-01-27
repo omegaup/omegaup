@@ -595,7 +595,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             GROUP BY
                 p.problem_id
             ORDER BY
-                max(s.time) DESC,
+                min(s.time) DESC,
                 p.problem_id DESC;
         ';
         $val = [$identityId];
