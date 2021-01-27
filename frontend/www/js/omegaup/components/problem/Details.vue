@@ -1,6 +1,6 @@
 <template>
   <div class="mt-4">
-    <ul class="nav justify-content-center nav-tabs">
+    <ul v-if="shouldShowTabs" class="nav justify-content-center nav-tabs">
       <li
         v-for="tab in availableTabs"
         :key="tab.name"
@@ -231,13 +231,6 @@
       </div>
       <div
         class="tab-pane fade p-4"
-        :class="{ 'show active': selectedTab === 'ranking' }"
-      >
-        <!-- TODO: Add Scoreboard component when we migrate arena.contest.tpl-->
-        <slot name="arena-scoreboard"></slot>
-      </div>
-      <div
-        class="tab-pane fade p-4"
         :class="{ 'show active': selectedTab === 'clarifications' }"
       >
         <slot name="quality-nomination-buttons">
@@ -385,9 +378,7 @@ export default class ProblemDetails extends Vue {
   @Prop() guid!: string;
   @Prop() isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
-  @Prop({ default: false }) shouldShowSolutions!: boolean;
-  @Prop({ default: true }) shouldShowRanking!: boolean;
-  @Prop({ default: false }) shouldShowClarifications!: boolean;
+  @Prop({ default: false }) shouldShowTabs!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
@@ -411,7 +402,7 @@ export default class ProblemDetails extends Vue {
       {
         name: 'solution',
         text: T.wordsSolution,
-        visible: this.user.loggedIn && this.shouldShowSolutions,
+        visible: this.user.loggedIn,
       },
       {
         name: 'runs',
@@ -419,14 +410,9 @@ export default class ProblemDetails extends Vue {
         visible: this.user.admin,
       },
       {
-        name: 'ranking',
-        text: T.wordsRanking,
-        visible: this.shouldShowRanking,
-      },
-      {
         name: 'clarifications',
         text: T.wordsClarifications,
-        visible: this.user.admin || this.shouldShowClarifications,
+        visible: this.user.admin,
       },
     ];
     return tabs.filter((tab) => tab.visible);

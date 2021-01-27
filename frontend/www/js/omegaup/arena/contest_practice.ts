@@ -26,6 +26,7 @@ OmegaUp.on('ready', () => {
           problems: this.problems,
           problemInfo: this.problemInfo,
           problem: this.problem,
+          activeTab: 'problems',
         },
         on: {
           'navigate-to-problem': (source: ActiveProblem) => {
