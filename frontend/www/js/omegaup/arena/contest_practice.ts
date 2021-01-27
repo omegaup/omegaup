@@ -11,13 +11,20 @@ import arena_ContestPractice, {
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestPracticePayload();
+  // The hash is of the form `#problems/${alias}`.
+  const problemMatch = /#problems\/([^/]+)/.exec(window.location.hash);
+  const problemAlias = problemMatch?.[1] ?? null;
+  let problem: ActiveProblem | null = null;
+  if (problemAlias) {
+    problem = { alias: problemAlias, runs: [] };
+  }
   const contestPractice = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
     data: () => ({
       problemInfo: null as types.ProblemInfo | null,
       problems: payload.problems as types.NavbarContestProblem[],
-      problem: null as ActiveProblem | null,
+      problem: problem as ActiveProblem | null,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
@@ -55,11 +62,4 @@ OmegaUp.on('ready', () => {
       });
     },
   });
-
-  // The hash is of the form `#problems/${alias}`.
-  const problemMatch = /#problems\/([^/]+)/.exec(window.location.hash);
-  const problemAlias = problemMatch ? problemMatch[1] : null;
-  if (problemAlias) {
-    contestPractice.problem = { alias: problemAlias, runs: [] };
-  }
 });
