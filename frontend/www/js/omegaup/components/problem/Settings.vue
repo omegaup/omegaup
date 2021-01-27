@@ -182,7 +182,7 @@ export default class Settings extends Vue {
 
   @Emit('languages-changed')
   onLanguagesChange(event: Event): string {
-    const newValue = (<HTMLInputElement>event.target).value;
+    const newValue = (event.target as HTMLInputElement).value;
     return newValue;
   }
 }
