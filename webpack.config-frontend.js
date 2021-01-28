@@ -41,7 +41,7 @@ module.exports = {
     common_navbar: './frontend/www/js/omegaup/common/navbar.ts',
     common_navbar_v2: './frontend/www/js/omegaup/common/navbar_v2.ts',
     common_stats: './frontend/www/js/omegaup/common/stats.ts',
-    contest_edit: './frontend/www/js/omegaup/contest/edit.js',
+    contest_edit: './frontend/www/js/omegaup/contest/edit.ts',
     contest_intro: './frontend/www/js/omegaup/contest/intro.ts',
     contest_list: './frontend/www/js/omegaup/contest/list.js',
     contest_list_participant:
@@ -55,6 +55,7 @@ module.exports = {
     course_clone: './frontend/www/js/omegaup/course/clone.ts',
     course_details: './frontend/www/js/omegaup/course/details.ts',
     course_edit: './frontend/www/js/omegaup/course/edit.ts',
+    course_homepage: './frontend/www/js/omegaup/course/homepage.ts',
     course_intro: './frontend/www/js/omegaup/course/intro.ts',
     course_list: './frontend/www/js/omegaup/course/list.ts',
     course_mine: './frontend/www/js/omegaup/course/mine.ts',
