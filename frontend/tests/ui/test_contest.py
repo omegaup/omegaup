@@ -466,9 +466,16 @@ def create_contest(driver, alias, scoreboard_time_percent=100):
 def add_students_contest(driver, users):
     '''Add students to a recently contest.'''
 
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'a[data-nav-contest-edit]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH, '//a[@data-nav-contestant]')))
     util.add_students(
         driver, users,
-        tab_xpath='//li[contains(@class, "contestants")]//a',
+        tab_xpath='//a[@data-nav-contestant]',
         container_xpath='//div[contains(@class, "contestants-input-area")]',
         parent_xpath='div[contains(@class, "contestants")]',
         submit_locator=(By.CLASS_NAME, 'user-add-single'))
@@ -481,7 +488,11 @@ def add_students_bulk(driver, users):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             ('li.contestants > a')))).click()
+             'a[data-nav-contest-edit]'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             ('a.contestants')))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR, 'div.contestants')))
@@ -510,7 +521,11 @@ def add_problem_to_contest(driver, problem):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             'li.problems > a'))).click()
+             'a[data-nav-contest-edit]'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'a.problems'))).click()
 
     driver.typeahead_helper('*[contains(@class, "problems-container")]',
                             problem)
@@ -574,7 +589,11 @@ def change_contest_admission_mode(driver, contest_admission_mode):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             'li.admission-mode > a'))).click()
+             'a[data-nav-contest-edit]'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'a.admission-mode'))).click()
     Select(driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,
