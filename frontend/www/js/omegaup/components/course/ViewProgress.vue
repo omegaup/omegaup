@@ -19,7 +19,9 @@
                     class="score text-center"
                   >
                     {{ assignment.name }}<br />
-                    <span>{{ getTotalPoints(assignment) }}</span>
+                    <span class="h6">{{
+                      getTotalPointsByAssignment(assignment)
+                    }}</span>
                     <a
                       v-if="assignment.max_points === 0"
                       data-toggle="tooltip"
@@ -28,7 +30,12 @@
                       ><img src="/media/question.png"
                     /></a>
                   </th>
-                  <th class="text-center">{{ T.courseProgressGlobalScore }}</th>
+                  <th class="text-center">
+                    {{ T.courseProgressGlobalScore }}<br />
+                    <span class="h6">{{
+                      getTotalPointsByCourse(assignments)
+                    }}</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -82,7 +89,7 @@ import * as ui from '../../ui';
 import AsyncComputedPlugin from 'vue-async-computed';
 import AsyncComputed from 'vue-async-computed-decorator';
 import JSZip from 'jszip';
-import StudentProgress from './StudentProgress.vue';
+import omegaup_StudentProgress from './StudentProgress.vue';
 
 Vue.use(AsyncComputedPlugin);
 
@@ -163,7 +170,7 @@ export function toOds(courseName: string, table: TableCell[][]): string {
 
 @Component({
   components: {
-    'omegaup-student-progress': StudentProgress,
+    'omegaup-student-progress': omegaup_StudentProgress,
   },
 })
 export default class CourseViewProgress extends Vue {
@@ -239,7 +246,13 @@ export default class CourseViewProgress extends Vue {
       .reduce((acc, curr) => acc + curr, 0);
   }
 
-  getTotalPoints(assignment: omegaup.Assignment): string {
+  getTotalPointsByCourse(): string {
+    return ui.formatString(T.studentProgressDescriptionTotalPoints, {
+      points: this.totalPoints,
+    });
+  }
+
+  getTotalPointsByAssignment(assignment: omegaup.Assignment): string {
     return ui.formatString(T.studentProgressDescriptionTotalPoints, {
       points: assignment.max_points,
     });
