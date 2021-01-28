@@ -2,7 +2,12 @@
   <tr>
     <td class="text-center align-middle">
       <a :href="studentProgressUrl">
-        {{ student.name || student.username }}
+        <omegaup-user-username
+          :classname="student.classname"
+          :username="student.username"
+          :name="student.name"
+          :country="student.country_id"
+        ></omegaup-user-username>
       </a>
     </td>
     <td
@@ -50,12 +55,16 @@ import T from '../../lang';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
 import * as markdown from '../../markdown';
+import user_Username from '../user/Username.vue';
 
 const markdownConverter = new markdown.Converter();
 
 @Component({
   directives: {
     tooltip: VTooltip,
+  },
+  components: {
+    'omegaup-user-username': user_Username,
   },
 })
 export default class StudentProgress extends Vue {

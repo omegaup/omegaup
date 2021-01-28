@@ -31,6 +31,6 @@ describe('SortControls.vue', () => {
 
     await wrapper.find('a').trigger('click');
 
-    expect(wrapper.emitted('emit-apply-filter')).toEqual([['title', 'asc']]);
+    expect(wrapper.emitted('apply-filter')).toEqual([['title', 'asc']]);
   });
 });

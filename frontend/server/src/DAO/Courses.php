@@ -262,7 +262,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * Returns a list of students within a course with their score and progress
      * by problem
-     * @return array{allProgress: list<array{name: null|string, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}>, problemTitles: array<string, string>}
+     * @return array{allProgress: list<array{classname: string, country_id: null|string, name: null|string, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}>, problemTitles: array<string, string>}
      */
     public static function getStudentsInCourseWithProgressPerAssignment(
         int $courseId,
@@ -271,11 +271,32 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         $sql = 'SELECT
                     i.username,
                     i.name,
+                    i.country_id,
                     pr.assignment_alias,
                     pr.problem_alias,
                     pr.problem_title,
                     problem_points,
-                    MAX(r.contest_score) AS problem_score
+                    MAX(r.contest_score) AS problem_score,
+                    IFNULL(
+                        (
+                            SELECT urc.classname FROM
+                                User_Rank_Cutoffs urc
+                            WHERE
+                                urc.score <= (
+                                        SELECT
+                                            ur.score
+                                        FROM
+                                            User_Rank ur
+                                        WHERE
+                                            ur.user_id = i.user_id
+                                    )
+                            ORDER BY
+                                urc.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        \'user-rank-unranked\'
+                    ) AS classname
                 FROM
                     Groups_Identities AS gi
                 CROSS JOIN
@@ -314,7 +335,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ORDER BY
                     `pr`.`order`;';
 
-        /** @var list<array{assignment_alias: string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, problem_title: string, username: string}> */
+        /** @var list<array{assignment_alias: string, classname: string, country_id: null|string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, problem_title: string, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId, $groupId]
@@ -326,6 +347,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $username = $row['username'];
             if (!isset($allProgress[$username])) {
                 $allProgress[$username] = [
+                    'classname' => $row['classname'],
+                    'country_id' => $row['country_id'],
                     'name' => $row['name'],
                     'progress' => [],
                     'points' => [],
@@ -366,8 +389,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         usort(
             $allProgress,
             /**
-             * @param array{name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string} $a
-             * @param array{name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string} $b
+             * @param array{classname: string, country_id: null|string, name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string} $a
+             * @param array{classname: string, country_id: null|string, name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string} $b
              */
             fn (array $a, array $b) => strcasecmp(
                 !empty($a['name']) ? $a['name'] : $a['username'],
