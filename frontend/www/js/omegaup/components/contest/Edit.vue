@@ -59,8 +59,8 @@
           <a
             href="#"
             data-toggle="tab"
-            class="dropdown-item contestants"
             data-nav-contestant
+            class="dropdown-item contestants"
             :class="{ active: showTab === 'contestants' }"
             @click="showTab = 'contestants'"
             >{{ T.contestAdduserAddContestant }}</a
@@ -211,14 +211,14 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 
-import contest_AddProblem from './AddProblem.vue';
+import contest_AddProblem from './AddProblemv2.vue';
 import contest_AddContestant from './AddContestant.vue';
-import contest_Clone from './Clone.vue';
+import contest_Clone from './Clonev2.vue';
 import contest_Admins from '../common/Adminsv2.vue';
 import common_Requests from '../common/Requestsv2.vue';
 import contest_GroupAdmins from '../common/GroupAdminsv2.vue';
-import contest_Groups from './Groups.vue';
-import contest_Links from './Links.vue';
+import contest_Groups from './Groupsv2.vue';
+import contest_Links from './Linksv2.vue';
 import contest_NewForm from './NewForm.vue';
 import common_Publish from '../common/Publishv2.vue';
 
