@@ -3,7 +3,9 @@ import expect from 'expect';
 import { omegaup } from '../../omegaup';
 
 import course_StudentProgress from './StudentProgress.vue';
-import type { types } from '../../api_types';
+import { types } from '../../api_types';
+import * as ui from '../../ui';
+import T from '../../lang';
 
 describe('StudentProgress.vue', () => {
   it('Should handle scores', async () => {
@@ -57,6 +59,11 @@ describe('StudentProgress.vue', () => {
     });
     expect(wrapper.find('div.bg-yellow').exists()).toBe(true);
     expect(wrapper.find('div.bg-red').exists()).toBe(true);
-    expect(wrapper.find('td[data-global-score]').text()).toBe('50%');
+    expect(wrapper.find('td[data-global-score]').text()).toBe(
+      '50% ' +
+        ui.formatString(T.studentProgressDescriptionTotalPoints, {
+          points: 100,
+        }),
+    );
   });
 });

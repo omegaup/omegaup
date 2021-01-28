@@ -15,7 +15,8 @@
       :key="assignment.alias"
       class="flex-column text-center text-nowrap justify-content-center align-items-center"
     >
-      {{ getProgressDescription(assignment.alias) }}
+      {{ getProgressByAssignment(assignment.alias) }}%<br />
+      <span class="h6">{{ getPointsByAsssignment(assignment.alias) }}</span>
       <div class="d-flex justify-content-center">
         <div
           v-if="
@@ -41,7 +42,12 @@
       </div>
     </td>
     <td data-global-score class="text-center font-weight-bold align-middle">
-      {{ globalScore }}%
+      {{ globalScore }}%<br />
+      <span class="h6">{{
+        ui.formatString(T.studentProgressDescriptionTotalPoints, {
+          points: globalPoints,
+        })
+      }}</span>
     </td>
   </tr>
 </template>
@@ -74,6 +80,7 @@ export default class StudentProgress extends Vue {
   @Prop() problemTitles!: { [key: string]: string };
 
   T = T;
+  ui = ui;
 
   progress(assignmentAlias: string): number {
     if (
@@ -125,29 +132,53 @@ export default class StudentProgress extends Vue {
     );
   }
 
-  get globalScore(): string {
-    const totalPoints = this.assignments
+  get totalPoints(): number {
+    return this.assignments
       .map((assignment) => assignment.max_points ?? 0)
       .reduce((acc, curr) => acc + curr, 0);
-    if (!totalPoints) {
-      return '0.00';
+  }
+
+  get globalPoints(): string {
+    if (!this.totalPoints) {
+      return '0';
     }
 
     return this.assignments
-      .map((assignment) => (this.score(assignment.alias) * 100) / totalPoints)
+      .map((assignment) => this.score(assignment.alias))
       .reduce((acc, curr) => acc + curr, 0)
       .toFixed(0);
   }
 
-  getProgressDescription(assignmentAlias: string): string {
+  get globalScore(): string {
+    if (!this.totalPoints) {
+      return '0.00';
+    }
+
+    return this.assignments
+      .map(
+        (assignment) => (this.score(assignment.alias) * 100) / this.totalPoints,
+      )
+      .reduce((acc, curr) => acc + curr, 0)
+      .toFixed(0);
+  }
+
+  getProgressByAssignment(assignmentAlias: string): string {
     const score = this.score(assignmentAlias);
     const points = this.points(assignmentAlias);
     if (points === 0) {
       return T.courseWithoutProblems;
     }
-    return ui.formatString(T.studentProgressDescription, {
-      score: score,
-      progress: (points != 0 ? (score / points) * 100 : 0).toFixed(0),
+    return (points != 0 ? (score / points) * 100 : 0).toFixed(0);
+  }
+
+  getPointsByAsssignment(assignmentAlias: string): string {
+    const score = this.score(assignmentAlias);
+    const points = this.points(assignmentAlias);
+    if (points === 0) {
+      return '';
+    }
+    return ui.formatString(T.studentProgressDescriptionTotalPoints, {
+      points: score.toFixed(0),
     });
   }
 
@@ -195,8 +226,12 @@ export default class StudentProgress extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../../sass/main.scss';
+
+.h6 {
+  font-size: 0.8rem;
+}
 
 .box {
   width: 20px;

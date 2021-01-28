@@ -30,19 +30,24 @@
                   >
                     <span>
                       {{ assignment.name }}<br />
-                      {{ getTotalPoints(assignment) }}
-                      <a
-                        v-if="assignment.max_points === 0"
-                        data-toggle="tooltip"
-                        rel="tooltip"
-                        :title="T.studentProgressOnlyLecturesDescription"
-                        ><img src="/media/question.png"
-                      /></a>
+                      <span class="h6">
+                        {{ getTotalPointsByAssignment(assignment) }}
+                        <a
+                          v-if="assignment.max_points === 0"
+                          data-toggle="tooltip"
+                          rel="tooltip"
+                          :title="T.studentProgressOnlyLecturesDescription"
+                          ><img src="/media/question.png"
+                        /></a>
+                      </span>
                     </span>
                   </th>
                   <th class="text-center">
                     <span>
-                      {{ T.courseProgressGlobalScore }}
+                      {{ T.courseProgressGlobalScore }}<br />
+                      <span class="h6">{{
+                        getTotalPointsByCourse(assignments)
+                      }}</span>
                       <omegaup-common-sort-controls
                         column="total"
                         :sort-order="sortOrder"
@@ -54,7 +59,7 @@
                 </tr>
               </thead>
               <tbody>
-                <omegaup-student-progress
+                <omegaup-course-student-progress
                   v-for="student in orderedStudents"
                   :key="student.username"
                   :student="student"
@@ -65,7 +70,7 @@
                   :sort-order="sortOrder"
                   @apply-filter="onApplyFilter"
                 >
-                </omegaup-student-progress>
+                </omegaup-course-student-progress>
               </tbody>
             </table>
           </div>
@@ -107,8 +112,8 @@ import * as ui from '../../ui';
 import AsyncComputedPlugin from 'vue-async-computed';
 import AsyncComputed from 'vue-async-computed-decorator';
 import JSZip from 'jszip';
-import StudentProgress from './StudentProgress.vue';
 import common_SortControls from '../common/SortControls.vue';
+import course_StudentProgress from './StudentProgress.vue';
 
 Vue.use(AsyncComputedPlugin);
 
@@ -190,7 +195,7 @@ export function toOds(courseName: string, table: TableCell[][]): string {
 @Component({
   components: {
     'omegaup-common-sort-controls': common_SortControls,
-    'omegaup-student-progress': StudentProgress,
+    'omegaup-course-student-progress': course_StudentProgress,
   },
 })
 export default class CourseViewProgress extends Vue {
@@ -304,7 +309,13 @@ export default class CourseViewProgress extends Vue {
       .reduce((acc, curr) => acc + curr, 0);
   }
 
-  getTotalPoints(assignment: omegaup.Assignment): string {
+  getTotalPointsByCourse(): string {
+    return ui.formatString(T.studentProgressDescriptionTotalPoints, {
+      points: this.totalPoints,
+    });
+  }
+
+  getTotalPointsByAssignment(assignment: omegaup.Assignment): string {
     return ui.formatString(T.studentProgressDescriptionTotalPoints, {
       points: assignment.max_points,
     });
@@ -409,6 +420,10 @@ export default class CourseViewProgress extends Vue {
 </script>
 
 <style scoped>
+.h6 {
+  font-size: 0.8rem;
+}
+
 .panel-body {
   overflow: auto;
   white-space: nowrap;
