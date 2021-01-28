@@ -116,7 +116,7 @@ export default class UserBasicInfo extends Vue {
 }
 </script>
 
-<style>
+<style type="scss" scoped>
 .fields-border > .form-group,
 .fields-border div > .form-group {
   border-color: #e9e9e9 !important;
