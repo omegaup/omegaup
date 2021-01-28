@@ -38,12 +38,6 @@
                         :title="T.studentProgressOnlyLecturesDescription"
                         ><img src="/media/question.png"
                       /></a>
-                      <!--<omegaup-common-sort-controls
-                        :column="assignment.alias"
-                        :sort-order="sortOrder"
-                        :column-name="columnName"
-                        @apply-filter="onApplyFilter"
-                      ></omegaup-common-sort-controls>-->
                     </span>
                   </th>
                   <th class="text-center">
