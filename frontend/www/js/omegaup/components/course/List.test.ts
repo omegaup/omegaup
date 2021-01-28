@@ -58,6 +58,7 @@ describe('List.vue', () => {
     const wrapper = mount(course_List, {
       propsData: coursesListProps,
     });
+
     expect(wrapper.text()).toContain(T.courseCardAboutCourses);
     expect(wrapper.text()).toContain(
       T.courseCardDescriptionCourses.split('\n')[0],
