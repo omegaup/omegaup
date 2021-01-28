@@ -75,6 +75,8 @@ const translations: { [key: string]: string; } = {
   badge_cppExpert_name: "C++ Expert User",
   badge_feedbackProvider_description: "User has provided feedback for at least one problem.",
   badge_feedbackProvider_name: "Feedback Provider",
+  badge_introToAlgorithmsCourseGraduate_description: "The user has solved more than 70% of Introduction to Algorithms course.",
+  badge_introToAlgorithmsCourseGraduate_name: "Introduction to Algorithms Course Graduate",
   badge_javaExpert_description: "The user has solved more than 10 problems in Java.",
   badge_javaExpert_name: "Java Expert User",
   badge_karelExpert_description: "The user has solved more than 10 problems in Karel.",
