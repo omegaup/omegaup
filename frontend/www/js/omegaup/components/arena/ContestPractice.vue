@@ -104,14 +104,6 @@ export default class ArenaContestPractice extends Vue {
   ui = ui;
   activeProblem: ActiveProblem | null = this.problem;
 
-  mounted() {
-    if (!this.problem) {
-      this.activeProblem = null;
-      return;
-    }
-    this.onNavigateToProblem(this.problem.alias);
-  }
-
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;
   }
