@@ -1,9 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import expect from 'expect';
-import user_Profile from './Profilev2.vue';
+import user_Profile from './Profile.vue';
 
-describe('Profilev2.vue', () => {
+describe('Profile.vue', () => {
   it('Should display profile edit button', () => {
     const badge_alias = 'contestManager';
     const badges = ['100SolvedProblems'];
