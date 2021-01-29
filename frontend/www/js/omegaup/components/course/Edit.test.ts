@@ -47,6 +47,7 @@ describe('Edit.vue', () => {
             student_count: 1,
             unlimited_duration: false,
           },
+          allLanguages: { kp: 'Karel Pascal', kj: 'Karel Java' },
           assignmentProblems: [],
           selectedAssignment: undefined,
           students: [],

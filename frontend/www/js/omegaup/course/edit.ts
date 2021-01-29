@@ -120,6 +120,7 @@ OmegaUp.on('ready', () => {
                   description: source.description,
                   start_time: source.startTime,
                   alias: source.alias,
+                  languages: source.selectedLanguages,
                   show_scoreboard: source.showScoreboard,
                   needs_basic_information: source.needsBasicInformation,
                   requests_user_information: source.requests_user_information,
