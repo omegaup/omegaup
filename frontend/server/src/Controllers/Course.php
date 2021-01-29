@@ -13,7 +13,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseAdmin=array{role: string, username: string}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CourseDetails=array{admission_mode?: string, alias: string, assignments?: list<CourseAssignment>, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
+ * @psalm-type CourseDetails=array{admission_mode?: string, alias: string, assignments?: list<CourseAssignment>, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, languages: null|string, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -37,8 +37,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemStats: list<CourseProblemStatistics>, verdicts: list<CourseProblemVerdict>}
  * @psalm-type CourseStudent=array{name: null|string, username: string}
  * @psalm-type StudentProgress=array{name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}
- * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
- * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
+ * @psalm-type CourseNewPayload=array{is_admin: bool, is_curator: bool, languages: array<string, string>}
+ * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, allLanguages: array<string, string>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, problemTitles: array<string, string>, students: list<StudentProgress>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
@@ -431,6 +431,15 @@ class Course extends \OmegaUp\Controllers\Controller {
                 );
             }
         }
+        $languages = $r->ensureOptionalString('languages');
+        if (!is_null($languages)) {
+            $languagesSet = explode(',', $languages);
+            \OmegaUp\Validators::validateValidSubset(
+                $languagesSet,
+                'languages',
+                array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
+            );
+        }
 
         $r->ensureOptionalEnum(
             'admission_mode',
@@ -650,6 +659,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'name' => $newName,
                     'description' => $originalCourse->description,
                     'alias' => $newAlias,
+                    'languages' => $originalCourse->description,
                     'school_id' => $originalCourse->school_id,
                     'start_time' => $startTime,
                     'finish_time' => $cloneCourseFinishTime,
@@ -779,6 +789,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'description' => $r['description'],
             'alias' => $r['alias'],
             'school_id' => $r['school_id'],
+            'languages' => $r['languages'],
             'start_time' => $r['start_time'],
             'finish_time' => $r['finish_time'],
             'admission_mode' => $r['admission_mode'] ?: self::ADMISSION_MODE_PRIVATE,
@@ -875,6 +886,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $problemset = new \OmegaUp\DAO\VO\Problemsets([
                 'acl_id' => $assignment->acl_id,
                 'type' => 'Assignment',
+                'languages' => $course->languages,
                 'scoreboard_url' => \OmegaUp\SecurityTools::randomString(30),
                 'scoreboard_url_admin' => \OmegaUp\SecurityTools::randomString(
                     30
@@ -2882,6 +2894,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $r->identity
                     ),
                     'is_admin' => true,
+                    'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCourseNew'
@@ -2959,6 +2972,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 intval($course->course_id),
                 intval($course->group_id)
             ),
+            'allLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
             'identityRequests' => \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourseWithFirstAdmin(
                 intval($course->course_id)
             ),
@@ -3908,6 +3922,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'school_id' => intval($course->school_id),
             'school_name' => null,
             'start_time' => $course->start_time,
+            'languages' => explode(',', $course->languages),
             'finish_time' => $course->finish_time,
             'is_admin' => $isAdmin,
             'is_curator' => $isCurator,
@@ -4548,6 +4563,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'alias',
             'name',
             'description',
+            'languages' => ['important' => true],
             'start_time',
             'finish_time',
             'school_id',
@@ -4561,7 +4577,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             'admission_mode',
         ];
         $originalAdmissionMode = $course->admission_mode;
-        self::updateValueProperties($r, $course, $valueProperties);
+        $importantChange = self::updateValueProperties(
+            $r,
+            $course,
+            $valueProperties
+        );
         $unlimitedDuration = $r->ensureOptionalBool(
             'unlimited_duration'
         ) ?? false;
@@ -4577,6 +4597,14 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             // Push changes
             \OmegaUp\DAO\Courses::update($course);
+
+            // It means column languages has been modified
+            if ($importantChange) {
+                $assignment = \OmegaUp\DAO\Courses::updateLanguagesToAssignments(
+                    $course,
+                    $r['languages']
+                );
+            }
 
             if ($updateRequests) {
                 // Get the list of contestants

@@ -165,6 +165,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     p.input_limit,
                     IFNULL(p.difficulty, 0.0) AS difficulty,
                     pp.order,
+                    ps.languages AS problemset_languages,
                     p.languages,
                     pp.points,
                     pp.commit,
@@ -175,6 +176,10 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     Problemset_Problems pp
                 ON
                     pp.problem_id = p.problem_id
+                INNER JOIN
+                    Problemsets ps
+                ON
+                    pp.problemset_id = ps.problemset_id
                 INNER JOIN
                     Assignments a
                 ON
@@ -189,11 +194,19 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, problemset_languages: string, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
+        $problems = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$assignmentAlias, $courseAlias]
         );
+        foreach ($problems as &$problem) {
+            $problem['languages'] = join(',', array_intersect(
+                explode(',', $problem['problemset_languages']),
+                explode(',', $problem['languages'])
+            ));
+            unset($problem['problemset_languages']);
+        }
+        return $problems;
     }
 
     /*

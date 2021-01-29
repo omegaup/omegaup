@@ -1802,6 +1802,7 @@ export namespace types {
     finish_time?: Date;
     is_admin: boolean;
     is_curator: boolean;
+    languages?: string;
     name: string;
     needs_basic_information: boolean;
     requests_user_information: string;
@@ -1821,6 +1822,7 @@ export namespace types {
 
   export interface CourseEditPayload {
     admins: types.CourseAdmin[];
+    allLanguages: { [key: string]: string };
     assignmentProblems: types.ProblemsetProblem[];
     course: types.CourseDetails;
     groupsAdmins: types.CourseGroupAdmin[];
@@ -1848,6 +1850,7 @@ export namespace types {
   export interface CourseNewPayload {
     is_admin: boolean;
     is_curator: boolean;
+    languages: { [key: string]: string };
   }
 
   export interface CourseProblem {
