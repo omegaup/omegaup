@@ -1,0 +1,14 @@
+{
+  "es": {
+    "name": "Graduado del Curso de Introducción a Algoritmos II",
+    "description": "El usuario ha resuelto más del 70% del curso de Introducción a Algoritmos II."
+  },
+  "en": {
+    "name": "Introduction to Algorithms II Course Graduate",
+    "description": "The user has solved more than 70% of Introduction to Algorithms II course."
+  },
+  "pt": {
+    "name": "Graduado do curso de Introdução aos Algoritmos II",
+    "description": "O usuário tem resolvido mais de 70% do curso de Introdução aos Algoritmos II."
+  }
+}
