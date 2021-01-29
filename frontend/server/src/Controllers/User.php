@@ -3664,7 +3664,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{profile: UserProfileInfo}, template: string}
+     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{profile: UserProfileInfo}, entrypoint: string}
      *
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param string $contest_alias
@@ -3712,7 +3712,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         'omegaupTitleProfile'
                     ),
                 ],
-                'template' => 'user.profile.tpl',
+                'entrypoint' => 'user_profile',
             ];
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             \OmegaUp\ApiCaller::logException($e);
@@ -3723,7 +3723,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         'omegaupTitleProfile'
                     )
                 ],
-                'template' => 'user.profile.tpl',
+                'entrypoint' => 'user_profile',
             ];
         }
     }
