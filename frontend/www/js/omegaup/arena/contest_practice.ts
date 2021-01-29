@@ -18,22 +18,13 @@ OmegaUp.on('ready', () => {
   const problemInfo: types.ProblemInfo | null = null;
   if (problemAlias) {
     getProblemDetails(
-      {
-        contest_alias: payload.contest.alias,
-        problem_alias: problemAlias,
-        prevent_problemset_open: false,
-      },
+      payload.contest.alias,
+      problemAlias,
       (problemInfo: messages.ProblemDetailsResponse) => {
-        const currentProblem = payload.problems?.find(
-          ({ alias }) => alias == problemInfo.alias,
-        );
-        problemInfo.title = currentProblem?.text ?? '';
         problem = { alias: problemInfo.alias, runs: problemInfo.runs ?? [] };
         createComponentContestPractice(problem, problemInfo);
       },
       () => {
-        ui.dismissNotifications();
-        window.location.hash = '#problems';
         createComponentContestPractice(problem, problemInfo);
       },
     );
@@ -65,24 +56,15 @@ OmegaUp.on('ready', () => {
           on: {
             'navigate-to-problem': (source: ActiveProblem) => {
               getProblemDetails(
-                {
-                  contest_alias: payload.contest.alias,
-                  problem_alias: source.alias,
-                  prevent_problemset_open: false,
-                },
+                payload.contest.alias,
+                source.alias,
                 (problem: messages.ProblemDetailsResponse) => {
-                  const currentProblem = payload.problems?.find(
-                    ({ alias }) => alias == problem.alias,
-                  );
-                  problem.title = currentProblem?.text ?? '';
                   contestPractice.problemInfo = problem;
                   source.alias = problem.alias;
                   source.runs = problem.runs ?? [];
                   window.location.hash = `#problems/${source.alias}`;
                 },
                 () => {
-                  ui.dismissNotifications();
-                  window.location.hash = '#problems';
                   contestPractice.problem = null;
                 },
               );
@@ -94,10 +76,27 @@ OmegaUp.on('ready', () => {
   }
 
   function getProblemDetails(
-    params: messages.ProblemDetailsRequest,
+    contestAlias: string,
+    problemAlias: string,
     cb: (problem: messages.ProblemDetailsResponse) => void,
     cbError: () => void,
   ): void {
-    api.Problem.details(params).then(cb).catch(cbError);
+    api.Problem.details({
+      contest_alias: contestAlias,
+      problem_alias: problemAlias,
+      prevent_problemset_open: false,
+    })
+      .then((problemInfo) => {
+        const currentProblem = payload.problems?.find(
+          ({ alias }) => alias == problemInfo.alias,
+        );
+        problemInfo.title = currentProblem?.text ?? '';
+        cb(problemInfo);
+      })
+      .catch(() => {
+        ui.dismissNotifications();
+        window.location.hash = '#problems';
+        cbError();
+      });
   }
 });
