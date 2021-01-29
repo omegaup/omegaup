@@ -26,7 +26,7 @@
               <div class="col-8 mt-1">
                 <div class="progress">
                   <div
-                    class="progress-bar progress-bar-striped bg-warning"
+                    class="progress-bar progress-bar-striped bg-warning text-dark"
                     role="progressbar"
                     :style="`width: ${course.progress}%`"
                     :aria-valuenow="course.progress"
