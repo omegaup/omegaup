@@ -1,6 +1,6 @@
 import { OmegaUp } from '../omegaup';
 import * as time from '../time';
-import { types } from '../api_types';
+import { messages, types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
@@ -17,24 +17,26 @@ OmegaUp.on('ready', () => {
   let problem: ActiveProblem | null = null;
   const problemInfo: types.ProblemInfo | null = null;
   if (problemAlias) {
-    api.Problem.details({
-      contest_alias: payload.contest.alias,
-      problem_alias: problemAlias,
-      prevent_problemset_open: false,
-    })
-      .then((problemInfo) => {
+    getProblemDetails(
+      {
+        contest_alias: payload.contest.alias,
+        problem_alias: problemAlias,
+        prevent_problemset_open: false,
+      },
+      (problemInfo: messages.ProblemDetailsResponse) => {
         const currentProblem = payload.problems?.find(
           ({ alias }) => alias == problemInfo.alias,
         );
         problemInfo.title = currentProblem?.text ?? '';
         problem = { alias: problemInfo.alias, runs: problemInfo.runs ?? [] };
         createComponentContestPractice(problem, problemInfo);
-      })
-      .catch(() => {
+      },
+      () => {
         ui.dismissNotifications();
         window.location.hash = '#problems';
         createComponentContestPractice(problem, problemInfo);
-      });
+      },
+    );
   } else {
     createComponentContestPractice(problem, problemInfo);
   }
@@ -62,30 +64,40 @@ OmegaUp.on('ready', () => {
           },
           on: {
             'navigate-to-problem': (source: ActiveProblem) => {
-              api.Problem.details({
-                contest_alias: payload.contest.alias,
-                problem_alias: source.alias,
-                prevent_problemset_open: false,
-              })
-                .then((problemExt) => {
+              getProblemDetails(
+                {
+                  contest_alias: payload.contest.alias,
+                  problem_alias: source.alias,
+                  prevent_problemset_open: false,
+                },
+                (problem: messages.ProblemDetailsResponse) => {
                   const currentProblem = payload.problems?.find(
-                    ({ alias }) => alias == problemExt.alias,
+                    ({ alias }) => alias == problem.alias,
                   );
-                  problemExt.title = currentProblem?.text ?? '';
-                  contestPractice.problemInfo = problemExt;
-                  source.alias = problemExt.alias;
-                  source.runs = problemExt.runs ?? [];
+                  problem.title = currentProblem?.text ?? '';
+                  contestPractice.problemInfo = problem;
+                  source.alias = problem.alias;
+                  source.runs = problem.runs ?? [];
                   window.location.hash = `#problems/${source.alias}`;
-                })
-                .catch(() => {
+                },
+                () => {
                   ui.dismissNotifications();
                   window.location.hash = '#problems';
                   contestPractice.problem = null;
-                });
+                },
+              );
             },
           },
         });
       },
     });
+  }
+
+  function getProblemDetails(
+    params: messages.ProblemDetailsRequest,
+    cb: (problem: messages.ProblemDetailsResponse) => void,
+    cbError: () => void,
+  ): void {
+    api.Problem.details(params).then(cb).catch(cbError);
   }
 });
