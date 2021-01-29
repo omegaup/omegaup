@@ -49,7 +49,7 @@
                   </div>
                   <div class="modal-body">
                     <omegaup-markdown
-                      :markdown="courseModalByType(acessMode)"
+                      :markdown="courseModalByType(accessMode)"
                     ></omegaup-markdown>
                   </div>
                 </div>
