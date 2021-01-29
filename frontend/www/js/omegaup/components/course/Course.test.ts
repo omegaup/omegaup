@@ -4,11 +4,11 @@ import expect from 'expect';
 import T from '../../lang';
 import type { types } from '../../api_types';
 
-import course_CourseCard from './CourseCard.vue';
+import course_Course from './Course.vue';
 
-describe('CourseCard.vue', () => {
+describe('Course.vue', () => {
   it('Should handle a card with public course', () => {
-    const wrapper = mount(course_CourseCard, {
+    const wrapper = mount(course_Course, {
       propsData: {
         courseName: 'Introductorio a la OMI',
         courseAlias: 'OMI',
@@ -63,7 +63,7 @@ describe('CourseCard.vue', () => {
     const now = new Date();
     const finishTime = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
-    const wrapper = mount(course_CourseCard, {
+    const wrapper = mount(course_Course, {
       propsData: {
         courseName: 'Clase 2020 semestre 1',
         courseAlias: 'S1-2020',
