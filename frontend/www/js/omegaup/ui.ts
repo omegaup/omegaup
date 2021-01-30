@@ -2,6 +2,13 @@ import T from './lang';
 import { formatDate, formatDateTime } from './time';
 import { omegaup } from './omegaup';
 
+export enum MessageType {
+  Danger = 'alert-danger',
+  Info = 'alert-info',
+  Success = 'alert-success',
+  Warning = 'alert-warning',
+}
+
 export function navigateTo(href: string): void {
   window.location.href = href;
 }
@@ -68,11 +75,11 @@ export function formatString(
   });
 }
 
-export function displayStatus(
-  message: string,
-  type: string,
-  autoHide = true,
-): void {
+export function displayStatus(args: {
+  message: string;
+  type: MessageType;
+  autoHide?: boolean;
+}): void {
   if ($('#status .message').length == 0) {
     console.error('Showing warning but there is no status div');
   }
@@ -81,7 +88,7 @@ export function displayStatus(
   $('#loading').hide();
   $('#root').show();
 
-  $('#status .message').html(message);
+  $('#status .message').html(args.message);
   const statusElement = $('#status');
   let statusCounter = parseInt(statusElement.attr('data-counter') || '0');
   if (statusCounter % 2 == 1) {
@@ -89,7 +96,7 @@ export function displayStatus(
   }
   statusElement
     .removeClass('alert-success alert-info alert-warning alert-danger')
-    .addClass(type)
+    .addClass(args.type)
     .addClass('animating')
     .attr('data-counter', statusCounter + 1)
     .slideDown({
@@ -97,7 +104,7 @@ export function displayStatus(
         statusElement
           .removeClass('animating')
           .attr('data-counter', statusCounter + 2);
-        if (type == 'alert-success' && autoHide) {
+        if (args.type == 'alert-success' && args.autoHide) {
           setTimeout(() => {
             dismissNotifications(statusCounter + 2);
           }, 5000);
@@ -107,19 +114,23 @@ export function displayStatus(
 }
 
 export function error(message: string): void {
-  displayStatus(message, 'alert-danger');
+  displayStatus({ message: message, type: MessageType.Danger });
 }
 
 export function info(message: string): void {
-  displayStatus(message, 'alert-info');
+  displayStatus({ message: message, type: MessageType.Info });
 }
 
-export function success(message: string, autoHide = true): void {
-  displayStatus(message, 'alert-success', autoHide);
+export function success(message: string, autoHide: boolean = true): void {
+  displayStatus({
+    message: message,
+    type: MessageType.Success,
+    autoHide: autoHide,
+  });
 }
 
 export function warning(message: string): void {
-  displayStatus(message, 'alert-warning');
+  displayStatus({ message: message, type: MessageType.Warning });
 }
 
 export function apiError(response: { error?: string; payload?: any }): void {
