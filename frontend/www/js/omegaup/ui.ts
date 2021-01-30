@@ -68,7 +68,11 @@ export function formatString(
   });
 }
 
-export function displayStatus(message: string, type: string): void {
+export function displayStatus(
+  message: string,
+  type: string,
+  autoHide = true,
+): void {
   if ($('#status .message').length == 0) {
     console.error('Showing warning but there is no status div');
   }
@@ -93,7 +97,7 @@ export function displayStatus(message: string, type: string): void {
         statusElement
           .removeClass('animating')
           .attr('data-counter', statusCounter + 2);
-        if (type == 'alert-success') {
+        if (type == 'alert-success' && autoHide) {
           setTimeout(() => {
             dismissNotifications(statusCounter + 2);
           }, 5000);
@@ -110,8 +114,8 @@ export function info(message: string): void {
   displayStatus(message, 'alert-info');
 }
 
-export function success(message: string): void {
-  displayStatus(message, 'alert-success');
+export function success(message: string, autoHide = true): void {
+  displayStatus(message, 'alert-success', autoHide);
 }
 
 export function warning(message: string): void {
