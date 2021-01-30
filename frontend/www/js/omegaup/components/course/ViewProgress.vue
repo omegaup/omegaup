@@ -241,14 +241,12 @@ export default class CourseViewProgress extends Vue {
         const sortFactor =
           this.sortOrder === omegaup.SortOrder.Descending ? 1 : -1;
         return this.students
-          .map((student: types.StudentProgress) => {
-            student.globalScore = this.getGlobalScoreByStudent(student).value;
-            return student;
-          })
-          .sort(
-            (a, b) =>
-              sortFactor * ((a.globalScore ?? 0) - (b.globalScore ?? 0)),
-          );
+          .map((student) => ({
+            value: student,
+            sortKey: this.getGlobalScoreByStudent(student).value,
+          }))
+          .sort((a, b) => sortFactor * (a.sortKey - b.sortKey))
+          .map((sortableStudent) => sortableStudent.value);
       }
       default:
         return this.students.sort((a, b) =>
