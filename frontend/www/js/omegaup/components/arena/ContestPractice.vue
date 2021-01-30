@@ -64,7 +64,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -111,6 +111,15 @@ export default class ArenaContestPractice extends Vue {
   onNavigateToProblem(problemAlias: string) {
     this.activeProblem = { alias: problemAlias, runs: [] };
     this.$emit('navigate-to-problem', this.activeProblem);
+  }
+
+  @Watch('problem')
+  onActiveProblemChanged(newValue: ActiveProblem | null): void {
+    if (!newValue) {
+      this.activeProblem = null;
+      return;
+    }
+    this.onNavigateToProblem(newValue.alias);
   }
 }
 </script>
