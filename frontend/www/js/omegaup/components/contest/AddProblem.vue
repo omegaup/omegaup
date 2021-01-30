@@ -1,58 +1,68 @@
 <template>
-  <div class="panel panel-primary problems-container">
-    <div class="panel-body">
+  <div class="card problems-container">
+    <div class="card-body">
       <form class="form" @submit.prevent="onSubmit">
-        <div class="form-group col-md-6">
-          <label>{{ T.wordsProblem }}</label>
-          <omegaup-autocomplete
-            v-model="alias"
-            :init="(el) => typeahead.problemTypeahead(el)"
-          ></omegaup-autocomplete>
-        </div>
-        <div class="form-group col-md-6">
-          <label for="use-latest-version">{{
-            T.contestAddproblemChooseVersion
-          }}</label>
-          <div class="form-control">
-            <label class="radio-inline">
-              <input
-                v-model="useLatestVersion"
-                type="radio"
-                name="use-latest-version"
-                :value="true"
-              />
-              {{ T.contestAddproblemLatestVersion }}
-            </label>
-            <label class="radio-inline">
-              <input
-                v-model="useLatestVersion"
-                type="radio"
-                name="use-latest-version"
-                :value="false"
-              />
-              {{ T.contestAddproblemOtherVersion }}
-            </label>
+        <div class="row">
+          <div class="form-group col-md-6">
+            <label>{{ T.wordsProblem }}</label>
+            <omegaup-autocomplete
+              v-model="alias"
+              :init="(el) => typeahead.problemTypeahead(el)"
+            ></omegaup-autocomplete>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="use-latest-version">{{
+              T.contestAddproblemChooseVersion
+            }}</label>
+            <div class="form-control">
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input
+                    v-model="useLatestVersion"
+                    class="form-check-input"
+                    type="radio"
+                    name="use-latest-version"
+                    :value="true"
+                  />
+                  {{ T.contestAddproblemLatestVersion }}
+                </label>
+              </div>
+              <div class="form-check form-check-inline">
+                <label class="form-check-label">
+                  <input
+                    v-model="useLatestVersion"
+                    class="form-check-input"
+                    type="radio"
+                    name="use-latest-version"
+                    :value="false"
+                  />
+                  {{ T.contestAddproblemOtherVersion }}
+                </label>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="form-group col-md-6">
-          <label>{{ T.contestAddproblemProblemPoints }}</label>
-          <input
-            v-model="points"
-            class="form-control problem-points"
-            size="3"
-          />
+        <div class="row">
+          <div class="form-group col-md-6">
+            <label>{{ T.contestAddproblemProblemPoints }}</label>
+            <input
+              v-model="points"
+              class="form-control problem-points"
+              size="3"
+            />
+          </div>
+          <div class="form-group col-md-6">
+            <label>{{ T.contestAddproblemContestOrder }}</label>
+            <input
+              v-model="order"
+              class="form-control"
+              max="100"
+              size="2"
+              type="number"
+            />
+          </div>
         </div>
-        <div class="form-group col-md-6">
-          <label>{{ T.contestAddproblemContestOrder }}</label>
-          <input
-            v-model="order"
-            class="form-control"
-            max="100"
-            size="2"
-            type="number"
-          />
-        </div>
-        <div v-show="!useLatestVersion" class="form-group col-md-12">
+        <div v-show="!useLatestVersion" class="form-group">
           <button
             class="btn btn-primary get-versions"
             type="submit"
@@ -61,9 +71,9 @@
           >
             {{ T.wordsGetVersions }}
           </button>
-          <span class="label label-info">{{
-            T.selectProblemToGetVersions
-          }}</span>
+          <small class="form-text text-muted">
+            {{ T.selectProblemToGetVersions }}
+          </small>
         </div>
         <omegaup-problem-versions
           v-show="!useLatestVersion"
@@ -73,26 +83,26 @@
           :show-footer="false"
           @runs-diff="onRunsDiff"
         ></omegaup-problem-versions>
+        <div class="form-group">
+          <button
+            class="btn btn-primary add-problem"
+            type="submit"
+            :disabled="addProblemButtonDisabled"
+            @click.prevent="onAddProblem"
+          >
+            {{ addProblemButtonLabel }}
+          </button>
+        </div>
       </form>
-      <div class="form-group col-md-12">
-        <button
-          class="btn btn-primary add-problem"
-          type="submit"
-          :disabled="addProblemButtonDisabled"
-          @click.prevent="onAddProblem"
-        >
-          {{ addProblemButtonLabel }}
-        </button>
-      </div>
     </div>
-    <table class="table table-striped">
+    <table class="table table-striped mb-0">
       <thead>
         <tr>
           <th></th>
-          <th>{{ T.contestAddproblemContestOrder }}</th>
-          <th>{{ T.contestAddproblemProblemName }}</th>
-          <th>{{ T.contestAddproblemProblemPoints }}</th>
-          <th>{{ T.contestAddproblemProblemRemove }}</th>
+          <th class="text-center">{{ T.contestAddproblemContestOrder }}</th>
+          <th class="text-center">{{ T.contestAddproblemProblemName }}</th>
+          <th class="text-center">{{ T.contestAddproblemProblemPoints }}</th>
+          <th class="text-center">{{ T.contestAddproblemProblemRemove }}</th>
         </tr>
       </thead>
       <tbody>
@@ -110,15 +120,17 @@
               ></span>
             </button>
           </td>
-          <td>{{ problem.order }}</td>
+          <td class="text-center">{{ problem.order }}</td>
           <td>
             <a :href="`/arena/problem/${problem.alias}/`">{{
               problem.alias
             }}</a>
           </td>
-          <td>{{ problem.points }}</td>
-          <td>
-            <button class="close" @click="onRemove(problem)">×</button>
+          <td class="text-right">{{ problem.points }}</td>
+          <td class="text-center">
+            <button class="close float-none" @click="onRemove(problem)">
+              ×
+            </button>
           </td>
         </tr>
       </tbody>
@@ -129,7 +141,6 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
@@ -154,20 +165,28 @@ const emptyCommit: types.ProblemVersion = {
 export default class AddProblem extends Vue {
   @Prop() contestAlias!: string;
   @Prop() initialPoints!: number;
-  @Prop() data!: omegaup.Problem[];
+  @Prop() initialProblems!: types.ContestProblem[];
 
   T = T;
   typeahead = typeahead;
   alias = '';
   points = this.initialPoints;
-  order = this.data.length + 1;
-  problems = this.data;
-  selected: omegaup.Problem = {
+  order = this.initialProblems.length + 1;
+  problems = this.initialProblems;
+  selected: types.ContestProblem = {
+    accepted: 0,
     alias: '',
+    commit: '',
+    difficulty: 0,
+    languages: '',
     order: 1,
     points: this.points,
+    problem_id: 0,
+    submissions: 0,
     title: '',
-    input_limit: 0,
+    version: '',
+    visibility: 0,
+    visits: 0,
   };
   versionLog: types.ProblemVersion[] = [];
   useLatestVersion = true;
@@ -176,25 +195,32 @@ export default class AddProblem extends Vue {
 
   onSubmit(): void {
     if (this.useLatestVersion) {
-      this.$emit('emit-change-alias', this, this.alias);
+      this.$emit('get-versions', this.alias, this);
     } else {
       this.onAddProblem();
     }
   }
 
   onAddProblem(): void {
-    this.$emit('emit-add-problem', this);
+    this.$emit('add-problem', {
+      order: this.order,
+      alias: this.alias,
+      points: this.points,
+      commit:
+        !this.useLatestVersion && this.selectedRevision
+          ? this.selectedRevision.commit
+          : undefined,
+    });
   }
 
-  onEdit(problem: omegaup.Problem): void {
+  onEdit(problem: types.ContestProblem): void {
     this.alias = problem.alias;
     this.points = problem.points;
     this.order = problem.order;
   }
 
-  onRemove(problem: omegaup.Problem): void {
-    this.selected = problem;
-    this.$emit('emit-remove-problem', this);
+  onRemove(problem: types.ContestProblem): void {
+    this.$emit('remove-problem', problem.alias);
   }
 
   onRunsDiff(
@@ -211,7 +237,7 @@ export default class AddProblem extends Vue {
     if (!found) {
       return;
     }
-    this.$emit('emit-runs-diff', this, versions, selectedCommit);
+    this.$emit('runs-diff', this.alias, versions, selectedCommit);
   }
 
   get addProblemButtonLabel(): string {
@@ -230,8 +256,9 @@ export default class AddProblem extends Vue {
     return this.selectedRevision.commit === '';
   }
 
-  @Watch('problems')
-  onProblemsChange(newValue: omegaup.Problem[]): void {
+  @Watch('initialProblems')
+  onInitialProblemsChange(newValue: types.ContestProblem[]): void {
+    this.problems = newValue;
     this.alias = '';
     this.order = newValue.length + 1;
   }
@@ -243,7 +270,7 @@ export default class AddProblem extends Vue {
       this.selectedRevision = this.publishedRevision = emptyCommit;
       return;
     }
-    this.$emit('emit-change-alias', this, newProblemAlias);
+    this.$emit('get-versions', newProblemAlias, this);
   }
 }
 </script>

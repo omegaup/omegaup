@@ -2,7 +2,7 @@ import { omegaup, OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
 import T from '../lang';
-import contest_Edit from '../components/contest/Editv2.vue';
+import contest_Edit from '../components/contest/Edit.vue';
 import * as ui from '../ui';
 import * as api from '../api';
 

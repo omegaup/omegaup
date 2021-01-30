@@ -3,9 +3,9 @@ import expect from 'expect';
 
 import T from '../../lang';
 
-import contest_Links from './Linksv2.vue';
+import contest_Links from './Links.vue';
 
-describe('Linksv2.vue', () => {
+describe('Links.vue', () => {
   it('Should display the links', async () => {
     const wrapper = shallowMount(contest_Links, {
       propsData: {
