@@ -114,6 +114,20 @@ OmegaUp.on('ready', () => {
           users: this.users,
         },
         on: {
+          'update-contest': function (contest: omegaup.Contest) {
+            api.Contest.update(
+              Object.assign({}, contest, {
+                contest_alias: contest.alias,
+                alias: null,
+              }),
+            )
+              .then(() => {
+                ui.success(`
+                  ${T.contestEditContestEdited} <a href="/arena/${contest.alias}/">${T.contestEditGoToContest}</a>
+                `);
+              })
+              .catch(ui.apiError);
+          },
           'add-problem': (problem: types.ContestProblem) => {
             api.Contest.addProblem({
               contest_alias: payload.details.alias,

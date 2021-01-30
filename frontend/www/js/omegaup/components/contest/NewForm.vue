@@ -430,10 +430,6 @@ export default class NewForm extends Vue {
   }
 
   onSubmit() {
-    if (this.update) {
-      this.$emit('emit-update-contest', this);
-      return;
-    }
     const contest: omegaup.Contest = {
       alias: this.alias,
       title: this.title,
@@ -443,7 +439,7 @@ export default class NewForm extends Vue {
       window_length: !this.windowLengthEnabled ? null : this.windowLength,
       points_decay_factor: this.pointsDecayFactor,
       submissions_gap: (this.submissionsGap || 1) * 60,
-      languages: this.languages,
+      languages: this.languages[0] === '' ? [] : this.languages,
       feedback: this.feedback,
       penalty: this.penalty,
       scoreboard: this.scoreboard,
@@ -453,6 +449,10 @@ export default class NewForm extends Vue {
       needs_basic_information: this.needsBasicInformation,
       requests_user_information: this.requestsUserInformation,
     };
+    if (this.update) {
+      this.$emit('update-contest', contest);
+      return;
+    }
     this.$emit('create-contest', contest);
   }
 }

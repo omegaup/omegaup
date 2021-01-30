@@ -67,9 +67,7 @@
           :initial-requests-user-information="contest.requests_user_information"
           :all-languages="contest.available_languages"
           :update="true"
-          @emit-update-contest="
-            (newFormComponent) => $emit('update-contest', newFormComponent)
-          "
+          @update-contest="(contest) => $emit('update-contest', contest)"
         ></omegaup-contest-new-form>
       </div>
       <div v-if="showTab === 'problems'" class="tab-pane active problems">
