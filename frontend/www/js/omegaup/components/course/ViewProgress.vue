@@ -30,7 +30,7 @@
                   >
                     <span>
                       {{ assignment.name }}<br />
-                      <span class="h6">
+                      <span>
                         {{ getTotalPointsByAssignment(assignment) }}
                         <a
                           v-if="assignment.max_points === 0"
@@ -45,9 +45,7 @@
                   <th class="text-center">
                     <span>
                       {{ T.courseProgressGlobalScore }}<br />
-                      <span class="h6">{{
-                        getTotalPointsByCourse(assignments)
-                      }}</span>
+                      <span>{{ getTotalPointsByCourse(assignments) }}</span>
                       <omegaup-common-sort-controls
                         column="total"
                         :sort-order="sortOrder"
@@ -239,24 +237,19 @@ export default class CourseViewProgress extends Vue {
         return this.students.sort((a, b) =>
           a.username < b.username ? 1 : b.username < a.username ? -1 : 0,
         );
-      case 'total':
-        if (this.sortOrder === omegaup.SortOrder.Descending) {
-          return this.students.sort((a, b) =>
-            this.getGlobalScoreByStudent(a) > this.getGlobalScoreByStudent(b)
-              ? 1
-              : this.getGlobalScoreByStudent(b) >
-                this.getGlobalScoreByStudent(a)
-              ? -1
-              : 0,
+      case 'total': {
+        const sortFactor =
+          this.sortOrder === omegaup.SortOrder.Descending ? 1 : -1;
+        return this.students
+          .map((student: types.StudentProgress) => {
+            student.globalScore = this.getGlobalScoreByStudent(student).value;
+            return student;
+          })
+          .sort(
+            (a, b) =>
+              sortFactor * ((a.globalScore ?? 0) - (b.globalScore ?? 0)),
           );
-        }
-        return this.students.sort((a, b) =>
-          this.getGlobalScoreByStudent(a) < this.getGlobalScoreByStudent(b)
-            ? 1
-            : this.getGlobalScoreByStudent(b) < this.getGlobalScoreByStudent(a)
-            ? -1
-            : 0,
-        );
+      }
       default:
         return this.students.sort((a, b) =>
           a.username > b.username ? 1 : b.username > a.username ? -1 : 0,
@@ -420,10 +413,6 @@ export default class CourseViewProgress extends Vue {
 </script>
 
 <style scoped>
-.h6 {
-  font-size: 0.8rem;
-}
-
 .panel-body {
   overflow: auto;
   white-space: nowrap;

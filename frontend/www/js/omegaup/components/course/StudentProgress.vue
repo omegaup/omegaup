@@ -16,7 +16,7 @@
       class="flex-column text-center text-nowrap justify-content-center align-items-center"
     >
       {{ getProgressByAssignment(assignment.alias) }}%<br />
-      <span class="h6">{{ getPointsByAsssignment(assignment.alias) }}</span>
+      <span>{{ getPointsByAsssignment(assignment.alias) }}</span>
       <div class="d-flex justify-content-center">
         <div
           v-if="
@@ -43,7 +43,7 @@
     </td>
     <td data-global-score class="text-center font-weight-bold align-middle">
       {{ globalScore }}%<br />
-      <span class="h6">{{
+      <span>{{
         ui.formatString(T.studentProgressDescriptionTotalPoints, {
           points: globalPoints,
         })
@@ -172,11 +172,11 @@ export default class StudentProgress extends Vue {
   }
 
   getPointsByAsssignment(assignmentAlias: string): string {
-    const score = this.score(assignmentAlias);
     const points = this.points(assignmentAlias);
     if (points === 0) {
       return '';
     }
+    const score = this.score(assignmentAlias);
     return ui.formatString(T.studentProgressDescriptionTotalPoints, {
       points: score.toFixed(0),
     });
@@ -228,10 +228,6 @@ export default class StudentProgress extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-
-.h6 {
-  font-size: 0.8rem;
-}
 
 .box {
   width: 20px;
