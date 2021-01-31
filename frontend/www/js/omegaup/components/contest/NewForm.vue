@@ -439,7 +439,7 @@ export default class NewForm extends Vue {
       window_length: !this.windowLengthEnabled ? null : this.windowLength,
       points_decay_factor: this.pointsDecayFactor,
       submissions_gap: (this.submissionsGap || 1) * 60,
-      languages: this.languages[0] === '' ? [] : this.languages,
+      languages: this.languages,
       feedback: this.feedback,
       penalty: this.penalty,
       scoreboard: this.scoreboard,
