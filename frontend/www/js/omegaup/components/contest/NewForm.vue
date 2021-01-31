@@ -5,16 +5,32 @@
     </div>
     <div class="card-body panel-body">
       <div class="btn-group bottom-margin mb-3">
-        <button class="btn btn-default btn-secondary" @click="fillOmi">
+        <button
+          class="btn btn-default btn-secondary"
+          data-contest-omi
+          @click="fillOmi"
+        >
           {{ T.contestNewFormOmiStyle }}
         </button>
-        <button class="btn btn-default btn-secondary" @click="fillPreIoi">
+        <button
+          class="btn btn-default btn-secondary"
+          data-contest-preioi
+          @click="fillPreIoi"
+        >
           {{ T.contestNewForm }}
         </button>
-        <button class="btn btn-default btn-secondary" @click="fillConacup">
+        <button
+          class="btn btn-default btn-secondary"
+          data-contest-conacup
+          @click="fillConacup"
+        >
           {{ T.contestNewFormConacupStyle }}
         </button>
-        <button class="btn btn-default btn-secondary" @click="fillIcpc">
+        <button
+          class="btn btn-default btn-secondary"
+          data-contest-cpc
+          @click="fillIcpc"
+        >
           {{ T.contestNewFormICPCStyle }}
         </button>
       </div>
