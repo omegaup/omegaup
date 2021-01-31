@@ -3,9 +3,9 @@ import expect from 'expect';
 
 import T from '../../lang';
 
-import contest_Groups from './Groupsv2.vue';
+import contest_Groups from './Groups.vue';
 
-describe('Groupsv2.vue', () => {
+describe('Groups.vue', () => {
   it('Should handle empty groups', async () => {
     const wrapper = shallowMount(contest_Groups, {
       propsData: {

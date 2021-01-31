@@ -57,7 +57,7 @@ import omegaup_Markdown from '../Markdown.vue';
     'omegaup-markdown': omegaup_Markdown,
   },
 })
-export default class CourseCard extends Vue {
+export default class Course extends Vue {
   @Prop() courseName!: string;
   @Prop() courseAlias!: string;
   @Prop() schoolName!: string;

@@ -1,6 +1,6 @@
 <template>
   <span class="ml-1">
-    <a href="#" @click="$emit('emit-apply-filter', column, toggleSort)">
+    <a href="#" @click="$emit('apply-filter', column, toggleSort)">
       <font-awesome-icon
         v-if="!selected"
         :icon="['fas', 'exchange-alt']"
