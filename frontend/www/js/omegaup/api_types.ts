@@ -2843,7 +2843,6 @@ export namespace types {
   export interface StudentProgress {
     classname: string;
     country_id?: string;
-    globalScore?: number;
     name?: string;
     points: { [key: string]: { [key: string]: number } };
     progress: { [key: string]: { [key: string]: number } };
