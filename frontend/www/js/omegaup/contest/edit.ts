@@ -2,8 +2,7 @@ import { omegaup, OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
 import T from '../lang';
-import contest_Edit from '../components/contest/Editv2.vue';
-import contest_AddProblem from '../components/contest/AddProblemv2.vue';
+import contest_Edit from '../components/contest/Edit.vue';
 import * as ui from '../ui';
 import * as api from '../api';
 
@@ -41,7 +40,7 @@ OmegaUp.on('ready', () => {
       },
       refreshDetails: (): void => {
         api.Contest.adminDetails({
-          contest: payload.details.alias,
+          contest_alias: payload.details.alias,
         })
           .then((response) => {
             contestEdit.details = response;
@@ -131,7 +130,12 @@ OmegaUp.on('ready', () => {
           },
           'get-versions': (
             problemAlias: string,
-            addProblemComponent: contest_AddProblem,
+            addProblemComponent: {
+              versionLog: types.ProblemVersion[];
+              problems: types.ContestProblem[];
+              selectedRevision: types.ProblemVersion;
+              publishedRevision: types.ProblemVersion;
+            },
           ) => {
             api.Problem.versions({
               problem_alias: problemAlias,
