@@ -75,7 +75,11 @@ export function formatString(
   });
 }
 
-export function displayStatus(args: {
+export function displayStatus({
+  message,
+  type,
+  autoHide,
+}: {
   message: string;
   type: MessageType;
   autoHide?: boolean;
@@ -88,7 +92,7 @@ export function displayStatus(args: {
   $('#loading').hide();
   $('#root').show();
 
-  $('#status .message').html(args.message);
+  $('#status .message').html(message);
   const statusElement = $('#status');
   let statusCounter = parseInt(statusElement.attr('data-counter') || '0');
   if (statusCounter % 2 == 1) {
@@ -96,7 +100,7 @@ export function displayStatus(args: {
   }
   statusElement
     .removeClass('alert-success alert-info alert-warning alert-danger')
-    .addClass(args.type)
+    .addClass(type)
     .addClass('animating')
     .attr('data-counter', statusCounter + 1)
     .slideDown({
@@ -104,7 +108,7 @@ export function displayStatus(args: {
         statusElement
           .removeClass('animating')
           .attr('data-counter', statusCounter + 2);
-        if (args.type == 'alert-success' && args.autoHide) {
+        if (type == 'alert-success' && autoHide) {
           setTimeout(() => {
             dismissNotifications(statusCounter + 2);
           }, 5000);
