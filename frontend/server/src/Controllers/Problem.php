@@ -5093,8 +5093,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         /*$assoc=*/true
                     );
                 }
-                $contestAlias = $r->ensureOptionalString(
-                    'contest_alias',
+                $problemAlias = $r->ensureOptionalString(
+                    'problem_alias',
                     /*$required=*/ false,
                     fn (string $alias) => \OmegaUp\Validators::alias($alias)
                 );
@@ -5105,7 +5105,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                 'title' => $r->ensureOptionalString(
                                     'title'
                                 ) ?? '',
-                                'alias' => $contestAlias ?? '',
+                                'alias' => $problemAlias ?? '',
                                 'emailClarifications' => $r->ensureOptionalBool(
                                     'email_clarifications'
                                 ) ?? false,
