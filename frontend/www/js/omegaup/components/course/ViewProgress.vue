@@ -12,42 +12,63 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th class="text-center">{{ T.wordsName }}</th>
+                  <th class="text-center">
+                    <span>
+                      {{ T.wordsName }}
+                      <omegaup-common-sort-controls
+                        column="student"
+                        :sort-order="sortOrder"
+                        :column-name="columnName"
+                        @apply-filter="onApplyFilter"
+                      ></omegaup-common-sort-controls>
+                    </span>
+                  </th>
                   <th
                     v-for="assignment in assignments"
                     :key="assignment.alias"
                     class="score text-center"
                   >
-                    {{ assignment.name }}<br />
-                    <span class="h6">{{
-                      getTotalPointsByAssignment(assignment)
-                    }}</span>
-                    <a
-                      v-if="assignment.max_points === 0"
-                      data-toggle="tooltip"
-                      rel="tooltip"
-                      :title="T.studentProgressOnlyLecturesDescription"
-                      ><img src="/media/question.png"
-                    /></a>
+                    <span>
+                      {{ assignment.name }}<br />
+                      <span>
+                        {{ getTotalPointsByAssignment(assignment) }}
+                        <a
+                          v-if="assignment.max_points === 0"
+                          data-toggle="tooltip"
+                          rel="tooltip"
+                          :title="T.studentProgressOnlyLecturesDescription"
+                          ><img src="/media/question.png"
+                        /></a>
+                      </span>
+                    </span>
                   </th>
                   <th class="text-center">
-                    {{ T.courseProgressGlobalScore }}<br />
-                    <span class="h6">{{
-                      getTotalPointsByCourse(assignments)
-                    }}</span>
+                    <span>
+                      {{ T.courseProgressGlobalScore }}<br />
+                      <span>{{ getTotalPointsByCourse(assignments) }}</span>
+                      <omegaup-common-sort-controls
+                        column="total"
+                        :sort-order="sortOrder"
+                        :column-name="columnName"
+                        @apply-filter="onApplyFilter"
+                      ></omegaup-common-sort-controls>
+                    </span>
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <omegaup-student-progress
-                  v-for="student in students"
+                <omegaup-course-student-progress
+                  v-for="student in orderedStudents"
                   :key="student.username"
                   :student="student"
                   :assignments="assignments"
                   :course="course"
                   :problem-titles="problemTitles"
+                  :column-name="columnName"
+                  :sort-order="sortOrder"
+                  @apply-filter="onApplyFilter"
                 >
-                </omegaup-student-progress>
+                </omegaup-course-student-progress>
               </tbody>
             </table>
           </div>
@@ -89,7 +110,8 @@ import * as ui from '../../ui';
 import AsyncComputedPlugin from 'vue-async-computed';
 import AsyncComputed from 'vue-async-computed-decorator';
 import JSZip from 'jszip';
-import omegaup_StudentProgress from './StudentProgress.vue';
+import common_SortControls from '../common/SortControls.vue';
+import course_StudentProgress from './StudentProgress.vue';
 
 Vue.use(AsyncComputedPlugin);
 
@@ -170,7 +192,8 @@ export function toOds(courseName: string, table: TableCell[][]): string {
 
 @Component({
   components: {
-    'omegaup-student-progress': omegaup_StudentProgress,
+    'omegaup-common-sort-controls': common_SortControls,
+    'omegaup-course-student-progress': course_StudentProgress,
   },
 })
 export default class CourseViewProgress extends Vue {
@@ -180,6 +203,8 @@ export default class CourseViewProgress extends Vue {
   @Prop() problemTitles!: { [key: string]: string };
 
   T = T;
+  sortOrder: omegaup.SortOrder = omegaup.SortOrder.Ascending;
+  columnName = 'student';
 
   score(
     student: types.StudentProgress,
@@ -199,6 +224,35 @@ export default class CourseViewProgress extends Vue {
 
   studentProgressUrl(student: types.StudentProgress): string {
     return `/course/${this.course.alias}/student/${student.username}/`;
+  }
+
+  get orderedStudents(): types.StudentProgress[] {
+    switch (this.columnName) {
+      case 'student':
+        if (this.sortOrder === omegaup.SortOrder.Descending) {
+          return this.students.sort((a, b) =>
+            a.username > b.username ? 1 : b.username > a.username ? -1 : 0,
+          );
+        }
+        return this.students.sort((a, b) =>
+          a.username < b.username ? 1 : b.username < a.username ? -1 : 0,
+        );
+      case 'total': {
+        const sortFactor =
+          this.sortOrder === omegaup.SortOrder.Descending ? 1 : -1;
+        return this.students
+          .map((student) => ({
+            value: student,
+            sortKey: this.getGlobalScoreByStudent(student).value,
+          }))
+          .sort((a, b) => sortFactor * (a.sortKey - b.sortKey))
+          .map((sortableStudent) => sortableStudent.value);
+      }
+      default:
+        return this.students.sort((a, b) =>
+          a.username > b.username ? 1 : b.username > a.username ? -1 : 0,
+        );
+    }
   }
 
   get courseUrl(): string {
@@ -344,6 +398,14 @@ export default class CourseViewProgress extends Vue {
         compression: 'DEFLATE',
       }),
     );
+  }
+
+  onApplyFilter(columnName: string, sortOrder: string): void {
+    this.columnName = columnName;
+    this.sortOrder =
+      sortOrder === omegaup.SortOrder.Ascending
+        ? omegaup.SortOrder.Ascending
+        : omegaup.SortOrder.Descending;
   }
 }
 </script>
