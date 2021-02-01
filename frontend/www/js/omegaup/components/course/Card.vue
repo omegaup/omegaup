@@ -80,10 +80,11 @@ export enum CardType {
 })
 export default class CourseCard extends Vue {
   @Prop() course!: types.FilteredCourse;
-  @Prop() type!: CardType;
+  @Prop() type!: string;
 
   T = T;
   ui = ui;
+  CardType = CardType;
 
   get buttonMessage(): string {
     switch (this.type) {
