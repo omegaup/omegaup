@@ -6,11 +6,11 @@
         <div class="col-sm-10 col-lg-9">
           <div class="card-body">
             <h5 class="card-title">{{ course.name }}</h5>
-            <p v-if="type === 'public'" class="card-text">
+            <p v-if="type === CardType.Public" class="card-text">
               {{ course.description }}
             </p>
             <omegaup-markdown
-              v-if="type !== 'finished'"
+              v-if="type !== CardType.Finished"
               class="card-text"
               :markdown="
                 ui.formatString(T.courseCardImpartedBy, {
@@ -19,7 +19,7 @@
               "
             ></omegaup-markdown>
             <div
-              v-if="type === 'student'"
+              v-if="type === CardType.Student"
               class="row no-gutters justify-content-start align-items-center mb-4"
             >
               <div class="col-4">{{ T.wordsProgress }}:</div>
@@ -39,7 +39,7 @@
               </div>
             </div>
             <div
-              v-if="type === 'finished'"
+              v-if="type === CardType.Finished"
               class="text-center mb-4 course-star"
             >
               ⭐
@@ -67,6 +67,12 @@ import * as ui from '../../ui';
 
 import omegaup_Markdown from '../Markdown.vue';
 
+export enum CardType {
+  Finished = 'finished',
+  Public = 'public',
+  Student = 'student',
+}
+
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
@@ -74,7 +80,7 @@ import omegaup_Markdown from '../Markdown.vue';
 })
 export default class CourseCard extends Vue {
   @Prop() course!: types.FilteredCourse;
-  @Prop() type!: string;
+  @Prop() type!: CardType;
 
   T = T;
   ui = ui;
