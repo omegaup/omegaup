@@ -194,16 +194,20 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, problemset_languages: string, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, problemset_languages: null|string, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
         $problems = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$assignmentAlias, $courseAlias]
         );
         foreach ($problems as &$problem) {
-            $problem['languages'] = join(',', array_intersect(
-                explode(',', $problem['problemset_languages']),
-                explode(',', $problem['languages'])
-            ));
+            // There are languages in problemset table, so we can get the list
+            // directly from that table
+            if (!is_null($problem['problemset_languages'])) {
+                $problem['languages'] = join(',', array_intersect(
+                    explode(',', $problem['problemset_languages']),
+                    explode(',', $problem['languages'])
+                ));
+            }
             unset($problem['problemset_languages']);
         }
         return $problems;

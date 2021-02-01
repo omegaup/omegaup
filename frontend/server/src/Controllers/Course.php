@@ -13,7 +13,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseAdmin=array{role: string, username: string}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CourseDetails=array{admission_mode?: string, alias: string, assignments?: list<CourseAssignment>, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, languages: null|string, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
+ * @psalm-type CourseDetails=array{admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, languages: list<string>, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -282,6 +282,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $alias
      * @omegaup-request-param null|string $description
      * @omegaup-request-param mixed $finish_time
+     * @omegaup-request-param null|string $languages
      * @omegaup-request-param null|string $name
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
@@ -316,6 +317,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $alias
      * @omegaup-request-param null|string $description
      * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
+     * @omegaup-request-param null|string $languages
      * @omegaup-request-param null|string $name
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
@@ -369,6 +371,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $alias
      * @omegaup-request-param null|string $description
      * @omegaup-request-param int|null $finish_time
+     * @omegaup-request-param null|string $languages
      * @omegaup-request-param null|string $name
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
@@ -659,7 +662,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'name' => $newName,
                     'description' => $originalCourse->description,
                     'alias' => $newAlias,
-                    'languages' => $originalCourse->description,
+                    'languages' => $originalCourse->languages,
                     'school_id' => $originalCourse->school_id,
                     'start_time' => $startTime,
                     'finish_time' => $cloneCourseFinishTime,
@@ -764,6 +767,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $finish_time
+     * @omegaup-request-param mixed $languages
      * @omegaup-request-param mixed $name
      * @omegaup-request-param mixed $needs_basic_information
      * @omegaup-request-param mixed $public
@@ -3922,7 +3926,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             'school_id' => intval($course->school_id),
             'school_name' => null,
             'start_time' => $course->start_time,
-            'languages' => explode(',', $course->languages),
+            'languages' => !is_null(
+                $course->languages
+            ) ? explode(
+                ',',
+                $course->languages
+            ) : [],
             'finish_time' => $course->finish_time,
             'is_admin' => $isAdmin,
             'is_curator' => $isCurator,
@@ -4523,6 +4532,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $alias
      * @omegaup-request-param null|string $description
      * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
+     * @omegaup-request-param string $languages
      * @omegaup-request-param null|string $name
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
@@ -4602,7 +4612,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             if ($importantChange) {
                 $assignment = \OmegaUp\DAO\Courses::updateLanguagesToAssignments(
                     $course,
-                    $r['languages']
+                    $r->ensureString('languages')
                 );
             }
 
