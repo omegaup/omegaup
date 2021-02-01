@@ -6,11 +6,11 @@
         <div class="col-sm-10 col-lg-9">
           <div class="card-body">
             <h5 class="card-title">{{ course.name }}</h5>
-            <p v-if="type === CardType.Public" class="card-text">
+            <p v-if="type === CourseType.Public" class="card-text">
               {{ course.description }}
             </p>
             <omegaup-markdown
-              v-if="type !== CardType.Finished"
+              v-if="type !== CourseType.Finished"
               class="card-text"
               :markdown="
                 ui.formatString(T.courseCardImpartedBy, {
@@ -19,7 +19,7 @@
               "
             ></omegaup-markdown>
             <div
-              v-if="type === CardType.Student"
+              v-if="type === CourseType.Student"
               class="row no-gutters justify-content-start align-items-center mb-4"
             >
               <div class="col-4">{{ T.wordsProgress }}:</div>
@@ -39,7 +39,7 @@
               </div>
             </div>
             <div
-              v-if="type === CardType.Finished"
+              v-if="type === CourseType.Finished"
               class="text-center mb-4 course-star"
             >
               ⭐
@@ -67,7 +67,7 @@ import * as ui from '../../ui';
 
 import omegaup_Markdown from '../Markdown.vue';
 
-export enum CardType {
+export enum CourseType {
   Finished = 'finished',
   Public = 'public',
   Student = 'student',
@@ -84,15 +84,15 @@ export default class CourseCard extends Vue {
 
   T = T;
   ui = ui;
-  CardType = CardType;
+  CourseType = CourseType;
 
   get buttonMessage(): string {
     switch (this.type) {
-      case 'finished':
+      case CourseType.Finished:
         return T.wordsSeeCourse;
-      case 'student':
+      case CourseType.Student:
         return T.courseCardCourseResume;
-      case 'public':
+      case CourseType.Public:
         return T.wordsStart;
     }
     return T.courseCardCourseResume;
