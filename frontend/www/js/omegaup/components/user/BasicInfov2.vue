@@ -74,7 +74,7 @@
 
         <div class="form-group row padding-field">
           <div class="col-sm-3">
-            <strong>{{ T.profileRank }}</strong
+            <strong>{{ T.profileAuthorRank }}</strong
             ><a href="https://blog.omegaup.com/categorias/" target="_blank"
               ><em class="glyphicon glyphicon-question-sign"></em
             ></a>
@@ -82,10 +82,12 @@
           <div class="col-sm-9 field-data">
             <strong
               ><omegaup-user-username
+                v-if="rank"
                 :classname="profile.classname"
                 :username="rank"
-              ></omegaup-user-username
-            ></strong>
+              ></omegaup-user-username>
+              <p v-else>{{ T.authorRankUnranked }}</p>
+            </strong>
           </div>
         </div>
       </div>
@@ -114,7 +116,7 @@ export default class UserBasicInfo extends Vue {
 }
 </script>
 
-<style>
+<style type="scss" scoped>
 .fields-border > .form-group,
 .fields-border div > .form-group {
   border-color: #e9e9e9 !important;
