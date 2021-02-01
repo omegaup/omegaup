@@ -1,12 +1,12 @@
 <template>
   <div class="card problem-form">
     <div v-if="!isUpdate" class="card-header">
-      <h3 class="card-title">
+      <h3 class="card-title mb-0">
         {{ T.problemNew }}
       </h3>
     </div>
-    <div class="page-header text-center top-margin">
-      <p class="no-bottom-margin">
+    <div class="text-center">
+      <p class="mt-3 mb-0">
         {{ T.problemEditFormFirstTimeCreatingAProblem }}
         <strong>
           <a :href="howToWriteProblemLink" target="_blank">
@@ -365,6 +365,7 @@ export default class ProblemForm extends Vue {
   }
 
   onGenerateAlias(): void {
+    console.log('Se llamó a la función');
     if (this.isUpdate) {
       return;
     }
