@@ -7,7 +7,7 @@ import * as ui from '../ui';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemListPayload();
   const queryString = window.location.search;
-  let sortOrder = 'desc';
+  let sortOrder: omegaup.SortOrder = omegaup.SortOrder.Descending;
   let columnName = 'problem_id';
   let language = 'all';
   let query = '';
@@ -16,7 +16,10 @@ OmegaUp.on('ready', () => {
     if (urlParams.get('sort_order')) {
       const sortOrderParam = urlParams.get('sort_order');
       if (sortOrderParam) {
-        sortOrder = sortOrderParam;
+        sortOrder =
+          sortOrderParam === 'desc'
+            ? omegaup.SortOrder.Descending
+            : omegaup.SortOrder.Ascending;
       }
     }
     if (urlParams.get('order_by')) {

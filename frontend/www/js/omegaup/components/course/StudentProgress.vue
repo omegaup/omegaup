@@ -2,7 +2,12 @@
   <tr>
     <td class="text-center align-middle">
       <a :href="studentProgressUrl">
-        {{ student.name || student.username }}
+        <omegaup-user-username
+          :classname="student.classname"
+          :username="student.username"
+          :name="student.name"
+          :country="student.country_id"
+        ></omegaup-user-username>
       </a>
     </td>
     <td
@@ -10,7 +15,8 @@
       :key="assignment.alias"
       class="flex-column text-center text-nowrap justify-content-center align-items-center"
     >
-      {{ getProgressDescription(assignment.alias) }}
+      {{ getProgressByAssignment(assignment.alias) }}%<br />
+      <span>{{ getPointsByAsssignment(assignment.alias) }}</span>
       <div class="d-flex justify-content-center">
         <div
           v-if="
@@ -37,7 +43,7 @@
     </td>
     <td data-global-score class="text-center font-weight-bold align-middle">
       {{ globalScore }}%<br />
-      <span class="h6">{{
+      <span>{{
         ui.formatString(T.studentProgressDescriptionTotalPoints, {
           points: globalPoints,
         })
@@ -55,12 +61,16 @@ import T from '../../lang';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
 import * as markdown from '../../markdown';
+import user_Username from '../user/Username.vue';
 
 const markdownConverter = new markdown.Converter();
 
 @Component({
   directives: {
     tooltip: VTooltip,
+  },
+  components: {
+    'omegaup-user-username': user_Username,
   },
 })
 export default class StudentProgress extends Vue {
@@ -152,15 +162,23 @@ export default class StudentProgress extends Vue {
       .toFixed(0);
   }
 
-  getProgressDescription(assignmentAlias: string): string {
+  getProgressByAssignment(assignmentAlias: string): string {
     const score = this.score(assignmentAlias);
     const points = this.points(assignmentAlias);
     if (points === 0) {
       return T.courseWithoutProblems;
     }
-    return ui.formatString(T.studentProgressDescription, {
-      score: score,
-      progress: (points != 0 ? (score / points) * 100 : 0).toFixed(0),
+    return (points != 0 ? (score / points) * 100 : 0).toFixed(0);
+  }
+
+  getPointsByAsssignment(assignmentAlias: string): string {
+    const points = this.points(assignmentAlias);
+    if (points === 0) {
+      return '';
+    }
+    const score = this.score(assignmentAlias);
+    return ui.formatString(T.studentProgressDescriptionTotalPoints, {
+      points: score.toFixed(0),
     });
   }
 
