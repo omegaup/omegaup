@@ -50,6 +50,46 @@
             </tbody>
           </table>
         </div>
+        <div
+          v-if="course.admission_mode === 'public'"
+          class="accordion"
+          data-accordion-clone
+        >
+          <div class="card">
+            <div class="card-header" data-heading-clone>
+              <h2 class="mb-0">
+                <button
+                  class="btn btn-link btn-block text-right"
+                  type="button"
+                  data-toggle="collapse"
+                  data-target="[data-accordion-collapse]"
+                  aria-expanded="false"
+                  aria-controls="data-accordion-collapse"
+                >
+                  {{ T.wordsCloneThisCourse }}
+                </button>
+              </h2>
+            </div>
+
+            <div
+              data-accordion-collapse
+              class="collapse hide"
+              aria-labelledby="[data-heading-clone]"
+              data-parent="[data-accordion-clone]"
+            >
+              <div class="card-body">
+                <omegaup-course-clone
+                  :initial-alias="aliasWithUsername"
+                  :initial-name="course.name"
+                  @clone="
+                    (alias, name, startTime) =>
+                      $emit('clone', alias, name, startTime)
+                  "
+                ></omegaup-course-clone>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <template
         v-if="userRegistrationRequested === null || userRegistrationAccepted"
@@ -130,6 +170,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 
+import course_Clone from './Clone.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -154,6 +195,7 @@ interface Statement {
     FontAwesomeIcon,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-radio-switch': omegaup_RadioSwitch,
+    'omegaup-course-clone': course_Clone,
   },
 })
 export default class CourseIntro extends Vue {
@@ -168,6 +210,7 @@ export default class CourseIntro extends Vue {
   @Prop({ default: null }) userRegistrationAnswered!: boolean;
   @Prop({ default: null }) userRegistrationAccepted!: boolean;
   @Prop() loggedIn!: boolean;
+  @Prop() currentUsername!: string;
 
   T = T;
   shareUserInformation = false;
@@ -180,6 +223,10 @@ export default class CourseIntro extends Vue {
       (this.requestsUserInformation === 'required' &&
         !this.shareUserInformation)
     );
+  }
+
+  get aliasWithUsername(): string {
+    return `${this.course?.alias}_${this.currentUsername}`;
   }
 
   onSubmit(): void {
