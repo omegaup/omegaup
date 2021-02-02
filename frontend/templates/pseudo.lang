@@ -249,6 +249,7 @@ contestUpdateAlreadyHasRuns = "(L3ng7h 0f a c0n7357 can'7 b3 chang3d 0nc3 a 501u
 contestWillBeginIn = "(Thi5 c0n7357 wi11 b3gin in )"
 contestsCreateNew = "(Cr3a73 a n3w c0n7357)"
 contestsJoinScoreboards = "(M3rg3 5c0r3b0ard5)"
+courseActionScoreboard = "(Sc0r3b0ard)"
 courseAddContent = "(Add c0n73n7)"
 courseAddProblemsAdd = "(Add pr0b13m5)"
 courseAddProblemsAddAssignmentDesc = "(Add a11 7h3 pr0b13m5 7ha7 y0u wan7 70 inc1ud3. Th353 pr0b13m5 wi11 b3 570r3d un7i1 y0u pr355 7h3 Add c0n73n7 bu770n. If y0u d0 n07 wan7 70 d3cid3 which pr0b13m5 70 u53 righ7 n0w, y0u can add 7h3m 1a73r.)"
