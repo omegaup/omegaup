@@ -1,11 +1,8 @@
 <template>
   <div class="card">
-    <div class="card-header">
-      <h3 class="card-title">{{ T.courseListAdminCourses }}</h3>
-    </div>
-
-    <div v-if="isMainUserIdentity" class="m-3">
-      <div class="float-right">
+    <h3 class="card-header mb-0">{{ T.courseListAdminCourses }}</h3>
+    <div class="card-body pb-0">
+      <div v-if="isMainUserIdentity" class="float-right">
         <a class="btn btn-primary" href="/course/new/">{{ T.courseNew }}</a>
       </div>
     </div>
@@ -31,7 +28,7 @@ import course_FilteredList from './FilteredList.vue';
     'omegaup-course-filtered-list': course_FilteredList,
   },
 })
-export default class CourseList extends Vue {
+export default class MyCoursesList extends Vue {
   @Prop() courses!: types.AdminCourses;
   @Prop() isMainUserIdentity!: boolean;
 
