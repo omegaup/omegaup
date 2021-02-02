@@ -14,7 +14,7 @@
                   column="problem_id"
                   :sort-order="sortOrder"
                   :column-name="columnName"
-                  @emit-apply-filter="
+                  @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
                   "
@@ -38,7 +38,7 @@
                 :column-type="omegaup.ColumnType.String"
                 :sort-order="sortOrder"
                 :column-name="columnName"
-                @emit-apply-filter="
+                @apply-filter="
                   (columnName, sortOrder) =>
                     $emit('apply-filter', columnName, sortOrder)
                 "
@@ -51,7 +51,7 @@
                   column="quality"
                   :sort-order="sortOrder"
                   :column-name="columnName"
-                  @emit-apply-filter="
+                  @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
                   "
@@ -65,7 +65,7 @@
                   column="difficulty"
                   :sort-order="sortOrder"
                   :column-name="columnName"
-                  @emit-apply-filter="
+                  @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
                   "
@@ -79,7 +79,7 @@
                   column="ratio"
                   :sort-order="sortOrder"
                   :column-name="columnName"
-                  @emit-apply-filter="
+                  @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
                   "
@@ -97,7 +97,7 @@
                   column="score"
                   :sort-order="sortOrder"
                   :column-name="columnName"
-                  @emit-apply-filter="
+                  @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
                   "
@@ -118,7 +118,7 @@
                   column="points"
                   :sort-order="sortOrder"
                   :column-name="columnName"
-                  @emit-apply-filter="
+                  @apply-filter="
                     (columnName, sortOrder) =>
                       $emit('apply-filter', columnName, sortOrder)
                   "
@@ -128,7 +128,7 @@
           </tr>
         </thead>
         <tbody data-problems>
-          <tr v-for="problem in problems">
+          <tr v-for="problem in problems" :key="problem.problem_id">
             <td>{{ problem.problem_id }}</td>
             <td>
               <a :href="`/arena/problem/${problem.alias}/`">{{
@@ -157,6 +157,7 @@
               />
               <a
                 v-for="tag in problem.tags"
+                :key="tag.name"
                 :class="`badge custom-badge custom-badge-${
                   tag.source.includes('quality') ? 'owner' : tag.source
                 } ${

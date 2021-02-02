@@ -54,9 +54,11 @@
 
         <div class="mt-4 markdown">
           <omegaup-markdown
+            ref="statement-markdown"
             :markdown="problem.statement.markdown"
             :image-mapping="problem.statement.images"
             :problem-settings="problem.settings"
+            @rendered="onProblemRendered"
           ></omegaup-markdown>
         </div>
         <hr class="my-3" />
@@ -247,7 +249,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Emit, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { messages, types } from '../../api_types';
 import T from '../../lang';
@@ -378,6 +380,8 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop({ default: false }) shouldShowTabs!: boolean;
 
+  @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
+
   PopupDisplayed = PopupDisplayed;
   T = T;
   ui = ui;
@@ -493,6 +497,87 @@ export default class ProblemDetails extends Vue {
   ): void {
     this.onPopupDismissed();
     this.$emit('dismiss-promotion', qualityPromotionComponent, isDismissed);
+  }
+
+  onProblemRendered(): void {
+    // TODO: We should probably refactor how the Markdown component is handled,
+    // one for problems (with MathJax and the problem-specific logic) and another
+    // for all other uses.
+    //
+    // It might be better for all of these things, plus the Markdown templating
+    // system altogether to be replaced by the Markdown Vue component be able
+    // to inject Vue components into the DOM after it's being rendered, so that
+    // all the templating and interactivity can be handled by Vue instead of by
+    // JavaScript.
+    const libinteractiveInterfaceNameElement = this.statementMarkdown.$el.querySelector(
+      'span.libinteractive-interface-name',
+    ) as HTMLElement;
+    if (
+      libinteractiveInterfaceNameElement &&
+      this.problem.settings?.interactive?.module_name
+    ) {
+      libinteractiveInterfaceNameElement.innerText = this.problem.settings.interactive.module_name.replace(
+        /\.idl$/,
+        '',
+      );
+    }
+
+    const outputOnlyDownloadElement = this.statementMarkdown.$el.querySelector(
+      '.output-only-download a',
+    );
+    if (outputOnlyDownloadElement) {
+      outputOnlyDownloadElement.setAttribute(
+        'href',
+        `/probleminput/${this.problem.alias}/${this.problem.commit}/${this.problem.alias}-input.zip`,
+      );
+    }
+
+    const libinteractiveDownloadFormElement = this.statementMarkdown.$el.querySelector(
+      '.libinteractive-download form',
+    ) as HTMLElement;
+    if (libinteractiveDownloadFormElement) {
+      libinteractiveDownloadFormElement.addEventListener(
+        'submit',
+        (e: Event) => {
+          e.preventDefault();
+
+          const form = e.target as HTMLElement;
+          const alias = this.problem.alias;
+          const commit = this.problem.commit;
+          const os = (form.querySelector('.download-os') as HTMLInputElement)
+            ?.value;
+          const lang = (form.querySelector(
+            '.download-lang',
+          ) as HTMLInputElement)?.value;
+          const extension = os == 'unix' ? '.tar.bz2' : '.zip';
+
+          ui.navigateTo(
+            `${window.location.protocol}//${window.location.host}/templates/${alias}/${commit}/${alias}_${os}_${lang}${extension}`,
+          );
+        },
+      );
+    }
+
+    const libinteractiveDownloadLangElement = this.statementMarkdown.$el.querySelector(
+      '.libinteractive-download .download-lang',
+    ) as HTMLSelectElement;
+    if (libinteractiveDownloadLangElement) {
+      libinteractiveDownloadLangElement.addEventListener(
+        'change',
+        (e: Event) => {
+          let form = e.target as HTMLElement;
+          while (!form.classList.contains('libinteractive-download')) {
+            if (!form.parentElement) {
+              return;
+            }
+            form = form.parentElement;
+          }
+          (form.querySelector(
+            '.libinteractive-extension',
+          ) as HTMLElement).innerText = libinteractiveDownloadLangElement.value;
+        },
+      );
+    }
   }
 
   onRunSubmitted(code: string, selectedLanguage: string): void {

@@ -2,6 +2,13 @@ import T from './lang';
 import { formatDate, formatDateTime } from './time';
 import { omegaup } from './omegaup';
 
+export enum MessageType {
+  Danger = 'alert-danger',
+  Info = 'alert-info',
+  Success = 'alert-success',
+  Warning = 'alert-warning',
+}
+
 export function navigateTo(href: string): void {
   window.location.href = href;
 }
@@ -68,7 +75,15 @@ export function formatString(
   });
 }
 
-export function displayStatus(message: string, type: string): void {
+export function displayStatus({
+  message,
+  type,
+  autoHide,
+}: {
+  message: string;
+  type: MessageType;
+  autoHide?: boolean;
+}): void {
   if ($('#status .message').length == 0) {
     console.error('Showing warning but there is no status div');
   }
@@ -93,7 +108,7 @@ export function displayStatus(message: string, type: string): void {
         statusElement
           .removeClass('animating')
           .attr('data-counter', statusCounter + 2);
-        if (type == 'alert-success') {
+        if (type == 'alert-success' && autoHide) {
           setTimeout(() => {
             dismissNotifications(statusCounter + 2);
           }, 5000);
@@ -103,19 +118,23 @@ export function displayStatus(message: string, type: string): void {
 }
 
 export function error(message: string): void {
-  displayStatus(message, 'alert-danger');
+  displayStatus({ message: message, type: MessageType.Danger });
 }
 
 export function info(message: string): void {
-  displayStatus(message, 'alert-info');
+  displayStatus({ message: message, type: MessageType.Info });
 }
 
-export function success(message: string): void {
-  displayStatus(message, 'alert-success');
+export function success(message: string, autoHide: boolean = true): void {
+  displayStatus({
+    message: message,
+    type: MessageType.Success,
+    autoHide: autoHide,
+  });
 }
 
 export function warning(message: string): void {
-  displayStatus(message, 'alert-warning');
+  displayStatus({ message: message, type: MessageType.Warning });
 }
 
 export function apiError(response: { error?: string; payload?: any }): void {
