@@ -1,11 +1,14 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import expect from 'expect';
-
-import T from '../../lang';
 import type { types } from '../../api_types';
 
 import course_CardsList from './CardsList.vue';
 
+const publicCoursesTitles = ['Curso público actual', 'Curso público pasado'];
+const studentCoursesTitles = [
+  'Curso que estudio sin terminar',
+  'Curso que estudio terminado',
+];
 const coursesListProps = {
   courses: {
     public: {
@@ -15,7 +18,7 @@ const coursesListProps = {
         current: {
           courses: [
             {
-              alias: 'CC',
+              alias: 'public1',
               counts: {
                 homework: 2,
                 lesson: 2,
@@ -23,7 +26,7 @@ const coursesListProps = {
               },
               description: 'Test description',
               finish_time: new Date(),
-              name: 'Curso de introducción',
+              name: publicCoursesTitles[0],
               start_time: new Date(),
               admission_mode: 'public',
               assignments: [],
@@ -33,7 +36,23 @@ const coursesListProps = {
           timeType: 'current',
         },
         past: {
-          courses: [],
+          courses: [
+            {
+              alias: 'public2',
+              counts: {
+                homework: 2,
+                lesson: 2,
+                test: 1,
+              },
+              description: 'Test description',
+              finish_time: new Date(),
+              name: publicCoursesTitles[1],
+              start_time: new Date(),
+              admission_mode: 'public',
+              assignments: [],
+              is_open: true,
+            },
+          ],
           timeType: 'past',
         },
       },
@@ -47,7 +66,40 @@ const coursesListProps = {
           timeType: 'current',
         },
         past: {
-          courses: [],
+          courses: [
+            {
+              alias: 'student1',
+              counts: {
+                homework: 2,
+                lesson: 2,
+                test: 1,
+              },
+              description: 'Test description',
+              finish_time: new Date(),
+              name: studentCoursesTitles[0],
+              start_time: new Date(),
+              admission_mode: 'public',
+              assignments: [],
+              is_open: true,
+              progress: 99,
+            },
+            {
+              alias: 'student2',
+              counts: {
+                homework: 2,
+                lesson: 2,
+                test: 1,
+              },
+              description: 'Test description',
+              finish_time: new Date(),
+              name: studentCoursesTitles[1],
+              start_time: new Date(),
+              admission_mode: 'public',
+              assignments: [],
+              is_open: true,
+              progress: 100,
+            },
+          ],
           timeType: 'past',
         },
       },
@@ -56,12 +108,35 @@ const coursesListProps = {
 };
 
 describe('CardsList.vue', () => {
-  it('Should handle empty courses list for user', () => {
-    const wrapper = shallowMount(course_CardsList, {
-      propsData: coursesListProps,
+  it('Should list public courses', async () => {
+    const wrapper = mount(course_CardsList, {
+      propsData: {
+        courses: coursesListProps.courses,
+        type: 'public',
+      },
     });
 
-    expect(wrapper.find('.public').text()).toContain(T.courseListPublicCourses);
-    expect(wrapper.find('.student').text()).toContain(T.courseListIStudy);
+    expect(wrapper.text()).toContain(publicCoursesTitles[0]);
+    expect(wrapper.text()).not.toContain(publicCoursesTitles[1]);
+
+    await wrapper.find('a[data-see-all]').trigger('click');
+    expect(wrapper.text()).toContain(publicCoursesTitles[0]);
+    expect(wrapper.text()).toContain(publicCoursesTitles[1]);
+  });
+
+  it('Should list student courses', async () => {
+    const wrapper = mount(course_CardsList, {
+      propsData: {
+        courses: coursesListProps.courses,
+        type: 'student',
+      },
+    });
+
+    expect(wrapper.text()).toContain(studentCoursesTitles[0]);
+    expect(wrapper.text()).not.toContain(studentCoursesTitles[1]);
+
+    await wrapper.find('a[data-see-all]').trigger('click');
+    expect(wrapper.text()).toContain(studentCoursesTitles[0]);
+    expect(wrapper.text()).toContain(studentCoursesTitles[1]);
   });
 });

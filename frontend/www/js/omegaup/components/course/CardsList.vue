@@ -16,7 +16,7 @@
             v-if="groupedCourses.hidden.length"
             class="col-sm-5 col-lg-8 text-right"
           >
-            <a href="#" @click="seeAll = !seeAll">{{
+            <a data-see-all href="#" @click="seeAll = !seeAll">{{
               togglePastCoursesText
             }}</a>
           </div>
@@ -142,7 +142,7 @@ export default class CourseCardsList extends Vue {
         return;
       }
       if (this.type === CourseListType.Public) {
-        courses.unhidden.push(course);
+        courses.hidden.push(course);
         return;
       }
       if (course.progress === 100) {
