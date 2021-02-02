@@ -28,7 +28,7 @@ import course_FilteredList from './FilteredList.vue';
     'omegaup-course-filtered-list': course_FilteredList,
   },
 })
-export default class MyCoursesList extends Vue {
+export default class Mine extends Vue {
   @Prop() courses!: types.AdminCourses;
   @Prop() isMainUserIdentity!: boolean;
 
