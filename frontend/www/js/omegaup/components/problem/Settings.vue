@@ -9,6 +9,7 @@
           class="form-control"
           :class="{ 'is-invalid': errors.includes('languages') }"
           required
+          @change="onLanguagesChange($event)"
         >
           <option
             v-for="(languageText, languageIndex) in validLanguages"
@@ -146,7 +147,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component
@@ -177,6 +178,12 @@ export default class Settings extends Vue {
   @Watch('initialLanguage')
   onInitialLanguageChange(newInitial: string): void {
     this.languages = newInitial;
+  }
+
+  @Emit('languages-changed')
+  onLanguagesChange(event: Event): string {
+    const newValue = (event.target as HTMLInputElement).value;
+    return newValue;
   }
 }
 </script>
