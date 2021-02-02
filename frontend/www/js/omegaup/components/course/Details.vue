@@ -157,7 +157,7 @@
                   :href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
                 >
                   <font-awesome-icon :icon="['fas', 'link']" />{{
-                    T.wordsPublic
+                    T.courseActionScoreboard
                   }}</a
                 >
                 <a
