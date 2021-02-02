@@ -60,6 +60,9 @@ OmegaUp.on('ready', () => {
   const problemMatch = /#problems\/([^/]+)/.exec(window.location.hash);
   const problemAlias = problemMatch?.[1] ?? null;
   if (problemAlias) {
+    // This needs to be set here and not at the top because it depends
+    // on the `navigate-to-problem` callback being invoked, and that is
+    // not the case if this is set a priori.
     contestPractice.problem = { alias: problemAlias, runs: [] };
   }
 });
