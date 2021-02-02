@@ -251,6 +251,7 @@ const translations: { [key: string]: string; } = {
   contestWillBeginIn: "Este concurso iniciar\u00e1 en ",
   contestsCreateNew: "Crear un concurso",
   contestsJoinScoreboards: "Unir scoreboards",
+  courseActionScoreboard: "Scoreboard",
   courseAddContent: "A\u00f1adir contenido",
   courseAddProblemsAdd: "Agregar problemas",
   courseAddProblemsAddAssignmentDesc: "Agrega los problemas/lecturas que quieras incluir, estos se guardar\u00e1n hasta que presiones el bot\u00f3n de A\u00f1adir contenido. Si a\u00fan no decides que problemas utilizar\u00e1s, puedes agregarlos m\u00e1s tarde.",
