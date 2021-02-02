@@ -58,7 +58,12 @@ class Course {
             'requests_user_information' => $requestsUserInformation,
             'show_scoreboard' => $showScoreboard,
             'needs_basic_information' => $needsBasicInformation,
-            'languages' => !is_null($languages) ? implode(',', $languages) : '',
+            'languages' => !is_null(
+                $languages
+            ) ? implode(
+                ',',
+                $languages
+            ) : null,
         ]);
 
         \OmegaUp\Controllers\Course::apiCreate($r);

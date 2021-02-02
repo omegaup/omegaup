@@ -1783,7 +1783,7 @@ export namespace types {
     finish_time?: Date;
     is_admin: boolean;
     is_curator: boolean;
-    languages: string[];
+    languages?: string[];
     name: string;
     needs_basic_information: boolean;
     requests_user_information: string;
