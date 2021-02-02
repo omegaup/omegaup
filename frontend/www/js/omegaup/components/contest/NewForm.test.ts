@@ -68,5 +68,7 @@ describe('NewForm.vue', () => {
     );
     await wrapper.find('form button[type="submit"]').trigger('click');
     expect(wrapper.emitted('update-contest')).toBeDefined();
+
+    wrapper.destroy();
   });
 });

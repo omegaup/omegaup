@@ -56,9 +56,12 @@
       </div>
       <div class="row">
         <div class="col-xs-12 pl-4">
-          <a class="name" @click="onNavigateToProblem(problem)">{{
-            problem.text
-          }}</a>
+          <a
+            :data-problem="problem.alias"
+            class="name"
+            @click="onNavigateToProblem(problem)"
+            >{{ problem.text }}</a
+          >
         </div>
       </div>
     </div>
