@@ -117,7 +117,7 @@ def test_user_ranking_course(driver):
 
         enter_course_assignments_page(driver, course_alias)
         util.check_scoreboard_events(driver, assignment_alias, url,
-                                     num_elements=1, scoreboard='Public')
+                                     num_elements=1, scoreboard='Scoreboard')
 
         enter_course_assignments_page(driver, course_alias)
         with driver.page_transition():
