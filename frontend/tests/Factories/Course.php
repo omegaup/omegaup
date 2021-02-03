@@ -4,6 +4,7 @@ namespace OmegaUp\Test\Factories;
 
 class Course {
     /**
+     * @param $languages list<string>
      * @return array{admin: \OmegaUp\DAO\VO\Identities, course_alias: string, request: \OmegaUp\Request}
      */
     public static function createCourse(
@@ -14,7 +15,8 @@ class Course {
         string $showScoreboard = 'false',
         ?int $courseDuration = 120,
         ?string $courseAlias = null,
-        ?bool $needsBasicInformation = false
+        ?bool $needsBasicInformation = false,
+        ?array $languages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
     ): array {
         if (is_null($admin)) {
             ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -56,6 +58,12 @@ class Course {
             'requests_user_information' => $requestsUserInformation,
             'show_scoreboard' => $showScoreboard,
             'needs_basic_information' => $needsBasicInformation,
+            'languages' => !is_null(
+                $languages
+            ) ? implode(
+                ',',
+                $languages
+            ) : null,
         ]);
 
         \OmegaUp\Controllers\Course::apiCreate($r);

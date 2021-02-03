@@ -3,7 +3,7 @@ import expect from 'expect';
 
 import T from '../../lang';
 
-import contest_AddProblem from './AddProblemv2.vue';
+import contest_AddProblem from './AddProblem.vue';
 
 describe('AddProblem.vue', () => {
   it('Should handle empty props', async () => {

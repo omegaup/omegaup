@@ -14,6 +14,7 @@ describe('Edit.vue', () => {
     const wrapper = shallowMount(course_Edit, {
       propsData: {
         data: {
+          allLanguages: { py2: 'Python 2', py3: 'Python 3' },
           course: {
             admission_mode: 'registration',
             alias: 'test-course',

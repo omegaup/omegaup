@@ -41,6 +41,7 @@ describe('ViewProgress.vue', () => {
     students: [
       {
         name: 'student',
+        classname: 'user-rank-unranked',
         points: {
           ['assignment']: { ['problem1']: 100, ['problem2']: 100 },
         },
