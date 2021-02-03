@@ -21,7 +21,11 @@
           </thead>
           <tbody>
             <tr v-for="problem in problems">
-              <td class="align-middle">{{ problem.alias }}</td>
+              <td class="align-middle">
+                <a :href="`/arena/problem/${problem.alias}/`">{{
+                  problem.alias
+                }}</a>
+              </td>
               <td class="align-middle">{{ problem.points }}</td>
               <td class="button-column align-middle">
                 <button
