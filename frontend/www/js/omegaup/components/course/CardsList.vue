@@ -16,7 +16,12 @@
           class="col-sm-5 col-lg-8 text-right"
         >
           <label class="form-check-label">
-            <input v-model="seeAll" class="form-check-input" type="checkbox" />
+            <input
+              v-model="seeAll"
+              data-see-all
+              class="form-check-input"
+              type="checkbox"
+            />
             {{ seeAllCoursesText }}
           </label>
         </div>
