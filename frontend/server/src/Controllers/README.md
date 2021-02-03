@@ -1532,6 +1532,7 @@ Create new course API
 | `alias`                     | `mixed`      |             |
 | `description`               | `mixed`      |             |
 | `finish_time`               | `mixed`      |             |
+| `languages`                 | `mixed`      |             |
 | `name`                      | `mixed`      |             |
 | `needs_basic_information`   | `mixed`      |             |
 | `public`                    | `mixed`      |             |
@@ -1926,6 +1927,7 @@ Edit Course contents
 | Name                        | Type                                        | Description |
 | --------------------------- | ------------------------------------------- | ----------- |
 | `alias`                     | `string`                                    |             |
+| `languages`                 | `string`                                    |             |
 | `school_id`                 | `int`                                       |             |
 | `admission_mode`            | `'private'\|'public'\|'registration'\|null` |             |
 | `description`               | `null\|string`                              |             |
