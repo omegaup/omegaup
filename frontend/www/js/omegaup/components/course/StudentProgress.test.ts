@@ -30,6 +30,7 @@ describe('StudentProgress.vue', () => {
         ] as omegaup.Assignment[],
         student: {
           name: 'student',
+          classname: 'user-rank-unranked',
           points: {
             ['assignment']: {
               ['problem1']: 100,

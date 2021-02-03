@@ -29,6 +29,7 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         'needs_basic_information' => true,
         'requests_user_information' => true,
         'show_scoreboard' => true,
+        'languages' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -121,6 +122,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
             $this->show_scoreboard = boolval(
                 $data['show_scoreboard']
             );
+        }
+        if (isset($data['languages'])) {
+            $this->languages = is_scalar(
+                $data['languages']
+            ) ? strval($data['languages']) : '';
         }
     }
 
@@ -216,4 +222,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $show_scoreboard = false;
+
+    /**
+     * Un filtro (opcional) de qué lenguajes se pueden usar en un curso
+     *
+     * @var string|null
+     */
+    public $languages = null;
 }

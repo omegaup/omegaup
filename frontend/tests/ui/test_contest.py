@@ -311,6 +311,20 @@ def create_contest_admin(driver, contest_alias, problem, users, user,
         assert (('/contest/%s/edit/' % contest_alias) in
                 driver.browser.current_url), driver.browser.current_url
 
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'input[data-title]'))).send_keys('(Updated)')
+
+        driver.browser.find_element_by_css_selector(
+            'form.contest-form').submit()
+
+        message_link = driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#status span.message a')))
+
+        assert (contest_alias in
+                message_link.get_attribute('href')), 'Update contest failed'
+
         add_problem_to_contest(driver, problem)
 
         add_students_bulk(driver, users)

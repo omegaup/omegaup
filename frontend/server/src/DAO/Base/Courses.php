@@ -43,7 +43,8 @@ abstract class Courses {
                 `school_id` = ?,
                 `needs_basic_information` = ?,
                 `requests_user_information` = ?,
-                `show_scoreboard` = ?
+                `show_scoreboard` = ?,
+                `languages` = ?
             WHERE
                 (
                     `course_id` = ?
@@ -77,6 +78,7 @@ abstract class Courses {
             intval($Courses->needs_basic_information),
             $Courses->requests_user_information,
             intval($Courses->show_scoreboard),
+            $Courses->languages,
             intval($Courses->course_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -110,7 +112,8 @@ abstract class Courses {
                 `Courses`.`school_id`,
                 `Courses`.`needs_basic_information`,
                 `Courses`.`requests_user_information`,
-                `Courses`.`show_scoreboard`
+                `Courses`.`show_scoreboard`,
+                `Courses`.`languages`
             FROM
                 `Courses`
             WHERE
@@ -204,7 +207,8 @@ abstract class Courses {
                 `Courses`.`school_id`,
                 `Courses`.`needs_basic_information`,
                 `Courses`.`requests_user_information`,
-                `Courses`.`show_scoreboard`
+                `Courses`.`show_scoreboard`,
+                `Courses`.`languages`
             FROM
                 `Courses`
         ';
@@ -266,8 +270,10 @@ abstract class Courses {
                     `school_id`,
                     `needs_basic_information`,
                     `requests_user_information`,
-                    `show_scoreboard`
+                    `show_scoreboard`,
+                    `languages`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -310,6 +316,7 @@ abstract class Courses {
             intval($Courses->needs_basic_information),
             $Courses->requests_user_information,
             intval($Courses->show_scoreboard),
+            $Courses->languages,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

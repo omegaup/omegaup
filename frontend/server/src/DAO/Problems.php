@@ -582,7 +582,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      */
     final public static function getProblemsSolved(int $identityId): array {
         $sql = '
-            SELECT DISTINCT
+            SELECT
                 p.*
             FROM
                 Problems p
@@ -592,7 +592,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 Runs r ON r.run_id = s.current_run_id
             WHERE
                 r.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
+            GROUP BY
+                p.problem_id
             ORDER BY
+                min(s.time) DESC,
                 p.problem_id DESC;
         ';
         $val = [$identityId];

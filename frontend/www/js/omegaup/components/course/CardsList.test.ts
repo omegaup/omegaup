@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 
 import T from '../../lang';
@@ -8,26 +8,28 @@ import course_CardsList from './CardsList.vue';
 
 const coursesListProps = {
   courses: {
-    admin: {
-      accessMode: 'admin',
-      activeTab: '',
-      filteredCourses: {
-        current: {
-          courses: [],
-          timeType: 'current',
-        },
-        past: {
-          courses: [],
-          timeType: 'past',
-        },
-      },
-    },
     public: {
       accessMode: 'public',
-      activeTab: '',
+      activeTab: 'current',
       filteredCourses: {
         current: {
-          courses: [],
+          courses: [
+            {
+              alias: 'CC',
+              counts: {
+                homework: 2,
+                lesson: 2,
+                test: 1,
+              },
+              description: 'Test description',
+              finish_time: new Date(),
+              name: 'Curso de introducción',
+              start_time: new Date(),
+              admission_mode: 'public',
+              assignments: [],
+              is_open: true,
+            },
+          ],
           timeType: 'current',
         },
         past: {
@@ -38,7 +40,7 @@ const coursesListProps = {
     },
     student: {
       accessMode: 'student',
-      activeTab: '',
+      activeTab: 'current',
       filteredCourses: {
         current: {
           courses: [],
@@ -55,14 +57,11 @@ const coursesListProps = {
 
 describe('CardsList.vue', () => {
   it('Should handle empty courses list for user', () => {
-    const wrapper = mount(course_CardsList, {
+    const wrapper = shallowMount(course_CardsList, {
       propsData: coursesListProps,
     });
 
-    expect(wrapper.text()).toContain(T.courseCardAboutCourses);
-    expect(wrapper.text()).toContain(
-      T.courseCardDescriptionCourses.split('\n')[0],
-    );
-    expect(wrapper.text()).toContain(T.wordsReadMore);
+    expect(wrapper.find('.public').text()).toContain(T.courseListPublicCourses);
+    expect(wrapper.find('.student').text()).toContain(T.courseListIStudy);
   });
 });
