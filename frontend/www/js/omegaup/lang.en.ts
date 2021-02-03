@@ -332,7 +332,7 @@ const translations: { [key: string]: string; } = {
   courseNewFormDescription: "Description",
   courseNewFormEndDate: "End date",
   courseNewFormEndDateDesc: "Time and date (in local time) in which the course will end.",
-  courseNewFormLanguages: "Set languages to the current contest",
+  courseNewFormLanguages: "Set languages to the current course",
   courseNewFormScheduleCourse: "Schedule course",
   courseNewFormShortTitleAlias: "Short title (alias)",
   courseNewFormShortTitleAliasDesc: "The alias is used to construct the course URL (examples: IPNVERANO2016, ITVERINTRO2016)",
