@@ -1,12 +1,12 @@
 <template>
-  <div class="card panel panel-default">
-    <div class="card-header panel-heading">
-      <h4 class="card-title panel-title">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="card-title">
         {{ title }}
         <span class="badge badge-secondary">{{ badges.length }} </span>
       </h4>
     </div>
-    <div class="card-body panel-body">
+    <div class="card-body">
       <div class="container-fluid">
         <div class="row">
           <omegaup-badge
@@ -17,7 +17,7 @@
         </div>
       </div>
     </div>
-    <div v-if="showAllBadgesLink" class="card-footer panel-footer">
+    <div v-if="showAllBadgesLink" class="card-footer">
       <a v-if="showAllBadgesLink" class="badges-link" href="/badge/list/">{{
         T.wordsBadgesSeeAll
       }}</a>
