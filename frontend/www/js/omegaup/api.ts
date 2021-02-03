@@ -581,18 +581,17 @@ export const Course = {
     messages._CourseAdminDetailsServerResponse,
     messages.CourseAdminDetailsResponse
   >('/api/course/adminDetails/', (x) => {
-    if (x.assignments)
-      x.assignments = ((x) => {
-        if (!Array.isArray(x)) {
-          return x;
-        }
-        return x.map((x) => {
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        });
-      })(x.assignments);
+    x.assignments = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        if (x.finish_time)
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        return x;
+      });
+    })(x.assignments);
     if (x.finish_time)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -656,18 +655,17 @@ export const Course = {
     messages._CourseDetailsServerResponse,
     messages.CourseDetailsResponse
   >('/api/course/details/', (x) => {
-    if (x.assignments)
-      x.assignments = ((x) => {
-        if (!Array.isArray(x)) {
-          return x;
-        }
-        return x.map((x) => {
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        });
-      })(x.assignments);
+    x.assignments = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        if (x.finish_time)
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        return x;
+      });
+    })(x.assignments);
     if (x.finish_time)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -688,20 +686,19 @@ export const Course = {
   >('/api/course/introDetails/', (x) => {
     if (x.details)
       x.details = ((x) => {
-        if (x.assignments)
-          x.assignments = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              if (x.finish_time)
-                x.finish_time = ((x: number) => new Date(x * 1000))(
-                  x.finish_time,
-                );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.assignments);
+        x.assignments = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (x.finish_time)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          });
+        })(x.assignments);
         if (x.finish_time)
           x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
         x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
