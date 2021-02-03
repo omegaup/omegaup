@@ -286,8 +286,6 @@ const translations: { [key: string]: string; } = {
   courseCardImpartedBy: "Impartido por: **%(school_name)**",
   courseCardSeeContent: "Ver contenido",
   courseCardShowTopics: "Mostrar temario",
-  courseCardsListHideFinishedCourses: "Ocultar cursos terminados",
-  courseCardsListHidePastCourses: "Ocultar cursos pasados",
   courseCardsListSearch: "\ud83d\udd0d Nombre del curso",
   courseCardsListShowFinishedCourses: "Mostrar cursos terminados",
   courseCardsListShowPastCourses: "Mostrar cursos pasados",

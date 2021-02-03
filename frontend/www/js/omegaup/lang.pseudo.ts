@@ -286,8 +286,6 @@ const translations: { [key: string]: string; } = {
   courseCardImpartedBy: "(Impar73d by: **%(school_name)**)",
   courseCardSeeContent: "(S33 c0n73n7)",
   courseCardShowTopics: "(Sh0w 70pic5)",
-  courseCardsListHideFinishedCourses: "(Hid3 fini5h3d c0ur535)",
-  courseCardsListHidePastCourses: "(Hid3 pa57 c0ur535)",
   courseCardsListSearch: "(\ud83d\udd0d C0ur53 nam3)",
   courseCardsListShowFinishedCourses: "(Sh0w fini5h3d c0ur535)",
   courseCardsListShowPastCourses: "(Sh0w pa57 c0ur535)",
