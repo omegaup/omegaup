@@ -160,7 +160,7 @@
               v-model="selectedLanguages"
               :options="Object.keys(allLanguages)"
               :multiple="true"
-              :placeholder="T.contestNewFormLanguages"
+              :placeholder="T.courseNewFormLanguages"
               :close-on-select="false"
               :allow-empty="false"
             >
