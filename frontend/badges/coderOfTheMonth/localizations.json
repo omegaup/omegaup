@@ -1,7 +1,7 @@
 {
   "es": {
     "name": "Coder del Mes",
-    "description": "El usuario ha sido nombrado Coder del Mes al menos una vez."
+    "description": "Otorgado a personas que han sido nombradas Coder del Mes al menos una vez."
   },
   "en": {
     "name": "Coder Of The Month",
@@ -9,6 +9,6 @@
   },
   "pt": {
     "name": "Programador do Mês",
-    "description": "O usuário tem sido Programador do Mês pelo menos uma vez."
+    "description": "Concedido a pessoas que foram nomeadas Coder do Mês pelo menos uma vez."
   }
 }

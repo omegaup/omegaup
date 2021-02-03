@@ -1,63 +1,91 @@
 <template>
-  <input class="form-control"
-        readonly
-        size="16"
-        type="text"
-        v-bind:disabled="!enabled">
+  <input
+    v-model="stringValue"
+    class="form-control"
+    :class="{ 'is-invalid': isInvalid }"
+    required="required"
+    size="16"
+    type="datetime-local"
+    :disabled="!enabled"
+    :max="finish ? time.formatDateTimeLocal(finish) : null"
+    :min="start ? time.formatDateTimeLocal(start) : null"
+    :readonly="readonly || usedFallback"
+  />
 </template>
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
-import { T } from '../omegaup.js';
+import T from '../lang';
+import * as time from '../time';
+import '../../../third_party/js/bootstrap-datetimepicker.min.js';
+import '../../../third_party/js/locales/bootstrap-datetimepicker.es.js';
+import '../../../third_party/js/locales/bootstrap-datetimepicker.pt-BR.js';
 
 @Component
 export default class DateTimePicker extends Vue {
   T = T;
+  time = time;
 
   @Prop() value!: Date;
   @Prop({ default: true }) enabled!: boolean;
   @Prop({ default: T.dateTimePickerFormat }) format!: string;
   @Prop({ default: null }) start!: Date;
   @Prop({ default: null }) finish!: Date;
+  @Prop({ default: false }) readonly!: boolean;
+  @Prop({ default: false }) isInvalid!: boolean;
 
-  mounted() {
-    let self = this;
-    $(self.$el)
+  private usedFallback: boolean = false;
+  private stringValue: string = time.formatDateTimeLocal(this.value);
+
+  public mounted() {
+    if ((this.$el as HTMLInputElement).type === 'text') {
+      // Even though we declared the input as having datetime-local type,
+      // browsers that don't support it will silently change the type to text.
+      // In that case, use the bootstrap datetimepicker.
+      this.mountedFallback();
+    }
+  }
+
+  private mountedFallback() {
+    this.usedFallback = true;
+    $(this.$el)
       .datetimepicker({
-        format: self.format,
-        defaultDate: self.value,
+        format: this.format,
+        defaultDate: this.value,
         locale: T.locale,
       })
-      .on('change', ev => {
-        self.$emit(
-          'input',
-          $(self.$el)
-            .data('datetimepicker')
-            .getDate(),
-        );
+      .on('change', () => {
+        this.$emit('input', $(this.$el).data('datetimepicker').getDate());
       });
 
-    $(this.$el)
-      .data('datetimepicker')
-      .setDate(self.value);
-    if (self.start !== null) {
-      $(this.$el)
-        .data('datetimepicker')
-        .setStartDate(self.start);
+    $(this.$el).data('datetimepicker').setDate(this.value);
+    if (this.start !== null) {
+      $(this.$el).data('datetimepicker').setStartDate(this.start);
     }
-    if (self.finish !== null) {
-      $(this.$el)
-        .data('datetimepicker')
-        .setEndDate(self.finish);
+    if (this.finish !== null) {
+      $(this.$el).data('datetimepicker').setEndDate(this.finish);
     }
+  }
+
+  @Watch('stringValue')
+  onStringValueChanged(newStringValue: string) {
+    if (this.usedFallback) {
+      // If the fallback was used, we don't need to update anything.
+      return;
+    }
+    this.$emit('input', time.parseDateTimeLocal(newStringValue));
   }
 
   @Watch('value')
-  onPropertyChanged(newValue: string) {
-    $(this.$el)
-      .data('datetimepicker')
-      .setDate(newValue);
+  onPropertyChanged(newValue: Date) {
+    this.stringValue = time.formatDateTimeLocal(newValue);
+    if (this.usedFallback) {
+      $(this.$el).data('datetimepicker').setDate(newValue);
+    }
   }
 }
-
 </script>
+
+<style>
+@import '../../../third_party/css/bootstrap-datetimepicker.css';
+</style>

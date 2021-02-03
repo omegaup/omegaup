@@ -15,42 +15,49 @@ location /preguntas/ {
 rewrite ^/admin/user/([a-zA-Z0-9_-]+)/?$ /admin/user.php?username=$1 last;
 rewrite ^/admin/support/?$ /admin/support.php last;
 rewrite ^/arena/?$ /arena/index.php last;
-rewrite ^/arena/admin/?$ /arena/adminpractice.php last;
+rewrite ^/arena/admin/?$ /arena/admin.php last;
 rewrite ^/arena/problem/([a-zA-Z0-9_+-]+)/?$ /arena/problem.php?problem_alias=$1 last;
 rewrite ^/arena/problem/([a-zA-Z0-9_+-]+)/print/?$ /arena/problemprint.php?problem_alias=$1 last;
 rewrite ^/arena/([a-zA-Z0-9_+-]+)/virtual/?$ /arena/virtual.php?contest_alias=$1  last;
 rewrite ^/arena/([a-zA-Z0-9_+-]+)/print/?$ /arena/contestprint.php?alias=$1 last;
-rewrite ^/arena/[a-zA-Z0-9_+-]+/admin/?$ /arena/admin.php last;
+rewrite ^/arena/[a-zA-Z0-9_+-]+/admin/?$ /arena/contestadmin.php last;
 rewrite ^/arena/[a-zA-Z0-9_+-]+/scoreboard/[a-zA-Z0-9_+-]+/?$ /arena/scoreboard.php last;
 rewrite ^/arena/([a-zA-Z0-9_+-]+)/?$ /arena/contest.php?contest_alias=$1 last;
 rewrite ^/arena/([a-zA-Z0-9_+-]+)/practice/?$ /arena/contest.php?contest_alias=$1&is_practice=true last;
-rewrite ^/badge/list/?$ /badgelist.php last;
+rewrite ^/badge/list/?$ /badge/list.php last;
 rewrite ^/badge/([a-zA-Z0-9_-]+)/?$ /badge.php?badge_alias=$1 last;
+rewrite ^/certificate/([a-zA-Z0-9_+-]+)/?$ /certificate/details.php?uuid=$1 last;
 rewrite ^/coderofthemonth/?$ /coderofthemonth.php last;
+rewrite ^/coderofthemonth/female/?$ /coderofthemonth.php?category=female last;
 rewrite ^/contest/?$ /contests.php last;
-rewrite ^/contest/mine/?$ /contestmine.php last;
-rewrite ^/contest/new/?$ /contestnew.php last;
+rewrite ^/contest/mine/?$ /contests/mine.php last;
+rewrite ^/contest/new/?$ /contests/new.php last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/?$ /arena/$1/ permanent;
-rewrite ^/contest/([a-zA-Z0-9_+-]+)/activity/?$ /contestactivity.php?contest=$1 last;
-rewrite ^/contest/([a-zA-Z0-9_+-]+)/edit/?$ /contestedit.php?contest=$1 last;
-rewrite ^/contest/([a-zA-Z0-9_+-]+)/report/?$ /contestreport.php?contest_alias=$1 last;
-rewrite ^/contest/([a-zA-Z0-9_+-]+)/stats/?$ /conteststats.php?contest=$1 last;
-rewrite ^/course/?$ /courselist.php last;
-rewrite ^/course/([a-zA-Z0-9_+-]+)/activity/?$ /courseactivity.php?course=$1 last;
-rewrite ^/course/new/?$ /coursenew.php last;
-rewrite ^/course/([a-zA-Z0-9_+-]+)/?$ /course.php?course_alias=$1 last;
+rewrite ^/contest/([a-zA-Z0-9_+-]+)/activity/?$ /contests/activity.php?contest=$1 last;
+rewrite ^/contest/([a-zA-Z0-9_+-]+)/edit/?$ /contests/edit.php?contest_alias=$1 last;
+rewrite ^/contest/([a-zA-Z0-9_+-]+)/report/?$ /contests/report.php?contest_alias=$1 last;
+rewrite ^/contest/([a-zA-Z0-9_+-]+)/stats/?$ /contests/stats.php?contest_alias=$1 last;
+rewrite ^/course/?$ /course/list.php last;
+rewrite ^/course/home/?$ /course/home.php last;
+rewrite ^/course/mine/?$ /course/mine.php last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/activity/?$ /course/activity.php?course=$1 last;
+rewrite ^/course/new/?$ /course/new.php last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/?$ /course/assignment.php?course_alias=$1 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/admin/?$ /arena/courseadmin.php?course_alias=$1&assignment_alias=$2 last;
-rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/?$ /course.php?course_alias=$1&assignment_alias=$2 last;
-rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /coursescoreboard.php?course_alias=$1&assignment_alias=$2 last;
-rewrite ^/course/([a-zA-Z0-9_+-]+)/edit/?$ /courseedit.php?course=$1 last;
-rewrite ^/course/([a-zA-Z0-9_+-]+)/list/?$ /coursesubmissionslist.php?course=$1 last;
-rewrite ^/course/([a-zA-Z0-9_+-]+)/student/([a-zA-Z0-9_+-]+)/?$ /coursestudent.php?course=$1&student=$2 last;
-rewrite ^/course/([a-zA-Z0-9_+-]+)/students/?$ /coursestudents.php?course=$1 last;
-rewrite ^/group/?$ /grouplist.php last;
-rewrite ^/group/new/?$ /groupnew.php last;
-rewrite ^/group/([a-zA-Z0-9_+:-]+)/edit/?$ /groupedit.php?group=$1 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/?$ /course/assignment.php?course_alias=$1&assignment_alias=$2 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /course/scoreboard.php?course_alias=$1&assignment_alias=$2 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/clone/([a-zA-Z0-9._-]+)/?$ /course/clone.php?course_alias=$1&token=$2 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/edit/?$ /course/edit.php?course=$1 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/list/?$ /course/submissionslist.php?course=$1 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/statistics/?$ /course/statistics.php?course=$1 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/student/([a-zA-Z0-9_+-]+)/?$ /course/student.php?course=$1&student=$2 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/students/?$ /course/students.php?course=$1 last;
+rewrite ^/course/list/(student|public)/?$ /course/singlelist.php?course_type=$1 last;
+rewrite ^/group/?$ /group/list.php last;
+rewrite ^/group/new/?$ /group/new.php last;
+rewrite ^/group/([a-zA-Z0-9_+:-]+)/edit/?$ /group/edit.php?group=$1 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /groupscoreboard.php?group=$1&scoreboard=$2 last;
-rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/edit/?$ /groupscoreboardedit.php?group=$1&scoreboard=$2 last;
+rewrite ^/group/([a-zA-Z0-9_+:-]+)/scoreboard/([a-zA-Z0-9_+-]+)/edit/?$ /group/scoreboardedit.php?group=$1&scoreboard=$2 last;
 rewrite ^/group/([a-zA-Z0-9_+:-]+)/stats/?$ /groupstats.php?group=$1 last;
 rewrite ^/interview/list/?$ /interviews/list.php last;
 rewrite ^/interview/([a-zA-Z0-9_+-]+)/arena?$ /interviews/arena.php?alias=$1 last;
@@ -61,20 +68,100 @@ rewrite ^/login/google/?$ /logingoogle.php last;
 rewrite ^/login/password/recover/?$ /loginpasswordrecover.php last;
 rewrite ^/login/password/reset/?$ /loginpasswordreset.php last;
 rewrite ^/logout/?$ /logout.php last;
-rewrite ^/nomination/?$ /qualitynomination.php last;
-rewrite ^/nomination/([0-9]+)/?$ /qualitynomination.php?qualitynomination_id=$1 last;
-rewrite ^/nomination/mine/?$ /qualitynomination_mine.php last;
+rewrite ^/metrics/?$ /metrics.php last;
+rewrite ^/nomination/?$ /qualitynomination/list.php last;
+rewrite ^/nomination/([0-9]+)/?$ /qualitynomination/details.php?qualitynomination_id=$1 last;
+rewrite ^/nomination/mine/?$ /qualitynomination/my_list.php last;
 rewrite ^/permissions/?$ /permissions.php last;
-rewrite ^/problem/?$ /problemlist.php last;
-rewrite ^/problem/list/?$ /problemlist.php last;
-rewrite ^/problem/mine/?$ /problemmine.php last;
-rewrite ^/problem/new/?$ /problemnew.php last;
-rewrite ^/problem/([a-zA-Z0-9_+-]+)/edit/?$ /problemedit.php?problem=$1 last;
-rewrite ^/problem/([a-zA-Z0-9_+-]+)/stats/?$ /problemstats.php?problem=$1 last;
-rewrite ^/profile/?$ /profile.php last;
-rewrite ^/profile/edit/?$ /profileedit.php last;
-rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile.php?username=$1 last;
-rewrite ^/rank/?$ /rank.php last;
+rewrite ^/problem/?$ /problems/list.php last;
+rewrite ^/problem/collection/?$ /problems/collection.php last;
+rewrite ^/problem/collection/author/?$ /problems/collection_details_by_author.php last;
+rewrite ^/problem/collection/([a-zA-Z0-9_+-]+)/?$ /problems/collection_details_by_level.php?level=$1 last;
+rewrite ^/problem/list/?$ /problems/list.php last;
+rewrite ^/problem/mine/?$ /problems/mine.php last;
+rewrite ^/problem/new/?$ /problems/new.php last;
+rewrite ^/problem/random(/language)?/?$ /problems/random/language.php last;
+rewrite ^/problem/random/karel/?$ /problems/random/karel.php last;
+rewrite ^/problem/([a-zA-Z0-9_+-]+)/edit/?$ /problems/edit.php?problem=$1 last;
+rewrite ^/problem/([a-zA-Z0-9_+-]+)/stats/?$ /problems/stats.php?problem_alias=$1 last;
+rewrite ^/profile/?$ /profile/index.php last;
+rewrite ^/profile/edit/?$ /profile/edit.php last;
+rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile/index.php?username=$1 last;
+rewrite ^/rank/?$ /rank/users.php last;
+rewrite ^/rank/authors/?$ /rank/authors.php last;
+rewrite ^/rank/schools/?$ /rank/schools.php last;
 rewrite ^/privacypolicy/?$ /privacypolicy.php last;
-rewrite ^/schoolsrank/?$ /schoolsrank.php last;
-rewrite ^/scoreboardmerge/?$ /scoreboardmerge.php last;
+rewrite ^/schoolofthemonth/?$ /schools/schoolofthemonth.php last;
+rewrite ^/schools/?$ /course/ permanent;
+rewrite ^/schoolsrank/?$ /rank/schools/ permanent;
+rewrite ^/schools/profile/([0-9]+)/?$ /schools/profile.php?school_id=$1 last;
+rewrite ^/scoreboardmerge/?$ /contests/scoreboardmerge.php last;
+rewrite ^/submissions/?$ /submissions/list.php last;
+rewrite ^/submissions/([a-zA-Z0-9_+.-]+)/?$ /submissions/user_list.php?username=$1 last;
+rewrite ^/user/emailedit/([a-zA-Z0-9_]+)/?$ /users/emailedit.php?username=$1 last;
+rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/redirecttointerview/([a-zA-Z0-9_+-]+)/?$ /userverifyemail.php?id=$1&redirecttointerview=$2 last;
+rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/?$ /userverifyemail.php?id=$1 last;
+
+# Cache control
+location ~ (/dist/|^/third_party/|^/media/|^/css|^/js/|^/img/) {
+  add_header  Cache-Control "max-age=31557600";
+}
+
+# libinteractive templates
+location ~ '^/templates/([a-zA-Z0-9_-]+)/([0-9a-f]{40})/([a-zA-Z0-9_.-]+)$' {
+  if (-f $request_filename) {
+    # Normal case: file is found and nginx can handle it natively.
+    break;
+  }
+  if (-d $document_root/templates/$1/$2) {
+    # Directory was found, but file was not. That means that the
+    # re-generation process was already run, so we will never be
+    # able to find that file.
+    return 404;
+  }
+  if ($args != '') {
+    # The re-generation process was already run, and we still
+    # could not find that file. Give up to avoid infinitely
+    # redirecting.
+    return 404;
+  }
+  # Try re-generating the template. Once this is done, it will cause a redirect to nginx.
+  rewrite '^/templates/([a-zA-Z0-9_-]+)/([0-9a-f]{40})/(.*)$' /problems/template.php?problem_alias=$1&commit=$2&filename=$3? last;
+}
+
+# output-only inputs.
+location ~ '^/probleminput/([a-zA-Z0-9_-]+)/([0-9a-f]{40})/([a-zA-Z0-9_.-]+)$' {
+  if (-f $request_filename) {
+    # Normal case: file is found and nginx can handle it natively.
+    break;
+  }
+  if (-d $document_root/probleminput/$1/$2) {
+    # Directory was found, but file was not. That means that the
+    # re-generation process was already run, so we will never be
+    # able to find that file.
+    return 404;
+  }
+  if ($args != '') {
+    # The re-generation process was already run, and we still
+    # could not find that file. Give up to avoid infinitely
+    # redirecting.
+    return 404;
+  }
+  # Try re-generating the template. Once this is done, it will cause a redirect to nginx.
+  rewrite '^/probleminput/([a-zA-Z0-9_-]+)/([0-9a-f]{40})/(.*)$' /problems/input.php?problem_alias=$1&commit=$2&filename=$3 last;
+}
+
+# problem images
+location ~ '^/img/([a-zA-Z0-9_-]+)/([0-9a-f]{40})\.([a-zA-Z0-9._-]+)$' {
+  if (-f $request_filename) {
+    break;
+  }
+  if ($args != '') {
+    # The re-generation process was already run, and we still
+    # could not find that file. Give up to avoid infinitely
+    # redirecting.
+    return 404;
+  }
+  # Try re-generating the image. Once this is done, it will cause a redirect to nginx.
+  rewrite /problems/image.php?problem_alias=$1&object_id=$2&extension=$3? last;
+}

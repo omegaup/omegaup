@@ -1,7 +1,7 @@
-{include file='head.tpl' htmlTitle="{#interviews#}"}
+{include file='head.tpl' htmlTitle="{#interviews#}" inline}
 
 <div class="page-header">
-	<h1><span>{#frontPageLoading#}</span> <small></small></h1>
+	<h1><span><img src="/media/wait.gif" /></span> <small></small></h1>
 </div>
 
 <ul class="nav nav-tabs nav-justified" id="sections">
@@ -179,6 +179,6 @@
 
 </div>
 
-<script type="text/javascript" src="{version_hash src="/js/interviews.edit.js"}"></script>
-{include file='footer.tpl'}
+<script type="text/javascript" src="{version_hash src="/js/interviews.edit.js"}" defer></script>
+{include file='footer.tpl' inline}
 

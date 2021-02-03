@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+# type: ignore
 
 '''Utils for Selenium tests.'''
 
 import contextlib
 import inspect
+import json
 import logging
 import os
 import functools
@@ -13,16 +15,15 @@ import sys
 import traceback
 
 from urllib.parse import urlparse
-from typing import NamedTuple, Text
+from typing import Iterator, List, NamedTuple, Text, Sequence
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 
-CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
 PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')
-MESSAGE_WHITELIST = ('/api/grader/status/',)
+MESSAGE_WHITELIST = ('http://staticxx.facebook.com/', '/api/grader/status/')
 
 # This contains all the Python path-hacking to a single file instead of
 # spreading it throughout all the files.
@@ -31,6 +32,48 @@ sys.path.append(os.path.join(OMEGAUP_ROOT, 'stuff'))
 import database_utils  # NOQA
 
 Identity = NamedTuple('Identity', [('username', Text), ('password', Text)])
+
+
+class StatusBarIsDismissed:
+    """A class that can wait for the status bar to be dismissed."""
+
+    def __init__(self, status_element, message_class, already_opened=False):
+        self.status_element = status_element
+        self.counter = int(
+            self.status_element.get_attribute('data-counter') or '0')
+        self.clicked = False
+        self.message_class = message_class
+        self.already_opened = already_opened
+
+    def _click_button(self):
+        if self.clicked:
+            return
+        message_class = self.status_element.get_attribute('class')
+        assert self.message_class in message_class, message_class
+        self.status_element.find_element_by_css_selector(
+            'button.close').click()
+        self.clicked = True
+
+    def __call__(self, driver):
+        if self.already_opened:
+            # The status was opened since the page was rendered. We can click
+            # the button immediately.
+            if not self.status_element.is_displayed():
+                return self.status_element
+            self._click_button()
+            return False
+        counter = int(self.status_element.get_attribute('data-counter') or '0')
+        if counter in (self.counter, self.counter + 1):
+            # We're still waiting for the status bar to open.
+            return False
+        if counter == self.counter + 2:
+            # Status has finished animating. Time to click the close button.
+            self._click_button()
+            return False
+        if counter == self.counter + 3:
+            # Status is currently closing down.
+            return False
+        return self.status_element
 
 
 # pylint: disable=too-many-arguments
@@ -48,12 +91,28 @@ def add_students(driver, users, *, tab_xpath,
     for user in users:
         driver.typeahead_helper(parent_xpath, user)
 
-        driver.wait.until(
-            EC.element_to_be_clickable(submit_locator)).click()
+        with dismiss_status(driver):
+            driver.wait.until(
+                EC.element_to_be_clickable(submit_locator)).click()
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
                  '%s//a[text()="%s"]' % (container_xpath, user))))
+
+
+@contextlib.contextmanager
+def dismiss_status(driver, *, message_class='', already_opened=False):
+    '''Closes the status bar and waits for it to disappear.'''
+    status_element = driver.wait.until(
+        EC.presence_of_element_located((By.ID, 'status')))
+    status_bar_is_dismissed = StatusBarIsDismissed(
+        status_element,
+        message_class=message_class,
+        already_opened=already_opened)
+    try:
+        yield
+    finally:
+        driver.wait.until(status_bar_is_dismissed)
 
 
 def create_run(driver, problem_alias, filename):
@@ -76,12 +135,13 @@ def create_run(driver, problem_alias, filename):
                                  'frontend/tests/resources/%s' % filename)
     with open(resource_path, 'r') as f:
         driver.browser.execute_script(
-            'document.querySelector("#submit .CodeMirror")'
+            'document.querySelector("form[data-run-submit] .CodeMirror")'
             '.CodeMirror.setValue(arguments[0]);',
             f.read())
-    with driver.page_transition():
-        driver.browser.find_element_by_css_selector(
-            '#submit input[type="submit"]').submit()
+    original_url = driver.browser.current_url
+    driver.browser.find_element_by_css_selector(
+        'form[data-run-submit] button[type="submit"]').submit()
+    driver.wait.until(EC.url_changes(original_url))
 
     logging.debug('Run submitted.')
 
@@ -126,55 +186,202 @@ def annotate(f):
 
 
 @contextlib.contextmanager
-def assert_no_js_errors(driver, *, path_whitelist=(), message_whitelist=()):
+def assert_js_errors(driver,
+                     *,
+                     expected_paths: Sequence[str] = (),
+                     expected_messages: Sequence[str] = ()) -> Iterator[None]:
+    '''Shows in a list unexpected errors in javascript console'''
+    assert expected_paths or expected_messages, (
+        'Both `expected_paths` and `expected_messages` cannot be empty')
+    assert not driver.log_collector.empty(), (
+        'assert_js_errors() cannot be called without an assert_no_js_errors()')
+    driver.log_collector.push()
+    try:
+        yield
+    finally:
+        matched_errors = []
+        unmatched_errors = []
+        seen_paths: List[bool] = [False] * len(expected_paths)
+        seen_messages: List[bool] = [False] * len(expected_messages)
+        for entry in driver.log_collector.pop():
+            matched = False
+            for i, path in enumerate(expected_paths):
+                if not path_matches(entry['message'], (path, )):
+                    continue
+                matched = True
+                seen_paths[i] = True
+            for i, message in enumerate(expected_messages):
+                if not message_matches(entry['message'], (message, )):
+                    continue
+                matched = True
+                seen_messages[i] = True
+            if matched:
+                matched_errors.append(entry)
+            else:
+                unmatched_errors.append(entry)
+        driver.log_collector.extend(unmatched_errors)
+
+    if driver.browser_name == 'firefox':
+        # Firefox does not support providing console message contents.
+        return
+    missed_paths = [
+        path for path, seen in zip(expected_paths, seen_paths) if not seen
+    ]
+    missed_messages = [
+        message for message, seen in zip(expected_messages, seen_messages)
+        if not seen
+    ]
+    if missed_paths or missed_messages:
+        raise Exception(
+            ('Some messages were not matched\n'
+             '\tMatched errors:\n\t\t{matched_errors}\n'
+             '\tUnmatched errors:\n\t\t{unmatched_errors}\n'
+             '\tMissed paths:\n\t\t{missed_paths}\n'
+             '\tMissed messages:\n\t\t{missed_messages}\n').format(
+                 matched_errors='\n'.join(
+                     json.dumps(entry) for entry in matched_errors),
+                 unmatched_errors='\n'.join(
+                     json.dumps(entry) for entry in unmatched_errors),
+                 missed_paths='\n'.join(missed_paths),
+                 missed_messages='\n'.join(missed_messages)))
+
+
+@contextlib.contextmanager
+def assert_no_js_errors(
+        driver,
+        *,
+        path_whitelist: Sequence[str] = (),
+        message_whitelist: Sequence[str] = ()) -> Iterator[None]:
     '''Shows in a list unexpected errors in javascript console'''
     driver.log_collector.push()
     try:
         yield
     finally:
+        original_errors = []
         unexpected_errors = []
         for entry in driver.log_collector.pop():
-            if 'WebSocket' in entry['message']:
-                # Travis does not have broadcaster yet.
+            original_errors.append(entry)
+            if path_matches(entry['message'], path_whitelist + PATH_WHITELIST):
                 continue
-            if is_path_whitelisted(entry['message'], path_whitelist):
-                continue
-            if is_message_whitelisted(entry['message'], message_whitelist):
+            if message_matches(entry['message'],
+                               message_whitelist + MESSAGE_WHITELIST):
                 continue
             unexpected_errors.append(entry['message'])
-        assert not unexpected_errors, '\n'.join(unexpected_errors)
+        if unexpected_errors:
+            raise Exception(
+                ('There were unexpected messages\n'
+                 '\tOriginal errors:\n\t\t{original_errors}\n'
+                 '\tUnexpected errors:\n\t\t{unexpected_errors}').format(
+                     original_errors='\n'.join(
+                         json.dumps(message) for message in original_errors),
+                     unexpected_errors='\n'.join(unexpected_errors)))
 
 
-def is_path_whitelisted(message, path_whitelist):
-    '''Checks whether URL in message is whitelisted.'''
+@annotate
+@no_javascript_errors()
+def create_problem(
+        driver,
+        problem_alias: str,
+        resource_path: str = 'frontend/tests/resources/triangulos.zip'
+) -> None:
+    '''Create a problem.'''
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'a[data-nav-problems]'))).click()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                 'a[data-nav-problems-create]'))).click()
+
+    with assert_js_errors(
+            driver,
+            expected_messages=('/api/problem/details/',)
+    ):
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[@name = "problem_alias"]'))).send_keys(problem_alias)
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[@name = "title"]'))).send_keys(problem_alias)
+    input_limit = driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//input[@name = "input_limit"]')))
+    input_limit.clear()
+    input_limit.send_keys('1024')
+    # Alias should be set automatically
+    driver.browser.find_element_by_name('source').send_keys('test')
+    # Make the problem public
+    driver.browser.find_element_by_xpath(
+        '//input[@type="radio" and @name="visibility" and @value="true"]'
+    ).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH, '//input[@type = "search"]'))).send_keys('Recur')
+    driver.wait.until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, '.vbt-matched-text'))
+    ).click()
+    Select(
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (
+                    By.CSS_SELECTOR,
+                    'select[name="problem-level"]'
+                )
+            )
+        )
+    ).select_by_value('problemLevelBasicKarel')
+    contents_element = driver.browser.find_element_by_name(
+        'problem_contents')
+    contents_element.send_keys(os.path.join(OMEGAUP_ROOT, resource_path))
+    with driver.page_transition(wait_for_ajax=False):
+        contents_element.submit()
+    assert (('/problem/%s/edit/' % problem_alias) in
+            driver.browser.current_url), driver.browser.current_url
+
+
+def path_matches(message: str, path_list: Sequence[str]) -> bool:
+    '''Checks whether URL in message matches the expected list.'''
 
     match = re.search(r'(https?://[^\s\'"]+)', message)
+    if not match:
+        return False
     url = urlparse(match.group(1))
-
     if not url:
         return False
 
-    for whitelisted_path in path_whitelist + PATH_WHITELIST:
+    for whitelisted_path in path_list:
         if url.path == whitelisted_path:  # Compares params in the url
             return True
 
     return False
 
 
-def is_message_whitelisted(message, message_whitelist):
+def message_matches(message: str, message_list: Sequence[str]) -> bool:
     '''Checks whether string in message is whitelisted.
 
-    It only compares strings between double or single quotes.
+    It compares strings between double or single quotes, or the trailing part
+    of the message. This last part is needed because SauceLabs for some reason
+    sometimes does not quote messages that are manually injected through
+    console.error().
     '''
 
     match = re.search(r'(\'(?:[^\']|\\\')*\'|"(?:[^"]|\\")*")', message)
+    if match:
+        quoted_string = match.group(1)[1:-1]  # Removing quotes of match regex.
+        for whitelisted_message in message_list:
+            if quoted_string == whitelisted_message:
+                return True
 
-    if not match:
         return False
 
-    quoted_string = match.group(1)[1:-1]  # Removing quotes of match regex.
-    for whitelisted_message in message_whitelist + MESSAGE_WHITELIST:
-        if quoted_string == whitelisted_message:
+    # No quoted messages found, so let's try to do a substring match.
+    for whitelisted_message in message_list:
+        if whitelisted_message in message:
             return True
 
     return False
@@ -187,7 +394,7 @@ def check_scoreboard_events(driver, alias, url, *, num_elements, scoreboard):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 '//tr/td/a[contains(@href, "%s")][text()="%s"]' %
+                 '//tr/td/a[contains(@href, "%s")][contains(text(), "%s")]' %
                  (alias, scoreboard)))).click()
     assert (url in driver.browser.current_url), driver.browser.current_url
 
@@ -208,33 +415,33 @@ def create_group(driver, group_title, description):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.ID, 'nav-contests'))).click()
+            (By.CSS_SELECTOR, 'a[data-nav-user]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//li[@id = "nav-contests"]'
-                  '//a[@href = "/group/"]')))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-user-groups]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
                  ('//a[@href = "/group/new/"]')))).click()
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//input[@name = "title"]'))).send_keys(group_title)
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//textarea[@name = "description"]'))).send_keys(description)
+    with assert_js_errors(
+            driver,
+            expected_messages=('/api/group/details/',)
+    ):
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[@name = "title"]'))).send_keys(group_title)
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//textarea[@name = "description"]'))).send_keys(description)
 
     with driver.page_transition():
         driver.wait.until(
             EC.visibility_of_element_located(
-                (By.XPATH,
-                 '//form[contains(concat(" ", normalize-space(@class), '
-                 '" "), " new-group-form ")]'))).submit()
+                (By.CSS_SELECTOR, 'form[data-group-new]'))).submit()
 
     group_alias = re.search(r'/group/([^/]*)/edit/',
                             driver.browser.current_url).group(1)
@@ -247,13 +454,11 @@ def add_identities_group(driver, group_alias):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.ID, 'nav-contests'))).click()
+            (By.CSS_SELECTOR, 'a[data-nav-user]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//li[@id = "nav-contests"]'
-                  '//a[@href = "/group/"]')))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-user-groups]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -267,19 +472,12 @@ def add_identities_group(driver, group_alias):
     identities_element = driver.browser.find_element_by_name('identities')
     identities_element.send_keys(os.path.join(
         OMEGAUP_ROOT, 'frontend/tests/resources/identities.csv'))
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//div[contains(concat(" ", normalize-space(@class), " "), '
-             '" upload-csv ")]/div/a'))).click()
 
     username_elements = driver.browser.find_elements_by_xpath(
-        '//table[contains(concat(" ", normalize-space(@class), " "), " '
-        'identities-table ")]/tbody/tr/td[contains(concat(" ", '
+        '//table[@data-identities-table]/tbody/tr/td[contains(concat(" ", '
         'normalize-space(@class), " "), " username ")]/strong')
     password_elements = driver.browser.find_elements_by_xpath(
-        '//table[contains(concat(" ", normalize-space(@class), " "), " '
-        'identities-table ")]/tbody/tr/td[contains(concat(" ", '
+        '//table[@data-identities-table]/tbody/tr/td[contains(concat(" ", '
         'normalize-space(@class), " "), " password ")]')
     usernames = [username.text for username in username_elements]
     passwords = [password.text for password in password_elements]
@@ -290,10 +488,24 @@ def add_identities_group(driver, group_alias):
         EC.element_to_be_clickable(
             (By.XPATH,
              '//button[starts-with(@name, "create-identities")]')))
-    create_identities_button.click()
-    message = driver.wait.until(
-        EC.visibility_of_element_located((By.ID, 'status')))
-    message_class = message.get_attribute('class')
-    assert 'success' in message_class, message_class
+    with dismiss_status(driver, message_class='success'):
+        create_identities_button.click()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//a[contains(@href, "#members")]'))).click()
+
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH, '//table[@data-table-identities]')))
+
+    identity_elements = driver.browser.find_elements_by_xpath(
+        '//table[@data-table-identities]/tbody/tr/td/span/a'
+    )
+    uploaded_identities = [identity.text for identity in identity_elements]
+    for i, identity in enumerate(identities):
+        assert identity.username == uploaded_identities[i], (
+            'username %s does not match with %s' % (
+                identity.username, uploaded_identities[i]))
 
     return identities

@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# type: ignore
 
 '''Manages virtual machines.'''
 

@@ -1,22 +1,21 @@
 <template>
-  <div class="panel panel-default">
-    <div class="panel-body">
-      <div class="upload-csv">
-        <div class="panel-heading">
-          {{ T.groupsUploadCsvFile }} <input name="identities"
-               type="file">
+  <div class="card">
+    <div class="card-body">
+      <div class="mb-4">
+        <omegaup-markdown :markdown="T.groupsCsvHelp"></omegaup-markdown>
+        {{ T.groupsUploadCsvFile }}
+        <input
+          name="identities"
+          type="file"
+          accept=".csv,.txt"
+          @change="readCsv"
+        />
+      </div>
+      <template v-if="identities.length > 0">
+        <div class="card-header">
+          <h3 class="card-title">{{ T.wordsIdentities }}</h3>
         </div>
-        <div class="panel-heading">
-          <a class="btn btn-primary"
-               v-on:click.prevent="readCsv">{{ T.groupsUploadCsvFile }}</a>
-        </div>
-      </div><br>
-      <div class="panel panel-default no-bottom-margin"
-           v-show="identities.length &gt; 0">
-        <div class="panel-heading">
-          <h3 class="panel-title">{{ T.wordsIdentities }}</h3>
-        </div>
-        <table class="identities-table table">
+        <table class="table" data-identities-table>
           <thead>
             <tr>
               <th>{{ T.profileUsername }}</th>
@@ -29,8 +28,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="identity in identities">
-              <td class="username"><strong>{{ identity.username }}</strong></td>
+            <tr
+              v-for="identity in identities"
+              :key="identity.username"
+              :class="{ 'alert-danger': userErrorRow === identity.username }"
+            >
+              <td class="username">
+                <strong>{{ identity.username }}</strong>
+              </td>
               <td>{{ identity.name }}</td>
               <td class="password">{{ identity.password }}</td>
               <td>{{ identity.country_id }}</td>
@@ -40,83 +45,72 @@
             </tr>
           </tbody>
         </table>
-        <div class="panel-heading">
-          <button class="btn btn-primary"
-               name="create-identities"
-               v-on:click.prevent="bulkIdentities">{{ T.groupCreateIdentities }}</button>
-        </div>
-        <div>
+        <div class="card-footer">
+          <div class="w-100">
+            <button
+              class="btn btn-primary"
+              name="create-identities"
+              @click.prevent="$emit('bulk-identities', identities)"
+            >
+              {{ T.groupCreateIdentities }}
+            </button>
+          </div>
+          <button
+            class="btn"
+            @click.prevent="$emit('download-identities', identities)"
+          >
+            <font-awesome-icon :icon="['fas', 'download']" />
+          </button>
           {{ T.groupsIdentityWarning }}
         </div>
-      </div>
+      </template>
     </div>
   </div>
 </template>
 
-<script>
-import {T, UI} from '../../omegaup.js';
-import * as CSV from '../../../../third_party/js/csv.js/csv.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { types } from '../../api_types';
+import T from '../../lang';
+import omegaup_Markdown from '../Markdown.vue';
 
-export default {
-  props: {groupAlias: String},
-  data: function() { return {T: T, identities: []};},
-  methods: {
-    readCsv: function() {
-      let self = this;
-      let fileUpload = self.$el.querySelector('input[type=file]');
-      let regex = /.*\.(?:csv|txt)$/;
-      if (!regex.test(fileUpload.value.toLowerCase())) {
-        UI.error(T.groupsInvalidCsv);
-        return;
-      }
-      self.identities = [];
-      CSV.fetch({
-           file: fileUpload.files[0],
-         })
-          .done(function(dataset) {
-            if (dataset.fields.length != 6) {
-              UI.error(T.groupsInvalidCsv);
-              return;
-            }
-            for (let cells of dataset.records) {
-              self.identities.push({
-                username: self.groupAlias + ':' + cells[0],
-                name: cells[1],
-                password: self.generatePassword(),
-                country_id: cells[2],
-                state_id: cells[3],
-                gender: cells[4],
-                school_name: cells[5],
-              });
-            }
-          });
-    },
-    bulkIdentities: function() {
-      self = this;
-      self.$emit('bulk-identities', self.identities);
-    },
-    generatePassword: function() {
-      const validChars = 'acdefhjkmnpqruvwxyACDEFHJKLMNPQRUVWXY346';
-      const len = 8;
-      // Browser supports window.crypto
-      if (typeof window.crypto == 'object') {
-        let arr = new Uint8Array(2 * len);
-        window.crypto.getRandomValues(arr);
-        return Array.from(arr.filter(value => value <=
-                                              (255 - 255 % validChars.length)),
-                          value => validChars[value % validChars.length])
-            .join('')
-            .substr(0, len);
-      }
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
+library.add(faDownload);
 
-      // Browser does not support window.crypto
-      let password = '';
-      for (var i = 0; i < len; i++) {
-        password +=
-            validChars.charAt(Math.floor(Math.random() * validChars.length));
-      }
-      return password;
-    },
+@Component({
+  components: {
+    FontAwesomeIcon,
+    'omegaup-markdown': omegaup_Markdown,
   },
-};
+})
+export default class Identities extends Vue {
+  @Prop() groupAlias!: string;
+  @Prop() userErrorRow!: string | null;
+
+  T = T;
+  identities: types.Identity[] = [];
+
+  readFile(e: HTMLInputElement): File | null {
+    return (e.files && e.files[0]) || null;
+  }
+
+  readCsv(ev: Event): void {
+    const file = this.readFile(ev.target as HTMLInputElement);
+    if (!file || file.name === '') {
+      return;
+    }
+
+    const regex = /.*\.(?:csv|txt)$/;
+
+    if (!regex.test(file.name.toLowerCase())) {
+      this.$emit('invalid-file');
+      return;
+    }
+
+    this.identities = [];
+    this.$emit('read-csv', { identities: this.identities, file: file });
+  }
+}
 </script>

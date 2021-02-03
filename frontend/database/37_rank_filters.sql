@@ -27,10 +27,10 @@ BEGIN
     SET @ties_count = 0;
 
     INSERT INTO
-        User_Rank (user_id, rank, problems_solved_count, score, username, name, country_id, state_id, school_id)
+        User_Rank (user_id, `rank`, problems_solved_count, score, username, name, country_id, state_id, school_id)
     SELECT
         user_id,
-        rank,
+        `rank`,
         problems_solved_count,
         score,
         username,
@@ -57,7 +57,7 @@ BEGIN
         CASE
             WHEN @prev_value = score THEN @rank_count
             WHEN @prev_value := score THEN @rank_count := @rank_count + 1 + @prev_ties_count
-        END AS rank
+        END AS `rank`
         FROM
         (
             SELECT
@@ -88,7 +88,7 @@ BEGIN
             ORDER BY
                 score DESC
         ) AS UsersProblemsSolved
-    ) AS Rank;
+    ) AS `Rank`;
     COMMIT;
 END$$
 DELIMITER ;

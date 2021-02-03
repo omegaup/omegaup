@@ -1,0 +1,42 @@
+version: '3.3'
+
+services:
+
+  gitserver:
+    build:
+      dockerfile: ./Dockerfile.local-backend
+      context: ./stuff/docker/
+    image: omegaup/local-backend
+    user: "${UID_GID}"
+    entrypoint: [
+      "wait-for-it",
+      "mysql:3306",
+      "--",
+      "/bin/bash",
+      "-c",
+      "cp /usr/bin/omegaup-gitserver /var/lib/omegaup/omegaup-gitserver && exec /usr/bin/omegaup-gitserver",
+    ]
+
+  grader:
+    build:
+      dockerfile: ./Dockerfile.local-backend
+      context: ./stuff/docker/
+    image: omegaup/local-backend
+    user: "${UID_GID}"
+    entrypoint: ["wait-for-it", "mysql:3306", "--", "/usr/bin/omegaup-grader"]
+
+  broadcaster:
+    build:
+      dockerfile: ./Dockerfile.local-backend
+      context: ./stuff/docker/
+    image: omegaup/local-backend
+    user: "${UID_GID}"
+    entrypoint: ["/usr/bin/omegaup-broadcaster"]
+
+  runner:
+    build:
+      dockerfile: ./Dockerfile.local-backend
+      context: ./stuff/docker/
+    image: omegaup/local-backend
+    user: "${UID_GID}"
+    entrypoint: ["wait-for-it", "grader:11302", "--", "/usr/bin/omegaup-runner", "-noop-sandbox"]

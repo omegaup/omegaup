@@ -3,26 +3,35 @@
 ''' Assigns users badges and creates the notifications.'''
 
 import argparse
+import datetime
 import json
 import logging
 import os
-
-from typing import Set
+import sys
+from typing import Optional, Set
 
 import MySQLdb
 
-import lib.db
-import lib.logs
+sys.path.insert(
+    0,
+    os.path.join(
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
+import lib.db   # pylint: disable=wrong-import-position
+import lib.logs  # pylint: disable=wrong-import-position
 
 
 BADGES_PATH = os.path.abspath(os.path.join(__file__, '..', '..',
                                            '..', 'frontend/badges'))
 
 
-def get_all_owners(badge: str, cur: MySQLdb.cursors.DictCursor) -> Set[int]:
+def get_all_owners(badge: str, current_timestamp: Optional[datetime.datetime],
+                   cur: MySQLdb.cursors.DictCursor) -> Set[int]:
     '''Returns a set of ids of users who should receive the badge'''
     with open(os.path.join(BADGES_PATH, badge, 'query.sql')) as fd:
         query = fd.read()
+    if current_timestamp is not None:
+        query = query.replace(
+            'NOW()', f"'{current_timestamp.strftime('%Y-%m-%d %H:%M:%S')}'")
     cur.execute(query)
     results = set()
     for row in cur:
@@ -46,7 +55,7 @@ def get_current_owners(badge: str,
     return results
 
 
-def save_new_owners(badge: str, users: set,
+def save_new_owners(badge: str, users: Set[int],
                     cur: MySQLdb.cursors.DictCursor) -> None:
     '''Adds new badge owners entries to Users_Badges table'''
     badges_tuples = []
@@ -65,13 +74,14 @@ def save_new_owners(badge: str, users: set,
         VALUES (%s, %s)''', notifications_tuples)
 
 
-def process_badges(cur: MySQLdb.cursors.DictCursor) -> None:
+def process_badges(current_timestamp: Optional[datetime.datetime],
+                   cur: MySQLdb.cursors.DictCursor) -> None:
     '''Processes all badges'''
     badges = [f.name for f in os.scandir(BADGES_PATH) if f.is_dir()]
     for badge in badges:
         logging.info('==== Badge %s ====', badge)
         try:
-            all_owners = get_all_owners(badge, cur)
+            all_owners = get_all_owners(badge, current_timestamp, cur)
             current_owners = get_current_owners(badge, cur)
             new_owners = all_owners - current_owners
             logging.info('New owners: %s', new_owners)
@@ -82,10 +92,14 @@ def process_badges(cur: MySQLdb.cursors.DictCursor) -> None:
             raise
 
 
-def main():
+def main() -> None:
     '''Main entrypoint.'''
     parser = argparse.ArgumentParser(
         description='Assign badges and create notifications.')
+
+    parser.add_argument(
+        '--current-timestamp',
+        type=lambda s: datetime.datetime.strptime(s, '%Y-%m-%d %H:%M:%S'))
 
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
@@ -97,11 +111,8 @@ def main():
     dbconn = lib.db.connect(args)
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
-            process_badges(cur)
+            process_badges(args.current_timestamp, cur)  # type: ignore
         dbconn.commit()
-    except:  # noqa: bare-except
-        logging.exception(
-            'Failed to assign all badges and create notifications.')
     finally:
         dbconn.close()
         logging.info('Finished')

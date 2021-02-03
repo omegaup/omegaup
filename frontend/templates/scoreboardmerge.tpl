@@ -1,7 +1,7 @@
-{include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle="{#omegaupTitleScoreboardmerge#}"}
+{include file='redirect.tpl' inline}
+{include file='head.tpl' navbarSection='contests' headerPayload=$headerPayload htmlTitle="{#omegaupTitleScoreboardmerge#}" inline}
 
 <div id="scoreboard-merge"></div>
-<script type="text/javascript" src="{version_hash src="/js/dist/contest_scoreboardmerge.js"}"></script>
+{js_include entrypoint="contest_scoreboardmerge"}
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

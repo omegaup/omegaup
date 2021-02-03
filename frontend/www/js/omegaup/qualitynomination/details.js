@@ -1,13 +1,15 @@
 import Vue from 'vue';
 import qualitynomination_Details from '../components/qualitynomination/Details.vue';
-import {OmegaUp, T, API} from '../omegaup.js';
-import UI from '../ui.js';
+import { OmegaUp } from '../omegaup-legacy';
+import T from '../lang';
+import * as api from '../api';
+import * as ui from '../ui';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let payload = JSON.parse(document.getElementById('payload').innerText);
   let viewDetails = new Vue({
-    el: '#qualitynomination-details',
-    render: function(createElement) {
+    el: '#main-container',
+    render: function (createElement) {
       return createElement('omegaup-qualitynomination-details', {
         props: {
           contents: payload.contents,
@@ -20,32 +22,34 @@ OmegaUp.on('ready', function() {
             username: payload.author.username,
             name: payload.author.name,
           },
-          problem: {alias: payload.problem.alias, title: payload.problem.title},
+          problem: {
+            alias: payload.problem.alias,
+            title: payload.problem.title,
+          },
           qualitynomination_id: parseInt(payload.qualitynomination_id),
           reviewer: payload.reviewer,
           votes: payload.votes,
-          initialRationale: payload.contents.rationale
+          initialRationale: payload.contents.rationale,
         },
         on: {
-          'mark-resolution': function(viewDetails, banProblem) {
+          'mark-resolution': function (viewDetails, newStatus, all) {
             if (!viewDetails.rationale) {
-              omegaup.UI.error(T.editFieldRequired);
+              ui.error(T.editFieldRequired);
               return;
             }
-            let newStatus = banProblem ? 'approved' : 'denied';
-            API.QualityNomination.resolve({
-                                   problem_alias: viewDetails.problem.alias,
-                                   status: newStatus,
-                                   qualitynomination_id:
-                                       viewDetails.qualitynomination_id,
-                                   rationale: viewDetails.rationale
-                                 })
-                .then(function(data) {
-                  omegaup.UI.success(T.qualityNominationResolutionSuccess);
-                })
-                .fail(UI.apiError);
-          }
-        }
+            api.QualityNomination.resolve({
+              problem_alias: viewDetails.problem.alias,
+              status: newStatus,
+              qualitynomination_id: viewDetails.qualitynomination_id,
+              rationale: viewDetails.rationale,
+              all: all,
+            })
+              .then(function (data) {
+                ui.success(T.qualityNominationResolutionSuccess);
+              })
+              .catch(ui.apiError);
+          },
+        },
       });
     },
     components: {

@@ -7,22 +7,32 @@
       <h4>{{ T.userRoles }}</h4>
       <table class="table">
         <tbody>
-          <tr v-for="role in roles">
-            <td><input type="checkbox"
-                   v-model="role.value"
-                   v-on:change.prevent="onChangeRole($event, role.title)"></td>
-            <td>{{ role.title }}</td>
+          <tr v-for="role in roles" :key="role.name">
+            <td>
+              <input
+                v-model="role.value"
+                type="checkbox"
+                @change.prevent="onChangeRole($event, role)"
+              />
+            </td>
+
+            <td>{{ role.name }}</td>
           </tr>
         </tbody>
       </table>
       <h4>{{ T.userGroups }}</h4>
       <table class="table">
         <tbody>
-          <tr v-for="group in groups">
-            <td><input type="checkbox"
-                   v-model="group.value"
-                   v-on:change.prevent="onChangeGroup($event, group.title)"></td>
-            <td>{{ group.title }}</td>
+          <tr v-for="group in groups" :key="group.alias">
+            <td>
+              <input
+                v-model="group.value"
+                type="checkbox"
+                @change.prevent="onChangeGroup($event, group)"
+              />
+            </td>
+
+            <td>{{ group.name }}</td>
           </tr>
         </tbody>
       </table>
@@ -30,24 +40,41 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
+import T from '../../lang';
 
-export default {
-  props: {
-    initialRoles: Array,
-    initialGroups: Array,
-  },
-  data: function() {
-    return {T: T, roles: this.initialRoles, groups: this.initialGroups};
-  },
-  methods: {
-    onChangeRole: function(ev, role) {
-      this.$emit('change-role', role, ev.target.checked);
-    },
-    onChangeGroup: function(ev, group) {
-      this.$emit('change-group', group, ev.target.checked);
-    },
-  },
-};
+@Component
+export default class AdminRoles extends Vue {
+  @Prop() initialRoles!: omegaup.Role[];
+  @Prop() initialGroups!: types.Group[];
+
+  T = T;
+  roles: omegaup.Role[] = this.initialRoles;
+  groups: types.Group[] = this.initialGroups;
+
+  @Emit()
+  onChangeRole(
+    ev: Event,
+    role: omegaup.Role,
+  ): omegaup.Selectable<omegaup.Role> {
+    return {
+      value: role,
+      selected: (ev.target as HTMLInputElement).checked,
+    };
+  }
+
+  @Emit()
+  onChangeGroup(
+    ev: Event,
+    group: types.Group,
+  ): omegaup.Selectable<types.Group> {
+    return {
+      value: group,
+      selected: (ev.target as HTMLInputElement).checked,
+    };
+  }
+}
 </script>

@@ -5,33 +5,38 @@
  * @author alan
  */
 
-class CourseDetailsTest extends OmegaupTestCase {
+class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetCourseDetailsValid() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
         // Add assignment that's already underway.
         $adminLogin = self::login($courseData['admin']);
-        CourseController::apiCreateAssignment(new Request([
+        \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'name' => Utils::CreateRandomString(),
-            'alias' => Utils::CreateRandomString(),
-            'description' => Utils::CreateRandomString(),
-            'start_time' => (Time::get()),
-            'finish_time' => (Time::get() + 120),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'alias' => \OmegaUp\Test\Utils::createRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => (\OmegaUp\Time::get()),
+            'finish_time' => (\OmegaUp\Time::get() + 120),
             'course_alias' => $courseData['course_alias'],
             'assignment_type' => 'homework',
         ]));
 
         // Call the details API
-        $response = CourseController::apiDetails(new Request([
+        $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals($courseData['course_alias'], $response['alias']);
-        Validators::validateNumber($response['start_time'], 'start_time', true);
-        Validators::validateNumber($response['finish_time'], 'finish_time', true);
+        \OmegaUp\Validators::validateNumber(
+            $response['start_time']->time,
+            'start_time'
+        );
+        \OmegaUp\Validators::validateNumber(
+            $response['finish_time']->time,
+            'finish_time'
+        );
 
         // Both assignments added should be visible since the caller is an
         // admin.
@@ -46,41 +51,52 @@ class CourseDetailsTest extends OmegaupTestCase {
             $this->assertNotNull($assignment['start_time']);
             $this->assertNotNull($assignment['finish_time']);
 
-            Validators::validateNumber($assignment['start_time'], 'start_time', true);
-            Validators::validateNumber($assignment['finish_time'], 'finish_time', true);
+            \OmegaUp\Validators::validateNumber(
+                $assignment['start_time']->time,
+                'start_time'
+            );
+            \OmegaUp\Validators::validateNumber(
+                $assignment['finish_time']->time,
+                'finish_time'
+            );
         }
     }
 
     public function testGetCourseDetailsAsStudentValid() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
         // Add assignment that's already underway.
         $adminLogin = self::login($courseData['admin']);
-        $assignmentAlias = Utils::CreateRandomString();
-        CourseController::apiCreateAssignment(new Request([
+        $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
+        \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $assignmentAlias,
-            'description' => Utils::CreateRandomString(),
-            'start_time' => (Time::get() + 60),
-            'finish_time' => (Time::get() + 120),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => (\OmegaUp\Time::get() + 60),
+            'finish_time' => (\OmegaUp\Time::get() + 120),
             'course_alias' => $courseData['course_alias'],
             'assignment_type' => 'homework',
         ]));
 
-        $user = CoursesFactory::addStudentToCourse($courseData);
+        $user = \OmegaUp\Test\Factories\Course::addStudentToCourse($courseData);
         $userLogin = self::login($user);
 
         // Call the details API
-        $response = CourseController::apiDetails(new Request([
+        $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals($courseData['course_alias'], $response['alias']);
-        Validators::validateNumber($response['start_time'], 'start_time', true);
-        Validators::validateNumber($response['finish_time'], 'finish_time', true);
+        \OmegaUp\Validators::validateNumber(
+            $response['start_time']->time,
+            'start_time'
+        );
+        \OmegaUp\Validators::validateNumber(
+            $response['finish_time']->time,
+            'finish_time'
+        );
 
         // Only the course that has started should be visible.
         $this->assertEquals(false, $response['is_admin']);
@@ -93,114 +109,133 @@ class CourseDetailsTest extends OmegaupTestCase {
 
     /**
      * Get details with user not registered to the Course. Should fail.
-     * @expectedException ForbiddenAccessException
      */
     public function testGetCourseDetailsNoCourseMember() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
-        $user = UserFactory::createUser();
-        $userLogin = self::login($user);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $userLogin = self::login($identity);
 
-        $response = CourseController::apiDetails(new Request([
-            'auth_token' => $userLogin->auth_token,
-            'alias' => $courseData['course_alias']
-        ]));
+        try {
+            \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'alias' => $courseData['course_alias']
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**
      * Get details with user not registered to the Course. Should fail even if course is Public.
-     * @expectedException ForbiddenAccessException
      */
     public function testGetCourseDetailsNoCourseMemberPublic() {
-        $courseData = CoursesFactory::createCourse(null, null, true);
-        $user = UserFactory::createUser();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
+            null,
+            null,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $userLogin = self::login($user);
-        $response = CourseController::apiDetails(new Request([
-            'auth_token' => $userLogin->auth_token,
-            'alias' => $courseData['course_alias']
-        ]));
+        $userLogin = self::login($identity);
+        try {
+            \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'alias' => $courseData['course_alias']
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     public function testGetCourseIntroDetailsNoCourseMemberPublic() {
-        $courseData = CoursesFactory::createCourse(null, null, true);
-        $user = UserFactory::createUser();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
+            null,
+            null,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $userLogin = self::login($user);
-        $response = CourseController::apiIntroDetails(new Request([
+        $userLogin = self::login($identity);
+        $response = \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals($courseData['request']['name'], $response['name']);
         $this->assertArrayNotHasKey('assignments', $response);
     }
 
     public function testGetCourseDetailsCourseMember() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
-        $user = CoursesFactory::addStudentToCourse($courseData);
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $user = \OmegaUp\Test\Factories\Course::addStudentToCourse($courseData);
         $userLogin = self::login($user);
 
-        $response = CourseController::apiDetails(new Request([
+        $response = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals('ok', $response['status']);
         $this->assertEquals(false, $response['is_admin']);
     }
 
     public function testGetAssignmentAsStudent() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
         // Add assignment that hasn't started yet.
         $adminLogin = self::login($courseData['admin']);
-        $assignmentAlias = Utils::CreateRandomString();
-        CourseController::apiCreateAssignment(new Request([
+        $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
+        \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'name' => Utils::CreateRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $assignmentAlias,
-            'description' => Utils::CreateRandomString(),
-            'start_time' => (Time::get() + 60),
-            'finish_time' => (Time::get() + 120),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => (\OmegaUp\Time::get() + 60),
+            'finish_time' => (\OmegaUp\Time::get() + 120),
             'course_alias' => $courseData['course_alias'],
             'assignment_type' => 'homework',
         ]));
 
-        $user = UserFactory::createUser();
-        $userLogin = self::login($user);
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $userLogin = self::login($identity);
 
         // Try to get details before being added to the course;
         try {
-            $response = CourseController::apiAssignmentDetails(new Request([
+            $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
                 'course' => $courseData['course_alias'],
                 'assignment' => $courseData['assignment_alias'],
             ]));
             $this->fail('Exception was expected.');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // OK!
         }
 
-        CoursesFactory::addStudentToCourse($courseData, $user);
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identity
+        );
 
         // Call the details API for the assignment that's already started.
-        $response = CourseController::apiAssignmentDetails(new Request([
+        \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
             'course' => $courseData['course_alias'],
             'assignment' => $courseData['assignment_alias'],
         ]));
-        $this->assertEquals('ok', $response['status']);
 
         // Call the detail API for the assignment that has not started.
         try {
-            $response = CourseController::apiAssignmentDetails(new Request([
+            $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
                 'course' => $courseData['course_alias'],
                 'assignment' => $assignmentAlias,
             ]));
             $this->fail('Exception was expected.');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // OK!
         }
     }

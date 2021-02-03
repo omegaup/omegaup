@@ -5,12 +5,12 @@
  * @author @joemmanuel
  */
 
-class CourseAssignmentScoreboardTest extends OmegaupTestCase {
+class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Get score of a given assignment happy path
      */
     public function testGetAssignmentScoreboard() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
         $problemsInAssignment = 3;
         $studentsInCourse = 5;
 
@@ -18,9 +18,9 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         $adminLogin = self::login($courseData['admin']);
         $problemAssignmentsMap = [];
         for ($i = 0; $i < $problemsInAssignment; $i++) {
-            $problemData = ProblemsFactory::createProblem();
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
-            CourseController::apiAddProblem(new Request([
+            \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment_alias'],
@@ -33,11 +33,13 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         // Add students to course
         $students = [];
         for ($i = 0; $i < $studentsInCourse; $i++) {
-            $students[] = CoursesFactory::addStudentToCourse($courseData);
+            $students[] = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData
+            );
         }
 
         // Generate runs
-        $expectedScores = CoursesFactory::submitRunsToAssignmentsInCourse(
+        $expectedScores = \OmegaUp\Test\Factories\Course::submitRunsToAssignmentsInCourse(
             $courseData,
             $students,
             [$courseData['assignment_alias']],
@@ -46,25 +48,31 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
 
         // Call API
         $adminLogin = self::login($courseData['admin']);
-        $response = CourseController::apiAssignmentScoreboard(new Request([
+        $response = \OmegaUp\Controllers\Course::apiAssignmentScoreboard(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course' => $courseData['course_alias'],
             'assignment' => $courseData['assignment_alias']
         ]));
 
-        // Validation. Courses should be sorted by names instead of ranking.
+        $userScore = [];
+        foreach ($expectedScores as $index => $score) {
+            $key = array_keys($score);
+            $userScore[$index] = $score[$key[0]];
+        }
+
+        // Validation. Now, courses should be sorted by ranking.
         array_multisort(
+            array_values($userScore),
+            SORT_DESC,
             array_keys($expectedScores),
             SORT_ASC,
-            array_values($expectedScores),
-            SORT_DESC,
             $expectedScores
         );
         $expectedPlace = 0;
         $lastScore = 0;
         $i = 0;
         foreach ($expectedScores as $username => $score) {
-            if ($lastScore != $score) {
+            if ($lastScore !== $score) {
                 $expectedPlace = $i + 1;
                 $lastScore = $score;
             }
@@ -74,9 +82,10 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
                 $response['ranking'][$i]['username'],
                 'Scoreboard is not properly sorted by username.'
             );
-            $this->assertFalse(
-                array_key_exists('place', $response['ranking'][$i]),
-                'Course scoreboard contains place information and should not.'
+            $this->assertEquals(
+                $expectedPlace,
+                $response['ranking'][$i]['place'],
+                'Course scoreboard place information is wrong.'
             );
             $i++;
         }
@@ -86,7 +95,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
      * Get scoreboard events of a given assignment happy path
      */
     public function testGetAssignmentScoreboardEvents() {
-        $courseData = CoursesFactory::createCourseWithOneAssignment();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
         $problemsInAssignment = 3;
         $studentsInCourse = 5;
 
@@ -94,12 +103,12 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         $adminLogin = self::login($courseData['admin']);
         $problemAssignmentsMap = [];
         for ($i = 0; $i < $problemsInAssignment; $i++) {
-            $problemData = ProblemsFactory::createProblem(
-                new ProblemParams(),
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams(),
                 $adminLogin
             );
 
-            CourseController::apiAddProblem(new Request([
+            \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment_alias'],
@@ -112,7 +121,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         // Add students to course
         $students = [];
         for ($i = 0; $i < $studentsInCourse; $i++) {
-            $students[] = CoursesFactory::addStudentToCourse(
+            $students[] = \OmegaUp\Test\Factories\Course::addStudentToCourse(
                 $courseData,
                 null,
                 $adminLogin
@@ -120,7 +129,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         }
 
         // Generate runs
-        $expectedScores = CoursesFactory::submitRunsToAssignmentsInCourse(
+        $expectedScores = \OmegaUp\Test\Factories\Course::submitRunsToAssignmentsInCourse(
             $courseData,
             $students,
             [$courseData['assignment_alias']],
@@ -128,7 +137,7 @@ class CourseAssignmentScoreboardTest extends OmegaupTestCase {
         );
 
         // Call API
-        $response = ProblemsetController::apiScoreboardEvents(new Request([
+        $response = \OmegaUp\Controllers\Problemset::apiScoreboardEvents(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'problemset_id' => $courseData['problemset_id'],
         ]));

@@ -1,6 +1,6 @@
-{include file='head.tpl' htmlTitle="Reporte {$smarty.get.contest_alias}"}
+{include file='head.tpl' htmlTitle="Reporte {$smarty.get.contest_alias}" inline}
 <script type="text/json" id="payload">{['contestReport' => $contestReport]|json_encode}</script>
 <div id="contest-report"></div>
-<script type="text/javascript" src="{version_hash src="/js/dist/contest_report.js"}"></script>
+{js_include entrypoint="contest_report"}
 <link rel="stylesheet" href="/css/report.css" />
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

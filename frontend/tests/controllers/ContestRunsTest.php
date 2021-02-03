@@ -6,54 +6,66 @@
  * @author joemmanuel
  */
 
-class ContestRunsTest extends OmegaupTestCase {
+class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Contestant submits runs and admin is able to get them
      */
     public function testGetRunsForContest() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
         // Grade the run
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Create request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
         ]);
 
         // Call API
-        $response = ContestController::apiRuns($r);
+        $response = \OmegaUp\Controllers\Contest::apiRuns($r);
 
         // Assert
         $this->assertEquals(1, count($response['runs']));
-        $this->assertEquals($runData['response']['guid'], $response['runs'][0]['guid']);
-        $this->assertEquals($contestant->username, $response['runs'][0]['username']);
-        $this->assertEquals('J1', $response['runs'][0]['judged_by']);
+        $this->assertEquals(
+            $runData['response']['guid'],
+            $response['runs'][0]['guid']
+        );
+        $this->assertEquals(
+            $identity->username,
+            $response['runs'][0]['username']
+        );
 
         // Contest admin should be able to view run, even if not problem admin.
-        $directorIdentity = IdentityController::resolveIdentity(
+        $directorIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $contestData['director']->username
         );
-        $this->assertFalse(Authorization::isProblemAdmin(
+        $this->assertFalse(\OmegaUp\Authorization::isProblemAdmin(
             $directorIdentity,
             $problemData['problem']
         ));
-        $response = RunController::apiDetails(new Request([
+        $response = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
             'problemset_id' => $contestData['contest']->problemset_id,
             'run_alias' => $response['runs'][0]['guid'],
             'auth_token' => $login->auth_token,
@@ -68,35 +80,42 @@ class ContestRunsTest extends OmegaupTestCase {
      */
     public function testEditProblemsetPointsDuringAContest() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
         // Grade the run
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Build request
         $directorLogin = self::login($contestData['director']);
 
         // Call API
-        $response = ContestController::apiRuns(new Request([
+        $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
         ]));
 
         $this->assertEquals(100, $response['runs'][0]['contest_score']);
 
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -105,10 +124,10 @@ class ContestRunsTest extends OmegaupTestCase {
         ]);
 
         // Call API with different points value
-        ContestController::apiAddProblem($r);
+        \OmegaUp\Controllers\Contest::apiAddProblem($r);
 
         // Call API
-        $response = ContestController::apiRuns(new Request([
+        $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
         ]));

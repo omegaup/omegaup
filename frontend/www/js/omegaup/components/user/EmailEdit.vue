@@ -7,22 +7,28 @@
       <div class="panel-body">
         <form class="form-horizontal">
           <div class="form-group">
-            <label class="col-md-3 control-label"
-                 for="email">{{ T.userEmailEditEmail }}</label>
+            <label class="col-md-3 control-label" for="email">{{
+              T.userEmailEditEmail
+            }}</label>
             <div class="col-md-7">
-              <input class="form-control"
-                   name='email'
-                   size='30'
-                   type='text'
-                   v-model="email">
+              <input
+                v-model="email"
+                class="form-control"
+                name="email"
+                size="30"
+                type="text"
+              />
             </div>
           </div>
           <div class="form-group">
             <div class="col-md-offset-3 col-md-7">
-              <button class="btn btn-primary"
-                   type="button"
-                   v-on:click.prevent="$emit('submit', this.email)">{{ T.wordsSaveChanges
-                   }}</button>
+              <button
+                class="btn btn-primary"
+                type="button"
+                @click.prevent="$emit('submit', email)"
+              >
+                {{ T.wordsSaveChanges }}
+              </button>
             </div>
           </div>
         </form>
@@ -33,7 +39,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
+import T from '../../lang';
 
 @Component
 export default class UserEmailEdit extends Vue {
@@ -41,5 +47,4 @@ export default class UserEmailEdit extends Vue {
   T = T;
   email: string = this.initialEmail;
 }
-
 </script>

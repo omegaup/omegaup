@@ -1,40 +1,66 @@
 <?php
 
-// From https://gist.github.com/Xeoncross/dc2ebf017676ae946082
-function preferred_language(array $available_languages, $http_accept_language) {
-    $available_languages = array_flip($available_languages);
+/**
+ * From https://gist.github.com/Xeoncross/dc2ebf017676ae946082
+ *
+ * @param list<string> $availableLanguages
+ */
+function preferredLanguage(
+    array $availableLanguages,
+    string $httpAcceptLanguage
+): string {
+    $availableLanguages = array_flip($availableLanguages);
 
-    $langs;
-    preg_match_all('~([\w-]+)(?:[^,\d]+([\d.]+))?~', strtolower($http_accept_language), $matches, PREG_SET_ORDER);
-    foreach ($matches as $match) {
-        list($a, $b) = explode('-', $match[1]) + ['', ''];
-        $value = isset($match[2]) ? (float) $match[2] : 1.0;
+    /** @var array<string, float> */
+    $langs = [];
+    if (
+        preg_match_all(
+            '~([\w-]+)(?:[^,\d]+([\d.]+))?~',
+            strtolower($httpAcceptLanguage),
+            $matches,
+            PREG_SET_ORDER
+        ) !== false
+    ) {
+        /** @var list<string> $match */
+        foreach ($matches as $match) {
+            list($a, $b) = explode('-', $match[1]) + ['', ''];
+            $value = isset($match[2]) ? floatval($match[2]) : 1.0;
 
-        if (isset($available_languages[$match[1]])) {
-            $langs[$match[1]] = $value;
-            continue;
-        }
+            if (isset($availableLanguages[$match[1]])) {
+                $langs[$match[1]] = $value;
+                continue;
+            }
 
-        if (isset($available_languages[$a])) {
-            $langs[$a] = $value - 0.1;
+            if (isset($availableLanguages[$a])) {
+                $langs[$a] = $value - 0.1;
+            }
         }
     }
-    if ($langs) {
+    if (!empty($langs)) {
         arsort($langs);
-        return key($langs);
+        return strval(key($langs));
     } else {
-        return key($available_languages);
+        return strval(key($availableLanguages));
     }
 }
 
 $languages = ['en', 'es'];
 $preferred = $languages[0];
 
-if (array_key_exists('HTTP_ACCEPT_LANGUAGE', $_SERVER)) {
-    $preferred = preferred_language($languages, $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+if (
+    isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) &&
+    is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])
+) {
+    $preferred = preferredLanguage(
+        $languages,
+        strval($_SERVER['HTTP_ACCEPT_LANGUAGE'])
+    );
 }
 
-$location = $_SERVER['REQUEST_URI'];
+$location = (
+    isset($_SERVER['REQUEST_URI']) &&
+    is_string($_SERVER['REQUEST_URI'])
+) ? $_SERVER['REQUEST_URI'] : '';
 if ($location[strlen($location) - 1] != '/') {
     $location .= '/';
 }

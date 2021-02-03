@@ -1,0 +1,12 @@
+{
+	"Logging": {
+		"File": ""
+	},
+	"Broadcaster": {
+		"FrontendURL": "http://frontend:8001",
+		"ScoreboardUpdateSecret": "secret"
+	},
+	"Tracing": {
+		"File": "/var/log/omegaup/broadcaster.tracing.json"
+	}
+}

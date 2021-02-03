@@ -8,23 +8,49 @@ import * as monaco from 'monaco-editor';
 
 export default {
   props: {
-    store: Object,
-    storeMapping: Object,
+    store: {
+      type: Object,
+      required: true,
+    },
+    storeMapping: {
+      type: Object,
+      required: true,
+    },
     theme: {
       type: String,
-      'default': 'vs-dark',
+      default: 'vs-dark',
     },
   },
-  data: function() {
+  data: function () {
     return {
       title: 'diff',
     };
   },
-  mounted: function() {
-    this._originalModel =
-        monaco.editor.createModel(this.originalContents, 'text/plain');
-    this._modifiedModel =
-        monaco.editor.createModel(this.modifiedContents, 'text/plain');
+  computed: {
+    originalContents() {
+      return Util.vuexGet(this.store, this.storeMapping.originalContents);
+    },
+    modifiedContents() {
+      return Util.vuexGet(this.store, this.storeMapping.modifiedContents);
+    },
+  },
+  watch: {
+    originalContents: function (value) {
+      this._originalModel.setValue(value);
+    },
+    modifiedContents: function (value) {
+      this._modifiedModel.setValue(value);
+    },
+  },
+  mounted: function () {
+    this._originalModel = monaco.editor.createModel(
+      this.originalContents,
+      'text/plain',
+    );
+    this._modifiedModel = monaco.editor.createModel(
+      this.modifiedContents,
+      'text/plain',
+    );
 
     this._editor = monaco.editor.createDiffEditor(this.$el, {
       theme: this.theme,
@@ -36,19 +62,9 @@ export default {
     });
   },
   methods: {
-    onResize: function() { this._editor.layout();},
-  },
-  computed: {
-    originalContents() {
-      return Util.vuexGet(this.store, this.storeMapping.originalContents);
+    onResize: function () {
+      this._editor.layout();
     },
-    modifiedContents() {
-      return Util.vuexGet(this.store, this.storeMapping.modifiedContents);
-    },
-  },
-  watch: {
-    originalContents: function(value) { this._originalModel.setValue(value);},
-    modifiedContents: function(value) { this._modifiedModel.setValue(value);},
   },
 };
 </script>

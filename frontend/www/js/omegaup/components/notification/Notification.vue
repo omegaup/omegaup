@@ -1,95 +1,147 @@
 <template>
-  <li class="dropdown-item notification">
-    <hr class="notification-separator">
-    <div class="notification-header">
+  <div class="d-flex align-items-center flex-wrap px-4">
+    <hr class="w-100 my-2" />
+    <div class="w-100 d-flex justify-content-between">
       <div class="notification-date">
         {{ date }}
-      </div><button class="close"
-           v-on:click="$emit('remove', notification)">❌</button>
-    </div><img class="notification-img"
-        v-bind:src="iconUrl">
-    <div class="notification-text">
-      {{ text }}
+      </div>
+      <button
+        class="close"
+        @click.prevent="$emit('remove', notification, null)"
+      >
+        ❌
+      </button>
     </div>
-  </li>
+    <div
+      class="w-100 d-flex align-items-center pt-1"
+      :class="{ 'notification-link': url }"
+      @click="handleClick"
+    >
+      <img class="d-block" width="80" :src="iconUrl" />
+      <template v-if="notificationMarkdown">
+        <omegaup-markdown :markdown="notificationMarkdown"></omegaup-markdown>
+      </template>
+      <div v-else-if="url">
+        <a :href="url">
+          {{ text }}
+        </a>
+      </div>
+      <div v-else>
+        {{ text }}
+      </div>
+    </div>
+  </div>
 </template>
-
-<style>
-.notification {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.notification-header {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-}
-
-.notification-header .close {
-  font-size: inherit;
-}
-
-.notification-date {
-  font-size: 12px;
-  color: #666;
-}
-
-.notification-img {
-  display: block;
-  width: 15%;
-  height: auto;
-}
-
-.notification-text {
-  padding: 0 0 0 5px;
-  width: 85%;
-}
-
-.notification-separator {
-  width: 100%;
-  margin: 5px 0;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import UI from '../../ui.js';
-import omegaup from '../../api.js';
+import { types } from '../../api_types';
+import T from '../../lang';
+import * as ui from '../../ui';
+import * as time from '../../time';
 
-@Component
+import omegaup_Markdown from '../Markdown.vue';
+
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class Notification extends Vue {
-  @Prop() notification!: omegaup.Notification;
-
-  T = T;
-  UI = UI;
+  @Prop() notification!: types.Notification;
 
   get iconUrl(): string {
+    if (this.notification.contents.body) {
+      return this.notification.contents.body.iconUrl;
+    }
+
     switch (this.notification.contents.type) {
       case 'badge':
         return `/media/dist/badges/${this.notification.contents.badge}.svg`;
+      case 'demotion':
+        if (this.notification.contents.status == 'banned') {
+          return '/media/banned.svg';
+        }
+        return '/media/warning.svg';
+      case 'general_notification':
+        return '/media/email.svg';
       default:
-        return 'media/info.png';
+        return '/media/info.png';
     }
   }
 
   get text(): string {
     switch (this.notification.contents.type) {
+      case 'demotion':
+        return this.notification.contents.message || '';
+      case 'general_notification':
+        return this.notification.contents.message || '';
+      default:
+        return '';
+    }
+  }
+
+  get notificationMarkdown(): string {
+    if (this.notification.contents.body) {
+      return ui.formatString(
+        T[this.notification.contents.body.localizationString],
+        this.notification.contents.body.localizationParams,
+      );
+    }
+    switch (this.notification.contents.type) {
       case 'badge':
-        return this.UI.formatString(this.T.notificationNewBadge, {
-          badgeName: this.T[`badge_${this.notification.contents.badge}_name`],
+        return ui.formatString(T.notificationNewBadge, {
+          badgeName: T[`badge_${this.notification.contents.badge}_name`],
         });
       default:
         return '';
     }
   }
 
+  get url(): string {
+    if (this.notification.contents.body) {
+      return this.notification.contents.body.url;
+    }
+
+    switch (this.notification.contents.type) {
+      case 'general_notification':
+        return this.notification.contents.url || '';
+      case 'badge':
+        return `/badge/${this.notification.contents.badge}/`;
+      case 'demotion':
+        // TODO: Add link to problem page.
+        return '';
+      default:
+        return '';
+    }
+  }
+
   get date() {
-    return this.UI.formatDate(this.notification.timestamp);
+    return time.formatDate(this.notification.timestamp);
+  }
+
+  handleClick(): void {
+    if (this.url) {
+      this.$emit('remove', this.notification, this.url);
+    }
   }
 }
-
 </script>
+
+<style lang="scss" scoped>
+.close {
+  font-size: inherit;
+}
+
+.notification-date {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.notification-link {
+  cursor: pointer;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+</style>

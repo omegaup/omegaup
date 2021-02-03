@@ -1,95 +1,197 @@
 <template>
-  <div class="panel">
-    <div class="page-header">
-      <h1>{{ T.qualityNomination }}</h1>
-    </div>
-    <div class="pull-right"
-         v-if="!myView">
-      <label><input type="checkbox"
-             v-model="showAll"> {{ T.qualityNominationShowAll }}</label>
-    </div>
-    <div>
+  <div>
+    <form class="form-group">
+      <div class="form-row mb-3">
+        <label class="col-form-label">{{ T.wordsSearchBy }}</label>
+        <div class="col-md-4">
+          <select v-model="selectColumn" name="column" class="form-control">
+            <option
+              v-for="(columnText, columnIndex) in columns"
+              :value="columnIndex"
+            >
+              {{ columnText }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <omegaup-autocomplete
+            v-show="selectColumn == 'problem_alias'"
+            v-model="queryProblem"
+            :init="(el) => typeahead.problemTypeahead(el)"
+            :placeholder="T.wordsKeyword"
+            class="form-control"
+          ></omegaup-autocomplete>
+          <omegaup-autocomplete
+            v-show="
+              selectColumn == 'nominator_username' ||
+              selectColumn == 'author_username'
+            "
+            v-model="queryUsername"
+            :init="(el) => typeahead.userTypeahead(el)"
+            :placeholder="T.wordsKeyword"
+            class="form-control"
+          ></omegaup-autocomplete>
+        </div>
+      </div>
+      <button
+        class="btn btn-primary"
+        @click.prevent="
+          $emit('go-to-page', 1, getStatus(), getQuery(), selectColumn)
+        "
+      >
+        {{ T.wordsSearch }}
+      </button>
+    </form>
+    <div class="card">
+      <h3 class="card-header">
+        {{
+          ui.formatString(T.nominationsRangeHeader, {
+            lowCount: (pages - 1) * length + 1,
+            highCount: pages * length,
+          })
+        }}
+      </h3>
+      <div class="card-body">
+        <a v-if="isAdmin" href="/group/omegaup:quality-reviewer/edit/#members">
+          {{ T.addUsersToReviewerGroup }}
+        </a>
+        <div v-if="!myView" class="pull-right">
+          <label>
+            <input
+              v-model="showAll"
+              type="checkbox"
+              @change="
+                $emit('go-to-page', 1, getStatus(), getQuery(), selectColumn)
+              "
+            />
+            {{ T.qualityNominationShowAll }}
+          </label>
+        </div>
+      </div>
       <table class="table table-striped">
         <thead>
           <tr>
-            <td>{{ T.qualityNominationType }}</td>
-            <td>{{ T.wordsAlias }}</td>
-            <td>{{ T.wordsNominator }}</td>
-            <td>{{ T.wordsAuthor }}</td>
-            <td>{{ T.wordsSubmissionDate }}</td>
-            <td>{{ T.qualityNominationAssignedJudge }}</td>
-            <td>{{ T.wordsStatus }}</td>
-            <td><!-- view button --></td>
+            <th>{{ T.wordsAlias }}</th>
+            <th v-if="!myView">{{ T.wordsNominator }}</th>
+            <th>{{ T.wordsAuthor }}</th>
+            <th>{{ T.wordsSubmissionDate }}</th>
+            <th v-if="!myView" data-name="reason">{{ T.wordsReason }}</th>
+            <th class="text-center">{{ T.wordsStatus }}</th>
+            <th><!-- view button --></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="nomination in visibleNominations">
-            <td>{{ nomination.nomination }}</td>
+          <tr v-for="nomination in nominations">
             <td>
-              <a v-bind:href="problemUrl(nomination.problem.alias)">{{ nomination.problem.title
+              <a :href="problemUrl(nomination.problem.alias)">{{
+                nomination.problem.title
+              }}</a>
+            </td>
+            <td v-if="!myView">
+              <a :href="userUrl(nomination.nominator.username)">{{
+                nomination.nominator.username
               }}</a>
             </td>
             <td>
-              <a v-bind:href="userUrl(nomination.nominator.username)">{{
-              nomination.nominator.username }}</a>
-            </td>
-            <td>
-              <a v-bind:href="userUrl(nomination.author.username)">{{ nomination.author.username
+              <a :href="userUrl(nomination.author.username)">{{
+                nomination.author.username
               }}</a>
             </td>
-            <td>{{ nomination.time.format('long') }}</td>
-            <td><!-- TODO: Judges aren't returned from the API yet --></td>
-            <td>{{ nomination.status }}</td>
+            <td>{{ nomination.time.toLocaleDateString(T.locale) }}</td>
+            <td v-if="!myView">{{ nomination.contents.reason }}</td>
+            <td class="text-center">{{ nomination.status }}</td>
             <td>
-              <a v-bind:href="nominationDetailsUrl(nomination.qualitynomination_id)">{{
-              T.wordsDetails }}</a>
+              <a
+                :href="nominationDetailsUrl(nomination.qualitynomination_id)"
+                >{{ T.wordsDetails }}</a
+              >
             </td>
           </tr>
         </tbody>
       </table>
-    </div>
-    <div>
-      <a href="/group/omegaup:quality-reviewer/edit/#members">{{ T.addUsersToReviewerGroup }}</a>
+      <omegaup-common-paginator
+        :pager-items="pagerItems"
+        @page-changed="
+          (page) =>
+            $emit('go-to-page', page, getStatus(), getQuery(), selectColumn)
+        "
+      ></omegaup-common-paginator>
     </div>
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
-import UI from '../../ui.js';
+<script lang="ts">
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import T from '../../lang';
+import * as ui from '../../ui';
+import common_Paginator from '../common/Paginatorv2.vue';
+import { types } from '../../api_types';
+import Autocomplete from '../Autocomplete.vue';
+import * as typeahead from '../../typeahead';
 
-export default {
-  props: {
-    nominations: Array,
-    currentUser: String,
-    myView: Boolean,
+@Component({
+  components: {
+    'omegaup-common-paginator': common_Paginator,
+    'omegaup-autocomplete': Autocomplete,
   },
-  data: function() {
-    return {
-      showAll: true,
-      T: T,
-    };
-  },
-  computed: {
-    visibleNominations: function() {
-      var self = this;
-      if (this.showAll) {
-        return this.nominations;
-      } else {
-        return this.nominations.filter(function(nomination) {
-          return nomination.status == 'open';
-        });
-      }
-    },
-  },
-  methods: {
-    problemUrl: function(problemAlias) {
-      return '/arena/problem/' + problemAlias + '/';
-    },
-    userUrl: function(username) { return '/profile/' + username + '/';},
-    nominationDetailsUrl: function(nominationId) {
-      return '/nomination/' + nominationId + '/';
+})
+export default class QualityNominationList extends Vue {
+  @Prop() pages!: number;
+  @Prop() length!: number;
+  @Prop() myView!: boolean;
+  @Prop() nominations!: types.NominationListItem[];
+  @Prop() pagerItems!: types.PageItem[];
+  @Prop() isAdmin!: boolean;
+
+  showAll = true;
+  T = T;
+  ui = ui;
+  typeahead = typeahead;
+
+  queryProblem = '';
+  queryUsername = '';
+  selectColumn = '';
+  columns = {
+    problem_alias: T.wordsProblem,
+    nominator_username: T.wordsNominator,
+    author_username: T.wordsAuthor,
+  };
+
+  @Watch('selectColumn')
+  onPropertyChanged() {
+    this.queryProblem = '';
+    this.queryUsername = '';
+  }
+
+  getQuery(): string {
+    if (
+      this.selectColumn == 'nominator_username' ||
+      this.selectColumn == 'author_username'
+    ) {
+      return this.queryUsername;
+    } else {
+      return this.queryProblem;
     }
   }
-};
+
+  getStatus(): string {
+    if (this.showAll) {
+      return 'all';
+    } else {
+      return 'open';
+    }
+  }
+
+  problemUrl(problemAlias: string): string {
+    return `/arena/problem/${problemAlias}/`;
+  }
+
+  userUrl(username: string): string {
+    return `/profile/${username}/`;
+  }
+
+  nominationDetailsUrl(nominationId: number): string {
+    return `/nomination/${nominationId}/`;
+  }
+}
 </script>

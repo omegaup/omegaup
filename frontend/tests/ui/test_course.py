@@ -1,15 +1,43 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+# type: ignore
 
 '''Run Selenium course tests.'''
 
+import logging
 import urllib
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.select import Select
 
 from ui import util  # pylint: disable=no-name-in-module
+from ui import conftest  # pylint: disable=no-name-in-module
+
+
+def _setup_course(driver: conftest.Driver, course_alias: str, school_name: str,
+                  assignment_alias: str, problem_alias: str) -> None:
+    with driver.login_admin():
+        util.create_problem(
+            driver,
+            problem_alias,
+            resource_path='frontend/tests/resources/testproblem.zip')
+        create_course(driver, course_alias, school_name)
+        add_students_course(driver, [driver.user_username])
+        add_assignment_with_problem(driver, assignment_alias, problem_alias)
+
+
+def _click_on_problem(driver: conftest.Driver, problem_alias: str) -> None:
+    for _ in range(10):
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 (f'//div[@data-navbar-problem]'
+                  f'//a[contains(text(), "{problem_alias}")]/parent::div'
+                  )))).click()
+        if driver.browser.current_url.endswith(f'#problems/{problem_alias}'):
+            break
+    else:
+        logging.error('Failed to find the problem to click')
 
 
 # Assignment scoreboard is still not completely working.
@@ -19,33 +47,42 @@ def test_user_ranking_course(driver):
     '''Creates a course and students to participate make submits to problems'''
 
     run_id = driver.generate_id()
-    course_alias = 'ut_rank_course_%s' % run_id
-    school_name = 'ut_rank_school_%s' % run_id
-    assignment_alias = 'ut_rank_hw_%s' % run_id
-    problem = 'sumas'
+    course_alias = f'ut_rank_course_{run_id}'
+    school_name = f'ut_rank_school_{run_id}'
+    assignment_alias = f'ut_rank_hw_{run_id}'
+    problem = 'ut_rc_problem_%s' % driver.generate_id()
 
-    with driver.login_admin():
-        create_course(driver, course_alias, school_name)
-        add_students_course(driver, [driver.user_username])
-        add_assignment(driver, assignment_alias)
-        add_problem_to_assignment(driver, assignment_alias, problem)
+    _setup_course(driver, course_alias, school_name, assignment_alias, problem)
 
     with driver.login_user():
         enter_course(driver, course_alias, assignment_alias)
+        _click_on_problem(driver, problem)
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//a[contains(@href, "#problems/%s")]' %
-                  problem)))).click()
-
-        util.create_run(driver, problem, 'Main.cpp11')
+        util.create_run(driver, problem, 'Main.cpp17-gcc')
         driver.update_score_in_course(problem, assignment_alias)
 
+        # Refresh the current page.
+        with driver.page_transition():
+            driver.browser.get(driver.browser.current_url.split('#')[0])
+
+        _click_on_problem(driver, problem)
+
+        # When user has tried or solved a problem, feedback popup will be shown
+        with util.dismiss_status(driver):
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR,
+                     '.popup button.close'))).click()
+            driver.wait.until(
+                EC.invisibility_of_element_located(
+                    (By.CSS_SELECTOR,
+                     '.popup button.close')))
+
+        _click_on_problem(driver, problem)
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
-                 'button.details'))).click()
+                 'button[data-run-details]'))).click()
 
         assert (('show-run:') in
                 driver.browser.current_url), driver.browser.current_url
@@ -60,21 +97,56 @@ def test_user_ranking_course(driver):
                  '//a[contains(@href, "/assignment/%s/scoreboard/")]' %
                  assignment_alias))).click()
 
+        toggle_contestants_element = driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, 'input.toggle-contestants')))
+        for _ in range(10):
+            toggle_contestants_element.click()
+            if not toggle_contestants_element.is_selected():
+                break
+        else:
+            logging.error('Failed to toggle contestants')
+
         run_user = driver.browser.find_element_by_xpath(
             '//td[contains(@class, "accepted")]/preceding-sibling::td[@class='
             '"user"]')
         assert run_user.text == driver.user_username, run_user
 
-        url = '/course/%s/assignment/%s/scoreboard' % (course_alias,
-                                                       assignment_alias)
+        url = '/course/{}/assignment/{}/scoreboard'.format(
+            course_alias, assignment_alias)
 
         enter_course_assignments_page(driver, course_alias)
         util.check_scoreboard_events(driver, assignment_alias, url,
-                                     num_elements=1, scoreboard='Public')
+                                     num_elements=1, scoreboard='Scoreboard')
 
         enter_course_assignments_page(driver, course_alias)
-        util.check_scoreboard_events(driver, assignment_alias, url,
-                                     num_elements=1, scoreboard='Admin')
+        with driver.page_transition():
+            driver.wait.until(EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//a[contains(@href, "/course/%s/edit/")]' %
+                 course_alias))).click()
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//input[@name = "show-scoreboard"][@value="true"]'))).click()
+
+        driver.browser.find_element_by_css_selector(
+            'form[data-course-form]').submit()
+        assert (('/course/%s/edit/' % course_alias) in
+                driver.browser.current_url), driver.browser.current_url
+
+    with driver.login_user():
+        enter_course(driver, course_alias, assignment_alias, first_time=False)
+
+        for _ in range(10):
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, ('//a[contains(@href, "#ranking")]')))).click()
+            if driver.browser.current_url.endswith('#ranking'):
+                break
+        assert (('#ranking') in
+                driver.browser.current_url), driver.browser.current_url
 
 
 def test_create_identities_for_course(driver):
@@ -95,8 +167,7 @@ def test_create_identities_for_course(driver):
     # creates some identities associated with the course group
     with driver.login_admin():
         create_course(driver, course_alias, school_name)
-        add_assignment(driver, assignment_alias)
-        add_problem_to_assignment(driver, assignment_alias, problem)
+        add_assignment_with_problem(driver, assignment_alias, problem)
         # The function require the group alias. We are assuming that it is the
         # same as the course alias, since that is the default
         unassociated, associated = util.add_identities_group(driver,
@@ -110,16 +181,16 @@ def test_create_identities_for_course(driver):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 ('//a[contains(@href, "#problems/%s")]' %
-                  problem)))).click()
+                 ('//a[contains(text(), "%s")]/parent::div' %
+                  problem.title())))).click()
 
-        util.create_run(driver, problem, 'Main.cpp11')
+        util.create_run(driver, problem, 'Main.cpp17-gcc')
         driver.update_score_in_course(problem, assignment_alias)
 
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
-                 'button.details'))).click()
+                 'button[data-run-details]'))).click()
 
         assert (('show-run:') in
                 driver.browser.current_url), driver.browser.current_url
@@ -128,13 +199,11 @@ def test_create_identities_for_course(driver):
     with driver.login(username, password):
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'nav-user'))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-user]'))).click()
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.XPATH,
-                     ('//li[@id = "nav-user"]'
-                      '//a[@href = "/profile/"]')))).click()
+                    (By.CSS_SELECTOR, 'a[data-nav-profile]'))).click()
 
         with driver.page_transition():
             driver.wait.until(
@@ -171,38 +240,44 @@ def test_create_identities_for_course(driver):
 def enter_course_assignments_page(driver, course_alias):
     '''Steps to enter into scoreboard page'''
 
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'li[data-nav-right]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH, '//a[@href = "/schools/"]'))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-courses-mine]'))).click()
 
-    with driver.page_transition():
-        course_url = '/course/%s' % course_alias
+    course_url = f'/course/{course_alias}/'
+    with driver.page_transition(target_url=driver.url(course_url)):
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//a[@href = "%s"]' % course_url))).click()
+                (By.CSS_SELECTOR, f'a[href="{course_url}"]'))).click()
 
 
 @util.annotate
-def create_course(driver, course_alias, school_name):
+def create_course(driver, course_alias: str, school_name: str) -> None:
     '''Creates one course with a new school.'''
-
-    with driver.page_transition():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, '//a[@href = "/schools/"]'))).click()
-
-    with driver.page_transition():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, ('//a[@href = "/course/new/"]')))).click()
-
     driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.CLASS_NAME, ('name')))).send_keys(course_alias)
-    driver.browser.find_element_by_class_name('alias').send_keys(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[data-nav-courses]'))).click()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, 'a[data-nav-courses-create]'))).click()
+    driver.send_keys(
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, 'input[data-course-new-name]'))),
         course_alias)
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'input[data-course-new-alias]'))).send_keys(course_alias)
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'input[name="show-scoreboard"][value="true"]'))).click()
     driver.typeahead_helper('*[contains(@class, "omegaup-course-details")]',
                             school_name,
                             select_suggestion=False)
@@ -210,25 +285,27 @@ def create_course(driver, course_alias, school_name):
         'course description')
 
     with driver.page_transition():
-        driver.browser.find_element_by_tag_name('form').submit()
-    assert (('/course/%s/edit/' % course_alias) in
-            driver.browser.current_url), driver.browser.current_url
+        driver.browser.find_element_by_css_selector(
+            'form[data-course-form]').submit()
+    assert (f'/course/{course_alias}/edit/' in driver.browser.current_url
+            ), driver.browser.current_url
 
 
 @util.annotate
-def add_assignment(driver, assignment_alias):
+def add_assignment_with_problem(driver, assignment_alias, problem_alias):
     '''Add assignments to a recently created course.'''
 
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH, (
-                '//a[contains(@href, "#assignments")]')))).click()
+                '//a[contains(@href, "#content")]')))).click()
     driver.wait.until(
-        EC.visibility_of_element_located((By.CSS_SELECTOR, '#assignments')))
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, 'div[data-content-tab]')))
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, ('#assignments .new button')))).click()
+            (By.CSS_SELECTOR, 'div[data-content-tab] .new button'))).click()
 
     driver.wait.until(
         EC.visibility_of_element_located(
@@ -246,8 +323,24 @@ def add_assignment(driver, assignment_alias):
     new_assignment_form.find_element_by_css_selector('textarea').send_keys(
         'homework description')
 
-    new_assignment_form.find_element_by_css_selector(
-        'button[type=submit]').click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR,
+             '[data-course-problemlist] .card-footer')))
+
+    driver.typeahead_helper(
+        '*[contains(@class, "card-footer")]', problem_alias)
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'button[data-add-problem]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR,
+             '[data-course-problemlist] table.table-striped')))
+
+    with util.dismiss_status(driver):
+        new_assignment_form.find_element_by_css_selector(
+            'button[data-schedule-assignment]').click()
     driver.wait.until(
         EC.invisibility_of_element_located(
             (By.CSS_SELECTOR, '.omegaup-course-assignmentdetails')))
@@ -256,40 +349,6 @@ def add_assignment(driver, assignment_alias):
             (By.XPATH,
              '//*[contains(@class, "omegaup-course-assignmentlist")]'
              '//a[text()="%s"]' % assignment_alias)))
-
-
-@util.annotate
-def add_problem_to_assignment(driver, assignment_alias, problem):
-    '''Add problems to an assignment given.'''
-
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//a[@href = "#problems"]'))).click()
-    Select(driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//select[@name = "assignments"]')))).select_by_visible_text(
-                 assignment_alias)
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR,
-             '#problems .problemlist button'))).click()
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist .panel-footer')))
-
-    driver.typeahead_helper(
-        '*[contains(@class, "panel-footer")]', problem)
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist .panel-footer '
-             'button[type=submit]'))).click()
-    driver.wait.until(
-        EC.invisibility_of_element_located(
-            (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist .panel-footer')))
 
 
 @util.annotate
@@ -304,7 +363,7 @@ def update_scoreboard_for_assignment(driver, assignment_alias, course_alias):
         (urllib.parse.quote(assignment_alias, safe=''),
          urllib.parse.quote(course_alias, safe='')))
     driver.browser.get(scoreboard_refresh_url)
-    assert '{"status":"ok"}' in driver.browser.page_source
+    assert '"status":"ok"' in driver.browser.page_source
 
 
 @util.annotate
@@ -313,21 +372,22 @@ def add_students_course(driver, users):
 
     util.add_students(
         driver, users, tab_xpath='//a[contains(@href, "#students")]',
-        container_xpath='//*[@id="students"]',
+        container_xpath='//div[@data-students-tab]',
         parent_xpath='*[contains(@class, "omegaup-course-addstudent")]',
         submit_locator=(By.CSS_SELECTOR,
                         '.omegaup-course-addstudent form button[type=submit]'))
 
 
 @util.annotate
-def enter_course(driver, course_alias, assignment_alias):
+def enter_course(driver, course_alias, assignment_alias, *, first_time=True):
     '''Enter to course previously created.'''
-
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[data-nav-courses]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH, '//a[@href = "/schools/"]'))).click()
-
+                (By.CSS_SELECTOR, 'a[data-nav-courses-all]'))).click()
     course_url = '/course/%s' % course_alias
     with driver.page_transition():
         driver.wait.until(
@@ -337,15 +397,25 @@ def enter_course(driver, course_alias, assignment_alias):
     assert (course_url in
             driver.browser.current_url), driver.browser.current_url
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//input[@name = "accept-teacher"]'))).click()
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//button[@name = "start-course-submit"]'))).click()
+    if first_time:
+        with driver.page_transition(target_url=driver.browser.current_url):
+            accept_teacher_element = driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR,
+                     'input[name="accept-teacher"][value="true"]')))
+            for _ in range(10):
+                accept_teacher_element.click()
+                if accept_teacher_element.is_selected():
+                    break
+            else:
+                logging.error('Failed to accept teacher')
 
-    assignment_url = '/course/%s/assignment/%s' % (course_alias,
-                                                   assignment_alias)
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR,
+                     'button[name="start-course-submit"]'))).click()
+
+    assignment_url = f'/course/{course_alias}/assignment/{assignment_alias}/'
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -353,3 +423,5 @@ def enter_course(driver, course_alias, assignment_alias):
                  ('//a[starts-with(@href, "%s")]' % assignment_url)))).click()
     assert (assignment_url in
             driver.browser.current_url), driver.browser.current_url
+
+    driver.wait.until(EC.url_contains('#problems'))

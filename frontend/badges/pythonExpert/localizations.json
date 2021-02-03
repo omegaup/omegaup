@@ -1,0 +1,14 @@
+{
+    "es": {
+      "name": "Especialista en Python",
+      "description": "Otorgado a personas que han resuelto más de 10 problemas en Python."
+    },
+    "en": {
+      "name": "Python Expert User",
+      "description": "The user has solved more than 10 problems in Python."
+    },
+    "pt": {
+      "name": "Especialista em Python",
+      "description": "Concedido a pessoas que resolveram mais de 10 problemas em Python."
+    }
+  }

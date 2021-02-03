@@ -9,7 +9,7 @@
           "password": "testtesttest",
           "requests": [
             {
-              "api": "UserController::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\User::apiCreate",
               "params": {
                 "username": "test_user_0",
                 "email": "user_0@domain.com",
@@ -17,7 +17,7 @@
               }
             },
             {
-              "api": "UserController::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\User::apiCreate",
               "params": {
                 "username": "test_user_1",
                 "email": "user_1@domain.com",
@@ -31,7 +31,7 @@
           "password": "test_user_0",
           "requests": [
             {
-              "api": "ContestController::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\Contest::apiCreate",
               "params": {
                 "visibility": 1,
                 "title": "Prueba",
@@ -44,8 +44,10 @@
                 "points_decay_factor": 0,
                 "partial_score": 1,
                 "submissions_gap": 1200,
-                "feedback": "yes",
+                "penalty": 0,
+                "feedback": "detailed",
                 "penalty_type": "contest_start",
+                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
                 "penalty_calc_policy": "sum",
                 "admission_mode": "private",
                 "show_scoreboard_after": "true"

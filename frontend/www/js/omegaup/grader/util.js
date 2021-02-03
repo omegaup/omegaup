@@ -3,7 +3,7 @@ export function vuexGet(store, name) {
   var o = store.state;
   for (let p of name.split('.')) {
     if (typeof o === 'undefined') return undefined;
-    if (!o.hasOwnProperty(p)) return undefined;
+    if (!Object.prototype.hasOwnProperty.call(o, p)) return undefined;
     o = o[p];
   }
   return o;
@@ -14,7 +14,7 @@ export function vuexSet(store, name, value) {
 }
 
 export function parseDuration(value) {
-  if (typeof(value) === 'number') {
+  if (typeof value === 'number') {
     return value;
   }
 
@@ -23,8 +23,10 @@ export function parseDuration(value) {
     let scale = 1.0;
     if (chunk.indexOf('ns') === chunk.length - 2) {
       scale = 1e-9;
-    } else if (chunk.indexOf('us') === chunk.length - 2 ||
-               chunk.indexOf('µs') === chunk.length - 2) {
+    } else if (
+      chunk.indexOf('us') === chunk.length - 2 ||
+      chunk.indexOf('µs') === chunk.length - 2
+    ) {
       scale = 1e-6;
     } else if (chunk.indexOf('ms') === chunk.length - 2) {
       scale = 1e-3;
@@ -38,11 +40,17 @@ export function parseDuration(value) {
 
 export const languageMonacoModelMapping = {
   cpp11: 'cpp',
+  'cpp11-gcc': 'cpp',
+  'cpp11-clang': 'cpp',
+  'cpp17-gcc': 'cpp',
+  'cpp17-clang': 'cpp',
   cpp: 'cpp',
   cs: 'csharp',
   java: 'java',
   lua: 'lua',
   py: 'python',
+  py2: 'python',
+  py3: 'python',
   rb: 'ruby',
 
   // Fake languages.
@@ -54,11 +62,17 @@ export const languageMonacoModelMapping = {
 
 export const languageExtensionMapping = {
   cpp11: 'cpp',
+  'cpp11-gcc': 'cpp',
+  'cpp11-clang': 'cpp',
+  'cpp17-gcc': 'cpp',
+  'cpp17-clang': 'cpp',
   cpp: 'cpp',
   cs: 'cs',
   java: 'java',
   lua: 'lua',
   py: 'py',
+  py2: 'py',
+  py3: 'py',
   rb: 'rb',
 
   // Fake languages.

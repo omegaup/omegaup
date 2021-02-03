@@ -1,59 +1,75 @@
 <?php
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+namespace OmegaUp\DAO\VO;
 
 /**
- * Value Object file for table {{ table.name }}.
+ * Value Object class for table `{{ table.name }}`.
  *
- * VO does not have any behaviour.
  * @access public
  */
-class {{ table.class_name }} extends VO {
+class {{ table.class_name }} extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
 {%- for column in table.columns %}
         '{{ column.name }}' => true,
 {%- endfor %}
     ];
 
-    /**
-     * Constructor de {{ table.class_name }}
-     *
-     * Para construir un objeto de tipo {{ table.class_name }} debera llamarse a el constructor
-     * sin parametros. Es posible, construir un objeto pasando como parametro un arreglo asociativo
-     * cuyos campos son iguales a las variables que constituyen a este objeto.
-     */
-    function __construct(?array $data = null) {
+    public function __construct(?array $data = null) {
         if (empty($data)) {
             return;
         }
         $unknownColumns = array_diff_key($data, self::FIELD_NAMES);
         if (!empty($unknownColumns)) {
-            throw new Exception('Unknown columns: ' . join(', ', array_keys($unknownColumns)));
+            throw new \Exception(
+                'Unknown columns: ' . join(', ', array_keys($unknownColumns))
+            );
         }
 {%- for column in table.columns %}
         if (isset($data['{{ column.name }}'])) {
 {%- if 'timestamp' in column.type or 'datetime' in column.type %}
             /**
-             * @var string|int|float $data['{{ column.name }}']
-             * @var int $this->{{ column.name }}
+             * @var \OmegaUp\Timestamp|string|int|float $data['{{ column.name }}']
+             * @var \OmegaUp\Timestamp $this->{{ column.name }}
              */
-            $this->{{ column.name }} = DAO::fromMySQLTimestamp($data['{{ column.name }}']);
+            $this->{{ column.name }} = (
+                \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $data['{{ column.name }}']
+                )
+            );
 {%- elif column.php_primitive_type == 'bool' %}
-            $this->{{ column.name }} = boolval($data['{{ column.name }}']);
-{%- elif column.php_primitive_type in ('int', 'float') %}
-            $this->{{ column.name }} = ({{ column.php_primitive_type }})$data['{{ column.name }}'];
+            $this->{{ column.name }} = boolval(
+                $data['{{ column.name }}']
+            );
+{%- elif column.php_primitive_type == 'int' %}
+            $this->{{ column.name }} = intval(
+                $data['{{ column.name }}']
+            );
+{%- elif column.php_primitive_type == 'float' %}
+            $this->{{ column.name }} = floatval(
+                $data['{{ column.name }}']
+            );
 {%- else %}
-            $this->{{ column.name }} = strval($data['{{ column.name }}']);
+            $this->{{ column.name }} = is_scalar(
+                $data['{{ column.name }}']
+            ) ? strval($data['{{ column.name }}']) : '';
 {%- endif %}
     {%- if column.default == 'CURRENT_TIMESTAMP' %}
         } else {
-            $this->{{ column.name }} = Time::get();
+            $this->{{ column.name }} = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
+    {%- elif column.default and ('timestamp' in column.type or 'datetime' in column.type) %}
+        } else {
+            $this->{{ column.name }} = new \OmegaUp\Timestamp(
+                {{ column.default|strtotime }}
+            ); // {{ column.default }}
     {%- endif %}
         }
 {%- endfor %}
@@ -75,7 +91,7 @@ class {{ table.class_name }} extends VO {
 {%- if column.default == 'CURRENT_TIMESTAMP' %}
     public ${{ column.name }};  // CURRENT_TIMESTAMP
 {%- elif 'timestamp' in column.type %}
-    public ${{ column.name }} = {{ column.default|strtotime }}; // {{ column.default }}
+    public ${{ column.name }};  // {{ column.default }}
 {%- elif column.php_primitive_type == 'bool' %}
     public ${{ column.name }} = {{ 'true' if column.default == '1' else 'false' }};
 {%- elif column.php_primitive_type == 'int' %}

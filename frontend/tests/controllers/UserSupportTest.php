@@ -5,19 +5,27 @@
  *
  * @author juan.pablo
  */
-class UserSupportTest extends OmegaupTestCase {
+class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for users with support role
      */
     public function testUserHasSupportRole() {
-        [, $supportIdentity] = UserFactory::createSupportUser();
-        [, $mentorIdentity] = UserFactory::createMentorIdentity();
+        ['user' => $supportUser, 'identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
+        ['user' => $mentorUser, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
 
         // Asserting that user belongs to the support group
-        $this->assertTrue(Authorization::isSupportTeamMember($supportIdentity));
+        $this->assertTrue(
+            \OmegaUp\Authorization::isSupportTeamMember(
+                $supportIdentity
+            )
+        );
 
         // Asserting that user doesn't belong to the support group
-        $this->assertFalse(Authorization::isSupportTeamMember($mentorIdentity));
+        $this->assertFalse(
+            \OmegaUp\Authorization::isSupportTeamMember(
+                $mentorIdentity
+            )
+        );
     }
 
     /**
@@ -25,19 +33,19 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testVerifyUser() {
         // Support team member will verify $user
-        [$supportUser,] = UserFactory::createSupportUser();
+        ['user' => $supportUser, 'identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
 
         // Creates a user
-        $email = Utils::CreateRandomString().'@mail.com';
-        $user = UserFactory::createUser(new UserParams([
+        $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
             'email' => $email,
             'verify' => false
         ]));
 
         // Call api using support team member
-        $supportLogin = self::login($supportUser);
+        $supportLogin = self::login($supportIdentity);
 
-        $response = UserController::apiExtraInformation(new Request([
+        $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'email' => $email
         ]));
@@ -45,19 +53,18 @@ class UserSupportTest extends OmegaupTestCase {
         $this->assertEquals(0, $response['verified']);
 
         // Call apiVerifyEmail
-        UserController::apiVerifyEmail(new Request([
+        \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'usernameOrEmail' => $email,
         ]));
 
         // Get user information to pick up verification changes
-        $response = UserController::apiExtraInformation(new Request([
+        $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'email' => $email
         ]));
 
         $this->assertEquals(1, $response['verified']);
-        $this->assertEquals('ok', $response['status']);
     }
 
     /**
@@ -65,17 +72,21 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testUserGeneratesValidToken() {
         // Support team member will verify $user
-        [$supportUser,] = UserFactory::createSupportUser();
+        ['user' => $supportUser, 'identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
 
         // Creates a user
-        $email = Utils::CreateRandomString().'@mail.com';
-        $user = UserFactory::createUser(new UserParams(['email' => $email]));
+        $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['email' => $email]
+            )
+        );
 
         // Call api using support team member
-        $supportLogin = self::login($supportUser);
+        $supportLogin = self::login($supportIdentity);
 
         // Support tries to generate token without a request
-        $response = UserController::apiExtraInformation(new Request([
+        $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'email' => $email
         ]));
@@ -83,31 +94,29 @@ class UserSupportTest extends OmegaupTestCase {
         $this->assertEquals(0, $response['within_last_day']);
 
         // Now, user makes a password change request
-        ResetController::apiCreate(new Request([
+        \OmegaUp\Controllers\Reset::apiCreate(new \OmegaUp\Request([
             'email' => $email
         ]));
 
         // Support can genearate token
-        UserController::apiExtraInformation(new Request([
+        \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'email' => $email
         ]));
-        $response = ResetController::apiGenerateToken(new Request([
+        $response = \OmegaUp\Controllers\Reset::apiGenerateToken(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'email' => $email,
         ]));
 
         // Finally, users can update their password with the generated token
         $reset_token = explode('reset_token=', $response['link'])[1];
-        $password = Utils::CreateRandomString();
-        $response = ResetController::apiUpdate(new Request([
+        $password = \OmegaUp\Test\Utils::createRandomString();
+        $response = \OmegaUp\Controllers\Reset::apiUpdate(new \OmegaUp\Request([
             'email' => $email,
             'reset_token' => $reset_token,
             'password' => $password,
             'password_confirmation' => $password
         ]));
-
-        $this->assertContains('ok', $response['status']);
     }
 
     /**
@@ -115,24 +124,29 @@ class UserSupportTest extends OmegaupTestCase {
      */
     public function testUserGeneratesExpiredToken() {
         // Support team member will verify $user
-        [$supportUser, ] = UserFactory::createSupportUser();
+        ['user' => $supportUser, 'identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
 
         // Creates a user
-        $email = Utils::CreateRandomString().'@mail.com';
-        $user = UserFactory::createUser(new UserParams(['email' => $email]));
+        $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['email' => $email]
+            )
+        );
 
         // Call api using support team member
-        $supportLogin = self::login($supportUser);
+        $supportLogin = self::login($supportIdentity);
 
         // time travel
-        $reset_sent_at =
-            ApiUtils::GetStringTime(Time::get() - PASSWORD_RESET_MIN_WAIT - (60 * 60 * 24));
-        $user = UsersDAO::FindByEmail($email);
+        $reset_sent_at = \OmegaUp\ApiUtils::getStringTime(
+            \OmegaUp\Time::get() - PASSWORD_RESET_MIN_WAIT - (60 * 60 * 24)
+        );
+        $user = \OmegaUp\DAO\Users::findByEmail($email);
         $user->reset_sent_at = $reset_sent_at;
-        UsersDAO::update($user);
+        \OmegaUp\DAO\Users::update($user);
 
         // Support can not genearate token because it has expired
-        $response = UserController::apiExtraInformation(new Request([
+        $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
             'auth_token' => $supportLogin->auth_token,
             'email' => $email
         ]));

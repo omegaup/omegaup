@@ -1,45 +1,40 @@
 <template>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h2 class="panel-title">{{ title }} <span class="badge">{{ badges.length }}</span> <a class=
-      "badges-link"
-         href="/badge/list/"
-         v-if="this.showAllBadgesLink">{{ this.T.wordsBadgesSeeAll }}</a></h2>
+  <div class="card">
+    <div class="card-header">
+      <h4 class="card-title">
+        {{ title }}
+        <span class="badge badge-secondary">{{ badges.length }} </span>
+      </h4>
     </div>
-    <div class="panel-body">
-      <div class="badges-container">
-        <omegaup-badge v-bind:badge="badge"
-             v-bind:key="badge.badge_alias"
-             v-for="badge in badges"></omegaup-badge>
+    <div class="card-body">
+      <div class="container-fluid">
+        <div class="row">
+          <omegaup-badge
+            v-for="(badge, idx) in badges"
+            :key="idx"
+            :badge="badge"
+          ></omegaup-badge>
+        </div>
       </div>
     </div>
-    <div v-show="!badges"><img src="/media/wait.gif"></div>
+    <div v-if="showAllBadgesLink" class="card-footer">
+      <a v-if="showAllBadgesLink" class="badges-link" href="/badge/list/">{{
+        T.wordsBadgesSeeAll
+      }}</a>
+    </div>
+    <div v-show="!badges"><img src="/media/wait.gif" /></div>
   </div>
 </template>
 
-<style>
-.badges-container {
-  display: grid;
-  justify-content: space-between;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  grid-auto-rows: 180px;
-}
-
-a.badges-link {
-  color: #337ab7;
-  font-size: 14px;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
-import Badge from '../badge/Badge.vue';
+import { types } from '../../api_types';
+import T from '../../lang';
+import badge_Badge from '../badge/Badge.vue';
 
 @Component({
   components: {
-    'omegaup-badge': Badge,
+    'omegaup-badge': badge_Badge,
   },
 })
 export default class BadgeList extends Vue {
@@ -49,15 +44,16 @@ export default class BadgeList extends Vue {
 
   T = T;
 
-  get badges(): omegaup.Badge[] {
+  get badges(): types.Badge[] {
     return Array.from(this.allBadges)
-      .map((badge: string) => {
-        return {
-          badge_alias: badge,
-          unlocked: this.visitorBadges.has(badge),
-        };
-      })
-      .sort((a: omegaup.Badge, b: omegaup.Badge) => {
+      .map((badge: string) => ({
+        badge_alias: badge,
+        unlocked: this.visitorBadges.has(badge),
+        assignation_time: new Date(),
+        total_users: 0,
+        owners_count: 0,
+      }))
+      .sort((a: types.Badge, b: types.Badge) => {
         // Alphabetical order BY NAME, not alias.
         const aName = this.getBadgeName(a.badge_alias);
         const bName = this.getBadgeName(b.badge_alias);
@@ -75,8 +71,14 @@ export default class BadgeList extends Vue {
   }
 
   getBadgeName(alias: string): string {
-    return this.T[`badge_${alias}_name`];
+    return T[`badge_${alias}_name`];
   }
 }
-
 </script>
+
+<style>
+a.badges-link {
+  color: #337ab7;
+  font-size: 1rem;
+}
+</style>

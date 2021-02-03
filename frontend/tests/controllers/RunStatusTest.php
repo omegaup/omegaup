@@ -3,62 +3,112 @@
 /**
  * Description of DetailsRunTest
  */
-class RunStatusTest extends OmegaupTestCase {
+class RunStatusTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test of viewing run details
      */
     public function testShowRunDetailsValid() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run
-        $runData = RunsFactory::createRun($problemData, $contestData, $contestant);
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
 
-        $login = self::login($contestant);
-        $response = RunController::apiStatus(new Request([
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Run::apiStatus(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'run_alias' => $runData['response']['guid'],
         ]));
 
         $this->assertEquals($runData['response']['guid'], $response['guid']);
         $this->assertEquals('JE', $response['verdict']);
-        $this->assertEquals('new', $response['status']);
+        $this->assertEquals('uploading', $response['status']);
+    }
+
+    /**
+     * Basic test of viewing run details with grade run
+     */
+    public function testShowRunDetailsValidWithGradeRun() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Create our contestant
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create a run
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0.05, 'PA');
+
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Run::apiStatus(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'run_alias' => $runData['response']['guid'],
+        ]));
+
+        $this->assertEquals($runData['response']['guid'], $response['guid']);
+        $this->assertEquals('PA', $response['verdict']);
+        $this->assertEquals('ready', $response['status']);
+        $this->assertEquals(5, $response['contest_score']);
+        $this->assertEquals(0.05, $response['score']);
     }
 
     /**
      * Basic test of downloading a full run.
      */
     public function testDownload() {
-        $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
-        $contestantIdentity = IdentityController::resolveIdentity($user->username);
-        $authorIdentity = IdentityController::resolveIdentity(
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $user, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $authorIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $problemData['author']->username
         );
-        $runData = RunsFactory::createRunToProblem($problemData, $user);
-        RunsFactory::gradeRun($runData);
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $contestantIdentity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         try {
-            RunController::downloadSubmission(
+            \OmegaUp\Controllers\Run::downloadSubmission(
                 $runData['response']['guid'],
                 $contestantIdentity,
                 false
             );
             $this->fail('Should not have allowed to download submission');
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
 
-        $submissionZip = RunController::downloadSubmission(
+        $submissionZip = \OmegaUp\Controllers\Run::downloadSubmission(
             $runData['response']['guid'],
             $authorIdentity,
             false

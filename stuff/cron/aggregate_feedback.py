@@ -11,14 +11,22 @@ import calendar
 import collections
 import datetime
 import json
-import operator
 import logging
+import operator
+import os
+import sys
 import warnings
+from typing import Dict, Mapping, NamedTuple, Optional, Sequence, Tuple, Set
+from typing import DefaultDict
 
 import MySQLdb.constants.ER
 
-import lib.db
-import lib.logs
+sys.path.insert(
+    0,
+    os.path.join(
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
+import lib.db   # pylint: disable=wrong-import-position
+import lib.logs  # pylint: disable=wrong-import-position
 
 CONFIDENCE = 10
 MIN_POINTS = 10
@@ -35,15 +43,29 @@ GET_ALL_SCORES_AND_SUGGESTIONS = """SELECT qn.`contents`, ur.`score`
                                     LEFT JOIN `User_Rank` as ur
                                     ON ur.`user_id` = qn.`user_id`
                                     WHERE `nomination` = 'suggestion'
-                                      AND qn.`qualitynomination_id` > %s;"""
+                                      AND qn.`qualitynomination_id` > %s
+                                      AND qn.`qualitynomination_id` IN (
+                                          SELECT MAX(qualitynomination_id)
+                                          FROM `QualityNominations`
+                                          WHERE
+                                            `user_id` = qn.`user_id` AND
+                                            `problem_id` = qn.`problem_id`
+                                      );"""
 
 GET_PROBLEM_SCORES_AND_SUGGESTIONS = """SELECT qn.`contents`, ur.`score`
                                         FROM `QualityNominations` as qn
                                         LEFT JOIN `User_Rank` as ur
                                         ON ur.`user_id` = qn.`user_id`
                                         WHERE qn.`nomination` = 'suggestion'
-                                          AND qn.`qualitynomination_id` > %s
-                                          AND qn.`problem_id` = %s;"""
+                                        AND qn.`qualitynomination_id` > %s
+                                        AND qn.`problem_id` = %s
+                                        AND qn.`qualitynomination_id` IN (
+                                          SELECT MAX(qualitynomination_id)
+                                          FROM `QualityNominations`
+                                          WHERE
+                                            `user_id` = qn.`user_id` AND
+                                            `problem_id` = qn.`problem_id`
+                                        );"""
 
 # weighting factors according to user's range
 WEIGHTING_FACTORS = {
@@ -55,40 +77,62 @@ WEIGHTING_FACTORS = {
     'user-rank-international-master': 6,
 }
 
+# before_ac weighting factors
+# TODO: Set correct weighting factors after regression
+BEFORE_AC_WEIGHTING_FACTORS = {
+    'user-rank-unranked': 0,
+    'user-rank-beginner': 0,
+    'user-rank-specialist': 0,
+    'user-rank-expert': 0,
+    'user-rank-master': 0,
+    'user-rank-international-master': 0,
+}
+
 
 class Votes:
     '''This class is an abstraction of a vote with their
     simple count and weighted sum'''
     __slots__ = ['count', 'weighted_sum']
 
-    def __init__(self, count=0, weighted_sum=0):
+    def __init__(self, count: int = 0, weighted_sum: int = 0) -> None:
         self.count = count
         self.weighted_sum = weighted_sum
 
 
-def fill_rank_cutoffs(dbconn):
+class RankCutoff(NamedTuple):
+    '''Cutoff percentile for user ranking.'''
+    classname: str
+    score: float
+
+
+def fill_rank_cutoffs(
+        dbconn: MySQLdb.connections.Connection) -> Sequence[RankCutoff]:
     '''Creates and fills RankCutoff collection'''
-    rank_cutoff = collections.namedtuple('rank_cutoff', ['classname', 'score'])
     with dbconn.cursor() as cur:
         cur.execute("""SELECT urc.`classname`, urc.`score`
                        FROM `User_Rank_Cutoffs` as urc
                        ORDER BY urc.`percentile` ASC;""")
-        return [rank_cutoff(row[0], row[1]) for row in cur]
+        return [RankCutoff(row[0], row[1]) for row in cur]
 
 
-def get_weighting_factor(score, rank_cutoffs):
-    '''Gets the user vote weighting factor based on user's
-    score stored in User_Rank table and according to the
-    User_Rank_Cutoffs scores and classnames'''
+def get_weighting_factor(score: Optional[float],
+                         rank_cutoffs: Sequence[RankCutoff],
+                         weighting_factors: Mapping[str, int]) -> int:
+    '''Gets the user vote weighting factor based on nomination status
+    (before_AC or not), user's score stored in User_Rank table and
+    according to the User_Rank_Cutoffs scores and classnames'''
     if score is None:
-        return WEIGHTING_FACTORS['user-rank-unranked']
+        return weighting_factors['user-rank-unranked']
     for cutoff in rank_cutoffs:
         if cutoff.score <= score:
-            return WEIGHTING_FACTORS[cutoff.classname]
-    return WEIGHTING_FACTORS['user-rank-unranked']
+            return weighting_factors[cutoff.classname]
+    return weighting_factors['user-rank-unranked']
 
 
-def get_global_quality_and_difficulty_average(dbconn, rank_cutoffs):
+def get_global_quality_and_difficulty_average(
+        dbconn: MySQLdb.connections.Connection,
+        rank_cutoffs: Sequence[RankCutoff]
+) -> Tuple[Optional[float], Optional[float]]:
     '''Gets the global quality and difficulty average based on user feedback.
 
     This will be used as the prior belief when updating each individual
@@ -108,25 +152,33 @@ def get_global_quality_and_difficulty_average(dbconn, rank_cutoffs):
                 logging.exception('Failed to parse contents')
                 continue
 
+            before_ac = contents.get('before_ac', False)
             user_score = row[1]
-            weighting_factor = get_weighting_factor(user_score, rank_cutoffs)
-            if 'quality' in contents:
+            weighting_factor = get_weighting_factor(
+                user_score, rank_cutoffs,
+                WEIGHTING_FACTORS if not before_ac else
+                BEFORE_AC_WEIGHTING_FACTORS)
+            if 'quality' in contents and contents['quality'] is not None:
                 quality_sum += weighting_factor * contents['quality']
                 quality_n += weighting_factor
-            if 'difficulty' in contents:
+            if ('difficulty' in contents and
+                    contents['difficulty'] is not None):
                 difficulty_sum += weighting_factor * contents['difficulty']
                 difficulty_n += weighting_factor
 
-    global_quality_average = None
+    global_quality_average: Optional[float] = None
     if quality_n:
         global_quality_average = quality_sum / float(quality_n)
-    global_difficulty_average = None
+    global_difficulty_average: Optional[float] = None
     if difficulty_n:
         global_difficulty_average = difficulty_sum / float(difficulty_n)
     return (global_quality_average, global_difficulty_average)
 
 
-def get_problem_aggregates(dbconn, problem_id, rank_cutoffs):
+def get_problem_aggregates(
+        dbconn: MySQLdb.connections.Connection, problem_id: int,
+        rank_cutoffs: Sequence[RankCutoff]
+) -> Tuple[Sequence[Votes], Sequence[Votes], Dict[str, int], int]:
     '''Gets the aggregates for a particular problem.'''
     with dbconn.cursor() as cur:
         cur.execute(GET_PROBLEM_SCORES_AND_SUGGESTIONS,
@@ -135,18 +187,27 @@ def get_problem_aggregates(dbconn, problem_id, rank_cutoffs):
         quality_votes = [Votes() for _ in range(VOTES_NUM)]
         difficulty_votes = [Votes() for _ in range(VOTES_NUM)]
 
-        problem_tag_votes = collections.defaultdict(int)
+        problem_tag_votes: Dict[str, int] = collections.defaultdict(int)
         problem_tag_votes_n = 0
         for row in cur:
             contents = json.loads(row[0])
+            before_ac = contents.get('before_ac', False)
             user_score = row[1]
-            weighting_factor = get_weighting_factor(user_score, rank_cutoffs)
-            if 'quality' in contents:
-                quality_votes[contents['quality']].count += 1
+            weighting_factor = get_weighting_factor(
+                user_score, rank_cutoffs,
+                WEIGHTING_FACTORS if not before_ac else
+                BEFORE_AC_WEIGHTING_FACTORS)
+            if 'quality' in contents and contents['quality'] is not None:
+                # TODO: This is just provisional until
+                # obtaining the before_ac weighting factors
+                quality_votes[contents['quality']].count += (
+                    1 if not before_ac else 0)
                 quality_votes[contents['quality']].weighted_sum += (
                     weighting_factor)
-            if 'difficulty' in contents:
-                difficulty_votes[contents['difficulty']].count += 1
+            if ('difficulty' in contents and
+                    contents['difficulty'] is not None):
+                difficulty_votes[contents['difficulty']].count += (
+                    1 if not before_ac else 0)
                 difficulty_votes[contents['difficulty']].weighted_sum += (
                     weighting_factor)
             if 'tags' in contents and contents['tags']:
@@ -158,7 +219,8 @@ def get_problem_aggregates(dbconn, problem_id, rank_cutoffs):
             problem_tag_votes, problem_tag_votes_n)
 
 
-def bayesian_average(apriori_average, values):
+def bayesian_average(apriori_average: Optional[float],
+                     values: Sequence[Votes]) -> Optional[float]:
     '''Gets the Bayesian average of an observation based on a prior value.'''
     weighted_n = 0
     weighted_sum = 0
@@ -169,11 +231,12 @@ def bayesian_average(apriori_average, values):
     if weighted_n < CONFIDENCE or apriori_average is None:
         return None
 
-    return (CONFIDENCE * apriori_average + weighted_sum) / (
+    return (CONFIDENCE * apriori_average + weighted_sum) / float(
         CONFIDENCE + weighted_n)
 
 
-def get_most_voted_tags(problem_tag_votes, problem_tag_votes_n):
+def get_most_voted_tags(problem_tag_votes: Mapping[str, float],
+                        problem_tag_votes_n: int) -> Optional[Sequence[str]]:
     '''Gets the most voted tags for each problem.
 
     This returns the list of user-suggested problem tags, provided that:
@@ -195,8 +258,10 @@ def get_most_voted_tags(problem_tag_votes, problem_tag_votes_n):
     return final_tags
 
 
-def replace_autogenerated_tags(dbconn, problem_id, problem_tags):
-    '''Replace the autogenerated tags for problem_id with problem_tags.'''
+def replace_voted_tags(dbconn: MySQLdb.connections.Connection,
+                       problem_id: int,
+                       problem_tags: Sequence[str]) -> None:
+    '''Replace the voted tags for problem_id with problem_tags.'''
 
     try:
         logging.debug('Replacing problem %d tags with %r', problem_id,
@@ -205,38 +270,38 @@ def replace_autogenerated_tags(dbconn, problem_id, problem_tags):
             cur.execute("""DELETE FROM
                                `Problems_Tags`
                            WHERE
-                               `problem_id` = %s AND `autogenerated` = 1;""",
+                               `problem_id` = %s AND `source` = 'voted';""",
                         (problem_id,))
             cur.execute("""INSERT IGNORE INTO
                                `Problems_Tags`(`problem_id`, `tag_id`,
-                                               `public`, `autogenerated`)
+                                               `source`)
                            SELECT
                                %%s AS `problem_id`,
                                `t`.`tag_id` AS `tag_id`,
-                               1 AS `public`,
-                               1 AS `autogenerated `
+                               'voted' AS `source`
                            FROM
                                `Tags` AS `t`
                            WHERE
                                `t`.`name` IN (%s);""" %
                         ', '.join('%s' for _ in problem_tags),
                         (problem_id,) + tuple(problem_tags))
-            for msg in cur.messages:
-                if isinstance(msg, tuple) and msg[0] == cur.Warning:
-                    if msg[1][1] == MySQLdb.constants.ER.DUP_ENTRY:
-                        # It is somewhat expected to get duplicate entries.
-                        continue
+            for level, code, message in dbconn.show_warnings():
+                if code == MySQLdb.constants.ER.DUP_ENTRY:
+                    # It is somewhat expected to get duplicate entries.
+                    continue
                 logging.warning('Warning while updated tags in problem %d: %r',
-                                problem_id, msg)
+                                problem_id, (level, code, message))
             dbconn.commit()
     except:  # noqa: bare-except
-        logging.exception('Failed to replace autogenerated tags')
+        logging.exception('Failed to replace voted tags')
         dbconn.rollback()
 
 
-def aggregate_problem_feedback(dbconn, problem_id, rank_cutoffs,
-                               global_quality_average,
-                               global_difficulty_average):
+def aggregate_problem_feedback(
+        dbconn: MySQLdb.connections.Connection, problem_id: int,
+        rank_cutoffs: Sequence[RankCutoff],
+        global_quality_average: Optional[float],
+        global_difficulty_average: Optional[float]) -> None:
     '''Aggregates user feedback for a certain problem
 
     Updates problem quality, difficulty, and tags for a problem passed on
@@ -294,10 +359,10 @@ def aggregate_problem_feedback(dbconn, problem_id, rank_cutoffs,
     problem_tags = get_most_voted_tags(problem_tag_votes,
                                        problem_tag_votes_n)
     if problem_tags:
-        replace_autogenerated_tags(dbconn, problem_id, problem_tags)
+        replace_voted_tags(dbconn, problem_id, problem_tags)
 
 
-def aggregate_feedback(dbconn):
+def aggregate_feedback(dbconn: MySQLdb.connections.Connection) -> None:
     '''Aggregates user feedback.
 
     This updates problem quality, difficulty, and tags for each problem that
@@ -320,7 +385,90 @@ def aggregate_feedback(dbconn):
                                        global_difficulty_average)
 
 
-def get_last_friday():
+def aggregate_reviewers_feedback_for_problem(
+        dbconn: MySQLdb.connections.Connection,
+        problem_id: int) -> None:
+    '''Aggregates the reviewers feedback for a certain problem'''
+    with dbconn.cursor() as cur:
+        cur.execute("""SELECT qn.`contents`
+                       FROM `QualityNominations` as qn
+                       WHERE qn.`nomination` = 'quality_tag'
+                       AND qn.`problem_id` = %s;""",
+                    (problem_id,))
+
+        total_votes = 0
+        seal_positive_votes = 0
+        level_tag_votes: DefaultDict[str, int] = collections.defaultdict(int)
+        topic_tag_votes: Set[str] = set()
+        for row in cur:
+            try:
+                contents = json.loads(row[0])
+            except json.JSONDecodeError:  # pylint: disable=no-member
+                logging.exception('Failed to parse contents')
+                continue
+            total_votes += 1
+            if contents['quality_seal']:
+                seal_positive_votes += 1
+            if 'tag' in contents and not contents['tag'] is None:
+                level_tag_votes[contents['tag']] += 1
+            if 'tags' in contents:
+                # Take the union of voted topic tags
+                topic_tag_votes.update(contents['tags'])
+
+        # Update the quality_seal for problem
+        cur.execute(
+            """
+            UPDATE
+                `Problems` as p
+            SET
+                p.`quality_seal` = %s
+            WHERE
+                p.`problem_id` = %s;""",
+            (seal_positive_votes > (total_votes / 2), problem_id))
+
+        # Delete old level and topic tags for problem and add the new ones
+        most_voted_level = max(level_tag_votes, key=level_tag_votes.get)
+        final_tags = list({(problem_id, tag) for tag in topic_tag_votes} |
+                          {(problem_id, most_voted_level)})
+
+        cur.execute("""DELETE FROM
+                               `Problems_Tags`
+                           WHERE
+                               `problem_id` = %s AND `source` = 'quality';""",
+                    (problem_id,))
+
+        # Add new tags for problem
+        cur.executemany("""INSERT IGNORE INTO
+                               `Problems_Tags`(`problem_id`, `tag_id`,
+                                               `source`)
+                           SELECT
+                               %s AS `problem_id`,
+                               `t`.`tag_id` AS `tag_id`,
+                               'quality' AS `source`
+                           FROM
+                               `Tags` AS `t`
+                           WHERE
+                               `t`.`name` = %s;""",
+                        (final_tags))
+
+
+def aggregate_reviewers_feedback(
+        dbconn: MySQLdb.connections.Connection) -> None:
+    '''Aggregates the quality_tag nominations sent by reviewers
+
+    Updates the quality_seal field on Problems table and updates the
+    problem level tag.
+    '''
+    with dbconn.cursor() as cur:
+        cur.execute("""SELECT DISTINCT qn.`problem_id`
+                       FROM `QualityNominations` as qn
+                       WHERE qn.`nomination` = 'quality_tag';""")
+        for row in cur:
+            aggregate_reviewers_feedback_for_problem(dbconn, row[0])
+        dbconn.commit()
+
+
+def get_last_friday() -> datetime.date:
     '''Returns datetime object corresponding to last Friday.
     '''
     current_date = datetime.datetime.now().date()
@@ -335,7 +483,8 @@ def get_last_friday():
     return last_friday
 
 
-def update_problem_of_the_week(dbconn, difficulty):
+def update_problem_of_the_week(dbconn: MySQLdb.connections.Connection,
+                               difficulty: str) -> None:
     '''Computes and records the problem of the past week.
 
     We will choose the problem that has not previously been chosen as problem
@@ -375,7 +524,7 @@ def update_problem_of_the_week(dbconn, difficulty):
                      0.0 if difficulty == 'easy' else 2.0,
                      2.0 if difficulty == 'easy' else 4.0))
 
-        quality_map = collections.defaultdict(int)
+        quality_map: Dict[int, int] = collections.defaultdict(int)
         for row in cur:
             problem_id = row[0]
             try:
@@ -384,7 +533,7 @@ def update_problem_of_the_week(dbconn, difficulty):
                 logging.exception('Failed to parse contents')
                 continue
 
-            if 'quality' not in contents:
+            if 'quality' not in contents or contents['quality'] is None:
                 continue
 
             quality_map[problem_id] += contents['quality']
@@ -407,7 +556,7 @@ def update_problem_of_the_week(dbconn, difficulty):
         dbconn.commit()
 
 
-def main():
+def main() -> None:
     '''Main entrypoint.'''
     parser = argparse.ArgumentParser(
         description='Aggregate user feedback.')
@@ -422,6 +571,13 @@ def main():
     dbconn = lib.db.connect(args)
     warnings.filterwarnings('ignore', category=dbconn.Warning)
     try:
+        try:
+            aggregate_reviewers_feedback(dbconn)
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to calculate problem quality seal and category.')
+            raise
+
         try:
             aggregate_feedback(dbconn)
         except:  # noqa: bare-except

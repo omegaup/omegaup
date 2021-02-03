@@ -1,47 +1,43 @@
 <?php
 
-/**
- * Description of UpdateClarificationTest
- *
- * @author joemmanuel
- */
-
-class UpdateClarificationTest extends OmegaupTestCase {
+class ClarificationUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for answer
-     *
      */
     public function testUpdateAnswer() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant who will submit the clarification
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create clarification
         $this->detourBroadcasterCalls($this->exactly(2));
-        $clarificationData = ClarificationsFactory::createClarification(
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
             $contestData,
-            $contestant
+            $identity
         );
 
         // Update answer
         $newAnswer = 'new answer';
-        $response = ClarificationsFactory::answer(
+        $response = \OmegaUp\Test\Factories\Clarification::answer(
             $clarificationData,
             $contestData,
             $newAnswer
         );
 
         // Get clarification from DB
-        $clarification = ClarificationsDAO::getByPK(
+        $clarification = \OmegaUp\DAO\Clarifications::getByPK(
             $clarificationData['response']['clarification_id']
         );
 

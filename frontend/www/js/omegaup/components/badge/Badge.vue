@@ -1,39 +1,22 @@
 <template>
-  <figure class="badge-container"
-          v-tooltip="description">
-    <a class="badge-icon"
-            v-bind:href="`/badge/${this.badge.badge_alias}/`"><img v-bind:src="this.iconUrl"></a>
+  <figure v-tooltip="description" class="col-md-3 col-sm-3 badge-container">
+    <a class="badge-icon" :href="`/badge/${badge.badge_alias}/`"
+      ><img
+        :class="{ 'badge-gray': !badge.unlocked }"
+        :src="iconUrl"
+        class="img-fluid"
+    /></a>
+
     <figcaption class="badge-name">
-      {{ this.name }}
+      {{ name }}
     </figcaption>
   </figure>
 </template>
 
-<style>
-.badge-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-.badge-icon {
-  display: block;
-  height: 70%;
-  width: 100%;
-}
-.badge-icon img {
-  max-height: 100%;
-}
-.badge-name {
-  padding-top: 5px;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import omegaup from '../../api.js';
+import { types } from '../../api_types';
+import T from '../../lang';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
 
@@ -43,23 +26,43 @@ import { VTooltip } from 'v-tooltip';
   },
 })
 export default class Badge extends Vue {
-  @Prop() badge!: omegaup.Badge;
-
-  T = T;
+  @Prop() badge!: types.Badge;
 
   get name(): string {
-    return this.T[`badge_${this.badge.badge_alias}_name`];
+    return T[`badge_${this.badge.badge_alias}_name`];
   }
 
   get description(): string {
-    return this.T[`badge_${this.badge.badge_alias}_description`];
+    return T[`badge_${this.badge.badge_alias}_description`];
   }
 
   get iconUrl(): string {
-    return this.badge.unlocked
-      ? `/media/dist/badges/${this.badge.badge_alias}.svg`
-      : '/media/locked_badge.svg';
+    return `/media/dist/badges/${this.badge.badge_alias}.svg`;
   }
 }
-
 </script>
+
+<style>
+.badge-container {
+  align-items: center;
+  text-align: center;
+}
+
+img {
+  max-height: 10rem !important;
+}
+
+.badge-icon {
+  display: block;
+  width: 100%;
+}
+.badge-icon img {
+  max-height: 100%;
+}
+.badge-name {
+  padding-top: 0.5rem;
+}
+.badge-gray {
+  filter: grayscale(100%);
+}
+</style>

@@ -24,7 +24,7 @@
 					<div class="form-group">
 						<label for="birth_date" class="col-md-4 control-label">{#userEditBirthDate#}</label>
 						<div class="col-md-7">
-							<input id='birth_date' name='birth_date' value='' type='text' size ='10' class="form-control">
+							<input id='birth_date' name='birth_date' value='' readonly type='text' size ='10' class="form-control">
 						</div>
 					</div>
 
@@ -107,10 +107,10 @@
 							<option value=""></option>
 							{foreach from=$PROGRAMMING_LANGUAGES key=extension item=name}
 							<option value="{$extension}">
-								{if $extension != 'cat'}
-									{$name}
-								{else}
+								{if $extension == 'cat'}
 									{#outputOnly#}
+								{else}
+									{$name}
 								{/if}
 							</option>
 							{/foreach}
@@ -121,7 +121,7 @@
 					<div class="form-group">
 						<label for="graduation_date" class="col-md-4 control-label">{#userEditGraduationDate#}</label>
 						<div class="col-md-7">
-							<input id='graduation_date' name='graduation_date' value='' type='text' size ='10' class="form-control">
+							<input id='graduation_date' name='graduation_date' readonly value='' type='text' size ='10' class="form-control">
 						</div>
 					</div>
 
@@ -157,7 +157,7 @@
 		</div>
 {if !empty($ENABLED_EXPERIMENTS) && in_array('identities', $ENABLED_EXPERIMENTS)}
 		<div id="manage-identities"></div>
-		<script type="text/javascript" src="{version_hash src="/js/dist/user_manage_identities.js"}"></script>
+		{js_include entrypoint="user_manage_identities"}
 {/if}
 		{block name="basic-content"}
 		<div class="panel panel-default">
@@ -195,5 +195,8 @@
 		{/block}
 	</div>
 
-	<script type="text/javascript" src="{version_hash src="/js/user.edit.js"}"></script>
+	<!-- Bootstrap datepicker plugin from http://www.eyecon.ro/bootstrap-datepicker/ -->
+	<link rel="stylesheet" href="/third_party/css/bootstrap-datepicker.css">
+	<script type="text/javascript" src="{version_hash src="/third_party/js/bootstrap-datepicker.js"}" defer></script>
+	<script type="text/javascript" src="{version_hash src="/js/user.edit.js"}" defer></script>
 {/block}

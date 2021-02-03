@@ -1,6 +1,5 @@
 # Ignore objects
 *.o
-bin/mysql-connector-java-5.1.29.jar
 
 # Ignore temporary files
 *~
@@ -8,6 +7,7 @@ bin/mysql-connector-java-5.1.29.jar
 *.swo
 *.pyc
 .pytest_cache/
+.mypy_cache/
 .cache
 tags
 nohup.out
@@ -15,9 +15,6 @@ tags
 
 # Ignore classes
 *.class
-
-# Ignore configuration files
-*.conf
 
 # IDE-related stuff
 build.xml
@@ -31,7 +28,6 @@ grader/lib/
 *.jks
 *.crt
 *.key
-*.pem
 *.srl
 
 # ignore frontend config file
@@ -41,21 +37,14 @@ frontend/server/api/tests/config.php
 test_config.php
 
 # and log
-omegaup.log
-frontend/log/omegaup.log
 yarn-error.log
 
 #ignore crated-by-test stuff
-frontend/server/api/tests/problems/
-frontend/server/api/tests/submissions/
-frontend/tests/controllers/gitserver.config.json
-frontend/tests/controllers/gitserver.log
-frontend/tests/controllers/gitserver.pid
-frontend/tests/controllers/grade/
-frontend/tests/controllers/img/
-frontend/tests/controllers/templates/
+frontend/tests/runfiles/
 frontend/tests/ui/results/
-omegaup_test.log
+.nyc_output/
+coverage.xml
+coverage/
 
 # Ignore runtime and test stuff
 test-env
@@ -65,6 +54,7 @@ bin/grader.sh
 frontend/www/runner-distrib.sh
 geckodriver.log
 yarn-error.log
+.phpunit.result.cache
 
 # Ignore Mac crap :P
 frontend/.DS_Store
@@ -74,10 +64,11 @@ frontend/.DS_Store
 frontend/www/apc.php
 frontend/www/coverage/
 frontend/www/img/
-frontend/www/js/google-analytics.js
-frontend/www/pmamini.php
 frontend/www/phpminiadmin/
+frontend/www/pmamini.php
 frontend/www/templates/
+frontend/www/probleminput/
+frontend/www/tests/index.html
 
 # Ignore sublime sftp config
 sftp-config.json
@@ -103,6 +94,15 @@ frontend/www/media/dist/
 # Ignore C++ / Pascal docs
 frontend/www/docs/cpp
 frontend/www/docs/pas
+frontend/www/docs/java
 
 # Ignore VS Code json
 .vscode/*
+.save
+
+# Ignore omegaup.db
+omegaup.db
+.my.cnf
+
+# Ignore backend stuff
+stuff/docker/go/*/

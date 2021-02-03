@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  SVG por defecto para los Badges
+  Este archivo servirá como referencia para personalizar badges a criterio de los contribuidores.
+
+  Este archivo puede ser modificado usando una herramienta de diseño (Adobe Illustrator, Potoshop,
+  Inkscape, etc), o también se puede modificar directamente desde el código (cosas simples como
+  el cambio de colores).
+
+  Las restricciones que todo Badge SVG deberá respetar:
+  - Ancho (width)  = Alto (height) = 600px (SIEMPRE).
+  - Tamaño de archivo de 15KB como máximo.
+-->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg2"
+   x="0px"
+   y="0px"
+   viewBox="0 0 497.99121 600.11328"
+   xml:space="preserve"
+   height="600.11328"
+   width="497.99121"
+   sodipodi:docname="icon.svg"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"><metadata
+   id="metadata949"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:Work></rdf:RDF></metadata><defs
+   id="defs947"><linearGradient
+     id="linearGradient2984"
+     osb:paint="solid"><stop
+       style="stop-color:#0b0000;stop-opacity:1;"
+       offset="0"
+       id="stop2982" /></linearGradient></defs>
+
+<style
+   type="text/css"
+   id="style915">
+  <!--
+    Estos colores pueden ser personalizados a gusto del contribuidor en caso
+    desee configurar el ícono a partir del código.
+
+    Simplemente se reemplazan (o agregan) los colores con las clases que se encuentran a continuación
+    y se asignan las clases correspondientes en el los trazos.
+  -->
+  .st0{fill:#FFFFFF;} <!-- Color de fondo de la parte superior del badge -->
+  .st1{fill:#5588DD;} <!-- Color para "Up" y fondo de la parte inferior del badge -->
+  .st2{fill:#111111;} <!-- Color de "omega" -->
+  <!-- Colores para el ícono de la laptop -->
+  .st3{fill:#BBBBBB;}
+  .st4{fill:#888888;}
+</style>
+
+<sodipodi:namedview
+   bordercolor="#666666"
+   borderopacity="1.0"
+   id="base"
+   inkscape:current-layer="g944"
+   inkscape:cx="499.82454"
+   inkscape:cy="190.0276"
+   inkscape:document-units="px"
+   inkscape:pageopacity="0.0"
+   inkscape:pageshadow="2"
+   inkscape:window-height="705"
+   inkscape:window-maximized="1"
+   inkscape:window-width="1366"
+   inkscape:window-x="-8"
+   inkscape:window-y="-8"
+   inkscape:zoom="0.42454318"
+   pagecolor="#ffffff"
+   showgrid="false"
+   fit-margin-top="0"
+   fit-margin-left="0"
+   fit-margin-right="0"
+   fit-margin-bottom="0">
+</sodipodi:namedview>
+
+<g
+   id="g944"
+   transform="translate(-51.048266,0.08765367)">
+  <g
+   id="g920">
+    <path
+   d="M 548.8,100.5 C 548.6,92.6 542.9,85.7 535,84.6 498,79.5 461.4,70.7 425.6,57.5 390,44.4 350.5,26.2 308,2.2 c -5.4,-3 -10.5,-3.1 -15.9,0 -42.2,24 -81.4,42.2 -117.3,55.3 -35.8,13.1 -72.3,22 -109.1,27.1 -7.9,1.1 -13.5,7.9 -14.4,15.9 -3.5,150.8 29.5,274.2 98.8,370.2 37.7,52.3 85,94.7 142,127 4.4,3.2 11.3,3 16.5,0 56.6,-32.9 103.8,-75 141.4,-127 69.4,-95.9 102.2,-219.4 98.8,-370.2 z"
+   id="path918"
+   inkscape:connector-curvature="0" />
+  </g>
+
+  <!-- Badge -->
+   <!-- Parte superior -->
+  <g
+   id="g1504"
+   style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1"><path
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1"
+     id="path922"
+     d="M 516.2,114.9 C 481.5,109.3 446.8,99.9 412.4,87.3 378,74.7 340.7,57.3 300.1,35.3 259.5,57.3 221.9,74.7 187.5,87.3 153.1,99.9 118.7,109.4 84,114.9 83.5,169 88.1,219.2 97.6,265.7 h 405.1 c 9.4,-46.4 14,-96.6 13.5,-150.8 z"
+     class="st0"
+     inkscape:connector-curvature="0" /><path
+     sodipodi:nodetypes="cccccc"
+     inkscape:connector-curvature="0"
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1"
+     id="path924"
+     d="m 97.6,265.7 c 14.6,71.2 40.9,133.3 79,186.5 32.5,45.3 73.8,82.9 123.5,113.2 49.7,-30.3 90.8,-68 123.5,-113.2 38.1,-52.7 64.5,-114.9 79.1,-186.5 -3.84581,-84.5728 -396.96671,-102.53668 -405.1,0 z"
+     class="st1" /></g> <!-- Parte inferior -->
+
+  <!-- Logo de omegaUp -->
+  <g
+   id="layer1_2_"
+   transform="translate(-1.5300006,-318.74925)"
+   inkscape:groupmode="layer"
+   inkscape:label="Layer 1">
+    
+    
+    
+    
+    
+    
+    
+  </g>
+
+  <!-- Ícono de laptop -->
+  
+<path
+   sodipodi:type="star"
+   style="opacity:1;fill:#ffbb00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.9000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+   id="path1506"
+   sodipodi:sides="5"
+   sodipodi:cx="301.43338"
+   sodipodi:cy="126.82188"
+   sodipodi:r1="72.313408"
+   sodipodi:r2="36.156704"
+   sodipodi:arg1="0.9240379"
+   sodipodi:arg2="1.5523564"
+   inkscape:flatsided="false"
+   inkscape:rounded="0"
+   inkscape:randomized="0"
+   d="m 345.00963,184.53097 -42.90956,-21.55854 -42.08549,23.12602 7.2436,-47.47138 -34.99928,-32.87935 47.38635,-7.780388 20.45475,-43.446569 22.04278,42.662829 47.64101,6.027898 -33.76317,34.14746 z"
+   inkscape:transform-center-x="0.41203587"
+   inkscape:transform-center-y="-6.5122724" /><path
+   sodipodi:type="star"
+   style="opacity:1;fill:#ffbb00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.9000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+   id="path1506-6"
+   sodipodi:sides="5"
+   sodipodi:cx="427.1951"
+   sodipodi:cy="180.43312"
+   sodipodi:r1="72.313408"
+   sodipodi:r2="36.156704"
+   sodipodi:arg1="0.9240379"
+   sodipodi:arg2="1.5523564"
+   inkscape:flatsided="false"
+   inkscape:rounded="0"
+   inkscape:randomized="0"
+   d="m 470.77135,238.14221 -42.90956,-21.55853 -42.0855,23.12601 7.2436,-47.47137 -34.99927,-32.87936 47.38635,-7.78038 20.45475,-43.44657 22.04278,42.66283 47.64101,6.02789 -33.76317,34.14747 z"
+   inkscape:transform-center-x="0.41203587"
+   inkscape:transform-center-y="-6.5122724" /><path
+   sodipodi:type="star"
+   style="opacity:1;fill:#ffbb00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.9000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+   id="path1506-5"
+   sodipodi:sides="5"
+   sodipodi:cx="174.90778"
+   sodipodi:cy="184.23747"
+   sodipodi:r1="72.313408"
+   sodipodi:r2="36.156704"
+   sodipodi:arg1="0.9240379"
+   sodipodi:arg2="1.5523564"
+   inkscape:flatsided="false"
+   inkscape:rounded="0"
+   inkscape:randomized="0"
+   d="m 218.48403,241.94656 -42.90956,-21.55853 -42.0855,23.12601 7.2436,-47.47137 -34.99928,-32.87935 47.38636,-7.78039 20.45475,-43.44657 22.04278,42.66283 47.64101,6.02789 -33.76317,34.14747 z"
+   inkscape:transform-center-x="0.41203587"
+   inkscape:transform-center-y="-6.5122724" /><path
+   style="fill:#980065;stroke-width:0.3781575"
+   d="m 275.47504,380.69819 c -2.95393,-0.97737 -5.16683,-2.33794 -7.26657,-4.46776 -1.67835,-1.7024 -4.08888,-5.95982 -4.58237,-8.0932 -0.21584,-0.93314 -0.11034,-1.0075 2.35178,-1.65703 1.41776,-0.37402 2.73358,-0.70015 2.92403,-0.72473 0.19046,-0.0245 0.46013,0.47599 0.5993,1.11234 0.75044,3.43176 3.47512,6.75676 6.70915,8.18731 2.50994,1.11026 6.65497,1.01958 9.32777,-0.20407 2.38141,-1.09023 4.67649,-3.25245 5.70126,-5.37121 1.01307,-2.09458 1.21509,-6.18298 0.40973,-8.29178 -0.87998,-2.30424 -3.67025,-4.76286 -7.43697,-6.55304 -1.74753,-0.83053 -4.79395,-2.26862 -6.76983,-3.19575 -7.97154,-3.74044 -10.96655,-7.4944 -10.96655,-13.74549 0,-3.70262 1.0181,-6.36052 3.45971,-9.03203 6.53303,-7.14817 18.71817,-6.60956 24.527,1.08417 0.83026,1.09969 1.50958,2.08751 1.50958,2.19514 0,0.29068 -4.08549,2.9499 -4.53207,2.9499 -0.21119,0 -0.38399,-0.14621 -0.38399,-0.32491 0,-0.88373 -3.17637,-3.8067 -4.9798,-4.58251 -2.79136,-1.2008 -6.99806,-0.97407 -9.53736,0.51406 -4.27858,2.50741 -5.56278,7.95735 -2.75085,11.67411 1.24457,1.64504 3.14754,2.72782 13.32174,7.57993 5.65113,2.69503 8.80464,5.58087 10.23898,9.36991 0.90051,2.37882 0.91052,7.88577 0.0191,10.44148 -1.68975,4.8439 -5.62797,8.91252 -10.38641,10.73035 -3.08845,1.17986 -8.57988,1.37306 -11.50623,0.40481 z m 56.80014,0.14343 c -8.60971,-1.93172 -16.22742,-7.76257 -20.05981,-15.35447 -2.32369,-4.60324 -2.81872,-6.85518 -2.81872,-12.82279 0,-4.73983 0.11977,-5.84219 0.88382,-8.13038 3.36509,-10.07845 10.93852,-17.36223 20.88211,-20.08344 3.35284,-0.91755 10.62056,-0.93962 13.96996,-0.0424 2.6871,0.7198 7.22144,2.81181 8.82013,4.06937 0.97036,0.76326 1.01196,0.94373 1.01196,4.39036 v 3.59438 l -1.97475,-1.72748 c -3.95458,-3.45936 -9.60111,-5.5002 -15.24651,-5.51058 -6.33036,-0.0114 -10.95417,1.98274 -15.6793,6.76292 -4.93704,4.99458 -6.95225,9.76727 -6.96191,16.48818 -0.0158,10.87139 7.28134,20.27373 17.73136,22.84725 2.40743,0.59288 7.79862,0.59637 10.22803,0.007 2.83402,-0.68796 6.90267,-2.67477 9.44505,-4.61221 l 2.26894,-1.72908 0.10934,3.41413 c 0.0933,2.91707 0.0114,3.48878 -0.56725,3.927 -1.47207,1.11599 -5.73069,3.15334 -8.23966,3.94191 -3.44832,1.08383 -10.26043,1.36549 -13.80275,0.57071 z M 161.72614,343.93187 v -36.71618 l 10.68295,0.16433 c 11.49405,0.17682 12.84303,0.36718 17.23566,2.43219 2.64929,1.24546 6.78589,5.27207 8.09004,7.87494 1.8762,3.74459 2.36319,5.80921 2.36319,10.01886 0,5.9441 -1.88238,10.698 -5.77894,14.59456 -4.16778,4.16777 -9.56506,5.82594 -18.96329,5.82594 h -5.6883 v 16.26077 16.26077 h -3.97066 -3.97065 z M 180.55331,340.55 c 7.44941,-1.20887 11.19641,-4.88502 11.6947,-11.47355 0.43061,-5.69368 -1.33509,-9.92441 -5.00631,-11.99537 -2.82721,-1.59485 -5.83268,-2.21765 -11.99644,-2.48592 l -5.57781,-0.24276 v 13.29456 13.29455 l 4.25426,-0.003 c 2.33985,-0.002 5.32407,-0.17647 6.6316,-0.38866 z m 36.3505,11.18337 c 7.00475,-15.90309 12.82365,-29.00245 12.93092,-29.10972 0.10719,-0.10719 5.82703,12.90435 12.71062,28.9147 l 12.51562,29.1097 h -3.28518 -3.28519 l -3.36759,-8.13038 -3.36758,-8.13039 -12.12553,0.003 -12.12553,0.003 -3.40342,8.12246 -3.40342,8.12245 -3.2648,0.004 -3.26481,0.004 z m 22.35052,7.07608 c 0.0114,-0.54207 -9.23906,-22.40583 -9.47969,-22.40583 -0.17751,0 -8.11736,18.17153 -9.70737,22.21675 -0.1457,0.37069 1.90391,0.4727 9.49768,0.4727 5.32591,0 9.68614,-0.12763 9.68938,-0.28362 z m 125.98358,21.49585 c 1.25161,-3.40322 25.53714,-57.77971 25.72153,-57.5918 0.18753,0.19106 23.13934,53.4204 24.78345,57.47726 0.15457,0.38135 -0.52756,0.46405 -3.11945,0.37815 l -3.31727,-0.10991 -3.28241,-7.94131 -3.28244,-7.94131 h -12.17554 -12.17552 l -3.43138,8.03586 -3.43138,8.03584 h -3.20782 c -1.7643,0 -3.15109,-0.15423 -3.08177,-0.34275 z m 35.10563,-21.3071 c 0,-0.5969 -9.38316,-22.28549 -9.64144,-22.28558 -0.32921,-1.1e-4 -9.6446,21.28345 -9.6446,22.03578 0,0.19844 4.09105,0.34467 9.64302,0.34467 5.30365,0 9.64302,-0.0428 9.64302,-0.0949 z m 26.47102,-6.52289 v -28.17272 h 3.02525 3.02527 v 25.33655 25.33655 h 7.75223 7.75223 v 2.83619 2.83617 h -10.77749 -10.77749 z"
+   id="path60"
+   inkscape:connector-curvature="0"
+   sodipodi:nodetypes="cccccccccccsssssssscsscccccccscsccscscscccscccsccccsccssscccccccccccccccccsscccccccccccccscsccccccccccccsccccssccccccccccccccc" /></g>
+</svg>

@@ -1,19 +1,9 @@
 <?php
-require_once('../../server/bootstrap_smarty.php');
+namespace OmegaUp;
+require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
-try {
-    $session = SessionController::apiCurrentSession(
-        new Request($_REQUEST)
-    )['session'];
-    $smartyProperties = ProblemController::getProblemDetailsForSmarty(
-        new Request($_REQUEST)
-    );
-} catch (Exception $e) {
-    ApiCaller::handleException($e);
-}
-
-foreach ($smartyProperties as $key => $value) {
-    $smarty->assign($key, $value);
-}
-
-$smarty->display('../../templates/arena.problem.tpl');
+\OmegaUp\UITools::render(
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $r
+    )
+);

@@ -1,0 +1,25 @@
+codecov:
+  require_ci_to_pass: yes
+  strict_yaml_branch: master
+
+coverage:
+  status:
+    project:
+      php:
+        flags:
+          - php
+      javascript:
+        flags:
+          - javascript
+
+flags:
+  php:
+    paths:
+      - frontend/server
+  javascript:
+    paths:
+      - frontend/www
+
+ignore:
+  - frontend/www/third_party
+  - frontend/server/*.php

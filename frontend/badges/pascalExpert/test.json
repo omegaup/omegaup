@@ -1,0 +1,443 @@
+{
+    "testType": "apicall",
+    "actions": [
+        {
+            "type": "apicalls",
+            "apicalls": [
+                {
+                    "username": "admintest",
+                    "password": "testtesttest",
+                    "requests": [
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "Sumas",
+                                "problem_alias": "sumas",
+                                "validator": "token-numeric",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/testproblem.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "Sumas_2",
+                                "problem_alias": "sumas_2",
+                                "validator": "token-numeric",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/testproblem.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "Sumas_3",
+                                "problem_alias": "sumas_3",
+                                "validator": "token-numeric",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/testproblem.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "Sumas_4",
+                                "problem_alias": "sumas_4",
+                                "validator": "token-numeric",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/testproblem.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "Sumas_5",
+                                "problem_alias": "sumas_5",
+                                "validator": "token-numeric",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/testproblem.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "Sumas_6",
+                                "problem_alias": "sumas_6",
+                                "validator": "token-numeric",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/testproblem.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "Sumas_7",
+                                "problem_alias": "sumas_7",
+                                "validator": "token-numeric",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/testproblem.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "Sumas_8",
+                                "problem_alias": "sumas_8",
+                                "validator": "token-numeric",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/testproblem.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "Sumas_9",
+                                "problem_alias": "sumas_9",
+                                "validator": "token-numeric",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/testproblem.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "Sumas_10",
+                                "problem_alias": "sumas_10",
+                                "validator": "token-numeric",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/testproblem.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "Sumas_11",
+                                "problem_alias": "sumas_11",
+                                "validator": "token-numeric",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/testproblem.zip"
+                            }
+                        },                    
+                        {
+                            "api": "\\OmegaUp\\Controllers\\User::apiCreate",
+                            "params": {
+                                "username": "test_user_0",
+                                "email": "user_0@domain.com",
+                                "password": "test_user_0"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\User::apiCreate",
+                            "params": {
+                                "username": "test_user_1",
+                                "email": "user_1@domain.com",
+                                "password": "test_user_1"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "username": "test_user_1",
+                    "password": "test_user_1",
+                    "requests": [
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas",
+                                "language": "pas",
+                                "source": "Program Main (input,output);uses crt; Var num1, num2, total: Integer;Begin read(num1);read(num2);total:= num1+num2;writeln(total);End."
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas_2",
+                                "language": "pas",
+                                "source": "Program Main (input,output);uses crt; Var num1, num2, total: Integer;Begin read(num1);read(num2);total:= num1+num2;writeln(total);End."
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas_3",
+                                "language": "pas",
+                                "source": "Program Main (input,output);uses crt; Var num1, num2, total: Integer;Begin read(num1);read(num2);total:= num1+num2;writeln(total);End."
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas_4",
+                                "language": "pas",
+                                "source": "Program Main (input,output);uses crt; Var num1, num2, total: Integer;Begin read(num1);read(num2);total:= num1+num2;writeln(total);End."
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas_5",
+                                "language": "pas",
+                                "source": "Program Main (input,output);uses crt; Var num1, num2, total: Integer;Begin read(num1);read(num2);total:= num1+num2;writeln(total);End."
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas_6",
+                                "language": "pas",
+                                "source": "Program Main (input,output);uses crt; Var num1, num2, total: Integer;Begin read(num1);read(num2);total:= num1+num2;writeln(total);End."
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas_7",
+                                "language": "pas",
+                                "source": "Program Main (input,output);uses crt; Var num1, num2, total: Integer;Begin read(num1);read(num2);total:= num1+num2;writeln(total);End."
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas_8",
+                                "language": "pas",
+                                "source": "Program Main (input,output);uses crt; Var num1, num2, total: Integer;Begin read(num1);read(num2);total:= num1+num2;writeln(total);End."
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas_9",
+                                "language": "pas",
+                                "source": "Program Main (input,output);uses crt; Var num1, num2, total: Integer;Begin read(num1);read(num2);total:= num1+num2;writeln(total);End."
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas_10",
+                                "language": "pas",
+                                "source": "Program Main (input,output);uses crt; Var num1, num2, total: Integer;Begin read(num1);read(num2);total:= num1+num2;writeln(total);End."
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas_11",
+                                "language": "pas",
+                                "source": "Program Main (input,output);uses crt; Var num1, num2, total: Integer;Begin read(num1);read(num2);total:= num1+num2;writeln(total);End."
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "username": "test_user_0",
+                    "password": "test_user_0",
+                    "requests": [
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "sumas",
+                                "language": "pas",
+                                "source": "Program Main (input,output);uses crt; Var num1, num2, total: Integer;Begin read(num1);read(num2);total:= num1+num2;writeln(total);End."
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "expectedResults": [
+        "test_user_1"
+    ]
+}

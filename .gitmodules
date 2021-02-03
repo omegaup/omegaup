@@ -48,3 +48,6 @@
 [submodule "paragonie/sodium_compat"]
 	path = frontend/server/libs/third_party/sodium_compat
 	url = https://github.com/paragonie/sodium_compat.git
+[submodule "endclothing/prometheus_client_php"]
+	path = frontend/server/libs/third_party/prometheus_client_php
+	url = https://github.com/endclothing/prometheus_client_php

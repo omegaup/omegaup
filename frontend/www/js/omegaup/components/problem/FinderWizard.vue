@@ -2,52 +2,169 @@
   <transition name="modal">
     <div class="modal-mask">
       <div class="modal-container">
-        <button class="close"
-             v-on:click="$emit('close')">❌</button> <form-wizard color="#678DD7"
-             v-bind:back-button-text="T.wordsBack"
-             v-bind:finish-button-text="T.wordsConfirm"
-             v-bind:next-button-text="T.wordsNext"
-             v-bind:subtitle="T.wizardDescription"
-             v-bind:title="T.wizardTitle"
-             v-on:on-complete="searchProblems"><tab-content v-bind:title=
-             "T.wizardStepOne"><toggle-button v-bind:color=
-             "{checked: '#678DD7', unchecked: '#343a40'}"
-                       v-bind:font-size="12"
-                       v-bind:height="35"
-                       v-bind:labels=
-                       "{checked: `${T.wordsKarel}`, unchecked: `${T.wordsAnyLanguage}`}"
-                       v-bind:value="karel"
-                       v-bind:width="160"
-                       v-model="karel"></toggle-button> <tags-input element-id="tags"
-                    v-bind:existing-tags="tagsObject"
-                    v-bind:only-existing-tags="true"
-                    v-bind:placeholder="T.wordsAddTag"
-                    v-bind:typeahead="true"
-                    v-model="selectedTags"></tags-input></tab-content> <tab-content v-bind:title=
-                    "T.wizardStepTwo"><vue-slider tooltip="none"
-                    v-bind:adsorb="true"
-                    v-bind:dot-size="18"
-                    v-bind:enable-cross="false"
-                    v-bind:included="true"
-                    v-bind:marks="sliderMarks"
-                    v-bind:max="4"
-                    v-bind:min="0"
-                    v-model="difficultyRange"></vue-slider></tab-content> <tab-content v-bind:title=
-                    "T.wizardStepThree">
-          <div class="tab-select">
-            <label class="tab-select-el"
-                 v-bind:class="{ 'tab-select-el-active': priority.type === selectedPriority }"
-                 v-for="priority in priorities">{{ priority.text }} <input class="hidden-radio"
-                   name="priority"
-                   type="radio"
-                   v-bind:value="priority.type"
-                   v-model="selectedPriority"></label>
-          </div>
-        </tab-content></form-wizard>
+        <button class="close" @click="$emit('close')">❌</button>
+        <form-wizard
+          color="#678DD7"
+          :back-button-text="T.wordsBack"
+          :finish-button-text="T.wordsConfirm"
+          :next-button-text="T.wordsNext"
+          :subtitle="T.wizardDescription"
+          :title="T.wizardTitle"
+          @on-complete="searchProblems"
+          ><tab-content :title="T.wizardStepOne"
+            ><toggle-button
+              v-model="karel"
+              :color="{ checked: '#678DD7', unchecked: '#343a40' }"
+              :font-size="12"
+              :height="35"
+              :labels="{
+                checked: `${T.wordsKarel}`,
+                unchecked: `${T.wordsAnyLanguage}`,
+              }"
+              :value="karel"
+              :width="160"
+            ></toggle-button>
+            <tags-input
+              v-model="selectedTags"
+              element-id="tags"
+              :existing-tags="tagObjects"
+              :only-existing-tags="true"
+              :placeholder="T.wordsAddTag"
+              :typeahead="true"
+            ></tags-input
+          ></tab-content>
+          <tab-content :title="T.wizardStepTwo"
+            ><vue-slider
+              v-model="difficultyRange"
+              tooltip="none"
+              :adsorb="true"
+              :dot-size="18"
+              :enable-cross="false"
+              :included="true"
+              :marks="SLIDER_MARKS"
+              :max="4"
+              :min="0"
+            ></vue-slider
+          ></tab-content>
+          <tab-content :title="T.wizardStepThree">
+            <div class="tab-select">
+              <label
+                v-for="priority in PRIORITIES"
+                class="tab-select-el"
+                :class="{
+                  'tab-select-el-active': priority.type === selectedPriority,
+                }"
+                >{{ priority.text }}
+                <input
+                  v-model="selectedPriority"
+                  class="hidden-radio"
+                  name="priority"
+                  type="radio"
+                  :value="priority.type"
+              /></label>
+            </div> </tab-content
+        ></form-wizard>
       </div>
     </div>
   </transition>
 </template>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
+// https://binarcode.github.io/vue-form-wizard/
+import { FormWizard, TabContent } from 'vue-form-wizard';
+import 'vue-form-wizard/dist/vue-form-wizard.min.css';
+// https://www.npmjs.com/package/vue-js-toggle-button
+import { ToggleButton } from 'vue-js-toggle-button';
+// https://github.com/voerro/vue-tagsinput
+import VoerroTagsInput from '@voerro/vue-tagsinput';
+import '@voerro/vue-tagsinput/dist/style.css';
+// https://nightcatsama.github.io/vue-slider-component/
+import VueSlider from 'vue-slider-component';
+import 'vue-slider-component/theme/default.css';
+
+interface Priority {
+  type: string;
+  text: string;
+}
+
+interface TagObject {
+  key: string;
+  value: string;
+}
+
+@Component({
+  components: {
+    FormWizard,
+    TabContent,
+    ToggleButton,
+    'tags-input': VoerroTagsInput,
+    VueSlider,
+  },
+})
+export default class ProblemFinderWizard extends Vue {
+  @Prop() possibleTags!: { name: string }[];
+
+  T = T;
+  karel = false;
+  selectedTags: TagObject[] = [];
+  difficultyRange = [0, 4];
+  SLIDER_MARKS: { [key: string]: string } = {
+    '0': T.qualityFormDifficultyVeryEasy,
+    '1': T.qualityFormDifficultyEasy,
+    '2': T.qualityFormDifficultyMedium,
+    '3': T.qualityFormDifficultyHard,
+    '4': T.qualityFormDifficultyVeryHard,
+  };
+  selectedPriority = 'quality';
+  PRIORITIES: Priority[] = [
+    {
+      type: 'quality',
+      text: T.wordsQuality,
+    },
+    {
+      type: 'points',
+      text: T.wordsPointsForRank,
+    },
+    {
+      type: 'submissions',
+      text: T.wizardPriorityPopularity,
+    },
+  ];
+
+  get tagObjects(): TagObject[] {
+    const tagObjects: TagObject[] = [];
+    this.possibleTags.forEach((tagObject) => {
+      tagObjects.push({
+        key: tagObject.name,
+        value: Object.prototype.hasOwnProperty.call(T, tagObject.name)
+          ? T[tagObject.name]
+          : tagObject.name,
+      });
+    });
+    return tagObjects;
+  }
+
+  searchProblems(): void {
+    // Build query parameters
+    let queryParameters: omegaup.QueryParameters = {
+      some_tags: true,
+      difficulty_range: `${this.difficultyRange[0].toString()},${this.difficultyRange[1].toString()}`,
+      order_by: this.selectedPriority,
+      sort_order: 'desc',
+    };
+    if (this.karel) {
+      queryParameters.only_karel = true;
+    }
+    if (this.selectedTags.length > 0) {
+      queryParameters.tag = this.selectedTags.map((tag) => tag.key);
+    }
+    this.$emit('search-problems', queryParameters);
+  }
+}
+</script>
 
 <style>
 .modal-mask {
@@ -57,8 +174,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, .5);
-  transition: opacity .3s ease;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: opacity 0.3s ease;
 }
 
 .modal-container {
@@ -86,7 +203,7 @@
 }
 
 .tags-input input {
-    padding-left: .25em;
+  padding-left: 0.25em;
 }
 
 .tags-input-remove {
@@ -99,13 +216,14 @@
 }
 
 .typeahead-badges {
-  margin-top: .35em;
+  margin-top: 0.35em;
 }
 
-.tags-input-remove:before, .tags-input-remove:after,
+.tags-input-remove:before,
+.tags-input-remove:after,
 .tags-input-typeahead-item-highlighted-default,
 .vue-slider-process {
-  background-color: #678DD7;
+  background-color: #678dd7;
 }
 
 .vue-slider {
@@ -125,106 +243,20 @@
 .tab-select-el {
   display: block;
   cursor: pointer;
-  padding: .25em 1em;
-  border: 1px solid #678DD7;
+  padding: 0.25em 1em;
+  border: 1px solid #678dd7;
   flex: 1;
   text-align: center;
-  color: #678DD7;
+  color: #678dd7;
 }
 
 .tab-select-el:hover,
 .tab-select-el-active {
-  color: #FFF;
-  background: #678DD7;
+  color: #fff;
+  background: #678dd7;
 }
 
 .hidden-radio {
   display: none;
 }
 </style>
-
-<script>
-// https://binarcode.github.io/vue-form-wizard/
-import {FormWizard, TabContent} from 'vue-form-wizard';
-import 'vue-form-wizard/dist/vue-form-wizard.min.css';
-// https://www.npmjs.com/package/vue-js-toggle-button
-import {ToggleButton} from 'vue-js-toggle-button';
-// https://github.com/voerro/vue-tagsinput
-import VoerroTagsInput from '@voerro/vue-tagsinput';
-import '@voerro/vue-tagsinput/dist/style.css';
-// https://nightcatsama.github.io/vue-slider-component/
-import VueSlider from 'vue-slider-component';
-import 'vue-slider-component/theme/default.css';
-
-import {OmegaUp, T, API} from '../../omegaup.js';
-
-export default {
-  props: {
-    possibleTags: Array,
-  },
-  data: function() {
-    return {
-      T, karel: false, selectedTags:[], difficultyRange:[0, 4],
-          sliderMarks:
-              {
-                '0': T.qualityFormDifficultyVeryEasy,
-                '1': T.qualityFormDifficultyEasy,
-                '2': T.qualityFormDifficultyMedium,
-                '3': T.qualityFormDifficultyHard,
-                '4': T.qualityFormDifficultyVeryHard,
-              },
-          selectedPriority: 'quality', priorities:[
-            {
-              type: 'quality',
-              text: T.wordsQuality,
-            },
-            {
-              type: 'points',
-              text: T.wordsPointsForRank,
-            },
-            {
-              type: 'submissions',
-              text: T.wizardPriorityPopularity,
-            },
-          ],
-    }
-  },
-  computed: {
-    tagsObject: function() {
-      const self = this;
-      const singleTagsObject = {};
-      self.possibleTags.forEach(tagObject => singleTagsObject[tagObject.name] =
-                                    tagObject.name);
-      return singleTagsObject;
-    },
-  },
-  methods: {
-    searchProblems: function() {
-      const self = this;
-      // Build query parameters
-      let queryParameters = {
-        'some_tags': 'true',
-        'min_difficulty': self.difficultyRange[0],
-        'max_difficulty': self.difficultyRange[1],
-        'order_by': self.selectedPriority,
-        'mode': 'desc'
-      };
-      if (self.karel) {
-        queryParameters['only_karel'] = 'true';
-      }
-      if (self.selectedTags.length > 0) {
-        queryParameters.tag = self.selectedTags;
-      }
-      self.$emit('search-problems', queryParameters);
-    },
-  },
-  components: {
-    FormWizard,
-    TabContent,
-    ToggleButton,
-    "tags-input": VoerroTagsInput,
-    VueSlider,
-  },
-}
-
-</script>

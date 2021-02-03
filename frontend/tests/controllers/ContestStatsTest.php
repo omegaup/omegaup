@@ -5,74 +5,116 @@
  *
  * @author joemmanuel
  */
-class ContestStatsTest extends OmegaupTestCase {
+class ContestStatsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Check stats are ok for WA, AC, PA and total counts
      * Also validates the max wait time guid
      */
     public function testGetStats() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Create a run that we will wait to grade it
-        $maxWaitRunData = RunsFactory::createRun($problemData, $contestData, $contestant);
-        Time::setTimeForTesting(Time::get() + 60);
+        $maxWaitRunData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
 
         // Create some runs to be pending
         $pendingRunsCount = 10;
         $pendingRunsData = [];
         for ($i = 0; $i < $pendingRunsCount; $i++) {
-            $pendingRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
-            Time::setTimeForTesting(Time::get() + 60);
+            $pendingRunsData[$i] = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $identity
+            );
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
         $ACRunsCount = 7;
         $ACRunsData = [];
         for ($i = 0; $i < $ACRunsCount; $i++) {
-            $ACRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
+            $ACRunsData[$i] = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $identity
+            );
 
             // Grade the run
-            RunsFactory::gradeRun($ACRunsData[$i]);
-            Time::setTimeForTesting(Time::get() + 60);
+            \OmegaUp\Test\Factories\Run::gradeRun($ACRunsData[$i]);
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
         $WARunsCount = 5;
         $WARunsData = [];
         for ($i = 0; $i < $WARunsCount; $i++) {
-            $WARunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
+            $WARunsData[$i] = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $identity
+            );
 
             // Grade the run with WA
-            RunsFactory::gradeRun($WARunsData[$i], 0, 'WA');
-            Time::setTimeForTesting(Time::get() + 60);
+            \OmegaUp\Test\Factories\Run::gradeRun($WARunsData[$i], 0, 'WA');
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
         // Create request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);
 
         // Call API
-        $response = ContestController::apiStats($r);
+        $response = \OmegaUp\Controllers\Contest::apiStats($r);
 
         // Check number of pending runs
-        $this->assertEquals(count($pendingRunsData) + 1 /* max wait run */, count($response['pending_runs']));
-        $this->assertEquals(count($ACRunsData), ($response['verdict_counts']['AC']));
-        $this->assertEquals(count($WARunsData), ($response['verdict_counts']['WA']));
+        $this->assertEquals(
+            count(
+                $pendingRunsData
+            ) + 1 /* max wait run */,
+            count(
+                $response['pending_runs']
+            )
+        );
+        $this->assertEquals(
+            count(
+                $ACRunsData
+            ),
+            ($response['verdict_counts']['AC'])
+        );
+        $this->assertEquals(
+            count(
+                $WARunsData
+            ),
+            ($response['verdict_counts']['WA'])
+        );
 
-        $this->assertEquals($maxWaitRunData['response']['guid'], $response['max_wait_time_guid']);
+        $this->assertEquals(
+            $maxWaitRunData['response']['guid'],
+            $response['max_wait_time_guid']
+        );
 
-        $this->assertEquals($pendingRunsCount + $ACRunsCount + $WARunsCount + 1, $response['total_runs']);
+        $this->assertEquals(
+            $pendingRunsCount + $ACRunsCount + $WARunsCount + 1,
+            $response['total_runs']
+        );
         $this->assertEquals(1, $response['distribution'][100]);
     }
 
@@ -81,36 +123,43 @@ class ContestStatsTest extends OmegaupTestCase {
      */
     public function testGetStatsNoWaitTime() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problemData, $contestData);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
 
         // Create our contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $ACRunsCount = 2;
         $ACRunsData = [];
         for ($i = 0; $i < $ACRunsCount; $i++) {
-            $ACRunsData[$i] = RunsFactory::createRun($problemData, $contestData, $contestant);
+            $ACRunsData[$i] = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $identity
+            );
 
             // Grade the run
-            RunsFactory::gradeRun($ACRunsData[$i]);
-            Time::setTimeForTesting(Time::get() + 60);
+            \OmegaUp\Test\Factories\Run::gradeRun($ACRunsData[$i]);
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
         }
 
         // Create request
         $login = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
         ]);
 
         // Call API
-        $response = ContestController::apiStats($r);
+        $response = \OmegaUp\Controllers\Contest::apiStats($r);
 
         // Check number of pending runs
         $this->assertEquals($ACRunsCount, $response['total_runs']);

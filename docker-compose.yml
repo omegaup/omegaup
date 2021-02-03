@@ -1,0 +1,106 @@
+version: '3.3'
+
+services:
+
+  frontend:
+    build:
+      dockerfile: ./Dockerfile.dev-php
+      context: ./stuff/docker/
+    image: omegaup/dev-php:20201122
+    user: "${UID_GID}"
+    restart: always
+    volumes:
+      - type: bind
+        source: .
+        target: /opt/omegaup
+      - 'omegaupdata:/var/lib/omegaup'
+    depends_on:
+      - mysql
+      - gitserver
+      - grader
+    ports:
+      - target: 8001
+        published: 8001
+        protocol: tcp
+        mode: host
+    environment:
+      CI: "${CI:-false}"
+
+  gitserver:
+    build:
+      dockerfile: ./Dockerfile.gitserver
+      context: ./stuff/docker/
+    image: omegaup/dev-gitserver:20200930
+    user: "${UID_GID}"
+    restart: always
+    depends_on:
+      - mysql
+    volumes:
+      - 'omegaupdata:/var/lib/omegaup'
+    expose:
+      - '33681'
+      - '33682'
+      - '6060'
+
+  broadcaster:
+    build:
+      dockerfile: ./Dockerfile.broadcaster
+      context: ./stuff/docker/
+    image: omegaup/dev-broadcaster:20201118
+    user: "${UID_GID}"
+    restart: always
+    depends_on:
+      - mysql
+    expose:
+      - '6060'
+      - '32672'
+      - '22291'
+
+  grader:
+    build:
+      dockerfile: ./Dockerfile.grader
+      context: ./stuff/docker/
+    image: omegaup/dev-grader:20201118
+    user: "${UID_GID}"
+    restart: always
+    depends_on:
+      - mysql
+    volumes:
+      - 'omegaupdata:/var/lib/omegaup'
+    expose:
+      - '6060'
+      - '21680'
+
+  runner:
+    build:
+      dockerfile: ./Dockerfile.runner
+      context: ./stuff/docker/
+    image: omegaup/dev-runner:20201118
+    user: "${UID_GID}"
+    restart: always
+    depends_on:
+      - grader
+    expose:
+      - '6060'
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'omegaup'
+      MYSQL_USER: 'omegaup'
+      MYSQL_PASSWORD: 'omegaup'
+      MYSQL_ROOT_PASSWORD: 'omegaup'
+    expose:
+      - '3306'
+    volumes:
+      - 'dbdata:/var/lib/mysql'
+    ports:
+      - target: 3306
+        published: 13306
+        protocol: tcp
+        mode: host
+
+volumes:
+  dbdata:
+  omegaupdata:

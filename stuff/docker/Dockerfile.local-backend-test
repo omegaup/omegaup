@@ -1,0 +1,18 @@
+FROM omegaup/local-backend-base-builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+USER root
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y \
+        curl ca-certificates openjdk-14-jre-headless && \
+    /usr/sbin/update-ca-certificates && \
+    apt-get autoremove -y && \
+    apt-get clean
+
+RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.27/libinteractive.jar \
+        -o /usr/share/java/libinteractive.jar
+
+USER ubuntu
+ADD go/Makefile /home/ubuntu/go/omegaup/
+
+CMD ["/bin/bash"]

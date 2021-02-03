@@ -1,21 +1,11 @@
 <?php
-if (!function_exists('try_define')) {
-    /**
-     * @param mixed $value
-     */
-    function try_define(string $name, $value) : void {
-        if (defined($name)) {
-            return;
-        }
-        define($name, $value);
-    }
-}
+require_once dirname(__DIR__) . '/server/try_define.php';
+
 # ###################################
 # GLOBAL CONFIG
 # ###################################
-try_define('OMEGAUP_ROOT', '/opt/omegaup/frontend');
 try_define('OMEGAUP_LOCKDOWN_DOMAIN', 'localhost-lockdown');
-try_define('OMEGAUP_COOKIE_DOMAIN', null);
+try_define('OMEGAUP_COOKIE_DOMAIN', '');
 try_define('OMEGAUP_AUTH_TOKEN_COOKIE_NAME', 'ouat');
 try_define('OMEGAUP_MD5_SALT', 'omegaup');
 try_define('OMEGAUP_URL', 'http://localhost');
@@ -25,8 +15,16 @@ try_define('OMEGAUP_MAINTENANCE', null);
 # ####################################
 # TEST CONFIG
 # ####################################
-try_define('OMEGAUP_TEST_ROOT', OMEGAUP_ROOT . '/tests/controllers/');
-try_define('OMEGAUP_TEST_RESOURCES_ROOT', OMEGAUP_ROOT . '/tests/resources/');
+try_define('IS_TEST', false);
+try_define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', true);
+try_define(
+    'OMEGAUP_TEST_ROOT',
+    sprintf('%s/tests/controllers/', strval(OMEGAUP_ROOT))
+);
+try_define(
+    'OMEGAUP_TEST_RESOURCES_ROOT',
+    sprintf('%s/tests/resources/', strval(OMEGAUP_ROOT))
+);
 try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', false);
 
 # ####################################
@@ -51,25 +49,52 @@ try_define('OMEGAUP_LOG_LEVEL', 'info');
 try_define('OMEGAUP_LOG_FILE', '/var/log/omegaup/omegaup.log');
 try_define('OMEGAUP_CSP_LOG_FILE', '/var/log/omegaup/csp.log');
 try_define('OMEGAUP_JSERROR_LOG_FILE', '/var/log/omegaup/jserror.log');
+try_define('OMEGAUP_MYSQL_TYPES_LOG_FILE', '/var/log/omegaup/omegaup.log');
 
 # ####################################
 # GRADER CONFIG
 # ####################################
 try_define('OMEGAUP_GRADER_URL', 'https://localhost:21680');
-try_define('OMEGAUP_GITSERVER_URL', 'http://localhost:33861');
-try_define('OMEGAUP_GITSERVER_SECRET_KEY', 'GdhxduUWe/y18iCnEWbTFX+JE4O8vSQPTUkjWtWf6ASAoSDkmUg4DUGwjERNliGN35kZyFj+tl5AzQaF4Ba9fA==');
-try_define('OMEGAUP_GITSERVER_PUBLIC_KEY', 'gKEg5JlIOA1BsIxETZYhjd+ZGchY/rZeQM0GheAWvXw=');
+try_define('OMEGAUP_GITSERVER_PORT', '33861');
+try_define(
+    'OMEGAUP_GITSERVER_URL',
+    'http://localhost:' . OMEGAUP_GITSERVER_PORT
+);
+try_define(
+    'OMEGAUP_GITSERVER_SECRET_KEY',
+    'GdhxduUWe/y18iCnEWbTFX+JE4O8vSQPTUkjWtWf6ASAoSDkmUg4DUGwjERNliGN35kZyFj+tl5AzQaF4Ba9fA=='
+);
+try_define(
+    'OMEGAUP_GITSERVER_PUBLIC_KEY',
+    'gKEg5JlIOA1BsIxETZYhjd+ZGchY/rZeQM0GheAWvXw='
+);
 try_define('OMEGAUP_GITSERVER_SECRET_TOKEN', '');
 try_define('OMEGAUP_GRADER_SECRET', 'secret');
-try_define('OMEGAUP_SSLCERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
-try_define('OMEGAUP_CACERT_URL', OMEGAUP_ROOT . '/omegaup.pem');
-try_define('BIN_PATH', OMEGAUP_ROOT . '/../bin');
-try_define('IMAGES_PATH', OMEGAUP_ROOT . '/www/img/');
+try_define(
+    'IMAGES_PATH',
+    sprintf('%s/www/img/', strval(OMEGAUP_ROOT))
+);
 try_define('IMAGES_URL_PATH', '/img/');
-try_define('TEMPLATES_PATH', OMEGAUP_ROOT . '/www/templates/');
+try_define(
+    'INPUTS_PATH',
+    sprintf('%s/www/probleminput/', strval(OMEGAUP_ROOT))
+);
+try_define('INPUTS_URL_PATH', '/probleminput/');
+try_define(
+    'TEMPLATES_PATH',
+    sprintf('%s/www/templates/', strval(OMEGAUP_ROOT))
+);
 try_define('TEMPLATES_URL_PATH', '/templates/');
 try_define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE', true);
 try_define('OMEGAUP_GRADER_FAKE', false);
+
+# ####################################
+# COURSE CLONE CONFIG
+# ####################################
+try_define(
+    'OMEGAUP_COURSE_CLONE_SECRET_KEY',
+    '6f8xSU_xkrelmCTSahbbxl3PRovgAfkrThyrqQ9JesE'
+);
 
 # ####################################
 # FACEBOOK LOGIN CONFIG
@@ -80,8 +105,11 @@ try_define('OMEGAUP_FB_SECRET', 'xxxxx');
 # ####################################
 # GOOGLE LOGIN CONFIG
 # ####################################
-try_define('OMEGAUP_GOOGLE_SECRET', 'xxxxx');
-try_define('OMEGAUP_GOOGLE_CLIENTID', '');
+try_define('OMEGAUP_GOOGLE_SECRET', 'acmtr0Y37vnTVJV4BwmdhOsK');
+try_define(
+    'OMEGAUP_GOOGLE_CLIENTID',
+    '982542692060-lf9htvij4ba13fiufpqeldic0qqqvird.apps.googleusercontent.com'
+);
 
 # ####################################
 # LINKEDIN LOGIN CONFIG
@@ -131,12 +159,6 @@ try_define('OMEGAUP_SESSION_CACHE_ENABLED', true);
 # SMARTY
 # #########################
 try_define('SMARTY_CACHE_DIR', '/var/tmp');
-try_define('IS_TEST', false);
-
-# #########################
-# PAGER CONSTANTS
-# #########################
-try_define('PROBLEMS_PER_PAGE', 100);
 
 # #########################
 # CONTEST CONSTANTS
@@ -161,7 +183,6 @@ try_define('PASSWORD_RESET_MIN_WAIT', 5 * 60);
 # ########################
 try_define('AWS_CLI_ACCESS_KEY_ID', null);
 try_define('AWS_CLI_SECRET_ACCESS_KEY', null);
-try_define('AWS_CLI_BINARY', '/usr/bin/aws');
 
 # ########################
 # NEW RELIC CONFIG

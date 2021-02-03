@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# type: ignore
 
 '''Replays a contest.'''
 
@@ -87,7 +88,7 @@ def main():
     db.commit()
 
     # Allow user to open the contest to see the shiny display
-    print('http://localhost:8080/arena/%s/scoreboard/%s?ws=on' %
+    print('http://localhost:8001/arena/%s/scoreboard/%s?ws=on' %
           (new_alias, scoreboard_token), file=sys.stderr)
     print('Press Enter to continue...', end=' ', file=sys.stderr)
     input()
@@ -137,12 +138,12 @@ def main():
         # Force scoreboard regeneration
         t0 = time.time()
         response = urllib.request.urlopen(
-            'http://localhost/api/scoreboard/refresh/',
+            'http://localhost:8001/api/scoreboard/refresh/',
             urllib.parse.urlencode({'token': 'secret', 'alias': new_alias,
                                     'run': str(run_id)})
         ).read()
         t1 = time.time()
-        assert response == '{"status":"ok"}', response
+        assert '"status":"ok"' in response, response
         times.append(t1 - t0)
     t1_all = time.time()
 

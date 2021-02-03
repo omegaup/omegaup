@@ -1,23 +1,23 @@
-<phpunit 
-	backupGlobals="false"
-	bootstrap="bootstrap.php"
-	backupStaticAttributes="true"
-	colors="true"
-	convertErrorsToExceptions="true"
-	convertNoticesToExceptions="true"
-	convertWarningsToExceptions="true"
-	stopOnFailure="false">
-	<filter>
-		<whitelist processUncoveredFilesFromWhitelist="true">
-			<directory suffix=".php">../server/</directory>
-			<exclude>
-				<file>../server/bootstrap_smarty.php</file>
-				<file>../server/config.php</file>
-				<file>../server/libs/PasswordHashCmd.php</file>
-				<file>../server/libs/ExperimentHashCmd.php</file>
-				<directory>../server/libs/third_party/</directory>
-				<directory>../server/libs/dao/base/</directory>
-			</exclude>
-		</whitelist>
-	</filter>
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="false" bootstrap="bootstrap.php" backupStaticAttributes="true" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" stopOnFailure="false" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">../server/</directory>
+    </include>
+    <exclude>
+      <file>../server/config.php</file>
+      <directory>../server/cmd/</directory>
+      <directory>../server/libs/third_party/</directory>
+      <directory>../server/libs/dao/base/</directory>
+      <directory>../server/src/Psalm/</directory>
+    </exclude>
+  </coverage>
+  <testsuites>
+    <testsuite name="Controllers">
+      <directory>./controllers/</directory>
+    </testsuite>
+    <testsuite name="Badges">
+      <directory>./badges/</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>

@@ -1,12 +1,32 @@
 <?php
 
-class QualityNominationTest extends OmegaupTestCase {
-    public function testGetNominationsHasAuthorAndNominatorSet() {
-        $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
+    public function setUp(): void {
+        parent::setUp();
 
-        $login = self::login($contestant);
-        QualityNominationController::apiCreate(new Request([
+        \OmegaUp\Test\Factories\QualityNomination::initQualityReviewers();
+        \OmegaUp\Test\Factories\QualityNomination::initTopicTags();
+    }
+
+    /**
+     * A PHPUnit data provider for all the tests that can accept a status.
+     *
+     * @return list<array{0: string, 1: int}>
+     */
+    public function qualityNominationsDemotionStatusProvider(): array {
+        return [
+            ['banned', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED],
+            ['warning', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING],
+        ];
+    }
+
+    public function testGetNominationsHasAuthorAndNominatorSet() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $login = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
@@ -16,17 +36,19 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
 
-        $nominations = QualityNominationsDAO::getNominations(null, null);
-        self::assertArrayHasKey('author', $nominations[0]);
-        self::assertArrayHasKey('nominator', $nominations[0]);
+        $response = \OmegaUp\Controllers\QualityNomination::apiList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token
+        ]));
+        self::assertArrayHasKey('author', $response['nominations'][0]);
+        self::assertArrayHasKey('nominator', $response['nominations'][0]);
     }
 
     public function testGetByIdHasAuthorAndNominatorSet() {
-        $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($contestant);
-        $result = QualityNominationController::apiCreate(new Request([
+        $login = self::login($identity);
+        $result = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
@@ -36,15 +58,20 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
 
-        $nomination = QualityNominationsDAO::getById($result['qualitynomination_id']);
+        $nomination = \OmegaUp\DAO\QualityNominations::getById(
+            $result['qualitynomination_id']
+        );
         self::assertArrayHasKey('author', $nomination);
         self::assertArrayHasKey('nominator', $nomination);
-        self::assertEquals($contestant->username, $nomination['nominator']['username']);
+        self::assertEquals(
+            $identity->username,
+            $nomination['nominator']['username']
+        );
     }
 
     public function testApiDetailsReturnsFieldsRequiredByUI() {
-        $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $contents = json_encode([
                  'statements' => [
@@ -56,8 +83,8 @@ class QualityNominationTest extends OmegaupTestCase {
                  'reason' => 'offensive',
             ]);
 
-        $login = self::login($user);
-        $qualitynomination = QualityNominationController::apiCreate(new Request([
+        $login = self::login($identity);
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
@@ -65,19 +92,50 @@ class QualityNominationTest extends OmegaupTestCase {
         ]));
 
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
-        $request = new Request([
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        $request = new \OmegaUp\Request(
+            [
             'auth_token' => $reviewerLogin->auth_token,
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]);
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id']]
+        );
 
-        $details = QualityNominationController::apiDetails($request);
-        $this->assertEquals('demotion', $details['nomination'], 'Should have set demotion');
-        $this->assertEquals($user->username, $details['nominator']['username'], 'Should have set user');
-        $this->assertEquals($problemData['request']['problem_alias'], $details['problem']['alias'], 'Should have set problem');
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
+        $this->assertEquals(
+            'demotion',
+            $details['nomination'],
+            'Should have set demotion'
+        );
+        $this->assertEquals(
+            $identity->username,
+            $details['nominator']['username'],
+            'Should have set user'
+        );
+        $this->assertEquals(
+            $problemData['request']['problem_alias'],
+            $details['problem']['alias'],
+            'Should have set problem'
+        );
         $this::assertArrayHasKey('author', $details);
-        $this->assertEquals(json_decode($contents, true), $details['contents'], 'Should have set contents');
-        $this->assertEquals(true, $details['reviewer'], 'Should have set reviewer');
-        $this->assertEquals($qualitynomination['qualitynomination_id'], $details['qualitynomination_id'], 'Should have set qualitynomination_id');
+        $this->assertEquals(
+            json_decode(
+                $contents,
+                true
+            ),
+            $details['contents'],
+            'Should have set contents'
+        );
+        $this->assertEquals(
+            true,
+            $details['reviewer'],
+            'Should have set reviewer'
+        );
+        $this->assertEquals(
+            $qualitynomination['qualitynomination_id'],
+            $details['qualitynomination_id'],
+            'Should have set qualitynomination_id'
+        );
     }
 
     /**
@@ -85,12 +143,15 @@ class QualityNominationTest extends OmegaupTestCase {
      * must have solved it first.
      */
     public function testMustSolveBeforeNominatingItForPromotion() {
-        $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
 
-        $login = self::login($contestant);
-        $r = new Request([
+        $login = self::login($identity);
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'promotion',
@@ -106,17 +167,17 @@ class QualityNominationTest extends OmegaupTestCase {
         ]);
 
         try {
-            QualityNominationController::apiCreate($r);
+            \OmegaUp\Controllers\QualityNomination::apiCreate($r);
             $this->fail('Should not have been able to nominate the problem');
-        } catch (PreconditionFailedException $e) {
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             // still expected.
         }
 
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        QualityNominationController::apiCreate($r);
+        \OmegaUp\Controllers\QualityNomination::apiCreate($r);
 
-        $response = QualityNominationController::apiMyList(new Request([
+        $response = \OmegaUp\Controllers\QualityNomination::apiMyList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
         $this->assertEquals(1, count($response['nominations']));
@@ -130,19 +191,110 @@ class QualityNominationTest extends OmegaupTestCase {
             $nomination['problem']['alias']
         );
         $this->assertEquals(
-            QualityNominationController::REVIEWERS_PER_NOMINATION,
+            \OmegaUp\Controllers\QualityNomination::REVIEWERS_PER_NOMINATION,
             count($nomination['votes'])
         );
 
-        $details = QualityNominationController::apiDetails(new Request([
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'qualitynomination_id' => $nomination['qualitynomination_id'],
         ]));
         $this->assertEquals(
-            $contestant->username,
+            $identity->username,
             $details['nominator']['username']
         );
         $this->assertNotNull($details['original_contents']);
+    }
+
+    /**
+     * Check if only a category tag is allowed for a nomination of
+     * type 'quality tag'.
+     */
+    public function testCategoryTagOnQualityTagNomination() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => false,
+                    'tag' => 'problemLevelAdvancedCompetitiveProgramming',
+                    'tags' => ['problemTagFunctions', 'problemTagRecursion'],
+                ]),
+            ]));
+            $this->fail('The user must be a reviewer.');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => false,
+                    'tag' => 'problemLevel',
+                    'tags' => ['problemTagFunctions', 'problemTagRecursion'],
+                ]),
+            ]));
+            $this->fail('The tag should be one of the level tags group.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
+
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => false,
+                    'tag' => 'problemLevelAdvancedCompetitiveProgramming',
+                    'tags' => ['problemTopic'],
+                ]),
+            ]));
+            $this->fail('The tag should be one of the public tags group.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
+
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => false,
+                'tag' => 'problemLevelAdvancedCompetitiveProgramming',
+            ]),
+        ]));
+
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => false,
+                    'tag' => 'problemLevelAdvancedCompetitiveProgramming',
+                ]),
+            ]));
+            $this->fail(
+                'Reviewer can not send again a nomination for the same problem'
+            );
+        } catch (\Omegaup\Exceptions\PreconditionFailedException $e) {
+            $this->assertEquals(
+                'qualityNominationReviewerHasAlreadySentNominationForProblem',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
@@ -150,12 +302,15 @@ class QualityNominationTest extends OmegaupTestCase {
      * have solved it first.
      */
     public function testMustSolveBeforeSuggesting() {
-        $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
 
-        $login = self::login($contestant);
-        $r = new Request([
+        $login = self::login($identity);
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'suggestion',
@@ -167,18 +322,20 @@ class QualityNominationTest extends OmegaupTestCase {
         ]);
 
         try {
-            QualityNominationController::apiCreate($r);
-            $this->fail('Should not have been able to make suggestion about the problem');
-        } catch (PreconditionFailedException $e) {
+            \OmegaUp\Controllers\QualityNomination::apiCreate($r);
+            $this->fail(
+                'Should not have been able to make suggestion about the problem'
+            );
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             // still expected.
         }
 
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $response = QualityNominationController::apiCreate($r);
+        $response = \OmegaUp\Controllers\QualityNomination::apiCreate($r);
 
         $r['qualitynomination_id'] = $response['qualitynomination_id'];
-        $nomination = QualityNominationController::apiDetails($r);
+        $nomination = \OmegaUp\Controllers\QualityNomination::apiDetails($r);
         $this->assertEquals(
             $problemData['request']['problem_alias'],
             $nomination['problem']['alias']
@@ -190,11 +347,11 @@ class QualityNominationTest extends OmegaupTestCase {
      * user might not have solved it first.
      */
     public function testNominatingForDemotion() {
-        $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($contestant);
-        QualityNominationController::apiCreate(new Request([
+        $login = self::login($identity);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
@@ -207,30 +364,37 @@ class QualityNominationTest extends OmegaupTestCase {
 
     public function testExtractAliasFromArgument() {
         $inputAndExpectedOutput =
-                ['http://localhost:8080/arena/prueba/#problems/sumas' => 'sumas',
-                 'http://localhost:8080/arena/prueba/practice/#problems/sumas' => 'sumas',
-                 'http://localhost:8080/arena/problem/sumas#problems' => 'sumas',
-                 'http://localhost:8080/course/prueba/assignment/prueba/#problems/sumas' => 'sumas',
-                 'http://localhost:8080/arena/prueba/#problems/sumas29187' => 'sumas29187',
-                 'http://localhost:8080/arena/prueba/practice/#problems/sumas_29187' => 'sumas_29187',
-                 'http://localhost:8080/arena/problem/_sumas29187-#problems' => '_sumas29187-',
-                 'http://localhost:8080/course/prueba/assignment/prueba/#problems/___asd_-_23-2-_' => '___asd_-_23-2-_'];
+                ['http://localhost:8001/arena/prueba/#problems/sumas' => 'sumas',
+                 'http://localhost:8001/arena/prueba/practice/#problems/sumas' => 'sumas',
+                 'http://localhost:8001/arena/problem/sumas#problems' => 'sumas',
+                 'http://localhost:8001/course/prueba/assignment/prueba/#problems/sumas' => 'sumas',
+                 'http://localhost:8001/arena/prueba/#problems/sumas29187' => 'sumas29187',
+                 'http://localhost:8001/arena/prueba/practice/#problems/sumas_29187' => 'sumas_29187',
+                 'http://localhost:8001/arena/problem/_sumas29187-#problems' => '_sumas29187-',
+                 'http://localhost:8001/course/prueba/assignment/prueba/#problems/___asd_-_23-2-_' => '___asd_-_23-2-_'];
 
         foreach ($inputAndExpectedOutput as $input => $expectedOutput) {
-            $actualOutput = QualityNominationController::extractAliasFromArgument($input);
-            $this->assertEquals($expectedOutput, $actualOutput, 'Incorrect alias was extracted from URL.');
+            $actualOutput = \OmegaUp\Controllers\QualityNomination::extractAliasFromArgument(
+                $input
+            );
+            $this->assertEquals(
+                $expectedOutput,
+                $actualOutput,
+                'Incorrect alias was extracted from URL.'
+            );
         }
     }
 
     /**
      * Check that a non-reviewer user cannot change the status of a demotion qualitynomination.
+     * @dataProvider qualityNominationsDemotionStatusProvider
      */
-    public function testDemotionCannotBeResolvedByRegularUser() {
-        $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
+    public function testDemotionCannotBeResolvedByRegularUser(string $status) {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($user);
-        $qualitynomination = QualityNominationController::apiCreate(new Request([
+        $login = self::login($identity);
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
@@ -240,29 +404,34 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
 
-        $request = new Request([
-            'auth_token' => $login->auth_token,
-            'status' => 'approved',
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-            'rationale' => 'ew plus something else'
-        ]);
         try {
-            $response = QualityNominationController::apiResolve($request);
+            $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'status' => $status,
+                    'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                    'rationale' => 'ew plus something else'
+                ])
+            );
             $this->fail("Normal user shouldn't be able to resolve demotion");
-        } catch (ForbiddenAccessException $e) {
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             // Expected.
         }
     }
 
     /**
-     * Check that a demotion can be approved and then reverted by a reviewer.
+     * Check that a demotion can be banned or warning and then reverted by a reviewer.
+     * @dataProvider qualityNominationsDemotionStatusProvider
      */
-    public function testDemotionCanBeApprovedAndLaterRevertedByReviewer() {
-        $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
+    public function testDemotionCanBeResolvedAndLaterRevertedByReviewer(
+        string $status,
+        int $visibility
+    ) {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($user);
-        $qualitynomination = QualityNominationController::apiCreate(new Request([
+        $login = self::login($identity);
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
@@ -277,49 +446,213 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
-        $request = new Request([
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => $status,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => 'ew plus something else',
+            ])
+        );
+
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'approved',
-            'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-            'rationale' => 'ew plus something else',
-        ]);
-        $response = QualityNominationController::apiResolve($request);
+        ]));
+        $this->assertEquals(
+            $status,
+            $details['nomination_status'],
+            "qualitynomination should have been marked as {$status}"
+        );
 
-        $details = QualityNominationController::apiDetails($request);
-        $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
-
-        $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have been public banned');
+        $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+        $this->assertEquals(
+            $visibility,
+            $problem['visibility'],
+            "Problem should have been public {$status}"
+        );
 
         // Revert ban.
-        $request = new Request([
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => 'resolved',
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => 'ew'
+            ])
+        );
+
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'denied',
-            'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-            'rationale' => 'ew'
-        ]);
-        $response = QualityNominationController::apiResolve($request);
+        ]));
+        $this->assertEquals(
+            'resolved',
+            $details['nomination_status'],
+            'qualitynomination should have been marked as resolved'
+        );
 
-        $details = QualityNominationController::apiDetails($request);
-        $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been marked as denied');
-
-        $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC, $problem['visibility'], 'Problem should have been made public');
+        $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+        $this->assertEquals(
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+            $problem['visibility'],
+            'Problem should have been made public'
+        );
     }
 
     /**
-     * Check that a demotion approved by a reviewer sends an email to the problem creator.
+     * Check that multiple demotion can be banned or warning and then reverted by a reviewer.
+     * @dataProvider qualityNominationsDemotionStatusProvider
      */
-    public function testDemotionApprovedByReviewerAndSendMail() {
-        $emailSender = new ScopedEmailSender();
-        $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
+    public function testMultipleDemotionCanBeResolvedAndLaterRevertedByReviewer(
+        string $status,
+        int $visibility
+    ) {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($user);
-        $qualitynomination = QualityNominationController::apiCreate(new Request([
+        $login = self::login($identity);
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        $qualitynomination1 = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => $status,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => 'ew plus something else',
+                'all' => true,
+            ])
+        );
+
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+        ]));
+        $this->assertEquals(
+            $status,
+            $details['nomination_status'],
+            "qualitynomination should have been marked as {$status}"
+        );
+        $details1 = \OmegaUp\Controllers\QualityNomination::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'qualitynomination_id' => $qualitynomination1['qualitynomination_id'],
+            ])
+        );
+        $this->assertEquals(
+            $status,
+            $details1['nomination_status'],
+            "qualitynomination should have been marked as {$status}"
+        );
+
+        $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+        $this->assertEquals(
+            $visibility,
+            $problem['visibility'],
+            "Problem should have been public {$status}"
+        );
+
+        // Revert ban.
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => 'resolved',
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => 'ew',
+                'all' => true,
+            ])
+        );
+
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+        ]));
+        $this->assertEquals(
+            'resolved',
+            $details['nomination_status'],
+            'qualitynomination should have been marked as resolved'
+        );
+        $details1 = \OmegaUp\Controllers\QualityNomination::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'qualitynomination_id' => $qualitynomination1['qualitynomination_id'],
+            ])
+        );
+        $this->assertEquals(
+            'resolved',
+            $details1['nomination_status'],
+            'qualitynomination should have been marked as resolved'
+        );
+
+        $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+        $this->assertEquals(
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+            $problem['visibility'],
+            'Problem should have been made public'
+        );
+    }
+
+    /**
+     * Check that a demotion banned or warning by a reviewer sends an email to the problem creator.
+     * @dataProvider qualityNominationsDemotionStatusProvider
+     */
+    public function testDemotionResolvedByReviewerAndSendMail(string $status) {
+        $emailSender = new \OmegaUp\Test\FakeEmailSender();
+        $scopedSender = new \OmegaUp\Test\ScopedEmailSender($emailSender);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
@@ -334,40 +667,226 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
-        $request = new Request([
-            'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'approved',
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-            'rationale' => 'qwert plus something else'
-        ]);
-        $response = QualityNominationController::apiResolve($request);
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
 
-        $this->assertContains(
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => $status,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => 'qwert plus something else'
+            ])
+        );
+
+        $this->assertCount(1, $emailSender->listEmails);
+        $this->assertStringContainsString(
             $problemData['problem']->title,
-            $emailSender::$listEmails[0]['subject']
+            $emailSender->listEmails[0]['subject']
         );
-        $this->assertContains(
-            $problemData['authorIdentity']->name,
-            $emailSender::$listEmails[0]['body']
+        $this->assertStringContainsString(
+            $problemData['author']->name,
+            $emailSender->listEmails[0]['body']
         );
-        $this->assertContains('qwert', $emailSender::$listEmails[0]['body']);
-        $this->assertContains('something else', $emailSender::$listEmails[0]['body']);
-        $this->assertEquals(1, count($emailSender::$listEmails));
+        $this->assertStringContainsString(
+            'qwert',
+            $emailSender->listEmails[0]['body']
+        );
+        $this->assertStringContainsString(
+            'something else',
+            $emailSender->listEmails[0]['body']
+        );
     }
 
     /**
-     * Check that a demotion can be denied by a reviewer.
+     * Check that a multiple demotion banned or warning by a reviewer sends an email to the problem creator.
+     * @dataProvider qualityNominationsDemotionStatusProvider
      */
-    public function testDemotionCanBeDeniedByReviewer() {
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => ProblemController::VISIBILITY_PUBLIC
-        ]));
-        $user = UserFactory::createUser();
+    public function testMultipleDemotionResolvedByReviewerAndSendMail(string $status) {
+        $emailSender = new \OmegaUp\Test\FakeEmailSender();
+        $scopedSender = new \OmegaUp\Test\ScopedEmailSender($emailSender);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($user);
-        $qualitynomination = QualityNominationController::apiCreate(new Request([
+        $login = self::login($identity);
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'qwert',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        $qualitynomination1 = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'qwert',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => $status,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => 'qwert plus something else',
+                'all' => true,
+            ])
+        );
+
+        $this->assertCount(1, $emailSender->listEmails);
+        $this->assertStringContainsString(
+            $problemData['problem']->title,
+            $emailSender->listEmails[0]['subject']
+        );
+        $this->assertStringContainsString(
+            $problemData['author']->name,
+            $emailSender->listEmails[0]['body']
+        );
+        $this->assertStringContainsString(
+            'qwert',
+            $emailSender->listEmails[0]['body']
+        );
+        $this->assertStringContainsString(
+            'something else',
+            $emailSender->listEmails[0]['body']
+        );
+    }
+
+    /**
+     * Check that a demotion's logs is saved correctly.
+     * @dataProvider qualityNominationsDemotionStatusProvider
+     */
+    public function testDemotionLogsSavedCorrectly(
+        string $status,
+        int $visibility
+    ) {
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
+            [
+                'username' => 'user_test_author'
+            ]
+        ));
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams(
+            [
+                'author' => $author,
+                'title' => 'problem_1'
+            ]
+        ));
+        ['identity' => $nominator] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($nominator);
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+
+        $rationale = 'rationale';
+        \OmegaUp\Controllers\QualityNomination::apiResolve(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => $status,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => $rationale,
+            ])
+        );
+
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+        ]));
+        $this->assertEquals($rationale, $details['contents']['rationale']);
+
+        $logs = \OmegaUp\DAO\QualityNominationLog::getAllLogsForNomination(
+            $qualitynomination['qualitynomination_id']
+        );
+
+        $this->assertCount(1, $logs);
+        $this->assertEquals(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id,
+            $logs[0]->user_id
+        );
+        $this->assertEquals('open', $logs[0]->from_status);
+        $this->assertEquals($status, $logs[0]->to_status);
+        $this->assertEquals($rationale, $logs[0]->rationale);
+
+        // Revert ban.
+        $rationale = 'problem solved';
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => 'resolved',
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => $rationale
+            ])
+        );
+
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+        ]));
+        $this->assertEquals($rationale, $details['contents']['rationale']);
+
+        $logs = \OmegaUp\DAO\QualityNominationLog::getAllLogsForNomination(
+            $qualitynomination['qualitynomination_id']
+        );
+
+        $this->assertCount(2, $logs);
+        $this->assertEquals(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id,
+            $logs[1]->user_id
+        );
+        $this->assertEquals($status, $logs[1]->from_status);
+        $this->assertEquals('resolved', $logs[1]->to_status);
+        $this->assertEquals($rationale, $logs[1]->rationale);
+    }
+
+    /**
+     * Check that a demotion can be resolved by a reviewer.
+     */
+    public function testDemotionCanBeBannedByReviewer() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => 'public'
+        ]));
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
@@ -382,32 +901,125 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
         // Login as a reviewer and deny ban.
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
-        $request = new Request([
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'denied',
+            'status' => 'resolved',
             'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew'
         ]);
-        $response = QualityNominationController::apiResolve($request);
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            $request
+        );
 
-        $details = QualityNominationController::apiDetails($request);
-        $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been marked as denied');
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
+        $this->assertEquals(
+            'resolved',
+            $details['nomination_status'],
+            'qualitynomination should have been marked as resolved'
+        );
 
-        $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC, $problem['visibility'], 'Problem should have remained public');
+        $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
+        $this->assertEquals(
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+            $problem['visibility'],
+            'Problem should have remained public'
+        );
     }
 
     /**
-     * Check that a demotion can be approved and then reopned by a reviewer.
+     * A PHPUnit data provider for all the tests that can accept a column for search nominations.
+     *
+     * @return list<array{0: string, 1:string, 2: int}>
      */
-    public function testDemotionCanBeApprovedAndThenReopenedByReviewer() {
-        $problemData = ProblemsFactory::createProblem();
-        $user = UserFactory::createUser();
+    public function qualityNominationsDemotionSearchColumnsProvider(): array {
+        return [
+            ['problem_alias', 'problem_1', 1],
+            ['author_username', 'user_test_author', 1],
+            ['nominator_username', 'user_test_nominator',1],
+            ['nominator_username', 'invalid_user_test_nominator', 0],
+        ];
+    }
 
-        $login = self::login($user);
-        $qualitynomination = QualityNominationController::apiCreate(new Request([
+    /**
+     * Check that can search nominations.
+     * @dataProvider qualityNominationsDemotionSearchColumnsProvider
+     */
+    public function testSearchNominations(
+        string $column,
+        string $query,
+        int $valueExpected
+    ) {
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
+            [
+                'username' => 'user_test_author'
+            ]
+        ));
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams(
+            [
+                'author' => $author,
+                'title' => 'problem_1'
+            ]
+        ));
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
+            [
+                'username' => 'user_test_nominator'
+            ]
+        ));
+        $login = self::login($identity);
+
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                ],
+                'rationale' => 'qwert',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        $response = \OmegaUp\Controllers\QualityNomination::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+            ])
+        );
+
+        $this->assertCount(1, $response['nominations']);
+        // Search for $column
+        $response = \OmegaUp\Controllers\QualityNomination::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'query' => $query,
+                'column' => $column
+            ])
+        );
+        $this->assertCount($valueExpected, $response['nominations']);
+    }
+
+    /**
+     * @dataProvider qualityNominationsDemotionStatusProvider
+     * Check that a demotion can be banned and then reopned by a reviewer.
+     */
+    public function testDemotionCanBeResolvedAndThenReopenedByReviewer(
+        $status,
+        $visibility
+    ) {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
@@ -422,51 +1034,77 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
-        $request = new Request([
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'approved',
+            'status' => $status,
             'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew plus something else'
         ]);
-        $response = QualityNominationController::apiResolve($request);
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            $request
+        );
 
-        $details = QualityNominationController::apiDetails($request);
-        $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
+        $this->assertEquals(
+            $status,
+            $details['nomination_status'],
+            'qualitynomination should have been marked as banned'
+        );
 
-        $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have been public banned');
+        $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
+        $this->assertEquals(
+            $visibility,
+            $problem['visibility'],
+            "Problem should have been public {$status}"
+        );
 
         // Reopen demotion request.
-        $request = new Request([
+        $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
             'status' => 'open',
             'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew'
         ]);
-        $response = QualityNominationController::apiResolve($request);
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            $request
+        );
 
-        $details = QualityNominationController::apiDetails($request);
-        $this->assertEquals('open', $details['nomination_status'], 'qualitynomination should have been re-opened');
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
+        $this->assertEquals(
+            'open',
+            $details['nomination_status'],
+            'qualitynomination should have been re-opened'
+        );
 
-        $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_PUBLIC_BANNED, $problem['visibility'], 'Problem should have remained public banned');
+        $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
+        $this->assertEquals(
+            $visibility,
+            $problem['visibility'],
+            "Problem should have remained public {$status}"
+        );
     }
 
     /**
-     * Check that a demotion of a private problem can be approved and
-     * then denied, and it keeps its original visibility
+     * Check that a demotion of a private problem can be banned and
+     * then resolved, and it keeps its original visibility
+     * @dataProvider qualityNominationsDemotionStatusProvider
      */
-    public function testDemotionOfPrivateProblemApprovedAndThenDeniedKeepsItsOriginalVisibility() {
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => ProblemController::VISIBILITY_PRIVATE
+    public function testDemotionOfPrivateProblemResolvedAndThenBannedKeepsItsOriginalVisibility(
+        string $status,
+        int $visibility
+    ) {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => 'private'
         ]));
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($user);
-        $qualitynomination = QualityNominationController::apiCreate(new Request([
+        $login = self::login($identity);
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
@@ -481,51 +1119,160 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
         // Login as a reviewer and approve ban.
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
-        $request = new Request([
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'approved',
+            'status' => $status,
             'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew plus something else'
         ]);
-        $response = QualityNominationController::apiResolve($request);
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            $request
+        );
 
-        $details = QualityNominationController::apiDetails($request);
-        $this->assertEquals('approved', $details['nomination_status'], 'qualitynomination should have been marked as approved');
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
+        $this->assertEquals(
+            $status,
+            $details['nomination_status'],
+            "qualitynomination should have been marked as {$status}"
+        );
 
-        $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_PRIVATE_BANNED, $problem['visibility'], 'Problem should have been private banned');
+        $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
+        $this->assertEquals(
+            // To transform from public to private (banned or warning).
+            $visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED ? \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED : \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING,
+            $problem['visibility'],
+            'Problem should have been private resolved'
+        );
 
         // Reopen demotion request.
-        $request = new Request([
+        $request = new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
-            'status' => 'denied',
+            'status' => 'resolved',
             'problem_alias' => $problemData['request']['problem_alias'],
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
             'rationale' => 'ew'
         ]);
-        $response = QualityNominationController::apiResolve($request);
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            $request
+        );
 
-        $details = QualityNominationController::apiDetails($request);
-        $this->assertEquals('denied', $details['nomination_status'], 'qualitynomination should have been re-opened');
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails($request);
+        $this->assertEquals(
+            'resolved',
+            $details['nomination_status'],
+            'qualitynomination should have been re-opened'
+        );
 
-        $problem = ProblemController::apiDetails($request);
-        $this->assertEquals(ProblemController::VISIBILITY_PRIVATE, $problem['visibility'], 'Problem should have been private');
+        $problem = \OmegaUp\Controllers\Problem::apiDetails($request);
+        $this->assertEquals(
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+            $problem['visibility'],
+            'Problem should have been private'
+        );
+    }
+
+    /**
+     * User who tried a problem but couldn't solve it yet (non AC, CE, JE verdicts),
+     * should be able to send a dismissal or suggestion for it adding the before_ac
+     * flag on nomination contents.
+     */
+    public function testBeforeAcNomination() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'suggestion',
+                'contents' => json_encode([
+                    'quality' => 3,
+                    'tags' => ['problemTopicGraphTheory', 'problemTopicGreedy', 'problemTopicBinarySearch'],
+                    'before_ac' => true,
+                ]),
+            ]));
+            $this->fail('Must have tried to solve the problem first.');
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
+            $this->assertEquals(
+                $e->getMessage(),
+                'qualityNominationMustHaveTriedToSolveProblem'
+            );
+        }
+
+        // Now TRY to solve the problem
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA', 60);
+        $login = self::login($identity);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'suggestion',
+            'contents' => json_encode([
+                'quality' => 3,
+                'tags' => ['problemTopicGraphTheory', 'problemTopicGreedy'],
+                'before_ac' => true,
+            ]),
+        ]));
+
+        // Dismissals could be sent before AC also
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'dismissal',
+            'contents' => json_encode([
+                'before_ac' => true
+            ]),
+        ]));
+
+        // Now solve the problem, it must not be allowed to send a before AC
+        // nomination, as the problem is already solved
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        $login = self::login($identity);
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'suggestion',
+                'contents' => json_encode([
+                    'quality' => 3,
+                    'tags' => ['problemTopicGreedy', 'problemTopicMath'],
+                    'before_ac' => true,
+                ]),
+            ]));
+            $this->fail('Must not have solved the problem.');
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
+            $this->assertEquals(
+                $e->getMessage(),
+                'qualityNominationMustNotHaveSolvedProblem'
+            );
+        }
     }
 
     /**
      * Check that before a duplicate nomination needs to have a valid original problem.
      */
     public function testNominatingForDuplicate() {
-        $originalProblemData = ProblemsFactory::createProblem();
-        $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
+        $originalProblemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
 
         try {
-            QualityNominationController::apiCreate(new Request([
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'nomination' => 'demotion',
@@ -535,12 +1282,12 @@ class QualityNominationTest extends OmegaupTestCase {
                 ]),
             ]));
             $this->fail('Missing "original" should have been caught');
-        } catch (InvalidParameterException $e) {
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // Expected.
         }
 
         try {
-            QualityNominationController::apiCreate(new Request([
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'nomination' => 'demotion',
@@ -551,11 +1298,11 @@ class QualityNominationTest extends OmegaupTestCase {
                 ]),
             ]));
             $this->fail('Invalid "original" should have been caught');
-        } catch (NotFoundException $e) {
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             // Expected.
         }
 
-        QualityNominationController::apiCreate(new Request([
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
@@ -566,7 +1313,7 @@ class QualityNominationTest extends OmegaupTestCase {
             ]),
         ]));
 
-        QualityNominationController::apiCreate(new Request([
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
@@ -582,13 +1329,16 @@ class QualityNominationTest extends OmegaupTestCase {
      * Nomination list test.
      */
     public function testNominationList() {
-        $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
-        RunsFactory::gradeRun($runData);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $login = self::login($contestant);
-        QualityNominationController::apiCreate(new Request([
+        $login = self::login($identity);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'promotion',
@@ -600,44 +1350,40 @@ class QualityNominationTest extends OmegaupTestCase {
                     ],
                 ],
                 'source' => 'omegaUp',
-                'tags' => ['ez-pz'],
+                'tags' => ['problemTopicSorting'],
             ]),
         ]));
 
         // Login as an arbitrary reviewer.
-        $login = self::login(QualityNominationFactory::$reviewers[0]);
-        $response = QualityNominationController::apiList(new Request([
+        $login = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        $response = \OmegaUp\Controllers\QualityNomination::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
         $nomination = $this->findByPredicate(
             $response['nominations'],
-            function ($nomination) use (&$problemData) {
-                return $nomination['problem']['alias'] == $problemData['request']['problem_alias'];
-            }
+            fn ($nomination) => $nomination['problem']['alias'] == $problemData['request']['problem_alias']
         );
         $this->assertNotNull($nomination);
         $this->assertEquals(
-            QualityNominationController::REVIEWERS_PER_NOMINATION,
+            \OmegaUp\Controllers\QualityNomination::REVIEWERS_PER_NOMINATION,
             count($nomination['votes'])
         );
 
         // Login as one of the reviewers of that nomination.
         $reviewer = $this->findByPredicate(
-            QualityNominationFactory::$reviewers,
-            function ($reviewer) use (&$nomination) {
-                return $reviewer->username == $nomination['votes'][0]['user']['username'];
-            }
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers,
+            fn ($reviewer) => $reviewer->username == $nomination['votes'][0]['user']['username']
         );
         $this->assertNotNull($reviewer);
         $login = self::login($reviewer);
-        $response = QualityNominationController::apiMyAssignedList(new Request([
+        $response = \OmegaUp\Controllers\QualityNomination::apiMyAssignedList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
         $this->assertArrayContainsWithPredicate(
             $response['nominations'],
-            function ($nomination) use (&$problemData) {
-                return $nomination['problem']['alias'] == $problemData['request']['problem_alias'];
-            }
+            fn ($nomination) => $nomination['problem']['alias'] == $problemData['request']['problem_alias']
         );
     }
 
@@ -645,14 +1391,17 @@ class QualityNominationTest extends OmegaupTestCase {
      * Duplicate tag test.
      */
     public function testTagsForDuplicate() {
-        $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
-        RunsFactory::gradeRun($runData);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $login = self::login($contestant);
+        $login = self::login($identity);
         try {
-            QualityNominationController::apiCreate(new Request([
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'nomination' => 'promotion',
@@ -664,31 +1413,31 @@ class QualityNominationTest extends OmegaupTestCase {
                         ],
                     ],
                     'source' => 'omegaUp',
-                    'tags' => ['ez-pz', 'ez', 'ez'],
+                    'tags' => ['problemTopicSorting', 'problemTopicMath', 'problemTopicMath'],
                 ]),
             ]));
             $this->fail('Duplicate tags should be caught.');
-        } catch (DuplicatedEntryInArrayException $e) {
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInArrayException $e) {
             // Expected.
         }
 
         try {
-            QualityNominationController::apiCreate(new Request([
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'nomination' => 'suggestion',
                 'contents' => json_encode([
                     // No difficulty!
                     'quality' => 3,
-                    'tags' => ['ez-pz', 'ez', 'ez'],
+                    'tags' => ['problemTopicSorting', 'problemTopicMath', 'problemTopicMath'],
                 ]),
             ]));
             $this->fail('Duplicate tags should be caught.');
-        } catch (DuplicatedEntryInArrayException $e) {
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInArrayException $e) {
             // Expected.
         }
 
-        QualityNominationController::apiCreate(new Request([
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'promotion',
@@ -700,20 +1449,68 @@ class QualityNominationTest extends OmegaupTestCase {
                     ],
                 ],
                 'source' => 'omegaUp',
-                'tags' => ['ez-pz', 'ez'],
+                'tags' => ['problemTopicSorting', 'problemTopicMath'],
             ]),
         ]));
 
-        QualityNominationController::apiCreate(new Request([
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'suggestion',
             'contents' => json_encode([
                 // No difficulty!
                 'quality' => 3,
-                'tags' => ['ez-pz', 'ez'],
+                'tags' => ['problemTopicSorting', 'problemTopicMath'],
             ]),
         ]));
+    }
+
+    public function testIncorrectTag() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $login = self::login($identity);
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'promotion',
+                'contents' => json_encode([
+                    'rationale' => 'cool!',
+                    'statements' => [
+                        'es' => [
+                            'markdown' => 'a + b',
+                        ],
+                    ],
+                    'source' => 'omegaUp',
+                    'tags' => ['ez', 'ez-pz'],
+                ]),
+            ]));
+            $this->fail('Incorrect tags should be caught.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            // Expected.
+        }
+
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'suggestion',
+                'contents' => json_encode([
+                    // No difficulty!
+                    'quality' => 3,
+                    'tags' => ['ez', 'ez-pz'],
+                ]),
+            ]));
+            $this->fail('Incorrect tags should be caught.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            // Expected.
+        }
     }
 
     /**
@@ -721,14 +1518,17 @@ class QualityNominationTest extends OmegaupTestCase {
      * All other nomination types should not appear on this list.
      */
     public function testNominationListDoesntShowSuggestionsOrDismisssal() {
-        $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
-        RunsFactory::gradeRun($runData);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         // Create promotion nomination.
-        $login = self::login($contestant);
-        QualityNominationController::apiCreate(new Request([
+        $login = self::login($identity);
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'promotion',
@@ -740,12 +1540,12 @@ class QualityNominationTest extends OmegaupTestCase {
                     ],
                 ],
                 'source' => 'omegaUp',
-                'tags' => ['ez-pz'],
+                'tags' => ['problemTopicSorting'],
             ]),
         ]));
 
         // Create demotion nomination.
-        $qualitynomination = QualityNominationController::apiCreate(new Request([
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'demotion',
@@ -756,7 +1556,7 @@ class QualityNominationTest extends OmegaupTestCase {
         ]));
 
         // Create dismissal nomination.
-        QualityNominationController::apiCreate(new Request([
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'dismissal',
@@ -764,20 +1564,28 @@ class QualityNominationTest extends OmegaupTestCase {
         ]));
 
         // Create dismissal nomination.
-        QualityNominationFactory::createSuggestion(
-            $login,
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identity,
             $problemData['request']['problem_alias'],
             null,
             1,
-            ['DP', 'Math']
+            ['problemTopicDynamicProgramming', 'problemTopicMath'],
+            false
         );
 
-        $reviewerLogin = self::login(QualityNominationFactory::$reviewers[0]);
-        $list = QualityNominationController::apiList(new Request([
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        $list = \OmegaUp\Controllers\QualityNomination::apiList(new \OmegaUp\Request([
             'auth_token' => $reviewerLogin->auth_token,
         ]));
-        $this->assertEquals('ok', $list['status'], 'Status of apiList call is not ok');
-        $this->assertGreaterThanOrEqual(2, count($list['nominations']), "List didn't return enough nominations");
+        $this->assertGreaterThanOrEqual(
+            2,
+            count(
+                $list['nominations']
+            ),
+            "List didn't return enough nominations"
+        );
         foreach ($list['nominations'] as $nomination) {
             $isPromotion = ($nomination['nomination'] == 'promotion');
             $isDemotion = ($nomination['nomination'] == 'demotion');
@@ -793,74 +1601,99 @@ class QualityNominationTest extends OmegaupTestCase {
      * have solved it first.
      */
     public function testMustSolveBeforeDismissed() {
-        $problemData = ProblemsFactory::createProblem();
-        $contestant = UserFactory::createUser();
-        $runData = RunsFactory::createRunToProblem($problemData, $contestant);
-        $login = self::login($contestant);
-        $r = new Request([
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $identity
+        );
+        $login = self::login($identity);
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'nomination' => 'dismissal',
             'contents' => json_encode([]),
         ]);
         try {
-            QualityNominationController::apiCreate($r);
+            \OmegaUp\Controllers\QualityNomination::apiCreate($r);
             $this->fail('Should not have been able to dismissed the problem');
-        } catch (PreconditionFailedException $e) {
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             // Expected.
         }
-        $problem = ProblemsDAO::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new NotFoundException('problemNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
-        $problemDismissed = QualityNominationsDAO::getByUserAndProblem(
+        $problemDismissed = \OmegaUp\DAO\QualityNominations::getByUserAndProblem(
             $r->user->user_id,
             $problem->problem_id,
             $r['nomination'],
             json_encode([]), // re-encoding it for normalization.
             'open'
         );
-        RunsFactory::gradeRun($runData);
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
         try {
-            $this->assertEquals(0, count($problemDismissed), 'Should not have been able to dismiss the problem');
-        } catch (PreconditionFailedException $e) {
+            $this->assertEquals(
+                0,
+                count(
+                    $problemDismissed
+                ),
+                'Should not have been able to dismiss the problem'
+            );
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             // Expected.
         }
         try {
-            QualityNominationController::apiCreate($r);
-            $pd = QualityNominationsDAO::getByUserAndProblem(
+            \OmegaUp\Controllers\QualityNomination::apiCreate($r);
+            $pd = \OmegaUp\DAO\QualityNominations::getByUserAndProblem(
                 $r->user->user_id,
                 $problem->problem_id,
                 $r['nomination'],
                 json_encode([]), // re-encoding it for normalization.
                 'open'
             );
-            $this->assertGreaterThan(0, count($pd), 'The problem should have been dismissed');
-        } catch (PreconditionFailedException $e) {
+            $this->assertGreaterThan(
+                0,
+                count(
+                    $pd
+                ),
+                'The problem should have been dismissed'
+            );
+        } catch (\OmegaUp\Exceptions\PreconditionFailedException $e) {
             // Expected.
         }
     }
 
     public function testGetGlobalDifficultyAndQuality() {
-        $problemData[0] = ProblemsFactory::createProblem();
-        $problemData[1] = ProblemsFactory::createProblem();
+        $problemData[0] = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData[1] = \OmegaUp\Test\Factories\Problem::createProblem();
         self::setUpSyntheticSuggestions($problemData);
 
-        $globalContents = QualityNominationsDAO::getAllNominations();
-        $actualGlobals = QualityNominationsDAO::calculateGlobalDifficultyAndQuality($globalContents);
-        $expectedGlobals = [23/13 /*quality*/, 54/16 /*difficulty*/];
+        $globalContents = \OmegaUp\DAO\QualityNominations::getAllNominations();
+        $actualGlobals = \OmegaUp\DAO\QualityNominations::calculateGlobalDifficultyAndQuality(
+            $globalContents
+        );
+        $expectedGlobals = [23 / 13 /*quality*/, 54 / 16 /*difficulty*/];
 
         $this->assertEquals($expectedGlobals, $actualGlobals);
     }
 
     public function testGetSuggestionRowMap() {
-        $problemData[0] = ProblemsFactory::createProblem();
-        $problemData[1] = ProblemsFactory::createProblem();
+        $problemData[0] = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData[1] = \OmegaUp\Test\Factories\Problem::createProblem();
         self::setUpSyntheticSuggestions($problemData);
-        $contents[0] = QualityNominationsDAO::getAllSuggestionsPerProblem($problemData[0]['problem']->problem_id);
-        $actualResult[0] = QualityNominationsDAO::calculateProblemSuggestionAggregates($contents[0]);
-        $contents[1] = QualityNominationsDAO::getAllSuggestionsPerProblem($problemData[1]['problem']->problem_id);
-        $actualResult[1] = QualityNominationsDAO::calculateProblemSuggestionAggregates($contents[1]);
+        $contents[0] = \OmegaUp\DAO\QualityNominations::getAllSuggestionsPerProblem(
+            $problemData[0]['problem']->problem_id
+        );
+        $actualResult[0] = \OmegaUp\DAO\QualityNominations::calculateProblemSuggestionAggregates(
+            $contents[0]
+        );
+        $contents[1] = \OmegaUp\DAO\QualityNominations::getAllSuggestionsPerProblem(
+            $problemData[1]['problem']->problem_id
+        );
+        $actualResult[1] = \OmegaUp\DAO\QualityNominations::calculateProblemSuggestionAggregates(
+            $contents[1]
+        );
 
         $expectedResult[0] = [
             'quality_sum' => 13,
@@ -869,10 +1702,10 @@ class QualityNominationTest extends OmegaupTestCase {
             'difficulty_n' => 7,
             'tags_n' => 15,
             'tags' => [
-                'dp' => 6,
-                'math' => 6,
-                'matrices' => 1,
-                'greedy' => 2,
+                'problemTopicDynamicProgramming' => 6,
+                'problemTopicMath' => 6,
+                'problemTopicMatrices' => 1,
+                'problemTopicGreedy' => 2,
                 ]
             ];
         $expectedResult[1] = [
@@ -882,11 +1715,11 @@ class QualityNominationTest extends OmegaupTestCase {
             'difficulty_n' => 9,
             'tags_n' => 15,
             'tags' => [
-                'search' => 6,
-                'geometry' => 4,
-                'matrices' => 1,
-                'math' => 2,
-                'dp' => 2,
+                'problemTopicSorting' => 6,
+                'problemTopicGeometry' => 4,
+                'problemTopicMatrices' => 1,
+                'problemTopicMath' => 2,
+                'problemTopicDynamicProgramming' => 2,
             ],
         ];
         $this->assertEquals($expectedResult, $actualResult);
@@ -894,220 +1727,472 @@ class QualityNominationTest extends OmegaupTestCase {
 
     /*
         Creates 5 problems and 5 users.
-         - The first time the cronjob is executed, the problems are voted by users as unranked users (with vote weight = 2)
-         - The second time, the problems are voted by ranked users according to the number of problems they solved
+         - The first time the cronjob is executed, the problems are voted by
+           users as unranked users (with vote weight = 2)
+         - The second time, the problems are voted by ranked users according to
+           the number of problems they solved
     */
     public function testAggregateFeedback() {
-        /* Previous tests create some users with their assigned ranges and forget to delete them, which affects this test */
-        Utils::deleteAllRanks();
-        Utils::deleteAllPreviousRuns();
-
         for ($i = 0; $i < 5; $i++) {
-            $problemData[$i] = ProblemsFactory::createProblem();
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
+        $userData = [];
+        $identityData = [];
         for ($i = 0; $i < 5; $i++) {
-            $userData[$i] = UserFactory::createUser();
+            ['user' => $userData[$i], 'identity' => $identityData[$i]] = \OmegaUp\Test\Factories\User::createUser();
         }
-        self::setUpRankForUsers($problemData, $userData, true);
+        self::setUpRankForUsers($problemData, $identityData, true);
 
-        Utils::RunAggregateFeedback();
+        // Create and extra user and send a before_ac nomination
+        // that should not affect the current results.
+        $beforeACUser = \OmegaUp\Test\Factories\User::createUser();
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData[0],
+            $beforeACUser['identity']
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA');
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $beforeACUser['identity'],
+            $problemData[0]['request']['problem_alias'],
+            4, /* difficulty */
+            4, /* quality */
+            ['problemTopicDynamicProgramming', 'problemTopicMath'],
+            true
+        );
 
-        $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['problem_alias']);
-        $this->assertEquals(2.971428571, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
-        $this->assertEquals(2.2, $newProblem[0]->quality, 'Wrong quality.', 0.001);
-        $this->assertEquals('[0, 0, 2, 2, 1]', $newProblem[0]->difficulty_histogram, 'Wrong difficulty histogram');
-        $this->assertEquals('[1, 1, 0, 1, 2]', $newProblem[0]->quality_histogram, 'Wrong quality histogram');
+        \OmegaUp\Test\Utils::runAggregateFeedback();
 
-        $newProblem[2] = ProblemsDAO::getByAlias($problemData[2]['request']['problem_alias']);
-        $this->assertEquals(0, $newProblem[2]->difficulty, 'Wrong difficulty', 0.001);
-        $this->assertEquals(0, $newProblem[2]->quality, 'Wrong quality', 0.001);
+        $newProblem[0] = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData[0]['request']['problem_alias']
+        );
+        $this->assertEqualsWithDelta(
+            2.971428571,
+            $newProblem[0]->difficulty,
+            0.001,
+            'Wrong difficulty.'
+        );
+        $this->assertEqualsWithDelta(
+            2.2,
+            $newProblem[0]->quality,
+            0.001,
+            'Wrong quality.'
+        );
+        $this->assertEquals(
+            '[0, 0, 2, 2, 1]',
+            $newProblem[0]->difficulty_histogram,
+            'Wrong difficulty histogram'
+        );
+        $this->assertEquals(
+            '[1, 1, 0, 1, 2]',
+            $newProblem[0]->quality_histogram,
+            'Wrong quality histogram'
+        );
 
-        $tagArrayForProblem1 = ProblemsTagsDAO::getProblemTags(
+        $newProblem[2] = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData[2]['request']['problem_alias']
+        );
+        $this->assertEqualsWithDelta(
+            0,
+            $newProblem[2]->difficulty,
+            0.001,
+            'Wrong difficulty'
+        );
+        $this->assertEqualsWithDelta(
+            0,
+            $newProblem[2]->quality,
+            0.001,
+            'Wrong quality'
+        );
+
+        $tagArrayForProblem1 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $newProblem[0],
             false /* public_only */,
-            true /* includeAutogenerated */
+            true /* includeVoted */
         );
 
-        $tagArrayForProblem3 = ProblemsTagsDAO::getProblemTags(
+        $tagArrayForProblem3 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $newProblem[2],
             false /* public_only */,
-            true /* includeAutogenerated */
+            true /* includeVoted */
         );
 
-        $extractName = function ($tag) {
-            return $tag['name'];
-        };
+        $extractName = fn ($tag) => $tag['name'];
 
         $tags1 = array_map($extractName, $tagArrayForProblem1);
-        $this->assertEquals($tags1, ['dp', 'math', 'matrices', 'greedy', 'lenguaje']);
+        $this->assertEqualsCanonicalizing(
+            $tags1,
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemRestrictedTagLanguage',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicMath',
+                'problemTopicMatrices'
+            ]
+        );
 
         $tags3 = array_map($extractName, $tagArrayForProblem3);
-        $this->assertEquals($tags3, ['dp', 'greedy', 'geometry', 'search', 'lenguaje']);
+        $this->assertEqualsCanonicalizing(
+            $tags3,
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemRestrictedTagLanguage',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicGeometry',
+                'problemTopicSorting'
+            ]
+        );
 
-        Utils::RunUpdateUserRank();
-        Utils::RunAggregateFeedback();
+        \OmegaUp\Test\Utils::runUpdateRanks();
+        \OmegaUp\Test\Utils::runAggregateFeedback();
 
-        $newProblem[0] = ProblemsDAO::getByAlias($problemData[0]['request']['problem_alias']);
-        $this->assertEquals(2.895384615, $newProblem[0]->difficulty, 'Wrong difficulty.', 0.001);
-        $this->assertEquals(2.538378378, $newProblem[0]->quality, 'Wrong quality.', 0.001);
+        $newProblem[0] = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData[0]['request']['problem_alias']
+        );
+        $this->assertEqualsWithDelta(
+            2.895384615,
+            $newProblem[0]->difficulty,
+            0.001,
+            'Wrong difficulty.'
+        );
+        $this->assertEqualsWithDelta(
+            2.538378378,
+            $newProblem[0]->quality,
+            0.001,
+            'Wrong quality.'
+        );
 
-        $newProblem[1] = ProblemsDAO::getByAlias($problemData[1]['request']['problem_alias']);
-        $this->assertEquals(3.446886447, $newProblem[1]->difficulty, 'Wrong difficulty.', 0.001);
-        $this->assertEquals(0, $newProblem[1]->quality, 'Wrong quality.', 0.001);
+        $newProblem[1] = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData[1]['request']['problem_alias']
+        );
+        $this->assertEqualsWithDelta(
+            3.446886447,
+            $newProblem[1]->difficulty,
+            0.001,
+            'Wrong difficulty.'
+        );
+        $this->assertEqualsWithDelta(
+            0,
+            $newProblem[1]->quality,
+            0.001,
+            'Wrong quality.'
+        );
 
-        $newProblem[2] = ProblemsDAO::getByAlias($problemData[2]['request']['problem_alias']);
-        $this->assertEquals(2.684981685, $newProblem[2]->difficulty, 'Wrong difficulty', 0.001);
-        $this->assertEquals(1.736164736, $newProblem[2]->quality, 'Wrong quality', 0.001);
+        $newProblem[2] = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData[2]['request']['problem_alias']
+        );
+        $this->assertEqualsWithDelta(
+            2.684981685,
+            $newProblem[2]->difficulty,
+            0.001,
+            'Wrong difficulty'
+        );
+        $this->assertEqualsWithDelta(
+            1.736164736,
+            $newProblem[2]->quality,
+            0.001,
+            'Wrong quality'
+        );
 
-        $tagArrayForProblem1 = ProblemsTagsDAO::getProblemTags(
+        $tagArrayForProblem1 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $newProblem[0],
             false /* public_only */,
-            true /* includeAutogenerated */
+            true /* includeVoted */
         );
 
-        $tagArrayForProblem3 = ProblemsTagsDAO::getProblemTags(
+        $tagArrayForProblem3 = \OmegaUp\DAO\ProblemsTags::getProblemTags(
             $newProblem[2],
             false /* public_only */,
-            true /* includeAutogenerated */
+            true /* includeVoted */
         );
 
         $tags1 = array_map($extractName, $tagArrayForProblem1);
-        $this->assertEquals($tags1, ['dp', 'math', 'greedy', 'lenguaje']);
+        $this->assertEqualsCanonicalizing(
+            $tags1,
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicMath',
+                'problemRestrictedTagLanguage'
+            ]
+        );
 
         $tags3 = array_map($extractName, $tagArrayForProblem3);
-        $this->assertEquals($tags3, ['dp', 'greedy', 'geometry', 'search', 'lenguaje']);
+        $this->assertEqualsCanonicalizing(
+            $tags3,
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicGeometry',
+                'problemTopicSorting',
+                'problemRestrictedTagLanguage'
+            ]
+        );
     }
 
-    public function setUpRankForUsers($problems, $users, $withSuggestions = false) {
+    /**
+     * Test if the problem's quality_seal sets to true after receiving
+     * the feedback of reviewers.
+     */
+    public function testReviewersFeedbackPostive() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicKarel',
+                'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[1]
+        );
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicKarel',
+                'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[2]
+        );
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => false,
+                'tag' => 'problemLevelAdvancedSpecializedTopics',
+            ]),
+        ]));
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        $problem = \OmegaUp\DAO\Problems::getByPK(
+            $problemData['problem']->problem_id
+        );
+        $this->assertTrue($problem->quality_seal);
+    }
+
+    /**
+     * Test if the problem's quality_seal remains as false after receiving
+     * the feedback of reviewers.
+     */
+    public function testReviewersFeedbackNegative() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => false,
+                'tag' => 'problemLevelAdvancedSpecializedTopics',
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[1]
+        );
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => false,
+                'tag' => 'problemLevelBasicIntroductionToProgramming',
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[2]
+        );
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicIntroductionToProgramming',
+                'tags' => ['problemTagQueues', 'problemTagRecursion'],
+            ]),
+        ]));
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        $problem = \OmegaUp\DAO\Problems::getByPK(
+            $problemData['problem']->problem_id
+        );
+        $this->assertFalse($problem->quality_seal);
+    }
+
+    public function setUpRankForUsers(
+        $problems,
+        $users,
+        $withSuggestions = false
+    ) {
         for ($i = 0; $i < 5; $i++) {
             for ($j = 0; $j <= $i; $j++) {
-                $runData = RunsFactory::createRunToProblem($problems[$j], $users[$i]);
-                RunsFactory::gradeRun($runData);
+                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                    $problems[$j],
+                    $users[$i]
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($runData);
             }
-            $login[] = self::login($users[$i]);
         }
 
         if ($withSuggestions) {
-            Utils::deleteAllSuggestions();
-
-            QualityNominationFactory::createSuggestion(
-                $login[0],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[0],
                 $problems[0]['request']['problem_alias'],
                 2, /* difficulty */
                 1, /* quality */
-                ['DP', 'Math']
+                ['problemTopicDynamicProgramming', 'problemTopicMath'],
+                false
             );
 
-            QualityNominationFactory::createSuggestion(
-                $login[1],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[1],
                 $problems[0]['request']['problem_alias'],
                 3, /* difficulty */
                 3, /* quality */
-                ['Matrices', 'Math']
+                ['problemTopicMatrices', 'problemTopicMath'],
+                false
             );
 
-            QualityNominationFactory::createSuggestion(
-                $login[2],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[2],
                 $problems[0]['request']['problem_alias'],
                 4, /* difficulty */
                 0, /* quality */
-                ['Math', 'DP']
+                ['problemTopicMath', 'problemTopicDynamicProgramming'],
+                false
             );
 
-            QualityNominationFactory::createSuggestion(
-                $login[3],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[3],
                 $problems[0]['request']['problem_alias'],
                 2, /* difficulty */
                 4, /* quality */
-                ['DP', 'Math', 'Greedy']
+                ['problemTopicDynamicProgramming', 'problemTopicMath', 'problemTopicGreedy'],
+                false
             );
 
-            QualityNominationFactory::createSuggestion(
-                $login[4],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[4],
                 $problems[0]['request']['problem_alias'],
                 3, /* difficulty */
                 4, /* quality */
-                ['Greedy', 'DP']
+                ['problemTopicGreedy', 'problemTopicDynamicProgramming'],
+                false
             );
 
-            QualityNominationFactory::createSuggestion(
-                $login[1],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[1],
                 $problems[1]['request']['problem_alias'],
                 3, /* difficulty */
                 null, /* quality */
-                ['Matrices', 'Math']
+                ['problemTopicMatrices', 'problemTopicMath'],
+                false
             );
 
-            QualityNominationFactory::createSuggestion(
-                $login[2],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[2],
                 $problems[1]['request']['problem_alias'],
                 null, /* difficulty */
                 1, /* quality */
-                ['Math', 'DP']
+                ['problemTopicMath', 'problemTopicDynamicProgramming'],
+                false
             );
 
-            QualityNominationFactory::createSuggestion(
-                $login[3],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[3],
                 $problems[1]['request']['problem_alias'],
                 4, /* difficulty */
                 null, /* quality */
-                ['DP', 'Math', 'Greedy']
+                ['problemTopicDynamicProgramming', 'problemTopicMath', 'problemTopicGreedy'],
+                false
             );
 
-            QualityNominationFactory::createSuggestion(
-                $login[4],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[4],
                 $problems[1]['request']['problem_alias'],
                 4, /* difficulty */
                 0, /* quality */
-                ['Greedy', 'DP']
+                ['problemTopicGreedy', 'problemTopicDynamicProgramming'],
+                false
             );
 
-            QualityNominationFactory::createSuggestion(
-                $login[2],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[2],
                 $problems[2]['request']['problem_alias'],
                 4, /* difficulty */
                 4, /* quality */
-                ['Search', 'DP', 'Greedy']
+                ['problemTopicSorting', 'problemTopicDynamicProgramming', 'problemTopicGreedy'],
+                false
             );
 
-            QualityNominationFactory::createSuggestion(
-                $login[3],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[3],
                 $problems[2]['request']['problem_alias'],
                 4, /* difficulty */
                 1, /* quality */
-                ['Geometry', 'DP', 'Search', 'Greedy']
+                ['problemTopicGeometry', 'problemTopicDynamicProgramming', 'problemTopicSorting', 'problemTopicGreedy'],
+                false
             );
 
-            QualityNominationFactory::createSuggestion(
-                $login[4],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[4],
                 $problems[2]['request']['problem_alias'],
                 1, /* difficulty */
                 1, /* quality */
-                ['Search', 'Greedy']
+                ['problemTopicSorting', 'problemTopicGreedy'],
+                false
             );
 
-            QualityNominationFactory::createSuggestion(
-                $login[3],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[3],
                 $problems[3]['request']['problem_alias'],
                 4, /* difficulty */
                 3, /* quality */
-                ['DP', 'Math', 'Greedy']
+                ['problemTopicDynamicProgramming', 'problemTopicMath', 'problemTopicGreedy'],
+                false
             );
 
-            QualityNominationFactory::createSuggestion(
-                $login[4],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[4],
                 $problems[3]['request']['problem_alias'],
                 3, /* difficulty */
                 null, /* quality */
-                ['Greedy', 'DP']
+                ['problemTopicGreedy', 'problemTopicDynamicProgramming'],
+                false
             );
 
-            QualityNominationFactory::createSuggestion(
-                $login[4],
+            \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                $users[4],
                 $problems[4]['request']['problem_alias'],
                 3, /* difficulty */
                 null, /* quality */
-                ['Greedy', 'DP']
+                ['problemTopicGreedy', 'problemTopicDynamicProgramming'],
+                false
             );
         }
     }
@@ -1121,35 +2206,35 @@ class QualityNominationTest extends OmegaupTestCase {
     // with difficulty < 2.
     public function testUpdateProblemOfTheWeek() {
         $syntheticProblems = self::setUpSyntheticSuggestionsForProblemOfTheWeek();
-        Utils::RunAggregateFeedback();
+        \OmegaUp\Test\Utils::runAggregateFeedback();
 
-        $problemOfTheWeek = ProblemOfTheWeekDAO::getByDificulty('easy');
-        $this->assertEquals(count($problemOfTheWeek), 1);
+        $problemOfTheWeek = \OmegaUp\DAO\ProblemOfTheWeek::getByDifficulty(
+            'easy'
+        );
+        $this->assertCount(1, $problemOfTheWeek);
         $this->assertEquals(
-            $problemOfTheWeek[0]->problem_id,
-            $syntheticProblems[1]['problem']->problem_id
+            $syntheticProblems[1]['problem']->problem_id,
+            $problemOfTheWeek[0]->problem_id
         );
         // TODO(heduenas): Make assertation for hard problem of the week when that gets implmented.
     }
 
     public function setUpSyntheticSuggestionsForProblemOfTheWeek() {
-        // Delete existing suggestions and problems of the week.
-        Utils::deleteAllSuggestions();
-        Utils::deleteAllProblemsOfTheWeek();
-
         // Setup synthetic data.
         $numberOfProblems = 4;
         for ($i = 0; $i < $numberOfProblems; $i++) {
-            $problemData[$i] = ProblemsFactory::createProblem();
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
-        $login = [];
+        $identities = [];
         for ($i = 0; $i < 10; $i++) {
-            $contestant = UserFactory::createUser();
+            ['identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
             for ($j = 0; $j < $numberOfProblems; $j++) {
-                $runData = RunsFactory::createRunToProblem($problemData[$j], $contestant);
-                RunsFactory::gradeRun($runData);
+                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                    $problemData[$j],
+                    $identities[$i]
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($runData);
             }
-            $login[] = self::login($contestant);
         }
 
         // Easy problem with low quality.
@@ -1167,250 +2252,303 @@ class QualityNominationTest extends OmegaupTestCase {
 
         for ($problemIdx = 0; $problemIdx < $numberOfProblems; $problemIdx++) {
             for ($userIdx = 0; $userIdx < 10; $userIdx++) {
-                QualityNominationFactory::createSuggestion(
-                    $login[$userIdx],
+                \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                    $identities[$userIdx],
                     $problemData[$problemIdx]['request']['problem_alias'],
                     $difficultyRatings[$problemIdx][$userIdx],
                     $qualityRatings[$problemIdx][$userIdx],
-                    [] // No tags.
+                    [], // No tags.
+                    false
                 );
             }
         }
 
         // Set date for all quality nominations as 1 week ago, so that they are eligible for
         // current problem of the week.
-        $dateOneWeekAgo = (new DateTime())->sub(new DateInterval('P7D'))->format('Y-m-d H:i:s');
-        MySQLConnection::getInstance()->Execute('UPDATE `QualityNominations` SET `time` = ?', [$dateOneWeekAgo]);
+        $dateOneWeekAgo = (new DateTime())
+            ->setTimestamp(\OmegaUp\Time::get())
+            ->sub(new DateInterval('P7D'))
+            ->format('Y-m-d H:i:s');
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            'UPDATE `QualityNominations` SET `time` = ?',
+            [$dateOneWeekAgo]
+        );
 
         return $problemData;
     }
 
     public function testAutogeneratedTagsWithConflicts() {
-        $problemData[0] = ProblemsFactory::createProblem();
-        $problemData[1] = ProblemsFactory::createProblem();
+        $problemData[0] = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData[1] = \OmegaUp\Test\Factories\Problem::createProblem();
         self::setUpSyntheticSuggestions($problemData);
 
         // Manually add one tag.
-        ProblemsFactory::addTag($problemData[0], 'dp', 1 /* public */);
-        $tags = array_map(function ($tag) {
-            return $tag['name'];
-        }, ProblemsTagsDAO::getProblemTags(
-            $problemData[0]['problem'],
-            false /* public_only */,
-            true /* includeAutogenerated */
-        ));
-        $this->assertEquals($tags, ['dp', 'lenguaje']);
+        \OmegaUp\Test\Factories\Problem::addTag(
+            $problemData[0],
+            'problemTopicDynamicProgramming',
+            1 /* public */
+        );
+        $tags = array_map(
+            fn ($tag) => $tag['name'],
+            \OmegaUp\DAO\ProblemsTags::getProblemTags(
+                $problemData[0]['problem'],
+                false /* public_only */,
+                true /* includeVoted */
+            )
+        );
+        $this->assertEqualsCanonicalizing(
+            $tags,
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemTopicDynamicProgramming',
+                'problemRestrictedTagLanguage'
+            ]
+        );
 
-        Utils::RunAggregateFeedback();
+        \OmegaUp\Test\Utils::runAggregateFeedback();
 
-        $tags = array_map(function ($tag) {
-            return $tag['name'];
-        }, ProblemsTagsDAO::getProblemTags(
-            $problemData[0]['problem'],
-            false /* public_only */,
-            true /* includeAutogenerated */
-        ));
-        $this->assertEquals($tags, ['dp', 'math', 'greedy', 'lenguaje']);
+        $tags = array_map(
+            fn ($tag) => $tag['name'],
+            \OmegaUp\DAO\ProblemsTags::getProblemTags(
+                $problemData[0]['problem'],
+                false /* public_only */,
+                true /* includeVoted */
+            )
+        );
+        $this->assertEqualsCanonicalizing(
+            $tags,
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicMath',
+                'problemRestrictedTagLanguage'
+            ]
+        );
     }
 
     public function setUpSyntheticSuggestions($problemData) {
-        Utils::deleteAllSuggestions();
-
         // Setup synthetic data.
-        $login = [];
+        $contestants = [];
+        $identities = [];
         for ($i = 0; $i < 10; $i++) {
-            $contestant = UserFactory::createUser();
+            ['user' => $contestants[], 'identity' => $identities[]] = \OmegaUp\Test\Factories\User::createUser();
             for ($j = 0; $j < 2; $j++) {
-                $runData = RunsFactory::createRunToProblem($problemData[$j], $contestant);
-                RunsFactory::gradeRun($runData);
+                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                    $problemData[$j],
+                    $identities[$i]
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($runData);
             }
-            $login[] = self::login($contestant);
         }
 
-        QualityNominationFactory::createSuggestion(
-            $login[0],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[0],
             $problemData[0]['request']['problem_alias'],
             null,
             1,
-            ['DP', 'Math']
+            ['problemTopicDynamicProgramming', 'problemTopicMath'],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[1],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[1],
             $problemData[0]['request']['problem_alias'],
             3,
             3,
-            ['Math', 'DP']
+            ['problemTopicMath', 'problemTopicDynamicProgramming'],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[2],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[2],
             $problemData[0]['request']['problem_alias'],
             4,
             0,
-            ['Matrices', 'Math']
+            ['problemTopicMatrices', 'problemTopicMath'],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[3],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[3],
             $problemData[0]['request']['problem_alias'],
             null,
             null,
-            ['Math']
+            ['problemTopicMath'],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[4],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[4],
             $problemData[0]['request']['problem_alias'],
             3,
             4,
-            ['DP', 'Math', 'Greedy']
+            ['problemTopicDynamicProgramming', 'problemTopicMath', 'problemTopicGreedy'],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[5],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[5],
             $problemData[0]['request']['problem_alias'],
             3,
             null,
-            []
+            [],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[6],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[6],
             $problemData[0]['request']['problem_alias'],
             null,
             1,
-            []
+            [],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[7],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[7],
             $problemData[0]['request']['problem_alias'],
             4,
             null,
-            ['Greedy', 'DP']
+            ['problemTopicGreedy', 'problemTopicDynamicProgramming'],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[8],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[8],
             $problemData[0]['request']['problem_alias'],
             4,
             0,
-            ['DP']
+            ['problemTopicDynamicProgramming'],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[9],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[9],
             $problemData[0]['request']['problem_alias'],
             4,
             4,
-            ['DP', 'Math']
+            ['problemTopicDynamicProgramming', 'problemTopicMath'],
+            false
         );
 
-        QualityNominationFactory::createSuggestion(
-            $login[0],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[0],
             $problemData[1]['request']['problem_alias'],
             4,
             1,
-            ['Search', 'Geometry']
+            ['problemTopicSorting', 'problemTopicGeometry'],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[1],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[1],
             $problemData[1]['request']['problem_alias'],
             1,
             1,
-            ['Search', 'Geometry']
+            ['problemTopicSorting', 'problemTopicGeometry'],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[2],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[2],
             $problemData[1]['request']['problem_alias'],
             4,
             3,
-            ['Matrices', 'Search']
+            ['problemTopicMatrices', 'problemTopicSorting'],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[3],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[3],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            ['Search']
+            ['problemTopicSorting'],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[4],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[4],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            ['Search', 'Math', 'Geometry']
+            ['problemTopicSorting', 'problemTopicMath', 'problemTopicGeometry'],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[5],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[5],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            []
+            [],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[6],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[6],
             $problemData[1]['request']['problem_alias'],
             null,
             1,
-            []
+            [],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[7],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[7],
             $problemData[1]['request']['problem_alias'],
             3,
             null,
-            ['Search', 'DP']
+            ['problemTopicSorting', 'problemTopicDynamicProgramming'],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[8],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[8],
             $problemData[1]['request']['problem_alias'],
             4,
             1,
-            ['DP']
+            ['problemTopicDynamicProgramming'],
+            false
         );
-        QualityNominationFactory::createSuggestion(
-            $login[9],
+        \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+            $identities[9],
             $problemData[1]['request']['problem_alias'],
             4,
             3,
-            ['Geometry', 'Math']
+            ['problemTopicGeometry', 'problemTopicMath'],
+            false
         );
     }
 
     public function testMostVotedTags() {
         $tags = [
-            'DP' => 15,
-            'Graph' => 10,
-            'Binary Search' => 5,
-            'Math' => 2,
-            'Greedy' => 1,
+            'problemTopicDynamicProgramming' => 15,
+            'problemTopicGraphTheory' => 10,
+            'problemTopicBinarySearch' => 5,
+            'problemTopicMath' => 2,
+            'problemTopicGreedy' => 1,
         ];
 
         $this->assertEquals(
-            QualityNominationsDAO::mostVotedTags($tags, 0.25),
-            ['DP', 'Graph', 'Binary Search']
+            \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.25),
+            ['problemTopicDynamicProgramming', 'problemTopicGraphTheory', 'problemTopicBinarySearch']
         );
 
         $this->assertEquals(
-            QualityNominationsDAO::mostVotedTags($tags, 0.5),
-            ['DP', 'Graph']
+            \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.5),
+            ['problemTopicDynamicProgramming', 'problemTopicGraphTheory']
         );
 
         $this->assertEquals(
-            QualityNominationsDAO::mostVotedTags($tags, 0.9),
-            ['DP']
+            \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.9),
+            ['problemTopicDynamicProgramming']
         );
 
         $this->assertEquals(
-            QualityNominationsDAO::mostVotedTags($tags, 0.9),
-            ['DP']
+            \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.9),
+            ['problemTopicDynamicProgramming']
         );
 
         $this->assertEquals(
-            QualityNominationsDAO::mostVotedTags($tags, 0.01),
-            ['DP', 'Graph', 'Binary Search', 'Math', 'Greedy']
+            \OmegaUp\DAO\QualityNominations::mostVotedTags($tags, 0.01),
+            ['problemTopicDynamicProgramming', 'problemTopicGraphTheory', 'problemTopicBinarySearch', 'problemTopicMath', 'problemTopicGreedy']
         );
 
         $tagsWithLittleVotes = [
-            'DP' => 2,
-            'Graph' => 1,
+            'problemTopicDynamicProgramming' => 2,
+            'problemTopicGraphTheory' => 1,
         ];
 
         $this->assertEquals(
-            QualityNominationsDAO::mostVotedTags($tagsWithLittleVotes, 0.25),
+            \OmegaUp\DAO\QualityNominations::mostVotedTags(
+                $tagsWithLittleVotes,
+                0.25
+            ),
             [],
             'There must be at least 5 votes.'
         );
@@ -1420,9 +2558,185 @@ class QualityNominationTest extends OmegaupTestCase {
             'T7' => 9, 'T8' => 9, 'T9' => 9, 'T10' => 9, 'T11' => 9, 'T12' => 9];
 
         $this->assertEquals(
-            QualityNominationsDAO::mostVotedTags($tooManyTagsWithMaxVotes, 0.25),
+            \OmegaUp\DAO\QualityNominations::mostVotedTags(
+                $tooManyTagsWithMaxVotes,
+                0.25
+            ),
             [],
             'There must be a maximum number of tags to be assigned.'
         );
+    }
+
+    /**
+     * A PHPUnit data provider for all the tests that can accept a status.
+     *
+     * @return list<array{0: string, 1: int, 2: string, 3:array<string:boolean>, 4: boolean }>
+     */
+    public function qualityNominationsDemotionStatusApiUpdateCaseProvider(): array {
+        return [
+            [
+                'warning',
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+                'qualityNominationProblemHasWarning',
+                [
+                    'private_banned' => false,
+                    'public_banned' => false,
+                    'private' => false,
+                    'private_warning' => true,
+                    'public_warning' => true,
+                    'public' => false,
+                    'promoted' => false
+                ],
+                true
+            ],
+            [
+                'warning',
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+                'qualityNominationProblemHasWarning',
+                [
+                    'private_banned' => true,
+                    'public_banned' => true,
+                    'private' => true,
+                    'private_warning' => true,
+                    'public_warning' => true,
+                    'public' => true,
+                    'promoted' => true
+                ],
+                false
+            ],
+            [
+                'banned',
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+                'qualityNominationProblemHasBeenBanned',
+                [
+                    'private_banned' => false,
+                    'public_banned' => true,
+                    'private' => false,
+                    'private_warning' => false,
+                    'public_warning' => false,
+                    'public' => false,
+                    'promoted' => false
+                ],
+                true,
+            ],
+            [
+                'banned',
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+                'qualityNominationProblemHasBeenBanned',
+                [
+                    'private_banned' => true,
+                    'public_banned' => true,
+                    'private' => true,
+                    'private_warning' => true,
+                    'public_warning' => true,
+                    'public' => true,
+                    'promoted' => true
+                ],
+                false,
+            ]
+        ];
+    }
+
+    /**
+     * Check that a non-reviewer user cannot change the visibility that is not PRIVATE_WARNING
+     * or PUBLIC_WARNING of his problems with a demotion qualitynomination but only reviewer
+     * can change any visibility.
+     * @dataProvider qualityNominationsDemotionStatusApiUpdateCaseProvider
+     */
+    public function testUserCannotUpdateProblemWithDemotionResolved(
+        string $status,
+        int $intVisibility,
+        string $errorMessage,
+        array $invalidVisibilities,
+        bool $loginAsAuthor
+    ) {
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
+            [
+                'username' => 'user_test_author'
+            ]
+        ));
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams(
+            [
+                'author' => $author,
+                'title' => 'problem_1'
+            ]
+        ));
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        \OmegaUp\Controllers\QualityNomination::apiResolve(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => $status,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => 'ew plus something else',
+            ])
+        );
+
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+        ]));
+        $this->assertEquals(
+            $status,
+            $details['nomination_status'],
+            "qualitynomination should have been marked as {$status}"
+        );
+
+        $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+        $this->assertEquals(
+            $intVisibility,
+            $problem['visibility'],
+            "Problem should have been public {$status}"
+        );
+
+        $login = self::login($author);
+        foreach ($invalidVisibilities as $visibility => $shouldPass) {
+            try {
+                \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+                    'auth_token' => ($loginAsAuthor ? $login->auth_token : $reviewerLogin->auth_token),
+                    'problem_alias' => $problemData['request']['problem_alias'],
+                    'visibility' => $visibility,
+                    'message' => "public {$status} -> {$visibility}",
+                ]));
+                if (!$shouldPass) {
+                    $this->fail(
+                        "Normal user shouldn't be able to update to problem {$status} to other visibility that is not {$status}"
+                    );
+                }
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+                if ($shouldPass) {
+                    $this->fail(
+                        "Normal user should be able to update to problem warning to other visibility {$status}"
+                    );
+                }
+                $this->assertEquals(
+                    $e->getMessage(),
+                    $errorMessage
+                );
+            }
+        }
     }
 }

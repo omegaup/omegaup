@@ -1,0 +1,56 @@
+FROM ubuntu:focal
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y openjdk-14-jre-headless curl \
+        ca-certificates gnupg2 xz-utils && \
+    /usr/sbin/update-ca-certificates && \
+    apt-get autoremove -y && \
+    apt-get clean
+
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
+
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y \
+        php7.4-fpm php7.4-curl php7.4-mysql php7.4-sqlite3 php7.4-zip \
+        php7.4-mbstring php7.4-json php7.4-opcache php7.4-xml php-apcu \
+        nginx git yarn nodejs supervisor python3-jinja2 python3-requests \
+        python3-mysqldb python3-pyparsing mysql-client-core-8.0 \
+        sudo wait-for-it && \
+    apt-get autoremove -y && \
+    apt-get clean
+
+RUN curl -sL https://getcomposer.org/download/1.10.10/composer.phar -o /usr/bin/composer
+RUN chmod +x /usr/bin/composer
+
+RUN curl -sL https://github.com/omegaup/gitserver/releases/download/v1.4.16/omegaup-gitserver.tar.xz | tar xJ -C /
+RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.27/libinteractive.jar -o /usr/share/java/libinteractive.jar
+
+RUN useradd --create-home --shell=/bin/bash ubuntu
+
+RUN mkdir -p /etc/omegaup/frontend
+RUN mkdir -p /var/log/omegaup && chown -R ubuntu /var/log/omegaup
+RUN mkdir -p /var/log/supervisor && chown -R ubuntu /var/log/supervisor
+
+COPY ./etc/omegaup/frontend/* /etc/omegaup/frontend/
+COPY ./etc/supervisor/* /etc/supervisor/
+COPY ./etc/php/7.4/fpm/* /etc/php/7.4/fpm/
+COPY ./etc/nginx/* /etc/nginx/
+COPY ./etc/sudoers.d/* /etc/sudoers.d/
+RUN chmod 440 /etc/sudoers.d/ubuntu
+COPY ./usr/bin/* /usr/bin/
+RUN chmod +x /usr/bin/yarn-dev.sh /usr/bin/developer-environment.sh
+COPY ./my.cnf /home/ubuntu/.my.cnf
+
+RUN mkdir /opt/omegaup && chown -R ubuntu /opt/omegaup
+USER ubuntu
+WORKDIR /opt/omegaup
+
+EXPOSE 8001
+
+ENV CI=false
+
+CMD ["wait-for-it", "grader:36663", "gitserver:33861", "broadcaster:22291", "mysql:3306", "--", \
+     "/bin/bash", "-c", \
+     "while [[ ! -d /opt/omegaup/frontend/server ]]; do sleep 1; done; exec /usr/bin/supervisord"]

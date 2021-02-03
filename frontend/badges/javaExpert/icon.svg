@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  SVG por defecto para los Badges
+  Este archivo servirá como referencia para personalizar badges a criterio de los contribuidores.
+
+  Este archivo puede ser modificado usando una herramienta de diseño (Adobe Illustrator, Potoshop,
+  Inkscape, etc), o también se puede modificar directamente desde el código (cosas simples como
+  el cambio de colores).
+
+  Las restricciones que todo Badge SVG deberá respetar:
+  - Ancho (width)  = Alto (height) = 600px (SIEMPRE).
+  - Tamaño de archivo de 15KB como máximo.
+-->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg2"
+   x="0px"
+   y="0px"
+   viewBox="0 0 497.99121 600.11328"
+   xml:space="preserve"
+   height="600.11328"
+   width="497.99121"
+   sodipodi:docname="icon.svg"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"><metadata
+   id="metadata949"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:Work></rdf:RDF></metadata><defs
+   id="defs947"><linearGradient
+     id="linearGradient2984"
+     osb:paint="solid"><stop
+       style="stop-color:#0b0000;stop-opacity:1;"
+       offset="0"
+       id="stop2982" /></linearGradient></defs>
+
+<style
+   type="text/css"
+   id="style915">
+  <!--
+    Estos colores pueden ser personalizados a gusto del contribuidor en caso
+    desee configurar el ícono a partir del código.
+
+    Simplemente se reemplazan (o agregan) los colores con las clases que se encuentran a continuación
+    y se asignan las clases correspondientes en el los trazos.
+  -->
+  .st0{fill:#FFFFFF;} <!-- Color de fondo de la parte superior del badge -->
+  .st1{fill:#5588DD;} <!-- Color para "Up" y fondo de la parte inferior del badge -->
+  .st2{fill:#111111;} <!-- Color de "omega" -->
+  <!-- Colores para el ícono de la laptop -->
+  .st3{fill:#BBBBBB;}
+  .st4{fill:#888888;}
+</style>
+
+<sodipodi:namedview
+   bordercolor="#666666"
+   borderopacity="1.0"
+   id="base"
+   inkscape:current-layer="g944"
+   inkscape:cx="662.46565"
+   inkscape:cy="152.70848"
+   inkscape:document-units="px"
+   inkscape:pageopacity="0.0"
+   inkscape:pageshadow="2"
+   inkscape:window-height="705"
+   inkscape:window-maximized="1"
+   inkscape:window-width="1366"
+   inkscape:window-x="-8"
+   inkscape:window-y="-8"
+   inkscape:zoom="0.42454318"
+   pagecolor="#ffffff"
+   showgrid="false"
+   fit-margin-top="0"
+   fit-margin-left="0"
+   fit-margin-right="0"
+   fit-margin-bottom="0">
+</sodipodi:namedview>
+
+<g
+   id="g944"
+   transform="translate(-51.048266,0.08765367)">
+  <g
+   id="g920">
+    <path
+   d="M 548.8,100.5 C 548.6,92.6 542.9,85.7 535,84.6 498,79.5 461.4,70.7 425.6,57.5 390,44.4 350.5,26.2 308,2.2 c -5.4,-3 -10.5,-3.1 -15.9,0 -42.2,24 -81.4,42.2 -117.3,55.3 -35.8,13.1 -72.3,22 -109.1,27.1 -7.9,1.1 -13.5,7.9 -14.4,15.9 -3.5,150.8 29.5,274.2 98.8,370.2 37.7,52.3 85,94.7 142,127 4.4,3.2 11.3,3 16.5,0 56.6,-32.9 103.8,-75 141.4,-127 69.4,-95.9 102.2,-219.4 98.8,-370.2 z"
+   id="path918"
+   inkscape:connector-curvature="0" />
+  </g>
+
+  <!-- Badge -->
+   <!-- Parte superior -->
+  <g
+   id="g1504"
+   style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1"><path
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1"
+     id="path922"
+     d="M 516.2,114.9 C 481.5,109.3 446.8,99.9 412.4,87.3 378,74.7 340.7,57.3 300.1,35.3 259.5,57.3 221.9,74.7 187.5,87.3 153.1,99.9 118.7,109.4 84,114.9 83.5,169 88.1,219.2 97.6,265.7 h 405.1 c 9.4,-46.4 14,-96.6 13.5,-150.8 z"
+     class="st0"
+     inkscape:connector-curvature="0" /><path
+     sodipodi:nodetypes="cccccc"
+     inkscape:connector-curvature="0"
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1"
+     id="path924"
+     d="m 97.6,265.7 c 14.6,71.2 40.9,133.3 79,186.5 32.5,45.3 73.8,82.9 123.5,113.2 49.7,-30.3 90.8,-68 123.5,-113.2 38.1,-52.7 64.5,-114.9 79.1,-186.5 -1.36024,-58.82904 -407.272973,-67.15027 -405.1,0 z"
+     class="st1" /></g> <!-- Parte inferior -->
+
+  <!-- Logo de omegaUp -->
+  <g
+   id="layer1_2_"
+   transform="translate(-1.5300006,-318.74925)"
+   inkscape:groupmode="layer"
+   inkscape:label="Layer 1">
+    
+    
+    
+    
+    
+    
+    
+  </g>
+
+  <!-- Ícono de laptop -->
+  
+<path
+   sodipodi:type="star"
+   style="opacity:1;fill:#ffbb00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.9000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+   id="path1506"
+   sodipodi:sides="5"
+   sodipodi:cx="301.43338"
+   sodipodi:cy="126.82188"
+   sodipodi:r1="72.313408"
+   sodipodi:r2="36.156704"
+   sodipodi:arg1="0.9240379"
+   sodipodi:arg2="1.5523564"
+   inkscape:flatsided="false"
+   inkscape:rounded="0"
+   inkscape:randomized="0"
+   d="m 345.00963,184.53097 -42.90956,-21.55854 -42.08549,23.12602 7.2436,-47.47138 -34.99928,-32.87935 47.38635,-7.780388 20.45475,-43.446569 22.04278,42.662829 47.64101,6.027898 -33.76317,34.14746 z"
+   inkscape:transform-center-x="0.41203587"
+   inkscape:transform-center-y="-6.5122724" /><path
+   sodipodi:type="star"
+   style="opacity:1;fill:#ffbb00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.9000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+   id="path1506-6"
+   sodipodi:sides="5"
+   sodipodi:cx="427.1951"
+   sodipodi:cy="180.43312"
+   sodipodi:r1="72.313408"
+   sodipodi:r2="36.156704"
+   sodipodi:arg1="0.9240379"
+   sodipodi:arg2="1.5523564"
+   inkscape:flatsided="false"
+   inkscape:rounded="0"
+   inkscape:randomized="0"
+   d="m 470.77135,238.14221 -42.90956,-21.55853 -42.0855,23.12601 7.2436,-47.47137 -34.99927,-32.87936 47.38635,-7.78038 20.45475,-43.44657 22.04278,42.66283 47.64101,6.02789 -33.76317,34.14747 z"
+   inkscape:transform-center-x="0.41203587"
+   inkscape:transform-center-y="-6.5122724" /><path
+   sodipodi:type="star"
+   style="opacity:1;fill:#ffbb00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.9000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+   id="path1506-5"
+   sodipodi:sides="5"
+   sodipodi:cx="174.90778"
+   sodipodi:cy="184.23747"
+   sodipodi:r1="72.313408"
+   sodipodi:r2="36.156704"
+   sodipodi:arg1="0.9240379"
+   sodipodi:arg2="1.5523564"
+   inkscape:flatsided="false"
+   inkscape:rounded="0"
+   inkscape:randomized="0"
+   d="m 218.48403,241.94656 -42.90956,-21.55853 -42.0855,23.12601 7.2436,-47.47137 -34.99928,-32.87935 47.38636,-7.78039 20.45475,-43.44657 22.04278,42.66283 47.64101,6.02789 -33.76317,34.14747 z"
+   inkscape:transform-center-x="0.41203587"
+   inkscape:transform-center-y="-6.5122724" /><g
+   style="overflow:visible"
+   id="g118"
+   transform="matrix(0.44906804,0,0,0.44906804,221.32094,208.872)"><g
+     id="g95">
+	<path
+   id="path69"
+   d="m 117.151,349.592 c 0,0 -17.265,10.049 12.301,13.44 35.824,4.09 54.13,3.501 93.596,-3.959 0,0 10.397,6.504 24.892,12.137 -88.501,37.917 -200.296,-2.197 -130.789,-21.618 z"
+   inkscape:connector-curvature="0"
+   style="clip-rule:evenodd;fill:#0074bd;fill-rule:evenodd" />
+	<path
+   id="path71"
+   d="m 106.331,300.104 c 0,0 -19.367,14.339 10.221,17.397 38.271,3.951 68.483,4.275 120.792,-5.792 0,0 7.218,7.332 18.585,11.339 -106.986,31.294 -226.147,2.462 -149.598,-22.944 z"
+   inkscape:connector-curvature="0"
+   style="clip-rule:evenodd;fill:#0074bd;fill-rule:evenodd" />
+	<path
+   id="path73"
+   d="m 197.494,216.145 c 21.818,25.115 -5.721,47.697 -5.721,47.697 0,0 55.367,-28.577 29.945,-64.38 -23.752,-33.373 -41.962,-49.951 56.623,-107.124 10e-4,0 -154.754,38.641 -80.847,123.807 z"
+   inkscape:connector-curvature="0"
+   style="clip-rule:evenodd;fill:#ea2d2e;fill-rule:evenodd" />
+	<path
+   id="path75"
+   d="m 314.542,386.202 c 0,0 12.781,10.536 -14.077,18.684 -51.071,15.469 -212.604,20.135 -257.47,0.619 -16.117,-7.02 14.121,-16.75 23.635,-18.805 9.92,-2.146 15.584,-1.754 15.584,-1.754 -17.937,-12.631 -115.935,24.807 -49.772,35.544 180.429,29.246 328.895,-13.173 282.1,-34.288 z"
+   inkscape:connector-curvature="0"
+   style="clip-rule:evenodd;fill:#0074bd;fill-rule:evenodd" />
+	<path
+   id="path77"
+   d="m 125.46,248.822 c 0,0 -82.155,19.519 -29.092,26.613 22.412,2.999 67.063,2.309 108.685,-1.183 34.006,-2.854 68.133,-8.958 68.133,-8.958 0,0 -11.982,5.14 -20.657,11.06 -83.444,21.947 -244.612,11.726 -198.207,-10.712 39.227,-18.977 71.138,-16.82 71.138,-16.82 z"
+   inkscape:connector-curvature="0"
+   style="clip-rule:evenodd;fill:#0074bd;fill-rule:evenodd" />
+	<path
+   id="path79"
+   d="m 272.846,331.198 c 84.818,-44.063 45.597,-86.412 18.223,-80.708 -6.694,1.397 -9.697,2.607 -9.697,2.607 0,0 2.494,-3.907 7.243,-5.588 54.155,-19.03 95.794,56.146 -17.464,85.919 -0.001,0 1.302,-1.18 1.695,-2.23 z"
+   inkscape:connector-curvature="0"
+   style="clip-rule:evenodd;fill:#0074bd;fill-rule:evenodd" />
+	<path
+   id="path81"
+   d="m 221.719,0 c 0,0 46.963,46.99 -44.557,119.227 -73.393,57.969 -16.734,91.009 -0.026,128.778 C 134.291,209.352 102.865,175.321 123.944,143.653 154.898,97.174 240.663,74.632 221.719,0 Z"
+   inkscape:connector-curvature="0"
+   style="clip-rule:evenodd;fill:#ea2d2e;fill-rule:evenodd" />
+	<path
+   id="path83"
+   d="m 133.799,450.637 c 81.397,5.204 206.426,-2.896 209.385,-41.415 0,0 -5.688,14.602 -67.276,26.188 -69.481,13.081 -155.197,11.558 -206.016,3.167 0,0 10.411,8.617 63.907,12.06 z"
+   inkscape:connector-curvature="0"
+   style="clip-rule:evenodd;fill:#0074bd;fill-rule:evenodd" />
+	<path
+   id="path85"
+   d="m 339.426,519.716 h -2.479 v -1.385 h 6.676 v 1.385 h -2.469 v 6.928 h -1.729 v -6.928 z m 13.33,0.351 h -0.032 l -2.461,6.576 h -1.132 l -2.446,-6.576 h -0.025 v 6.576 h -1.638 v -8.313 h 2.402 l 2.264,5.885 2.271,-5.885 h 2.388 v 8.313 h -1.59 v -6.576 z"
+   inkscape:connector-curvature="0"
+   style="clip-rule:evenodd;fill:#ea2d2e;fill-rule:evenodd" />
+	<path
+   id="path87"
+   d="m 120.461,597.813 c -7.676,6.654 -15.793,10.396 -23.079,10.396 -10.378,0 -16.007,-6.236 -16.007,-16.216 0,-10.803 6.027,-18.71 30.163,-18.71 h 8.923 z m 21.189,23.903 V 547.72 c 0,-18.915 -10.787,-31.396 -36.782,-31.396 -15.168,0 -28.467,3.75 -39.278,8.525 l 3.111,13.106 c 8.515,-3.127 19.526,-6.031 30.337,-6.031 14.978,0 21.423,6.031 21.423,18.505 v 9.356 h -7.485 c -36.383,0 -52.798,14.11 -52.798,35.336 0,18.285 10.819,28.682 31.185,28.682 13.088,0 22.87,-5.405 32.001,-13.315 l 1.663,11.228 z"
+   inkscape:connector-curvature="0"
+   style="clip-rule:evenodd;fill:#ea2d2e;fill-rule:evenodd" />
+	<path
+   id="path89"
+   d="M 212.362,621.716 H 185.939 L 154.132,518.214 h 23.077 l 19.743,63.6 4.391,19.109 c 9.965,-27.639 17.032,-55.701 20.566,-82.709 h 22.445 c -6.002,34.08 -16.831,71.492 -31.992,103.502 z"
+   inkscape:connector-curvature="0"
+   style="clip-rule:evenodd;fill:#ea2d2e;fill-rule:evenodd" />
+	<path
+   id="path91"
+   d="m 313.755,597.813 c -7.701,6.654 -15.82,10.396 -23.086,10.396 -10.382,0 -16.011,-6.236 -16.011,-16.216 0,-10.803 6.039,-18.71 30.154,-18.71 h 8.942 v 24.53 z m 21.196,23.903 V 547.72 c 0,-18.915 -10.818,-31.396 -36.789,-31.396 -15.188,0 -28.484,3.75 -39.295,8.525 l 3.116,13.106 c 8.519,-3.127 19.545,-6.031 30.355,-6.031 14.96,0 21.416,6.031 21.416,18.505 v 9.356 h -7.485 c -36.391,0 -52.801,14.11 -52.801,35.336 0,18.285 10.804,28.682 31.169,28.682 13.099,0 22.862,-5.405 32.018,-13.315 l 1.674,11.228 z"
+   inkscape:connector-curvature="0"
+   style="clip-rule:evenodd;fill:#ea2d2e;fill-rule:evenodd" />
+	<path
+   id="path93"
+   d="m 36.941,639.306 c -6.037,8.821 -15.8,15.809 -26.479,19.749 L 0,646.731 c 8.135,-4.178 15.103,-10.912 18.345,-17.182 2.796,-5.589 3.96,-12.773 3.96,-29.971 v -118.18 h 22.519 v 116.551 c 0,23.001 -1.836,32.3 -7.883,41.357 z"
+   inkscape:connector-curvature="0"
+   style="clip-rule:evenodd;fill:#ea2d2e;fill-rule:evenodd" />
+</g></g></g>
+</svg>

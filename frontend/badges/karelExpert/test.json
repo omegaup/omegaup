@@ -1,0 +1,443 @@
+{
+    "testType": "apicall",
+    "actions": [
+        {
+            "type": "apicalls",
+            "apicalls": [
+                {
+                    "username": "admintest",
+                    "password": "testtesttest",
+                    "requests": [
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "karel_helloworld",
+                                "problem_alias": "karel_helloworld",
+                                "validator": "token-caseless",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "kj,kp",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/karel_helloworld.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "karel_helloworld_2",
+                                "problem_alias": "karel_helloworld_2",
+                                "validator": "token-caseless",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "kj,kp",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/karel_helloworld.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "karel_helloworld_3",
+                                "problem_alias": "karel_helloworld_3",
+                                "validator": "token-caseless",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "kj,kp",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/karel_helloworld.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "karel_helloworld_4",
+                                "problem_alias": "karel_helloworld_4",
+                                "validator": "token-caseless",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "kj,kp",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/karel_helloworld.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "karel_helloworld_5",
+                                "problem_alias": "karel_helloworld_5",
+                                "validator": "token-caseless",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "kj,kp",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/karel_helloworld.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "karel_helloworld_6",
+                                "problem_alias": "karel_helloworld_6",
+                                "validator": "token-caseless",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "kj,kp",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/karel_helloworld.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "karel_helloworld_7",
+                                "problem_alias": "karel_helloworld_7",
+                                "validator": "token-caseless",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "kj,kp",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/karel_helloworld.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "karel_helloworld_8",
+                                "problem_alias": "karel_helloworld_8",
+                                "validator": "token-caseless",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "kj,kp",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/karel_helloworld.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "karel_helloworld_9",
+                                "problem_alias": "karel_helloworld_9",
+                                "validator": "token-caseless",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "kj,kp",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/karel_helloworld.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "karel_helloworld_10",
+                                "problem_alias": "karel_helloworld_10",
+                                "validator": "token-caseless",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "kj,kp",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/karel_helloworld.zip"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
+                            "params": {
+                                "visibility": "public",
+                                "title": "karel_helloworld_11",
+                                "problem_alias": "karel_helloworld_11",
+                                "validator": "token-caseless",
+                                "time_limit": 1000,
+                                "validator_time_limit": 0,
+                                "overall_wall_time_limit": 1000,
+                                "extra_wall_time": 0,
+                                "memory_limit": 32768,
+                                "output_limit": 10240,
+                                "input_limit": 10240,
+                                "source": "omegaUp classics",
+                                "languages": "kj,kp",
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+                            },
+                            "files": {
+                                "problem_contents": "frontend/tests/resources/karel_helloworld.zip"
+                            }
+                        },                    
+                        {
+                            "api": "\\OmegaUp\\Controllers\\User::apiCreate",
+                            "params": {
+                                "username": "test_user_0",
+                                "email": "user_0@domain.com",
+                                "password": "test_user_0"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\User::apiCreate",
+                            "params": {
+                                "username": "test_user_1",
+                                "email": "user_1@domain.com",
+                                "password": "test_user_1"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "username": "test_user_1",
+                    "password": "test_user_1",
+                    "requests": [
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "karel_helloworld",
+                                "language": "kj",
+                                "source": "class program { program() { turnOff(); } }"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "karel_helloworld_2",
+                                "language": "kj",
+                                "source": "class program { program() { turnOff(); } }"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "karel_helloworld_3",
+                                "language": "kj",
+                                "source": "class program { program() { turnOff(); } }"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "karel_helloworld_4",
+                                "language": "kj",
+                                "source": "class program { program() { turnOff(); } }"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "karel_helloworld_5",
+                                "language": "kj",
+                                "source": "class program { program() { turnOff(); } }"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "karel_helloworld_6",
+                                "language": "kj",
+                                "source": "class program { program() { turnOff(); } }"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "karel_helloworld_7",
+                                "language": "kj",
+                                "source": "class program { program() { turnOff(); } }"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "karel_helloworld_8",
+                                "language": "kj",
+                                "source": "class program { program() { turnOff(); } }"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "karel_helloworld_9",
+                                "language": "kj",
+                                "source": "class program { program() { turnOff(); } }"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "karel_helloworld_10",
+                                "language": "kj",
+                                "source": "class program { program() { turnOff(); } }"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "karel_helloworld_11",
+                                "language": "kj",
+                                "source": "class program { program() { turnOff(); } }"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "username": "test_user_0",
+                    "password": "test_user_0",
+                    "requests": [
+                        {
+                            "api": "\\OmegaUp\\Controllers\\Run::apiCreate",
+                            "params": {
+                                "problem_alias": "karel_helloworld",
+                                "language": "kj",
+                                "source": "class program { program() { turnOff(); } }"
+                            },
+                            "gradeResult": {
+                                "verdict": "AC"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "expectedResults": [
+        "test_user_1"
+    ]
+}

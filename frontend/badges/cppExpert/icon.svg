@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  SVG por defecto para los Badges
+  Este archivo servirá como referencia para personalizar badges a criterio de los contribuidores.
+
+  Este archivo puede ser modificado usando una herramienta de diseño (Adobe Illustrator, Potoshop,
+  Inkscape, etc), o también se puede modificar directamente desde el código (cosas simples como
+  el cambio de colores).
+
+  Las restricciones que todo Badge SVG deberá respetar:
+  - Ancho (width)  = Alto (height) = 600px (SIEMPRE).
+  - Tamaño de archivo de 15KB como máximo.
+-->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg2"
+   x="0px"
+   y="0px"
+   viewBox="0 0 497.99121 600.11328"
+   xml:space="preserve"
+   height="600.11328"
+   width="497.99121"
+   sodipodi:docname="icon.svg"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"><metadata
+   id="metadata949"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:Work></rdf:RDF></metadata><defs
+   id="defs947"><linearGradient
+     id="linearGradient2984"
+     osb:paint="solid"><stop
+       style="stop-color:#0b0000;stop-opacity:1;"
+       offset="0"
+       id="stop2982" /></linearGradient></defs>
+
+<style
+   type="text/css"
+   id="style915">
+  <!--
+    Estos colores pueden ser personalizados a gusto del contribuidor en caso
+    desee configurar el ícono a partir del código.
+
+    Simplemente se reemplazan (o agregan) los colores con las clases que se encuentran a continuación
+    y se asignan las clases correspondientes en el los trazos.
+  -->
+  .st0{fill:#FFFFFF;} <!-- Color de fondo de la parte superior del badge -->
+  .st1{fill:#5588DD;} <!-- Color para "Up" y fondo de la parte inferior del badge -->
+  .st2{fill:#111111;} <!-- Color de "omega" -->
+  <!-- Colores para el ícono de la laptop -->
+  .st3{fill:#BBBBBB;}
+  .st4{fill:#888888;}
+</style>
+
+<sodipodi:namedview
+   bordercolor="#666666"
+   borderopacity="1.0"
+   id="base"
+   inkscape:current-layer="g944"
+   inkscape:cx="32.640682"
+   inkscape:cy="239.3396"
+   inkscape:document-units="px"
+   inkscape:pageopacity="0.0"
+   inkscape:pageshadow="2"
+   inkscape:window-height="705"
+   inkscape:window-maximized="1"
+   inkscape:window-width="1366"
+   inkscape:window-x="-8"
+   inkscape:window-y="-8"
+   inkscape:zoom="0.60039472"
+   pagecolor="#ffffff"
+   showgrid="false"
+   fit-margin-top="0"
+   fit-margin-left="0"
+   fit-margin-right="0"
+   fit-margin-bottom="0">
+</sodipodi:namedview>
+
+<g
+   id="g944"
+   transform="translate(-51.048266,0.08765367)">
+  <g
+   id="g920">
+    <path
+   d="M 548.8,100.5 C 548.6,92.6 542.9,85.7 535,84.6 498,79.5 461.4,70.7 425.6,57.5 390,44.4 350.5,26.2 308,2.2 c -5.4,-3 -10.5,-3.1 -15.9,0 -42.2,24 -81.4,42.2 -117.3,55.3 -35.8,13.1 -72.3,22 -109.1,27.1 -7.9,1.1 -13.5,7.9 -14.4,15.9 -3.5,150.8 29.5,274.2 98.8,370.2 37.7,52.3 85,94.7 142,127 4.4,3.2 11.3,3 16.5,0 56.6,-32.9 103.8,-75 141.4,-127 69.4,-95.9 102.2,-219.4 98.8,-370.2 z"
+   id="path918"
+   inkscape:connector-curvature="0" />
+  </g>
+
+  <!-- Badge -->
+   <!-- Parte superior -->
+  <g
+   id="g1504"
+   style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1"><path
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1"
+     id="path922"
+     d="M 516.2,114.9 C 481.5,109.3 446.8,99.9 412.4,87.3 378,74.7 340.7,57.3 300.1,35.3 259.5,57.3 221.9,74.7 187.5,87.3 153.1,99.9 118.7,109.4 84,114.9 83.5,169 88.1,219.2 97.6,265.7 h 405.1 c 9.4,-46.4 14,-96.6 13.5,-150.8 z"
+     class="st0"
+     inkscape:connector-curvature="0" /><path
+     sodipodi:nodetypes="cccccc"
+     inkscape:connector-curvature="0"
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-opacity:1"
+     id="path924"
+     d="m 97.6,265.7 c 14.6,71.2 40.9,133.3 79,186.5 32.5,45.3 73.8,82.9 123.5,113.2 49.7,-30.3 90.8,-68 123.5,-113.2 38.1,-52.7 64.5,-114.9 79.1,-186.5 -135.03333,-15.25279 -270.06667,-12.97439 -405.1,0 z"
+     class="st1" /></g> <!-- Parte inferior -->
+
+  <!-- Logo de omegaUp -->
+  <g
+   id="layer1_2_"
+   transform="translate(-1.5300006,-318.74925)"
+   inkscape:groupmode="layer"
+   inkscape:label="Layer 1">
+    
+    
+    
+    
+    
+    
+    
+  </g>
+
+  <!-- Ícono de laptop -->
+  
+<path
+   sodipodi:type="star"
+   style="opacity:1;fill:#ffbb00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.9000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+   id="path1506"
+   sodipodi:sides="5"
+   sodipodi:cx="301.43338"
+   sodipodi:cy="126.82188"
+   sodipodi:r1="72.313408"
+   sodipodi:r2="36.156704"
+   sodipodi:arg1="0.9240379"
+   sodipodi:arg2="1.5523564"
+   inkscape:flatsided="false"
+   inkscape:rounded="0"
+   inkscape:randomized="0"
+   d="m 345.00963,184.53097 -42.90956,-21.55854 -42.08549,23.12602 7.2436,-47.47138 -34.99928,-32.87935 47.38635,-7.780388 20.45475,-43.446569 22.04278,42.662829 47.64101,6.027898 -33.76317,34.14746 z"
+   inkscape:transform-center-x="0.41203587"
+   inkscape:transform-center-y="-6.5122724" /><path
+   sodipodi:type="star"
+   style="opacity:1;fill:#ffbb00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.9000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+   id="path1506-6"
+   sodipodi:sides="5"
+   sodipodi:cx="427.1951"
+   sodipodi:cy="180.43312"
+   sodipodi:r1="72.313408"
+   sodipodi:r2="36.156704"
+   sodipodi:arg1="0.9240379"
+   sodipodi:arg2="1.5523564"
+   inkscape:flatsided="false"
+   inkscape:rounded="0"
+   inkscape:randomized="0"
+   d="m 470.77135,238.14221 -42.90956,-21.55853 -42.0855,23.12601 7.2436,-47.47137 -34.99927,-32.87936 47.38635,-7.78038 20.45475,-43.44657 22.04278,42.66283 47.64101,6.02789 -33.76317,34.14747 z"
+   inkscape:transform-center-x="0.41203587"
+   inkscape:transform-center-y="-6.5122724" /><path
+   sodipodi:type="star"
+   style="opacity:1;fill:#ffbb00;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.9000001;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+   id="path1506-5"
+   sodipodi:sides="5"
+   sodipodi:cx="174.90778"
+   sodipodi:cy="184.23747"
+   sodipodi:r1="72.313408"
+   sodipodi:r2="36.156704"
+   sodipodi:arg1="0.9240379"
+   sodipodi:arg2="1.5523564"
+   inkscape:flatsided="false"
+   inkscape:rounded="0"
+   inkscape:randomized="0"
+   d="m 218.48403,241.94656 -42.90956,-21.55853 -42.0855,23.12601 7.2436,-47.47137 -34.99928,-32.87935 47.38636,-7.78039 20.45475,-43.44657 22.04278,42.66283 47.64101,6.02789 -33.76317,34.14747 z"
+   inkscape:transform-center-x="0.41203587"
+   inkscape:transform-center-y="-6.5122724" /><g
+   id="g79"
+   transform="matrix(0.68430355,0,0,0.63239797,194.51989,257.94974)"><path
+     id="path45"
+     d="M 302.107,258.262 C 304.508,254.103 306,249.417 306,245.209 V 99.14 c 0,-4.208 -1.49,-8.893 -3.892,-13.052 L 153,172.175 Z"
+     inkscape:connector-curvature="0"
+     style="fill:#00599c" /><path
+     id="path47"
+     d="m 166.25,341.193 126.5,-73.034 c 3.644,-2.104 6.956,-5.737 9.357,-9.897 L 153,172.175 3.893,258.263 c 2.401,4.159 5.714,7.793 9.357,9.896 l 126.5,73.034 c 7.287,4.208 19.213,4.208 26.5,0 z"
+     inkscape:connector-curvature="0"
+     style="fill:#004482" /><path
+     id="path49"
+     d="m 302.108,86.087 c -2.402,-4.16 -5.715,-7.793 -9.358,-9.897 L 166.25,3.156 c -7.287,-4.208 -19.213,-4.208 -26.5,0 L 13.25,76.19 C 5.962,80.397 0,90.725 0,99.14 v 146.069 c 0,4.208 1.491,8.894 3.893,13.053 L 153,172.175 Z"
+     inkscape:connector-curvature="0"
+     style="fill:#659ad2" /><g
+     id="g53">
+	<path
+   id="path51"
+   d="m 153,274.175 c -56.243,0 -102,-45.757 -102,-102 0,-56.243 45.757,-102 102,-102 36.292,0 70.139,19.53 88.331,50.968 l -44.143,25.544 C 188.083,130.951 171.15,121.175 153,121.175 c -28.122,0 -51,22.878 -51,51 0,28.121 22.878,51 51,51 18.152,0 35.085,-9.776 44.191,-25.515 l 44.143,25.543 c -18.192,31.441 -52.04,50.972 -88.334,50.972 z"
+   inkscape:connector-curvature="0"
+   style="fill:#ffffff" />
+</g><g
+     id="g57">
+	<polygon
+   id="polygon55"
+   points="221,166.508 221,177.841 232.334,177.841 232.334,189.175 243.666,189.175 243.666,177.841 255,177.841 255,166.508 243.666,166.508 243.666,155.175 232.334,155.175 232.334,166.508 "
+   style="fill:#ffffff" />
+</g><g
+     id="g61">
+	<polygon
+   id="polygon59"
+   points="263.5,166.508 263.5,177.841 274.834,177.841 274.834,189.175 286.166,189.175 286.166,177.841 297.5,177.841 297.5,166.508 286.166,166.508 286.166,155.175 274.834,155.175 274.834,166.508 "
+   style="fill:#ffffff" />
+</g></g></g>
+</svg>

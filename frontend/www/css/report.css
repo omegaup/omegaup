@@ -1,112 +1,59 @@
 @media all {
-	div.problem {
-		page-break-before: always;
-	}
+  div.problem {
+    page-break-before: always;
+  }
 
-	.title h1.problem-title {
-		text-align: center;
-	}
-	.title .data {
-		margin: 0 auto 1em auto;
-	}
-	.title .data tr:nth-child(even) {
-		background-color: transparent;
-	}
+  .title h1.problem-title {
+    text-align: center;
+  }
+  .title .data {
+    margin: 0 auto 1em auto;
+  }
+  .title .data tr:nth-child(even) {
+    background-color: transparent;
+  }
 
-	h1, h2, h3, h4, h5, h6 {
-		page-break-after: avoid;
-		page-break-inside: avoid;
-	}
-	h1 {
-		font-size: 1.5em;
-	}
-	h2 {
-		font-size: 1.3em;
-	}
-	h3 {
-		font-size: 1.15em;
-	}
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+  h1 {
+    font-size: 1.5em;
+  }
+  h2 {
+    font-size: 1.3em;
+  }
+  h3 {
+    font-size: 1.15em;
+  }
 
-	table {
-		page-break-inside: avoid;
-	}
-	table td {
-		border: 1px solid #000;
-		padding: 0.2em;
-	}
-	tr:nth-child(even) {
-		background-color: #eee;
-	}
-	td.numeric {
-		text-align: right;
-	}
+  table {
+    page-break-inside: avoid;
+  }
+  table td {
+    border: 1px solid #000;
+    padding: 0.2em;
+  }
+  tr:nth-child(even) {
+    background-color: #eee;
+  }
+  td.numeric {
+    text-align: right;
+  }
 
-	.statement p, .statement li {
-		hyphens: auto;
-		line-height: 150%;
-		text-align: justify;
-		orphans: 2;
-		widows: 2;
-		page-break-inside: avoid;
-	}
-	.statement p {
-		margin-bottom: 1.5em;
-	}
-	.statement ul {
-		list-style: disc;
-	}
-	.statement ol {
-		list-style: decimal;
-	}
-	.statement li {
-		margin-left: 2em;
-	}
-
-	.statement img {
-		max-width: 50%;
-		page-break-inside: avoid;
-	}
-
-	.statement pre {
-		line-height: 125%;
-	}
-
-	.statement table.sample_io {
-		border: 1px solid #000;
-		background: #eee;
-		margin: 0.75ex;
-		padding : 0.75ex;
-	}
-	.statement table.sample_io th {
-		padding: 0.75ex;
-	}
-	.statement table.sample_io td {
-		font-size: 10pt;
-		background: #eee;
-		vertical-align: top;
-		padding: 1.25ex;
-		border: 1px solid #000;
-	}
-	.statement table.sample_io pre {
-		white-space: pre;
-		word-break: keep-all;
-		word-wrap: normal;
-		background: transparent;
-		border: 0px;
-		padding: 0px;
-		margin: inherit;
-	}
-	figure {
-		text-align: center;
-		page-break-inside: avoid;
-	}
-	div.libinteractive-download {
-		display: none;
-	}
+  div.libinteractive-download,
+  div.output-only-download {
+    display: none;
+  }
 }
 
 @media print {
-	@page {
-		margin: 1in;
-	}
+  @page {
+    margin: 1in;
+  }
 }

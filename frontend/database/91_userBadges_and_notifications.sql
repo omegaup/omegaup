@@ -27,7 +27,7 @@ CREATE TABLE `Users_Badges` (
   PRIMARY KEY (`user_badge_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_ubu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Badges de Usuario';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Badges de Usuario';
 
 -- Notifications
 CREATE TABLE `Notifications` (
@@ -39,4 +39,4 @@ CREATE TABLE `Notifications` (
   PRIMARY KEY (`notification_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_nu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Notificaciones';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Notificaciones';

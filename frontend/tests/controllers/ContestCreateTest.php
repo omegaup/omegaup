@@ -1,20 +1,20 @@
 <?php
 
 /**
- * CreateContestTest
+ * ContestCreateTest
  *
  * @author joemmanuel
  */
 
-class CreateContestTest extends OmegaupTestCase {
+class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic Create Contest scenario
      *
      */
     public function testCreateContestPositive() {
         // Create a valid contest Request object
-        $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -24,7 +24,7 @@ class CreateContestTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = ContestController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreate(clone $r);
 
         // Assert status of new contest
         $this->assertEquals('ok', $response['status']);
@@ -53,8 +53,8 @@ class CreateContestTest extends OmegaupTestCase {
 
         foreach ($valid_keys as $key) {
             // Create a valid contest Request object
-            $contestData = ContestsFactory::getRequest(new ContestParams(
-                ['admission_mode' => 'private']
+            $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
             ));
             $r = $contestData['request'];
             $contestDirector = $contestData['director'];
@@ -68,27 +68,23 @@ class CreateContestTest extends OmegaupTestCase {
             $r['auth_token'] = $login->auth_token;
 
             try {
-                // Call the API
-                $response = ContestController::apiCreate($r);
-            } catch (InvalidParameterException $e) {
-                // This exception is expected
-                unset($_REQUEST);
+                $response = \OmegaUp\Controllers\Contest::apiCreate($r);
+                $this->fail("Exception was expected. Parameter: {$key}");
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+                $this->assertEquals('parameterEmpty', $e->getMessage());
+                $this->assertEquals($key, $e->parameter);
                 continue;
             }
-
-            $this->fail('Exception was expected. Parameter: ' . $key);
         }
     }
 
     /**
      * Tests that 2 contests with same name cannot be created
-     *
-     * @expectedException DuplicatedEntryInDatabaseException
      */
     public function testCreate2ContestsWithSameAlias() {
         // Create a valid contest Request object
-        $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -98,22 +94,25 @@ class CreateContestTest extends OmegaupTestCase {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = ContestController::apiCreate($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
         $this->assertEquals('ok', $response['status']);
 
         // Call the API for the 2nd time with same alias
-        $response = ContestController::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals('aliasInUse', $e->getMessage());
+        }
     }
 
     /**
      * Tests very long contests
-     *
-     * @expectedException InvalidParameterException
      */
     public function testCreateVeryLongContest() {
         // Create a valid contest Request object
-        $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -125,19 +124,41 @@ class CreateContestTest extends OmegaupTestCase {
         $login = self::login($contestDirector);
         $r['auth_token'] = $login->auth_token;
 
-        // Call the API
-        $response = ContestController::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('contestLengthTooLong', $e->getMessage());
+        }
+    }
+
+    public function testCreateContestWithInvalidAlias() {
+        // Create a valid contest Request object
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest();
+        $r = $contestData['request'];
+        $contestDirector = $contestData['director'];
+
+        $r['alias'] = 'blank spaces not allowed';
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($contestDirector);
+        $r['auth_token'] = $login->auth_token;
+
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
     }
 
     /**
      * Public contest without problems is not valid.
-     *
-     * @expectedException InvalidParameterException
      */
     public function testCreatePublicContest() {
         // Create a valid contest Request object
-        $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -147,23 +168,27 @@ class CreateContestTest extends OmegaupTestCase {
         $login = self::login($contestDirector);
         $r['auth_token'] = $login->auth_token;
 
-        // Call the API
-        $response = ContestController::apiCreate($r);
-        $this->assertEquals('ok', $response['status']);
+        try {
+            $response = \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'contestMustBeCreatedInPrivateMode',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
      * Public contest with problems NOW is NOT valid. You need
      * to create the contest first and then you can add problems
-     *
-     * @expectedException InvalidParameterException
      */
     public function testCreatePublicContestWithProblems() {
-        $problem = ProblemsFactory::createProblem();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create a valid contest Request object
-        $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -177,23 +202,28 @@ class CreateContestTest extends OmegaupTestCase {
         $login = self::login($contestDirector);
         $r['auth_token'] = $login->auth_token;
 
-        // Call the API
-        $response = ContestController::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'contestMustBeCreatedInPrivateMode',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
      * Public contest with private problems is not valid.
-     *
-     * @expectedException ForbiddenAccessException
      */
     public function testCreatePublicContestWithPrivateProblems() {
-        $problem = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => 0
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => 'private'
         ]));
 
         // Create a valid contest Request object
-        $contestData = ContestsFactory::getRequest(new ContestParams(
-            ['admission_mode' => 'private']
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest(new \OmegaUp\Test\Factories\ContestParams(
+            ['admissionMode' => 'private']
         ));
         $r = $contestData['request'];
         $contestDirector = $contestData['director'];
@@ -207,8 +237,12 @@ class CreateContestTest extends OmegaupTestCase {
         $login = self::login($contestDirector);
         $r['auth_token'] = $login->auth_token;
 
-        // Call the API
-        $response = ContestController::apiCreate($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('problemIsPrivate', $e->getMessage());
+        }
     }
 
     /**
@@ -217,50 +251,67 @@ class CreateContestTest extends OmegaupTestCase {
      */
     public function testCreateContestWithWindowLength() {
         // Get a problem
-        $problem = ProblemsFactory::createProblem();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        $originalTime = Time::get();
+        $originalTime = \OmegaUp\Time::get();
 
         // Create contest with 2 hours and a window length 30 of minutes
-        $contest = ContestsFactory::createContest(
-            new ContestParams([
-                'window_length' => 30,
-                'start_time' => $originalTime,
-                'finish_time' => $originalTime + 60 * 2 * 60,
+        $contest = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'windowLength' => 30,
+                'startTime' => $originalTime,
+                'finishTime' => $originalTime + 60 * 2 * 60,
             ])
         );
 
         // Add the problem to the contest
-        ContestsFactory::addProblemToContest($problem, $contest);
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contest
+        );
 
         // Create a contestant
-        $contestant = UserFactory::createUser();
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add contestant to contest
-        ContestsFactory::addUser($contest, $contestant);
+        \OmegaUp\Test\Factories\Contest::addUser($contest, $identity);
 
         // User joins the contest 1 hour and 50 minutes after it starts
         $updatedTime = $originalTime + 110 * 60;
-        Time::setTimeForTesting($updatedTime);
-        ContestsFactory::openContest($contest, $contestant);
-        ContestsFactory::openProblemInContest($contest, $problem, $contestant);
+        \OmegaUp\Time::setTimeForTesting($updatedTime);
+        \OmegaUp\Test\Factories\Contest::openContest($contest, $identity);
+        \OmegaUp\Test\Factories\Contest::openProblemInContest(
+            $contest,
+            $problem,
+            $identity
+        );
 
         // User creates a run in a valid time
-        $run = RunsFactory::createRun($problem, $contest, $contestant);
-        RunsFactory::gradeRun($run, 1.0, 'AC', 10);
+        $run = \OmegaUp\Test\Factories\Run::createRun(
+            $problem,
+            $contest,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
 
         try {
             // User tries to create a run 5 minutes after contest has finished
             $updatedTime = $updatedTime + 15 * 60;
-            Time::setTimeForTesting($updatedTime);
-            $run = RunsFactory::createRun($problem, $contest, $contestant);
-            RunsFactory::gradeRun($run, 1.0, 'AC', 10);
-            $this->fail('Contestant should not create a run after contest finishes');
-        } catch (NotAllowedToSubmitException $e) {
+            \OmegaUp\Time::setTimeForTesting($updatedTime);
+            $run = \OmegaUp\Test\Factories\Run::createRun(
+                $problem,
+                $contest,
+                $identity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
+            $this->fail(
+                'Contestant should not create a run after contest finishes'
+            );
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         } finally {
-            Time::setTimeForTesting($originalTime);
+            \OmegaUp\Time::setTimeForTesting($originalTime);
         }
     }
 }

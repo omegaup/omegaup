@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `Announcement` (
   `description` text NOT NULL COMMENT 'Mensaje de texto del aviso',
   PRIMARY KEY (`announcement_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sistema de mensajería dentro del sitio.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Sistema de mensajería dentro del sitio.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `Auth_Tokens` (
   `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`token`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tokens de autorización para los logins.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Tokens de autorización para los logins.';
 
 -- --------------------------------------------------------
 
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS `Badges` (
   `description` varchar(500) NOT NULL COMMENT 'La descripcion habla de como se obtuvo el badge, de forma corta.',
   `hint` varchar(100) DEFAULT NULL COMMENT 'Tip de como desbloquear el badge.',
   PRIMARY KEY (`badge_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Esta tabla guarda la informacion de cada uno de los badges.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Esta tabla guarda la informacion de cada uno de los badges.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS `Clarifications` (
   KEY `problem_id` (`problem_id`),
   KEY `contest_id` (`contest_id`),
   KEY `author_id` (`author_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Se guardan las clarificaciones.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Se guardan las clarificaciones.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS `Coder_Of_The_Month` (
   `interview_url` varchar(256) DEFAULT NULL COMMENT 'Para linekar a un post del blog con entrevistas.',
   PRIMARY KEY (`coder_of_the_month_id`),
   KEY `coder_of_the_month_id` (`coder_of_the_month_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guardar histórico de coders del mes de forma sencilla.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guardar histórico de coders del mes de forma sencilla.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS `Contests` (
   KEY `director_id` (`director_id`),
   KEY `rerun_id` (`contest_id`),
   UNIQUE KEY `contests_alias` (`alias`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursos que se llevan a cabo en el juez.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Concursos que se llevan a cabo en el juez.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -147,7 +147,7 @@ CREATE TABLE IF NOT EXISTS `Contests_Users` (
   PRIMARY KEY (`user_id`,`contest_id`),
   KEY `user_id` (`user_id`),
   KEY `contest_id` (`contest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Concursantes que pueden participar en concurso cerrado.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Concursantes que pueden participar en concurso cerrado.';
 
 --
 -- Estructura de tabla para la tabla `User_Login_Log`
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS `User_Login_Log` (
 	`ip` int UNSIGNED NOT NULL,
 	`time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de inicios de sesión exitosos';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Bitácora de inicios de sesión exitosos';
 
 --
 -- Estructura de tabla para la tabla `Contest_Access_Log`
@@ -170,7 +170,7 @@ CREATE TABLE IF NOT EXISTS `Contest_Access_Log` (
 	`ip` int UNSIGNED NOT NULL,
 	`time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	KEY `contest_id` (`contest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de acceso a concursos';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Bitácora de acceso a concursos';
 
 --
 -- Estructura de tabla para la tabla `Submission_Log`
@@ -184,7 +184,7 @@ CREATE TABLE IF NOT EXISTS `Submission_Log` (
 	`time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (`run_id`),
 	KEY `contest_id` (`contest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Bitácora de envíos';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Bitácora de envíos';
 
 -- --------------------------------------------------------
 
@@ -200,7 +200,7 @@ CREATE TABLE IF NOT EXISTS `Contest_Problems` (
   PRIMARY KEY (`contest_id`,`problem_id`),
   KEY `contest_id` (`contest_id`),
   KEY `problem_id` (`problem_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Relacion entre Concursos y los problemas que tiene este';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Relacion entre Concursos y los problemas que tiene este';
 
 -- --------------------------------------------------------
 
@@ -215,7 +215,7 @@ CREATE TABLE IF NOT EXISTS `Problem_Viewed` (
   PRIMARY KEY (`problem_id`,`user_id`),
   KEY `problem_id` (`problem_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tabla de vistas de problemas';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Tabla de vistas de problemas';
 
 --
 -- Estructura de tabla para la tabla `Contest_User_OpenedProblems`
@@ -230,7 +230,7 @@ CREATE TABLE IF NOT EXISTS `Contest_Problem_Opened` (
   KEY `contest_id` (`contest_id`),
   KEY `problem_id` (`problem_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Relacion entre Concursos y los problemas que tiene este';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Relacion entre Concursos y los problemas que tiene este';
 
 --
 -- Estructura de tabla para la tabla `Contest_User_Request`
@@ -271,7 +271,7 @@ CREATE TABLE IF NOT EXISTS `Countries` (
   `country_id` char(3) NOT NULL,
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`country_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catálogos para la normalización';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Catálogos para la normalización';
 
 -- --------------------------------------------------------
 
@@ -286,7 +286,7 @@ CREATE TABLE IF NOT EXISTS `Emails` (
   PRIMARY KEY (`email_id`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Esta tabla permite tener varios emails por persona';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Esta tabla permite tener varios emails por persona';
 
 -- --------------------------------------------------------
 
@@ -300,7 +300,7 @@ CREATE TABLE IF NOT EXISTS `Favorites` (
   PRIMARY KEY (`user_id`,`problem_id`),
   KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Problemas favoritos de los usuarios';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Problemas favoritos de los usuarios';
 
 -- --------------------------------------------------------
 
@@ -315,7 +315,7 @@ CREATE TABLE IF NOT EXISTS `Languages` (
   PRIMARY KEY (`language_id`),
   UNIQUE KEY `nombre_UNIQUE` (`name`),
   KEY `country_id` (`country_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de idiomas que potencialmente se soportarían.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Lista de idiomas que potencialmente se soportarían.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -326,7 +326,7 @@ CREATE TABLE IF NOT EXISTS `Languages` (
 CREATE TABLE IF NOT EXISTS `Interviews` (
   `contest_id` int(11) NOT NULL,
   PRIMARY KEY (`contest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Lista de id_concuros que se usan para entrevista';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Lista de id_concuros que se usan para entrevista';
 
 -- --------------------------------------------------------
 
@@ -344,7 +344,7 @@ CREATE TABLE IF NOT EXISTS `Messages` (
   PRIMARY KEY (`message_id`),
   KEY `sender_id` (`sender_id`,`recipient_id`),
   KEY `fk_m_recipient_id` (`recipient_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Sistema de mensajería dentro del sitio.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Sistema de mensajería dentro del sitio.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -357,7 +357,7 @@ CREATE TABLE IF NOT EXISTS `Permissions` (
   `name` varchar(50) NOT NULL COMMENT 'El nombre corto del permiso.',
   `description` varchar(100) NOT NULL COMMENT 'La descripción humana del permiso.',
   PRIMARY KEY (`permission_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los permisos que se pueden dar a los roles.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Establece los permisos que se pueden dar a los roles.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -396,7 +396,7 @@ CREATE TABLE IF NOT EXISTS `Problems` (
   PRIMARY KEY (`problem_id`),
   KEY `author_id` (`author_id`),
   UNIQUE KEY `problems_alias` (`alias`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Se crea un registro por cada prob externo.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Se crea un registro por cada prob externo.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -409,7 +409,7 @@ CREATE TABLE IF NOT EXISTS `Tags` (
   `name` varchar(32) NOT NULL,
   PRIMARY KEY (`tag_id`),
   UNIQUE KEY `tag_name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tags privados para los problemas.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Tags privados para los problemas.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -423,7 +423,7 @@ CREATE TABLE IF NOT EXISTS `Problems_Badges` (
   PRIMARY KEY (`badge_id`,`problem_id`),
   KEY `badge_id` (`badge_id`),
   KEY `problem_id` (`problem_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Relación entre 1 badge y los problemas que lo desbloqueaan.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Relación entre 1 badge y los problemas que lo desbloqueaan.';
 
 -- --------------------------------------------------------
 
@@ -439,7 +439,7 @@ CREATE TABLE IF NOT EXISTS `Problems_Languages` (
   KEY `problem_id` (`problem_id`),
   KEY `language_id` (`language_id`),
   KEY `translator_id` (`translator_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Las traducciones viven en el filesystem y no en la bdd.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Las traducciones viven en el filesystem y no en la bdd.';
 
 -- --------------------------------------------------------
 
@@ -454,7 +454,7 @@ CREATE TABLE IF NOT EXISTS `Problems_Tags` (
   PRIMARY KEY (`problem_id`,`tag_id`),
   KEY `problem_id` (`problem_id`),
   KEY `tag_id` (`tag_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Tags privados para los problemas.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Tags privados para los problemas.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -467,7 +467,7 @@ CREATE TABLE IF NOT EXISTS `Roles` (
   `name` varchar(50) NOT NULL COMMENT 'El nombre corto del rol.',
   `description` varchar(100) NOT NULL COMMENT 'La descripción humana del rol.',
   PRIMARY KEY (`role_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los usuarios.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Establece los roles que se pueden dar a los usuarios.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -481,7 +481,7 @@ CREATE TABLE IF NOT EXISTS `Roles_Permissions` (
   PRIMARY KEY (`role_id`,`permission_id`),
   KEY `role_id` (`role_id`),
   KEY `permission_id` (`permission_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los usuarios.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Establece los roles que se pueden dar a los usuarios.';
 
 -- --------------------------------------------------------
 
@@ -512,7 +512,7 @@ CREATE TABLE IF NOT EXISTS `Runs` (
   KEY `problem_id` (`problem_id`),
   KEY `contest_id` (`contest_id`),
   UNIQUE KEY `runs_alias` (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Estado de todas las ejecuciones.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Estado de todas las ejecuciones.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -528,7 +528,7 @@ CREATE TABLE IF NOT EXISTS `Schools` (
   PRIMARY KEY (`school_id`),
   KEY `state_id` (`state_id`),
   KEY `country_id` (`country_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catálogos para la normalización';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Catálogos para la normalización';
 
 -- --------------------------------------------------------
 
@@ -543,7 +543,7 @@ CREATE TABLE IF NOT EXISTS `States` (
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`state_id`),
   KEY `country_id` (`country_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Catálogos para la normalización';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Catálogos para la normalización';
 
 -- --------------------------------------------------------
 
@@ -578,7 +578,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   KEY `state_id` (`state_id`),
   KEY `school_id` (`school_id`),
   KEY `fk_main_email_id` (`main_email_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Usuarios registrados.' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Usuarios registrados.' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -595,7 +595,7 @@ CREATE TABLE IF NOT EXISTS `Users_Badges` (
   KEY `badge_id` (`badge_id`),
   KEY `user_id` (`user_id`),
   KEY `last_problem_id` (`last_problem_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda los badges que han sido desbloqueados.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guarda los badges que han sido desbloqueados.';
 
 -- --------------------------------------------------------
 
@@ -611,7 +611,7 @@ CREATE TABLE IF NOT EXISTS `User_Roles` (
   KEY `user_id` (`user_id`),
   KEY `role_id` (`role_id`),
   KEY `contest_id` (`contest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los usuarios.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Establece los roles que se pueden dar a los usuarios.';
 
 -- --------------------------------------------------------
 
@@ -626,7 +626,7 @@ CREATE TABLE IF NOT EXISTS `Users_Permissions` (
   PRIMARY KEY (`user_id`,`permission_id`),
   KEY `user_id` (`user_id`),
   KEY `permission_id` (`permission_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los permisos que se pueden dar a los usuarios.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Establece los permisos que se pueden dar a los usuarios.';
 
 --
 -- Estructura de tabla para la tabla `Groups`
@@ -642,7 +642,7 @@ CREATE TABLE IF NOT EXISTS `Groups` (
   PRIMARY KEY (`group_id`),
   KEY `owner_id` (`owner_id`),
   UNIQUE KEY `groups_alias` (`alias`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;
 
 --
 -- Estructura de tabla para la tabla `Groups_Users`
@@ -653,7 +653,7 @@ CREATE TABLE IF NOT EXISTS `Groups_Users` (
   PRIMARY KEY (`group_id`,`user_id`),
   KEY `user_id` (`user_id`),
   KEY `group_id` (`group_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Estructura de tabla para la tabla `Groups`
@@ -669,7 +669,7 @@ CREATE TABLE IF NOT EXISTS `Groups_Scoreboards` (
   PRIMARY KEY (`group_scoreboard_id`),
   KEY `group_id` (`group_id`),
   UNIQUE KEY `groups_scoreboards_alias` (`alias`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;
 
 --
 -- Estructura de tabla para la tabla `Groups_Users`
@@ -682,7 +682,7 @@ CREATE TABLE IF NOT EXISTS `Groups_Scoreboards_Contests` (
   PRIMARY KEY (`group_scoreboard_id`,`contest_id`),
   KEY `group_scoreboard_id` (`group_scoreboard_id`),
   KEY `contest_id` (`contest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Estructura de tabla para la tabla `Group_Roles`
@@ -696,7 +696,7 @@ CREATE TABLE IF NOT EXISTS `Group_Roles` (
   KEY `group_id` (`group_id`),
   KEY `role_id` (`role_id`),
   KEY `contest_id` (`contest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Establece los roles que se pueden dar a los grupos.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Establece los roles que se pueden dar a los grupos.';
 
 --
 -- Estructura de tabla para la tabla `User_Rank`
@@ -711,7 +711,7 @@ CREATE TABLE IF NOT EXISTS `User_Rank` (
   `country_id` char(3) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   KEY (`rank`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda el ranking de usuarios por problemas resueltos.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guarda el ranking de usuarios por problemas resueltos.';
 
 --
 -- Estructura de tabla para la tabla `User_Rank`
@@ -721,7 +721,7 @@ CREATE TABLE IF NOT EXISTS `Run_Counts` (
 	`total` int(11) NOT NULL DEFAULT 0,
 	`ac_count` int(11) NOT NULL DEFAULT 0,
 	PRIMARY KEY (`date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guarda la cantidad de runs que se han realizado hasta la fecha.';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Guarda la cantidad de runs que se han realizado hasta la fecha.';
 
 --
 -- Restricciones para tablas volcadas
@@ -987,10 +987,10 @@ BEGIN
     SET @ties_count = 0;
 
     INSERT INTO
-        User_Rank (user_id, rank, problems_solved_count, score, username, name, country_id)
+        User_Rank (user_id, `rank`, problems_solved_count, score, username, name, country_id)
     SELECT
         user_id,
-        rank,
+        `rank`,
         problems_solved_count,
         score,
         username,
@@ -1013,7 +1013,7 @@ BEGIN
         CASE
             WHEN @prev_value = score THEN @rank_count
             WHEN @prev_value := score THEN @rank_count := @rank_count + 1 + @prev_ties_count
-        END AS rank
+        END AS `rank`
         FROM
         (
             SELECT
@@ -1042,7 +1042,7 @@ BEGIN
             ORDER BY
                 score DESC
         ) AS UsersProblemsSolved
-    ) AS Rank;
+    ) AS `Rank`;
     COMMIT;
 END$$
 DELIMITER ;
@@ -1068,7 +1068,7 @@ CREATE EVENT `Update_Run_Counts`
 ON SCHEDULE EVERY 1 DAY STARTS NOW()
 DO BEGIN
    INSERT INTO
-       Run_Counts (date, total, ac_count)
+       Run_Counts (`date`, total, ac_count)
    SELECT
        CURDATE(),
        COUNT(*) AS total,
@@ -1076,7 +1076,7 @@ DO BEGIN
    FROM
        Runs
    WHERE
-       time <= CURDATE();
+       `time` <= CURDATE();
 END$$
 DELIMITER ;
 

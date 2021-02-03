@@ -1,11 +1,13 @@
 <?php
 
-class DbConfigTest extends OmegaUpTestCase {
+class DbConfigTest extends \OmegaUp\Test\ControllerTestCase {
     public function testTimeSync() {
-        $db_time = Utils::GetDbDatetime();
-        $php_time = date('Y-m-d H:i:s', Time::get());
+        /** @var \OmegaUp\Timestamp|null */
+        $dbTime = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            'SELECT NOW();'
+        );
 
-        $this->assertEquals($php_time, $db_time);
+        $this->assertEquals(\OmegaUp\Time::get(), $dbTime->time);
     }
 
     public function testPhpUtc() {
@@ -17,9 +19,11 @@ class DbConfigTest extends OmegaUpTestCase {
     public function testDbUtc() {
         // Go to the DB
 
-        $sql = "select timediff(now(),convert_tz(now(),@@session.time_zone,'+00:00')) d";
-        $rs = MySQLConnection::getInstance()->GetRow($sql);
+        /** @var null|string */
+        $timediff = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            'SELECT TIMEDIFF(NOW(), CONVERT_TZ(NOW(), @@session.time_zone, "+00:00")) d;'
+        );
 
-        $this->assertEquals('00:00:00', $rs['d']);
+        $this->assertEquals('00:00:00', $timediff);
     }
 }

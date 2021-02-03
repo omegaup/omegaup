@@ -1,7 +1,7 @@
-{include file='head.tpl' htmlTitle="{#interviewList#}"}
+{include file='head.tpl' htmlTitle="{#interviewList#}" inline}
 
 <span id="form-data" data-name="interviews" data-page="new"></span>
-<script src="{version_hash src="/js/alias.generate.js"}"></script>
+<script src="{version_hash src="/js/alias.generate.js"}" defer></script>
 
 <div class="panel panel-primary">
 	<div class="panel-heading">
@@ -17,9 +17,9 @@
 				</div>
 
 				<div class="form-group col-md-6">
-					<label for="alias">{#contestNewFormShortTitle_alias_#}</label>
+					<label for="alias">{#contestNewFormShortTitleAlias#}</label>
 					<input id='alias' name='alias' value='' type='text' class="form-control" disabled="true">
-					<p class="help-block">{#contestNewFormShortTitle_alias_Desc#}</p>
+					<p class="help-block">{#contestNewFormShortTitleAliasDesc#}</p>
 				</div>
 
 				<div class="form-group col-md-6">
@@ -54,6 +54,6 @@
 	</table>
 </div>
 
-<script type="text/javascript" src="{version_hash src="/js/interviews.list.js"}"></script>
-{include file='footer.tpl'}
+<script type="text/javascript" src="{version_hash src="/js/interviews.list.js"}" defer></script>
+{include file='footer.tpl' inline}
 

@@ -9,7 +9,7 @@
           "password": "testtesttest",
           "requests": [
             {
-              "api": "UserController::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\User::apiCreate",
               "params": {
                 "username": "test_user_0",
                 "email": "user_0@domain.com",
@@ -17,7 +17,7 @@
               }
             },
             {
-              "api": "UserController::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\User::apiCreate",
               "params": {
                 "username": "test_user_1",
                 "email": "user_1@domain.com",
@@ -31,9 +31,9 @@
           "password": "test_user_0",
           "requests": [
             {
-              "api": "ProblemController::apiCreate",
+              "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 1,
+                "visibility": "public",
                 "title": "Sumas",
                 "problem_alias": "sumas",
                 "validator": "token-numeric",
@@ -45,8 +45,10 @@
                 "output_limit": 10240,
                 "input_limit": 10240,
                 "source": "omegaUp classics",
-                "languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
-                "email_clarifications": 1
+                "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+                "email_clarifications": 1,
+                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
               },
               "files": {
                 "problem_contents": "frontend/tests/resources/testproblem.zip"

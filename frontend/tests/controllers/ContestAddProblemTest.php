@@ -1,26 +1,37 @@
 <?php
 
 /**
- * Description of AddProblemToContestTest
+ * Description of ContestAddProblemTest
  *
  * @author joemmanuel
  */
 
-class AddProblemToContestTest extends OmegaupTestCase {
+class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Check in DB for problem added to contest
      *
      * @param array $problemData
      * @param array $contestData
-     * @param Request $r
+     * @param \OmegaUp\Request $r
      */
-    public static function assertProblemAddedToContest($problemData, $contestData, $r) {
+    public static function assertProblemAddedToContest(
+        $problemData,
+        $contestData,
+        $r
+    ) {
         // Get problem and contest from DB
-        $problem = ProblemsDAO::getByAlias($problemData['request']['problem_alias']);
-        $contest = ContestsDAO::getByAlias($contestData['request']['alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $problemData['request']['problem_alias']
+        );
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
 
         // Get problem-contest and verify it
-        $problemset_problems = ProblemsetProblemsDAO::getByPK($contest->problemset_id, $problem->problem_id);
+        $problemset_problems = \OmegaUp\DAO\ProblemsetProblems::getByPK(
+            $contest->problemset_id,
+            $problem->problem_id
+        );
         self::assertNotNull($problemset_problems);
         self::assertEquals($r['points'], $problemset_problems->points);
         self::assertEquals($r['order_in_contest'], $problemset_problems->order);
@@ -31,14 +42,14 @@ class AddProblemToContestTest extends OmegaupTestCase {
      */
     public function testAddProblemToContestPositive() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Build request
         $directorLogin = self::login($contestData['director']);
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => $problemData['request']['problem_alias'],
@@ -47,7 +58,7 @@ class AddProblemToContestTest extends OmegaupTestCase {
         ]);
 
         // Call API
-        $response = ContestController::apiAddProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
 
         // Validate
         $this->assertEquals('ok', $response['status']);
@@ -57,116 +68,121 @@ class AddProblemToContestTest extends OmegaupTestCase {
 
     /**
      * Add a problem to contest with invalid params
-     *
-     * @expectedException InvalidParameterException
      */
     public function testAddProblemToContestInvalidProblem() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         // Build request
         $directorLogin = self::login($contestData['director']);
-        $r = new Request([
-            'auth_token' => $directorLogin->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'problem_alias' => 'this problem doesnt exists',
-            'points' => 100,
-            'order_in_contest' => 1,
-        ]);
 
-        // Call API
-        $response = ContestController::apiAddProblem($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
+                'auth_token' => $directorLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'problem_alias' => 'this_problem_does_not_exist',
+                'points' => 100,
+                'order_in_contest' => 1,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterNotFound', $e->getMessage());
+            $this->assertEquals('problem_alias', $e->parameter);
+        }
     }
 
     /**
      * Add a problem to contest with invalid params
-     *
-     * @expectedException InvalidParameterException
      */
     public function testAddProblemToContestInvalidContest() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create an empty request
         $directorLogin = self::login($contestData['director']);
-        $r = new Request([
-            'auth_token' => $directorLogin->auth_token,
-            'contest_alias' => 'invalid problem',
-            'problem_alias' => $problemData['request']['alias'],
-            'points' => 100,
-            'order_in_contest' => 1,
-        ]);
 
         // Call API
-        $response = ContestController::apiAddProblem($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
+                'auth_token' => $directorLogin->auth_token,
+                'contest_alias' => 'invalid_problem',
+                'problem_alias' => $problemData['problem']->alias,
+                'points' => 100,
+                'order_in_contest' => 1,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterNotFound', $e->getMessage());
+            $this->assertEquals('contest_alias', $e->parameter);
+        }
     }
 
     /**
      * Add a problem to contest with unauthorized user
-     *
-     * @expectedException ForbiddenAccessException
      */
     public function testAddProblemToContestWithUnauthorizedUser() {
         // Get a problem
-        $problemData = ProblemsFactory::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Log in as another random user
-        $user = UserFactory::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        // Build request
-        $userLogin = self::login($user);
-        $r = new Request([
-            'auth_token' => $userLogin->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'problem_alias' => $problemData['request']['alias'],
-            'points' => 100,
-            'order_in_contest' => 1,
-        ]);
+        $userLogin = self::login($identity);
 
-        // Call API
-        $response = ContestController::apiAddProblem($r);
+        try {
+            \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'problem_alias' => $problemData['problem']->alias,
+                'points' => 100,
+                'order_in_contest' => 1,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('cannotAddProb', $e->getMessage());
+        }
     }
 
     /**
      * Add too many problems to a contest.
      */
     public function testAddTooManyProblemsToContest() {
-        $contestData = ContestsFactory::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         $login = self::login($contestData['director']);
 
         for ($i = 0; $i < MAX_PROBLEMS_IN_CONTEST; $i++) {
-            $problemData = ProblemsFactory::createProblemWithAuthor(
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
                 $contestData['director'],
                 $login
             );
 
-            $r = new Request([
+            $r = new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['contest']->alias,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'points' => 100,
                 'order_in_contest' => $i + 1,
             ]);
-            $response = ContestController::apiAddProblem($r);
+            $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
             $this->assertEquals('ok', $response['status']);
             self::assertProblemAddedToContest($problemData, $contestData, $r);
         }
 
         // Try to insert one more problem than is allowed, and it should fail this time.
-        $problemData = ProblemsFactory::createProblemWithAuthor(
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
             $contestData['director'],
             $login
         );
         try {
-            $response = ContestController::apiAddProblem(new Request([
+            $response = \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['contest']->alias,
                 'problem_alias' => $problemData['request']['problem_alias'],
@@ -174,8 +190,11 @@ class AddProblemToContestTest extends OmegaupTestCase {
                 'order_in_contest' => MAX_PROBLEMS_IN_CONTEST + 1,
             ]));
             $this->fail('Should have failed adding the problem to the contest');
-        } catch (ApiException $e) {
-            $this->assertEquals($e->getMessage(), 'contestAddproblemTooManyProblems');
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            $this->assertEquals(
+                $e->getMessage(),
+                'contestAddproblemTooManyProblems'
+            );
         }
     }
 
@@ -183,43 +202,45 @@ class AddProblemToContestTest extends OmegaupTestCase {
      * Attempt to add banned problems to a contest.
      */
     public function testAddBannedProblemToContest() {
-        $contestData = ContestsFactory::createContest();
-        $problemData = ProblemsFactory::createProblem(new ProblemParams([
-            'visibility' => ProblemController::VISIBILITY_PUBLIC,
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => 'public',
             'author' => $contestData['director']
         ]));
         $problem = $problemData['problem'];
 
         // Ban the problem.
-        $problem->visibility = ProblemController::VISIBILITY_PUBLIC_BANNED;
-        ProblemsDAO::update($problem);
+        $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
+        \OmegaUp\DAO\Problems::update($problem);
 
         $directorLogin = self::login($contestData['director']);
         try {
-            ContestController::apiAddProblem(new Request([
+            \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'points' => 100,
                 'order_in_contest' => 1,
             ]));
-            $this->fail('Banned problems should not be able to be added to a contest');
-        } catch (ForbiddenAccessException $e) {
-            $this->assertEquals($e->getMessage(), 'problemIsBanned');
+            $this->fail(
+                'Banned problems should not be able to be added to a contest'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('problemIsBanned', $e->getMessage());
         }
 
         // Make it private. Now it should be possible to add it.
-        $problem->visibility = ProblemController::VISIBILITY_PRIVATE;
-        ProblemsDAO::update($problem);
+        $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
+        \OmegaUp\DAO\Problems::update($problem);
 
-        $r = new Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => $problemData['request']['problem_alias'],
             'points' => 100,
             'order_in_contest' => 1,
         ]);
-        $response = ContestController::apiAddProblem($r);
+        $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
         $this->assertEquals('ok', $response['status']);
         self::assertProblemAddedToContest($problemData, $contestData, $r);
     }

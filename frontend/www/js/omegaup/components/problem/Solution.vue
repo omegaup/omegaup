@@ -1,29 +1,94 @@
 <template>
-  <div class="panel">
-    <div class="solution"
-         v-html="solution"
-         v-if="status === 'unlocked' &amp;&amp; solution !== null"></div>
-    <div class="interstitial"
-         v-else="">
-      <p>{{ statusMessage }}</p>
-      <p v-html=
-      "UI.formatString(T.solutionTokens, { available: availableTokens, total: allTokens, })"
-         v-show="allTokens !== null &amp;&amp; availableTokens !== null"></p>
+  <div class="card">
+    <omegaup-markdown
+      v-if="showSolution"
+      :markdown="solution.markdown"
+      :image-mapping="solution.images"
+    ></omegaup-markdown>
+    <div v-else class="interstitial">
+      <omegaup-markdown :markdown="statusMessage"></omegaup-markdown>
+      <omegaup-markdown
+        v-show="allTokens !== null && availableTokens !== null"
+        :markdown="
+          ui.formatString(T.solutionTokens, {
+            available: availableTokens,
+            total: allTokens,
+          })
+        "
+      ></omegaup-markdown>
       <div class="text-center">
-        <a class="btn btn-primary btn-md"
-             v-if="status === 'unlocked'"
-             v-on:click="$emit('get-solution');">{{ T.wordsSeeSolution }}</a> <a class=
-             "btn btn-primary btn-md"
-             v-else-if=
-             "status === 'locked' &amp;&amp; allTokens === null &amp;&amp; availableTokens === null"
-             v-on:click="$emit('get-tokens')">{{ T.solutionViewCurrentTokens }}</a> <a class=
-             "btn btn-primary btn-md"
-             v-else-if="status === 'locked' &amp;&amp; availableTokens &gt; 0"
-             v-on:click="$emit('unlock-solution')">{{ T.wordsUnlockSolution }}</a>
+        <button
+          v-if="status === 'unlocked'"
+          class="btn btn-primary btn-md"
+          @click="$emit('get-solution')"
+        >
+          {{ T.wordsSeeSolution }}
+        </button>
+        <button
+          v-else-if="
+            status === 'locked' &&
+            allTokens === null &&
+            availableTokens === null
+          "
+          class="btn btn-primary btn-md"
+          @click="$emit('get-tokens')"
+        >
+          {{ T.solutionViewCurrentTokens }}
+        </button>
+        <button
+          v-else-if="status === 'locked' && availableTokens &gt; 0"
+          class="btn btn-primary btn-md"
+          @click="$emit('unlock-solution')"
+        >
+          {{ T.wordsUnlockSolution }}
+        </button>
       </div>
     </div>
   </div>
 </template>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import T from '../../lang';
+import * as ui from '../../ui';
+import { types } from '../../api_types';
+
+import omegaup_Markdown from '../Markdown.vue';
+
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
+export default class ProblemSolution extends Vue {
+  @Prop() status!: string;
+  @Prop({ default: null }) solution!: types.ProblemStatement | null;
+  @Prop() availableTokens!: number;
+  @Prop() allTokens!: number;
+
+  T = T;
+  ui = ui;
+
+  get showSolution(): boolean {
+    return this.status === 'unlocked' && this.solution !== null;
+  }
+
+  get statusMessage(): string {
+    switch (this.status) {
+      case 'unlocked':
+        return T.solutionConfirm;
+      case 'locked':
+        return T.solutionLocked;
+      case 'not_found':
+        return T.solutionNotFound;
+      case 'not_logged_in':
+        return T.solutionNotLoggedIn;
+      default:
+        return '';
+    }
+  }
+}
+</script>
 
 <style>
 .interstitial {
@@ -38,36 +103,3 @@
   font-size: 1.25em;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { T } from '../../omegaup.js';
-import UI from '../../ui.js';
-
-@Component
-export default class ProblemSolution extends Vue {
-  @Prop() status!: string;
-  @Prop() solution!: string;
-  @Prop() availableTokens!: number;
-  @Prop() allTokens!: number;
-
-  T = T;
-  UI = UI;
-
-  get statusMessage(): string {
-    switch (this.status) {
-      case 'unlocked':
-        return this.T.solutionConfirm;
-      case 'locked':
-        return this.T.solutionLocked;
-      case 'not_found':
-        return this.T.solutionNotFound;
-      case 'not_logged_in':
-        return this.T.solutionNotLoggedIn;
-      default:
-        return '';
-    }
-  }
-}
-
-</script>

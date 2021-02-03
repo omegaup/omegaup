@@ -1,4 +1,4 @@
-{include file='head.tpl' htmlTitle="Hackathon omegaUp"}
+{include file='head.tpl' htmlTitle="Hackathon omegaUp" inline}
 
 <div class="row">
 	<div class="col-md-12">
@@ -37,4 +37,4 @@
 	</div>
 </div>
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

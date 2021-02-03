@@ -1,0 +1,15 @@
+{
+  "es": {
+    "name": "Especialista en C++",
+    "description": "Otorgado a personas que han resuelto más de 10 problemas en C++."
+  },
+  "en": {
+    "name": "C++ Expert User",
+    "description": "The user has solved more than 10 problems in C++."
+  },
+  "pt": {
+    "name": "Especialista em C++",
+    "description": "Concedido a pessoas que resolveram mais de 10 problemas em C++."
+  }
+}
+

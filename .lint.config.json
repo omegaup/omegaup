@@ -1,31 +1,41 @@
 {
 	"custom_linters": [
 		{
+			"name": "api",
+			"path": "stuff/api_linter.py",
+			"class_name": "ApiLinter"
+		},
+		{
 			"name": "dao",
 			"path": "stuff/dao_linter.py",
 			"class_name": "DaoLinter"
 		},
 		{
 			"name": "i18n",
-			"path": "stuff/i18n.py",
+			"path": "stuff/i18n_linter.py",
 			"class_name": "I18nLinter"
+		},
+		{
+			"name": "translation_strings",
+			"path": "stuff/translation_strings_linter.py",
+			"class_name": "TranslationStringsLinter"
 		}
 	],
 	"lint": {
 		"whitespace": {
-			"whitelist": [
+			"allowlist": [
 				"^frontend/.*\\.(php|css|js|sql|tpl|py|vue)$"
 			],
-			"blacklist": [
+			"denylist": [
 				".*third_party.*",
 				".*\\.py$"
 			]
 		},
 		"php": {
-			"whitelist": [
+			"allowlist": [
 				"^frontend/.*\\.php$"
 			],
-			"blacklist": [
+			"denylist": [
 				".*third_party.*"
 			]
 		},
@@ -33,10 +43,34 @@
 			"extra_js_linters": [
 				"yarn run refactor"
 			],
-			"whitelist": [
-				"frontend/www/(js|ux)/.*\\.js$"
+			"allowlist": [
+				"frontend/www/js/.*\\.js$"
 			],
-			"blacklist": [
+			"denylist": [
+				".*third_party.*",
+				".*js/omegaup/lang\\..*"
+			]
+		},
+		"eslint": {
+			"allowlist": [
+				"frontend/www/.*\\.ts$",
+				"frontend/www/.*\\.vue$"
+			],
+			"denylist": [
+				".*js/omegaup/lang\\..*",
+				".*third_party.*",
+				"frontend/www/.*\\.d\\.ts$",
+				"frontend/www/js/omegaup/api_types.ts"
+			]
+		},
+		"typescript": {
+			"extra_js_linters": [
+				"yarn run refactor"
+			],
+			"allowlist": [
+				"frontend/www/.*\\.ts$"
+			],
+			"denylist": [
 				".*third_party.*",
 				".*js/omegaup/lang\\..*"
 			]
@@ -45,31 +79,46 @@
 			"extra_js_linters": [
 				"yarn run refactor"
 			],
-			"whitelist": [
+			"allowlist": [
 				"frontend/www/.*\\.vue$"
 			]
 		},
 		"python": {
 			"pycodestyle_config": "setup.cfg",
-			"whitelist": [
+			"mypy": true,
+			"allowlist": [
 				".*\\.py$"
 			],
-			"blacklist": [
+			"denylist": [
 				"bin/karel_mdo_convert.py",
 				"frontend/tests/ui/integration-test.py"
 			]
 		},
+		"api": {
+			"allowlist": [
+				"frontend/server/src/Controllers/.*\\.php$",
+				"frontend/www/js/omegaup/api.ts$",
+				"frontend/www/js/omegaup/api_types.ts$"
+			]
+		},
 		"i18n": {
-			"whitelist": [
+			"allowlist": [
 				"frontend/templates/.*\\.lang$",
 				"frontend/www/js/omegaup/lang\\..*\\.json$",
 				"frontend/www/js/omegaup/lang\\..*\\.js$"
 			]
 		},
 		"dao": {
-			"whitelist": [
+			"allowlist": [
 				"frontend/database/schema.sql",
-				"frontend/server/libs/dao/base/.*\\.base\\.php$"
+				"frontend/server/src/DAO/Base/.*\\.php$",
+				"frontend/server/src/DAO/VO/.*\\.php$"
+			]
+		},
+		"translation_strings": {
+			"allowlist": [
+				"^frontend/www/js/.*\\.(js|ts|vue)$",
+				"^frontend/templates/.*\\.tpl$"
 			]
 		}
 	}

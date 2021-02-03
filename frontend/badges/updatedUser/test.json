@@ -1,0 +1,94 @@
+{
+    "testType": "apicall",
+    "actions": [
+        {
+            "type": "apicalls",
+            "apicalls": [
+                {
+                    "username": "admintest",
+                    "password": "testtesttest",
+                    "requests": [
+                        {
+                            "api": "\\OmegaUp\\Controllers\\User::apiCreate",
+                            "params": {
+                                "username": "test_user_0",
+                                "email": "user_0@domain.com",
+                                "password": "test_user_0"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\User::apiCreate",
+                            "params": {
+                                "username": "test_user_1",
+                                "email": "user_1@domain.com",
+                                "password": "test_user_1"
+                            }
+                        },
+                        {
+                            "api": "\\OmegaUp\\Controllers\\User::apiCreate",
+                            "params": {
+                                "username": "test_user_2",
+                                "email": "user_2@domain.com",
+                                "password": "test_user_2"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "username": "test_user_0",
+                    "password": "test_user_0",
+                    "requests": [
+                        {
+                            "api": "\\OmegaUp\\Controllers\\User::apiUpdate",
+                            "params": {
+                                "original_username": "test_user_0",
+                                "country_id": "MX",
+                                "state_id": "GUA",
+                                "username": "test_user_0",
+                                "name": "usuario verificado",
+                                "gender": "male",
+                                "school_name": "ITSF",
+                                "scholar_degree": "bachelors",
+                                "graduation_date": "2020-03-03",
+                                "birth_date": "1996-02-02",
+                                "locale": "es",
+                                "preferred_language":"hs"
+                            },
+                            "gradeResult": {
+                                "status": "ok"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "username": "test_user_2",
+                    "password": "test_user_2",
+                    "requests": [
+                        {
+                            "api": "\\OmegaUp\\Controllers\\User::apiUpdate",
+                            "params": {
+                                "original_username": "test_user_2",
+                                "country_id": "MX",
+                                "state_id": "GUA",
+                                "username": "test_user_2",
+                                "name": "usuario verificado dos",
+                                "school_name": "ITSF",
+                                "scholar_degree": "bachelors",
+                                "graduation_date": "2020-03-03",
+                                "birth_date": "1996-02-02",
+                                "locale": "es",
+                                "preferred_language":"hs"
+                            },
+                            "gradeResult": {
+                                "status": "ok"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "expectedResults": [
+        "test_user_0"
+    ]
+}

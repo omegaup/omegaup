@@ -5,13 +5,13 @@
  *
  * @author joemmanuel
  */
-class TimeTest extends OmegaupTestCase {
+class TimeTest extends \OmegaUp\Test\ControllerTestCase {
     public function testTimeApi() {
         // Call API
-        $response = TimeController::apiGet();
+        $response = \OmegaUp\Controllers\Time::apiGet();
 
         // Validate result
-        $time = Time::get();
+        $time = \OmegaUp\Time::get();
         $this->assertLessThanOrEqual($time, $response['time']);
     }
 }
