@@ -5028,7 +5028,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{payload: ProblemFormPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param bool|null $allow_user_add_tags
-     * @omegaup-request-param null|string $contest_alias
      * @omegaup-request-param bool|null $email_clarifications
      * @omegaup-request-param null|string $extra_wall_time
      * @omegaup-request-param null|string $input_limit
@@ -5093,8 +5092,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         /*$assoc=*/true
                     );
                 }
-                $contestAlias = $r->ensureOptionalString(
-                    'contest_alias',
+                $problemAlias = $r->ensureOptionalString(
+                    'problem_alias',
                     /*$required=*/ false,
                     fn (string $alias) => \OmegaUp\Validators::alias($alias)
                 );
@@ -5105,7 +5104,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                 'title' => $r->ensureOptionalString(
                                     'title'
                                 ) ?? '',
-                                'alias' => $contestAlias ?? '',
+                                'alias' => $problemAlias ?? '',
                                 'emailClarifications' => $r->ensureOptionalBool(
                                     'email_clarifications'
                                 ) ?? false,

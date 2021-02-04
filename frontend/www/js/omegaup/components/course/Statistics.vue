@@ -50,9 +50,8 @@ export default class Statistics extends Vue {
   @Prop() verdicts!: types.CourseProblemVerdict[];
   T = T;
   // chart options
-  selected = this.verdictChartOptions;
+  selected = this.averageChartOptions;
   options = [
-    { value: this.varianceChartOptions, text: T.courseStatisticsVariance },
     { value: this.averageChartOptions, text: T.courseStatisticsAverageScore },
     {
       value: this.highScoreChartOptions,
@@ -62,10 +61,11 @@ export default class Statistics extends Vue {
       value: this.lowScoreChartOptions,
       text: T.courseStatisticsStudentsScored,
     },
-    { value: this.minimumChartOptions, text: T.courseStatisticsMinimumScore },
-    { value: this.maximumChartOptions, text: T.courseStatisticsMaximumScore },
     { value: this.runsChartOptions, text: T.courseStatisticsAverageRuns },
     { value: this.verdictChartOptions, text: T.courseStatisticsVerdicts },
+    { value: this.varianceChartOptions, text: T.courseStatisticsVariance },
+    { value: this.minimumChartOptions, text: T.courseStatisticsMinimumScore },
+    { value: this.maximumChartOptions, text: T.courseStatisticsMaximumScore },
   ];
   // get chart options
   get varianceChartOptions() {
