@@ -40,16 +40,32 @@ describe('Settings.vue', () => {
     });
 
     expect(
-      wrapper.find('select[name="languages"]').findAll('option').at(0).text(),
+      wrapper
+        .find('select[name="current_languages"]')
+        .findAll('option')
+        .at(0)
+        .text(),
     ).toContain('C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua');
     expect(
-      wrapper.find('select[name="languages"]').findAll('option').at(1).text(),
+      wrapper
+        .find('select[name="current_languages"]')
+        .findAll('option')
+        .at(1)
+        .text(),
     ).toContain('Karel');
     expect(
-      wrapper.find('select[name="languages"]').findAll('option').at(2).text(),
+      wrapper
+        .find('select[name="current_languages"]')
+        .findAll('option')
+        .at(2)
+        .text(),
     ).toContain(T.wordsJustOutput);
     expect(
-      wrapper.find('select[name="languages"]').findAll('option').at(3).text(),
+      wrapper
+        .find('select[name="current_languages"]')
+        .findAll('option')
+        .at(3)
+        .text(),
     ).toContain(T.wordsNoSubmissions);
   });
 
@@ -62,7 +78,7 @@ describe('Settings.vue', () => {
       wrapper.find('input[name="validator_time_limit"]').attributes('disabled'),
     ).toBe('disabled');
 
-    const languages = wrapper.find('select[name="languages"]')
+    const languages = wrapper.find('select[name="current_languages"]')
       .element as HTMLInputElement;
     languages.value = 'cat';
     await languages.dispatchEvent(new Event('change'));
@@ -76,8 +92,8 @@ describe('Settings.vue', () => {
       wrapper.find('input[name="validator_time_limit"]').attributes('disabled'),
     ).toBeFalsy();
     expect(
-      (wrapper.find('select[name="languages"]').element as HTMLInputElement)
-        .value,
+      (wrapper.find('select[name="current_languages"]')
+        .element as HTMLInputElement).value,
     ).toBe('cat');
     expect(
       (wrapper.find('select[name="validator"]').element as HTMLInputElement)
