@@ -580,6 +580,28 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return new \OmegaUp\DAO\VO\Assignments($row);
     }
 
+    final public static function updateLanguagesToAssignments(
+        \OmegaUp\DAO\VO\Courses $course,
+        string $languages
+    ): int {
+        $sql = 'UPDATE
+                    Problemsets ps
+                INNER JOIN
+                    Assignments a
+                ON
+                    a.assignment_id = ps.assignment_id
+                SET
+                    ps.languages = ?
+                WHERE
+                    a.course_id = ?;';
+
+        $params = [$languages, $course->course_id];
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
     final public static function updateAssignmentMaxPoints(
         \OmegaUp\DAO\VO\Courses $course,
         string $assignment_alias
