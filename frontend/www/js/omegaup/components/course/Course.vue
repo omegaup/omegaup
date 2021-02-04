@@ -22,7 +22,7 @@
     <div
       class="mx-3 mt-2 mb-3 d-flex justify-content-between align-items-start"
     >
-      <div v-if="showTopics">
+      <div v-if="showTopics" class="w-100">
         <details>
           <summary>{{ T.courseCardShowTopics }}</summary>
           <ul>
@@ -30,6 +30,16 @@
               {{ assignment.name }}
             </li>
           </ul>
+        </details>
+        <details v-if="isPublic">
+          <summary>{{ T.wordsCloneThisCourse }}</summary>
+          <omegaup-course-clone
+            :initial-alias="aliasWithUsername"
+            :initial-name="courseName"
+            @clone="
+              (alias, name, startTime) => $emit('clone', alias, name, startTime)
+            "
+          ></omegaup-course-clone>
         </details>
       </div>
       <div v-if="progress > 0" class="d-flex align-items-center">
@@ -50,14 +60,17 @@ import { types } from '../../api_types';
 import * as time from '../../time';
 import * as ui from '../../ui';
 import T from '../../lang';
+import course_Clone from './Clone.vue';
 import omegaup_Markdown from '../Markdown.vue';
 
 @Component({
   components: {
+    'omegaup-course-clone': course_Clone,
     'omegaup-markdown': omegaup_Markdown,
   },
 })
 export default class Course extends Vue {
+  @Prop() currentUsername!: string;
   @Prop() courseName!: string;
   @Prop() courseAlias!: string;
   @Prop() schoolName!: string;
@@ -92,6 +105,10 @@ export default class Course extends Vue {
     return ui.formatString(T.courseCardImpartedBy, {
       school_name: ui.escape(this.schoolName),
     });
+  }
+
+  get aliasWithUsername(): string {
+    return `${this.courseAlias}_${this.currentUsername}`;
   }
 }
 </script>
