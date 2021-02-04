@@ -129,7 +129,7 @@ class Run {
             $problemData,
             $courseAssignmentData,
             $participant,
-            null,
+            /*$login=*/ null,
             $language
         );
 
