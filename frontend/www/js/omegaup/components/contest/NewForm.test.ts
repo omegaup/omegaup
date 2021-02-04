@@ -31,9 +31,7 @@ describe('NewForm.vue', () => {
       },
     });
 
-    expect(wrapper.find('div.card .card-header .panel-title').text()).toBe(
-      T.contestNew,
-    );
+    expect(wrapper.find('div.card .card-header').text()).toBe(T.contestNew);
 
     const contest = {
       alias: 'contestAlias',

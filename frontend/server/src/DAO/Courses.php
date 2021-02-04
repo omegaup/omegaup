@@ -24,7 +24,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 WHERE c.name
                 LIKE CONCAT('%', ?, '%') LIMIT 10";
 
-        /** @var list<array{acl_id: int, admission_mode: string, alias: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}> */
         $resultRows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$name]
@@ -160,6 +160,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 LEFT JOIN
                     Schools s
                 ON c.school_id = s.school_id
+                WHERE
+                    c.archived = 0
                 ORDER BY
                     pr.last_submission_time DESC;';
         /** @var list<array{accept_teacher: bool|null, admission_mode: string, alias: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, last_submission_time: \OmegaUp\Timestamp|null, name: string, progress: float, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
@@ -204,8 +206,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             LEFT JOIN
                 Schools s
             ON c.school_id = s.school_id
-            WHERE c.admission_mode = ?;
-           ';
+            WHERE
+                c.admission_mode = ?
+                AND c.archived = 0;';
 
         /** @var list<array{accept_teacher: int|null, admission_mode: string, alias: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, is_open: int, name: string, progress: float, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
@@ -486,9 +489,11 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             LEFT JOIN
                 Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
-                ai.identity_id = ? OR
-                (ur.role_id = ? AND uri.identity_id = ?) OR
-                (gr.role_id = ? AND gi.identity_id = ?)
+                c.archived = 0 AND (
+                    ai.identity_id = ? OR
+                    (ur.role_id = ? AND uri.identity_id = ?) OR
+                    (gr.role_id = ? AND gi.identity_id = ?)
+                )
             GROUP BY
                 c.course_id
             ORDER BY
@@ -504,7 +509,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $offset,
             $pageSize,
         ];
-        /** @var list<array{acl_id: int, admission_mode: string, alias: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $courses = [];
@@ -557,7 +562,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     ): ?\OmegaUp\DAO\VO\Courses {
         $sql = 'SELECT * FROM Courses WHERE (alias = ?) LIMIT 1;';
 
-        /** @var array{acl_id: int, admission_mode: string, alias: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}|null */
+        /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
         if (empty($row)) {
             return null;
