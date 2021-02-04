@@ -365,7 +365,6 @@ export default class ProblemForm extends Vue {
   }
 
   onGenerateAlias(): void {
-    console.log('Se llamó a la función');
     if (this.isUpdate) {
       return;
     }
