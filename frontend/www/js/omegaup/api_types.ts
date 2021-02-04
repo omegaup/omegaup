@@ -3302,6 +3302,8 @@ export namespace messages {
   };
   export type CourseArbitrateRequestRequest = { [key: string]: any };
   export type CourseArbitrateRequestResponse = {};
+  export type CourseArchiveRequest = { [key: string]: any };
+  export type CourseArchiveResponse = {};
   export type CourseAssignmentDetailsRequest = { [key: string]: any };
   export type _CourseAssignmentDetailsServerResponse = any;
   export type CourseAssignmentDetailsResponse = {
@@ -4160,6 +4162,9 @@ export namespace controllers {
     arbitrateRequest: (
       params?: messages.CourseArbitrateRequestRequest,
     ) => Promise<messages.CourseArbitrateRequestResponse>;
+    archive: (
+      params?: messages.CourseArchiveRequest,
+    ) => Promise<messages.CourseArchiveResponse>;
     assignmentDetails: (
       params?: messages.CourseAssignmentDetailsRequest,
     ) => Promise<messages.CourseAssignmentDetailsResponse>;
