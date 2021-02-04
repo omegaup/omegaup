@@ -30,6 +30,7 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         'requests_user_information' => true,
         'show_scoreboard' => true,
         'languages' => true,
+        'archived' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -127,6 +128,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
             $this->languages = is_scalar(
                 $data['languages']
             ) ? strval($data['languages']) : '';
+        }
+        if (isset($data['archived'])) {
+            $this->archived = boolval(
+                $data['archived']
+            );
         }
     }
 
@@ -229,4 +235,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $languages = null;
+
+    /**
+     * Indica si el curso ha sido archivado por el administrador.
+     *
+     * @var bool
+     */
+    public $archived = false;
 }

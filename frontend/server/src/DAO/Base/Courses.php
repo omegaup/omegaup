@@ -44,7 +44,8 @@ abstract class Courses {
                 `needs_basic_information` = ?,
                 `requests_user_information` = ?,
                 `show_scoreboard` = ?,
-                `languages` = ?
+                `languages` = ?,
+                `archived` = ?
             WHERE
                 (
                     `course_id` = ?
@@ -79,6 +80,7 @@ abstract class Courses {
             $Courses->requests_user_information,
             intval($Courses->show_scoreboard),
             $Courses->languages,
+            intval($Courses->archived),
             intval($Courses->course_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -113,7 +115,8 @@ abstract class Courses {
                 `Courses`.`needs_basic_information`,
                 `Courses`.`requests_user_information`,
                 `Courses`.`show_scoreboard`,
-                `Courses`.`languages`
+                `Courses`.`languages`,
+                `Courses`.`archived`
             FROM
                 `Courses`
             WHERE
@@ -208,7 +211,8 @@ abstract class Courses {
                 `Courses`.`needs_basic_information`,
                 `Courses`.`requests_user_information`,
                 `Courses`.`show_scoreboard`,
-                `Courses`.`languages`
+                `Courses`.`languages`,
+                `Courses`.`archived`
             FROM
                 `Courses`
         ';
@@ -271,8 +275,10 @@ abstract class Courses {
                     `needs_basic_information`,
                     `requests_user_information`,
                     `show_scoreboard`,
-                    `languages`
+                    `languages`,
+                    `archived`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -317,6 +323,7 @@ abstract class Courses {
             $Courses->requests_user_information,
             intval($Courses->show_scoreboard),
             $Courses->languages,
+            intval($Courses->archived),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
