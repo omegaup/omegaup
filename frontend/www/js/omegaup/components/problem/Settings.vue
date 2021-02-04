@@ -4,12 +4,11 @@
       <div class="form-group col-md-6">
         <label>{{ T.problemEditFormLanguages }}</label>
         <select
-          v-model="languages"
-          name="languages"
+          v-model="currentLanguages"
+          name="current_languages"
           class="form-control"
-          :class="{ 'is-invalid': errors.includes('languages') }"
+          :class="{ 'is-invalid': errors.includes('current_languages') }"
           required
-          @change="onLanguagesChange($event)"
         >
           <option
             v-for="(languageText, languageIndex) in validLanguages"
@@ -27,7 +26,7 @@
           name="validator"
           class="form-control"
           :class="{ 'is-invalid': errors.includes('validator') }"
-          :disabled="languages === ''"
+          :disabled="currentLanguages === ''"
           required
         >
           <option
@@ -48,7 +47,7 @@
         <input
           name="validator_time_limit"
           :value="validatorTimeLimit"
-          :disabled="languages === '' || validator !== 'custom'"
+          :disabled="currentLanguages === '' || validator !== 'custom'"
           type="text"
           class="form-control"
           :class="{
@@ -63,7 +62,7 @@
         <input
           name="time_limit"
           :value="timeLimit"
-          :disabled="languages === ''"
+          :disabled="currentLanguages === ''"
           type="text"
           class="form-control"
           :class="{ 'is-invalid': errors.includes('time_limit') }"
@@ -83,7 +82,7 @@
             'is-invalid': errors.includes('overall_wall_time_limit'),
           }"
           :value="overallWallTimeLimit"
-          :disabled="languages === ''"
+          :disabled="currentLanguages === ''"
           type="text"
           class="form-control"
           required
@@ -95,7 +94,7 @@
         <input
           name="extra_wall_time"
           :value="extraWallTime"
-          :disabled="languages === ''"
+          :disabled="currentLanguages === ''"
           type="text"
           class="form-control"
           :class="{ 'is-invalid': errors.includes('extra_wall_time') }"
@@ -110,7 +109,7 @@
         <input
           name="memory_limit"
           :value="memoryLimit"
-          :disabled="languages === ''"
+          :disabled="currentLanguages === ''"
           type="text"
           class="form-control"
           :class="{ 'is-invalid': errors.includes('memory_limit') }"
@@ -123,7 +122,7 @@
         <input
           name="output_limit"
           :value="outputLimit"
-          :disabled="languages === ''"
+          :disabled="currentLanguages === ''"
           type="text"
           class="form-control"
           :class="{ 'is-invalid': errors.includes('output_limit') }"
@@ -135,7 +134,7 @@
         <input
           name="input_limit"
           :value="inputLimit"
-          :disabled="languages === ''"
+          :disabled="currentLanguages === ''"
           type="text"
           class="form-control"
           :class="{ 'is-invalid': errors.includes('input_limit') }"
@@ -159,7 +158,7 @@ export default class Settings extends Vue {
   @Prop() inputLimit!: number;
   @Prop() overallWallTimeLimit!: number;
   @Prop() validatorTimeLimit!: number;
-  @Prop() initialLanguage!: string;
+  @Prop() languages!: string;
   @Prop() validLanguages!: Array<string>;
   @Prop() initialValidator!: string;
   @Prop() validatorTypes!: Array<string>;
@@ -168,21 +167,16 @@ export default class Settings extends Vue {
   T = T;
 
   validator = this.initialValidator;
-  languages = this.initialLanguage;
+  currentLanguages = this.languages;
 
   @Watch('initialValidator')
   onInitialValidatorChange(newInitial: string): void {
     this.validator = newInitial;
   }
 
-  @Watch('initialLanguage')
-  onInitialLanguageChange(newInitial: string): void {
-    this.languages = newInitial;
-  }
-
-  @Emit('languages-changed')
-  onLanguagesChange(event: Event): string {
-    const newValue = (event.target as HTMLInputElement).value;
+  @Emit('update:languages')
+  @Watch('currentLanguages')
+  onCurrentLanguagesChange(newValue: string): string {
     return newValue;
   }
 }

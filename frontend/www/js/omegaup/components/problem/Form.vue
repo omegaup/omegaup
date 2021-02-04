@@ -54,12 +54,11 @@
           :output-limit="outputLimit"
           :input-limit="inputLimit"
           :initial-validator="validator"
-          :initial-language="languages"
           :overall-wall-time-limit="overallWallTimeLimit"
           :validator-time-limit="validatorTimeLimit"
           :valid-languages="data.validLanguages"
           :validator-types="data.validatorTypes"
-          @languages-changed="languagesChanged"
+          :languages.sync="languages"
         ></omegaup-problem-settings>
 
         <div class="row">
@@ -341,10 +340,6 @@ export default class ProblemForm extends Vue {
     return this.selectedTags
       .filter((tag) => tag.public === false)
       .map((tag) => tag.tagname);
-  }
-
-  languagesChanged(newValue: string): void {
-    this.languages = newValue;
   }
 
   addTag(alias: string, tagname: string, isPublic: boolean): void {
