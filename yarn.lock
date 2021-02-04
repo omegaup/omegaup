@@ -4589,6 +4589,11 @@ interpret@^2.2.0:
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-2.2.0.tgz#1a78a0b5965c40a5416d007ad6f50ad27c417df9"
   integrity sha512-Ju0Bz/cEia55xDwUWEa8+olFpCiQoypjnQySseKtmjNrnps3P+xfpUmGr90T7yjlVJmOtybRvPXhKMbHr+fWnw==
 
+intro-ts@^1.3.19:
+  version "1.3.19"
+  resolved "https://registry.yarnpkg.com/intro-ts/-/intro-ts-1.3.19.tgz#1580a723b95b2372354e5d8069b46c77e8f77ea7"
+  integrity sha512-hMBq2BKGMf9Cjylwox9DnG3fgt5dqAutt/NMBF1NsWVJ7uAoWiYDAiKqQS0uO+Qi228rRZ2w6CDVHX0pDMm6Zw==
+
 invariant@^2.2.2:
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/invariant/-/invariant-2.2.4.tgz#610f3c92c9359ce1db616e538008d23ff35158e6"

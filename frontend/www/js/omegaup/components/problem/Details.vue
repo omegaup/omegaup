@@ -52,9 +52,8 @@
         </div>
 
         <div
+          v-intro="{ intro: T.helpIntroInstructions, step: 1 }"
           class="mt-4 markdown"
-          data-step="1"
-          :data-intro="T.helpIntroInstructions"
         >
           <omegaup-markdown
             ref="statement-markdown"
@@ -108,7 +107,9 @@
         </template>
         <div class="help">
           {{ T.wordsNeedHelpToSendSubmission }}
-          <a class="submissions-help" href="#">{{ T.wordsClickHere }}</a>
+          <button class="btn btn-link" @click="start">
+            {{ T.wordsClickHere }}
+          </button>
         </div>
         <omegaup-overlay
           v-if="user.loggedIn"
@@ -173,12 +174,11 @@
           </template>
         </omegaup-overlay>
         <omegaup-arena-runs
+          v-intro="{ intro: T.helpIntroNewRun, step: 2 }"
           :problem-alias="problem.alias"
           :runs="runs"
           :show-details="true"
           :problemset-problems="[]"
-          :data-step="2"
-          :data-intro="T.helpIntroNewRun"
           @details="(run) => onRunDetails(run.guid)"
           @new-submission="onNewSubmission"
         ></omegaup-arena-runs>
@@ -335,6 +335,8 @@ const numericSort = <T extends { [key: string]: any }>(key: string) => {
     return x[key].length - i - (y[key].length - j);
   };
 };
+import { introVuePlugin } from 'intro-ts';
+Vue.use(introVuePlugin);
 
 @Component({
   components: {
@@ -642,6 +644,26 @@ export default class ProblemDetails extends Vue {
     this.$emit('change-show-run-location', guid);
   }
 
+  start() {
+    this.$intro.addEventListener('finish', () => {
+      this.$intro.stop();
+      this.$intro
+        .addStep('select[name="language"]', T.helpIntroLanguage, 3, 'bottom')
+        .addStep('.vue-codemirror-wrap', T.helpIntroLanguage, 4, 'bottom')
+        .addStep('input[type="file"]', T.helpIntroLanguage, 5, 'bottom')
+        .addStep('input[type="submit"]', T.helpIntroLanguage, 6, 'bottom')
+        .start(3);
+      window.location.href = `#problems/${this.problem.alias}/new-run`;
+      this.onNewSubmission();
+    });
+    this.$intro
+      .setOption('doneLabel', T.wordsNextPage)
+      .setOption('nextLabel', T.wordsNext)
+      .setOption('prevLabel', T.wordsPrev)
+      .setOption('skipLabel', T.wordsSkip)
+      .start();
+  }
+
   @Emit('update:activeTab')
   onTabSelected(tabName: string): string {
     if (this.selectedTab === 'clarifications') {
@@ -681,12 +703,9 @@ export default class ProblemDetails extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../../../sass/main.scss';
-
-table td {
-  padding: 0.5rem;
-}
+@import '../../../../../../node_modules/intro-ts/lib/bandle/style.scss';
 
 .karel-js-link {
   border: 1px solid #eee;
