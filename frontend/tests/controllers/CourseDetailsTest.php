@@ -239,4 +239,37 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             // OK!
         }
     }
+
+    /**
+     * Tests the API to archive or desarchive a course
+     */
+    public function testArchiveCourse() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $adminLogin = self::login($courseData['admin']);
+
+        $course = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['course']->course_id
+        );
+        $this->assertFalse($course->archived);
+
+        \OmegaUp\Controllers\Course::apiArchive(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $course->alias,
+            'archive' => true
+        ]));
+        $course = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['course']->course_id
+        );
+        $this->assertTrue($course->archived);
+
+        \OmegaUp\Controllers\Course::apiArchive(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $course->alias,
+            'archive' => false
+        ]));
+        $course = \OmegaUp\DAO\Courses::getByPK(
+            $courseData['course']->course_id
+        );
+        $this->assertFalse($course->archived);
+    }
 }

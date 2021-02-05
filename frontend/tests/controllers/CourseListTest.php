@@ -95,6 +95,29 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(2, $course_array['counts']['test']);
     }
 
+    public function testGetListAndArchiveCourses() {
+        $userLogin = self::login($this->identity);
+
+        $this->assertNumberOfCoursesByType(
+            $userLogin,
+            /*$numberOfStudentCourses=*/1,
+            /*$numberOfPublicCourses=*/2
+        );
+
+        $adminLogin = self::login($this->adminUser);
+        \OmegaUp\Controllers\Course::apiArchive(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $this->courseAliases[2],
+            'archive' => true
+        ]));
+
+        $this->assertNumberOfCoursesByType(
+            $userLogin,
+            /*$numberOfStudentCourses=*/0,
+            /*$numberOfPublicCourses=*/2
+        );
+    }
+
     public function testGetCourseListForSmarty() {
         $userLogin = self::login($this->identity);
 
