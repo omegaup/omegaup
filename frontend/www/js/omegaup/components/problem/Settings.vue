@@ -5,9 +5,9 @@
         <label>{{ T.problemEditFormLanguages }}</label>
         <select
           v-model="currentLanguages"
-          name="current_languages"
+          name="languages"
           class="form-control"
-          :class="{ 'is-invalid': errors.includes('current_languages') }"
+          :class="{ 'is-invalid': errors.includes('languages') }"
           required
         >
           <option
