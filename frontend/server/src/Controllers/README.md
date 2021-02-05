@@ -1431,7 +1431,7 @@ _Nothing_
 
 ### Description
 
-Archives or des-archives a course
+Archives or un-archives a course
 
 ### Parameters
 

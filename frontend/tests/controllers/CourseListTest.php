@@ -110,12 +110,10 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $this->courseAliases[2],
             'archive' => true
         ]));
-        $course = \OmegaUp\DAO\Courses::getByAlias($this->courseAliases[2]);
-        print_r($course);
 
         $this->assertNumberOfCoursesByType(
             $userLogin,
-            /*$numberOfStudentCourses=*/1,
+            /*$numberOfStudentCourses=*/0,
             /*$numberOfPublicCourses=*/2
         );
     }
