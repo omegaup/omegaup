@@ -4026,7 +4026,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Archives or des-archives a course
+     * Archives or un-archives a course
      *
      * @return array{status: string}
      *
@@ -4049,7 +4049,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $archive = $r->ensureBool('archive');
+        $archive = $r->ensureOptionalBool('archive') ?? true;
         $course->archived = $archive;
         \OmegaUp\DAO\Courses::update($course);
 
