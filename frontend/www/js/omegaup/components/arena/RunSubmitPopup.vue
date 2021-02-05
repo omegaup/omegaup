@@ -79,6 +79,9 @@ import arena_CodeView from './CodeView.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 
+import { introVuePlugin } from 'intro-ts';
+Vue.use(introVuePlugin);
+
 @Component({
   components: {
     'omegaup-arena-code-view': arena_CodeView,
@@ -92,6 +95,7 @@ export default class ArenaRunSubmitPopup extends Vue {
   @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
   @Prop() preferredLanguage!: string;
+  @Prop({ default: false }) showTutorial!: boolean;
 
   T = T;
   omegaup = omegaup;
@@ -245,6 +249,22 @@ export default class ArenaRunSubmitPopup extends Vue {
     this.code = '';
     this.inputFile.type = 'text';
     this.inputFile.type = 'file';
+  }
+
+  mounted() {
+    if (this.showTutorial) {
+      this.$intro.stop();
+      this.$intro
+        .addStep('select[name="language"]', T.helpIntroLanguage, 3, 'top')
+        .addStep('.vue-codemirror-wrap', T.arenaRunSubmitPaste, 4, 'top')
+        .addStep('input[type="file"]', T.arenaRunSubmitUpload, 5, 'top')
+        .addStep('input[type="submit"]', T.helpIntroSubmit, 6, 'top')
+        .setOption('doneLabel', T.helpIntroDone)
+        .setOption('nextLabel', T.helpIntroNext)
+        .setOption('prevLabel', T.helpIntroPrevious)
+        .setOption('skipLabel', T.helpIntroSkip)
+        .start();
+    }
   }
 }
 </script>

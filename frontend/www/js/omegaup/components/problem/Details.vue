@@ -51,10 +51,7 @@
           </a>
         </div>
 
-        <div
-          v-intro="{ intro: T.helpIntroInstructions, step: 1 }"
-          class="mt-4 markdown"
-        >
+        <div data-help-statement class="mt-4 markdown">
           <omegaup-markdown
             ref="statement-markdown"
             :markdown="problem.statement.markdown"
@@ -106,9 +103,9 @@
           </slot>
         </template>
         <div class="help">
-          {{ T.wordsNeedHelpToSendSubmission }}
+          {{ T.helpIntroNeedHelpToSendSubmission }}
           <button class="btn btn-link" @click="start">
-            {{ T.wordsClickHere }}
+            {{ T.helpIntroClickHere }}
           </button>
         </div>
         <omegaup-overlay
@@ -121,6 +118,7 @@
               v-show="popupDisplayed === PopupDisplayed.RunSubmit"
               :preferred-language="problem.preferred_language"
               :languages="problem.languages"
+              :show-tutorial="showTutorial"
               @dismiss="onPopupDismissed"
               @submit-run="
                 (code, selectedLanguage) =>
@@ -174,7 +172,7 @@
           </template>
         </omegaup-overlay>
         <omegaup-arena-runs
-          v-intro="{ intro: T.helpIntroNewRun, step: 2 }"
+          data-help-runs
           :problem-alias="problem.alias"
           :runs="runs"
           :show-details="true"
@@ -403,6 +401,7 @@ export default class ProblemDetails extends Vue {
     this.initialClarifications?.length > 0 &&
     this.activeTab !== 'clarifications';
   currentRunDetailsData = this.runDetailsData;
+  showTutorial = false;
 
   get availableTabs(): Tab[] {
     const tabs = [
@@ -646,21 +645,21 @@ export default class ProblemDetails extends Vue {
 
   start() {
     this.$intro.addEventListener('finish', () => {
-      this.$intro.stop();
-      this.$intro
-        .addStep('select[name="language"]', T.helpIntroLanguage, 3, 'bottom')
-        .addStep('.vue-codemirror-wrap', T.helpIntroLanguage, 4, 'bottom')
-        .addStep('input[type="file"]', T.helpIntroLanguage, 5, 'bottom')
-        .addStep('input[type="submit"]', T.helpIntroLanguage, 6, 'bottom')
-        .start(3);
       window.location.href = `#problems/${this.problem.alias}/new-run`;
+      this.showTutorial = true;
       this.onNewSubmission();
     });
     this.$intro
-      .setOption('doneLabel', T.wordsNextPage)
-      .setOption('nextLabel', T.wordsNext)
-      .setOption('prevLabel', T.wordsPrev)
-      .setOption('skipLabel', T.wordsSkip)
+      .addStep('div[data-help-statement]', T.helpIntroInstructions, 1, 'bottom')
+      .addStep('div[data-help-runs]', T.helpIntroNewRun, 2, 'bottom')
+      /*.addStep('select[name="language"]', T.helpIntroLanguage, 3, 'bottom')
+      .addStep('.vue-codemirror-wrap', T.helpIntroLanguage, 4, 'bottom')
+      .addStep('input[type="file"]', T.helpIntroLanguage, 5, 'bottom')
+      .addStep('input[type="submit"]', T.helpIntroLanguage, 6, 'bottom')*/
+      .setOption('doneLabel', T.helpIntroNextPage)
+      .setOption('nextLabel', T.helpIntroNext)
+      .setOption('prevLabel', T.helpIntroPrevious)
+      .setOption('skipLabel', T.helpIntroSkip)
       .start();
   }
 
