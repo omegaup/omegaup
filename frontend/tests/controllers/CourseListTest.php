@@ -33,8 +33,8 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // This course shouldn't affect all the tests as it won't be listed
         $publicArchivedCourseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
-            /*$admin=*/            null,
-            /*$adminLogin=*/ null,
+            $this->adminUser,
+            self::login($this->adminUser),
             \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
         );
         $archivedCourse = \OmegaUp\DAO\Courses::getByPK(
@@ -93,6 +93,21 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertEquals(3, $course_array['counts']['homework']);
         $this->assertEquals(2, $course_array['counts']['test']);
+    }
+
+    public function testListCoursesMine() {
+        $adminLogin = self::login($this->adminUser);
+
+        $archivedCourses = \OmegaUp\Controllers\Course::getCourseMineDetailsForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+            ])
+        )['smartyProperties']['payload']['courses']['admin']['filteredCourses']['archived']['courses'];
+        $this->assertCount(1, $archivedCourses);
+        $this->assertEquals(
+            $this->courseAliases[3],
+            $archivedCourses[0]['alias']
+        );
     }
 
     public function testGetCourseListForSmarty() {
