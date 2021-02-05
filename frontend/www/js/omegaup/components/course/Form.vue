@@ -137,7 +137,6 @@
             </select>
           </div>
         </div>
-        <div class="row"></div>
         <div class="row">
           <div class="form-group container-fluid col-md-6">
             <label class="font-weight-bold w-100"
@@ -156,7 +155,7 @@
           </div>
           <div class="form-group col-md-6">
             <label class="font-weight-bold w-100">{{ T.wordsLanguages }}</label>
-            <multiselect
+            <vue-multiselect
               v-model="selectedLanguages"
               :options="Object.keys(allLanguages)"
               :multiple="true"
@@ -164,7 +163,7 @@
               :close-on-select="false"
               :allow-empty="false"
             >
-            </multiselect>
+            </vue-multiselect>
           </div>
         </div>
         <div class="row">
@@ -209,7 +208,7 @@ library.add(fas);
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
-    Multiselect,
+    'vue-multiselect': Multiselect,
   },
 })
 export default class CourseDetails extends Vue {
