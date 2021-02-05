@@ -31,7 +31,7 @@ OmegaUp.on('ready', () => {
           userRegistrationAnswered: payload.userRegistrationAnswered,
           userRegistrationAccepted: payload.userRegistrationAccepted,
           loggedIn: headerPayload.isLoggedIn,
-          currentUsername: headerPayload.currentUsername,
+          username: headerPayload.currentUsername,
         },
         on: {
           submit: (source: course_Intro) => {

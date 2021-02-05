@@ -70,7 +70,7 @@ import omegaup_Markdown from '../Markdown.vue';
   },
 })
 export default class Course extends Vue {
-  @Prop() currentUsername!: string;
+  @Prop() username!: string;
   @Prop() courseName!: string;
   @Prop() courseAlias!: string;
   @Prop() schoolName!: string;
@@ -108,7 +108,7 @@ export default class Course extends Vue {
   }
 
   get aliasWithUsername(): string {
-    return `${this.courseAlias}_${this.currentUsername}`;
+    return `${this.courseAlias}_${this.username}`;
   }
 }
 </script>

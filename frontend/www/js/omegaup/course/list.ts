@@ -19,7 +19,7 @@ OmegaUp.on('ready', () => {
         props: {
           courses: payload.courses,
           loggedIn: headerPayload.isLoggedIn,
-          currentUsername: headerPayload.currentUsername,
+          username: headerPayload.currentUsername,
         },
         on: {
           clone: (

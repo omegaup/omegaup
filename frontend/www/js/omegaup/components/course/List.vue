@@ -69,7 +69,7 @@
                 <omegaup-course
                   v-for="course in filteredCourses.courses"
                   :key="course.alias"
-                  :current-username="currentUsername"
+                  :username="username"
                   :is-public="accessMode === 'public'"
                   :course-name="course.name"
                   :course-alias="course.alias"
@@ -127,7 +127,7 @@ library.add(fas);
 export default class CourseList extends Vue {
   @Prop() courses!: types.StudentCourses;
   @Prop() loggedIn!: boolean;
-  @Prop() currentUsername!: string;
+  @Prop() username!: string;
 
   T = T;
 

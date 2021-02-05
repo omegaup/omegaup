@@ -210,7 +210,7 @@ export default class CourseIntro extends Vue {
   @Prop({ default: null }) userRegistrationAnswered!: boolean;
   @Prop({ default: null }) userRegistrationAccepted!: boolean;
   @Prop() loggedIn!: boolean;
-  @Prop() currentUsername!: string;
+  @Prop() username!: string;
 
   T = T;
   shareUserInformation = false;
@@ -226,7 +226,7 @@ export default class CourseIntro extends Vue {
   }
 
   get aliasWithUsername(): string {
-    return `${this.course?.alias}_${this.currentUsername}`;
+    return `${this.course?.alias}_${this.username}`;
   }
 
   onSubmit(): void {
