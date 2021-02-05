@@ -30,6 +30,19 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
             $privateCourseData,
             $this->identity
         );
+
+        // This course shouldn't affect all the tests as it won't be listed
+        $publicArchivedCourseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            /*$admin=*/            null,
+            /*$adminLogin=*/ null,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+        $archivedCourse = \OmegaUp\DAO\Courses::getByPK(
+            $publicArchivedCourseData['course']->course_id
+        );
+        $archivedCourse->archived = 1;
+        \OmegaUp\DAO\Courses::update($archivedCourse);
+        $this->courseAliases[] = $publicArchivedCourseData['course_alias'];
     }
 
     protected $adminUser;
