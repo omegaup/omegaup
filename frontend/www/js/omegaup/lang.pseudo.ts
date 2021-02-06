@@ -334,6 +334,7 @@ const translations: { [key: string]: string; } = {
   courseNewFormDescription: "(D35crip7i0n)",
   courseNewFormEndDate: "(End da73)",
   courseNewFormEndDateDesc: "(Tim3 and da73 (in 10ca1 7im3) in which 7h3 c0ur53 wi11 3nd.)",
+  courseNewFormLanguages: "(S37 1anguag35 f0r 7h3 curr3n7 c0ur53)",
   courseNewFormScheduleCourse: "(Sch3du13 c0ur53)",
   courseNewFormShortTitleAlias: "(Sh0r7 7i713 (a1ia5))",
   courseNewFormShortTitleAliasDesc: "(Th3 a1ia5 i5 u53d 70 c0n57ruc7 7h3 c0ur53 URL (3xamp135: IPNVERANO2016, ITVERINTRO2016))",

@@ -52,9 +52,6 @@
               </span>
             </div>
           </div>
-          <omegaup-markdown
-            :markdown="admissionModeDescription"
-          ></omegaup-markdown>
         </div>
         <div class="text-right">
           <button class="btn btn-primary change-admission-mode" type="submit">

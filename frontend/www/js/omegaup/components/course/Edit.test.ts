@@ -1,5 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
 
 import type { types } from '../../api_types';
 
@@ -14,7 +13,6 @@ describe('Edit.vue', () => {
     const wrapper = shallowMount(course_Edit, {
       propsData: {
         data: {
-          allLanguages: { py2: 'Python 2', py3: 'Python 3' },
           course: {
             admission_mode: 'registration',
             alias: 'test-course',
@@ -48,6 +46,7 @@ describe('Edit.vue', () => {
             student_count: 1,
             unlimited_duration: false,
           },
+          allLanguages: { kp: 'Karel Pascal', kj: 'Karel Java' },
           assignmentProblems: [],
           selectedAssignment: undefined,
           students: [],
