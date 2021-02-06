@@ -8,10 +8,11 @@ module.exports = {
     jquery: true,
     node: true,
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'jest-dom'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:jest-dom/recommended',
     'plugin:vue/recommended',
     'plugin:vue/vue3-recommended',
     'prettier',

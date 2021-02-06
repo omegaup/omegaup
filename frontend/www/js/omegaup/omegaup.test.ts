@@ -1,5 +1,3 @@
-import expect from 'expect';
-
 import { Experiments } from './omegaup';
 import T from './lang';
 

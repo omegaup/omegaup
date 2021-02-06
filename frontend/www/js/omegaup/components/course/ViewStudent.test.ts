@@ -1,5 +1,4 @@
 import { mount, shallowMount } from '@vue/test-utils';
-import expect from 'expect';
 
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
