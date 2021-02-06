@@ -561,6 +561,39 @@ export namespace types {
         x.courses = ((x) => {
           x.admin = ((x) => {
             x.filteredCourses = ((x) => {
+              x.archived = ((x) => {
+                x.courses = ((x) => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map((x) => {
+                    x.assignments = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        if (x.finish_time)
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      });
+                    })(x.assignments);
+                    if (x.finish_time)
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.archived);
               x.current = ((x) => {
                 x.courses = ((x) => {
                   if (!Array.isArray(x)) {
@@ -1289,7 +1322,15 @@ export namespace types {
   }
 
   export interface AdminCourses {
-    admin: types.CoursesByAccessMode;
+    admin: {
+      accessMode: string;
+      activeTab: string;
+      filteredCourses: {
+        archived: types.CoursesByTimeType;
+        current: types.CoursesByTimeType;
+        past: types.CoursesByTimeType;
+      };
+    };
   }
 
   export interface ArenaProblemDetails {
@@ -1778,6 +1819,7 @@ export namespace types {
   export interface CourseDetails {
     admission_mode: string;
     alias: string;
+    archived: boolean;
     assignments: types.CourseAssignment[];
     description: string;
     finish_time?: Date;
@@ -1923,6 +1965,7 @@ export namespace types {
 
   export interface CoursesList {
     admin: types.FilteredCourse[];
+    archived?: types.FilteredCourse[];
     public: types.FilteredCourse[];
     student: types.FilteredCourse[];
   }
@@ -2093,6 +2136,7 @@ export namespace types {
 
   export interface IntroDetailsPayload {
     alias: string;
+    archived: boolean;
     description: string;
     details?: types.CourseDetails;
     isFirstTimeAccess: boolean;
@@ -3302,6 +3346,8 @@ export namespace messages {
   };
   export type CourseArbitrateRequestRequest = { [key: string]: any };
   export type CourseArbitrateRequestResponse = {};
+  export type CourseArchiveRequest = { [key: string]: any };
+  export type CourseArchiveResponse = {};
   export type CourseAssignmentDetailsRequest = { [key: string]: any };
   export type _CourseAssignmentDetailsServerResponse = any;
   export type CourseAssignmentDetailsResponse = {
@@ -4160,6 +4206,9 @@ export namespace controllers {
     arbitrateRequest: (
       params?: messages.CourseArbitrateRequestRequest,
     ) => Promise<messages.CourseArbitrateRequestResponse>;
+    archive: (
+      params?: messages.CourseArchiveRequest,
+    ) => Promise<messages.CourseArchiveResponse>;
     assignmentDetails: (
       params?: messages.CourseAssignmentDetailsRequest,
     ) => Promise<messages.CourseAssignmentDetailsResponse>;

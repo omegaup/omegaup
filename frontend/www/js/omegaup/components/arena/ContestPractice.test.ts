@@ -1,13 +1,12 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
 import { mount } from '@vue/test-utils';
-import expect from 'expect';
 import type { types } from '../../api_types';
 import * as time from '../../time';
 
 import arena_ContestPractice from './ContestPractice.vue';
 
-describe('Details.vue', () => {
+describe('ContestPractice.vue', () => {
   const date = new Date();
 
   const contestDetails = {
@@ -123,7 +122,7 @@ describe('Details.vue', () => {
     } as types.RunDetails,
   } as types.ProblemInfo;
 
-  it('Should handle details for a problem in a contest, practice mode', () => {
+  it('Should handle details for a problem in a contest, practice mode', async () => {
     const wrapper = mount(arena_ContestPractice, {
       propsData: {
         contest: contestDetails,
@@ -145,19 +144,22 @@ describe('Details.vue', () => {
             text: 'B. hello other problem omegaUp',
           },
         ] as types.NavbarContestProblem[],
-        problem: sampleProblem,
+        problemInfo: sampleProblem,
       },
     });
 
     expect(wrapper.find('.clock').text()).toBe('∞');
-    expect(wrapper.find('.socket-status').text()).toBe('•');
-    expect(wrapper.find('.problem-list').text()).toContain(
+    expect(wrapper.find('.socket-status').text()).toBe('✗');
+    expect(wrapper.find('a[data-problem=problemOmegaUp]').text()).toBe(
       'A. hello problem omegaUp',
     );
-    expect(wrapper.find('.problem-list').text()).toContain(
+    expect(wrapper.find('a[data-problem=otherProblemOmegaUp]').text()).toBe(
       'B. hello other problem omegaUp',
     );
     expect(wrapper.text()).toContain(sampleProblem.points);
-    expect(wrapper.text()).toContain(time.formatDate(date));
+    expect(wrapper.text()).toContain(time.formatDateLocal(date));
+
+    await wrapper.find('a[data-problem=problemOmegaUp]').trigger('click');
+    expect(wrapper.emitted('navigate-to-problem')).toBeDefined();
   });
 });

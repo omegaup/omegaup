@@ -10,20 +10,29 @@
       </span>
     </div>
     <div class="summary" :class="{ active: !activeProblem }">
-      <a class="name" href="#problems">{{ T.wordsSummary }}</a>
+      <a
+        class="name"
+        href="#problems"
+        @click="$emit('disable-active-problem')"
+        >{{ T.wordsSummary }}</a
+      >
     </div>
     <div
       v-for="problem in problems"
+      :key="problem.alias"
       :class="{ active: problem.alias === activeProblem }"
       data-navbar-problem
     >
       <div class="row">
-        <div class="col-xs-5 problem-type">
+        <div class="col-xs-5 problem-type w-50">
           <span v-if="inAssignment">{{
             getProblemTypeTitle(problem.acceptsSubmissions)
           }}</span>
         </div>
-        <div v-if="problem.acceptsSubmissions" class="col-xs-7 solved">
+        <div
+          v-if="problem.acceptsSubmissions"
+          class="col-xs-7 solved text-right w-50 pr-4"
+        >
           <span
             >({{
               parseFloat(problem.bestScore).toFixed(digitsAfterDecimalPoint)
@@ -46,10 +55,13 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-xs-12">
-          <a class="name" @click="onNavigateToProblem(problem)">{{
-            problem.text
-          }}</a>
+        <div class="col-xs-12 pl-4">
+          <a
+            :data-problem="problem.alias"
+            class="name"
+            @click="onNavigateToProblem(problem)"
+            >{{ problem.text }}</a
+          >
         </div>
       </div>
     </div>
@@ -59,6 +71,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 
 import {
@@ -78,7 +91,7 @@ library.add(fas);
   },
 })
 export default class ArenaNavbarProblems extends Vue {
-  @Prop() problems!: omegaup.ContestProblem[];
+  @Prop() problems!: types.NavbarContestProblem[];
   @Prop() activeProblem!: string | null;
   @Prop() courseAlias!: string | null;
   @Prop() courseName!: string | null;
@@ -96,13 +109,13 @@ export default class ArenaNavbarProblems extends Vue {
     return `/course/${this.courseAlias}/`;
   }
 
-  onNavigateToProblem(problem: omegaup.ContestProblem) {
+  onNavigateToProblem(problem: types.ContestProblem) {
     this.$emit('navigate-to-problem', problem.alias);
   }
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 .problem-list .breadcrumbs-link {
   display: inherit;
 }

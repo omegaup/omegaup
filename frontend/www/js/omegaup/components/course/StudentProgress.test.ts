@@ -1,5 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
 import { omegaup } from '../../omegaup';
 
 import course_StudentProgress from './StudentProgress.vue';

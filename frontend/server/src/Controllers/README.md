@@ -64,6 +64,7 @@
   - [`/api/course/adminDetails/`](#apicourseadmindetails)
   - [`/api/course/admins/`](#apicourseadmins)
   - [`/api/course/arbitrateRequest/`](#apicoursearbitraterequest)
+  - [`/api/course/archive/`](#apicoursearchive)
   - [`/api/course/assignmentDetails/`](#apicourseassignmentdetails)
   - [`/api/course/assignmentScoreboard/`](#apicourseassignmentscoreboard)
   - [`/api/course/assignmentScoreboardEvents/`](#apicourseassignmentscoreboardevents)
@@ -1421,6 +1422,23 @@ interested to join the course.
 | `course_alias` | `string` |             |
 | `resolution`   | `bool`   |             |
 | `username`     | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/course/archive/`
+
+### Description
+
+Archives or un-archives a course
+
+### Parameters
+
+| Name           | Type      | Description |
+| -------------- | --------- | ----------- |
+| `archive`      | `boolean` |             |
+| `course_alias` | `string`  |             |
 
 ### Returns
 
