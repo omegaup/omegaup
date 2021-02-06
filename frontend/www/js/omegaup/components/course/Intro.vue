@@ -51,7 +51,7 @@
           </table>
         </div>
         <div
-          v-if="course.admission_mode === 'public'"
+          v-if="course.admission_mode === 'public' && loggedIn"
           class="accordion"
           data-accordion-clone
         >
@@ -98,10 +98,8 @@
           v-if="needsBasicInformation"
           :markdown="T.courseBasicInformationNeeded"
         ></omegaup-markdown>
-        <template v-if="requestsUserInformation != 'no'">
-          <omegaup-markdown
-            :markdown="statements.privacy.markdown || ''"
-          ></omegaup-markdown>
+        <template v-if="requestsUserInformation !== 'no' && privacyStatement">
+          <omegaup-markdown :markdown="privacyStatement"></omegaup-markdown>
           <omegaup-radio-switch
             :value.sync="shareUserInformation"
             :selected-value="shareUserInformation"
@@ -110,7 +108,7 @@
         </template>
         <template v-if="shouldShowAcceptTeacher">
           <omegaup-markdown
-            :markdown="statements.acceptTeacher.markdown || ''"
+            :markdown="acceptTeacherStatement"
           ></omegaup-markdown>
           <omegaup-radio-switch
             :value.sync="acceptTeacher"
@@ -227,6 +225,14 @@ export default class CourseIntro extends Vue {
 
   get aliasWithUsername(): string {
     return `${this.course?.alias}_${this.username}`;
+  }
+
+  get privacyStatement(): null | string {
+    return this.statements.privacy?.markdown ?? null;
+  }
+
+  get acceptTeacherStatement(): null | string {
+    return this.statements.acceptTeacher?.markdown ?? null;
   }
 
   onSubmit(): void {
