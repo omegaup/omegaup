@@ -54,11 +54,11 @@
           :output-limit="outputLimit"
           :input-limit="inputLimit"
           :initial-validator="validator"
-          :initial-language="languages"
           :overall-wall-time-limit="overallWallTimeLimit"
           :validator-time-limit="validatorTimeLimit"
           :valid-languages="data.validLanguages"
           :validator-types="data.validatorTypes"
+          :languages.sync="languages"
         ></omegaup-problem-settings>
 
         <div class="row">
@@ -153,6 +153,7 @@
                 name="show_diff"
                 class="form-control"
                 :class="{ 'is-invalid': errors.includes('show_diff') }"
+                :disabled="languages === ''"
               >
                 <option value="none">{{ T.problemVersionDiffModeNone }}</option>
                 <option value="examples">{{ T.wordsOnlyExamples }}</option>
