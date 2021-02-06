@@ -1,5 +1,4 @@
 import { mount } from '@vue/test-utils';
-import expect from 'expect';
 
 import { types } from '../../api_types';
 import T from '../../lang';
