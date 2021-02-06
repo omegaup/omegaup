@@ -64,6 +64,7 @@
   - [`/api/course/adminDetails/`](#apicourseadmindetails)
   - [`/api/course/admins/`](#apicourseadmins)
   - [`/api/course/arbitrateRequest/`](#apicoursearbitraterequest)
+  - [`/api/course/archive/`](#apicoursearchive)
   - [`/api/course/assignmentDetails/`](#apicourseassignmentdetails)
   - [`/api/course/assignmentScoreboard/`](#apicourseassignmentscoreboard)
   - [`/api/course/assignmentScoreboardEvents/`](#apicourseassignmentscoreboardevents)
@@ -1426,6 +1427,23 @@ interested to join the course.
 
 _Nothing_
 
+## `/api/course/archive/`
+
+### Description
+
+Archives or un-archives a course
+
+### Parameters
+
+| Name           | Type      | Description |
+| -------------- | --------- | ----------- |
+| `archive`      | `boolean` |             |
+| `course_alias` | `string`  |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/course/assignmentDetails/`
 
 ### Description
@@ -1532,6 +1550,7 @@ Create new course API
 | `alias`                     | `mixed`      |             |
 | `description`               | `mixed`      |             |
 | `finish_time`               | `mixed`      |             |
+| `languages`                 | `mixed`      |             |
 | `name`                      | `mixed`      |             |
 | `needs_basic_information`   | `mixed`      |             |
 | `public`                    | `mixed`      |             |
@@ -1926,6 +1945,7 @@ Edit Course contents
 | Name                        | Type                                        | Description |
 | --------------------------- | ------------------------------------------- | ----------- |
 | `alias`                     | `string`                                    |             |
+| `languages`                 | `string`                                    |             |
 | `school_id`                 | `int`                                       |             |
 | `admission_mode`            | `'private'\|'public'\|'registration'\|null` |             |
 | `description`               | `null\|string`                              |             |

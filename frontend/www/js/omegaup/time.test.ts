@@ -1,5 +1,3 @@
-import expect from 'expect';
-
 import * as time from './time';
 
 describe('time', () => {
