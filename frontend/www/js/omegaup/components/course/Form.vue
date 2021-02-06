@@ -191,6 +191,7 @@ import * as typeahead from '../../typeahead';
 import DatePicker from '../DatePicker.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
 import Multiselect from 'vue-multiselect';
+import 'vue-multiselect/dist/vue-multiselect.min.css';
 
 import {
   FontAwesomeIcon,
@@ -281,8 +282,6 @@ export default class CourseDetails extends Vue {
 </script>
 
 <style lang="scss">
-@import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
-
 .multiselect__tag {
   background: #678dd7;
 }
