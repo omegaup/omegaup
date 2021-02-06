@@ -40,7 +40,6 @@
     "eslint-config-prettier": "^6.12.0",
     "eslint-plugin-jest-dom": "^3.6.5",
     "eslint-plugin-vue": "^7.0.0",
-    "expect": "^26.6.2",
     "file-loader": "^6.2",
     "fork-ts-checker-webpack-plugin": "^6.1",
     "highcharts": "8",
