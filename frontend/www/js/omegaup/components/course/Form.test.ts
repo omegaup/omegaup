@@ -6,6 +6,7 @@ import T from '../../lang';
 import course_Form from './Form.vue';
 
 const baseCourseFormProps = {
+  allLanguages: { py2: 'Python 2', py3: 'Python 3' },
   course: {
     admission_mode: 'registration',
     alias: 'Newx',
@@ -23,6 +24,7 @@ const baseCourseFormProps = {
     start_time: new Date(),
     student_count: 3,
     unlimited_duration: false,
+    languages: ['py2'],
   } as types.CourseDetails,
   update: true,
 };

@@ -7,7 +7,7 @@
       <form class="form" data-course-form @submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-4">
-            <label class="faux-label"
+            <label class="font-weight-bold w-100"
               >{{ T.wordsName }}
               <input
                 v-model="name"
@@ -19,7 +19,7 @@
             /></label>
           </div>
           <div class="form-group col-md-4">
-            <label class="faux-label"
+            <label class="font-weight-bold w-100"
               >{{ T.courseNewFormShortTitleAlias }}
               <font-awesome-icon
                 :title="T.courseNewFormShortTitleAliasDesc"
@@ -37,7 +37,7 @@
             /></label>
           </div>
           <div class="form-group col-md-4">
-            <span class="faux-label"
+            <span class="font-weight-bold"
               >{{ T.courseNewFormShowScoreboard }}
               <font-awesome-icon
                 :title="T.courseNewFormShowScoreboardDesc"
@@ -53,7 +53,7 @@
         </div>
         <div class="row">
           <div class="form-group col-md-4">
-            <label class="faux-label"
+            <label class="font-weight-bold w-100"
               >{{ T.courseNewFormStartDate }}
               <font-awesome-icon
                 :title="T.courseNewFormStartDateDesc"
@@ -62,7 +62,7 @@
             ></label>
           </div>
           <div class="form-group col-md-4">
-            <span class="faux-label"
+            <span class="font-weight-bold"
               >{{ T.courseNewFormUnlimitedDuration }}
               <font-awesome-icon
                 :title="T.courseNewFormUnlimitedDurationDesc"
@@ -75,7 +75,7 @@
             ></omegaup-radio-switch>
           </div>
           <div class="form-group col-md-4">
-            <label class="faux-label"
+            <label class="font-weight-bold w-100"
               >{{ T.courseNewFormEndDate }}
               <font-awesome-icon
                 :title="T.courseNewFormEndDateDesc"
@@ -90,7 +90,7 @@
         </div>
         <div class="row">
           <div class="form-group col-md-4">
-            <label class="faux-label"
+            <label class="font-weight-bold w-100"
               >{{ T.profileSchool }}
               <input
                 v-model="school_name"
@@ -104,7 +104,7 @@
             /></label>
           </div>
           <div class="form-group col-md-4">
-            <span class="faux-label"
+            <span class="font-weight-bold"
               >{{ T.courseNewFormBasicInformationRequired }}
               <font-awesome-icon
                 :title="T.courseNewFormBasicInformationRequiredDesc"
@@ -117,7 +117,7 @@
             ></omegaup-radio-switch>
           </div>
           <div class="form-group col-md-4">
-            <span class="faux-label"
+            <span class="font-weight-bold"
               >{{ T.courseNewFormUserInformationRequired }}
               <font-awesome-icon
                 :title="T.courseNewFormUserInformationRequiredDesc"
@@ -136,8 +136,10 @@
               </option>
             </select>
           </div>
-          <div class="form-group container-fluid">
-            <label
+        </div>
+        <div class="row">
+          <div class="form-group container-fluid col-md-6">
+            <label class="font-weight-bold w-100"
               >{{ T.courseNewFormDescription }}
               <textarea
                 v-model="description"
@@ -151,6 +153,20 @@
               ></textarea>
             </label>
           </div>
+          <div class="form-group col-md-6">
+            <label class="font-weight-bold w-100">{{ T.wordsLanguages }}</label>
+            <vue-multiselect
+              v-model="selectedLanguages"
+              :options="Object.keys(allLanguages)"
+              :multiple="true"
+              :placeholder="T.courseNewFormLanguages"
+              :close-on-select="false"
+              :allow-empty="false"
+            >
+            </vue-multiselect>
+          </div>
+        </div>
+        <div class="row">
           <div class="form-group col-md-12 text-right">
             <button class="btn btn-primary mr-2 submit" type="submit">
               <template v-if="update">
@@ -174,6 +190,8 @@ import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import DatePicker from '../DatePicker.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
+import Multiselect from 'vue-multiselect';
+import 'vue-multiselect/dist/vue-multiselect.min.css';
 
 import {
   FontAwesomeIcon,
@@ -191,12 +209,14 @@ library.add(fas);
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
+    'vue-multiselect': Multiselect,
   },
 })
 export default class CourseDetails extends Vue {
   @Prop({ default: false }) update!: boolean;
   @Prop() course!: types.CourseDetails;
   @Prop({ default: '' }) invalidParameterName!: string;
+  @Prop() allLanguages!: string[];
 
   T = T;
   alias = this.course.alias;
@@ -210,6 +230,7 @@ export default class CourseDetails extends Vue {
   needsBasicInformation = this.course.needs_basic_information;
   requests_user_information = this.course.requests_user_information;
   unlimitedDuration = this.course.finish_time === null;
+  selectedLanguages = this.course.languages;
 
   data(): { [name: string]: any } {
     return {
@@ -260,11 +281,8 @@ export default class CourseDetails extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
-.omegaup-course-details .form-group > label {
-  width: 100%;
-}
-.omegaup-course-details .faux-label {
-  font-weight: bold;
+<style lang="scss">
+.multiselect__tag {
+  background: #678dd7;
 }
 </style>

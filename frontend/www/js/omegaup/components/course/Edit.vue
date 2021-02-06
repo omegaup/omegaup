@@ -79,6 +79,7 @@
         <omegaup-course-form
           :update="true"
           :course="data.course"
+          :all-languages="data.allLanguages"
           @emit-cancel="onCancel"
           @submit="
             (formComponent) => $emit('submit-edit-course', formComponent)
