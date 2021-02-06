@@ -62,11 +62,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import T from '../../lang';
-
-interface Tab {
-  name: string;
-  text: string;
-}
+import { Tab } from '../problem/Details.vue';
 
 @Component
 export default class Arena extends Vue {

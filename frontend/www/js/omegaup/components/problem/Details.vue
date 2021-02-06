@@ -287,7 +287,7 @@ library.add(
   faExternalLinkAlt,
 );
 
-interface Tab {
+export interface Tab {
   name: string;
   text: string;
 }

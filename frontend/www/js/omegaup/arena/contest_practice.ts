@@ -11,6 +11,7 @@ import arena_ContestPractice, {
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestPracticePayload();
+  const locationHash = window.location.hash.substr(1).split('/');
   const contestPractice = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
@@ -18,6 +19,7 @@ OmegaUp.on('ready', () => {
       problemInfo: null as types.ProblemInfo | null,
       problems: payload.problems as types.NavbarContestProblem[],
       problem: null as ActiveProblem | null,
+      activeTab: window.location.hash ? locationHash[0] : 'problems',
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
@@ -26,7 +28,7 @@ OmegaUp.on('ready', () => {
           problems: this.problems,
           problemInfo: this.problemInfo,
           problem: this.problem,
-          activeTab: 'problems',
+          activeTab: this.activeTab,
         },
         on: {
           'navigate-to-problem': (source: ActiveProblem) => {
@@ -50,6 +52,9 @@ OmegaUp.on('ready', () => {
                 window.location.hash = '#problems';
                 contestPractice.problem = null;
               });
+          },
+          'update:activeTab': (tabName: string) => {
+            window.location.replace(`#${tabName}`);
           },
         },
       });
