@@ -110,7 +110,6 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-
     public function testGetListAndArchiveCourses() {
         $userLogin = self::login($this->identity);
 
