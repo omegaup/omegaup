@@ -12,6 +12,7 @@ describe('CloneWithToken.vue', () => {
         course: {
           admission_mode: 'private',
           alias: 'test-course',
+          archived: false,
           assignments: [],
           needs_basic_information: false,
           description: '# Test',
