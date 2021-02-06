@@ -1,6 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
-import expect from 'expect';
 import user_Profile from './Profilev2.vue';
 
 describe('Profilev2.vue', () => {
