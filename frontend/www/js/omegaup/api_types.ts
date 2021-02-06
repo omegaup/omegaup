@@ -1778,6 +1778,7 @@ export namespace types {
   export interface CourseDetails {
     admission_mode: string;
     alias: string;
+    archived: boolean;
     assignments: types.CourseAssignment[];
     description: string;
     finish_time?: Date;
@@ -2093,6 +2094,7 @@ export namespace types {
 
   export interface IntroDetailsPayload {
     alias: string;
+    archived: boolean;
     description: string;
     details?: types.CourseDetails;
     isFirstTimeAccess: boolean;
