@@ -1,5 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
 import T from '../../lang';
 import qualitynomination_List from './List.vue';
 import type { types } from '../../api_types';

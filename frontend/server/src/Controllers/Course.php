@@ -13,7 +13,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseAdmin=array{role: string, username: string}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CourseDetails=array{admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, languages: list<string>|null, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
+ * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, languages: list<string>|null, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -22,13 +22,13 @@ namespace OmegaUp\Controllers;
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, counts: array<string, int>, description: string, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>}
+ * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>, archived?: list<FilteredCourse>}
  * @psalm-type CourseCloneDetailsPayload=array{creator: array{classname: string, username: string}, details: CourseDetails, token: string}
  * @psalm-type CoursesByTimeType=array{courses: list<FilteredCourse>, timeType: string}
  * @psalm-type CoursesByAccessMode=array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType}}
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
  * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
- * @psalm-type AdminCourses=array{admin: CoursesByAccessMode}
+ * @psalm-type AdminCourses=array{admin: array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType, archived: CoursesByTimeType}}}
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses}
@@ -45,7 +45,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>, shouldShowFirstAssociatedIdentityRunWarning: bool}
- * @psalm-type IntroDetailsPayload=array{alias: string, description: string, details?: CourseDetails, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
+ * @psalm-type IntroDetailsPayload=array{alias: string, archived: boolean, description: string, details?: CourseDetails, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
@@ -1814,6 +1814,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             $response['public'] = \OmegaUp\DAO\Courses::getPublicCourses();
         }
 
+        if (in_array('archived', $courseTypes)) {
+            $response['archived'] = \OmegaUp\DAO\Courses::getArchivedCoursesAdminedByIdentity(
+                $identity->identity_id
+            );
+        }
+
         return $response;
     }
 
@@ -3169,7 +3175,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $page,
             $pageSize,
-            /*$courseTypes=*/['admin']
+            /*$courseTypes=*/['admin', 'archived']
         );
         $filteredCourses = [
             'admin' => [
@@ -3181,6 +3187,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'past' => [
                         'courses' => [],
                         'timeType' => 'past',
+                    ],
+                    'archived' => [
+                        'courses' => [],
+                        'timeType' => 'archived',
                     ],
                 ],
                 'accessMode' => 'admin',
@@ -3198,6 +3208,11 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $filteredCourses['admin']['filteredCourses']['past']['courses'][] = $course;
             }
         }
+
+        if (array_key_exists('archived', $courses)) {
+            $filteredCourses['admin']['filteredCourses']['archived']['courses'] = $courses['archived'];
+        }
+
         if (
             $filteredCourses['admin']['activeTab'] === ''
             && !empty(
@@ -3742,6 +3757,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'name' => $courseDetails['name'],
                 'description' => $courseDetails['description'],
                 'alias' => $courseDetails['alias'],
+                'archived' => $courseDetails['archived'],
                 'needsBasicInformation' => $needsBasicInformation,
                 'requestsUserInformation' =>
                     $courseDetails['requests_user_information'],
@@ -3880,7 +3896,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns course basic details
      *
-     * @return array{alias: string, needs_basic_information: bool, description: string, name: string, requests_user_information: string}
+     * @return array{alias: string, archived: boolean, needs_basic_information: bool, description: string, name: string, requests_user_information: string}
      */
     private static function getBasicCourseDetails(
         \OmegaUp\DAO\VO\Courses $course
@@ -3889,6 +3905,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'name' => strval($course->name),
             'description' => strval($course->description),
             'alias' => strval($course->alias),
+            'archived' => $course->archived,
             'needs_basic_information' => $course->needs_basic_information,
             'requests_user_information' => $course->requests_user_information,
         ];
@@ -3923,6 +3940,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'name' => strval($course->name),
             'description' => strval($course->description),
             'alias' => strval($course->alias),
+            'archived' => $course->archived,
             'school_id' => intval($course->school_id),
             'school_name' => null,
             'start_time' => $course->start_time,
@@ -4023,6 +4041,37 @@ class Course extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\DAO\Courses::getActivityReport($course)
             ),
         ];
+    }
+
+    /**
+     * Archives or un-archives a course
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param boolean $archive
+     */
+    public static function apiArchive(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $course = self::validateCourseExists($courseAlias);
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseNotFound'
+            );
+        }
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $archive = $r->ensureOptionalBool('archive') ?? true;
+        $course->archived = $archive;
+        \OmegaUp\DAO\Courses::update($course);
+
+        return [ 'status' => 'ok' ];
     }
 
     /**

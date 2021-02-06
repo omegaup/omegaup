@@ -68,6 +68,7 @@ OmegaUp.on('ready', () => {
           guid: this.guid,
           isAdmin: commonPayload.isAdmin,
           showVisibilityIndicators: true,
+          shouldShowTabs: true,
         },
         on: {
           'show-run': (source: problem_Details, guid: string) => {

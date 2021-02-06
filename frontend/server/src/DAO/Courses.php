@@ -520,6 +520,83 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
+     * Returns all archived courses that an identity can manage.
+     *
+     * @return list<FilteredCourse>
+     */
+    final public static function getArchivedCoursesAdminedByIdentity(
+        int $identityId
+    ): array {
+        $sql = '
+            SELECT
+                c.course_id,
+                c.admission_mode,
+                c.alias,
+                c.description,
+                c.finish_time,
+                c.name AS name,
+                s.name AS school_name,
+                c.start_time,
+                0.0 AS progress,
+                0 AS is_open,
+                CAST(NULL AS UNSIGNED) AS accept_teacher
+            FROM
+                Courses AS c
+            INNER JOIN
+                ACLs AS a ON a.acl_id = c.acl_id
+            INNER JOIN
+                Identities AS ai ON a.owner_id = ai.user_id
+            LEFT JOIN
+                Schools AS s ON s.school_id = c.school_id
+            LEFT JOIN
+                User_Roles ur ON ur.acl_id = c.acl_id
+            LEFT JOIN
+                Identities uri ON ur.user_id = uri.identity_id
+            LEFT JOIN
+                Group_Roles gr ON gr.acl_id = c.acl_id
+            LEFT JOIN
+                Groups_Identities gi ON gi.group_id = gr.group_id
+            WHERE
+                c.archived = 1 AND (
+                    ai.identity_id = ? OR
+                    (ur.role_id = ? AND uri.identity_id = ?) OR
+                    (gr.role_id = ? AND gi.identity_id = ?)
+                )
+            GROUP BY
+                c.course_id
+            ORDER BY
+                c.course_id DESC;';
+
+        $params = [
+            $identityId,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            $identityId,
+            \OmegaUp\Authorization::ADMIN_ROLE,
+            $identityId,
+        ];
+        /** @var list<array{accept_teacher: int|null, admission_mode: string, alias: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, is_open: int, name: string, progress: float, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+
+        $courses = [];
+        foreach ($rs as $row) {
+            $row['assignments'] = \OmegaUp\DAO\Courses::getAllAssignments(
+                $row['alias'],
+                /*$isAdmin=*/true
+            );
+            $row['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
+                $row['course_id']
+            );
+            $row['is_open'] = boolval($row['is_open']);
+            $row['accept_teacher'] = !is_null($row['accept_teacher'])
+              ? boolval($row['accept_teacher'])
+              : null;
+            unset($row['course_id']);
+            $courses[] = $row;
+        }
+        return $courses;
+    }
+
+    /**
      * Returns all courses owned by a user.
      * @return \OmegaUp\DAO\VO\Courses[]
      */

@@ -1,5 +1,3 @@
-import expect from 'expect';
-
 import * as ui from './ui';
 import * as time from './time';
 
