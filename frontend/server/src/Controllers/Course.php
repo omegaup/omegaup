@@ -22,13 +22,13 @@ namespace OmegaUp\Controllers;
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, counts: array<string, int>, description: string, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>}
+ * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>, archived?: list<FilteredCourse>}
  * @psalm-type CourseCloneDetailsPayload=array{creator: array{classname: string, username: string}, details: CourseDetails, token: string}
  * @psalm-type CoursesByTimeType=array{courses: list<FilteredCourse>, timeType: string}
  * @psalm-type CoursesByAccessMode=array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType}}
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
  * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
- * @psalm-type AdminCourses=array{admin: CoursesByAccessMode}
+ * @psalm-type AdminCourses=array{admin: array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType, archived: CoursesByTimeType}}}
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses}
@@ -1814,6 +1814,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             $response['public'] = \OmegaUp\DAO\Courses::getPublicCourses();
         }
 
+        if (in_array('archived', $courseTypes)) {
+            $response['archived'] = \OmegaUp\DAO\Courses::getArchivedCoursesAdminedByIdentity(
+                $identity->identity_id
+            );
+        }
+
         return $response;
     }
 
@@ -3169,7 +3175,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $page,
             $pageSize,
-            /*$courseTypes=*/['admin']
+            /*$courseTypes=*/['admin', 'archived']
         );
         $filteredCourses = [
             'admin' => [
@@ -3181,6 +3187,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'past' => [
                         'courses' => [],
                         'timeType' => 'past',
+                    ],
+                    'archived' => [
+                        'courses' => [],
+                        'timeType' => 'archived',
                     ],
                 ],
                 'accessMode' => 'admin',
@@ -3198,6 +3208,11 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $filteredCourses['admin']['filteredCourses']['past']['courses'][] = $course;
             }
         }
+
+        if (array_key_exists('archived', $courses)) {
+            $filteredCourses['admin']['filteredCourses']['archived']['courses'] = $courses['archived'];
+        }
+
         if (
             $filteredCourses['admin']['activeTab'] === ''
             && !empty(
