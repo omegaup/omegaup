@@ -30,6 +30,7 @@
 	"arenaContestEndedUsePractice": "Este concurso ha terminado. Para continuar enviando soluciones usa nuestro Modo Pr\u00e1ctica haciendo clic aqu\u00ed.",
 	"arenaContestNotOpened": "Necesitas abrir el concurso como no-administrador para hacer env\u00edos.",
 	"arenaContestOrganizer": "Organiza",
+	"arenaContestPracticeOriginalScoreboardText": "Para ver el scoreboard original da clic [aqu\u00ed](/arena/%(contestAlias)/#ranking)",
 	"arenaContestWindowLength": "Tiempo para resolver los problemas",
 	"arenaCurrentContests": "Concursos actuales",
 	"arenaCurrentPublicContests": "Concursos p\u00fablicos recientes",
