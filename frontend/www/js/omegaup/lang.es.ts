@@ -445,7 +445,6 @@ const translations: { [key: string]: string; } = {
   helpIntroNeedHelpToSendSubmission: "\u00bfNecesitas ayuda para realizar un nuevo env\u00edo?",
   helpIntroNewRun: "Da clic aqu\u00ed para abrir la ventana donde enviar\u00e1s la soluci\u00f3n",
   helpIntroNext: "Siguiente",
-  helpIntroNextPage: "P\u00e1gina siguiente",
   helpIntroPrevious: "Anterior",
   helpIntroSkip: "Saltar",
   helpIntroSubmit: "Da clic aqu\u00ed para enviar el c\u00f3digo con la soluci\u00f3n del problema",

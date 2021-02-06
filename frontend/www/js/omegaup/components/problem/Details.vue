@@ -118,7 +118,6 @@
               v-show="popupDisplayed === PopupDisplayed.RunSubmit"
               :preferred-language="problem.preferred_language"
               :languages="problem.languages"
-              :show-tutorial="showTutorial"
               @dismiss="onPopupDismissed"
               @submit-run="
                 (code, selectedLanguage) =>
@@ -293,6 +292,8 @@ library.add(
   faBan,
   faExternalLinkAlt,
 );
+import introJs from 'intro.js';
+import 'intro.js/minified/introjs.min.css';
 
 interface Tab {
   name: string;
@@ -333,8 +334,6 @@ const numericSort = <T extends { [key: string]: any }>(key: string) => {
     return x[key].length - i - (y[key].length - j);
   };
 };
-import { introVuePlugin } from 'intro-ts';
-Vue.use(introVuePlugin);
 
 @Component({
   components: {
@@ -401,7 +400,6 @@ export default class ProblemDetails extends Vue {
     this.initialClarifications?.length > 0 &&
     this.activeTab !== 'clarifications';
   currentRunDetailsData = this.runDetailsData;
-  showTutorial = false;
 
   get availableTabs(): Tab[] {
     const tabs = [
@@ -644,19 +642,27 @@ export default class ProblemDetails extends Vue {
   }
 
   start() {
-    this.$intro.addEventListener('finish', () => {
-      window.location.href = `#problems/${this.problem.alias}/new-run`;
-      this.showTutorial = true;
-      this.onNewSubmission();
-    });
-    this.$intro
-      .addStep('div[data-help-statement]', T.helpIntroInstructions, 1, 'bottom')
-      .addStep('div[data-help-runs]', T.helpIntroNewRun, 2, 'bottom')
-      /*.addStep('select[name="language"]', T.helpIntroLanguage, 3, 'bottom')
-      .addStep('.vue-codemirror-wrap', T.helpIntroLanguage, 4, 'bottom')
-      .addStep('input[type="file"]', T.helpIntroLanguage, 5, 'bottom')
-      .addStep('input[type="submit"]', T.helpIntroLanguage, 6, 'bottom')*/
-      .setOption('doneLabel', T.helpIntroNextPage)
+    const introJS = introJs();
+    introJS.start();
+    introJS
+      .addSteps([
+        { element: 'div[data-help-statement]', intro: T.helpIntroInstructions },
+        { element: 'div[data-help-runs]', intro: T.helpIntroNewRun },
+        { element: 'select[name="language"]', intro: T.helpIntroLanguage },
+        { element: '.vue-codemirror-wrap', intro: T.arenaRunSubmitPaste },
+        { element: 'input[type="file"]', intro: T.arenaRunSubmitUpload },
+        { element: 'input[type="submit"]', intro: T.helpIntroSubmit },
+      ])
+      .onbeforechange((data: HTMLElement) => {
+        if (data.getAttribute('class')?.includes('introjsFloatingElement')) {
+          introJS.refresh();
+          this.onNewSubmission();
+        }
+      })
+      .oncomplete(() => {
+        this.onPopupDismissed();
+      })
+      .setOption('doneLabel', T.helpIntroDone)
       .setOption('nextLabel', T.helpIntroNext)
       .setOption('prevLabel', T.helpIntroPrevious)
       .setOption('skipLabel', T.helpIntroSkip)
@@ -702,9 +708,8 @@ export default class ProblemDetails extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-@import '../../../../../../node_modules/intro-ts/lib/bandle/style.scss';
 
 .karel-js-link {
   border: 1px solid #eee;
