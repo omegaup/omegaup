@@ -2,7 +2,10 @@
   <div class="course-edit">
     <div class="page-header">
       <h1>
-        <span>{{ T.wordsEditCourse }} {{ data.course.name }}</span>
+        {{ T.wordsEditCourse }}
+        <span :class="{ 'text-secondary': data.course.archived }">{{
+          data.course.name
+        }}</span>
         <small>
           &ndash;
           <a :href="courseURL">
