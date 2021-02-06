@@ -76,6 +76,8 @@ const translations: { [key: string]: string; } = {
   badge_cppExpert_name: "Especialista en C++",
   badge_feedbackProvider_description: "Otorgado a personas que han enviado la calificaci\u00f3n de al menos un problema.",
   badge_feedbackProvider_name: "Proveedor de Feedback",
+  badge_introToAlgorithms2CourseGraduate_description: "Otorgado a personas que han resuelto m\u00e1s del 70% del curso de Introducci\u00f3n a Algoritmos II.",
+  badge_introToAlgorithms2CourseGraduate_name: "Aprob\u00f3 el curso de Introducci\u00f3n a Algoritmos II",
   badge_introToAlgorithmsCourseGraduate_description: "Otorgado a personas que han resuelto m\u00e1s del 70% del curso de Introducci\u00f3n a Algoritmos I.",
   badge_introToAlgorithmsCourseGraduate_name: "Aprob\u00f3 el curso de Introducci\u00f3n a Algoritmos I",
   badge_javaExpert_description: "Otorgado a personas que han resuelto m\u00e1s de 10 problemas en Java.",
