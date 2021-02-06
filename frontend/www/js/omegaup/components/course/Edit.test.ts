@@ -16,6 +16,7 @@ describe('Edit.vue', () => {
           course: {
             admission_mode: 'registration',
             alias: 'test-course',
+            archived: false,
             assignments: [
               {
                 problemset_id: 1,

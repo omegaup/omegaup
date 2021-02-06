@@ -1,0 +1,14 @@
+{
+  "es": {
+    "name": "Aprobó el curso de Introducción a Algoritmos I",
+    "description": "Otorgado a personas que han resuelto más del 70% del curso de Introducción a Algoritmos I."
+  },
+  "en": {
+    "name": "Introduction to Algorithms I Course Graduate",
+    "description": "The user has solved more than 70% of Introduction to Algorithms I course."
+  },
+  "pt": {
+    "name": "Aprovou o curso de Introdução aos Algoritmos I",
+    "description": "Concedido a pessoas que resolveram mais do 70% do curso de Introdução aos Algoritmos I."
+  }
+}

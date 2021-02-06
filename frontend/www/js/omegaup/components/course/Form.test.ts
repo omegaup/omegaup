@@ -10,6 +10,7 @@ const baseCourseFormProps = {
   course: {
     admission_mode: 'registration',
     alias: 'Newx',
+    archived: false,
     assignments: [],
     needs_basic_information: false,
     description: 'New',
