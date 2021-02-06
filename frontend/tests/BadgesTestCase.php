@@ -58,7 +58,7 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
         string $courseAlias,
         string $language,
         string $folderName
-    ) {
+    ): void {
         // Create problems
         $problems = [];
         for ($i = 0; $i < 10; $i++) {
@@ -127,7 +127,7 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Test\Factories\Run::gradeRun($runData);
         }
 
-        $queryPath = static::OMEGAUP_BADGES_ROOT . '/' . $folderName . '/' . static::QUERY_FILE;
+        $queryPath = self::OMEGAUP_BADGES_ROOT . '/' . $folderName . '/' . self::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = [$students[0]['user']->user_id];
         $this->assertEquals($expected, $results);
