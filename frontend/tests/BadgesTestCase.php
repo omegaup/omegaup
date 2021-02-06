@@ -53,4 +53,83 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
         sort($results);
         return $results;
     }
+
+    protected function courseGraduateTest(
+        string $courseAlias,
+        string $language,
+        string $folderName
+    ) {
+        // Create problems
+        $problems = [];
+        for ($i = 0; $i < 10; $i++) {
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        // Create course
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            /*$admin=*/            null,
+            /*$adminLogin=*/ null,
+            /*$admissionMode=*/ \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
+            /*$requestsUserInformation=*/ 'no',
+            /*$showScoreboard=*/ 'false',
+            /*$startTimeDelay=*/ 0,
+            /*$courseDuration=*/ 120,
+            /*$assignmentDuration=*/ 120,
+            $courseAlias
+        );
+        $assignmentAlias = $courseData['assignment_alias'];
+
+        // Login
+        $login = self::login($courseData['admin']);
+
+        // Add the problems to the assignment
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignmentAlias,
+            $problems
+        );
+
+        // Create students
+        $students = [];
+        $students[0] = \OmegaUp\Test\Factories\User::createUser();
+        $students[1] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add students to course
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $students[0]['identity']
+        );
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $students[1]['identity']
+        );
+
+        // One student solves 90% of the problems
+        for ($i = 0; $i < 9; $i++) {
+            $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+                $problems[$i],
+                $courseData,
+                $students[0]['identity'],
+                $language
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        }
+
+        // The other student solves only one problem with multiple submissions
+        for ($i = 0; $i < 10; $i++) {
+            $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+                $problems[0],
+                $courseData,
+                $students[1]['identity'],
+                $language
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        }
+
+        $queryPath = static::OMEGAUP_BADGES_ROOT . '/' . $folderName . '/' . static::QUERY_FILE;
+        $results = self::getSortedResults(file_get_contents($queryPath));
+        $expected = [$students[0]['user']->user_id];
+        $this->assertEquals($expected, $results);
+    }
 }
