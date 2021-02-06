@@ -160,6 +160,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 LEFT JOIN
                     Schools s
                 ON c.school_id = s.school_id
+                WHERE
+                    c.archived = 0
                 ORDER BY
                     pr.last_submission_time DESC;';
         /** @var list<array{accept_teacher: bool|null, admission_mode: string, alias: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, last_submission_time: \OmegaUp\Timestamp|null, name: string, progress: float, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
@@ -204,8 +206,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             LEFT JOIN
                 Schools s
             ON c.school_id = s.school_id
-            WHERE c.admission_mode = ?;
-           ';
+            WHERE
+                c.admission_mode = ?
+                AND c.archived = 0;';
 
         /** @var list<array{accept_teacher: int|null, admission_mode: string, alias: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, is_open: int, name: string, progress: float, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
@@ -486,9 +489,11 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             LEFT JOIN
                 Groups_Identities gi ON gi.group_id = gr.group_id
             WHERE
-                ai.identity_id = ? OR
-                (ur.role_id = ? AND uri.identity_id = ?) OR
-                (gr.role_id = ? AND gi.identity_id = ?)
+                c.archived = 0 AND (
+                    ai.identity_id = ? OR
+                    (ur.role_id = ? AND uri.identity_id = ?) OR
+                    (gr.role_id = ? AND gi.identity_id = ?)
+                )
             GROUP BY
                 c.course_id
             ORDER BY

@@ -4026,6 +4026,37 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Archives or un-archives a course
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param boolean $archive
+     */
+    public static function apiArchive(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $course = self::validateCourseExists($courseAlias);
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseNotFound'
+            );
+        }
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $archive = $r->ensureOptionalBool('archive') ?? true;
+        $course->archived = $archive;
+        \OmegaUp\DAO\Courses::update($course);
+
+        return [ 'status' => 'ok' ];
+    }
+
+    /**
      * Validates and authenticate token for operations when user can be logged
      * in or not. This is the only private function that receives Request as a
      * parameter because it needs authenticate it wheter there is no token.

@@ -335,6 +335,7 @@ const translations: { [key: string]: string; } = {
   courseNewFormDescription: "Descri\u00e7\u00e3o",
   courseNewFormEndDate: "Data de finaliza\u00e7\u00e3o",
   courseNewFormEndDateDesc: "Data e hora (no hor\u00e1rio local), em que o curso vai acabar.",
+  courseNewFormLanguages: "Definir idiomas para o curso atual",
   courseNewFormScheduleCourse: "Criar o curso",
   courseNewFormShortTitleAlias: "T\u00edtulo curto (alias)",
   courseNewFormShortTitleAliasDesc: "O alias \u00e9 usado para construir o URL do curso (examples: IPNVERANO2016, ITVERINTRO2016)",

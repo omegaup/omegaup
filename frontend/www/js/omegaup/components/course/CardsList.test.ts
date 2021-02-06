@@ -1,5 +1,4 @@
 import { mount } from '@vue/test-utils';
-import expect from 'expect';
 import type { types } from '../../api_types';
 
 import course_CardsList from './CardsList.vue';
@@ -119,11 +118,9 @@ describe('CardsList.vue', () => {
     expect(wrapper.text()).toContain(publicCoursesTitles[0]);
     expect(wrapper.text()).toContain(publicCoursesTitles[1]);
 
-    expect(wrapper.find('div.dropdown-divider').element.style.display).toBe(
-      'none',
-    );
+    expect(wrapper.find('div.dropdown-divider').element).not.toBeVisible();
     await wrapper.find('input[data-see-all]').trigger('click');
-    expect(wrapper.find('div.dropdown-divider').element.style.display).toBe('');
+    expect(wrapper.find('div.dropdown-divider').element).toBeVisible();
   });
 
   it('Should list student courses', async () => {
@@ -137,10 +134,8 @@ describe('CardsList.vue', () => {
     expect(wrapper.text()).toContain(studentCoursesTitles[0]);
     expect(wrapper.text()).toContain(studentCoursesTitles[1]);
 
-    expect(wrapper.find('div.dropdown-divider').element.style.display).toBe(
-      'none',
-    );
+    expect(wrapper.find('div.dropdown-divider').element).not.toBeVisible();
     await wrapper.find('input[data-see-all]').trigger('click');
-    expect(wrapper.find('div.dropdown-divider').element.style.display).toBe('');
+    expect(wrapper.find('div.dropdown-divider').element).toBeVisible();
   });
 });
