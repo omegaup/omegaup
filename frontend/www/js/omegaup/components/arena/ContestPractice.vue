@@ -52,7 +52,7 @@
     </template>
     <template #arena-clarifications>
       <omegaup-arena-clarification-list
-        :clarifications="clarifications"
+        :clarifications="currentClarifications"
         :in-contest="true"
         @clarification-response="
           (id, responseText, isPublic) =>
@@ -95,7 +95,7 @@ export default class ArenaContestPractice extends Vue {
   @Prop() problems!: types.NavbarContestProblem[];
   @Prop({ default: null }) problem!: ActiveProblem | null;
   @Prop() problemInfo!: types.ProblemInfo;
-  @Prop() initialClarifications!: types.Clarification[];
+  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop({ default: false }) isEphemeralExperimentEnabled!: boolean;
   @Prop({ default: false }) admin!: boolean;
   @Prop({ default: true }) showNavigation!: boolean;
@@ -107,7 +107,7 @@ export default class ArenaContestPractice extends Vue {
 
   T = T;
   ui = ui;
-  clarifications = this.initialClarifications || [];
+  currentClarifications = this.clarifications;
   activeProblem: ActiveProblem | null = this.problem;
 
   get activeProblemAlias(): null | string {
