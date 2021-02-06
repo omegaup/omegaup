@@ -604,6 +604,10 @@ export const Course = {
     messages.CourseArbitrateRequestRequest,
     messages.CourseArbitrateRequestResponse
   >('/api/course/arbitrateRequest/'),
+  archive: apiCall<
+    messages.CourseArchiveRequest,
+    messages.CourseArchiveResponse
+  >('/api/course/archive/'),
   assignmentDetails: apiCall<
     messages.CourseAssignmentDetailsRequest,
     messages._CourseAssignmentDetailsServerResponse,
