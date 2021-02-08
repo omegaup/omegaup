@@ -6,9 +6,11 @@
         <div class="col-sm-10 col-lg-9">
           <div class="card-body">
             <h5 class="card-title">{{ course.name }}</h5>
-            <p v-if="type === CourseType.Public" class="card-text">
-              {{ course.description }}
-            </p>
+            <omegaup-markdown
+              v-if="type === CourseType.Public"
+              class="card-long-text"
+              :markdown="course.description"
+            ></omegaup-markdown>
             <omegaup-markdown
               v-if="type !== CourseType.Finished"
               class="card-text"
@@ -44,7 +46,7 @@
             >
               ⭐
             </div>
-            <div class="text-center">
+            <div class="text-center mt-1">
               <a
                 class="btn btn-primary text-white"
                 role="button"
@@ -116,6 +118,11 @@ export default class CourseCard extends Vue {
 
   .finished-course-card {
     background-color: $omegaup-grey--lighter;
+  }
+
+  .card-long-text {
+    overflow-y: scroll;
+    max-height: 250px;
   }
 }
 
