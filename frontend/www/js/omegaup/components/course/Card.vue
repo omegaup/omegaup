@@ -80,7 +80,7 @@ export enum CourseType {
 })
 export default class CourseCard extends Vue {
   @Prop() course!: types.FilteredCourse;
-  @Prop() type!: string;
+  @Prop() type!: CourseType;
 
   T = T;
   ui = ui;

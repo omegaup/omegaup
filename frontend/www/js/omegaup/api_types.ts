@@ -561,6 +561,39 @@ export namespace types {
         x.courses = ((x) => {
           x.admin = ((x) => {
             x.filteredCourses = ((x) => {
+              x.archived = ((x) => {
+                x.courses = ((x) => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map((x) => {
+                    x.assignments = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        if (x.finish_time)
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      });
+                    })(x.assignments);
+                    if (x.finish_time)
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.archived);
               x.current = ((x) => {
                 x.courses = ((x) => {
                   if (!Array.isArray(x)) {
@@ -1289,7 +1322,15 @@ export namespace types {
   }
 
   export interface AdminCourses {
-    admin: types.CoursesByAccessMode;
+    admin: {
+      accessMode: string;
+      activeTab: string;
+      filteredCourses: {
+        archived: types.CoursesByTimeType;
+        current: types.CoursesByTimeType;
+        past: types.CoursesByTimeType;
+      };
+    };
   }
 
   export interface ArenaProblemDetails {
@@ -1924,6 +1965,7 @@ export namespace types {
 
   export interface CoursesList {
     admin: types.FilteredCourse[];
+    archived?: types.FilteredCourse[];
     public: types.FilteredCourse[];
     student: types.FilteredCourse[];
   }

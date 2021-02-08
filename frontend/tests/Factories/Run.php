@@ -227,7 +227,7 @@ class Run {
     /**
      * Given a run, set a score to a given run
      *
-     * @param ?array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}}  $runData     The run.
+     * @param ?array{participant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}}  $runData     The run.
      * @param float   $points             The score of the run
      * @param string  $verdict            The verdict of the run.
      * @param ?int    $submitDelay        The number of minutes worth of penalty.
