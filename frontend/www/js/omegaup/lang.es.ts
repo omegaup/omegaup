@@ -328,6 +328,7 @@ const translations: { [key: string]: string; } = {
   courseInvalidStartTime: "La fecha de inicio debe ser antes que la fecha de fin",
   courseList: "Lista de cursos",
   courseListAdminCourses: "Cursos que administro",
+  courseListArchivedCourses: "Cursos archivados",
   courseListCurrentCourses: "Cursos actuales",
   courseListIStudy: "Cursos que estudio",
   courseListPastCourses: "Cursos pasados",
