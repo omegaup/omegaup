@@ -262,7 +262,8 @@
       </div>
       <div v-if="showTab === 'archive'" class="tab-pane active" role="tabpanel">
         <omegaup-course-archive
-          :already-archived="data.course.archived"
+          :already-archived="alreadyArchived"
+          @archive-course="onArchiveCourse"
         ></omegaup-course-archive>
       </div>
     </div>
@@ -337,6 +338,7 @@ export default class CourseEdit extends Vue {
   T = T;
   showTab = this.initialTab;
   admissionMode = omegaup.AdmissionMode;
+  alreadyArchived = this.data.course.archived;
 
   assignmentProblems = this.data.assignmentProblems;
   assignments = this.data.course.assignments;
@@ -390,6 +392,11 @@ export default class CourseEdit extends Vue {
   onSelectAssignmentTab(): void {
     this.showTab = 'content';
     this.onResetAssignmentForm();
+  }
+
+  onArchiveCourse(archive: boolean): void {
+    this.$emit('archive-course', this.data.course.alias, archive);
+    this.alreadyArchived = archive;
   }
 
   @Watch('initialTab')
