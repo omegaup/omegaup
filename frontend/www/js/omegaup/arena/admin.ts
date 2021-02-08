@@ -77,6 +77,7 @@ OmegaUp.on('ready', () => {
               text: problemName,
               bestScore: 0,
               maxScore: 0,
+              hasRuns: false,
             });
           }
 

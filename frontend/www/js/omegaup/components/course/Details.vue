@@ -1,7 +1,9 @@
 <template>
   <div>
     <h3 class="text-center">
-      {{ course.name }}
+      <span :class="{ 'text-secondary': course.archived }">
+        {{ course.name }}
+      </span>
       <a v-if="course.is_admin" :href="`/course/${course.alias}/edit/`">
         <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
@@ -157,7 +159,7 @@
                   :href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
                 >
                   <font-awesome-icon :icon="['fas', 'link']" />{{
-                    T.wordsPublic
+                    T.courseActionScoreboard
                   }}</a
                 >
                 <a

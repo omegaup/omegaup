@@ -1,5 +1,3 @@
-import expect from 'expect';
-
 import * as markdown from './markdown';
 
 describe('markdown', () => {

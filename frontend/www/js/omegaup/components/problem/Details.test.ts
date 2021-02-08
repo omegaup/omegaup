@@ -1,7 +1,6 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
 import { mount } from '@vue/test-utils';
-import expect from 'expect';
 import type { types } from '../../api_types';
 import * as time from '../../time';
 
@@ -184,6 +183,7 @@ describe('Details.vue', () => {
         histogram: histogram,
         showNewRunWindow: false,
         publicTags: [],
+        shouldShowTabs: true,
       },
     });
 
@@ -216,6 +216,7 @@ describe('Details.vue', () => {
         histogram: histogram,
         showNewRunWindow: false,
         publicTags: [],
+        shouldShowTabs: true,
       },
     });
 

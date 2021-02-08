@@ -1,36 +1,28 @@
 <template>
-  <div class="card panel panel-primary">
+  <div class="card">
     <div v-if="!update" class="card-header bg-primary text-white panel-heading">
-      <h3 class="panel-title">{{ T.contestNew }}</h3>
+      <h3 class="card-title mb-0">{{ T.contestNew }}</h3>
     </div>
-    <div class="card-body panel-body">
-      <div class="btn-group bottom-margin mb-3">
-        <button
-          class="btn btn-default btn-secondary"
-          data-contest-omi
-          @click="fillOmi"
-        >
+    <div class="card-body">
+      <div class="btn-group d-block mb-3 text-center">
+        <button class="btn btn-secondary" data-contest-omi @click="fillOmi">
           {{ T.contestNewFormOmiStyle }}
         </button>
         <button
-          class="btn btn-default btn-secondary"
+          class="btn btn-secondary"
           data-contest-preioi
           @click="fillPreIoi"
         >
           {{ T.contestNewForm }}
         </button>
         <button
-          class="btn btn-default btn-secondary"
+          class="btn btn-secondary"
           data-contest-conacup
           @click="fillConacup"
         >
           {{ T.contestNewFormConacupStyle }}
         </button>
-        <button
-          class="btn btn-default btn-secondary"
-          data-contest-cpc
-          @click="fillIcpc"
-        >
+        <button class="btn btn-secondary" data-contest-cpc @click="fillIcpc">
           {{ T.contestNewFormICPCStyle }}
         </button>
       </div>

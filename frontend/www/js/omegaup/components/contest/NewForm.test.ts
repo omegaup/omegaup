@@ -1,5 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
 
 import T from '../../lang';
 
@@ -31,9 +30,7 @@ describe('NewForm.vue', () => {
       },
     });
 
-    expect(wrapper.find('div.card .card-header .panel-title').text()).toBe(
-      T.contestNew,
-    );
+    expect(wrapper.find('div.card .card-header').text()).toBe(T.contestNew);
 
     const contest = {
       alias: 'contestAlias',
@@ -68,5 +65,7 @@ describe('NewForm.vue', () => {
     );
     await wrapper.find('form button[type="submit"]').trigger('click');
     expect(wrapper.emitted('update-contest')).toBeDefined();
+
+    wrapper.destroy();
   });
 });

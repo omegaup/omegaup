@@ -1,10 +1,14 @@
-const util = require('util');
-const process = require('process');
+import * as util from 'util';
+import 'process';
+
+import '@testing-library/jest-dom';
+import '@testing-library/jest-dom/extend-expect';
 
 // Intercept all API calls. Only let `API.Session.currentSession()` work and
 // fail everything else.
-require('jest-fetch-mock').enableMocks();
-fetchMock.mockIf(/^\/api\/.*/, (req) => {
+import fetchMock from 'jest-fetch-mock';
+fetchMock.enableMocks();
+fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
   if (req.url != '/api/session/currentSession/') {
     return Promise.resolve({
       ok: false,
@@ -28,27 +32,40 @@ fetchMock.mockIf(/^\/api\/.*/, (req) => {
   });
 });
 
+declare global {
+  namespace NodeJS {
+    interface Global {
+      $: JQuery;
+      jQuery: JQuery;
+      document: Document;
+    }
+  }
+
+  interface Window {
+    jQuery: JQuery;
+  }
+}
+
 global.jQuery = require('jquery');
 global.$ = global.jQuery;
 window.jQuery = global.jQuery;
 
 // This is needed for CodeMirror to work.
 global.document.createRange = () => {
-  return {
+  return ({
     setEnd: () => {},
     setStart: () => {},
     getBoundingClientRect: () => {},
     getClientRects: () => [],
-  };
+  } as any) as Range;
 };
 
 // Any write to console.error() will cause a test failure.
 const originalConsoleError = console.error;
-console.error = function () {
-  originalConsoleError(...arguments);
+console.error = function (...args: any[]) {
+  originalConsoleError(...args);
   throw new Error(
-    'Unexpected call to console.error(). Failing test: ' +
-      util.inspect(arguments),
+    'Unexpected call to console.error(). Failing test: ' + util.inspect(args),
   );
 };
 
