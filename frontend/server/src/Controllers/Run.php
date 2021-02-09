@@ -155,6 +155,23 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
+        $allRuns = \OmegaUp\DAO\Runs::getForProblemDetails(
+            intval($problem->problem_id),
+            /*$problemsetId=*/null,
+            intval($r->identity->identity_id)
+        );
+
+        if (($n = count($allRuns)) > 0) {
+            $lastRun = $allRuns[$n - 1];
+            $lastRunTime = $lastRun['time'];
+            $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
+            $nextSubmissionTimestamp = new \OmegaUp\Timestamp($lastRunTime->time + $submissionGap);
+
+            if ($nextSubmissionTimestamp->time > \OmegaUp\Time::get()) {
+                throw new \OmegaUp\Exceptions\NotAllowedToSubmitException('arenaRunSubmitWaitBetweenUploads');
+            }
+        }
+
         if ($problem->deprecated) {
             throw new \OmegaUp\Exceptions\PreconditionFailedException(
                 'problemDeprecated'
