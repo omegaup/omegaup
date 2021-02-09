@@ -1,5 +1,5 @@
 <template>
-  <div data-contest-wrapper>
+  <div data-arena-wrapper :data-arena-mode="arenaMode">
     <div class="title">
       <h1>
         <span>{{ contestTitle }}</span>
@@ -69,6 +69,7 @@ export default class Arena extends Vue {
   @Prop({ default: false }) isAdmin!: boolean;
   @Prop() contestTitle!: string;
   @Prop() activeTab!: string;
+  @Prop() arenaMode!: string;
 
   T = T;
   selectedTab = this.activeTab;
@@ -108,13 +109,13 @@ export default class Arena extends Vue {
 </script>
 
 <style lang="scss" scoped>
-[data-contest-practice] {
+[data-arena-mode$='practice'] {
   background: #668 url(/media/gradient.png) repeat-x 0 0;
   font-family: sans-serif;
   overflow-y: auto;
 }
 
-[data-contest-wrapper] {
+[data-arena-wrapper] {
   background: #ebeff2;
   font-family: sans-serif;
   overflow-y: auto;
