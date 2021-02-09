@@ -165,10 +165,14 @@ class Run extends \OmegaUp\Controllers\Controller {
             $lastRun = $allRuns[$n - 1];
             $lastRunTime = $lastRun['time'];
             $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
-            $nextSubmissionTimestamp = new \OmegaUp\Timestamp($lastRunTime->time + $submissionGap);
+            $nextSubmissionTimestamp = new \OmegaUp\Timestamp(
+                $lastRunTime->time + $submissionGap
+            );
 
             if ($nextSubmissionTimestamp->time > \OmegaUp\Time::get()) {
-                throw new \OmegaUp\Exceptions\NotAllowedToSubmitException('arenaRunSubmitWaitBetweenUploads');
+                throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
+                    'arenaRunSubmitWaitBetweenUploads'
+                );
             }
         }
 

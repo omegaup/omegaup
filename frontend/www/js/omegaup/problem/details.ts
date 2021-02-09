@@ -159,8 +159,12 @@ OmegaUp.on('ready', () => {
             })
               .then((response) => {
                 ui.reportEvent('submission', 'submit');
-                window.console.log('Response:', response.nextSubmissionTimestamp);
-                problemDetailsView.nextSubmissionTimestamp = response.nextSubmissionTimestamp;
+                window.console.log(
+                  'Response:',
+                  response.nextSubmissionTimestamp,
+                );
+                problemDetailsView.nextSubmissionTimestamp =
+                  response.nextSubmissionTimestamp;
 
                 updateRun({
                   guid: response.guid,

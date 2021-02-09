@@ -4402,7 +4402,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $lastRun = $runsPayload[$n - 1];
             $lastRunTime = $lastRun['time'];
             $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
-            $nextSubmissionTimestamp = new \OmegaUp\Timestamp($lastRunTime->time + $submissionGap);
+            $nextSubmissionTimestamp = new \OmegaUp\Timestamp(
+                $lastRunTime->time + $submissionGap
+            );
         }
 
         $response = [
