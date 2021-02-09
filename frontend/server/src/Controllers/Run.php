@@ -171,7 +171,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
             if ($nextSubmissionTimestamp->time > \OmegaUp\Time::get()) {
                 throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
-                    'arenaRunSubmitWaitBetweenUploads'
+                    'runWaitGap'
                 );
             }
         }
