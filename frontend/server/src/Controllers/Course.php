@@ -3125,12 +3125,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $course = self::validateCourseExists($courseAlias);
-        if (
-            is_null($course->course_id) ||
-            is_null($course->group_id)
-        ) {
-            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
-        }
 
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -3139,12 +3133,19 @@ class Course extends \OmegaUp\Controllers\Controller {
         $studentsProgress = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
             "{$courseAlias}-{$page}-{$length}",
-            fn () => \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
-                $course->course_id,
-                $course->group_id,
-                $page,
-                $length
-            ),
+            function () use ($course, $page, $length) {
+                if (is_null($course->course_id) || is_null($course->group_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'courseNotFound'
+                    );
+                }
+                return \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
+                    $course->course_id,
+                    $course->group_id,
+                    $page,
+                    $length
+                );
+            },
             60 * 60 * 12 // 12 hours
         );
 
@@ -3159,9 +3160,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                     'students' => $studentsProgress['allProgress'],
                     'problemTitles' => $studentsProgress['problemTitles'],
-                    'totalRows' => $studentProgress['totalRows'],
+                    'totalRows' => $studentsProgress['totalRows'],
                     'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
-                        $studenProgress['totalRows'],
+                        $studentsProgress['totalRows'],
                         $length,
                         $page,
                         "/course/{$courseAlias}/students/",

@@ -420,48 +420,13 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         $sqlCount = '
             SELECT
-                COUNT(*)';
-
-        $sqlFrom = '
+                COUNT(*)
             FROM
                 Groups_Identities AS gi
-            CROSS JOIN
-                (
-                    SELECT
-                        a.assignment_id,
-                        a.alias AS assignment_alias,
-                        a.problemset_id,
-                        p.problem_id,
-                        p.title AS problem_title,
-                        p.alias AS problem_alias,
-                        `psp`.`order`,
-                        psp.points AS problem_points
-                    FROM Assignments a
-                    INNER JOIN Problemsets ps
-                    ON a.problemset_id = ps.problemset_id
-                    INNER JOIN Problemset_Problems psp
-                    ON psp.problemset_id = ps.problemset_id
-                    INNER JOIN Problems p
-                    ON p.problem_id = psp.problem_id
-                    WHERE a.course_id = ?
-                    GROUP BY a.assignment_id, p.problem_id
-                ) AS pr
             INNER JOIN Identities i
                 ON i.identity_id = gi.identity_id
-            LEFT JOIN Submissions s
-                ON s.problem_id = pr.problem_id
-                AND s.identity_id = i.identity_id
-                AND s.problemset_id = pr.problemset_id
-            LEFT JOIN Runs r
-                ON r.run_id = s.current_run_id
             WHERE
                 gi.group_id = ?';
-
-        $sqlGroupBy = '
-            GROUP BY
-                i.identity_id, pr.assignment_id, pr.problem_id
-            ORDER BY
-                `pr`.`order`';
 
         $sql = '
                 SELECT
@@ -492,19 +457,55 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             1
                     ),
                     "user-rank-unranked"
-                ) AS classname';
-
-        $sqlLimit = ' LIMIT ?, ?';
+                ) AS classname
+                FROM
+                    Groups_Identities AS gi
+                CROSS JOIN
+                    (
+                        SELECT
+                            a.assignment_id,
+                            a.alias AS assignment_alias,
+                            a.problemset_id,
+                            p.problem_id,
+                            p.title AS problem_title,
+                            p.alias AS problem_alias,
+                            `psp`.`order`,
+                            psp.points AS problem_points
+                        FROM Assignments a
+                        INNER JOIN Problemsets ps
+                        ON a.problemset_id = ps.problemset_id
+                        INNER JOIN Problemset_Problems psp
+                        ON psp.problemset_id = ps.problemset_id
+                        INNER JOIN Problems p
+                        ON p.problem_id = psp.problem_id
+                        WHERE a.course_id = ?
+                        GROUP BY a.assignment_id, p.problem_id
+                    ) AS pr
+                INNER JOIN Identities i
+                    ON i.identity_id = gi.identity_id
+                LEFT JOIN Submissions s
+                    ON s.problem_id = pr.problem_id
+                    AND s.identity_id = i.identity_id
+                    AND s.problemset_id = pr.problemset_id
+                LEFT JOIN Runs r
+                    ON r.run_id = s.current_run_id
+                WHERE
+                    gi.group_id = ?
+                GROUP BY
+                    i.identity_id, pr.assignment_id, pr.problem_id
+                ORDER BY
+                    `pr`.`order`
+                LIMIT ?, ?';
 
         /** @var int */
-        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sqlCount . $sqlFrom,
-            [ $courseId, $groupId ]
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlCount,
+            [ $groupId ]
         ) ?? 0;
 
         /** @var list<array{assignment_alias: string, classname: string, country_id: null|string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, problem_title: string, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql . $sqlFrom . $sqlGroupBy . $sqlLimit,
+            $sql,
             [
                 $courseId,
                 $groupId,
