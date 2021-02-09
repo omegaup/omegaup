@@ -112,6 +112,8 @@
               v-show="popupDisplayed === PopupDisplayed.RunSubmit"
               :preferred-language="problem.preferred_language"
               :languages="problem.languages"
+              :waiting-for-server-response="waitingForServerResponse"
+              :next-submission-timestamp="nextSubmissionTimestamp"
               @dismiss="onPopupDismissed"
               @submit-run="
                 (code, selectedLanguage) =>
@@ -377,6 +379,8 @@ export default class ProblemDetails extends Vue {
   @Prop() guid!: string;
   @Prop() isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
+  @Prop({ default: false }) waitingForServerResponse!: boolean;
+  @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 

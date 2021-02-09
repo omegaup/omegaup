@@ -951,6 +951,9 @@ export namespace types {
             });
           })(x.clarifications);
         x.problem = ((x) => {
+          if (x.nextSubmissionTimestamp) {
+            x.nextSubmissionTimestamp = new Date(x.nextSubmissionTimestamp * 1000);
+          }
           if (x.problemsetter)
             x.problemsetter = ((x) => {
               if (x.creation_date)

@@ -39,6 +39,8 @@ OmegaUp.on('ready', () => {
         (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
       guid: null as null | string,
+      waitingForServerResponse: false,
+      nextSubmissionTimestamp: payload.problem.nextSubmissionTimestamp,
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
@@ -68,6 +70,8 @@ OmegaUp.on('ready', () => {
           guid: this.guid,
           isAdmin: commonPayload.isAdmin,
           showVisibilityIndicators: true,
+          waitingForServerResponse: this.waitingForServerResponse,
+          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
         },
         on: {
           'show-run': (source: problem_Details, guid: string) => {
@@ -145,6 +149,8 @@ OmegaUp.on('ready', () => {
             refreshRuns();
           },
           'submit-run': (code: string, language: string) => {
+            problemDetailsView.waitingForServerResponse = true;
+
             api.Run.create({
               problem_alias: payload.problem.alias,
               language: language,
@@ -152,6 +158,8 @@ OmegaUp.on('ready', () => {
             })
               .then((response) => {
                 ui.reportEvent('submission', 'submit');
+                window.console.log('Response:', response.nextSubmissionTimestamp);
+                problemDetailsView.nextSubmissionTimestamp = response.nextSubmissionTimestamp;
 
                 updateRun({
                   guid: response.guid,
@@ -175,6 +183,9 @@ OmegaUp.on('ready', () => {
                 if (run.errorname) {
                   ui.reportEvent('submission', 'submit-fail', run.errorname);
                 }
+              })
+              .finally(() => {
+                problemDetailsView.waitingForServerResponse = false;
               });
           },
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {

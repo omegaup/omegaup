@@ -4390,6 +4390,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $runsPayload = \OmegaUp\DAO\Runs::getForProblemDetails(
+            intval($problem->problem_id),
+            /*$problemsetId=*/null,
+            intval($r->identity->identity_id)
+        );
+
+        $nextSubmissionTimestamp = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
+
+        if (($n = count($runsPayload)) > 0) {
+            $lastRun = $runsPayload[$n - 1];
+            $lastRunTime = $lastRun['time'];
+            $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
+            $nextSubmissionTimestamp = new \OmegaUp\Timestamp($lastRunTime->time + $submissionGap);
+        }
+
         $response = [
             'smartyProperties' => [
                 'payload' => [
@@ -4441,6 +4456,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'visibility' => $details['visibility'],
                         'accepts_submissions' => $details['accepts_submissions'],
                         'input_limit' => $details['input_limit'],
+                        'nextSubmissionTimestamp' => $nextSubmissionTimestamp,
                     ],
                     'user' => [
                         'loggedIn' => false,
@@ -4511,11 +4527,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $response['smartyProperties']['payload'],
             [
                 'nominationStatus' => $nominationPayload,
-                'runs' => \OmegaUp\DAO\Runs::getForProblemDetails(
-                    intval($problem->problem_id),
-                    /*$problemsetId=*/null,
-                    intval($r->identity->identity_id)
-                ),
+                'runs' => $runsPayload,
                 'solutionStatus' => self::getProblemSolutionStatus(
                     $problem,
                     $r->identity

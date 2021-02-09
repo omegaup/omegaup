@@ -53,7 +53,10 @@
       </div>
       <div class="form-group row">
         <div class="col-sm-10">
-          <button type="submit" class="btn btn-primary" :disabled="!canSubmit">
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            :disabled="!canSubmit || waitingForServerResponse">
             <omegaup-countdown
               v-if="!canSubmit"
               :target-time="nextSubmissionTimestamp"
@@ -89,6 +92,7 @@ import omegaup_OverlayPopup from '../OverlayPopup.vue';
 export default class ArenaRunSubmitPopup extends Vue {
   @Ref() inputFile!: HTMLInputElement;
   @Prop() languages!: string[];
+  @Prop({ default: false }) waitingForServerResponse!: boolean;
   @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
   @Prop() preferredLanguage!: string;
@@ -238,13 +242,8 @@ export default class ArenaRunSubmitPopup extends Vue {
       alert(T.arenaRunSubmitEmptyCode);
       return;
     }
-    this.$emit('submit-run', this.code, this.selectedLanguage);
-  }
 
-  clearForm(): void {
-    this.code = '';
-    this.inputFile.type = 'text';
-    this.inputFile.type = 'file';
+    this.$emit('submit-run', this.code, this.selectedLanguage);
   }
 }
 </script>
