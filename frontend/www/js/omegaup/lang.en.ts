@@ -332,6 +332,7 @@ const translations: { [key: string]: string; } = {
   courseInvalidStartTime: "The start time must be before the end time.",
   courseList: "Courses list",
   courseListAdminCourses: "Courses I manage",
+  courseListArchivedCourses: "Arquived courses",
   courseListCurrentCourses: "Current courses",
   courseListIStudy: "Courses I study",
   courseListPastCourses: "Past courses",

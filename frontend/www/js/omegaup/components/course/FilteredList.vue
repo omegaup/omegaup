@@ -47,27 +47,27 @@
             </thead>
             <tbody>
               <tr v-for="course in filteredCourses.courses" :key="course.alias">
-                <td>
+                <td class="align-middle">
                   <a :href="`/course/${course.alias}/`">{{ course.name }}</a>
                 </td>
-                <td v-if="showPercentage" class="text-center">
+                <td v-if="showPercentage" class="text-center align-middle">
                   {{ `${course.progress}%` }}
                 </td>
-                <td class="text-center">
+                <td class="text-center align-middle">
                   {{
                     course.finish_time
                       ? time.formatDate(course.finish_time)
                       : T.wordsUnlimitedDuration
                   }}
                 </td>
-                <td class="text-center">
+                <td class="text-center align-middle">
                   {{
                     course.counts.homework
                       ? course.counts.homework
                       : T.wordsNotApplicable
                   }}
                 </td>
-                <td class="text-center">
+                <td class="text-center align-middle">
                   {{
                     course.counts.test
                       ? course.counts.test
@@ -75,7 +75,7 @@
                   }}
                 </td>
                 <template v-if="courses.accessMode === 'admin'">
-                  <td>
+                  <td class="align-middle">
                     <a :href="`/course/${course.alias}/edit/`">
                       <font-awesome-icon
                         icon="edit"
@@ -83,7 +83,7 @@
                       />
                     </a>
                   </td>
-                  <td>
+                  <td class="align-middle">
                     <a href="`/course/${course.alias}/list/`">
                       <font-awesome-icon
                         icon="list-alt"
@@ -91,7 +91,7 @@
                       />
                     </a>
                   </td>
-                  <td>
+                  <td class="align-middle">
                     <a :href="`/course/${course.alias}/activity/`">
                       <font-awesome-icon
                         icon="clock"
@@ -143,6 +143,7 @@ export default class CourseFilteredList extends Vue {
   getTabName(timeType: string): string {
     if (timeType === 'current') return T.courseListCurrentCourses;
     if (timeType === 'past') return T.courseListPastCourses;
+    if (timeType === 'archived') return T.courseListArchivedCourses;
     return '';
   }
 }
