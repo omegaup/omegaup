@@ -72,6 +72,7 @@ OmegaUp.on('ready', () => {
           showVisibilityIndicators: true,
           waitingForServerResponse: this.waitingForServerResponse,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          shouldShowTabs: true,
         },
         on: {
           'show-run': (source: problem_Details, guid: string) => {

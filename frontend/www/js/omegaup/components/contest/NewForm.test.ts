@@ -1,5 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
 
 import T from '../../lang';
 
@@ -66,5 +65,7 @@ describe('NewForm.vue', () => {
     );
     await wrapper.find('form button[type="submit"]').trigger('click');
     expect(wrapper.emitted('update-contest')).toBeDefined();
+
+    wrapper.destroy();
   });
 });

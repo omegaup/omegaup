@@ -1,6 +1,6 @@
 <template>
   <div class="mt-4">
-    <ul class="nav justify-content-center nav-tabs">
+    <ul v-if="shouldShowTabs" class="nav justify-content-center nav-tabs">
       <li
         v-for="tab in availableTabs"
         :key="tab.name"
@@ -29,6 +29,7 @@
     </ul>
     <div class="tab-content">
       <div
+        v-if="problem"
         class="tab-pane fade p-4"
         :class="{ 'show active': selectedTab === 'problems' }"
       >
@@ -288,7 +289,7 @@ library.add(
   faExternalLinkAlt,
 );
 
-interface Tab {
+export interface Tab {
   name: string;
   text: string;
 }
@@ -381,6 +382,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop({ default: false }) waitingForServerResponse!: boolean;
   @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
+  @Prop({ default: false }) shouldShowTabs!: boolean;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 

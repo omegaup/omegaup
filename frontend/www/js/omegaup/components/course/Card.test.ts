@@ -1,5 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
 
 import T from '../../lang';
 
@@ -27,7 +26,6 @@ describe('Card.vue', () => {
     });
 
     expect(wrapper.text()).toContain(course.name);
-    expect(wrapper.text()).toContain(course.description);
   });
 
   it('Should render information for finished course', () => {
