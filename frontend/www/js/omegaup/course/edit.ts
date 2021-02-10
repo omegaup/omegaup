@@ -473,6 +473,20 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'archive-course': (alias: string, archive: boolean) => {
+            api.Course.archive({
+              course_alias: alias,
+              archive,
+            })
+              .then(() => {
+                if (archive) {
+                  ui.success(T.courseArchivedSuccess);
+                  return;
+                }
+                ui.success(T.courseUnarchivedSuccess);
+              })
+              .catch(ui.apiError);
+          },
         },
         ref: 'component',
       });
