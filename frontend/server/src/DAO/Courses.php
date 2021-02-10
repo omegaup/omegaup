@@ -429,8 +429,15 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 gi.group_id = ?';
 
-        // The original query, gets the students with their assignments and
-        // problems and the score for each of them
+        // Gets on each row:
+        // - the students with their information;
+        // - the problem and the points the problem gives;
+        // - the alias of the assignment of the problem;
+        // - the max score gotten by the user in the problem
+        //
+        // This is done joining two querys:
+        // - the one information of users and the runs made by them,
+        // - the one with the information of the problem in the assignment/course.
         $sql = '
                 SELECT
                 i.username,

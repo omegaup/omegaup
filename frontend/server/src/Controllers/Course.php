@@ -3114,11 +3114,8 @@ class Course extends \OmegaUp\Controllers\Controller {
     ): array {
         $r->ensureIdentity();
 
-        $r->ensureOptionalInt('page');
-        $page = is_null($r['page']) ?? 1;
-
-        $r->ensureOptionalInt('length');
-        $length = is_null($r['length']) ?? 100;
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? 100;
 
         $courseAlias = $r->ensureString(
             'course',
