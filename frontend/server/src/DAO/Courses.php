@@ -418,6 +418,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     ): array {
         $offset = ($page - 1) * $rowsPerPage;
 
+        // Gets the total number of students in a course
         $sqlCount = '
             SELECT
                 COUNT(*)
@@ -428,6 +429,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 gi.group_id = ?';
 
+        // The original query, gets the students with their assignments and
+        // problems and the score for each of them
         $sql = '
                 SELECT
                 i.username,
