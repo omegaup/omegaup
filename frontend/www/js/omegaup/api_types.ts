@@ -63,6 +63,27 @@ export namespace types {
       );
     }
 
+    export function ActivityFeedv2Payload(
+      elementId: string = 'payload',
+    ): types.ActivityFeedv2Payload {
+      return ((x) => {
+        x.events = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.events);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function AuthorRankTablePayload(
       elementId: string = 'payload',
     ): types.AuthorRankTablePayload {
@@ -1312,6 +1333,15 @@ export namespace types {
   export interface ActivityFeedPayload {
     alias: string;
     events: types.ActivityEvent[];
+    type: string;
+  }
+
+  export interface ActivityFeedv2Payload {
+    alias: string;
+    events: types.ActivityEvent[];
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
     type: string;
   }
 

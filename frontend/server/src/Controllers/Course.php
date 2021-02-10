@@ -3446,6 +3446,65 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{smartyProperties: array{payload: ActivityFeedPayload, title: string}, entrypoint: string}
+     *
+     * @omegaup-request-param string $course
+     */
+    public static function getActivityFeedDetailsv2ForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? 100;
+
+        $courseAlias = $r->ensureString(
+            'course',
+            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
+        );
+        $course = self::validateCourseExists($courseAlias);
+
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $report = \OmegaUp\DAO\Courses::getPaginatedActivityReport(
+            $course,
+            $page,
+            $length
+        );
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'page' => $page,
+                    'length' => $length,
+                    'alias' => $courseAlias,
+                    'events' => \OmegaUp\ActivityReport::getActivityReport(
+                        $report['activity']
+                    ),
+                    'type' => 'course',
+                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+                        $report['totalRows'],
+                        $length,
+                        $page,
+                        "/course/{$courseAlias}/activity/",
+                        /*$adjacent=*/ 5,
+                        []
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'activityReport'
+                ),
+            ],
+            'entrypoint' => 'activity_feed',
+        ];
+    }
+
+    /**
      * @param CoursesList $courses
      * @param list<string> $coursesTypes
      *
