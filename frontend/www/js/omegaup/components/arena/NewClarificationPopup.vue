@@ -9,8 +9,9 @@
         <label class="col-md-6 col-form-label font-weight-bold">
           {{ T.wordsProblem }}
           <select
-            v-model="newClarification.problem"
+            v-model="problemAlias"
             class="form-control"
+            required="required"
             data-new-clarification-problem
           >
             <option
@@ -25,8 +26,9 @@
         <label v-if="users" class="col-md-6 col-form-label font-weight-bold">
           {{ T.wordsMessageTo }}
           <select
-            v-model="newClarification.username"
+            v-model="username"
             class="form-control"
+            :required="users"
             data-new-clarification-user
           >
             <option
@@ -43,7 +45,7 @@
         <label class="col-md-12 col-form-label font-weight-bold">
           {{ T.arenaClarificationCreate }}
           <textarea
-            v-model="newClarification.message"
+            v-model="message"
             class="w-100"
             maxlength="200"
             required="required"
@@ -68,17 +70,6 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 
-export interface NewClarification {
-  problem: null | string;
-  message?: string;
-}
-
-export interface NewAdminClarification {
-  problem: null | string;
-  username: string;
-  message?: string;
-}
-
 @Component({
   components: {
     'omegaup-overlay-popup': omegaup_OverlayPopup,
@@ -89,9 +80,11 @@ export default class ArenaNewClarificationPopup extends Vue {
   // when PR #5126 or #5131 are merged
   @Prop({ default: () => [] }) problems!: types.NavbarContestProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
-  @Prop() newClarification!: NewClarification | NewAdminClarification;
+  @Prop({ default: null }) problemAlias!: string;
+  @Prop({ default: null }) username!: string;
 
   T = T;
+  message: null | string = null;
 
   get filteredUsers(): { username: string; name: string }[] {
     return this.users.map((user) => {
@@ -103,7 +96,12 @@ export default class ArenaNewClarificationPopup extends Vue {
   }
 
   onSubmit(): void {
-    this.$emit('new-clarification', this.newClarification);
+    this.$emit(
+      'new-clarification',
+      this.problemAlias,
+      this.username,
+      this.message,
+    );
   }
 }
 </script>

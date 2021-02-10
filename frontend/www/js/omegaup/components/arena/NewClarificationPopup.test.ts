@@ -1,8 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
-import arena_NewClarificationPopup, {
-  NewClarification,
-} from './NewClarificationPopup.vue';
+import arena_NewClarificationPopup from './NewClarificationPopup.vue';
 
 describe('NewClarification.vue', () => {
   it('Should handle empty list of users', () => {
@@ -19,10 +17,8 @@ describe('NewClarification.vue', () => {
           },
         ] as types.NavbarContestProblem[],
         users: null,
-        newClarification: {
-          problem: 'sumas',
-          message: 'new clarification',
-        } as NewClarification,
+        problem: 'sumas',
+        message: 'new clarification',
       },
     });
 
@@ -64,10 +60,9 @@ describe('NewClarification.vue', () => {
             username: 'omegaUp',
           },
         ] as types.ContestUser[],
-        newClarification: {
-          problem: 'sumas',
-          message: 'new clarification',
-        } as NewClarification,
+        problem: 'sumas',
+        username: 'omegaUp',
+        message: 'new clarification',
       },
     });
 
