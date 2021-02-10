@@ -20,7 +20,9 @@
           <div class="modal-content">
             <form
               class="form"
-              @submit.prevent="$emit('new-clarification', newClarification)"
+              @submit.prevent="
+                $emit('new-clarification', problemAlias, message)
+              "
             >
               <div class="modal-header">
                 <h5 class="modal-title">{{ T.wordsNewClarification }}</h5>
@@ -36,10 +38,7 @@
               <div class="modal-body">
                 <label>
                   {{ T.wordsProblem }}
-                  <select
-                    v-model="newClarification.problem"
-                    required="required"
-                  >
+                  <select v-model="problemAlias" required="required">
                     <option
                       v-for="problem in problems"
                       :key="problem.alias"
@@ -50,7 +49,7 @@
                   </select>
                 </label>
                 <textarea
-                  v-model="newClarification.message"
+                  v-model="message"
                   class="w-100"
                   maxlength="200"
                   required="required"
@@ -109,7 +108,6 @@ import T from '../../lang';
 import { types } from '../../api_types';
 
 import arena_Clarification from './Clarification.vue';
-import { NewClarification } from '../../arena/contest_practice';
 
 @Component({
   components: {
@@ -123,9 +121,8 @@ export default class ArenaClarificationList extends Vue {
   @Prop({ default: () => [] }) problems!: types.NavbarProblemsetProblem[];
 
   T = T;
-  newClarification: NewClarification = {
-    problem: this.problems[0]?.alias ?? null,
-  };
+  problemAlias = this.problems[0]?.alias ?? null;
+  message: null | string = null;
 }
 </script>
 

@@ -3,6 +3,7 @@
     :active-tab="activeTab"
     :contest-title="contest.title"
     :is-admin="isAdmin"
+    :background-class="'practice'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #arena-problems>
@@ -57,7 +58,8 @@
         :is-admin="contestAdmin"
         :in-contest="true"
         @new-clarification="
-          (newClarification) => $emit('new-clarification', newClarification)
+          (problemAlias, message) =>
+            $emit('new-clarification', problemAlias, message)
         "
         @clarification-response="
           (id, responseText, isPublic) =>
@@ -142,12 +144,6 @@ export default class ArenaContestPractice extends Vue {
 </script>
 
 <style lang="scss" scoped>
-[data-contest-practice] {
-  background: #668 url(/media/gradient.png) repeat-x 0 0;
-  font-family: sans-serif;
-  overflow-y: auto;
-}
-
 .navleft {
   overflow: hidden;
 }

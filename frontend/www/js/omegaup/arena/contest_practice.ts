@@ -8,11 +8,6 @@ import arena_ContestPractice, {
   ActiveProblem,
 } from '../components/arena/ContestPractice.vue';
 
-export interface NewClarification {
-  problem: null | string;
-  message?: string;
-}
-
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestPracticePayload();
@@ -62,11 +57,11 @@ OmegaUp.on('ready', () => {
                 contestPractice.problem = null;
               });
           },
-          'new-clarification': (newClarification: NewClarification) => {
+          'new-clarification': (problemAlias: string, message: string) => {
             api.Clarification.create({
               contest_alias: payload.contest.alias,
-              problem_alias: newClarification.problem,
-              message: newClarification.message,
+              problem_alias: problemAlias,
+              message: message,
             })
               .then(refreshClarifications)
               .catch(ui.apiError);
