@@ -1,5 +1,10 @@
 <template>
-  <tr :class="{ resolved: clarification.answer }">
+  <tr
+    :class="{
+      resolved: clarification.answer,
+      'direct-message': isDirectMessage,
+    }"
+  >
     <td class="text-center align-middle">
       {{
         !inContest ? clarification.contest_alias : clarification.problem_alias
@@ -113,6 +118,12 @@ export default class ArenaClarificationForm extends Vue {
       text: T.wordsOther,
     },
   ];
+
+  get isDirectMessage(): boolean {
+    return (
+      this.clarification.answer == null && this.clarification.receiver != null
+    );
+  }
 
   get responseText(): string {
     const response = this.responses.find(
