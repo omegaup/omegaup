@@ -76,7 +76,7 @@
       <table class="table mb-0">
         <thead>
           <tr>
-            <th class="text-center">
+            <th class="text-center" scope="col">
               {{ !inContest ? T.wordsContest : T.wordsProblem }}
             </th>
             <th class="text-center" scope="col">{{ T.wordsAuthor }}</th>
@@ -109,6 +109,7 @@ import T from '../../lang';
 import { types } from '../../api_types';
 
 import arena_Clarification from './Clarification.vue';
+import { NewClarification } from '../../arena/contest_practice';
 
 @Component({
   components: {
@@ -119,12 +120,11 @@ export default class ArenaClarificationList extends Vue {
   @Prop() inContest!: boolean;
   @Prop({ default: false }) isAdmin!: boolean;
   @Prop() clarifications!: types.Clarification[];
-  @Prop() problems!: types.NavbarProblemsetProblem[];
+  @Prop({ default: () => [] }) problems!: types.NavbarProblemsetProblem[];
 
   T = T;
-  newClarification = {
-    problem: this.inContest && this.problems ? this.problems[0].alias : null,
-    message: null,
+  newClarification: NewClarification = {
+    problem: this.problems[0]?.alias ?? null,
   };
 }
 </script>

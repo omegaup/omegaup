@@ -3209,7 +3209,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiClarifications(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        $offset = $r->ensureOptionalInt('offset') ?? null;
+        $offset = $r->ensureOptionalInt('offset');
         $rowcount = $r->ensureOptionalInt('rowcount') ?? 1000;
 
         $contestAlias = $r->ensureString(

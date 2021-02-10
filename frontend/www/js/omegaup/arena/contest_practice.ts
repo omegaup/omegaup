@@ -8,9 +8,9 @@ import arena_ContestPractice, {
   ActiveProblem,
 } from '../components/arena/ContestPractice.vue';
 
-interface NewClarification {
+export interface NewClarification {
   problem: null | string;
-  message: string;
+  message?: string;
 }
 
 OmegaUp.on('ready', () => {

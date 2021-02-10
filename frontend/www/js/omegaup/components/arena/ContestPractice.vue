@@ -3,7 +3,6 @@
     :active-tab="activeTab"
     :contest-title="contest.title"
     :is-admin="isAdmin"
-    :arena-mode="'practice'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #arena-problems>
@@ -136,7 +135,7 @@ export default class ArenaContestPractice extends Vue {
   }
 
   @Watch('clarifications')
-  onCarificationsChanged(newValue: types.Clarification[]): void {
+  onClarificationsChanged(newValue: types.Clarification[]): void {
     this.currentClarifications = newValue;
   }
 }
