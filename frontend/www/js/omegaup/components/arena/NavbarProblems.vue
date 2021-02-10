@@ -91,7 +91,7 @@ library.add(fas);
   },
 })
 export default class ArenaNavbarProblems extends Vue {
-  @Prop() problems!: types.NavbarContestProblem[];
+  @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop() activeProblem!: string | null;
   @Prop() courseAlias!: string | null;
   @Prop() courseName!: string | null;

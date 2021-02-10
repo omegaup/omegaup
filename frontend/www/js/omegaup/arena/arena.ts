@@ -228,7 +228,7 @@ export class Arena {
 
   navbarProblems:
     | (Vue & {
-        problems: types.NavbarContestProblem[];
+        problems: types.NavbarProblemsetProblem[];
         activeProblem: string | null;
       })
     | null = null;
