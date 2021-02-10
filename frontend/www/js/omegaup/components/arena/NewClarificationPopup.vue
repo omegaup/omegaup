@@ -69,9 +69,14 @@ import T from '../../lang';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 
 export interface NewClarification {
-  problem?: string;
-  username?: string;
-  message: string;
+  problem: null | string;
+  message?: string;
+}
+
+export interface NewAdminClarification {
+  problem: null | string;
+  username: string;
+  message?: string;
 }
 
 @Component({
@@ -81,10 +86,10 @@ export interface NewClarification {
 })
 export default class ArenaNewClarificationPopup extends Vue {
   // TODO: Change the type NavbarContestProblem with NavbarProblemsetProblem
-  // when PR #5126 is merged
+  // when PR #5126 or #5131 are merged
   @Prop({ default: () => [] }) problems!: types.NavbarContestProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
-  @Prop() newClarification!: NewClarification;
+  @Prop() newClarification!: NewClarification | NewAdminClarification;
 
   T = T;
 
@@ -97,12 +102,8 @@ export default class ArenaNewClarificationPopup extends Vue {
     });
   }
 
-  clearForm(): void {
-    this.$emit('dismiss');
-  }
-
   onSubmit(): void {
-    this.$emit('new-clarification', this, this.newClarification);
+    this.$emit('new-clarification', this.newClarification);
   }
 }
 </script>
