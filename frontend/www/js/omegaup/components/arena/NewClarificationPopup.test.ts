@@ -21,8 +21,8 @@ describe('NewClarification.vue', () => {
         users: null,
         newClarification: {
           problem: 'sumas',
-          message: null,
-        },
+          message: 'new clarification',
+        } as NewClarification,
       },
     });
 
@@ -66,7 +66,7 @@ describe('NewClarification.vue', () => {
         ] as types.ContestUser[],
         newClarification: {
           problem: 'sumas',
-          message: null,
+          message: 'new clarification',
         } as NewClarification,
       },
     });
