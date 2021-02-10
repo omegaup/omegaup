@@ -5,6 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  *  CourseController
  *
+ * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type Progress=array{score: float, max_score: float}
  * @psalm-type AssignmentProgress=array<string, Progress>
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
@@ -50,6 +51,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string}
+ * @psalm-type ActivityFeedv2Payload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants

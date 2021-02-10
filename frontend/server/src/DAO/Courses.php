@@ -1061,7 +1061,11 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * @return array{activity: list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int|null, name: null| string, time: \OmegaUp\Timestamp, username: string}>, totalRows: int}
      */
-    public static function getPaginatedActivityReport(\OmegaUp\DAO\VO\Courses $course, int $page, int $rowsPerPage): array {
+    public static function getPaginatedActivityReport(
+        \OmegaUp\DAO\VO\Courses $course,
+        int $page,
+        int $rowsPerPage
+    ): array {
         $offset = ($page - 1) * $rowsPerPage;
 
         $sql = '(
@@ -1231,7 +1235,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         return [
             'activity' => $activity,
-            'totalRows' => $totalRows,  
+            'totalRows' => $totalRows,
         ];
     }
 }
