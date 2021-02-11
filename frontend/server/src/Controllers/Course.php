@@ -3448,7 +3448,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ActivityFeedPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: ActivityFeedv2Payload, title: string}, entrypoint: string}
      *
      * @omegaup-request-param string $course
      */
