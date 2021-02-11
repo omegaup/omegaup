@@ -69,5 +69,6 @@ describe('Edit.vue', () => {
     await wrapper.find('a[data-tab-admins]').trigger('click');
     await wrapper.find('a[data-tab-clone]').trigger('click');
     await wrapper.find('a[data-tab-course]').trigger('click');
+    await wrapper.find('a[data-tab-archive]').trigger('click');
   });
 });
