@@ -1698,20 +1698,6 @@ export const User = {
     messages.UserListUnsolvedProblemsRequest,
     messages.UserListUnsolvedProblemsResponse
   >('/api/user/listUnsolvedProblems/'),
-  listWithExtraInformation: apiCall<
-    messages.UserListWithExtraInformationRequest,
-    messages._UserListWithExtraInformationServerResponse,
-    messages.UserListWithExtraInformationResponse
-  >('/api/user/listWithExtraInformation/', (x) => {
-    if (!Array.isArray(x)) {
-      return x;
-    }
-    return x.map((x) => {
-      if (x.birth_date)
-        x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-      return x;
-    });
-  }),
   login: apiCall<messages.UserLoginRequest, messages.UserLoginResponse>(
     '/api/user/login/',
   ),

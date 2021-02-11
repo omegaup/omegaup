@@ -24,7 +24,6 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfileInfo=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
  * @psalm-type UserProfileContests=array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place: int}>
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
- * @psalm-type UserListItemWithExtraInformation=array{birth_date: \OmegaUp\Timestamp|null, email: null|string, name: string, school_name: null|string, username: string}
  * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile: UserProfileInfo, contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, programmingLanguages: array<string,string>}
  * @psalm-type LoginDetailsPayload=array{facebookUrl: string, linkedinUrl: string, statusError?: string, validateRecaptcha: bool}
  */
@@ -1994,28 +1993,6 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param string $query
-     *
-     * @return list<UserListItemWithExtraInformation>
-     */
-    public static function apiListWithExtraInformation(
-        \OmegaUp\Request $r
-    ): array {
-        $r->ensureMainUserIdentity();
-
-        // Only users with privileges of support team can see this list
-        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
-            );
-        }
-
-        return \OmegaUp\DAO\Identities::findByUsernameOrName(
-            $r->ensureString('query')
-        );
-    }
-
-    /**
      * @omegaup-request-param string $originalEmail
      * @omegaup-request-param string $newEmail
      *
@@ -2073,8 +2050,8 @@ class User extends \OmegaUp\Controllers\Controller {
         $response = [];
         foreach ($identities as $identity) {
             $response[] = [
-                'label' => strval($identity['username']),
-                'value' => strval($identity['username'])
+                'label' => strval($identity->username),
+                'value' => strval($identity->username)
             ];
         }
         return $response;
@@ -2677,6 +2654,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * Updates the main email of the current user
      *
      * @omegaup-request-param string $email
+     * @omegaup-request-param null|string $originalEmail
      *
      * @param \OmegaUp\Request $r
      *
@@ -2684,6 +2662,39 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function apiUpdateMainEmail(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
+
+        $user = $r->user;
+        $originalEmail = $r->ensureOptionalString(
+            'originalEmail',
+            /*$required=*/ false,
+            fn (string $originalEmail) => \OmegaUp\Validators::email(
+                $originalEmail
+            )
+        );
+
+        if (!is_null($originalEmail)) {
+            // Only users with privileges of support team can update the email
+            // on behalf to another user
+            if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                    'userNotAllowed'
+                );
+            }
+
+            $user = \OmegaUp\DAO\Users::findByEmail($originalEmail);
+            if (is_null($user) || is_null($user->main_identity_id)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+            }
+            if (
+                is_null(
+                    \OmegaUp\DAO\Identities::getByPK(
+                        $user->main_identity_id
+                    )
+                )
+            ) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+            }
+        }
 
         $emailParam = $r->ensureString(
             'email',
@@ -2694,36 +2705,36 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Update email
-            if (!is_null($r->user->main_email_id)) {
-                $email = \OmegaUp\DAO\Emails::getByPK($r->user->main_email_id);
+            if (!is_null($user->main_email_id)) {
+                $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
                 if (!is_null($email)) {
                     $email->email = $emailParam;
                     \OmegaUp\DAO\Emails::update($email);
                 }
             } else {
                 $email = new \OmegaUp\DAO\VO\Emails([
-                    'user_id' => $r->user->user_id,
+                    'user_id' => $user->user_id,
                     'email' => $emailParam,
                 ]);
                 \OmegaUp\DAO\Emails::create($email);
-                $r->user->main_email_id = $email->email_id;
-                \OmegaUp\DAO\Users::update($r->user);
+                $user->main_email_id = $email->email_id;
+                \OmegaUp\DAO\Users::update($user);
             }
 
             // Add verification_id if not there
-            if ($r->user->verified == '0') {
+            if ($user->verified == '0') {
                 self::$log->info('User not verified.');
 
-                if (is_null($r->user->verification_id)) {
+                if (is_null($user->verification_id)) {
                     self::$log->info(
                         'User does not have verification id. Generating.'
                     );
 
                     try {
-                        $r->user->verification_id = \OmegaUp\SecurityTools::randomString(
+                        $user->verification_id = \OmegaUp\SecurityTools::randomString(
                             50
                         );
-                        \OmegaUp\DAO\Users::update($r->user);
+                        \OmegaUp\DAO\Users::update($user);
                     } catch (\Exception $e) {
                         // best effort, eat exception
                     }
@@ -2742,14 +2753,16 @@ class User extends \OmegaUp\Controllers\Controller {
             throw $e;
         }
 
-        // Delete profile cache
-        \OmegaUp\Cache::deleteFromCache(
-            \OmegaUp\Cache::USER_PROFILE,
-            $r->identity->username
-        );
+        if (!is_null($originalEmail)) {
+            // Delete profile cache, no needed for support team members
+            \OmegaUp\Cache::deleteFromCache(
+                \OmegaUp\Cache::USER_PROFILE,
+                $r->identity->username
+            );
+        }
 
         // Send verification email
-        self::sendVerificationEmail($r->user);
+        self::sendVerificationEmail($user);
 
         return [
             'status' => 'ok',

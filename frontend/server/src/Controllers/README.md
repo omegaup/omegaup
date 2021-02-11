@@ -215,7 +215,6 @@
   - [`/api/user/list/`](#apiuserlist)
   - [`/api/user/listAssociatedIdentities/`](#apiuserlistassociatedidentities)
   - [`/api/user/listUnsolvedProblems/`](#apiuserlistunsolvedproblems)
-  - [`/api/user/listWithExtraInformation/`](#apiuserlistwithextrainformation)
   - [`/api/user/login/`](#apiuserlogin)
   - [`/api/user/mailingListBackfill/`](#apiusermailinglistbackfill)
   - [`/api/user/problemsCreated/`](#apiuserproblemscreated)
@@ -4153,22 +4152,6 @@ Get Problems unsolved by user
 | ---------- | ----------------- |
 | `problems` | `types.Problem[]` |
 
-## `/api/user/listWithExtraInformation/`
-
-### Description
-
-### Parameters
-
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `query` | `string` |             |
-
-### Returns
-
-```typescript
-types.UserListItemWithExtraInformation[]
-```
-
 ## `/api/user/login/`
 
 ### Description
@@ -4415,9 +4398,10 @@ Updates the main email of the current user
 
 ### Parameters
 
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `email` | `string` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `email`         | `string`       |             |
+| `originalEmail` | `null\|string` |             |
 
 ### Returns
 
