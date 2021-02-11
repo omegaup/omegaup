@@ -223,11 +223,18 @@ class Request extends \ArrayObject {
             strval($mixedVal) :
             ''
         );
-        if (!is_null($validator) && !$validator($val)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                $key
-            );
+        if (!is_null($validator)) {
+            try {
+                if (!$validator($val)) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterInvalid',
+                        $key
+                    );
+                }
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+                $e->parameter = $key;
+                throw $e;
+            }
         }
         $this[$key] = $val;
         return $val;
