@@ -16,6 +16,7 @@ const translations: { [key: string]: string; } = {
   addUsersToReviewerGroup: "Click to add a user to the list of reviewers.",
   adminAdded: "Admin successfully added.",
   adminRemoved: "Admin successfully removed.",
+  adminSupportPageNotFound: "Page not found",
   admissionModeManualOnly: "Manual only (Add your students usernames)",
   admissionModePublic: "Public (Students enroll from the list of public courses)",
   admissionModeShareURL: "Share URL (Students enroll from the URL)",
