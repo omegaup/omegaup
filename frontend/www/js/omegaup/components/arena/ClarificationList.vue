@@ -18,12 +18,7 @@
       >
         <div class="modal-dialog" role="document">
           <div class="modal-content">
-            <form
-              class="form"
-              @submit.prevent="
-                $emit('new-clarification', { problemAlias, message })
-              "
-            >
+            <form class="form" @submit.prevent="onNewClarification">
               <div class="modal-header">
                 <h5 class="modal-title">{{ T.wordsNewClarification }}</h5>
                 <button
@@ -123,6 +118,13 @@ export default class ArenaClarificationList extends Vue {
   T = T;
   problemAlias = this.problems[0]?.alias ?? null;
   message: null | string = null;
+
+  onNewClarification(): void {
+    if (this.problemAlias == null || this.message == null) return;
+    const problemAlias = this.problemAlias;
+    const message = this.message;
+    this.$emit('new-clarification', { problemAlias, message });
+  }
 }
 </script>
 

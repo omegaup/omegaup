@@ -10,7 +10,7 @@ import arena_ContestPractice, {
 
 export interface ClarificationRequest {
   problemAlias: string;
-  message?: string;
+  message: string;
 }
 
 OmegaUp.on('ready', () => {
@@ -62,11 +62,11 @@ OmegaUp.on('ready', () => {
                 contestPractice.problem = null;
               });
           },
-          'new-clarification': (target: ClarificationRequest) => {
+          'new-clarification': (request: ClarificationRequest) => {
             api.Clarification.create({
               contest_alias: payload.contest.alias,
-              problem_alias: target.problemAlias,
-              message: target.message,
+              problem_alias: request.problemAlias,
+              message: request.message,
             })
               .then(refreshClarifications)
               .catch(ui.apiError);
