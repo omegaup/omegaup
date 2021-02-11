@@ -4,7 +4,7 @@ import { types } from '../api_types';
 import activity_Feed from '../components/activity/Feed.vue';
 
 OmegaUp.on('ready', function () {
-  const payload = types.payloadParsers.ActivityFeedv2Payload();
+  const payload = types.payloadParsers.ActivityFeedPayload();
 
   new Vue({
     el: '#main-container',

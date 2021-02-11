@@ -50,8 +50,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
- * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string}
- * @psalm-type ActivityFeedv2Payload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
+ * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -3411,50 +3410,10 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{payload: ActivityFeedPayload, title: string}, entrypoint: string}
      *
      * @omegaup-request-param string $course
-     */
-    public static function getActivityFeedDetailsForSmarty(
-        \OmegaUp\Request $r
-    ): array {
-        $r->ensureMainUserIdentity();
-        $courseAlias = $r->ensureString(
-            'course',
-            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
-        );
-        $course = self::validateCourseExists($courseAlias);
-
-        if (is_null($course->course_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
-        }
-
-        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
-
-        return [
-            'smartyProperties' => [
-                'payload' => [
-                    'alias' => $courseAlias,
-                    'events' => \OmegaUp\ActivityReport::getActivityReport(
-                        \OmegaUp\DAO\Courses::getActivityReport($course)
-                    ),
-                    'type' => 'course',
-                ],
-                'title' => new \OmegaUp\TranslationString(
-                    'activityReport'
-                ),
-            ],
-            'entrypoint' => 'activity_feed',
-        ];
-    }
-
-    /**
-     * @return array{smartyProperties: array{payload: ActivityFeedv2Payload, title: string}, entrypoint: string}
-     *
-     * @omegaup-request-param string $course
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
      */
-    public static function getActivityFeedDetailsv2ForSmarty(
+    public static function getActivityFeedDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -3475,7 +3434,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $report = \OmegaUp\DAO\Courses::getPaginatedActivityReport(
+        $report = \OmegaUp\DAO\Courses::getActivityReport(
             $course,
             $page,
             $length
@@ -4101,7 +4060,11 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         return [
             'events' => \OmegaUp\ActivityReport::getActivityReport(
-                \OmegaUp\DAO\Courses::getActivityReport($course)
+                \OmegaUp\DAO\Courses::getActivityReport(
+                    $course,
+                    1,
+                    100
+                )['activity']
             ),
         ];
     }
