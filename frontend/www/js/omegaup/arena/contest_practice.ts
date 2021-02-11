@@ -19,7 +19,7 @@ OmegaUp.on('ready', () => {
     components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
     data: () => ({
       problemInfo: null as types.ProblemInfo | null,
-      problems: payload.problems as types.NavbarContestProblem[],
+      problems: payload.problems as types.NavbarProblemsetProblem[],
       problem: null as ActiveProblem | null,
     }),
     render: function (createElement) {

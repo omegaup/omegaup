@@ -378,8 +378,8 @@ Creates a Clarification
 | Name            | Type           | Description |
 | --------------- | -------------- | ----------- |
 | `contest_alias` | `string`       |             |
+| `message`       | `string`       |             |
 | `problem_alias` | `string`       |             |
-| `message`       | `null\|string` |             |
 | `username`      | `null\|string` |             |
 
 ### Returns
