@@ -15,7 +15,7 @@ describe('NewClarification.vue', () => {
             maxScore: 100,
             text: 'A. Sumas',
           },
-        ] as types.NavbarContestProblem[],
+        ] as types.NavbarProblemsetProblem[],
         users: null,
         problem: 'sumas',
         message: 'new clarification',
@@ -50,7 +50,7 @@ describe('NewClarification.vue', () => {
             maxScore: 100,
             text: 'A. Sumas',
           },
-        ] as types.NavbarContestProblem[],
+        ] as types.NavbarProblemsetProblem[],
         users: [
           {
             access_time: undefined,

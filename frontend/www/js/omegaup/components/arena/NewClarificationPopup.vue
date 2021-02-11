@@ -55,7 +55,11 @@
       </div>
       <div class="form-group row">
         <div class="col-sm-10">
-          <button type="submit" class="btn btn-primary">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            :disbaled="!shouldSubmitClarification"
+          >
             {{ T.wordsSend }}
           </button>
         </div>
@@ -76,12 +80,10 @@ import omegaup_OverlayPopup from '../OverlayPopup.vue';
   },
 })
 export default class ArenaNewClarificationPopup extends Vue {
-  // TODO: Change the type NavbarContestProblem with NavbarProblemsetProblem
-  // when PR #5126 or #5131 are merged
-  @Prop({ default: () => [] }) problems!: types.NavbarContestProblem[];
+  @Prop({ default: () => [] }) problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
-  @Prop({ default: null }) problemAlias!: string;
-  @Prop({ default: null }) username!: string;
+  @Prop({ default: null }) problemAlias!: null | string;
+  @Prop({ default: null }) username!: null | string;
 
   T = T;
   message: null | string = null;
@@ -95,13 +97,34 @@ export default class ArenaNewClarificationPopup extends Vue {
     });
   }
 
-  onSubmit(): void {
-    this.$emit(
-      'new-clarification',
-      this.problemAlias,
-      this.username,
-      this.message,
+  get ownerUsername(): null | string {
+    if (this.users == null) return null;
+    return this.users.find((user) => user.is_owner)?.username ?? null;
+  }
+
+  get shouldSubmitClarification(): boolean {
+    return (
+      this.message != null &&
+      (this.username != null || this.users.length == 0) &&
+      this.problemAlias != null
     );
+  }
+
+  onSubmit(): void {
+    if (this.problemAlias == null || this.message == null) return;
+    const clarificationRequest: types.Clarification = {
+      clarification_id: 0,
+      author:
+        this.users != null && this.username != null ? this.username : undefined,
+      problem_alias: this.problemAlias,
+      message: this.message,
+      public:
+        this.ownerUsername != null &&
+        this.username != null &&
+        this.ownerUsername == this.username,
+      time: new Date(),
+    };
+    this.$emit('new-clarification', clarificationRequest);
   }
 }
 </script>
