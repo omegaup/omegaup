@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-admin-support': admin_Support,
     },
-    data: function () {
+    data: () => {
       return {
         username: null as null | string,
         link: null as null | string,
