@@ -57,10 +57,7 @@
         :clarifications="currentClarifications"
         :is-admin="contestAdmin"
         :in-contest="true"
-        @new-clarification="
-          (problemAlias, message) =>
-            $emit('new-clarification', problemAlias, message)
-        "
+        @new-clarification="(target) => $emit('new-clarification', target)"
         @clarification-response="
           (id, responseText, isPublic) =>
             $emit('clarification-response', id, responseText, isPublic)

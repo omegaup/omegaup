@@ -21,7 +21,7 @@
             <form
               class="form"
               @submit.prevent="
-                $emit('new-clarification', problemAlias, message)
+                $emit('new-clarification', { problemAlias, message })
               "
             >
               <div class="modal-header">
