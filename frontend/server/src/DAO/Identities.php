@@ -10,6 +10,8 @@ namespace OmegaUp\DAO;
  * {@link \OmegaUp\DAO\VO\Identities}.
  *
  * @access public
+ *
+ * @psalm-type UserListItemWithExtraInformation=array{birth_date: \OmegaUp\Timestamp|null, email: null|string, name: string, school_name: null|string, username: string}
  */
 class Identities extends \OmegaUp\DAO\Base\Identities {
     public static function findByEmail(string $email): ?\OmegaUp\DAO\VO\Identities {
@@ -56,34 +58,60 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return list<\OmegaUp\DAO\VO\Identities>
+     * @return list<UserListItemWithExtraInformation>
      */
     public static function findByUsernameOrName(string $usernameOrName) {
-        $sql = "
-            SELECT
-                i.*
-            FROM
-                Identities i
-            WHERE
-                i.username = ? OR i.name = ?
-            UNION DISTINCT
-            SELECT DISTINCT
-                i.*
-            FROM
-                Identities i
-            WHERE
-                i.username LIKE CONCAT('%', ?, '%') OR
-                i.name LIKE CONCAT('%', ?, '%')
-            LIMIT 100";
+        $sql = "SELECT
+                    i.name,
+                    i.username,
+                    s.name AS school_name,
+                    u.birth_date,
+                    e.email
+                FROM
+                    Identities i
+                LEFT JOIN
+                    Users u
+                ON
+                    i.user_id = u.user_id
+                LEFT JOIN
+                    Schools s
+                ON
+                    i.current_identity_school_id = s.school_id
+                LEFT JOIN
+                    Emails e
+                ON
+                    u.main_email_id = e.email_id
+                WHERE
+                    i.username = ? OR i.name = ?
+                UNION DISTINCT
+                SELECT DISTINCT
+                    i.name,
+                    i.username,
+                    s.name AS school_name,
+                    u.birth_date,
+                    e.email
+                FROM
+                    Identities i
+                LEFT JOIN
+                    Users u
+                ON
+                    i.user_id = u.user_id
+                LEFT JOIN
+                    Schools s
+                ON
+                    i.current_identity_school_id = s.school_id
+                LEFT JOIN
+                    Emails e
+                ON
+                    u.main_email_id = e.email_id
+                WHERE
+                    i.username LIKE CONCAT('%', ?, '%') OR
+                    i.name LIKE CONCAT('%', ?, '%')
+                LIMIT 100";
         $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
 
-        /** @var list<array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}> $rs */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
-        $result = [];
-        foreach ($rs as $identityData) {
-            $result[] = new \OmegaUp\DAO\VO\Identities($identityData);
-        }
-        return $result;
+        /** @var list<UserListItemWithExtraInformation> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
     }
 
     public static function findByUserId(int $userId): ?\OmegaUp\DAO\VO\Identities {

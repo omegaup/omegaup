@@ -24,7 +24,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfileInfo=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
  * @psalm-type UserProfileContests=array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place: int}>
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
- * @psalm-type UserListItem=array{label: string, value: string}
+ * @psalm-type UserListItemWithExtraInformation=array{birth_date: \OmegaUp\Timestamp|null, email: null|string, name: string, school_name: null|string, username: string}
  * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile: UserProfileInfo, contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, programmingLanguages: array<string,string>}
  * @psalm-type LoginDetailsPayload=array{facebookUrl: string, linkedinUrl: string, statusError?: string, validateRecaptcha: bool}
  */
@@ -1994,6 +1994,60 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param string $query
+     *
+     * @return list<UserListItemWithExtraInformation>
+     */
+    public static function apiListWithExtraInformation(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+
+        // Only users with privileges of support team can see this list
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
+        return \OmegaUp\DAO\Identities::findByUsernameOrName(
+            $r->ensureString('query')
+        );
+    }
+
+    /**
+     * @omegaup-request-param string $originalEmail
+     * @omegaup-request-param string $newEmail
+     *
+     * @return array{status: string}
+     */
+    public static function apiChangeEmail(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+
+        // Only users with privileges of support team can see this list
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
+        $originalEmail = $r->ensureString(
+            'originalEmail',
+            fn (string $email) => \OmegaUp\Validators::email($email)
+        );
+        $newEmail = $r->ensureString(
+            'newEmail',
+            fn (string $email) => \OmegaUp\Validators::email($email)
+        );
+
+        \OmegaUp\DAO\Emails::changeEmail($originalEmail, $newEmail);
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
      * Gets a list of users. This returns an array instead of an object since
      * it is used by typeahead.
      *
@@ -2019,8 +2073,8 @@ class User extends \OmegaUp\Controllers\Controller {
         $response = [];
         foreach ($identities as $identity) {
             $response[] = [
-                'label' => strval($identity->username),
-                'value' => strval($identity->username)
+                'label' => strval($identity['username']),
+                'value' => strval($identity['username'])
             ];
         }
         return $response;

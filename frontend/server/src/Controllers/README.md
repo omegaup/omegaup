@@ -201,6 +201,7 @@
   - [`/api/user/addGroup/`](#apiuseraddgroup)
   - [`/api/user/addRole/`](#apiuseraddrole)
   - [`/api/user/associateIdentity/`](#apiuserassociateidentity)
+  - [`/api/user/changeEmail/`](#apiuserchangeemail)
   - [`/api/user/changePassword/`](#apiuserchangepassword)
   - [`/api/user/coderOfTheMonth/`](#apiusercoderofthemonth)
   - [`/api/user/coderOfTheMonthList/`](#apiusercoderofthemonthlist)
@@ -214,6 +215,7 @@
   - [`/api/user/list/`](#apiuserlist)
   - [`/api/user/listAssociatedIdentities/`](#apiuserlistassociatedidentities)
   - [`/api/user/listUnsolvedProblems/`](#apiuserlistunsolvedproblems)
+  - [`/api/user/listWithExtraInformation/`](#apiuserlistwithextrainformation)
   - [`/api/user/login/`](#apiuserlogin)
   - [`/api/user/mailingListBackfill/`](#apiusermailinglistbackfill)
   - [`/api/user/problemsCreated/`](#apiuserproblemscreated)
@@ -3891,6 +3893,21 @@ Associates an identity to the logged user given the username
 
 _Nothing_
 
+## `/api/user/changeEmail/`
+
+### Description
+
+### Parameters
+
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `newEmail`      | `string` |             |
+| `originalEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/user/changePassword/`
 
 ### Description
@@ -4135,6 +4152,22 @@ Get Problems unsolved by user
 | Name       | Type              |
 | ---------- | ----------------- |
 | `problems` | `types.Problem[]` |
+
+## `/api/user/listWithExtraInformation/`
+
+### Description
+
+### Parameters
+
+| Name    | Type     | Description |
+| ------- | -------- | ----------- |
+| `query` | `string` |             |
+
+### Returns
+
+```typescript
+types.UserListItemWithExtraInformation[]
+```
 
 ## `/api/user/login/`
 

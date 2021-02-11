@@ -2932,6 +2932,14 @@ export namespace types {
     value: string;
   }
 
+  export interface UserListItemWithExtraInformation {
+    birth_date?: Date;
+    email?: string;
+    name: string;
+    school_name?: string;
+    username: string;
+  }
+
   export interface UserProfile {
     birth_date?: Date;
     classname: string;
@@ -3903,6 +3911,8 @@ export namespace messages {
   export type UserAddRoleResponse = {};
   export type UserAssociateIdentityRequest = { [key: string]: any };
   export type UserAssociateIdentityResponse = {};
+  export type UserChangeEmailRequest = { [key: string]: any };
+  export type UserChangeEmailResponse = {};
   export type UserChangePasswordRequest = { [key: string]: any };
   export type UserChangePasswordResponse = {};
   export type UserCoderOfTheMonthRequest = { [key: string]: any };
@@ -3960,6 +3970,9 @@ export namespace messages {
   };
   export type UserListUnsolvedProblemsRequest = { [key: string]: any };
   export type UserListUnsolvedProblemsResponse = { problems: types.Problem[] };
+  export type UserListWithExtraInformationRequest = { [key: string]: any };
+  export type _UserListWithExtraInformationServerResponse = any;
+  export type UserListWithExtraInformationResponse = types.UserListItemWithExtraInformation[];
   export type UserLoginRequest = { [key: string]: any };
   export type UserLoginResponse = { auth_token: string };
   export type UserMailingListBackfillRequest = { [key: string]: any };
@@ -4617,6 +4630,9 @@ export namespace controllers {
     associateIdentity: (
       params?: messages.UserAssociateIdentityRequest,
     ) => Promise<messages.UserAssociateIdentityResponse>;
+    changeEmail: (
+      params?: messages.UserChangeEmailRequest,
+    ) => Promise<messages.UserChangeEmailResponse>;
     changePassword: (
       params?: messages.UserChangePasswordRequest,
     ) => Promise<messages.UserChangePasswordResponse>;
@@ -4656,6 +4672,9 @@ export namespace controllers {
     listUnsolvedProblems: (
       params?: messages.UserListUnsolvedProblemsRequest,
     ) => Promise<messages.UserListUnsolvedProblemsResponse>;
+    listWithExtraInformation: (
+      params?: messages.UserListWithExtraInformationRequest,
+    ) => Promise<messages.UserListWithExtraInformationResponse>;
     login: (
       params?: messages.UserLoginRequest,
     ) => Promise<messages.UserLoginResponse>;
