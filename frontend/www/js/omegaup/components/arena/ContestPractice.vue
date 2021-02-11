@@ -92,7 +92,7 @@ export interface ActiveProblem {
 })
 export default class ArenaContestPractice extends Vue {
   @Prop() contest!: types.ContestPublicDetails;
-  @Prop() problems!: types.NavbarContestProblem[];
+  @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: null }) problem!: ActiveProblem | null;
   @Prop() problemInfo!: types.ProblemInfo;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
