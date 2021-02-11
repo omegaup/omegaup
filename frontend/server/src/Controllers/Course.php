@@ -3451,6 +3451,8 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{payload: ActivityFeedv2Payload, title: string}, entrypoint: string}
      *
      * @omegaup-request-param string $course
+     * @omegaup-request-param int|null $length
+     * @omegaup-request-param int|null $page
      */
     public static function getActivityFeedDetailsv2ForSmarty(
         \OmegaUp\Request $r
