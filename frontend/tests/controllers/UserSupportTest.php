@@ -33,22 +33,28 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testVerifyUser() {
         // Support team member will verify $user
-        ['user' => $supportUser, 'identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
+        [
+            'identity' => $supportIdentity,
+        ] = \OmegaUp\Test\Factories\User::createSupportUser();
 
         // Creates a user
         $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
-            'email' => $email,
-            'verify' => false
-        ]));
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'email' => $email,
+                'verify' => false,
+            ])
+        );
 
         // Call api using support team member
         $supportLogin = self::login($supportIdentity);
 
-        $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
-            'auth_token' => $supportLogin->auth_token,
-            'email' => $email
-        ]));
+        $response = \OmegaUp\Controllers\User::apiExtraInformation(
+            new \OmegaUp\Request([
+                'auth_token' => $supportLogin->auth_token,
+                'email' => $email,
+            ])
+        );
 
         $this->assertEquals(0, $response['verified']);
 
@@ -59,12 +65,103 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Get user information to pick up verification changes
-        $response = \OmegaUp\Controllers\User::apiExtraInformation(new \OmegaUp\Request([
-            'auth_token' => $supportLogin->auth_token,
-            'email' => $email
-        ]));
+        $response = \OmegaUp\Controllers\User::apiExtraInformation(
+            new \OmegaUp\Request([
+                'auth_token' => $supportLogin->auth_token,
+                'email' => $email,
+            ])
+        );
 
         $this->assertEquals(1, $response['verified']);
+    }
+
+    public function testUpdateMainEmailAsASupportTeamMember() {
+        // Creates a user with role of support team member
+        [
+            'identity' => $supportIdentity,
+        ] = \OmegaUp\Test\Factories\User::createSupportUser();
+
+        $originalEmail = 'original_mail@omegaup.com';
+        $identityPassword = \OmegaUp\Test\Utils::createRandomString();
+        // Creates a common user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                [
+                    'email' => $originalEmail,
+                    'password' => $identityPassword,
+                ]
+            )
+        );
+
+        $loginResponse = \OmegaUp\Controllers\User::apiLogin(
+            new \OmegaUp\Request([
+                'usernameOrEmail' => $originalEmail,
+                'password' => $identityPassword,
+            ])
+        );
+
+        $this->assertLogin($identity, $loginResponse['auth_token']);
+
+        $login = self::login($supportIdentity);
+
+        $newEmail = 'new_mail@omegaup.com';
+        \OmegaUp\Controllers\User::apiUpdateMainEmail(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'email' => $newEmail,
+                'originalEmail' => $originalEmail,
+            ])
+        );
+
+        $loginResponse = \OmegaUp\Controllers\User::apiLogin(
+            new \OmegaUp\Request([
+                'usernameOrEmail' => $newEmail,
+                'password' => $identityPassword,
+            ])
+        );
+
+        $this->assertLogin($identity, $loginResponse['auth_token']);
+
+        try {
+            // Identity is no longer able to login with original email
+            $loginResponse = \OmegaUp\Controllers\User::apiLogin(
+                new \OmegaUp\Request([
+                    'usernameOrEmail' => $originalEmail,
+                    'password' => $identityPassword,
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\InvalidCredentialsException $e) {
+            $this->assertEquals('usernameOrPassIsWrong', $e->getMessage());
+        }
+    }
+
+    public function testUpdateMainEmailFromAnyoneElseAsACommonUser() {
+        // Creates a user to try update email
+        [
+            'identity' => $fakeSupportIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Creates a common user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['email' => 'original@email.com']
+            )
+        );
+
+        $login = self::login($fakeSupportIdentity);
+
+        try {
+            // Only users with support team member role can perform this action
+            \OmegaUp\Controllers\User::apiUpdateMainEmail(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'email' => 'new@email.com',
+                    'originalEmail' => 'original@email.com',
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     /**

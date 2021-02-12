@@ -129,6 +129,37 @@ class Validators {
     }
 
     /**
+     * Checks whether the string parameter is of a certain length.
+     *
+     * @param string   $parameter the parameter
+     * @param int|null $minLength the (optional) minimum length
+     * @param int|null $maxLength the (optional) maximum length
+     *
+     * @return true when the parameter's length is within the specified bounds.
+     */
+    public static function stringOfLengthInRange(
+        string $parameter,
+        ?int $minLength,
+        ?int $maxLength
+    ): bool {
+        if (!is_null($minLength) && strlen($parameter) < $minLength) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterStringTooShort',
+                /*$parameter=*/null,
+                ['min_length' => strval($minLength)]
+            );
+        }
+        if (!is_null($maxLength) && strlen($parameter) > $maxLength) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterStringTooLong',
+                /*$parameter=*/null,
+                ['max_length' => strval($maxLength)]
+            );
+        }
+        return true;
+    }
+
+    /**
      * Returns whether the alias is valid.
      * The form of namespaced alias is: "namespace:alias"
      *

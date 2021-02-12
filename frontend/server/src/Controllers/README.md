@@ -376,8 +376,8 @@ Creates a Clarification
 | Name            | Type           | Description |
 | --------------- | -------------- | ----------- |
 | `contest_alias` | `string`       |             |
+| `message`       | `string`       |             |
 | `problem_alias` | `string`       |             |
-| `message`       | `null\|string` |             |
 | `username`      | `null\|string` |             |
 
 ### Returns
@@ -4382,9 +4382,10 @@ Updates the main email of the current user
 
 ### Parameters
 
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `email` | `string` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `email`         | `string`       |             |
+| `originalEmail` | `null\|string` |             |
 
 ### Returns
 

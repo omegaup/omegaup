@@ -8,6 +8,11 @@ import arena_ContestPractice, {
   ActiveProblem,
 } from '../components/arena/ContestPractice.vue';
 
+export interface ClarificationRequest {
+  problemAlias: string;
+  message: string;
+}
+
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestPracticePayload();
@@ -19,16 +24,19 @@ OmegaUp.on('ready', () => {
     components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
     data: () => ({
       problemInfo: null as types.ProblemInfo | null,
-      problems: payload.problems as types.NavbarContestProblem[],
+      problems: payload.problems as types.NavbarProblemsetProblem[],
       problem: null as ActiveProblem | null,
+      clarifications: payload.clarifications,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
         props: {
           contest: payload.contest,
+          contestAdmin: payload.contestAdmin,
           problems: this.problems,
           problemInfo: this.problemInfo,
           problem: this.problem,
+          clarifications: this.clarifications,
           activeTab,
         },
         on: {
@@ -54,13 +62,49 @@ OmegaUp.on('ready', () => {
                 contestPractice.problem = null;
               });
           },
+          'new-clarification': (request: ClarificationRequest) => {
+            api.Clarification.create({
+              contest_alias: payload.contest.alias,
+              problem_alias: request.problemAlias,
+              message: request.message,
+            })
+              .then(refreshClarifications)
+              .catch(ui.apiError);
+
+            return false;
+          },
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
+          },
+          'clarification-response': (
+            id: number,
+            responseText: string,
+            isPublic: boolean,
+          ) => {
+            api.Clarification.update({
+              clarification_id: id,
+              answer: responseText,
+              public: isPublic,
+            })
+              .then(refreshClarifications)
+              .catch(ui.apiError);
           },
         },
       });
     },
   });
+
+  function refreshClarifications() {
+    api.Contest.clarifications({
+      contest_alias: payload.contest.alias,
+      rowcount: 100,
+      offset: null,
+    })
+      .then(time.remoteTimeAdapter)
+      .then((data) => {
+        contestPractice.clarifications = data.clarifications;
+      });
+  }
 
   // The hash is of the form `#problems/${alias}`.
   const problemMatch = /#problems\/([^/]+)/.exec(window.location.hash);
@@ -71,4 +115,8 @@ OmegaUp.on('ready', () => {
     // not the case if this is set a priori.
     contestPractice.problem = { alias: problemAlias, runs: [] };
   }
+
+  setInterval(() => {
+    refreshClarifications();
+  }, 5 * 60 * 1000);
 });
