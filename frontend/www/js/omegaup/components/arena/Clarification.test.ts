@@ -22,6 +22,7 @@ describe('Clarification.vue', () => {
       propsData: {
         clarification,
         inContest: true,
+        isAdmin: true,
       },
     });
 
