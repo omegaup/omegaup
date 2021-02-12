@@ -58,7 +58,7 @@
           <button
             type="submit"
             class="btn btn-primary"
-            :disbaled="!shouldSubmitClarification"
+            :disbaled="!canSubmitClarification"
           >
             {{ T.wordsSend }}
           </button>
@@ -102,7 +102,7 @@ export default class ArenaNewClarificationPopup extends Vue {
     return this.users.find((user) => user.is_owner)?.username ?? null;
   }
 
-  get shouldSubmitClarification(): boolean {
+  get canSubmitClarification(): boolean {
     return (
       this.message != null &&
       (this.username != null || this.users.length == 0) &&
