@@ -3930,8 +3930,6 @@ export namespace messages {
   export type UserAddRoleResponse = {};
   export type UserAssociateIdentityRequest = { [key: string]: any };
   export type UserAssociateIdentityResponse = {};
-  export type UserChangeEmailRequest = { [key: string]: any };
-  export type UserChangeEmailResponse = {};
   export type UserChangePasswordRequest = { [key: string]: any };
   export type UserChangePasswordResponse = {};
   export type UserCoderOfTheMonthRequest = { [key: string]: any };
@@ -4646,9 +4644,6 @@ export namespace controllers {
     associateIdentity: (
       params?: messages.UserAssociateIdentityRequest,
     ) => Promise<messages.UserAssociateIdentityResponse>;
-    changeEmail: (
-      params?: messages.UserChangeEmailRequest,
-    ) => Promise<messages.UserChangeEmailResponse>;
     changePassword: (
       params?: messages.UserChangePasswordRequest,
     ) => Promise<messages.UserChangePasswordResponse>;

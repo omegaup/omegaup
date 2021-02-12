@@ -1600,10 +1600,6 @@ export const User = {
     messages.UserAssociateIdentityRequest,
     messages.UserAssociateIdentityResponse
   >('/api/user/associateIdentity/'),
-  changeEmail: apiCall<
-    messages.UserChangeEmailRequest,
-    messages.UserChangeEmailResponse
-  >('/api/user/changeEmail/'),
   changePassword: apiCall<
     messages.UserChangePasswordRequest,
     messages.UserChangePasswordResponse

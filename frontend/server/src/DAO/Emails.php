@@ -33,23 +33,4 @@ class Emails extends \OmegaUp\DAO\Base\Emails {
         }
         return $emails;
     }
-
-    final public static function changeEmail(
-        string $originalEmail,
-        string $newEmail
-    ): int {
-        $sql = 'UPDATE
-                    `Emails`
-                SET
-                    `email` = ?
-                WHERE
-                    `email` = ?;';
-        $params = [
-            $newEmail,
-            $originalEmail,
-        ];
-
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
-        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
-    }
 }

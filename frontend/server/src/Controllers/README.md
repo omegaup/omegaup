@@ -201,7 +201,6 @@
   - [`/api/user/addGroup/`](#apiuseraddgroup)
   - [`/api/user/addRole/`](#apiuseraddrole)
   - [`/api/user/associateIdentity/`](#apiuserassociateidentity)
-  - [`/api/user/changeEmail/`](#apiuserchangeemail)
   - [`/api/user/changePassword/`](#apiuserchangepassword)
   - [`/api/user/coderOfTheMonth/`](#apiusercoderofthemonth)
   - [`/api/user/coderOfTheMonthList/`](#apiusercoderofthemonthlist)
@@ -3887,21 +3886,6 @@ Associates an identity to the logged user given the username
 | ---------- | -------- | ----------- |
 | `password` | `string` |             |
 | `username` | `string` |             |
-
-### Returns
-
-_Nothing_
-
-## `/api/user/changeEmail/`
-
-### Description
-
-### Parameters
-
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `newEmail`      | `string` |             |
-| `originalEmail` | `string` |             |
 
 ### Returns
 

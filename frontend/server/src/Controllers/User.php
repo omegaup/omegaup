@@ -1993,38 +1993,6 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param string $originalEmail
-     * @omegaup-request-param string $newEmail
-     *
-     * @return array{status: string}
-     */
-    public static function apiChangeEmail(\OmegaUp\Request $r): array {
-        $r->ensureMainUserIdentity();
-
-        // Only users with privileges of support team can see this list
-        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
-            );
-        }
-
-        $originalEmail = $r->ensureString(
-            'originalEmail',
-            fn (string $email) => \OmegaUp\Validators::email($email)
-        );
-        $newEmail = $r->ensureString(
-            'newEmail',
-            fn (string $email) => \OmegaUp\Validators::email($email)
-        );
-
-        \OmegaUp\DAO\Emails::changeEmail($originalEmail, $newEmail);
-
-        return [
-            'status' => 'ok',
-        ];
-    }
-
-    /**
      * Gets a list of users. This returns an array instead of an object since
      * it is used by typeahead.
      *
