@@ -238,6 +238,7 @@
         <omegaup-arena-clarification-list
           :clarifications="clarifications"
           :in-contest="false"
+          :is-admin="true"
           @clarification-response="
             (id, responseText, isPublic) =>
               $emit('clarification-response', id, responseText, isPublic)
