@@ -108,6 +108,31 @@
             </div>
           </form>
         </div>
+        <div class="row mb-3">
+          <form class="form w-100" @submit.prevent="onUpdateEmail">
+            <div class="col-md-12">
+              <div class="input-group">
+                <input
+                  v-model="newEmail"
+                  class="form-control"
+                  name="new_email"
+                  type="text"
+                  required="required"
+                  :placeholder="T.adminSupportTypeNewEmail"
+                />
+                <div class="input-group-append">
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="submit"
+                    :title="T.adminSupportTypeNewEmail"
+                  >
+                    {{ T.wordsSaveChanges }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
         <div class="row float-right">
           <div class="col-md-12">
             <button
@@ -140,6 +165,11 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 Vue.use(Clipboard);
 
+export interface UpdateEmailRequest {
+  email: null | string;
+  newEmail: null | string;
+}
+
 @Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon,
@@ -155,26 +185,36 @@ export default class AdminSupport extends Vue {
 
   T = T;
   ui = ui;
-  email: string = '';
+  email: null | string = null;
+  newEmail: null | string = null;
 
   @Emit('search-email')
-  onSearchEmail(): string {
+  onSearchEmail(): void | string {
+    if (this.email == null) return;
     return this.email;
   }
 
+  @Emit('update-email')
+  onUpdateEmail(): UpdateEmailRequest | void {
+    if (this.email == null || this.newEmail == null) return;
+    return { email: this.email, newEmail: this.newEmail };
+  }
+
   @Emit('verify-user')
-  onVerifyUser(): string {
+  onVerifyUser(): void | string {
+    if (this.email == null) return;
     return this.email;
   }
 
   @Emit('generate-token')
-  onGenerateToken(): string {
+  onGenerateToken(): void | string {
+    if (this.email == null) return;
     return this.email;
   }
 
   @Emit('reset')
-  onReset(): { email: null | string } {
-    return { email: this.email };
+  onReset(): UpdateEmailRequest {
+    return { email: this.email, newEmail: this.newEmail };
   }
 }
 </script>

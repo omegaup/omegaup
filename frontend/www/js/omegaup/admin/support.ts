@@ -1,4 +1,6 @@
-import admin_Support from '../components/admin/Support.vue';
+import admin_Support, {
+  UpdateEmailRequest,
+} from '../components/admin/Support.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import * as ui from '../ui';
@@ -44,6 +46,16 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'update-email': (updateEmailRequest: UpdateEmailRequest) => {
+            api.User.updateMainEmail({
+              originalEmail: updateEmailRequest.email,
+              email: updateEmailRequest.newEmail,
+            })
+              .then(() => {
+                ui.success(T.adminSupportEmailUpdatedSuccessfully);
+              })
+              .catch(ui.apiError);
+          },
           'verify-user': (email: string): void => {
             api.User.verifyEmail({ usernameOrEmail: email })
               .then(() => {
@@ -62,8 +74,9 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          reset: (target: { email: null | string }) => {
-            target.email = null;
+          reset: (updateEmailRequest: UpdateEmailRequest) => {
+            updateEmailRequest.email = null;
+            updateEmailRequest.newEmail = null;
             adminSupport.username = null;
             adminSupport.link = null;
             adminSupport.verified = false;
