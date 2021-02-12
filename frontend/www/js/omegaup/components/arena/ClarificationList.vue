@@ -121,7 +121,10 @@ export default class ArenaClarificationList extends Vue {
 
   onNewClarification(): void {
     if (this.problemAlias == null || this.message == null) return;
-    this.$emit('new-clarification', { problemAlias: this.problemAlias, message: this.message });
+    this.$emit('new-clarification', {
+      problemAlias: this.problemAlias,
+      message: this.message,
+    });
   }
 }
 </script>
