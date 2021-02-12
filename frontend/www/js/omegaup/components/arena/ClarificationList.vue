@@ -18,53 +18,50 @@
       >
         <div class="modal-dialog" role="document">
           <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">{{ T.wordsNewClarification }}</h5>
-              <button
-                type="button"
-                class="close w-auto"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <label>
-                {{ T.wordsProblem }}
-                <select v-model="newClarification.problemAlias">
-                  <option
-                    v-for="problem in contestProblems"
-                    :key="problem.alias"
-                    :value="problem.alias"
-                  >
-                    {{ problem.title }}
-                  </option>
-                </select>
-              </label>
-              <textarea
-                v-model="newClarification.message"
-                class="w-100"
-                maxlength="200"
-                :placeholder="T.arenaClarificationCreateMaxLength"
-              ></textarea>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-dismiss="modal"
-              >
-                {{ T.wordsClose }}
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary"
-                @click.prevent="sendClarification"
-              >
-                {{ T.wordsSend }}
-              </button>
-            </div>
+            <form class="form" @submit.prevent="onNewClarification">
+              <div class="modal-header">
+                <h5 class="modal-title">{{ T.wordsNewClarification }}</h5>
+                <button
+                  type="button"
+                  class="close w-auto"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <label>
+                  {{ T.wordsProblem }}
+                  <select v-model="problemAlias" required="required">
+                    <option
+                      v-for="problem in problems"
+                      :key="problem.alias"
+                      :value="problem.alias"
+                    >
+                      {{ problem.text }}
+                    </option>
+                  </select>
+                </label>
+                <textarea
+                  v-model="message"
+                  class="w-100"
+                  maxlength="200"
+                  required="required"
+                  :placeholder="T.arenaClarificationCreateMaxLength"
+                ></textarea>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  {{ T.wordsClose }}
+                </button>
+                <button class="btn btn-primary">{{ T.wordsSend }}</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -73,11 +70,8 @@
       <table class="table mb-0">
         <thead>
           <tr>
-            <th v-if="inContest" class="text-center" scope="col">
-              {{ T.wordsContest }}
-            </th>
-            <th v-else class="text-center" scope="col">
-              {{ T.wordsProblem }}
+            <th class="text-center" scope="col">
+              {{ !inContest ? T.wordsContest : T.wordsProblem }}
             </th>
             <th class="text-center" scope="col">{{ T.wordsAuthor }}</th>
             <th class="text-center" scope="col">{{ T.wordsTime }}</th>
@@ -90,6 +84,7 @@
             v-for="clarification in clarifications"
             :key="clarification.clarification_id"
             :in-contest="inContest"
+            :is-admin="isAdmin"
             :clarification="clarification"
             @clarification-response="
               (id, responseText, isPublic) =>
@@ -116,24 +111,20 @@ import arena_Clarification from './Clarification.vue';
 })
 export default class ArenaClarificationList extends Vue {
   @Prop() inContest!: boolean;
+  @Prop({ default: false }) isAdmin!: boolean;
   @Prop() clarifications!: types.Clarification[];
-  @Prop() contestProblems!: any[]; //TODO: decide how to pass problems for new clarification
+  @Prop({ default: () => [] }) problems!: types.NavbarProblemsetProblem[];
 
   T = T;
-  newClarification = {
-    problem:
-      this.inContest && this.contestProblems
-        ? this.contestProblems[0].alias
-        : null,
-    message: '',
-  };
+  problemAlias = this.problems[0]?.alias ?? null;
+  message: null | string = null;
 
-  sendClarification(): void {
-    //TODO: Emit an event to parent with the new clarification
-  }
-
-  sendClarificationResponse(): void {
-    //TODO: Emit an event to parent with the response to clarification
+  onNewClarification(): void {
+    if (this.problemAlias == null || this.message == null) return;
+    this.$emit('new-clarification', {
+      problemAlias: this.problemAlias,
+      message: this.message,
+    });
   }
 }
 </script>
