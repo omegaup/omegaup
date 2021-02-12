@@ -91,9 +91,11 @@ export default class ArenaClarificationList extends Vue {
   T = T;
   PopupDisplayed = PopupDisplayed;
   problemAlias =
-    this.inContest && this.problems ? this.problems[0].alias : null;
+    this.inContest && this.problems.length != 0 ? this.problems[0].alias : null;
   usernameAuthor =
-    this.inContest && this.isAdmin ? this.users[0].username : null;
+    this.inContest && this.isAdmin && this.users.length != 0
+      ? this.users[0].username
+      : null;
   currentPopupDisplayed = this.popupDisplayed;
 
   onNewClarification(): void {
@@ -102,9 +104,13 @@ export default class ArenaClarificationList extends Vue {
 
   onPopupDismissed(): void {
     this.problemAlias =
-      this.inContest && this.problems ? this.problems[0].alias : null;
+      this.inContest && this.problems.length != 0
+        ? this.problems[0].alias
+        : null;
     this.usernameAuthor =
-      this.inContest && this.isAdmin ? this.users[0].username : null;
+      this.inContest && this.isAdmin && this.users.length != 0
+        ? this.users[0].username
+        : null;
     this.currentPopupDisplayed = PopupDisplayed.None;
     this.$emit('update:activeTab', 'clarifications');
   }
