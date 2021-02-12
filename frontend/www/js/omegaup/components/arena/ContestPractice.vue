@@ -54,6 +54,7 @@
     <template #arena-clarifications>
       <omegaup-arena-clarification-list
         :problems="problems"
+        :users="users"
         :clarifications="currentClarifications"
         :is-admin="contestAdmin"
         :in-contest="true"
@@ -61,6 +62,9 @@
         @clarification-response="
           (id, responseText, isPublic) =>
             $emit('clarification-response', id, responseText, isPublic)
+        "
+        @update:activeTab="
+          (selectedTab) => $emit('update:activeTab', selectedTab)
         "
       ></omegaup-arena-clarification-list>
     </template>
@@ -98,6 +102,7 @@ export default class ArenaContestPractice extends Vue {
   @Prop() contest!: types.ContestPublicDetails;
   @Prop() contestAdmin!: boolean;
   @Prop() problems!: types.NavbarProblemsetProblem[];
+  @Prop() users!: types.ContestUser[];
   @Prop({ default: null }) problem!: ActiveProblem | null;
   @Prop() problemInfo!: types.ProblemInfo;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];

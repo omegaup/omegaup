@@ -82,11 +82,13 @@ import omegaup_OverlayPopup from '../OverlayPopup.vue';
 export default class ArenaNewClarificationPopup extends Vue {
   @Prop({ default: () => [] }) problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
-  @Prop({ default: null }) problemAlias!: null | string;
-  @Prop({ default: null }) username!: null | string;
+  @Prop({ default: null }) problem!: null | string;
+  @Prop({ default: null }) usernameAuthor!: null | string;
 
   T = T;
   message: null | string = null;
+  problemAlias = this.problem;
+  username = this.usernameAuthor;
 
   get filteredUsers(): { username: string; name: string }[] {
     return this.users.map((user) => {
@@ -105,7 +107,7 @@ export default class ArenaNewClarificationPopup extends Vue {
   get canSubmitClarification(): boolean {
     return (
       this.message != null &&
-      (this.username != null || this.users.length == 0) &&
+      (this.username != null || this.users == null || this.users.length == 0) &&
       this.problemAlias != null
     );
   }
@@ -124,7 +126,14 @@ export default class ArenaNewClarificationPopup extends Vue {
         this.ownerUsername == this.username,
       time: new Date(),
     };
-    this.$emit('new-clarification', clarificationRequest);
+    this.$emit('new-clarification', {
+      request: clarificationRequest,
+      target: this,
+    });
+  }
+
+  clearForm(): void {
+    this.$emit('dismiss');
   }
 }
 </script>
