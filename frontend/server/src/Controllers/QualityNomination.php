@@ -862,7 +862,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'email' => $email,
             'name' => $username,
         ] = $adminUser;
-        $user = \OmegaUp\DAO\Identities::findByUsernameOrName($username)[0];
+        $user = \OmegaUp\DAO\Identities::findByUsername($username);
+        if (is_null($user)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
 
         $emailParams = [
             'reason' => htmlspecialchars($rationale),
