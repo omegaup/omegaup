@@ -1238,18 +1238,14 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 c.course_id = ccl.new_course_id
             WHERE
                 ccl.course_id = ?
-        )';
+        ) ORDER BY
+            time DESC';
 
         $sqlCount = "
             SELECT
                 COUNT(*)
             FROM
                 ({$sql}) AS total";
-
-        $sqlOrderBy = '
-            ORDER BY
-                time DESC
-        ';
 
         $sqlLimit = ' LIMIT ?, ?';
 
@@ -1261,7 +1257,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         /** @var list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int|null, name: null|string, time: \OmegaUp\Timestamp, username: string}> */
         $activity = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql . $sqlOrderBy . $sqlLimit,
+            $sql . $sqlLimit,
             [$course->course_id, $course->course_id, $course->course_id, $offset, $rowsPerPage]
         );
 

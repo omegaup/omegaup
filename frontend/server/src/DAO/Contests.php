@@ -1004,18 +1004,14 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 p.problem_id = s.problem_id
             WHERE
                 sl.problemset_id = ?
-        )';
+        ) ORDER BY
+            time DESC';
 
         $sqlCount = "
             SELECT
                 COUNT(*)
             FROM
                 ({$sql}) AS total";
-
-        $sqlOrderBy = '
-            ORDER BY
-                time DESC
-        ';
 
         $sqlLimit = ' LIMIT ?, ?';
 
@@ -1027,7 +1023,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         /** @var list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int, name: null|string, time: \OmegaUp\Timestamp, username: string}> */
         $activity = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql . $sqlOrderBy . $sqlLimit,
+            $sql . $sqlLimit,
             [$contest->problemset_id, $contest->problemset_id, $offset, $rowsPerPage]
         );
 
