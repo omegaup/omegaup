@@ -58,7 +58,7 @@
           <button
             type="submit"
             class="btn btn-primary"
-            :disbaled="!canSubmitClarification"
+            :disabled="!canSubmitClarification"
           >
             {{ T.wordsSend }}
           </button>
