@@ -16,6 +16,7 @@ const translations: { [key: string]: string; } = {
   addUsersToReviewerGroup: "(C1ick 70 add a u53r 70 7h3 1i57 0f r3vi3w3r5.)",
   adminAdded: "(Admin 5ucc355fu11y add3d.)",
   adminRemoved: "(Admin 5ucc355fu11y r3m0v3d.)",
+  adminSupportPageNotFound: "(Pag3 n07 f0und)",
   admissionModeManualOnly: "(Manua1 0n1y (Add y0ur 57ud3n75 u53rnam35))",
   admissionModePublic: "(Pub1ic (S7ud3n75 3nr011 fr0m 7h3 1i57 0f pub1ic c0ur535))",
   admissionModeShareURL: "(Shar3 URL (S7ud3n75 3nr011 fr0m 7h3 URL))",

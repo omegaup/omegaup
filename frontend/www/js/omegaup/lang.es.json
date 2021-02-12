@@ -15,6 +15,7 @@
 	"addUsersToReviewerGroup": "Clic para agregar un usuario a la lista de revisores.",
 	"adminAdded": "Administrador agregado correctamente",
 	"adminRemoved": "Administrador eliminado correctamente",
+	"adminSupportPageNotFound": "P\u00e1gina no encontrada",
 	"admissionModeManualOnly": "Manual (Agrega los nombres de usuario de tus estudiantes)",
 	"admissionModePublic": "P\u00fablico (Los estudiantes se inscriben desde la lista de cursos p\u00fablicos)",
 	"admissionModeShareURL": "Compartir URL (Los estudiantes se inscriben desde el URL)",

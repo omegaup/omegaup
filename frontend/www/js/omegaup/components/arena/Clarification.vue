@@ -1,8 +1,13 @@
 <template>
-  <tr :class="{ resolved: clarification.answer }">
+  <tr
+    :class="{
+      resolved: clarification.answer,
+      'direct-message': isDirectMessage,
+    }"
+  >
     <td class="text-center align-middle">
       {{
-        inContest ? clarification.contest_alias : clarification.problem_alias
+        !inContest ? clarification.contest_alias : clarification.problem_alias
       }}
     </td>
     <td class="text-center align-middle">{{ clarification.author }}</td>
@@ -12,7 +17,7 @@
     <td class="align-middle">
       <pre>{{ clarification.message }}</pre>
     </td>
-    <td class="align-middle">
+    <td v-if="isAdmin" class="align-middle">
       <template v-if="clarification.answer">
         <pre>{{ clarification.answer }}</pre>
         <div v-if="!showUpdateAnswer" class="form-check mt-2 mt-xl-0">
@@ -66,6 +71,9 @@
         </button>
       </form>
     </td>
+    <td v-else class="align-middle">
+      <pre v-if="clarification.answer">{{ clarification.answer }}</pre>
+    </td>
   </tr>
 </template>
 
@@ -79,6 +87,7 @@ import * as time from '../../time';
 export default class ArenaClarificationForm extends Vue {
   @Prop() clarification!: types.Clarification;
   @Prop() inContest!: boolean;
+  @Prop({ default: false }) isAdmin!: boolean;
 
   T = T;
   time = time;
@@ -109,6 +118,12 @@ export default class ArenaClarificationForm extends Vue {
       text: T.wordsOther,
     },
   ];
+
+  get isDirectMessage(): boolean {
+    return (
+      this.clarification.answer == null && this.clarification.receiver != null
+    );
+  }
 
   get responseText(): string {
     const response = this.responses.find(
