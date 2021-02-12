@@ -3,6 +3,7 @@
     :active-tab="activeTab"
     :contest-title="contest.title"
     :is-admin="isAdmin"
+    :background-class="'practice'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #arena-problems>
@@ -52,8 +53,11 @@
     </template>
     <template #arena-clarifications>
       <omegaup-arena-clarification-list
+        :problems="problems"
         :clarifications="currentClarifications"
+        :is-admin="contestAdmin"
         :in-contest="true"
+        @new-clarification="(request) => $emit('new-clarification', request)"
         @clarification-response="
           (id, responseText, isPublic) =>
             $emit('clarification-response', id, responseText, isPublic)
@@ -92,7 +96,8 @@ export interface ActiveProblem {
 })
 export default class ArenaContestPractice extends Vue {
   @Prop() contest!: types.ContestPublicDetails;
-  @Prop() problems!: types.NavbarContestProblem[];
+  @Prop() contestAdmin!: boolean;
+  @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: null }) problem!: ActiveProblem | null;
   @Prop() problemInfo!: types.ProblemInfo;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
@@ -127,16 +132,15 @@ export default class ArenaContestPractice extends Vue {
     }
     this.onNavigateToProblem(newValue.alias);
   }
+
+  @Watch('clarifications')
+  onClarificationsChanged(newValue: types.Clarification[]): void {
+    this.currentClarifications = newValue;
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-[data-contest-practice] {
-  background: #668 url(/media/gradient.png) repeat-x 0 0;
-  font-family: sans-serif;
-  overflow-y: auto;
-}
-
 .navleft {
   overflow: hidden;
 }
