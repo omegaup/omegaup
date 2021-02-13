@@ -99,6 +99,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                     `Problems` AS `p` ON `p`.`problem_id` = `psp`.`problem_id`
                 WHERE
                     `a`.`course_id` = ?
+                    AND `p`.`languages` <> ""
                 GROUP BY
                     `a`.`assignment_id`, `p`.`problem_id`
                 ) AS pr
@@ -168,6 +169,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 `Problems` AS `p` ON `p`.`problem_id` = `psp`.`problem_id`
             WHERE
                 `a`.`course_id` = ?
+                AND `p`.`languages` <> ""
             GROUP BY
                 `a`.`assignment_id`, `p`.`problem_id`
             ) AS pr
