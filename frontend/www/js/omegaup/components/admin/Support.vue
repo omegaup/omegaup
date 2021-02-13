@@ -35,7 +35,7 @@
       </div>
       <template v-if="username != null">
         <div class="row mb-3">
-          <div class="col-md-6">
+          <div class="col">
             <form class="form w-100" @submit.prevent="onVerifyUser">
               <button
                 class="btn btn-outline-secondary"
@@ -53,16 +53,25 @@
               </button>
             </form>
           </div>
-          <div class="col-md-6">
+          <div class="col">
             <label v-if="lastLogin != null" class="font-weight-bold">
               {{
                 ui.formatString(T.userLastLogin, {
-                  lastLogin: lastLogin.toLocaleString(T.locale),
+                  lastLogin: time.formatDateTime(lastLogin),
                 })
               }}
             </label>
             <label v-else>
               {{ T.userNeverLoggedIn }}
+            </label>
+          </div>
+          <div v-if="birthDate != null" class="col">
+            <label class="font-weight-bold">
+              {{
+                ui.formatString(T.userBirthDate, {
+                  birthDate: time.formatDate(birthDate),
+                })
+              }}
             </label>
           </div>
         </div>
@@ -154,6 +163,7 @@ import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import Clipboard from 'v-clipboard';
 import T from '../../lang';
 import * as ui from '../../ui';
+import * as time from '../../time';
 
 import {
   FontAwesomeIcon,
@@ -166,8 +176,8 @@ library.add(fas);
 Vue.use(Clipboard);
 
 export interface UpdateEmailRequest {
-  email: null | string;
-  newEmail: null | string;
+  email: string;
+  newEmail: string;
 }
 
 @Component({
@@ -181,40 +191,43 @@ export default class AdminSupport extends Vue {
   @Prop() username!: string;
   @Prop() verified!: boolean;
   @Prop() link!: string;
-  @Prop() lastLogin!: Date;
+  @Prop() lastLogin!: null | Date;
+  @Prop() birthDate!: null | Date;
 
   T = T;
   ui = ui;
+  time = time;
   email: null | string = null;
   newEmail: null | string = null;
 
   @Emit('search-email')
-  onSearchEmail(): void | string {
-    if (this.email == null) return;
+  onSearchEmail(): null | string {
+    if (this.email == null) return null;
     return this.email;
   }
 
   @Emit('update-email')
-  onUpdateEmail(): UpdateEmailRequest | void {
-    if (this.email == null || this.newEmail == null) return;
+  onUpdateEmail(): null | UpdateEmailRequest {
+    if (this.email == null || this.newEmail == null) return null;
     return { email: this.email, newEmail: this.newEmail };
   }
 
   @Emit('verify-user')
-  onVerifyUser(): void | string {
-    if (this.email == null) return;
+  onVerifyUser(): null | string {
+    if (this.email == null) return null;
     return this.email;
   }
 
   @Emit('generate-token')
-  onGenerateToken(): void | string {
-    if (this.email == null) return;
+  onGenerateToken(): null | string {
+    if (this.email == null) return null;
     return this.email;
   }
 
-  @Emit('reset')
-  onReset(): UpdateEmailRequest {
-    return { email: this.email, newEmail: this.newEmail };
+  onReset() {
+    this.email = null;
+    this.newEmail = null;
+    this.$emit('reset');
   }
 }
 </script>

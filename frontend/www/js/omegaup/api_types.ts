@@ -3960,6 +3960,7 @@ export namespace messages {
   export type UserExtraInformationRequest = { [key: string]: any };
   export type _UserExtraInformationServerResponse = any;
   export type UserExtraInformationResponse = {
+    birth_date?: Date;
     last_login?: Date;
     username: string;
     verified: boolean;

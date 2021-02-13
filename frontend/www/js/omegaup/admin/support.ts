@@ -19,6 +19,7 @@ OmegaUp.on('ready', () => {
         link: null as null | string,
         verified: false,
         lastLogin: null as null | Date,
+        birthDate: null as null | Date,
       };
     },
     render: function (createElement) {
@@ -28,28 +29,32 @@ OmegaUp.on('ready', () => {
           link: this.link,
           verified: this.verified,
           lastLogin: this.lastLogin,
+          birthDate: this.birthDate,
         },
         on: {
           'search-email': (email: string): void => {
             adminSupport.username = null;
             adminSupport.link = null;
             adminSupport.lastLogin = null;
+            adminSupport.birthDate = null;
             adminSupport.verified = false;
             api.User.extraInformation({ email: email })
               .then((data) => {
                 adminSupport.username = data.username;
                 adminSupport.verified = data.verified;
-                if (data.last_login == null) {
-                  return;
+                if (data.last_login != null) {
+                  adminSupport.lastLogin = new Date(data.last_login);
                 }
-                adminSupport.lastLogin = new Date(data.last_login);
+                if (data.birth_date != null) {
+                  adminSupport.birthDate = new Date(data.birth_date);
+                }
               })
               .catch(ui.apiError);
           },
-          'update-email': (updateEmailRequest: UpdateEmailRequest) => {
+          'update-email': (request: UpdateEmailRequest) => {
             api.User.updateMainEmail({
-              originalEmail: updateEmailRequest.email,
-              email: updateEmailRequest.newEmail,
+              originalEmail: request.email,
+              email: request.newEmail,
             })
               .then(() => {
                 ui.success(T.adminSupportEmailUpdatedSuccessfully);
@@ -74,13 +79,12 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          reset: (updateEmailRequest: UpdateEmailRequest) => {
-            updateEmailRequest.email = null;
-            updateEmailRequest.newEmail = null;
+          reset: () => {
             adminSupport.username = null;
             adminSupport.link = null;
             adminSupport.verified = false;
             adminSupport.lastLogin = null;
+            adminSupport.birthDate = null;
           },
         },
       });

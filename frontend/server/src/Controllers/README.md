@@ -4002,6 +4002,7 @@ Gets extra information of the identity:
 
 | Name              | Type      |
 | ----------------- | --------- |
+| `birth_date`      | `Date`    |
 | `last_login`      | `Date`    |
 | `username`        | `string`  |
 | `verified`        | `boolean` |

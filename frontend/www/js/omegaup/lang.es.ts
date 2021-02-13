@@ -1156,6 +1156,7 @@ const translations: { [key: string]: string; } = {
   updateProblemLevel: "Actualizar el nivel del problema",
   updateStatementsCommitMessage: "Actualizando redacciones",
   userAlreadyAcceptedPrivacyPolicy: "El usuario ya hab\u00eda aceptado la pol\u00edtica de privacidad",
+  userBirthDate: "Fecha de nacimiento: %(birthDate)",
   userDoesNotHaveAnyPasswordChangeRequest: "El usuario no ha realizado la solicitud de cambio de contrase\u00f1a en las \u00faltimas 24 horas.",
   userEditAddPassword: "Agregar contrase\u00f1a",
   userEditBachelors: "Licenciatura",
