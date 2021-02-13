@@ -3991,6 +3991,7 @@ Gets extra information of the identity:
 
 - last password change request
 - verify status
+- birth date to verify the user identity
 
 ### Parameters
 

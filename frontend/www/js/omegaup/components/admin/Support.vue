@@ -35,7 +35,7 @@
       </div>
       <template v-if="username != null">
         <div class="row mb-3">
-          <div class="col">
+          <div class="col-md">
             <form class="form w-100" @submit.prevent="onVerifyUser">
               <button
                 class="btn btn-outline-secondary"
@@ -53,7 +53,7 @@
               </button>
             </form>
           </div>
-          <div class="col">
+          <div class="col-md">
             <label v-if="lastLogin != null" class="font-weight-bold">
               {{
                 ui.formatString(T.userLastLogin, {
@@ -65,7 +65,7 @@
               {{ T.userNeverLoggedIn }}
             </label>
           </div>
-          <div v-if="birthDate != null" class="col">
+          <div v-if="birthDate != null" class="col-md">
             <label class="font-weight-bold">
               {{
                 ui.formatString(T.userBirthDate, {
@@ -224,10 +224,10 @@ export default class AdminSupport extends Vue {
     return this.email;
   }
 
+  @Emit('reset')
   onReset() {
     this.email = null;
     this.newEmail = null;
-    this.$emit('reset');
   }
 }
 </script>

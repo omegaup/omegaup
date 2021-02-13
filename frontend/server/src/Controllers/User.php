@@ -1525,6 +1525,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * Gets extra information of the identity:
      * - last password change request
      * - verify status
+     * - birth date to verify the user identity
      *
      * @omegaup-request-param string $email
      *
