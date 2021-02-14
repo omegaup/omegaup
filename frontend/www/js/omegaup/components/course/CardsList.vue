@@ -26,7 +26,13 @@
           </label>
         </div>
       </div>
-      <div class="row mt-5 justify-content-between row-cols-1 row-cols-md-2">
+      <div
+        class="row mt-5 justify-content-between align-items-center row-cols-1"
+        :class="{
+          'row-cols-md-2': type !== CourseType.Public,
+          'row-cols-lg-2': type === CourseType.Public,
+        }"
+      >
         <omegaup-course-card
           v-for="course in groupedCourses.visible"
           :key="course.alias"

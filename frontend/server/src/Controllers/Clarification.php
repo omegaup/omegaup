@@ -28,7 +28,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
      * @return array{clarification_id: int}
      *
      * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param null|string $message
+     * @omegaup-request-param string $message
      * @omegaup-request-param string $problem_alias
      * @omegaup-request-param null|string $username
      */
@@ -45,15 +45,14 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['username'],
-            'username'
-        );
-        \OmegaUp\Validators::validateStringOfLengthInRange(
-            $r['message'],
+        $username = $r->ensureOptionalString('username');
+        $message = $r->ensureString(
             'message',
-            1,
-            200
+            fn (string $message) => \OmegaUp\Validators::stringOfLengthInRange(
+                $message,
+                1,
+                200
+            )
         );
 
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
@@ -66,8 +65,8 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $identity = !is_null($r['username']) ?
-            \OmegaUp\DAO\Identities::findByUsername($r['username']) : null;
+        $identity = !is_null($username) ?
+            \OmegaUp\DAO\Identities::findByUsername($username) : null;
 
         // Is the combination problemset_id and problem_id valid?
         if (
@@ -89,7 +88,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             'receiver_id' => $receiverId,
             'problemset_id' => $contest->problemset_id,
             'problem_id' => $problem->problem_id,
-            'message' => $r['message'],
+            'message' => $message,
             'time' => \OmegaUp\Time::get(),
             'public' => $receiverId == $r->identity->identity_id,
         ]);

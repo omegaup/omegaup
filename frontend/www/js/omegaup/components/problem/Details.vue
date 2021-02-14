@@ -238,6 +238,7 @@
         <omegaup-arena-clarification-list
           :clarifications="clarifications"
           :in-contest="false"
+          :is-admin="true"
           @clarification-response="
             (id, responseText, isPublic) =>
               $emit('clarification-response', id, responseText, isPublic)
@@ -287,7 +288,7 @@ library.add(
   faExternalLinkAlt,
 );
 
-interface Tab {
+export interface Tab {
   name: string;
   text: string;
 }

@@ -15,7 +15,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
     /**
      * @return list<Clarification>
      */
-    final public static function GetProblemsetClarifications(
+    final public static function getProblemsetClarifications(
         int $problemset_id,
         bool $admin,
         int $identityId,

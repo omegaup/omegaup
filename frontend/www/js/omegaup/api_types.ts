@@ -424,11 +424,35 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ContestPracticePayload {
       return ((x) => {
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
         x.contest = ((x) => {
           x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
+        if (x.users)
+          x.users = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (x.access_time)
+                x.access_time = ((x: number) => new Date(x * 1000))(
+                  x.access_time,
+                );
+              if (x.end_time)
+                x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+              return x;
+            });
+          })(x.users);
         return x;
       })(
         JSON.parse(
@@ -1211,6 +1235,37 @@ export namespace types {
       );
     }
 
+    export function StudentsProgressv2Payload(
+      elementId: string = 'payload',
+    ): types.StudentsProgressv2Payload {
+      return ((x) => {
+        x.course = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function SubmissionsListPayload(
       elementId: string = 'payload',
     ): types.SubmissionsListPayload {
@@ -1725,9 +1780,12 @@ export namespace types {
   }
 
   export interface ContestPracticePayload {
+    clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
-    problems?: types.NavbarContestProblem[];
+    contestAdmin: boolean;
+    problems: types.NavbarProblemsetProblem[];
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    users?: types.ContestUser[];
   }
 
   export interface ContestProblem {
@@ -2170,7 +2228,7 @@ export namespace types {
     validateRecaptcha: boolean;
   }
 
-  export interface NavbarContestProblem {
+  export interface NavbarProblemsetProblem {
     acceptsSubmissions: boolean;
     alias: string;
     bestScore: number;
@@ -2888,6 +2946,16 @@ export namespace types {
     course: types.CourseDetails;
     problemTitles: { [key: string]: string };
     students: types.StudentProgress[];
+  }
+
+  export interface StudentsProgressv2Payload {
+    course: types.CourseDetails;
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
+    problemTitles: { [key: string]: string };
+    students: types.StudentProgress[];
+    totalRows: number;
   }
 
   export interface Submission {

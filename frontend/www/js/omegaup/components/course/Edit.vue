@@ -14,7 +14,7 @@
         </small>
       </h1>
     </div>
-    <ul class="nav nav-pills">
+    <ul class="nav nav-pills mt-4">
       <li class="nav-item" role="presentation">
         <a
           href="#course"
@@ -75,9 +75,19 @@
           >{{ T.courseEditClone }}</a
         >
       </li>
+      <li class="nav-item" role="presentation">
+        <a
+          href="#archive"
+          class="nav-link"
+          data-tab-archive
+          :class="{ active: showTab === 'archive' }"
+          @click="showTab = 'archive'"
+          >{{ T.courseEditArchive }}</a
+        >
+      </li>
     </ul>
 
-    <div class="tab-content">
+    <div class="tab-content mt-2">
       <div v-if="showTab === 'course'" class="tab-pane active" role="tabpanel">
         <omegaup-course-form
           :update="true"
@@ -250,6 +260,12 @@
           </div>
         </div>
       </div>
+      <div v-if="showTab === 'archive'" class="tab-pane active" role="tabpanel">
+        <omegaup-course-archive
+          :already-archived="alreadyArchived"
+          @archive-course="onArchiveCourse"
+        ></omegaup-course-archive>
+      </div>
     </div>
   </div>
 </template>
@@ -258,6 +274,7 @@
 import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import course_Form from './Form.vue';
 import course_AssignmentList from './AssignmentList.vue';
+import course_Archive from './Archive.vue';
 import course_AssignmentDetails from './AssignmentDetails.vue';
 import course_AdmissionMode from './AdmissionMode.vue';
 import course_AddStudents from './AddStudents.vue';
@@ -301,6 +318,7 @@ const emptyAssignment: types.CourseAssignment = {
 @Component({
   components: {
     'omegaup-course-form': course_Form,
+    'omegaup-course-archive': course_Archive,
     'omegaup-course-assignment-list': course_AssignmentList,
     'omegaup-course-assignment-details': course_AssignmentDetails,
     'omegaup-course-admision-mode': course_AdmissionMode,
@@ -320,6 +338,7 @@ export default class CourseEdit extends Vue {
   T = T;
   showTab = this.initialTab;
   admissionMode = omegaup.AdmissionMode;
+  alreadyArchived = this.data.course.archived;
 
   assignmentProblems = this.data.assignmentProblems;
   assignments = this.data.course.assignments;
@@ -373,6 +392,11 @@ export default class CourseEdit extends Vue {
   onSelectAssignmentTab(): void {
     this.showTab = 'content';
     this.onResetAssignmentForm();
+  }
+
+  onArchiveCourse(archive: boolean): void {
+    this.$emit('archive-course', this.data.course.alias, archive);
+    this.alreadyArchived = archive;
   }
 
   @Watch('initialTab')

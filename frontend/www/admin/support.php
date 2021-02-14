@@ -1,22 +1,22 @@
 <?php
-
 namespace OmegaUp;
+require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
-require_once('../../server/bootstrap.php');
-
-\OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
-
-[
-    'identity' => $identity,
-] = \OmegaUp\Controllers\Session::getCurrentSession();
-if (
-    is_null($identity) ||
-    !\OmegaUp\Authorization::isSupportTeamMember($identity)
-) {
-    header('HTTP/1.1 404 Not found');
-    die();
-}
-
-\OmegaUp\UITools::getSmartyInstance()->display(
-    '../templates/admin.support.tpl'
+\OmegaUp\UITools::render(
+    function (\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'adminSupportPageNotFound'
+            );
+        }
+        return [
+            'smartyProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleSupportDashboard'
+                ),
+            ],
+            'entrypoint' => 'admin_support',
+        ];
+    }
 );

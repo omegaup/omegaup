@@ -5,6 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  *  CourseController
  *
+ * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type Progress=array{score: float, max_score: float}
  * @psalm-type AssignmentProgress=array<string, Progress>
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
@@ -41,6 +42,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, allLanguages: array<string, string>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, problemTitles: array<string, string>, students: list<StudentProgress>}
+ * @psalm-type StudentsProgressv2Payload=array{course: CourseDetails, problemTitles: array<string, string>, students: list<StudentProgress>, totalRows: int, page: int, length: int, pagerItems: list<PageItem>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
@@ -3091,6 +3093,79 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                     'students' => $allProgress,
                     'problemTitles' => $problemTitles,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleStudentsProgress'
+                ),
+            ],
+            'entrypoint' => 'course_students'
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: StudentsProgressv2Payload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param int $length
+     * @omegaup-request-param int $page
+     * @omegaup-request-param string $course
+     */
+    public static function getStudentsProgressForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureIdentity();
+
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? 100;
+
+        $courseAlias = $r->ensureString(
+            'course',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $course = self::validateCourseExists($courseAlias);
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $studentsProgress = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
+            "{$courseAlias}-{$page}-{$length}",
+            function () use ($course, $page, $length) {
+                if (is_null($course->course_id) || is_null($course->group_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'courseNotFound'
+                    );
+                }
+                return \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
+                    $course->course_id,
+                    $course->group_id,
+                    $page,
+                    $length
+                );
+            },
+            60 * 60 * 12 // 12 hours
+        );
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'page' => $page,
+                    'length' => $length,
+                    'course' => self::getCommonCourseDetails(
+                        $course,
+                        $r->identity
+                    ),
+                    'students' => $studentsProgress['allProgress'],
+                    'problemTitles' => $studentsProgress['problemTitles'],
+                    'totalRows' => $studentsProgress['totalRows'],
+                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+                        $studentsProgress['totalRows'],
+                        $length,
+                        $page,
+                        "/course/{$courseAlias}/students/",
+                        5,
+                        []
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleStudentsProgress'

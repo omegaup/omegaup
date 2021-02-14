@@ -143,7 +143,7 @@ describe('ContestPractice.vue', () => {
             maxScore: 100,
             text: 'B. hello other problem omegaUp',
           },
-        ] as types.NavbarContestProblem[],
+        ] as types.NavbarProblemsetProblem[],
         problemInfo: sampleProblem,
       },
     });

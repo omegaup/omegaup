@@ -1,5 +1,5 @@
 <template>
-  <div data-contest-wrapper>
+  <div data-arena-wrapper :class="backgroundClass">
     <div class="title">
       <h1>
         <span>{{ contestTitle }}</span>
@@ -62,17 +62,14 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import T from '../../lang';
-
-interface Tab {
-  name: string;
-  text: string;
-}
+import { Tab } from '../problem/Details.vue';
 
 @Component
 export default class Arena extends Vue {
   @Prop({ default: false }) isAdmin!: boolean;
   @Prop() contestTitle!: string;
   @Prop() activeTab!: string;
+  @Prop() backgroundClass!: string;
 
   T = T;
   selectedTab = this.activeTab;
@@ -112,13 +109,11 @@ export default class Arena extends Vue {
 </script>
 
 <style lang="scss" scoped>
-[data-contest-practice] {
-  background: #668 url(/media/gradient.png) repeat-x 0 0;
-  font-family: sans-serif;
-  overflow-y: auto;
+.practice {
+  background: #668 url(/media/gradient.png) repeat-x 0 0 !important;
 }
 
-[data-contest-wrapper] {
+[data-arena-wrapper] {
   background: #ebeff2;
   font-family: sans-serif;
   overflow-y: auto;

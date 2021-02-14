@@ -1,66 +1,70 @@
 <template>
-  <div data-contest-practice>
-    <div class="title">
-      <h1>
-        <span>{{ contest.title }}</span>
-        <sup class="socket-status" title="WebSocket">✗</sup>
-      </h1>
-      <div class="clock">∞</div>
-    </div>
-    <div class="tab navleft">
-      <div class="navbar">
-        <omegaup-arena-navbar-problems
-          :problems="problems"
-          :active-problem="activeProblemAlias"
-          :in-assignment="false"
-          :digits-after-decimal-point="contest.partialScore ? 2 : 0"
-          @disable-active-problem="activeProblem = null"
-          @navigate-to-problem="onNavigateToProblem"
-        ></omegaup-arena-navbar-problems>
+  <omegaup-arena
+    :active-tab="activeTab"
+    :contest-title="contest.title"
+    :is-admin="isAdmin"
+    :background-class="'practice'"
+    @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
+  >
+    <template #arena-problems>
+      <div data-contest-practice>
+        <div class="tab navleft">
+          <div class="navbar">
+            <omegaup-arena-navbar-problems
+              :problems="problems"
+              :active-problem="activeProblemAlias"
+              :in-assignment="false"
+              :digits-after-decimal-point="contest.partialScore ? 2 : 0"
+              @disable-active-problem="activeProblem = null"
+              @navigate-to-problem="onNavigateToProblem"
+            ></omegaup-arena-navbar-problems>
+          </div>
+          <omegaup-arena-contest-summary
+            v-if="activeProblem === null"
+            :contest="contest"
+            :show-ranking="false"
+          ></omegaup-arena-contest-summary>
+          <div v-else class="problem main">
+            <omegaup-problem-details
+              :user="{ loggedIn: true, admin: false, reviewer: false }"
+              :problem="problemInfo"
+              :active-tab="'problems'"
+              :runs="activeProblem.runs"
+            >
+              <template #quality-nomination-buttons><div></div></template>
+              <template #best-solvers-list><div></div></template>
+            </omegaup-problem-details>
+          </div>
+        </div>
       </div>
-      <omegaup-arena-contest-summary
-        v-if="activeProblem === null"
-        :contest="contest"
-        :show-ranking="false"
-      ></omegaup-arena-contest-summary>
-      <div v-else class="problem main">
-        <omegaup-problem-details
-          :user="{ loggedIn: true, admin: false, reviewer: false }"
-          :problem="problemInfo"
-          :active-tab="'problems'"
-          :runs="activeProblem.runs"
-          :should-show-clarifications="true"
-        >
-          <template #quality-nomination-buttons><div></div></template>
-          <template #best-solvers-list><div></div></template>
-          <template #arena-scoreboard>
-            <div class="card">
-              <div class="card-body">
-                <omegaup-markdown
-                  :markdown="
-                    ui.formatString(
-                      T.arenaContestPracticeOriginalScoreboardText,
-                      { contestAlias: contest.alias },
-                    )
-                  "
-                ></omegaup-markdown>
-              </div>
-            </div>
-          </template>
-          <template #clarifications-list>
-            <omegaup-arena-clarification-list
-              :clarifications="clarifications"
-              :in-contest="true"
-              @clarification-response="
-                (id, responseText, isPublic) =>
-                  $emit('clarification-response', id, responseText, isPublic)
-              "
-            ></omegaup-arena-clarification-list>
-          </template>
-        </omegaup-problem-details>
+    </template>
+    <template #arena-scoreboard>
+      <div class="card">
+        <div class="card-body">
+          <omegaup-markdown
+            :markdown="
+              ui.formatString(T.arenaContestPracticeOriginalScoreboardText, {
+                contestAlias: contest.alias,
+              })
+            "
+          ></omegaup-markdown>
+        </div>
       </div>
-    </div>
-  </div>
+    </template>
+    <template #arena-clarifications>
+      <omegaup-arena-clarification-list
+        :problems="problems"
+        :clarifications="currentClarifications"
+        :is-admin="contestAdmin"
+        :in-contest="true"
+        @new-clarification="(request) => $emit('new-clarification', request)"
+        @clarification-response="
+          (id, responseText, isPublic) =>
+            $emit('clarification-response', id, responseText, isPublic)
+        "
+      ></omegaup-arena-clarification-list>
+    </template>
+  </omegaup-arena>
 </template>
 
 <script lang="ts">
@@ -68,7 +72,8 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
-import arena_ClarificationList from '../arena/ClarificationList.vue';
+import arena_Arena from './Arena.vue';
+import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_ContestSummary from './ContestSummaryV2.vue';
 import omegaup_Markdown from '../Markdown.vue';
@@ -82,6 +87,7 @@ export interface ActiveProblem {
 @Component({
   components: {
     'omegaup-arena-clarification-list': arena_ClarificationList,
+    'omegaup-arena': arena_Arena,
     'omegaup-arena-contest-summary': arena_ContestSummary,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
     'omegaup-markdown': omegaup_Markdown,
@@ -90,18 +96,23 @@ export interface ActiveProblem {
 })
 export default class ArenaContestPractice extends Vue {
   @Prop() contest!: types.ContestPublicDetails;
-  @Prop() problems!: types.NavbarContestProblem[];
+  @Prop() contestAdmin!: boolean;
+  @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: null }) problem!: ActiveProblem | null;
   @Prop() problemInfo!: types.ProblemInfo;
+  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop({ default: false }) isEphemeralExperimentEnabled!: boolean;
   @Prop({ default: false }) admin!: boolean;
   @Prop({ default: true }) showNavigation!: boolean;
   @Prop({ default: false }) showRanking!: boolean;
   @Prop({ default: true }) showClarifications!: boolean;
   @Prop({ default: true }) showDeadlines!: boolean;
+  @Prop({ default: false }) isAdmin!: boolean;
+  @Prop() activeTab!: string;
 
   T = T;
   ui = ui;
+  currentClarifications = this.clarifications;
   activeProblem: ActiveProblem | null = this.problem;
 
   get activeProblemAlias(): null | string {
@@ -121,40 +132,15 @@ export default class ArenaContestPractice extends Vue {
     }
     this.onNavigateToProblem(newValue.alias);
   }
+
+  @Watch('clarifications')
+  onClarificationsChanged(newValue: types.Clarification[]): void {
+    this.currentClarifications = newValue;
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-[data-contest-practice] {
-  background: #668 url(/media/gradient.png) repeat-x 0 0;
-  font-family: sans-serif;
-  overflow-y: auto;
-}
-
-.title {
-  min-height: 80px;
-  h1 {
-    text-align: center;
-    font-size: 2em;
-    margin: 0.5em;
-  }
-}
-
-.socket-status {
-  color: #800;
-}
-
-.title,
-.clock {
-  text-align: center;
-}
-
-.clock {
-  font-size: 6em;
-  line-height: 0.4em;
-  margin-bottom: 0.2em;
-}
-
 .navleft {
   overflow: hidden;
 }
