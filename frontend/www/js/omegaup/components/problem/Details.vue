@@ -52,7 +52,7 @@
           </a>
         </div>
 
-        <div class="mt-4 markdown">
+        <div data-help-statement class="mt-4 markdown">
           <omegaup-markdown
             ref="statement-markdown"
             :markdown="problem.statement.markdown"
@@ -103,6 +103,12 @@
             </div>
           </slot>
         </template>
+        <div class="help">
+          {{ T.helpIntroNeedHelpToSendSubmission }}
+          <button class="btn btn-link" @click="start">
+            {{ T.helpIntroClickHere }}
+          </button>
+        </div>
         <omegaup-overlay
           v-if="user.loggedIn"
           :show-overlay="popupDisplayed !== PopupDisplayed.None"
@@ -166,6 +172,7 @@
           </template>
         </omegaup-overlay>
         <omegaup-arena-runs
+          data-help-runs
           :problem-alias="problem.alias"
           :runs="runs"
           :show-details="true"
@@ -287,6 +294,8 @@ library.add(
   faBan,
   faExternalLinkAlt,
 );
+import introJs from 'intro.js';
+import 'intro.js/minified/introjs.min.css';
 
 export interface Tab {
   name: string;
@@ -635,6 +644,34 @@ export default class ProblemDetails extends Vue {
     this.$emit('change-show-run-location', guid);
   }
 
+  start() {
+    const introJS = introJs();
+    introJS.start();
+    introJS
+      .addSteps([
+        { element: 'div[data-help-statement]', intro: T.helpIntroInstructions },
+        { element: 'div[data-help-runs]', intro: T.helpIntroNewRun },
+        { element: 'select[name="language"]', intro: T.helpIntroLanguage },
+        { element: '.vue-codemirror-wrap', intro: T.arenaRunSubmitPaste },
+        { element: 'input[type="file"]', intro: T.arenaRunSubmitUpload },
+        { element: 'input[type="submit"]', intro: T.helpIntroSubmit },
+      ])
+      .onbeforechange((data: HTMLElement) => {
+        if (data.getAttribute('class')?.includes('introjsFloatingElement')) {
+          introJS.refresh();
+          this.onNewSubmission();
+        }
+      })
+      .oncomplete(() => {
+        this.onPopupDismissed();
+      })
+      .setOption('doneLabel', T.helpIntroDone)
+      .setOption('nextLabel', T.helpIntroNext)
+      .setOption('prevLabel', T.helpIntroPrevious)
+      .setOption('skipLabel', T.helpIntroSkip)
+      .start();
+  }
+
   @Emit('update:activeTab')
   onTabSelected(tabName: string): string {
     if (this.selectedTab === 'clarifications') {
@@ -676,10 +713,6 @@ export default class ProblemDetails extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-
-table td {
-  padding: 0.5rem;
-}
 
 .karel-js-link {
   border: 1px solid #eee;
