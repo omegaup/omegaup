@@ -1,40 +1,42 @@
 <template>
   <div class="card">
     <h5 class="card-header">{{ T.wordsClarifications }}</h5>
-    <div v-if="inContest" class="card-body">
-      <a
-        href="#clarifications/new"
-        class="btn btn-primary"
-        @click="currentPopupDisplayed = PopupDisplayed.NewClarification"
-      >
-        {{ T.wordsNewClarification }}
-      </a>
-      <omegaup-overlay
-        :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
-        @hide-overlay="onPopupDismissed"
-      >
-        <template #popup>
-          <omegaup-arena-new-clarification-popup
-            v-show="currentPopupDisplayed === PopupDisplayed.NewClarification"
-            :problems="problems"
-            :users="users"
-            :problem="problemAlias"
-            :username-author="usernameAuthor"
-            @new-clarification="
-              (request) => $emit('new-clarification', request)
-            "
-            @dismiss="onPopupDismissed"
-          ></omegaup-arena-new-clarification-popup>
-        </template>
-      </omegaup-overlay>
-    </div>
+    <slot name="new-clarification">
+      <div class="card-body">
+        <a
+          href="#clarifications/new"
+          class="btn btn-primary"
+          @click="currentPopupDisplayed = PopupDisplayed.NewClarification"
+        >
+          {{ T.wordsNewClarification }}
+        </a>
+        <omegaup-overlay
+          :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
+          @hide-overlay="onPopupDismissed"
+        >
+          <template #popup>
+            <omegaup-arena-new-clarification-popup
+              v-show="currentPopupDisplayed === PopupDisplayed.NewClarification"
+              :problems="problems"
+              :users="users"
+              :problem-alias="problemAlias"
+              :username="username"
+              @new-clarification="
+                (request) => $emit('new-clarification', request)
+              "
+              @dismiss="onPopupDismissed"
+            ></omegaup-arena-new-clarification-popup>
+          </template>
+        </omegaup-overlay>
+      </div>
+    </slot>
     <div class="table-responsive">
       <table class="table mb-0">
         <thead>
           <tr>
-            <th class="text-center" scope="col">
-              {{ !inContest ? T.wordsContest : T.wordsProblem }}
-            </th>
+            <slot name="table-title">
+              <th class="text-center" scope="col">{{ T.wordsProblem }}</th>
+            </slot>
             <th class="text-center" scope="col">{{ T.wordsAuthor }}</th>
             <th class="text-center" scope="col">{{ T.wordsTime }}</th>
             <th class="text-center" scope="col">{{ T.wordsMessage }}</th>
@@ -87,15 +89,11 @@ export default class ArenaClarificationList extends Vue {
   @Prop({ default: () => [] }) problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
+  @Prop() problemAlias!: null | string;
+  @Prop() username!: null | string;
 
   T = T;
   PopupDisplayed = PopupDisplayed;
-  problemAlias =
-    this.inContest && this.problems.length != 0 ? this.problems[0].alias : null;
-  usernameAuthor =
-    this.inContest && this.isAdmin && this.users.length != 0
-      ? this.users[0].username
-      : null;
   currentPopupDisplayed = this.popupDisplayed;
 
   onNewClarification(): void {
@@ -103,14 +101,6 @@ export default class ArenaClarificationList extends Vue {
   }
 
   onPopupDismissed(): void {
-    this.problemAlias =
-      this.inContest && this.problems.length != 0
-        ? this.problems[0].alias
-        : null;
-    this.usernameAuthor =
-      this.inContest && this.isAdmin && this.users.length != 0
-        ? this.users[0].username
-        : null;
     this.currentPopupDisplayed = PopupDisplayed.None;
     this.$emit('update:activeTab', 'clarifications');
   }

@@ -9,7 +9,7 @@
         <label class="col-md-6 col-form-label font-weight-bold">
           {{ T.wordsProblem }}
           <select
-            v-model="problemAlias"
+            v-model="currentProblemAlias"
             class="form-control"
             required="required"
             data-new-clarification-problem
@@ -23,10 +23,13 @@
             </option>
           </select>
         </label>
-        <label v-if="users" class="col-md-6 col-form-label font-weight-bold">
+        <label
+          v-if="users.length != 0"
+          class="col-md-6 col-form-label font-weight-bold"
+        >
           {{ T.wordsMessageTo }}
           <select
-            v-model="username"
+            v-model="currentUsername"
             class="form-control"
             :required="users"
             data-new-clarification-user
@@ -82,13 +85,13 @@ import omegaup_OverlayPopup from '../OverlayPopup.vue';
 export default class ArenaNewClarificationPopup extends Vue {
   @Prop({ default: () => [] }) problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
-  @Prop({ default: null }) problem!: null | string;
-  @Prop({ default: null }) usernameAuthor!: null | string;
+  @Prop({ default: null }) problemAlias!: null | string;
+  @Prop({ default: null }) username!: null | string;
 
   T = T;
   message: null | string = null;
-  problemAlias = this.problem;
-  username = this.usernameAuthor;
+  currentProblemAlias = this.problemAlias;
+  currentUsername = this.username;
 
   get filteredUsers(): { username: string; name: string }[] {
     return this.users.map((user) => {
@@ -100,30 +103,28 @@ export default class ArenaNewClarificationPopup extends Vue {
   }
 
   get ownerUsername(): null | string {
-    if (this.users == null) return null;
     return this.users.find((user) => user.is_owner)?.username ?? null;
   }
 
   get canSubmitClarification(): boolean {
     return (
       this.message != null &&
-      (this.username != null || this.users == null || this.users.length == 0) &&
-      this.problemAlias != null
+      (this.currentUsername != null || this.users.length == 0) &&
+      this.currentProblemAlias != null
     );
   }
 
   onSubmit(): void {
-    if (this.problemAlias == null || this.message == null) return;
+    if (this.currentProblemAlias == null || this.message == null) return;
     const clarificationRequest: types.Clarification = {
       clarification_id: 0,
-      author:
-        this.users != null && this.username != null ? this.username : undefined,
-      problem_alias: this.problemAlias,
+      author: this.currentUsername != null ? this.currentUsername : undefined,
+      problem_alias: this.currentProblemAlias,
       message: this.message,
       public:
         this.ownerUsername != null &&
-        this.username != null &&
-        this.ownerUsername == this.username,
+        this.currentUsername != null &&
+        this.ownerUsername == this.currentUsername,
       time: new Date(),
     };
     this.$emit('new-clarification', {
