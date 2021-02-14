@@ -16,7 +16,7 @@ describe('NewClarification.vue', () => {
             text: 'A. Sumas',
           },
         ] as types.NavbarProblemsetProblem[],
-        users: null,
+        users: [],
         problem: 'sumas',
         message: 'new clarification',
       },

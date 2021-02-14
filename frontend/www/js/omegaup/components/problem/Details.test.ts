@@ -2,6 +2,7 @@ jest.mock('../../../../third_party/js/diff_match_patch.js');
 
 import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
+import T from '../../lang';
 import * as time from '../../time';
 
 import problem_Details from './Details.vue';
@@ -236,5 +237,55 @@ describe('Details.vue', () => {
       )
       .trigger('click');
     expect(wrapper.emitted('disqualify')).toBeDefined();
+  });
+
+  it('Should handle problem clarifications', async () => {
+    const clarifications = [
+      {
+        answer: undefined,
+        author: 'omegaUp',
+        clarification_id: 1,
+        contest_alias: 'Concurso de prueba',
+        message: 'Clarificación de prueba 1',
+        problem_alias: 'Problema de prueba',
+        public: true,
+        receiver: undefined,
+        time: new Date(),
+      },
+      {
+        answer: 'Ok',
+        author: 'omegaUp',
+        clarification_id: 2,
+        contest_alias: undefined,
+        message: 'Clarificación de prueba 2',
+        problem_alias: 'Problema de prueba',
+        public: false,
+        receiver: undefined,
+        time: new Date(),
+      },
+    ];
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        initialTab: 'problems',
+        problem: sampleProblem,
+        runDetailsData,
+        user: user,
+        nominationStatus: nominationStatus,
+        initialClarifications: [],
+        activeTab: 'problems',
+        runs: runs,
+        allRuns: runs,
+        clarifications: clarifications as types.Clarification[],
+        solutionStatus: 'not_found',
+        histogram: histogram,
+        showNewRunWindow: false,
+        publicTags: [],
+        shouldShowTabs: true,
+      },
+    });
+    await wrapper.find('a[href="#clarifications"]').trigger('click');
+    expect(wrapper.find('.tab-content .show table thead tr th').text()).toBe(
+      T.wordsContest,
+    );
   });
 });
