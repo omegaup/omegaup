@@ -1570,9 +1570,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a report with all user activity for a contest.
      *
-     * @return array{events: list<array{username: string, ip: int|null, time: \OmegaUp\Timestamp, classname?: string, alias?: string}>}
+     * @return array{events: list<ActivityEvent>, pagerItems: list<PageItem>}
      *
      * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param int|null $length
+     * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $token
      */
     public static function apiActivityReport(\OmegaUp\Request $r): array {
@@ -1581,6 +1583,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             $r->identity = null;
         }
+
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? 100;
         $contestAlias = $r->ensureString(
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
@@ -1595,13 +1600,23 @@ class Contest extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
+        $report = \OmegaUp\DAO\Contests::getActivityReport(
+            $response['contest'],
+            $page,
+            $length
+        );
+
         return [
             'events' => \OmegaUp\ActivityReport::getActivityReport(
-                \OmegaUp\DAO\Contests::getActivityReport(
-                    $response['contest'],
-                    1,
-                    100
-                )['activity']
+                $report['activity']
+            ),
+            'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+                $report['totalRows'],
+                $length,
+                $page,
+                "/contest/{$contestAlias}/activity/",
+                /*$adjacent=*/ 5,
+                []
             ),
         ];
     }
