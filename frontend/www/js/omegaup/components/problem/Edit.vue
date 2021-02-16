@@ -116,13 +116,13 @@
 
       <div v-if="showTab === 'markdown'" class="tab-pane active">
         <omegaup-problem-statementedit
-          :statement="data.statement"
+          :statement="currentStatement"
           markdown-type="statements"
           :alias="data.alias"
           :title="data.title"
           :source="data.source"
           :problemsetter="data.problemsetter"
-          @emit-update-markdown-contents="
+          @update-markdown-contents="
             (statements, newLanguage, currentMarkdown) =>
               $emit(
                 'update-markdown-contents',
@@ -159,7 +159,7 @@
           "
           markdown-type="solutions"
           :title="data.title"
-          @emit-update-markdown-contents="
+          @update-markdown-contents="
             (solutions, newLanguage, currentMarkdown) =>
               $emit(
                 'update-markdown-contents',
@@ -268,7 +268,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import problem_Form from './Form.vue';
 import problem_Tags from './Tags.vue';
 import problem_Versions from './Versions.vue';
@@ -300,6 +300,7 @@ export default class ProblemEdit extends Vue {
   T = T;
   alias = this.data.alias;
   showTab = 'edit';
+  currentStatement: types.ProblemStatement = this.statement;
 
   get activeTab(): string {
     switch (this.showTab) {
@@ -326,6 +327,11 @@ export default class ProblemEdit extends Vue {
 
   onDownload(): void {
     window.location.href = `/api/problem/download/problem_alias/${this.alias}/`;
+  }
+
+  @Watch('statement')
+  onStatementChange(newStatement: types.ProblemStatement): void {
+    this.currentStatement = newStatement;
   }
 }
 </script>
