@@ -235,13 +235,16 @@ OmegaUp.on('ready', () => {
             hiddenElement.download = 'identities.csv';
             hiddenElement.click();
           },
-          'read-csv': ({
-            identities,
-            file,
-          }: {
-            identities: types.Identity[];
-            file: File;
-          }) => {
+          'read-csv': (
+            {
+              identities,
+              file,
+            }: {
+              identities: types.Identity[];
+              file: File;
+            },
+            humanReadable: boolean,
+          ) => {
             CSV.fetch({ file })
               .done((dataset: CSV.Dataset) => {
                 if (!dataset.fields || dataset.fields.length != 6) {
@@ -259,7 +262,7 @@ OmegaUp.on('ready', () => {
                   identities.push({
                     username: `${payload.groupAlias}:${username}`,
                     name,
-                    password: generatePassword(),
+                    password: generatePassword(humanReadable),
                     country_id,
                     state_id,
                     gender,
@@ -297,7 +300,46 @@ OmegaUp.on('ready', () => {
     );
   }
 
-  function generatePassword(): string {
+  function generatePassword(humanReadable: boolean): string {
+    if (humanReadable) {
+      const words = {
+        es: [
+          'Loro',
+          'Perro',
+          'Pollo',
+          'Lagarto',
+          'Gato',
+          'Toro',
+          'Vaca',
+          'Sapo',
+          'Oso',
+          'Zorro',
+        ],
+        en: [
+          'Parrot',
+          'Dog',
+          'Chicken',
+          'Lizard',
+          'Cat',
+          'Bull',
+          'Cow',
+          'Frog',
+          'Bear',
+          'Fox',
+        ],
+      };
+      const itemsNumber = 3;
+      const langWords = T.lang === 'es' ? words.es : words.en;
+      let password = '';
+      for (let i = 0; i < itemsNumber; i++) {
+        password += langWords[Math.floor(Math.random() * langWords.length)];
+      }
+      for (let i = 0; i < itemsNumber; i++) {
+        password += Math.floor(Math.random() * 10); // 3 random numbers
+      }
+      return password;
+    }
+
     const validChars = 'acdefhjkmnpqruvwxyACDEFHJKLMNPQRUVWXY346';
     const len = 8;
     // Browser supports window.crypto

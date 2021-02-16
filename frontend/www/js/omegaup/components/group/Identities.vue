@@ -3,6 +3,16 @@
     <div class="card-body">
       <div class="mb-4">
         <omegaup-markdown :markdown="T.groupsCsvHelp"></omegaup-markdown>
+        <div class="form-check mb-4">
+          <label class="form-check-label">
+            <input
+              v-model="humanReadable"
+              class="form-check-input"
+              type="checkbox"
+            />
+            {{ T.passwordHumanReadable }}
+          </label>
+        </div>
         {{ T.groupsUploadCsvFile }}
         <input
           name="identities"
@@ -46,22 +56,24 @@
           </tbody>
         </table>
         <div class="card-footer">
-          <div class="w-100">
-            <button
-              class="btn btn-primary"
-              name="create-identities"
-              @click.prevent="$emit('bulk-identities', identities)"
-            >
-              {{ T.groupCreateIdentities }}
-            </button>
-          </div>
           <button
-            class="btn"
-            @click.prevent="$emit('download-identities', identities)"
+            class="btn btn-primary d-inline-block mb-2"
+            name="create-identities"
+            @click.prevent="$emit('bulk-identities', identities)"
           >
-            <font-awesome-icon :icon="['fas', 'download']" />
+            {{ T.groupCreateIdentities }}
           </button>
-          {{ T.groupsIdentityWarning }}
+          <div>
+            <button
+              class="btn btn-warning d-inline-block"
+              @click.prevent="
+                $emit('download-identities', identities, humanReadable)
+              "
+            >
+              <font-awesome-icon :icon="['fas', 'download']" />
+            </button>
+            {{ T.groupsIdentityWarning }}
+          </div>
         </div>
       </template>
     </div>
@@ -91,6 +103,7 @@ export default class Identities extends Vue {
 
   T = T;
   identities: types.Identity[] = [];
+  humanReadable = false;
 
   readFile(e: HTMLInputElement): File | null {
     return (e.files && e.files[0]) || null;
@@ -110,7 +123,11 @@ export default class Identities extends Vue {
     }
 
     this.identities = [];
-    this.$emit('read-csv', { identities: this.identities, file: file });
+    this.$emit(
+      'read-csv',
+      { identities: this.identities, file: file },
+      this.humanReadable,
+    );
   }
 }
 </script>
