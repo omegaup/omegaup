@@ -22,39 +22,44 @@
         />
       </div>
       <template v-if="identities.length > 0">
-        <div class="card-header">
-          <h3 class="card-title">{{ T.wordsIdentities }}</h3>
+        <h3 class="card-header">{{ T.wordsIdentities }}</h3>
+        <div class="table-responsive">
+          <table class="table" data-identities-table>
+            <thead>
+              <tr>
+                <th>{{ T.profileUsername }}</th>
+                <th>{{ T.profile }}</th>
+                <th>{{ T.loginPassword }}</th>
+                <th>{{ T.profileCountry }}</th>
+                <th>{{ T.profileState }}</th>
+                <th>{{ T.wordsGender }}</th>
+                <th>{{ T.profileSchool }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="identity in identities"
+                :key="identity.username"
+                :class="{ 'alert-danger': userErrorRow === identity.username }"
+              >
+                <td class="username">
+                  <strong>{{ identity.username }}</strong>
+                </td>
+                <td>{{ identity.name }}</td>
+                <td class="password">
+                  <details>
+                    <summary>{{ T.wordsShow }}</summary>
+                    {{ identity.password }}
+                  </details>
+                </td>
+                <td>{{ identity.country_id }}</td>
+                <td>{{ identity.state_id }}</td>
+                <td>{{ identity.gender }}</td>
+                <td>{{ identity.school_name }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <table class="table" data-identities-table>
-          <thead>
-            <tr>
-              <th>{{ T.profileUsername }}</th>
-              <th>{{ T.profile }}</th>
-              <th>{{ T.loginPassword }}</th>
-              <th>{{ T.profileCountry }}</th>
-              <th>{{ T.profileState }}</th>
-              <th>{{ T.wordsGender }}</th>
-              <th>{{ T.profileSchool }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="identity in identities"
-              :key="identity.username"
-              :class="{ 'alert-danger': userErrorRow === identity.username }"
-            >
-              <td class="username">
-                <strong>{{ identity.username }}</strong>
-              </td>
-              <td>{{ identity.name }}</td>
-              <td class="password">{{ identity.password }}</td>
-              <td>{{ identity.country_id }}</td>
-              <td>{{ identity.state_id }}</td>
-              <td>{{ identity.gender }}</td>
-              <td>{{ identity.school_name }}</td>
-            </tr>
-          </tbody>
-        </table>
         <div class="card-footer">
           <button
             class="btn btn-primary d-inline-block mb-2"

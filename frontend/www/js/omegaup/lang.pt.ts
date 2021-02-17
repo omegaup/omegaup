@@ -1459,6 +1459,7 @@ const translations: { [key: string]: string; } = {
   wordsSeeSolution: "Ver Solu\u00e7\u00e3o",
   wordsSelectFilter: "Selecione um filtro",
   wordsSend: "Enviar",
+  wordsShow: "Mostrar",
   wordsShowCasesDiff: "Mostrar diferen\u00e7as nos casos",
   wordsShowSiteAdmins: "Mostrar site-admins",
   wordsSolution: "Solu\u00e7\u00e3o",

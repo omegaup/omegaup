@@ -1457,6 +1457,7 @@ wordsSeeLatestSubmissions = "Ver as últimas submissões realizadas pelo usuári
 wordsSeeSolution = "Ver Solução"
 wordsSelectFilter = "Selecione um filtro"
 wordsSend = "Enviar"
+wordsShow = "Mostrar"
 wordsShowCasesDiff = "Mostrar diferenças nos casos"
 wordsShowSiteAdmins = "Mostrar site-admins"
 wordsSolution = "Solução"
