@@ -154,9 +154,7 @@
           @download-identities="
             (identities) => $emit('download-identities', identities)
           "
-          @read-csv="
-            (source, humanReadable) => $emit('read-csv', source, humanReadable)
-          "
+          @read-csv="(source) => $emit('read-csv', source)"
           @invalid-file="$emit('invalid-file')"
         ></omegaup-group-create-identities>
       </div>

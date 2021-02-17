@@ -235,16 +235,15 @@ OmegaUp.on('ready', () => {
             hiddenElement.download = 'identities.csv';
             hiddenElement.click();
           },
-          'read-csv': (
-            {
-              identities,
-              file,
-            }: {
-              identities: types.Identity[];
-              file: File;
-            },
-            humanReadable: boolean,
-          ) => {
+          'read-csv': ({
+            identities,
+            file,
+            humanReadable,
+          }: {
+            identities: types.Identity[];
+            file: File;
+            humanReadable: boolean;
+          }) => {
             CSV.fetch({ file })
               .done((dataset: CSV.Dataset) => {
                 if (!dataset.fields || dataset.fields.length != 6) {
