@@ -47,10 +47,7 @@
                 </td>
                 <td>{{ identity.name }}</td>
                 <td class="password">
-                  <details>
-                    <summary>{{ T.wordsShow }}</summary>
-                    {{ identity.password }}
-                  </details>
+                  {{ identity.password }}
                 </td>
                 <td>{{ identity.country_id }}</td>
                 <td>{{ identity.state_id }}</td>
