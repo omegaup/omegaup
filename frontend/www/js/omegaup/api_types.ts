@@ -1234,37 +1234,6 @@ export namespace types {
       );
     }
 
-    export function StudentsProgressv2Payload(
-      elementId: string = 'payload',
-    ): types.StudentsProgressv2Payload {
-      return ((x) => {
-        x.course = ((x) => {
-          x.assignments = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              if (x.finish_time)
-                x.finish_time = ((x: number) => new Date(x * 1000))(
-                  x.finish_time,
-                );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.assignments);
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        })(x.course);
-        return x;
-      })(
-        JSON.parse(
-          (document.getElementById(elementId) as HTMLElement).innerText,
-        ),
-      );
-    }
-
     export function SubmissionsListPayload(
       elementId: string = 'payload',
     ): types.SubmissionsListPayload {
@@ -2942,12 +2911,6 @@ export namespace types {
   }
 
   export interface StudentsProgressPayload {
-    course: types.CourseDetails;
-    problemTitles: { [key: string]: string };
-    students: types.StudentProgress[];
-  }
-
-  export interface StudentsProgressv2Payload {
     course: types.CourseDetails;
     length: number;
     page: number;

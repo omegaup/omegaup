@@ -20,6 +20,7 @@ OmegaUp.on('ready', function () {
           students: payload.students,
           problemTitles: payload.problemTitles,
           assignments: payload.course.assignments,
+          pagerItems: payload.pagerItems,
         },
       });
     },
