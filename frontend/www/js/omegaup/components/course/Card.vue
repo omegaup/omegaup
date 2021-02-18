@@ -5,7 +5,7 @@
         <div class="col-sm-2 col-lg-3" :class="`${type}-course-card`"></div>
         <div class="col-sm-10 col-lg-9">
           <div class="card-body">
-            <h5 class="card-title custom-text">{{ course.name }}</h5>
+            <h5 class="card-title text-trimmed">{{ course.name }}</h5>
             <omegaup-markdown
               v-if="type === CourseType.Public"
               class="card-long-text"
@@ -13,7 +13,7 @@
             ></omegaup-markdown>
             <omegaup-markdown
               v-if="type !== CourseType.Finished"
-              class="card-text custom-text"
+              class="card-text text-trimmed"
               :markdown="
                 ui.formatString(T.courseCardImpartedBy, {
                   school_name: course.school_name,
@@ -108,7 +108,7 @@ export default class CourseCard extends Vue {
 .card > .row.no-gutters {
   background-color: $omegaup-white;
 
-  .custom-text {
+  .text-trimmed {
     height: 50px;
     overflow-y: hidden;
   }
