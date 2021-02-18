@@ -43,10 +43,10 @@ OmegaUp.on('ready', () => {
                 adminSupport.username = data.username;
                 adminSupport.verified = data.verified;
                 if (data.last_login != null) {
-                  adminSupport.lastLogin = new Date(data.last_login);
+                  adminSupport.lastLogin = data.last_login;
                 }
                 if (data.birth_date != null) {
-                  adminSupport.birthDate = new Date(data.birth_date);
+                  adminSupport.birthDate = data.birth_date;
                 }
               })
               .catch(ui.apiError);
