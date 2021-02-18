@@ -1,78 +1,42 @@
 <template>
   <div class="card">
     <h5 class="card-header">{{ T.wordsClarifications }}</h5>
-    <div v-if="inContest" class="card-body">
-      <button
-        type="button"
-        class="btn btn-primary"
-        data-toggle="modal"
-        data-target=".new-clarification-modal"
-      >
-        {{ T.wordsNewClarification }}
-      </button>
-      <div
-        class="modal fade new-clarification-modal"
-        tabindex="-1"
-        role="dialog"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <form class="form" @submit.prevent="onNewClarification">
-              <div class="modal-header">
-                <h5 class="modal-title">{{ T.wordsNewClarification }}</h5>
-                <button
-                  type="button"
-                  class="close w-auto"
-                  data-dismiss="modal"
-                  aria-label="Close"
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <label>
-                  {{ T.wordsProblem }}
-                  <select v-model="problemAlias" required="required">
-                    <option
-                      v-for="problem in problems"
-                      :key="problem.alias"
-                      :value="problem.alias"
-                    >
-                      {{ problem.text }}
-                    </option>
-                  </select>
-                </label>
-                <textarea
-                  v-model="message"
-                  class="w-100"
-                  maxlength="200"
-                  required="required"
-                  :placeholder="T.arenaClarificationCreateMaxLength"
-                ></textarea>
-              </div>
-              <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  data-dismiss="modal"
-                >
-                  {{ T.wordsClose }}
-                </button>
-                <button class="btn btn-primary">{{ T.wordsSend }}</button>
-              </div>
-            </form>
-          </div>
-        </div>
+    <slot name="new-clarification">
+      <div class="card-body">
+        <a
+          href="#clarifications/new"
+          class="btn btn-primary"
+          @click="currentPopupDisplayed = PopupDisplayed.NewClarification"
+        >
+          {{ T.wordsNewClarification }}
+        </a>
+        <omegaup-overlay
+          :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
+          @hide-overlay="onPopupDismissed"
+        >
+          <template #popup>
+            <omegaup-arena-new-clarification-popup
+              v-show="currentPopupDisplayed === PopupDisplayed.NewClarification"
+              :problems="problems"
+              :users="users"
+              :problem-alias="problemAlias"
+              :username="username"
+              @new-clarification="
+                (request) => $emit('new-clarification', request)
+              "
+              @dismiss="onPopupDismissed"
+            ></omegaup-arena-new-clarification-popup>
+          </template>
+        </omegaup-overlay>
       </div>
-    </div>
+    </slot>
     <div class="table-responsive">
       <table class="table mb-0">
         <thead>
           <tr>
-            <th class="text-center" scope="col">
-              {{ !inContest ? T.wordsContest : T.wordsProblem }}
-            </th>
+            <slot name="table-title">
+              <th class="text-center" scope="col">{{ T.wordsProblem }}</th>
+            </slot>
             <th class="text-center" scope="col">{{ T.wordsAuthor }}</th>
             <th class="text-center" scope="col">{{ T.wordsTime }}</th>
             <th class="text-center" scope="col">{{ T.wordsMessage }}</th>
@@ -98,15 +62,24 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 
 import arena_Clarification from './Clarification.vue';
+import arena_NewClarification from './NewClarificationPopup.vue';
+import omegaup_Overlay from '../Overlay.vue';
+
+export enum PopupDisplayed {
+  None,
+  NewClarification,
+}
 
 @Component({
   components: {
     'omegaup-clarification': arena_Clarification,
+    'omegaup-arena-new-clarification-popup': arena_NewClarification,
+    'omegaup-overlay': omegaup_Overlay,
   },
 })
 export default class ArenaClarificationList extends Vue {
@@ -114,17 +87,31 @@ export default class ArenaClarificationList extends Vue {
   @Prop({ default: false }) isAdmin!: boolean;
   @Prop() clarifications!: types.Clarification[];
   @Prop({ default: () => [] }) problems!: types.NavbarProblemsetProblem[];
+  @Prop({ default: () => [] }) users!: types.ContestUser[];
+  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
+  @Prop() problemAlias!: null | string;
+  @Prop() username!: null | string;
 
   T = T;
-  problemAlias = this.problems[0]?.alias ?? null;
-  message: null | string = null;
+  PopupDisplayed = PopupDisplayed;
+  currentPopupDisplayed = this.popupDisplayed;
 
   onNewClarification(): void {
-    if (this.problemAlias == null || this.message == null) return;
-    this.$emit('new-clarification', {
-      problemAlias: this.problemAlias,
-      message: this.message,
-    });
+    this.currentPopupDisplayed = PopupDisplayed.NewClarification;
+  }
+
+  onPopupDismissed(): void {
+    this.currentPopupDisplayed = PopupDisplayed.None;
+    this.$emit('update:activeTab', 'clarifications');
+  }
+
+  @Watch('popupDisplayed')
+  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
+    this.currentPopupDisplayed = newValue;
+    if (newValue === PopupDisplayed.None) return;
+    if (newValue === PopupDisplayed.NewClarification) {
+      this.onNewClarification();
+    }
   }
 }
 </script>
@@ -140,9 +127,5 @@ export default class ArenaClarificationList extends Vue {
   word-break: break-all;
   background-color: #f5f5f5;
   border-radius: 4px;
-}
-
-.modal-dialog {
-  max-width: 50%;
 }
 </style>

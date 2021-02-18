@@ -243,7 +243,12 @@
             (id, responseText, isPublic) =>
               $emit('clarification-response', id, responseText, isPublic)
           "
-        ></omegaup-arena-clarification-list>
+        >
+          <template #new-clarification><div></div></template>
+          <template #table-title>
+            <th class="text-center" scope="col">{{ T.wordsContest }}</th>
+          </template>
+        </omegaup-arena-clarification-list>
       </div>
     </div>
   </div>

@@ -15,9 +15,13 @@
       :key="assignment.alias"
       class="flex-column text-center text-nowrap justify-content-center align-items-center"
     >
-      {{ getProgressByAssignment(assignment.alias) }}%<br />
-      <span>{{ getPointsByAsssignment(assignment.alias) }}</span>
-      <div class="d-flex justify-content-center">
+      <span class="d-block">{{
+        getProgressByAssignment(assignment.alias)
+      }}</span>
+      <span class="d-block">{{
+        getPointsByAsssignment(assignment.alias)
+      }}</span>
+      <div class="d-flex justify-content-center mt-1">
         <div
           v-if="
             Object.prototype.hasOwnProperty.call(
@@ -25,7 +29,7 @@
               assignment.alias,
             )
           "
-          class="d-flex border border-dark"
+          class="d-flex"
           :class="{ invisible: points(assignment.alias) === 0 }"
         >
           <div
@@ -42,8 +46,8 @@
       </div>
     </td>
     <td data-global-score class="text-center font-weight-bold align-middle">
-      {{ globalScore }}%<br />
-      <span>{{
+      <span class="d-block">{{ globalScore }}%</span>
+      <span class="d-block">{{
         ui.formatString(T.studentProgressDescriptionTotalPoints, {
           points: globalPoints,
         })
@@ -54,7 +58,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -76,8 +79,9 @@ const markdownConverter = new markdown.Converter();
 export default class StudentProgress extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() student!: types.StudentProgress;
-  @Prop() assignments!: omegaup.Assignment[];
+  @Prop() assignments!: types.CourseAssignment[];
   @Prop() problemTitles!: { [key: string]: string };
+  @Prop() pagerItems!: types.PageItem[];
 
   T = T;
   ui = ui;
