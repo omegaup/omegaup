@@ -3958,12 +3958,10 @@ Get Contests which a certain user has participated in
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `auth_token`    | `mixed`        |             |
-| `token`         | `null\|string` |             |
-| `username`      | `mixed`        |             |
+| Name         | Type           | Description |
+| ------------ | -------------- | ----------- |
+| `auth_token` | `null\|string` |             |
+| `username`   | `mixed`        |             |
 
 ### Returns
 
