@@ -3958,18 +3958,16 @@ Get Contests which a certain user has participated in
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `auth_token`    | `mixed`        |             |
-| `token`         | `null\|string` |             |
-| `username`      | `mixed`        |             |
+| Name         | Type           | Description |
+| ------------ | -------------- | ----------- |
+| `auth_token` | `null\|string` |             |
+| `username`   | `mixed`        |             |
 
 ### Returns
 
-| Name       | Type                                                                                                                                        |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `contests` | `{ [key: string]: { data: { alias: string; finish_time: Date; last_updated: Date; start_time: Date; title: string; }; place?: number; }; }` |
+| Name       | Type                        |
+| ---------- | --------------------------- |
+| `contests` | `types.UserProfileContests` |
 
 ## `/api/user/create/`
 
@@ -4305,9 +4303,9 @@ Get stats
 
 ### Returns
 
-| Name   | Type                                                 |
-| ------ | ---------------------------------------------------- |
-| `runs` | `{ date: string; runs: number; verdict: string; }[]` |
+| Name   | Type                       |
+| ------ | -------------------------- |
+| `runs` | `types.UserProfileStats[]` |
 
 ## `/api/user/statusVerified/`
 

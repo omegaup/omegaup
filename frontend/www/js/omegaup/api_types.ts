@@ -1291,45 +1291,47 @@ export namespace types {
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
       return ((x) => {
-        x.contests = ((x) => {
-          if (x instanceof Object) {
-            Object.keys(x).forEach(
-              (y) =>
-                (x[y] = ((x) => {
-                  x.data = ((x) => {
-                    x.finish_time = ((x: number) => new Date(x * 1000))(
-                      x.finish_time,
-                    );
-                    x.last_updated = ((x: number) => new Date(x * 1000))(
-                      x.last_updated,
-                    );
-                    x.start_time = ((x: number) => new Date(x * 1000))(
-                      x.start_time,
-                    );
+        if (x.contests)
+          x.contests = ((x) => {
+            if (x instanceof Object) {
+              Object.keys(x).forEach(
+                (y) =>
+                  (x[y] = ((x) => {
+                    x.data = ((x) => {
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                      x.last_updated = ((x: number) => new Date(x * 1000))(
+                        x.last_updated,
+                      );
+                      x.start_time = ((x: number) => new Date(x * 1000))(
+                        x.start_time,
+                      );
+                      return x;
+                    })(x.data);
                     return x;
-                  })(x.data);
-                  return x;
-                })(x[y])),
-            );
-          }
-          return x;
-        })(x.contests);
-        x.ownedBadges = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            if (x.assignation_time)
-              x.assignation_time = ((x: number) => new Date(x * 1000))(
-                x.assignation_time,
+                  })(x[y])),
               );
-            if (x.first_assignation)
-              x.first_assignation = ((x: number) => new Date(x * 1000))(
-                x.first_assignation,
-              );
+            }
             return x;
-          });
-        })(x.ownedBadges);
+          })(x.contests);
+        if (x.ownedBadges)
+          x.ownedBadges = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (x.assignation_time)
+                x.assignation_time = ((x: number) => new Date(x * 1000))(
+                  x.assignation_time,
+                );
+              if (x.first_assignation)
+                x.first_assignation = ((x: number) => new Date(x * 1000))(
+                  x.first_assignation,
+                );
+              return x;
+            });
+          })(x.ownedBadges);
         x.profile = ((x) => {
           if (x.birth_date)
             x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
@@ -3037,16 +3039,16 @@ export namespace types {
   }
 
   export interface UserProfileDetailsPayload {
-    badges: string[];
-    contests: types.UserProfileContests;
-    createdProblems: types.Problem[];
-    ownedBadges: types.Badge[];
+    badges?: string[];
+    contests?: types.UserProfileContests;
+    createdProblems?: types.Problem[];
+    ownedBadges?: types.Badge[];
     profile: types.UserProfileInfo;
-    programmingLanguages: { [key: string]: string };
-    solvedProblems: types.Problem[];
-    stats: types.UserProfileStats[];
+    programmingLanguages?: { [key: string]: string };
+    solvedProblems?: types.Problem[];
+    stats?: types.UserProfileStats[];
     statusError?: string;
-    unsolvedProblems: types.Problem[];
+    unsolvedProblems?: types.Problem[];
   }
 
   export interface UserProfileInfo {
@@ -3983,18 +3985,7 @@ export namespace messages {
   export type UserContestStatsRequest = { [key: string]: any };
   export type _UserContestStatsServerResponse = any;
   export type UserContestStatsResponse = {
-    contests: {
-      [key: string]: {
-        data: {
-          alias: string;
-          finish_time: Date;
-          last_updated: Date;
-          start_time: Date;
-          title: string;
-        };
-        place?: number;
-      };
-    };
+    contests: types.UserProfileContests;
   };
   export type UserCreateRequest = { [key: string]: any };
   export type UserCreateResponse = { username: string };
@@ -4050,9 +4041,7 @@ export namespace messages {
   export type UserSelectCoderOfTheMonthRequest = { [key: string]: any };
   export type UserSelectCoderOfTheMonthResponse = {};
   export type UserStatsRequest = { [key: string]: any };
-  export type UserStatsResponse = {
-    runs: { date?: string; runs: number; verdict: string }[];
-  };
+  export type UserStatsResponse = { runs: types.UserProfileStats[] };
   export type UserStatusVerifiedRequest = { [key: string]: any };
   export type UserStatusVerifiedResponse = {
     username: string;
