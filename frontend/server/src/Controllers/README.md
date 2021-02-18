@@ -4303,9 +4303,9 @@ Get stats
 
 ### Returns
 
-| Name   | Type                                                 |
-| ------ | ---------------------------------------------------- |
-| `runs` | `{ date: string; runs: number; verdict: string; }[]` |
+| Name   | Type                       |
+| ------ | -------------------------- |
+| `runs` | `types.UserProfileStats[]` |
 
 ## `/api/user/statusVerified/`
 

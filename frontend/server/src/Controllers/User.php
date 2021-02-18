@@ -24,7 +24,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfileInfo=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
  * @psalm-type UserProfileContests=array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place: int}>
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
- * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile?: UserProfileInfo, contests?: UserProfileContests, solvedProblems?: list<Problem>, unsolvedProblems?: list<Problem>, createdProblems?: list<Problem>, stats?: list<UserProfileStats>, badges?: list<string>, ownedBadges?: list<Badge>, programmingLanguages?: array<string,string>}
+ * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>}
+ * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
  * @psalm-type LoginDetailsPayload=array{facebookUrl: string, linkedinUrl: string, statusError?: string, validateRecaptcha: bool}
  */
 class User extends \OmegaUp\Controllers\Controller {
@@ -2072,7 +2073,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{runs: list<array{date: null|string, runs: int, verdict: string}>}
+     * @return array{runs: list<UserProfileStats>}
      */
     public static function apiStats(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -3773,24 +3774,26 @@ class User extends \OmegaUp\Controllers\Controller {
                             $r->identity,
                             $identity
                         ),
-                        'contests' => self::getContestStats(
-                            $identity->identity_id,
-                            $identity->username
-                        ),
-                        'solvedProblems' => self::getSolvedProblems(
-                            $identity->identity_id
-                        ),
-                        'unsolvedProblems' => self::getUnsolvedProblems(
-                            $identity->identity_id
-                        ),
-                        'createdProblems' => self::getCreatedProblems(
-                            $identity->identity_id
-                        ),
-                        'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
-                            $identity->identity_id
-                        ),
-                        'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
-                        'ownedBadges' => $ownedBadges,
+                        'extraProfileDetails' => [
+                            'contests' => self::getContestStats(
+                                $identity->identity_id,
+                                $identity->username
+                            ),
+                            'solvedProblems' => self::getSolvedProblems(
+                                $identity->identity_id
+                            ),
+                            'unsolvedProblems' => self::getUnsolvedProblems(
+                                $identity->identity_id
+                            ),
+                            'createdProblems' => self::getCreatedProblems(
+                                $identity->identity_id
+                            ),
+                            'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
+                                $identity->identity_id
+                            ),
+                            'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
+                            'ownedBadges' => $ownedBadges,
+                        ],
                     ],
                     'title' => new \OmegaUp\TranslationString(
                         'omegaupTitleProfile'
@@ -3802,7 +3805,13 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\ApiCaller::logException($e);
             return [
                 'smartyProperties' => [
-                    'payload' => ['statusError' => $e->getErrorMessage()],
+                    'payload' => [
+                        'statusError' => $e->getErrorMessage(),
+                        'profile' => self::getProfileDetails(
+                            $r->identity,
+                            $identity
+                        ),
+                    ],
                     'title' => new \OmegaUp\TranslationString(
                         'omegaupTitleProfile'
                     )
