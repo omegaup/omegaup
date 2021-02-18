@@ -1459,7 +1459,6 @@ const translations: { [key: string]: string; } = {
   wordsSeeSolution: "See Solution",
   wordsSelectFilter: "Select a filter",
   wordsSend: "Send",
-  wordsShow: "Show",
   wordsShowCasesDiff: "Show cases differences",
   wordsShowSiteAdmins: "Show site-admins",
   wordsSolution: "Solution",
