@@ -35,7 +35,7 @@
       </div>
       <template v-if="username != null">
         <div class="row mb-3">
-          <div class="col-md-6">
+          <div class="col-md">
             <form class="form w-100" @submit.prevent="onVerifyUser">
               <button
                 class="btn btn-outline-secondary"
@@ -53,16 +53,25 @@
               </button>
             </form>
           </div>
-          <div class="col-md-6">
+          <div class="col-md">
             <label v-if="lastLogin != null" class="font-weight-bold">
               {{
                 ui.formatString(T.userLastLogin, {
-                  lastLogin: lastLogin.toLocaleString(T.locale),
+                  lastLogin: time.formatDateTime(lastLogin),
                 })
               }}
             </label>
             <label v-else>
               {{ T.userNeverLoggedIn }}
+            </label>
+          </div>
+          <div v-if="birthDate != null" class="col-md">
+            <label class="font-weight-bold">
+              {{
+                ui.formatString(T.userBirthDate, {
+                  birthDate: time.formatDate(birthDate),
+                })
+              }}
             </label>
           </div>
         </div>
@@ -108,6 +117,31 @@
             </div>
           </form>
         </div>
+        <div class="row mb-3">
+          <form class="form w-100" @submit.prevent="onUpdateEmail">
+            <div class="col-md-12">
+              <div class="input-group">
+                <input
+                  v-model="newEmail"
+                  class="form-control"
+                  name="new_email"
+                  type="text"
+                  required="required"
+                  :placeholder="T.adminSupportTypeNewEmail"
+                />
+                <div class="input-group-append">
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="submit"
+                    :title="T.adminSupportTypeNewEmail"
+                  >
+                    {{ T.wordsSaveChanges }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
         <div class="row float-right">
           <div class="col-md-12">
             <button
@@ -129,6 +163,7 @@ import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import Clipboard from 'v-clipboard';
 import T from '../../lang';
 import * as ui from '../../ui';
+import * as time from '../../time';
 
 import {
   FontAwesomeIcon,
@@ -139,6 +174,11 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 Vue.use(Clipboard);
+
+export interface UpdateEmailRequest {
+  email: string;
+  newEmail: string;
+}
 
 @Component({
   components: {
@@ -151,30 +191,43 @@ export default class AdminSupport extends Vue {
   @Prop() username!: string;
   @Prop() verified!: boolean;
   @Prop() link!: string;
-  @Prop() lastLogin!: Date;
+  @Prop() lastLogin!: null | Date;
+  @Prop() birthDate!: null | Date;
 
   T = T;
   ui = ui;
-  email: string = '';
+  time = time;
+  email: null | string = null;
+  newEmail: null | string = null;
 
   @Emit('search-email')
-  onSearchEmail(): string {
+  onSearchEmail(): null | string {
+    if (this.email == null) return null;
     return this.email;
   }
 
+  @Emit('update-email')
+  onUpdateEmail(): null | UpdateEmailRequest {
+    if (this.email == null || this.newEmail == null) return null;
+    return { email: this.email, newEmail: this.newEmail };
+  }
+
   @Emit('verify-user')
-  onVerifyUser(): string {
+  onVerifyUser(): null | string {
+    if (this.email == null) return null;
     return this.email;
   }
 
   @Emit('generate-token')
-  onGenerateToken(): string {
+  onGenerateToken(): null | string {
+    if (this.email == null) return null;
     return this.email;
   }
 
   @Emit('reset')
-  onReset(): { email: null | string } {
-    return { email: this.email };
+  onReset() {
+    this.email = null;
+    this.newEmail = null;
   }
 }
 </script>

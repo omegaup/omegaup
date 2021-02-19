@@ -3991,6 +3991,7 @@ Gets extra information of the identity:
 
 - last password change request
 - verify status
+- birth date to verify the user identity
 
 ### Parameters
 
@@ -4002,6 +4003,7 @@ Gets extra information of the identity:
 
 | Name              | Type      |
 | ----------------- | --------- |
+| `birth_date`      | `Date`    |
 | `last_login`      | `Date`    |
 | `username`        | `string`  |
 | `verified`        | `boolean` |
