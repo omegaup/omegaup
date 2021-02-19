@@ -8,27 +8,27 @@ describe('Profilev2.vue', () => {
     const badges = ['100SolvedProblems'];
     const wrapper = shallowMount(user_Profile, {
       propsData: {
-        profile: {
-          country: 'Mexico',
-          country_id: 'MX',
-          name: 'omegaUp admin',
-          classname: 'user-rank-unranked',
-          email: 'admin@omegaup.com',
-          username: 'omegaup',
-          verified: true,
-          hide_problem_tags: false,
-          is_private: false,
-          preferred_language: 'py2',
-          programming_languages: {
-            py2: 'python2',
-          },
-          rankinfo: {
-            name: 'Test',
-            problems_solved: 2,
-            rank: 1,
-          },
-        },
         data: {
+          profile: {
+            country: 'Mexico',
+            country_id: 'MX',
+            name: 'omegaUp admin',
+            classname: 'user-rank-unranked',
+            email: 'admin@omegaup.com',
+            username: 'omegaup',
+            verified: true,
+            hide_problem_tags: false,
+            is_private: false,
+            preferred_language: 'py2',
+            programming_languages: {
+              py2: 'python2',
+            },
+            rankinfo: {
+              name: 'Test',
+              problems_solved: 2,
+              rank: 1,
+            },
+          },
           badges: badges,
           contests: {
             prueba: {
@@ -56,7 +56,7 @@ describe('Profilev2.vue', () => {
           ownedBadges: [],
           programmingLanguages: {},
           userClassname: 'user-rank-unranked',
-        } as types.ExtraProfileDetails,
+        } as types.UserProfileDetailsPayload,
         profileBadges: new Set(badge_alias) as Set<string>,
         visitorBadges: new Set(badge_alias) as Set<string>,
       },

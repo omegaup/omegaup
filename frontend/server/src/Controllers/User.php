@@ -24,8 +24,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfileInfo=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
  * @psalm-type UserProfileContests=array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place: int}>
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
- * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>}
- * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
+ * @psalm-type UserProfileDetailsPayload=array{profile: UserProfileInfo, statusError: string}|array{badges: list<string>, contests: UserProfileContests, createdProblems: list<Problem>, ownedBadges: list<Badge>, profile: UserProfileInfo, solvedProblems: list<Problem>, stats: list<UserProfileStats>, unsolvedProblems: list<Problem>}
  * @psalm-type LoginDetailsPayload=array{facebookUrl: string, linkedinUrl: string, statusError?: string, validateRecaptcha: bool}
  */
 class User extends \OmegaUp\Controllers\Controller {
@@ -3774,26 +3773,24 @@ class User extends \OmegaUp\Controllers\Controller {
                             $r->identity,
                             $identity
                         ),
-                        'extraProfileDetails' => [
-                            'contests' => self::getContestStats(
-                                $identity->identity_id,
-                                $identity->username
-                            ),
-                            'solvedProblems' => self::getSolvedProblems(
-                                $identity->identity_id
-                            ),
-                            'unsolvedProblems' => self::getUnsolvedProblems(
-                                $identity->identity_id
-                            ),
-                            'createdProblems' => self::getCreatedProblems(
-                                $identity->identity_id
-                            ),
-                            'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
-                                $identity->identity_id
-                            ),
-                            'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
-                            'ownedBadges' => $ownedBadges,
-                        ],
+                        'contests' => self::getContestStats(
+                            $identity->identity_id,
+                            $identity->username
+                        ),
+                        'solvedProblems' => self::getSolvedProblems(
+                            $identity->identity_id
+                        ),
+                        'unsolvedProblems' => self::getUnsolvedProblems(
+                            $identity->identity_id
+                        ),
+                        'createdProblems' => self::getCreatedProblems(
+                            $identity->identity_id
+                        ),
+                        'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
+                            $identity->identity_id
+                        ),
+                        'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
+                        'ownedBadges' => $ownedBadges,
                     ],
                     'title' => new \OmegaUp\TranslationString(
                         'omegaupTitleProfile'
