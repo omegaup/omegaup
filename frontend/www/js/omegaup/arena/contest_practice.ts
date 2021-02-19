@@ -7,11 +7,7 @@ import Vue from 'vue';
 import arena_ContestPractice, {
   ActiveProblem,
 } from '../components/arena/ContestPractice.vue';
-
-export interface ClarificationRequest {
-  problemAlias: string;
-  message: string;
-}
+import arena_NewClarification from '../components/arena/NewClarificationPopup.vue';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -24,7 +20,6 @@ OmegaUp.on('ready', () => {
     components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
     data: () => ({
       problemInfo: null as types.ProblemInfo | null,
-      problems: payload.problems as types.NavbarProblemsetProblem[],
       problem: null as ActiveProblem | null,
       clarifications: payload.clarifications,
     }),
@@ -33,7 +28,8 @@ OmegaUp.on('ready', () => {
         props: {
           contest: payload.contest,
           contestAdmin: payload.contestAdmin,
-          problems: this.problems,
+          problems: payload.problems,
+          users: payload.users,
           problemInfo: this.problemInfo,
           problem: this.problem,
           clarifications: this.clarifications,
@@ -62,13 +58,20 @@ OmegaUp.on('ready', () => {
                 contestPractice.problem = null;
               });
           },
-          'new-clarification': (request: ClarificationRequest) => {
+          'new-clarification': (request: {
+            request: types.Clarification;
+            target: arena_NewClarification;
+          }) => {
             api.Clarification.create({
               contest_alias: payload.contest.alias,
-              problem_alias: request.problemAlias,
-              message: request.message,
+              problem_alias: request.request.problem_alias,
+              username: request.request.author,
+              message: request.request.message,
             })
-              .then(refreshClarifications)
+              .then(() => {
+                request.target.clearForm();
+                refreshClarifications();
+              })
               .catch(ui.apiError);
 
             return false;
