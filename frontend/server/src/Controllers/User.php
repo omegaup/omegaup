@@ -1525,13 +1525,14 @@ class User extends \OmegaUp\Controllers\Controller {
      * Gets extra information of the identity:
      * - last password change request
      * - verify status
+     * - birth date to verify the user identity
      *
      * @omegaup-request-param string $email
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
-     * @return array{within_last_day: bool, verified: bool, username: string, last_login: \OmegaUp\Timestamp|null}
+     * @return array{birth_date: \OmegaUp\Timestamp|null, last_login: \OmegaUp\Timestamp|null, username: string, verified: bool, within_last_day: bool}
      */
     public static function apiExtraInformation(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
