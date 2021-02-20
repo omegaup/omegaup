@@ -55,6 +55,12 @@ OmegaUp.on('ready', () => {
                 contestPractice.problemInfo = problemInfo;
                 source.alias = problemInfo.alias;
                 source.runs = problemInfo.runs ?? [];
+                if (
+                  contestPractice.popupDisplayed === PopupDisplayed.RunSubmit
+                ) {
+                  window.location.hash = `#problems/${source.alias}/new-run`;
+                  return;
+                }
                 window.location.hash = `#problems/${source.alias}`;
               })
               .catch(() => {
