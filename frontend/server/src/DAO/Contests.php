@@ -911,11 +911,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
-     * @return list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int, name: null|string, time: \OmegaUp\Timestamp, username: string}>
+     * @return array{activity: list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int, name: null|string, time: \OmegaUp\Timestamp, username: string}>, totalRows: int}
      */
     public static function getActivityReport(
-        \OmegaUp\DAO\VO\Contests $contest
+        \OmegaUp\DAO\VO\Contests $contest,
+        int $page,
+        int $rowsPerPage
     ) {
+        $offset = ($page - 1) * $rowsPerPage;
+
         $sql = '(
             SELECT
                 i.username,
@@ -1000,11 +1004,32 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 p.problem_id = s.problem_id
             WHERE
                 sl.problemset_id = ?
-        ) ORDER BY time;';
-        /** @var list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int, name: null|string, time: \OmegaUp\Timestamp, username: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
+        ) ORDER BY
+            time DESC';
+
+        $sqlCount = "
+            SELECT
+                COUNT(*)
+            FROM
+                ({$sql}) AS total";
+
+        $sqlLimit = ' LIMIT ?, ?';
+
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlCount,
             [$contest->problemset_id, $contest->problemset_id]
         );
+
+        /** @var list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int, name: null|string, time: \OmegaUp\Timestamp, username: string}> */
+        $activity = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql . $sqlLimit,
+            [$contest->problemset_id, $contest->problemset_id, $offset, $rowsPerPage]
+        );
+
+        return [
+            'activity' => $activity,
+            'totalRows' => $totalRows,
+        ];
     }
 }

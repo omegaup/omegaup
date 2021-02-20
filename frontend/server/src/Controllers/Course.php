@@ -50,7 +50,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
- * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string}
+ * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -3422,11 +3422,16 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{payload: ActivityFeedPayload, title: string}, entrypoint: string}
      *
      * @omegaup-request-param string $course
+     * @omegaup-request-param int|null $length
+     * @omegaup-request-param int|null $page
      */
     public static function getActivityFeedDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? 100;
+
         $courseAlias = $r->ensureString(
             'course',
             fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
@@ -3441,14 +3446,30 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        $report = \OmegaUp\DAO\Courses::getActivityReport(
+            $course,
+            $page,
+            $length
+        );
+
         return [
             'smartyProperties' => [
                 'payload' => [
+                    'page' => $page,
+                    'length' => $length,
                     'alias' => $courseAlias,
                     'events' => \OmegaUp\ActivityReport::getActivityReport(
-                        \OmegaUp\DAO\Courses::getActivityReport($course)
+                        $report['activity']
                     ),
                     'type' => 'course',
+                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+                        $report['totalRows'],
+                        $length,
+                        $page,
+                        "/course/{$courseAlias}/activity/",
+                        /*$adjacent=*/ 5,
+                        []
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'activityReport'
@@ -4028,12 +4049,16 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a report with all user activity for a course.
      *
-     * @return array{events: list<array{username: string, ip: int|null, time: \OmegaUp\Timestamp, classname?: string, alias?: string}>}
+     * @return array{events: list<ActivityEvent>, pagerItems: list<PageItem>}
      *
      * @omegaup-request-param string $course_alias
+     * @omegaup-request-param int|null $length
+     * @omegaup-request-param int|null $page
      */
     public static function apiActivityReport(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? 100;
         $courseAlias = $r->ensureString(
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
@@ -4049,9 +4074,23 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        $report = \OmegaUp\DAO\Courses::getActivityReport(
+            $course,
+            $page,
+            $length
+        );
+
         return [
             'events' => \OmegaUp\ActivityReport::getActivityReport(
-                \OmegaUp\DAO\Courses::getActivityReport($course)
+                $report['activity']
+            ),
+            'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+                $report['totalRows'],
+                $length,
+                $page,
+                "/course/{$courseAlias}/activity/",
+                /*$adjacent=*/ 5,
+                []
             ),
         ];
     }
