@@ -47,6 +47,37 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
+     * @return array{acl_id: int, admission_mode: string, alias: string, contest_id: int, description: string, director: null|string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null
+     */
+    final public static function getByAliasWithDirector(string $alias) {
+        $sql = 'SELECT
+                    i.username AS director,
+                    c.*
+                FROM
+                    Contests c
+                INNER JOIN
+                    ACLs acl
+                ON
+                    acl.acl_id = c.acl_id
+                INNER JOIN
+                    Identities i
+                ON
+                    i.user_id = acl.owner_id
+                WHERE
+                    c.alias = ?
+                LIMIT
+                    1;';
+
+        /** @var array{acl_id: int, admission_mode: string, alias: string, contest_id: int, description: string, director: null|string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
+        if (empty($rs)) {
+            return null;
+        }
+
+        return $rs;
+    }
+
+    /**
      * @return list<\OmegaUp\DAO\VO\Contests>
      */
     final public static function getByTitle(string $title) {

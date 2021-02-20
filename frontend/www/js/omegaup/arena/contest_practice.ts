@@ -114,32 +114,34 @@ OmegaUp.on('ready', () => {
       });
   }
 
-  // The hash is of the form `#problems/${alias}`.
-  const problemMatch = /#problems\/([^/]+)/.exec(window.location.hash);
-  const problemAlias = problemMatch?.[1] ?? null;
-  if (problemAlias && problemMatch) {
-    // This needs to be set here and not at the top because it depends
-    // on the `navigate-to-problem` callback being invoked, and that is
-    // not the case if this is set a priori.
-    contestPractice.problem = { alias: problemAlias, runs: [] };
-    const popupDisplayed = problemMatch.input.split('/')[2];
-    if (popupDisplayed) {
-      if (popupDisplayed === 'new-run') {
-        contestPractice.popupDisplayed = PopupDisplayed.RunSubmit;
-      }
-      if (popupDisplayed.includes('show-run')) {
-        contestPractice.popupDisplayed = PopupDisplayed.RunDetails;
-      }
-    }
-  }
-  // The hash is of the form `#clarifications/[new]`.
-  const clarificationMatch = /#clarifications\/([^/]+)/.exec(
+  // The hash is of the forms:
+  // - `#problems/${alias}`
+  // - `#problems/${alias}/new-run`
+  // - `#problems/${alias}/show-run:xyz`
+  // - `#clarifications/${alias}/new`
+  // and all the matching forms in the following regex
+  const match = /#(?<tab>\w+)\/(?<problem>[^/]+)\/?(?<popup>[^/]*)/g.exec(
     window.location.hash,
   );
-  if (clarificationMatch) {
-    const popupDisplayed = clarificationMatch.input.split('/')[1];
-    if (popupDisplayed === 'new') {
-      contestPractice.showNewClarificationPopup = true;
+  if (match?.groups) {
+    switch (match?.groups.tab) {
+      case 'problems':
+        // This needs to be set here and not at the top because it depends
+        // on the `navigate-to-problem` callback being invoked, and that is
+        // not the case if this is set a priori.
+        contestPractice.problem = { alias: match.groups.problem, runs: [] };
+        if (match.groups.popup === 'new-run') {
+          contestPractice.popupDisplayed = PopupDisplayed.RunSubmit;
+        }
+        if (match.groups.popup.includes('show-run')) {
+          contestPractice.popupDisplayed = PopupDisplayed.RunDetails;
+        }
+        break;
+      case 'clarifications':
+        if (match.groups.popup === 'new') {
+          contestPractice.showNewClarificationPopup = true;
+        }
+        break;
     }
   }
 

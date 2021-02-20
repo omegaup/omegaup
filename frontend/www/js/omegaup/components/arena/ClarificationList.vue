@@ -4,7 +4,7 @@
     <slot name="new-clarification">
       <div class="card-body">
         <a
-          href="#clarifications/new"
+          href="#clarifications/all/new"
           class="btn btn-primary"
           @click="currentPopupDisplayed = PopupDisplayed.NewClarification"
         >
