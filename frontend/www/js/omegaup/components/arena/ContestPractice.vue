@@ -30,6 +30,7 @@
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="activeProblem.runs"
+              :initial-popup-displayed="popupDisplayed"
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -60,6 +61,7 @@
         :clarifications="currentClarifications"
         :is-admin="contestAdmin"
         :in-contest="true"
+        :show-new-clarification-popup="showNewClarificationPopup"
         @new-clarification="(request) => $emit('new-clarification', request)"
         @clarification-response="
           (id, responseText, isPublic) =>
@@ -83,7 +85,7 @@ import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_ContestSummary from './ContestSummaryV2.vue';
 import omegaup_Markdown from '../Markdown.vue';
-import problem_Details from '../problem/Details.vue';
+import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 
 export interface ActiveProblem {
   runs: types.Run[];
@@ -115,6 +117,8 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: true }) showClarifications!: boolean;
   @Prop({ default: true }) showDeadlines!: boolean;
   @Prop({ default: false }) isAdmin!: boolean;
+  @Prop({ default: false }) showNewClarificationPopup!: boolean;
+  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
 
   T = T;

@@ -1776,6 +1776,7 @@ export namespace types {
     admission_mode: string;
     alias: string;
     description: string;
+    director: string;
     feedback: string;
     finish_time: Date;
     languages: string;

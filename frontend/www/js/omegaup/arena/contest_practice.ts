@@ -7,6 +7,7 @@ import Vue from 'vue';
 import arena_ContestPractice, {
   ActiveProblem,
 } from '../components/arena/ContestPractice.vue';
+import { PopupDisplayed } from '../components/problem/Details.vue';
 import arena_NewClarification from '../components/arena/NewClarificationPopup.vue';
 
 OmegaUp.on('ready', () => {
@@ -22,6 +23,8 @@ OmegaUp.on('ready', () => {
       problemInfo: null as types.ProblemInfo | null,
       problem: null as ActiveProblem | null,
       clarifications: payload.clarifications,
+      popupDisplayed: PopupDisplayed.None,
+      showNewClarificationPopup: false,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
@@ -33,6 +36,8 @@ OmegaUp.on('ready', () => {
           problemInfo: this.problemInfo,
           problem: this.problem,
           clarifications: this.clarifications,
+          popupDisplayed: this.popupDisplayed,
+          showNewClarificationPopup: this.showNewClarificationPopup,
           activeTab,
         },
         on: {
@@ -112,11 +117,30 @@ OmegaUp.on('ready', () => {
   // The hash is of the form `#problems/${alias}`.
   const problemMatch = /#problems\/([^/]+)/.exec(window.location.hash);
   const problemAlias = problemMatch?.[1] ?? null;
-  if (problemAlias) {
+  if (problemAlias && problemMatch) {
     // This needs to be set here and not at the top because it depends
     // on the `navigate-to-problem` callback being invoked, and that is
     // not the case if this is set a priori.
     contestPractice.problem = { alias: problemAlias, runs: [] };
+    const popupDisplayed = problemMatch.input.split('/')[2];
+    if (popupDisplayed) {
+      if (popupDisplayed === 'new-run') {
+        contestPractice.popupDisplayed = PopupDisplayed.RunSubmit;
+      }
+      if (popupDisplayed.includes('show-run')) {
+        contestPractice.popupDisplayed = PopupDisplayed.RunDetails;
+      }
+    }
+  }
+  // The hash is of the form `#clarifications/[new]`.
+  const clarificationMatch = /#clarifications\/([^/]+)/.exec(
+    window.location.hash,
+  );
+  if (clarificationMatch) {
+    const popupDisplayed = clarificationMatch.input.split('/')[1];
+    if (popupDisplayed === 'new') {
+      contestPractice.showNewClarificationPopup = true;
+    }
   }
 
   setInterval(() => {
