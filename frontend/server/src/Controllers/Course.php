@@ -41,8 +41,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseNewPayload=array{is_admin: bool, is_curator: bool, languages: array<string, string>}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, allLanguages: array<string, string>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
- * @psalm-type StudentsProgressPayload=array{course: CourseDetails, problemTitles: array<string, string>, students: list<StudentProgress>}
- * @psalm-type StudentsProgressv2Payload=array{course: CourseDetails, problemTitles: array<string, string>, students: list<StudentProgress>, totalRows: int, page: int, length: int, pagerItems: list<PageItem>}
+ * @psalm-type StudentsProgressPayload=array{course: CourseDetails, problemTitles: array<string, string>, students: list<StudentProgress>, totalRows: int, page: int, length: int, pagerItems: list<PageItem>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
@@ -3043,67 +3042,6 @@ class Course extends \OmegaUp\Controllers\Controller {
 
     /**
      * @return array{entrypoint: string, smartyProperties: array{payload: StudentsProgressPayload, title: \OmegaUp\TranslationString}}
-     *
-     * @omegaup-request-param string $course
-     */
-    public static function getStudentsInformationForSmarty(
-        \OmegaUp\Request $r
-    ): array {
-        $r->ensureIdentity();
-        $courseAlias = $r->ensureString(
-            'course',
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
-
-        $course = self::validateCourseExists($courseAlias);
-
-        if (is_null($course->course_id) || is_null($course->group_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
-        }
-
-        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
-        [
-            'allProgress' => $allProgress,
-            'problemTitles' => $problemTitles,
-        ] = \OmegaUp\Cache::getFromCacheOrSet(
-            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
-            $courseAlias,
-            function () use ($course) {
-                if (is_null($course->course_id) || is_null($course->group_id)) {
-                    throw new \OmegaUp\Exceptions\NotFoundException(
-                        'courseNotFound'
-                    );
-                }
-                return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
-                    $course->course_id,
-                    $course->group_id
-                );
-            },
-            60 * 60 * 12 // 12 hours
-        );
-
-        return [
-            'smartyProperties' => [
-                'payload' => [
-                    'course' => self::getCommonCourseDetails(
-                        $course,
-                        $r->identity
-                    ),
-                    'students' => $allProgress,
-                    'problemTitles' => $problemTitles,
-                ],
-                'title' => new \OmegaUp\TranslationString(
-                    'omegaupTitleStudentsProgress'
-                ),
-            ],
-            'entrypoint' => 'course_students'
-        ];
-    }
-
-    /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: StudentsProgressv2Payload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page

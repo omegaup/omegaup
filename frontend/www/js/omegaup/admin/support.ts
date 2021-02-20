@@ -1,4 +1,6 @@
-import admin_Support from '../components/admin/Support.vue';
+import admin_Support, {
+  UpdateEmailRequest,
+} from '../components/admin/Support.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import * as ui from '../ui';
@@ -17,6 +19,7 @@ OmegaUp.on('ready', () => {
         link: null as null | string,
         verified: false,
         lastLogin: null as null | Date,
+        birthDate: null as null | Date,
       };
     },
     render: function (createElement) {
@@ -26,21 +29,31 @@ OmegaUp.on('ready', () => {
           link: this.link,
           verified: this.verified,
           lastLogin: this.lastLogin,
+          birthDate: this.birthDate,
         },
         on: {
           'search-email': (email: string): void => {
             adminSupport.username = null;
             adminSupport.link = null;
             adminSupport.lastLogin = null;
+            adminSupport.birthDate = null;
             adminSupport.verified = false;
             api.User.extraInformation({ email: email })
               .then((data) => {
                 adminSupport.username = data.username;
                 adminSupport.verified = data.verified;
-                if (data.last_login == null) {
-                  return;
-                }
-                adminSupport.lastLogin = new Date(data.last_login);
+                adminSupport.lastLogin = data.last_login ?? null;
+                adminSupport.birthDate = data.birth_date ?? null;
+              })
+              .catch(ui.apiError);
+          },
+          'update-email': (request: UpdateEmailRequest) => {
+            api.User.updateMainEmail({
+              originalEmail: request.email,
+              email: request.newEmail,
+            })
+              .then(() => {
+                ui.success(T.adminSupportEmailUpdatedSuccessfully);
               })
               .catch(ui.apiError);
           },
@@ -62,12 +75,12 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          reset: (target: { email: null | string }) => {
-            target.email = null;
+          reset: () => {
             adminSupport.username = null;
             adminSupport.link = null;
             adminSupport.verified = false;
             adminSupport.lastLogin = null;
+            adminSupport.birthDate = null;
           },
         },
       });
