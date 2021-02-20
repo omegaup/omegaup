@@ -151,9 +151,14 @@ export default class ArenaContestPractice extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .navleft {
   overflow: hidden;
+}
+
+.nav-tabs .nav-link {
+  background-color: #ddd;
+  border-top-color: #ddd;
 }
 
 .navleft .navbar {
