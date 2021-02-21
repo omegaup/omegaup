@@ -41,10 +41,7 @@ OmegaUp.on('ready', () => {
           if (alias != run.alias) {
             continue;
           }
-          const score = run.contest_score || 0;
-          if (score > maxScore) {
-            maxScore = score;
-          }
+          maxScore = Math.max(maxScore, run.contest_score || 0);
         }
         return maxScore;
       },
@@ -78,12 +75,12 @@ OmegaUp.on('ready', () => {
                 contestPractice.problemInfo = problemInfo;
                 request.problem.alias = problemInfo.alias;
                 request.runs = myRunsStore.state.runs;
-                (request.problem.bestScore = this.getMaxScore(
+                request.problem.bestScore = this.getMaxScore(
                   request.runs,
                   problemInfo.alias,
                   0,
-                )),
-                  (window.location.hash = `#problems/${request.problem.alias}`);
+                );
+                window.location.hash = `#problems/${request.problem.alias}`;
               })
               .catch(() => {
                 ui.dismissNotifications();
