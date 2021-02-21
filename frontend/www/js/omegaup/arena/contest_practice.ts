@@ -126,29 +126,30 @@ OmegaUp.on('ready', () => {
   // - `#problems/${alias}/show-run:xyz`
   // - `#clarifications/${alias}/new`
   // and all the matching forms in the following regex
-  const match = /#(?<tab>\w+)\/(?<problem>[^/]+)\/?(?<popup>[^/]*)/g.exec(
+  const match = /#(?<tab>\w+)\/(?<alias>[^/]+)(?:\/(?<popup>[^/]+))?/g.exec(
     window.location.hash,
   );
-  if (match?.groups) {
-    switch (match?.groups.tab) {
-      case 'problems':
-        // This needs to be set here and not at the top because it depends
-        // on the `navigate-to-problem` callback being invoked, and that is
-        // not the case if this is set a priori.
-        contestPractice.problem = { alias: match.groups.problem, runs: [] };
-        if (match.groups.popup === 'new-run') {
-          contestPractice.popupDisplayed = PopupDisplayed.RunSubmit;
-        }
-        if (match.groups.popup.includes('show-run')) {
-          contestPractice.popupDisplayed = PopupDisplayed.RunDetails;
-        }
-        break;
-      case 'clarifications':
-        if (match.groups.popup === 'new') {
-          contestPractice.showNewClarificationPopup = true;
-        }
-        break;
-    }
+  switch (match?.groups?.tab) {
+    case 'problems':
+      // This needs to be set here and not at the top because it depends
+      // on the `navigate-to-problem` callback being invoked, and that is
+      // not the case if this is set a priori.
+      contestPractice.problem = { alias: match.groups.problem, runs: [] };
+      if (match.groups.popup === 'new-run') {
+        contestPractice.popupDisplayed = PopupDisplayed.RunSubmit;
+      }
+      if (match.groups.popup.startsWith('show-run')) {
+        contestPractice.popupDisplayed = PopupDisplayed.RunDetails;
+      }
+      break;
+    case 'clarifications':
+      if (match.groups.popup === 'new') {
+        contestPractice.showNewClarificationPopup = true;
+      }
+      break;
+    default:
+      contestPractice.popupDisplayed = PopupDisplayed.None;
+      contestPractice.showNewClarificationPopup = false;
   }
 
   setInterval(() => {

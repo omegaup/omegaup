@@ -218,6 +218,10 @@ export namespace types {
       return ((x) => {
         x.contest = ((x) => {
           x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          if (x.last_updated)
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
@@ -435,6 +439,10 @@ export namespace types {
         })(x.clarifications);
         x.contest = ((x) => {
           x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          if (x.last_updated)
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
@@ -1335,6 +1343,9 @@ export namespace types {
   export interface ActivityFeedPayload {
     alias: string;
     events: types.ActivityEvent[];
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
     type: string;
   }
 
@@ -1615,7 +1626,7 @@ export namespace types {
     alias: string;
     available_languages: { [key: string]: string };
     description: string;
-    director?: string;
+    director: string;
     feedback: string;
     finish_time: Date;
     languages: string[];
@@ -1649,7 +1660,7 @@ export namespace types {
     admission_mode: string;
     alias: string;
     description: string;
-    director?: string;
+    director: string;
     feedback: string;
     finish_time: Date;
     languages: string[];
@@ -1773,57 +1784,34 @@ export namespace types {
   }
 
   export interface ContestPublicDetails {
+    acl_id?: number;
     admission_mode: string;
     alias: string;
+    contest_id?: number;
     description: string;
-    director?: string;
+    director: string;
     feedback: string;
     finish_time: Date;
     languages?: string;
+    last_updated?: Date;
     partial_score: boolean;
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
     points_decay_factor: number;
     problemset_id: number;
+    recommended?: boolean;
     rerun_id: number;
     scoreboard: number;
-    show_penalty: boolean;
+    show_penalty?: boolean;
     show_scoreboard_after: boolean;
     start_time: Date;
     submissions_gap: number;
     title: string;
+    urgent?: boolean;
     user_registration_accepted?: boolean;
     user_registration_answered?: boolean;
     user_registration_requested?: boolean;
-    window_length?: number;
-  }
-
-  export interface ContestPublicDetailsWithDirector {
-    acl_id: number;
-    admission_mode: string;
-    alias: string;
-    contest_id: number;
-    description: string;
-    director?: string;
-    feedback: string;
-    finish_time: Date;
-    languages?: string;
-    last_updated: Date;
-    partial_score: boolean;
-    penalty: number;
-    penalty_calc_policy: string;
-    penalty_type: string;
-    points_decay_factor: number;
-    problemset_id: number;
-    recommended: boolean;
-    rerun_id: number;
-    scoreboard: number;
-    show_scoreboard_after: boolean;
-    start_time: Date;
-    submissions_gap: number;
-    title: string;
-    urgent: boolean;
     window_length?: number;
   }
 
@@ -3170,13 +3158,8 @@ export namespace messages {
   export type ContestActivityReportRequest = { [key: string]: any };
   export type _ContestActivityReportServerResponse = any;
   export type ContestActivityReportResponse = {
-    events: {
-      alias?: string;
-      classname?: string;
-      ip?: number;
-      time: Date;
-      username: string;
-    }[];
+    events: types.ActivityEvent[];
+    pagerItems: types.PageItem[];
   };
   export type ContestAddAdminRequest = { [key: string]: any };
   export type ContestAddAdminResponse = {};
@@ -3379,13 +3362,8 @@ export namespace messages {
   export type CourseActivityReportRequest = { [key: string]: any };
   export type _CourseActivityReportServerResponse = any;
   export type CourseActivityReportResponse = {
-    events: {
-      alias?: string;
-      classname?: string;
-      ip?: number;
-      time: Date;
-      username: string;
-    }[];
+    events: types.ActivityEvent[];
+    pagerItems: types.PageItem[];
   };
   export type CourseAddAdminRequest = { [key: string]: any };
   export type CourseAddAdminResponse = {};

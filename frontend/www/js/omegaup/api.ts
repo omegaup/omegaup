@@ -399,6 +399,8 @@ export const Contest = {
     messages.ContestPublicDetailsResponse
   >('/api/contest/publicDetails/', (x) => {
     x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+    if (x.last_updated)
+      x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
     return x;
   }),

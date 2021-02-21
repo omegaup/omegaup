@@ -69,13 +69,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     1;';
 
         /** @var array{acl_id: int, admission_mode: string, alias: string, contest_id: int, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
-
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
-        if (empty($rs)) {
-            return null;
-        }
-
-        return $rs;
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
     }
 
     /**
@@ -943,11 +937,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
-     * @return list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int, name: null|string, time: \OmegaUp\Timestamp, username: string}>
+     * @return array{activity: list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int, name: null|string, time: \OmegaUp\Timestamp, username: string}>, totalRows: int}
      */
     public static function getActivityReport(
-        \OmegaUp\DAO\VO\Contests $contest
+        \OmegaUp\DAO\VO\Contests $contest,
+        int $page,
+        int $rowsPerPage
     ) {
+        $offset = ($page - 1) * $rowsPerPage;
+
         $sql = '(
             SELECT
                 i.username,
@@ -1032,11 +1030,32 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 p.problem_id = s.problem_id
             WHERE
                 sl.problemset_id = ?
-        ) ORDER BY time;';
-        /** @var list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int, name: null|string, time: \OmegaUp\Timestamp, username: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
+        ) ORDER BY
+            time DESC';
+
+        $sqlCount = "
+            SELECT
+                COUNT(*)
+            FROM
+                ({$sql}) AS total";
+
+        $sqlLimit = ' LIMIT ?, ?';
+
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlCount,
             [$contest->problemset_id, $contest->problemset_id]
         );
+
+        /** @var list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int, name: null|string, time: \OmegaUp\Timestamp, username: string}> */
+        $activity = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql . $sqlLimit,
+            [$contest->problemset_id, $contest->problemset_id, $offset, $rowsPerPage]
+        );
+
+        return [
+            'activity' => $activity,
+            'totalRows' => $totalRows,
+        ];
     }
 }
