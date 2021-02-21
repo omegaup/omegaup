@@ -47,6 +47,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type IntroDetailsPayload=array{alias: string, archived: boolean, description: string, details?: CourseDetails, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
+ * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, courseDetails: CourseDetails}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
@@ -3662,6 +3663,55 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         return $detailsResponse;
+    }
+
+    /**
+     * Gets the course and specific assignment details
+     *
+     * @return array{smartyProperties: array{payload: AssignmentDetailsPayload, title: string, inContest: bool}, entrypoint: string}
+     */
+    private static function getAssignmentDetailsForSmarty(
+        \OmegaUp\Request $r,
+        \OmegaUp\DAO\VO\Courses $course,
+        \OmegaUp\DAO\VO\Groups $group,
+        string $assignmentAlias
+    ): array {
+        $r->ensureIdentity();
+
+        $assignment = self::validateCourseAssignmentAlias(
+            $course,
+            $assignmentAlias
+        );
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'showRanking' => \OmegaUp\Controllers\Course::shouldShowScoreboard(
+                        $r->identity,
+                        $course,
+                        $group
+                    ),
+                    'shouldShowFirstAssociatedIdentityRunWarning' => (
+                        !is_null($r->user) &&
+                        !\OmegaUp\Controllers\User::isMainIdentity(
+                            $r->user,
+                            $r->identity
+                        ) &&
+                        \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
+                            $r->user
+                        )
+                    ),
+                    'courseDetails' => self::getCommonCourseDetails(
+                        $course,
+                        $r->identity
+                    ),
+                ],
+                'title' => "{$assignment->alias} - {$course->name}", // FIXME: Suggestions?
+                // Navbar is only hidden during exams.
+                'inContest' => $assignment->assignment_type === 'test',
+            ],
+            'entrypoint' => 'arena_course',
+        ];
     }
 
     /**
