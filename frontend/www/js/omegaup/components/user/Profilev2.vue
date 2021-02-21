@@ -223,10 +223,10 @@ import { Problem, ContestResult } from '../../linkable_resource';
   },
 })
 export default class UserProfile extends Vue {
-  @Prop() data!: types.UserProfileDetailsPayload;
+  @Prop() data!: types.ExtraProfileDetails;
+  @Prop() profile!: types.UserProfileInfo;
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
-  profile = this.data.profile;
   contests = this.data.contests
     ? Object.values(this.data.contests)
         .map((contest) => {
