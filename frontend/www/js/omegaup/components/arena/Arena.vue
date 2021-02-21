@@ -1,13 +1,13 @@
 <template>
   <div data-arena-wrapper :class="backgroundClass">
-    <div class="title">
-      <h1>
+    <div class="text-center mt-4 pt-2">
+      <h2>
         <span>{{ contestTitle }}</span>
         <sup class="socket-status" title="WebSocket">✗</sup>
-      </h1>
+      </h2>
       <div class="clock">∞</div>
     </div>
-    <ul class="nav justify-content-center nav-tabs">
+    <ul class="nav justify-content-center nav-tabs mt-4">
       <li
         v-for="tab in availableTabs"
         :key="tab.name"
@@ -119,28 +119,13 @@ export default class Arena extends Vue {
   overflow-y: auto;
 }
 
-.title {
-  min-height: 80px;
-  h1 {
-    text-align: center;
-    font-size: 2em;
-    margin: 0.5em;
-  }
-}
-
 .socket-status {
   color: #800;
 }
 
-.title,
 .clock {
-  text-align: center;
-}
-
-.clock {
-  font-size: 6em;
+  font-size: 3em;
   line-height: 0.4em;
-  margin-bottom: 0.2em;
 }
 
 .navleft {

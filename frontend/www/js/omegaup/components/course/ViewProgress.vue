@@ -1,100 +1,103 @@
 <template>
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-lg-10 mb-3">
-        <div class="omegaup-course-viewprogress card">
-          <div class="card-header">
-            <h2>
-              <a :href="courseUrl">{{ course.name }}</a>
-            </h2>
-          </div>
-          <div class="card-body table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th class="text-center">
-                    <span>
-                      {{ T.wordsName }}
-                      <omegaup-common-sort-controls
-                        column="student"
-                        :sort-order="sortOrder"
-                        :column-name="columnName"
-                        @apply-filter="onApplyFilter"
-                      ></omegaup-common-sort-controls>
-                    </span>
-                  </th>
-                  <th
-                    v-for="assignment in assignments"
-                    :key="assignment.alias"
-                    class="score text-center"
-                  >
-                    <span>
-                      {{ assignment.name }}<br />
-                      <span>
-                        {{ getTotalPointsByAssignment(assignment) }}
-                        <a
-                          v-if="assignment.max_points === 0"
-                          data-toggle="tooltip"
-                          rel="tooltip"
-                          :title="T.studentProgressOnlyLecturesDescription"
-                          ><img src="/media/question.png"
-                        /></a>
-                      </span>
-                    </span>
-                  </th>
-                  <th class="text-center">
-                    <span>
-                      {{ T.courseProgressGlobalScore }}<br />
-                      <span>{{ getTotalPointsByCourse(assignments) }}</span>
-                      <omegaup-common-sort-controls
-                        column="total"
-                        :sort-order="sortOrder"
-                        :column-name="columnName"
-                        @apply-filter="onApplyFilter"
-                      ></omegaup-common-sort-controls>
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <omegaup-course-student-progress
-                  v-for="student in orderedStudents"
-                  :key="student.username"
-                  :student="student"
-                  :assignments="assignments"
-                  :course="course"
-                  :problem-titles="problemTitles"
-                  :column-name="columnName"
-                  :sort-order="sortOrder"
-                  @apply-filter="onApplyFilter"
+  <div class="row">
+    <div class="col-lg-10 mb-3">
+      <div class="card">
+        <h2 class="card-header">
+          <a :href="courseUrl">{{ course.name }}</a>
+        </h2>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="text-center align-middle">
+                  <span>
+                    {{ T.wordsName }}
+                    <omegaup-common-sort-controls
+                      column="student"
+                      :sort-order="sortOrder"
+                      :column-name="columnName"
+                      @apply-filter="onApplyFilter"
+                    ></omegaup-common-sort-controls>
+                  </span>
+                </th>
+                <th
+                  v-for="assignment in assignments"
+                  :key="assignment.alias"
+                  class="score text-center align-middle"
                 >
-                </omegaup-course-student-progress>
-              </tbody>
-            </table>
-          </div>
+                  <span>
+                    {{ assignment.name }}
+                    <span class="d-block">
+                      {{ getTotalPointsByAssignment(assignment) }}
+                      <a
+                        v-if="assignment.max_points === 0"
+                        data-toggle="tooltip"
+                        rel="tooltip"
+                        :title="T.studentProgressOnlyLecturesDescription"
+                        ><img src="/media/question.png"
+                      /></a>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-center align-middle">
+                  <span>
+                    {{ T.courseProgressGlobalScore }}
+                    <span class="d-block">{{
+                      getTotalPointsByCourse(assignments)
+                    }}</span>
+                    <omegaup-common-sort-controls
+                      column="total"
+                      :sort-order="sortOrder"
+                      :column-name="columnName"
+                      @apply-filter="onApplyFilter"
+                    ></omegaup-common-sort-controls>
+                  </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <omegaup-course-student-progress
+                v-for="student in orderedStudents"
+                :key="student.username"
+                :student="student"
+                :assignments="assignments"
+                :course="course"
+                :problem-titles="problemTitles"
+                :column-name="columnName"
+                :sort-order="sortOrder"
+                @apply-filter="onApplyFilter"
+              >
+              </omegaup-course-student-progress>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer">
+          <omegaup-common-paginator
+            :pager-items="pagerItems"
+          ></omegaup-common-paginator>
         </div>
       </div>
-      <div class="col-md-2">
-        <div class="card sticky-top sticky-offset">
-          <div class="card-header p-1">
-            <p class="card-title text-sm-center mb-1">
-              {{ T.courseStudentsProgressExportToSpreadsheet }}
-            </p>
-          </div>
-          <div class="card-body">
-            <a
-              class="btn btn-primary btn-sm w-100 my-1"
-              :download="csvFilename"
-              :href="csvDataUrl"
-              >.csv</a
-            >
-            <a
-              class="btn btn-primary btn-sm w-100 my-1"
-              :download="odsFilename"
-              :href="odsDataUrl"
-              >.ods</a
-            >
-          </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card sticky-top sticky-offset">
+        <div class="card-header p-1">
+          <p class="card-title text-sm-center mb-1">
+            {{ T.courseStudentsProgressExportToSpreadsheet }}
+          </p>
+        </div>
+        <div class="card-body">
+          <a
+            class="btn btn-primary btn-sm w-100 my-1"
+            :download="csvFilename"
+            :href="csvDataUrl"
+            >.csv</a
+          >
+          <a
+            class="btn btn-primary btn-sm w-100 my-1"
+            :download="odsFilename"
+            :href="odsDataUrl"
+            >.ods</a
+          >
         </div>
       </div>
     </div>
@@ -112,6 +115,7 @@ import AsyncComputed from 'vue-async-computed-decorator';
 import JSZip from 'jszip';
 import common_SortControls from '../common/SortControls.vue';
 import course_StudentProgress from './StudentProgress.vue';
+import common_Paginator from '../common/Paginatorv2.vue';
 
 Vue.use(AsyncComputedPlugin);
 
@@ -194,6 +198,7 @@ export function toOds(courseName: string, table: TableCell[][]): string {
   components: {
     'omegaup-common-sort-controls': common_SortControls,
     'omegaup-course-student-progress': course_StudentProgress,
+    'omegaup-common-paginator': common_Paginator,
   },
 })
 export default class CourseViewProgress extends Vue {
@@ -201,6 +206,7 @@ export default class CourseViewProgress extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() students!: types.StudentProgress[];
   @Prop() problemTitles!: { [key: string]: string };
+  @Prop() pagerItems!: types.PageItem[];
 
   T = T;
   sortOrder: omegaup.SortOrder = omegaup.SortOrder.Ascending;

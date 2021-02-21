@@ -54,6 +54,9 @@
     <template #arena-clarifications>
       <omegaup-arena-clarification-list
         :problems="problems"
+        :users="users"
+        :problem-alias="problems.length != 0 ? problems[0].alias : null"
+        :username="contestAdmin && users.length != 0 ? users[0].username : null"
         :clarifications="currentClarifications"
         :is-admin="contestAdmin"
         :in-contest="true"
@@ -61,6 +64,9 @@
         @clarification-response="
           (id, responseText, isPublic) =>
             $emit('clarification-response', id, responseText, isPublic)
+        "
+        @update:activeTab="
+          (selectedTab) => $emit('update:activeTab', selectedTab)
         "
       ></omegaup-arena-clarification-list>
     </template>
@@ -98,6 +104,7 @@ export default class ArenaContestPractice extends Vue {
   @Prop() contest!: types.ContestPublicDetails;
   @Prop() contestAdmin!: boolean;
   @Prop() problems!: types.NavbarProblemsetProblem[];
+  @Prop({ default: () => [] }) users!: types.ContestUser[];
   @Prop({ default: null }) problem!: ActiveProblem | null;
   @Prop() problemInfo!: types.ProblemInfo;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
@@ -140,9 +147,14 @@ export default class ArenaContestPractice extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .navleft {
   overflow: hidden;
+}
+
+.nav-tabs .nav-link {
+  background-color: #ddd;
+  border-top-color: #ddd;
 }
 
 .navleft .navbar {

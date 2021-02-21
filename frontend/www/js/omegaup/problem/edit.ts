@@ -86,7 +86,12 @@ OmegaUp.on('ready', () => {
             if (markdownType === 'statements') {
               problemEdit.statement.markdown = currentMarkdown;
               if (Object.prototype.hasOwnProperty.call(statements, language)) {
-                problemEdit.statement.markdown = statements[language];
+                problemEdit.statement = {
+                  language: language,
+                  markdown: statements[language],
+                  images: {},
+                  sources: {},
+                };
                 return;
               }
               api.Problem.details(
