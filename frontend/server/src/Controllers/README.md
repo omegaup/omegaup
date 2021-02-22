@@ -442,13 +442,16 @@ Returns a report with all user activity for a contest.
 | Name            | Type           | Description |
 | --------------- | -------------- | ----------- |
 | `contest_alias` | `string`       |             |
+| `length`        | `int\|null`    |             |
+| `page`          | `int\|null`    |             |
 | `token`         | `null\|string` |             |
 
 ### Returns
 
-| Name     | Type                                                                                  |
-| -------- | ------------------------------------------------------------------------------------- |
-| `events` | `{ alias?: string; classname?: string; ip: number; time: Date; username: string; }[]` |
+| Name         | Type                    |
+| ------------ | ----------------------- |
+| `events`     | `types.ActivityEvent[]` |
+| `pagerItems` | `types.PageItem[]`      |
 
 ## `/api/contest/addAdmin/`
 
@@ -1285,15 +1288,18 @@ Returns a report with all user activity for a course.
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
+| Name           | Type        | Description |
+| -------------- | ----------- | ----------- |
+| `course_alias` | `string`    |             |
+| `length`       | `int\|null` |             |
+| `page`         | `int\|null` |             |
 
 ### Returns
 
-| Name     | Type                                                                                  |
-| -------- | ------------------------------------------------------------------------------------- |
-| `events` | `{ alias?: string; classname?: string; ip: number; time: Date; username: string; }[]` |
+| Name         | Type                    |
+| ------------ | ----------------------- |
+| `events`     | `types.ActivityEvent[]` |
+| `pagerItems` | `types.PageItem[]`      |
 
 ## `/api/course/addAdmin/`
 

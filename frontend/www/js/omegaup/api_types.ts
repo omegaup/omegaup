@@ -1335,6 +1335,9 @@ export namespace types {
   export interface ActivityFeedPayload {
     alias: string;
     events: types.ActivityEvent[];
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
     type: string;
   }
 
@@ -3141,13 +3144,8 @@ export namespace messages {
   export type ContestActivityReportRequest = { [key: string]: any };
   export type _ContestActivityReportServerResponse = any;
   export type ContestActivityReportResponse = {
-    events: {
-      alias?: string;
-      classname?: string;
-      ip?: number;
-      time: Date;
-      username: string;
-    }[];
+    events: types.ActivityEvent[];
+    pagerItems: types.PageItem[];
   };
   export type ContestAddAdminRequest = { [key: string]: any };
   export type ContestAddAdminResponse = {};
@@ -3350,13 +3348,8 @@ export namespace messages {
   export type CourseActivityReportRequest = { [key: string]: any };
   export type _CourseActivityReportServerResponse = any;
   export type CourseActivityReportResponse = {
-    events: {
-      alias?: string;
-      classname?: string;
-      ip?: number;
-      time: Date;
-      username: string;
-    }[];
+    events: types.ActivityEvent[];
+    pagerItems: types.PageItem[];
   };
   export type CourseAddAdminRequest = { [key: string]: any };
   export type CourseAddAdminResponse = {};
