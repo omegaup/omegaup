@@ -74,7 +74,7 @@ class Controller {
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
-     * @omegaup-request-param string $username
+     * @omegaup-request-param null|string $username
      */
     protected static function resolveTargetIdentity(
         \OmegaUp\Request $r

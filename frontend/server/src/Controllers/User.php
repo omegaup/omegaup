@@ -1396,7 +1396,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $category
      * @omegaup-request-param bool|null $omit_rank
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      */
     public static function apiProfile(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1834,7 +1834,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{contests: array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place?: int}>}
      *
      * @omegaup-request-param null|string $auth_token
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      */
     public static function apiContestStats(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1914,7 +1914,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get Problems solved by user
      *
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      *
      * @return array{problems: list<Problem>}
      */
@@ -1953,7 +1953,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get Problems unsolved by user
      *
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      *
      * @return array{problems: list<Problem>}
      */
@@ -1995,7 +1995,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get Problems created by user
      *
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      *
      * @return array{problems: list<Problem>}
      */
@@ -2070,7 +2070,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get stats
      *
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -3178,7 +3178,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
      *
-     * @omegaup-request-param string $username
+     * @omegaup-request-param null|string $username
      */
     public static function getPrivacyPolicy(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3265,7 +3265,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{hasAccepted: bool}
      *
-     * @omegaup-request-param string $username
+     * @omegaup-request-param null|string $username
      */
     public static function apiLastPrivacyPolicyAccepted(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3297,7 +3297,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $privacy_git_object_id
      * @omegaup-request-param string $statement_type
-     * @omegaup-request-param string $username
+     * @omegaup-request-param null|string $username
      */
     public static function apiAcceptPrivacyPolicy(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3743,7 +3743,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{entrypoint: string, smartyProperties: array{payload: UserProfileDetailsPayload, title: \OmegaUp\TranslationString}}
      *
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      */
     public static function getProfileDetailsForSmarty(\OmegaUp\Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -3823,7 +3823,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      *
      * @return array{smartyProperties: array{STATUS_ERROR: string}|array{COUNTRIES: list<\OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: UserProfileInfo}, template: string}
      */
@@ -3865,7 +3865,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * @omegaup-request-param null|string $auth_token
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      *
      * @return array{smartyProperties: array{STATUS_ERROR?: string, payload?: array{email: null|string}, profile?: UserProfileInfo}, template: string}
      */
@@ -3904,7 +3904,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      *
      * @return array{smartyProperties: array{STATUS_ERROR?: string, admin?: true, practice?: false, profile?: UserProfileInfo}, template: string}
      */
