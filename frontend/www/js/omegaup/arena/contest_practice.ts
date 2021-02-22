@@ -134,11 +134,10 @@ OmegaUp.on('ready', () => {
       // This needs to be set here and not at the top because it depends
       // on the `navigate-to-problem` callback being invoked, and that is
       // not the case if this is set a priori.
-      contestPractice.problem = { alias: match.groups.problem, runs: [] };
+      contestPractice.problem = { alias: match.groups.alias, runs: [] };
       if (match.groups.popup === 'new-run') {
         contestPractice.popupDisplayed = PopupDisplayed.RunSubmit;
-      }
-      if (match.groups.popup.startsWith('show-run')) {
+      } else if (match.groups.popup.startsWith('show-run')) {
         contestPractice.popupDisplayed = PopupDisplayed.RunDetails;
       }
       break;

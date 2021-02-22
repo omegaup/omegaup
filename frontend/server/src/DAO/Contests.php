@@ -47,12 +47,31 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
-     * @return array{acl_id: int, admission_mode: string, alias: string, contest_id: int, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null
+     * @return array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null}|null
      */
     final public static function getByAliasWithDirector(string $alias) {
         $sql = 'SELECT
                     i.username AS director,
-                    c.*
+                    c.problemset_id,
+                    c.title,
+                    c.description,
+                    c.start_time,
+                    c.finish_time,
+                    c.window_length,
+                    c.rerun_id,
+                    c.admission_mode,
+                    c.alias,
+                    c.scoreboard,
+                    c.points_decay_factor,
+                    c.partial_score,
+                    c.submissions_gap,
+                    c.feedback,
+                    c.penalty,
+                    c.penalty_type,
+                    c.penalty_calc_policy,
+                    c.show_scoreboard_after,
+                    IF(c.penalty <> 0 OR c.penalty_type <> \'none\', 1, 0) AS show_penalty,
+                    c.languages
                 FROM
                     Contests c
                 INNER JOIN
@@ -68,8 +87,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 LIMIT
                     1;';
 
-        /** @var array{acl_id: int, admission_mode: string, alias: string, contest_id: int, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
+        /** @var array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, show_penalty: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null}|null */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
+        if (empty($rs)) {
+            return null;
+        }
+        $rs['show_penalty'] = boolval($rs['show_penalty']);
+        return $rs;
     }
 
     /**
