@@ -3670,7 +3670,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{payload: AssignmentDetailsPayload, title: string, inContest: bool}, entrypoint: string}
      */
-    private static function getAssignmentDetailsForSmarty(
+    private static function getAssignmentDetailsForTypescript(
         \OmegaUp\Request $r,
         \OmegaUp\DAO\VO\Courses $course,
         \OmegaUp\DAO\VO\Groups $group,
