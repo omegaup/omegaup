@@ -8,6 +8,7 @@ import arena_ContestPractice, {
   ActiveProblem,
 } from '../components/arena/ContestPractice.vue';
 import arena_NewClarification from '../components/arena/NewClarificationPopup.vue';
+import problemsStore from './problemStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -37,6 +38,13 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'navigate-to-problem': (source: ActiveProblem) => {
+            const problemIndex = problemsStore.state.index[source.alias];
+            if (typeof problemIndex !== 'undefined') {
+              contestPractice.problemInfo =
+                problemsStore.state.problems[problemIndex];
+              window.location.hash = `#problems/${source.alias}`;
+              return;
+            }
             api.Problem.details({
               contest_alias: payload.contest.alias,
               problem_alias: source.alias,
@@ -50,6 +58,7 @@ OmegaUp.on('ready', () => {
                 contestPractice.problemInfo = problemInfo;
                 source.alias = problemInfo.alias;
                 source.runs = problemInfo.runs ?? [];
+                problemsStore.commit('addProblem', problemInfo);
                 window.location.hash = `#problems/${source.alias}`;
               })
               .catch(() => {
