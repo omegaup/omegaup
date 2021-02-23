@@ -61,7 +61,7 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($identity);
 
         try {
-            \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
+            \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                     'course_alias' => $courseData['course_alias'],
@@ -91,7 +91,7 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         // User login
         $login = self::login($identity);
 
-        $response = \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'course_alias' => $courseData['course_alias'],
@@ -123,7 +123,7 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         // User login
         $login = self::login($identity);
 
-        $response = \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'course_alias' => $courseData['course_alias'],

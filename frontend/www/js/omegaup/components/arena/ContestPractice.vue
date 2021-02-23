@@ -30,6 +30,8 @@
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="activeProblem.runs"
+              @submit-run="onRunSubmitted"
+              @show-run="onShowRunDetails"
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -87,7 +89,7 @@ import problem_Details from '../problem/Details.vue';
 
 export interface ActiveProblem {
   runs: types.Run[];
-  alias: string;
+  problem: types.NavbarProblemsetProblem;
 }
 
 @Component({
@@ -123,12 +125,24 @@ export default class ArenaContestPractice extends Vue {
   activeProblem: ActiveProblem | null = this.problem;
 
   get activeProblemAlias(): null | string {
-    return this.activeProblem?.alias ?? null;
+    return this.activeProblem?.problem.alias ?? null;
   }
 
-  onNavigateToProblem(problemAlias: string) {
-    this.activeProblem = { alias: problemAlias, runs: [] };
-    this.$emit('navigate-to-problem', this.activeProblem);
+  onNavigateToProblem(request: ActiveProblem) {
+    this.activeProblem = request;
+    this.$emit('navigate-to-problem', request);
+  }
+
+  onRunSubmitted(code: string, selectedLanguage: string): void {
+    const request = Object.assign({}, this.activeProblem, {
+      code,
+      selectedLanguage,
+    });
+    this.$emit('submit-run', request);
+  }
+
+  onShowRunDetails(target: problem_Details, guid: string): void {
+    this.$emit('show-run', { target, request: { guid } });
   }
 
   @Watch('problem')
@@ -137,7 +151,7 @@ export default class ArenaContestPractice extends Vue {
       this.activeProblem = null;
       return;
     }
-    this.onNavigateToProblem(newValue.alias);
+    this.onNavigateToProblem(newValue);
   }
 
   @Watch('clarifications')

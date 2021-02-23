@@ -501,7 +501,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $contest_alias
      */
-    public static function getContestDetailsForSmarty(
+    public static function getContestDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $contestAlias = $r->ensureString(
@@ -607,7 +607,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $contest_alias
      */
-    public static function getContestPracticeDetailsForSmarty(
+    public static function getContestPracticeDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $contestAlias = $r->ensureString(
@@ -693,7 +693,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page_size
      * @omegaup-request-param string $query
      */
-    public static function getContestListDetailsForSmarty(
+    public static function getContestListDetailsForTypeScript(
         \OmegaUp\Request $r
     ) {
         try {
@@ -798,7 +798,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page_size
      * @omegaup-request-param string $query
      */
-    public static function getContestListMineForSmarty(
+    public static function getContestListMineForTypeScript(
         \OmegaUp\Request $r
     ): array {
         // Authenticate user
@@ -849,7 +849,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{smartyProperties: array{payload: ContestNewPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getContestNewForSmarty(
+    public static function getContestNewForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -873,7 +873,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $contest_alias
      */
-    public static function getContestEditForSmarty(
+    public static function getContestEditForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -1628,7 +1628,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
      */
-    public static function getActivityFeedDetailsForSmarty(
+    public static function getActivityFeedDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -4326,7 +4326,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $contest_alias
      */
-    public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
+    public static function getStatsDataForTypeScript(\OmegaUp\Request $r) {
         // Get user
         $r->ensureIdentity();
         $contestAlias = $r->ensureString(
@@ -4497,7 +4497,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param null|string $filterBy
      */
-    public static function getContestReportDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getContestReportDetailsForTypeScript(\OmegaUp\Request $r) {
         $contestReport = self::getContestReportDetails($r)['ranking'];
         foreach ($contestReport as &$user) {
             if (!isset($user['problems'])) {

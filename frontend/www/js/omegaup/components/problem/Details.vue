@@ -114,10 +114,7 @@
               :preferred-language="problem.preferred_language"
               :languages="problem.languages"
               @dismiss="onPopupDismissed"
-              @submit-run="
-                (code, selectedLanguage) =>
-                  onRunSubmitted(code, selectedLanguage)
-              "
+              @submit-run="onRunSubmitted"
             ></omegaup-arena-runsubmit-popup>
             <omegaup-arena-rundetails-popup
               v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
