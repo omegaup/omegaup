@@ -2779,14 +2779,14 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $assignment_alias
      * @omegaup-request-param string $course_alias
      */
-    public static function getCourseDetailsForSmarty(\OmegaUp\Request $r): array {
+    public static function getCourseDetailsForTypeScript(\OmegaUp\Request $r): array {
         return self::getIntroDetails($r);
     }
 
     /**
      * @return array{entrypoint: string, smartyProperties: array{title: string}}
      */
-    public static function getCoursesHomepageForSmarty(\OmegaUp\Request $r): array {
+    public static function getCoursesHomepageForTypeScript(\OmegaUp\Request $r): array {
         return [
             'smartyProperties' => [
                 'title' => new \OmegaUp\TranslationString(
@@ -2803,7 +2803,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param string $token
      */
-    public static function getCourseCloneDetailsForSmarty(
+    public static function getCourseCloneDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -2847,7 +2847,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param bool|null $is_practice
      */
-    public static function getCourseAdminDetailsForSmarty(\OmegaUp\Request $r): array {
+    public static function getCourseAdminDetailsForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
         $isPractice = $r->ensureOptionalBool('is_practice') ?? false;
@@ -2895,7 +2895,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseNewPayload, title:\OmegaUp\TranslationString}}
      */
-    public static function getCourseNewDetailsForSmarty(\OmegaUp\Request $r): array {
+    public static function getCourseNewDetailsForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
         return [
@@ -2920,7 +2920,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $course
      */
-    public static function getCourseEditDetailsForSmarty(
+    public static function getCourseEditDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -2999,7 +2999,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $course
      */
-    public static function getCourseSubmissionsListForSmarty(\OmegaUp\Request $r) {
+    public static function getCourseSubmissionsListForTypeScript(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
         $courseAlias = $r->ensureString(
             'course',
@@ -3047,7 +3047,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      * @omegaup-request-param string $course
      */
-    public static function getStudentsProgressForSmarty(
+    public static function getStudentsProgressForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureIdentity();
@@ -3119,7 +3119,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $course
      * @omegaup-request-param string $student
      */
-    public static function getStudentProgressForSmarty(
+    public static function getStudentProgressForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureIdentity();
@@ -3179,7 +3179,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseListMinePayload, title: \OmegaUp\TranslationString}}
      */
-    public static function getCourseMineDetailsForSmarty(\OmegaUp\Request $r): array {
+    public static function getCourseMineDetailsForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
@@ -3252,7 +3252,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: \OmegaUp\TranslationString}}
      */
-    public static function getCourseListDetailsForSmarty(\OmegaUp\Request $r): array {
+    public static function getCourseListDetailsForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('page_size');
@@ -3292,7 +3292,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: \OmegaUp\TranslationString}}
      */
-    public static function getCourseSummaryListDetailsForSmarty(
+    public static function getCourseSummaryListDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $coursesTypes = ['student', 'public'];
@@ -3375,7 +3375,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $course
      */
-    public static function getCourseStatisticsForSmarty(
+    public static function getCourseStatisticsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureIdentity();
@@ -3425,7 +3425,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
      */
-    public static function getActivityFeedDetailsForSmarty(
+    public static function getActivityFeedDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();

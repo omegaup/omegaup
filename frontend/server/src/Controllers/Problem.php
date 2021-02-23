@@ -3445,7 +3445,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $problem_alias
      */
-    public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
+    public static function getStatsDataForTypeScript(\OmegaUp\Request $r) {
         // Get user
         $r->ensureIdentity();
 
@@ -4279,7 +4279,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{smartyProperties: array{payload: ProblemsMineInfoPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getProblemsMineInfoForSmarty(\OmegaUp\Request $r): array {
+    public static function getProblemsMineInfoForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
         $privateProblemsAlert = false;
@@ -4330,7 +4330,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $problemset_id
      * @omegaup-request-param null|string $statement_type
      */
-    public static function getProblemDetailsForSmarty(
+    public static function getProblemDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         try {
@@ -4589,7 +4589,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
      */
-    public static function getProblemListForSmarty(
+    public static function getProblemListForTypeScript(
         \OmegaUp\Request $r
     ): array {
         // Authenticate request
@@ -4670,7 +4670,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{smartyProperties: array{payload: ProblemListCollectionPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getProblemCollectionDetailsForSmarty(
+    public static function getProblemCollectionDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $tags = [];
@@ -4712,7 +4712,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{validLanguages: array<string, string>, validatorTypes: array<string, null|string>, visibilityStatuses: array<string, int>}
      */
-    public static function getCommonPayloadForSmarty(): array {
+    public static function getCommonPayloadForTypeScript(): array {
         $validatorTypes = [
             \OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS => \OmegaUp\Translations::getInstance()->get(
                 'problemEditFormTokenCaseless'
@@ -4792,7 +4792,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $validator_time_limit
      * @omegaup-request-param null|string $visibility
      */
-    public static function getProblemEditDetailsForSmarty(
+    public static function getProblemEditDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -4863,7 +4863,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => array_merge(
                     $details,
-                    self::getCommonPayloadForSmarty(),
+                    self::getCommonPayloadForTypeScript(),
                     $extraInfo
                 ),
                 'title' => new \OmegaUp\TranslationString(
@@ -4897,7 +4897,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $details = self::getProblemEditDetails($problem, $r->identity);
                 $result['smartyProperties']['payload'] = array_merge(
                     $details,
-                    self::getCommonPayloadForSmarty()
+                    self::getCommonPayloadForTypeScript()
                 );
                 $result['smartyProperties']['payload'] = array_merge(
                     $extraInfo,
@@ -5048,7 +5048,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $validator_time_limit
      * @omegaup-request-param null|string $visibility
      */
-    public static function getProblemNewForSmarty(
+    public static function getProblemNewForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -5155,7 +5155,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                 'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                                 'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                             ],
-                            self::getCommonPayloadForSmarty()
+                            self::getCommonPayloadForTypeScript()
                         ),
                         'title' => new \OmegaUp\TranslationString(
                             'omegaupTitleProblemNew'
@@ -5199,7 +5199,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                         'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                     ],
-                    self::getCommonPayloadForSmarty()
+                    self::getCommonPayloadForTypeScript()
                 ),
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblemNew'
@@ -5567,7 +5567,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $name
      * @omegaup-request-param mixed $os
      */
-    public static function getLibinteractiveGenForSmarty(\OmegaUp\Request $r): array {
+    public static function getLibinteractiveGenForTypeScript(\OmegaUp\Request $r): array {
         if (count($r) === 0) {
             // \OmegaUp\Request does not support empty().
             return [
@@ -5733,7 +5733,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
      */
-    public static function getCollectionsDetailsByLevelForSmarty(\OmegaUp\Request $r): array {
+    public static function getCollectionsDetailsByLevelForTypeScript(\OmegaUp\Request $r): array {
         $collectionLevel = $r->ensureString('level');
 
         $frequentTags = [];
@@ -5960,7 +5960,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
      */
-    public static function getCollectionsDetailsByAuthorForSmarty(\OmegaUp\Request $r): array {
+    public static function getCollectionsDetailsByAuthorForTypeScript(\OmegaUp\Request $r): array {
         $problems = [];
         $authorsRanking = [];
 

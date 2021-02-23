@@ -1188,7 +1188,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $problems = [];
         $requestParams = [];
         for ($i = 1; $i <= $pages; $i++) {
-            $response = \OmegaUp\Controllers\Problem::getProblemListForSmarty(
+            $response = \OmegaUp\Controllers\Problem::getProblemListForTypeScript(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                     'rowcount' => 1000,
@@ -1294,7 +1294,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue($response['results'][1]['quality_seal']);
         $this->assertTrue($response['results'][2]['quality_seal']);
 
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
@@ -1308,7 +1308,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicKarel',
