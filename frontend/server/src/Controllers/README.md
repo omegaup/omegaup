@@ -3964,16 +3964,16 @@ Get Contests which a certain user has participated in
 
 ### Parameters
 
-| Name         | Type           | Description |
-| ------------ | -------------- | ----------- |
-| `auth_token` | `null\|string` |             |
-| `username`   | `null\|string` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `token`    | `null\|string` |             |
+| `username` | `null\|string` |             |
 
 ### Returns
 
-| Name       | Type                                                                                                                                        |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `contests` | `{ [key: string]: { data: { alias: string; finish_time: Date; last_updated: Date; start_time: Date; title: string; }; place?: number; }; }` |
+| Name       | Type                                                                       |
+| ---------- | -------------------------------------------------------------------------- |
+| `contests` | `{ [key: string]: { data: types.ContestParticipated; place?: number; }; }` |
 
 ## `/api/user/create/`
 

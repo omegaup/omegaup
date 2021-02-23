@@ -1754,6 +1754,14 @@ export namespace types {
     languages: { [key: string]: string };
   }
 
+  export interface ContestParticipated {
+    alias: string;
+    finish_time: Date;
+    last_updated: Date;
+    start_time: Date;
+    title: string;
+  }
+
   export interface ContestPracticePayload {
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
@@ -3003,16 +3011,7 @@ export namespace types {
   }
 
   export interface UserProfileContests {
-    [key: string]: {
-      data: {
-        alias: string;
-        finish_time: Date;
-        last_updated: Date;
-        start_time: Date;
-        title: string;
-      };
-      place: number;
-    };
+    [key: string]: { data: types.ContestParticipated; place: number };
   }
 
   export interface UserProfileDetailsPayload {
@@ -3946,16 +3945,7 @@ export namespace messages {
   export type _UserContestStatsServerResponse = any;
   export type UserContestStatsResponse = {
     contests: {
-      [key: string]: {
-        data: {
-          alias: string;
-          finish_time: Date;
-          last_updated: Date;
-          start_time: Date;
-          title: string;
-        };
-        place?: number;
-      };
+      [key: string]: { data: types.ContestParticipated; place?: number };
     };
   };
   export type UserCreateRequest = { [key: string]: any };
