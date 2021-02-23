@@ -348,8 +348,8 @@ OmegaUp.on('ready', () => {
               window.location.pathname,
             )}`;
           },
-          'change-show-run-location': (guid: string) => {
-            window.location.hash = `#problems/show-run:${guid}/`;
+          'change-show-run-location': (request: { guid: string }) => {
+            window.location.hash = `#problems/show-run:${request.guid}/`;
           },
           rejudge: (run: types.Run) => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })

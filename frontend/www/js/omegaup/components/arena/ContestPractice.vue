@@ -31,6 +31,17 @@
               :active-tab="'problems'"
               :runs="activeProblem.runs"
               :initial-popup-displayed="popupDisplayed"
+              :guid="guid"
+              @update:activeTab="
+                (selectedTab) =>
+                  $emit('reset-hash', {
+                    selectedTab,
+                    alias: activeProblem.problem.alias,
+                  })
+              "
+              @change-show-run-location="onChangeShowRunLocation"
+              @submit-run="onRunSubmitted"
+              @show-run="onShowRunDetails"
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -89,7 +100,7 @@ import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 
 export interface ActiveProblem {
   runs: types.Run[];
-  alias: string;
+  problem: types.NavbarProblemsetProblem;
 }
 
 @Component({
@@ -120,6 +131,7 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
+  @Prop({ default: null }) guid!: null | string;
 
   T = T;
   ui = ui;
@@ -127,12 +139,34 @@ export default class ArenaContestPractice extends Vue {
   activeProblem: ActiveProblem | null = this.problem;
 
   get activeProblemAlias(): null | string {
-    return this.activeProblem?.alias ?? null;
+    return this.activeProblem?.problem.alias ?? null;
   }
 
-  onNavigateToProblem(problemAlias: string) {
-    this.activeProblem = { alias: problemAlias, runs: [] };
-    this.$emit('navigate-to-problem', this.activeProblem);
+  onNavigateToProblem(request: ActiveProblem) {
+    this.activeProblem = request;
+    this.$emit('navigate-to-problem', request);
+  }
+
+  onRunSubmitted(code: string, selectedLanguage: string): void {
+    const request = Object.assign({}, this.activeProblem, {
+      code,
+      selectedLanguage,
+    });
+    this.$emit('submit-run', request);
+  }
+
+  onShowRunDetails(target: problem_Details, guid: string): void {
+    this.$emit('show-run', { target, request: { guid } });
+  }
+
+  onChangeShowRunLocation(request: { guid: string }): void {
+    if (!this.activeProblem) {
+      return;
+    }
+    this.$emit(
+      'change-show-run-location',
+      Object.assign({}, request, { alias: this.activeProblem.problem.alias }),
+    );
   }
 
   @Watch('problem')
@@ -141,7 +175,7 @@ export default class ArenaContestPractice extends Vue {
       this.activeProblem = null;
       return;
     }
-    this.onNavigateToProblem(newValue.alias);
+    this.onNavigateToProblem(newValue);
   }
 
   @Watch('clarifications')
