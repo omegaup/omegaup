@@ -451,9 +451,9 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * @dataProvider coderOfTheMonthCategoryProvider
      */
-    public function testCoderOfTheMonthDetailsForSmarty(string $category) {
+    public function testCoderOfTheMonthDetailsForTypeScript(string $category) {
         // Test coder of the month details when user is not logged
-        $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty(
+        $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForTypeScript(
             new \OmegaUp\Request(['category' => $category])
         )['smartyProperties'];
         $this->assertArrayHasKey('payload', $response);
@@ -469,7 +469,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'identity' => $identity,
         ] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
-        $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty(
+        $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'category' => $category,
@@ -487,7 +487,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'identity' => $mentorIdentity,
         ] = \OmegaUp\Test\Factories\User::createMentorIdentity();
         $login = self::login($mentorIdentity);
-        $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty(
+        $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'category' => $category,

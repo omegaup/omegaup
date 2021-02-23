@@ -428,7 +428,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $group
      */
-    public static function getGroupEditDetailsForSmarty(
+    public static function getGroupEditDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         // Authenticate user
@@ -499,7 +499,7 @@ class Group extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{smartyProperties: array{payload: GroupListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getGroupListForSmarty(\OmegaUp\Request $r): array {
+    public static function getGroupListForTypeScript(\OmegaUp\Request $r): array {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
@@ -525,7 +525,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{payload: GroupScoreboardContestsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getGroupScoreboardEditForSmarty(
+    public static function getGroupScoreboardEditForTypeScript(
         \OmegaUp\Request $r
     ): array {
         // Authenticate user

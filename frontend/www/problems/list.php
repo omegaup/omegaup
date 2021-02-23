@@ -7,7 +7,7 @@ if (OMEGAUP_LOCKDOWN) {
 }
 
 \OmegaUp\UITools::render(
-    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Problem::getProblemListForSmarty(
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Problem::getProblemListForTypeScript(
         $r
     )
 );

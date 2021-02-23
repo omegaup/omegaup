@@ -2611,7 +2611,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
      */
-    public static function getAuthorRankForSmarty(\OmegaUp\Request $r) {
+    public static function getAuthorRankForTypeScript(\OmegaUp\Request $r) {
         $page = $r->ensureOptionalInt('page') ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
 
@@ -3466,7 +3466,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
-    public static function getRankForSmarty(\OmegaUp\Request $r) {
+    public static function getRankForTypeScript(\OmegaUp\Request $r) {
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('length');
         \OmegaUp\Validators::validateOptionalInEnum(
@@ -3565,7 +3565,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: IndexPayload, title: \OmegaUp\TranslationString}}
      */
-    public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getIndexDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
@@ -3635,7 +3635,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{payload: CoderOfTheMonthPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getCoderOfTheMonthDetailsForSmarty(
+    public static function getCoderOfTheMonthDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         try {
@@ -3745,7 +3745,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $username
      */
-    public static function getProfileDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getProfileDetailsForTypeScript(\OmegaUp\Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
         $identity = self::resolveTargetIdentity($r);
         if (
@@ -3827,7 +3827,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{STATUS_ERROR: string}|array{COUNTRIES: list<\OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: UserProfileInfo}, template: string}
      */
-    public static function getProfileEditDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getProfileEditDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
             self::authenticateOrAllowUnauthenticatedRequest($r);
 
@@ -3869,7 +3869,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{STATUS_ERROR?: string, payload?: array{email: null|string}, profile?: UserProfileInfo}, template: string}
      */
-    public static function getEmailEditDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getEmailEditDetailsForTypeScript(\OmegaUp\Request $r) {
         $currentSession = \OmegaUp\Controllers\Session::getCurrentSession();
 
         try {
@@ -3908,7 +3908,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{STATUS_ERROR?: string, admin?: true, practice?: false, profile?: UserProfileInfo}, template: string}
      */
-    public static function getInterviewResultsDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getInterviewResultsDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
             self::authenticateOrAllowUnauthenticatedRequest($r);
 
@@ -4009,7 +4009,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $state
      * @omegaup-request-param string $third_party_login
      */
-    public static function getLoginDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         if ($r->offsetExists('linkedin')) {
             $thirdPartyLogin = 'linkedin';
