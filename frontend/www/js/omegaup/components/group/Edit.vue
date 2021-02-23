@@ -1,11 +1,11 @@
 <template>
   <div class="group-edit">
     <div class="page-header">
-      <h1>
+      <h2>
         {{ ui.formatString(T.groupEditTitleWithName, { name: groupName }) }}
-      </h1>
+      </h2>
     </div>
-    <ul class="nav nav-pills">
+    <ul class="nav nav-pills mt-4">
       <li class="nav-item" role="presentation">
         <a
           :href="`#${AvailableTabs.Edit}`"
