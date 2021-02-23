@@ -4064,7 +4064,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $problem_alias
      * @omegaup-request-param mixed $problemset_id
      * @omegaup-request-param null|string $statement_type
-     * @omegaup-request-param string $username
+     * @omegaup-request-param null|string $username
      */
     public static function apiBestScore(\OmegaUp\Request $r) {
         $r->ensureIdentity();
