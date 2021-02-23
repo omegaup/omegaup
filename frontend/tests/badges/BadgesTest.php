@@ -342,7 +342,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
             )
         );
 
-        $smartyResult = \OmegaUp\Controllers\Badge::getDetailsForSmarty(new \OmegaUp\Request([
+        $smartyResult = \OmegaUp\Controllers\Badge::getDetailsForTypeScript(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'badge_alias' => 'problemSetter'
         ]));
