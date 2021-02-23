@@ -3,7 +3,7 @@ namespace OmegaUp;
 require_once(dirname(__DIR__, 1) . '/server/bootstrap.php');
 
 \OmegaUp\UITools::render(
-    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\User::getLoginDetailsForSmarty(
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\User::getLoginDetailsForTypeScript(
         $r
     )
 );

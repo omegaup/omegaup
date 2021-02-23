@@ -51,10 +51,6 @@ import T from '../../lang';
 import * as Highcharts from 'highcharts/highstock';
 import * as ui from '../../ui';
 
-interface Data {
-  runs: omegaup.RunInfo[];
-}
-
 interface GroupedPeriods {
   day: omegaup.VerdictByDate;
   week: omegaup.VerdictByDate;
@@ -119,7 +115,7 @@ const emptyPeriodRunCount = {
   },
 })
 export default class UserCharts extends Vue {
-  @Prop() data!: Data;
+  @Prop() data!: omegaup.RunInfo[];
   @Prop() username!: string;
 
   T = T;
@@ -130,14 +126,14 @@ export default class UserCharts extends Vue {
 
   get totalRuns(): number {
     let total = 0;
-    for (const runs of this.data.runs) {
+    for (const runs of this.data) {
       total += runs.runs;
     }
     return total;
   }
 
   get normalizedRunCounts(): NormalizedRunCounts[] {
-    const stats = this.data.runs;
+    const stats = this.data;
     const runs = stats.reduce(
       (total: omegaup.Run, amount: omegaup.RunInfo) => {
         total[amount.verdict] += amount.runs;
@@ -212,7 +208,7 @@ export default class UserCharts extends Vue {
   }
 
   get groupedPeriods(): GroupedPeriods {
-    const stats = this.data.runs;
+    const stats = this.data;
     const periods: Array<'day' | 'week' | 'month' | 'year'> = [
       'day',
       'week',

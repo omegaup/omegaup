@@ -127,7 +127,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 $contestData['contest']
             )
         );
-        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
@@ -165,7 +165,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 $contestData['contest']
             )
         );
-        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
@@ -273,7 +273,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Contest needs basic information for the user
-        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],

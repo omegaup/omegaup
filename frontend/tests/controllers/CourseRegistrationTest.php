@@ -362,7 +362,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         // Invited users can join the course , they don't need to requset access
         $invitedLogin = self::login($invited);
 
-        $response = \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $invitedLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],
@@ -386,7 +386,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         // The second one needs request access to join the course
         $uninvitedLogin = self::login($uninvited);
 
-        $response = \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $invitedLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],
