@@ -3339,28 +3339,25 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest' => $contest,
             'problemset' => $problemset
         ] = self::validateBasicDetails($contestAlias);
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['token'],
-            'token'
+
+        $token = $r->ensureOptionalString(
+            'token',
+            /*$required=*/ false,
         );
+        $identity = null;
         try {
             $r->ensureIdentity();
+            $identity = $r->identity;
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing.
-            $r->identity = null;
         }
-        return self::getScoreboard(
-            $contest,
-            $problemset,
-            $r->identity,
-            $r['token']
-        );
+        return self::getScoreboard($contest, $problemset, $identity, $token);
     }
 
     /**
      * @return Scoreboard
      */
-    private static function getScoreboard(
+    public static function getScoreboard(
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Problemsets $problemset,
         ?\OmegaUp\DAO\VO\Identities $identity,
@@ -3369,7 +3366,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // If true, will override Scoreboard Pertentage to 100%
         $showAllRuns = false;
 
-        if (is_null($token)) {
+        if (empty($token)) {
             // User should be logged
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\UnauthorizedException();
