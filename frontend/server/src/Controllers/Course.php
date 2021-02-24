@@ -3706,7 +3706,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $r->identity
                     ),
                 ],
-                'title' => "{$assignment->alias} - {$course->name}", // FIXME: Suggestions?
+                'title' => strval($assignment->name),
                 // Navbar is only hidden during exams.
                 'inContest' => $assignment->assignment_type === 'test',
             ],
