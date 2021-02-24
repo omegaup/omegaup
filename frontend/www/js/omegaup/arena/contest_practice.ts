@@ -61,12 +61,14 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'navigate-to-problem': (request: ActiveProblem) => {
-            const problemAliasStored = problemsStore.state.sortedAliases.find(
-              (alias: string) => alias === request.problem.alias,
-            );
-            if (typeof problemAliasStored !== 'undefined') {
+            if (
+              Object.prototype.hasOwnProperty.call(
+                problemsStore.state.problems,
+                request.problem.alias,
+              )
+            ) {
               contestPractice.problemInfo =
-                problemsStore.state.problems[problemAliasStored];
+                problemsStore.state.problems[request.problem.alias];
               window.location.hash = `#problems/${request.problem.alias}`;
               return;
             }
