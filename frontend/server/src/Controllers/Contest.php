@@ -551,7 +551,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
                     $r->user
                 );
-            $result['inContest'] = true;
+            $result['inContest'] = (
+                is_null($r->identity) ||
+                !\OmegaUp\Authorization::isContestAdmin(
+                    $r->identity,
+                    $contest
+                )
+            );
             $result['template'] = 'arena.contest.contestant.tpl';
             unset($result['entrypoint']);
             return $result;
