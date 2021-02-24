@@ -1622,7 +1622,7 @@ export namespace types {
     alias: string;
     available_languages: { [key: string]: string };
     description: string;
-    director: string;
+    director?: string;
     feedback: string;
     finish_time: Date;
     languages: string[];
@@ -1656,7 +1656,7 @@ export namespace types {
     admission_mode: string;
     alias: string;
     description: string;
-    director: string;
+    director?: string;
     feedback: string;
     finish_time: Date;
     languages: string[];
@@ -1783,7 +1783,6 @@ export namespace types {
     admission_mode: string;
     alias: string;
     description: string;
-    director: string;
     feedback: string;
     finish_time: Date;
     languages: string;
