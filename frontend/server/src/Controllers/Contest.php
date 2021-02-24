@@ -643,7 +643,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $contest = \OmegaUp\Controllers\Contest::validateContest($contestAlias);
+        [
+            'contestWithDirector' => $contestWithDirector,
+        ] = self::validateContestWithDirector($contestAlias);
+
+        if ($contestWithDirector['finish_time']->time > \OmegaUp\Time::get()) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'originalContestHasNotEnded'
+            );
+        }
 
         try {
             $r->ensureIdentity();
@@ -658,9 +666,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest' => $contest,
             'contest_admin' => $contestAdmin,
         ] = self::validateDetails($contestAlias, $r->identity);
-        [
-            'contestWithDirector' => $contestWithDirector,
-        ] = self::validateContestWithDirector($contestAlias);
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
