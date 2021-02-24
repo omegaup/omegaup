@@ -1864,11 +1864,9 @@
     eslint-visitor-keys "^2.0.0"
 
 "@voerro/vue-tagsinput@^2.0.2":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@voerro/vue-tagsinput/-/vue-tagsinput-2.1.0.tgz#5250be05fc83dd4bf732dfdb65b38ba28d60efc7"
-  integrity sha512-Sm05urpfRkY65IBcpIM7CFumB1+TcoOqP9AzAgdClQPIQn2yAxmV0zFoQ/ZOGmS2SLNok/LyKWFSPSP52Zor1w==
-  dependencies:
-    vue "^2.5.0"
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/@voerro/vue-tagsinput/-/vue-tagsinput-2.4.3.tgz#a4e9bdd1cf2f3248584380c8491799059dca5b73"
+  integrity sha512-r+4CJmuzrTgcHWit+vdnuiBdPRoEm7r361DMpSkGBlth/Cvf1vOdF/0WRI1vdstQc0r9j/Ifce34ImuzoFKqLw==
 
 "@vue/component-compiler-utils@^3.1.0":
   version "3.2.0"
@@ -8503,11 +8501,6 @@ vue-typeahead-bootstrap@^2.1.2:
   dependencies:
     resize-observer-polyfill "^1.5.0"
     vue "^2.5.17"
-
-vue@^2.5.0:
-  version "2.6.10"
-  resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.10.tgz#a72b1a42a4d82a721ea438d1b6bf55e66195c637"
-  integrity sha512-ImThpeNU9HbdZL3utgMCq0oiMzAkt1mcgy3/E6zWC/G6AaQoeuFdsl9nDhTDU3X1R6FK7nsIUuRACVcjI+A2GQ==
 
 vue@^2.5.17:
   version "2.6.11"
