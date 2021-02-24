@@ -656,7 +656,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         try {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            if ($contest->admission_mode === 'private') {
+            if ($contestWithDirector['admission_mode'] === 'private') {
                 throw $e;
             }
             $r->identity = null;

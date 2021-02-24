@@ -301,8 +301,6 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'finishTime' => $finishTime,
             ])
         );
-        $identity = [];
-
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contest
@@ -332,7 +330,6 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
     public function testContestPracticeWhenOriginalContestHasNotEnded() {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
-        $identity = [];
 
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
