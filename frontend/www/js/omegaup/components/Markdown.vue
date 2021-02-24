@@ -287,6 +287,11 @@ export default class Markdown extends Vue {
         font-size: 80%;
       }
     }
+
+    tr td:first-child pre {
+      overflow: visible;
+      margin-right: 20px;
+    }
   }
 
   iframe {
