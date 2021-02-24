@@ -1130,7 +1130,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ) {
             $registration = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK(
                 $identity->identity_id,
-                $contest['problemset_id']
+                $contest->problemset_id
             );
 
             $result['user_registration_requested'] = !is_null($registration);
