@@ -142,19 +142,23 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testContestParticipantsReport() {
         // Get a contest
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
-            'requestsUserInformation' => 'optional',
-        ]));
-        $user = [];
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'requestsUserInformation' => 'optional',
+            ])
+        );
         $identity = [];
-        for ($i = 0; $i < 3; $i++) {
+        $numberOfStudents = 3;
+        foreach (range(0, $numberOfStudents - 1) as $studentIterator) {
             // Create users
-            ['user' => $user[$i], 'identity' => $identity[$i]] = \OmegaUp\Test\Factories\User::createUser();
+            [
+                'identity' => $identity[$studentIterator],
+            ] = \OmegaUp\Test\Factories\User::createUser();
 
             // Add users to our private contest
             \OmegaUp\Test\Factories\Contest::addUser(
                 $contestData,
-                $identity[$i]
+                $identity[$studentIterator]
             );
         }
 
@@ -172,6 +176,10 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['smartyProperties']['payload'];
 
+        $this->assertEquals(
+            $contestData['director']->username,
+            $contestDetails['contest']['director']
+        );
         // Explicitly join contest
         \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
@@ -281,6 +289,73 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties']['payload'];
 
         $this->assertTrue($contestDetails['needsBasicInformation']);
+    }
+
+    public function testBasicContestPractice() {
+        // Get a contest in the past
+        $startTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 120 * 60);
+        $finishTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 60 * 60);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'startTime' => $startTime,
+                'finishTime' => $finishTime,
+            ])
+        );
+        $identity = [];
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add user to our private contest
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
+
+        $userLogin = self::login($identity);
+        $this->assertTrue(
+            \OmegaUp\Controllers\Contest::shouldShowIntro(
+                $identity,
+                $contestData['contest']
+            )
+        );
+
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestPracticeDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertEquals(
+            $contestData['director']->username,
+            $contestDetails['contest']['director']
+        );
+    }
+
+    public function testContestPracticeWhenOriginalContestHasNotEnded() {
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $identity = [];
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add user to our private contest
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
+
+        $userLogin = self::login($identity);
+        $this->assertTrue(
+            \OmegaUp\Controllers\Contest::shouldShowIntro(
+                $identity,
+                $contestData['contest']
+            )
+        );
+        try {
+            \OmegaUp\Controllers\Contest::getContestPracticeDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $userLogin->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('originalContestHasNotEnded', $e->getMessage());
+        }
     }
 
     private static function numberOfUsersSharingBasicInformation(
