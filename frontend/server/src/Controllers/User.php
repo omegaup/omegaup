@@ -1839,7 +1839,6 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{contests: array<string, array{data: ContestParticipated, place?: int}>}
      *
-     * @omegaup-request-param null|string $token
      * @omegaup-request-param null|string $username
      */
     public static function apiContestStats(\OmegaUp\Request $r): array {
@@ -1854,14 +1853,8 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
-        $token = $r->ensureOptionalString(
-            'token',
-            /*$required=*/ false,
-            fn (string $token) => \OmegaUp\Validators::stringNonEmpty($token)
-        );
-
         return [
-            'contests' => self::getContestStats($identity, $token),
+            'contests' => self::getContestStats($identity),
         ];
     }
 
@@ -1869,8 +1862,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return UserProfileContests
      */
     private static function getContestStats(
-        \OmegaUp\DAO\VO\Identities $identity,
-        ?string $token
+        \OmegaUp\DAO\VO\Identities $identity
     ): array {
         // Get contests where identity had at least 1 run
         $contestsParticipated = \OmegaUp\DAO\Contests::getContestsParticipated(
@@ -1893,8 +1885,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $scoreboardResponse = \OmegaUp\Controllers\Contest::getScoreboard(
                 $contestProblemset['contest'],
                 $contestProblemset['problemset'],
-                $identity,
-                $token
+                $identity
             );
             $contest = [
                 'alias' => $contestProblemset['contest']->alias,
@@ -3789,10 +3780,7 @@ class User extends \OmegaUp\Controllers\Controller {
                             $identity
                         ),
                         'extraProfileDetails' => [
-                            'contests' => self::getContestStats(
-                                $identity,
-                                /*$token=*/ null
-                            ),
+                            'contests' => self::getContestStats($identity),
                             'solvedProblems' => self::getSolvedProblems(
                                 $identity->identity_id
                             ),

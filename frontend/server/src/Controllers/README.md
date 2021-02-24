@@ -3966,7 +3966,6 @@ Get Contests which a certain user has participated in
 
 | Name       | Type           | Description |
 | ---------- | -------------- | ----------- |
-| `token`    | `null\|string` |             |
 | `username` | `null\|string` |             |
 
 ### Returns
