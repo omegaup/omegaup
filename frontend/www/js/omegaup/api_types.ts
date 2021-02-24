@@ -1786,7 +1786,7 @@ export namespace types {
     director: string;
     feedback: string;
     finish_time: Date;
-    languages?: string;
+    languages: string;
     partial_score: boolean;
     penalty: number;
     penalty_calc_policy: string;

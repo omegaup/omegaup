@@ -460,13 +460,6 @@ export default class ProblemDetails extends Vue {
     return this.histogram?.difficulty ?? 0;
   }
 
-  mounted(): void {
-    if (!this.guid) {
-      return;
-    }
-    this.$emit('show-run', this, this.guid);
-  }
-
   onNewSubmission(): void {
     if (!this.user.loggedIn) {
       this.$emit('redirect-login-page');
