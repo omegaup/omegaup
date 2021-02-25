@@ -2846,12 +2846,10 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
-     * @omegaup-request-param bool|null $is_practice
      */
     public static function getCourseAdminDetailsForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
-        $isPractice = $r->ensureOptionalBool('is_practice') ?? false;
         $courseAlias = $r->ensureString(
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
@@ -2888,7 +2886,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 ],
             ],
             'template' => 'arena.course.admin.tpl',
-            'inContest' => !$isPractice,
+            'inContest' => true,
         ];
     }
 

@@ -2,7 +2,7 @@
   <omegaup-arena
     :active-tab="activeTab"
     :contest-title="contest.title"
-    :is-admin="isAdmin"
+    :is-admin="contestAdmin"
     :background-class="'practice'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
@@ -123,12 +123,6 @@ export default class ArenaContestPractice extends Vue {
   @Prop() problemInfo!: types.ProblemInfo;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop({ default: false }) isEphemeralExperimentEnabled!: boolean;
-  @Prop({ default: false }) admin!: boolean;
-  @Prop({ default: true }) showNavigation!: boolean;
-  @Prop({ default: false }) showRanking!: boolean;
-  @Prop({ default: true }) showClarifications!: boolean;
-  @Prop({ default: true }) showDeadlines!: boolean;
-  @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
