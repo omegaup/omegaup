@@ -30,7 +30,7 @@
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="activeProblem.runs"
-              :initial-popup-displayed="popupDisplayed"
+              :popup-displayed="popupDisplayed"
               :guid="guid"
               @update:activeTab="
                 (selectedTab) =>
