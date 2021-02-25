@@ -139,18 +139,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
-     * @return list<array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, scoreboard_url_admin: string}>
+     * @return list<array{contest: \OmegaUp\DAO\VO\Contests, problemset: \OmegaUp\DAO\VO\Problemsets}>
      */
     public static function getContestsParticipated(int $identityId) {
         $sql = '
             SELECT
-                c.contest_id,
-                c.alias,
-                c.title,
-                c.start_time,
-                c.finish_time,
-                c.last_updated,
-                p.scoreboard_url_admin
+                *
             FROM
                 Contests c
             INNER JOIN
@@ -170,19 +164,33 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     s.identity_id = ? AND s.type= \'normal\' AND s.problemset_id IS NOT NULL
             )
             ORDER BY
-                contest_id DESC;';
+                c.contest_id DESC;';
 
-        /** @var list<array{alias: string, contest_id: int, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string}> */
+        /** @var list<array{access_mode: string, acl_id: int, acl_id: int, admission_mode: string, alias: string, assignment_id: int|null, contest_id: int, contest_id: int|null, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, interview_id: int|null, languages: null|string, languages: null|string, last_updated: \OmegaUp\Timestamp, needs_basic_information: bool, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, problemset_id: int, recommended: bool, requests_user_information: string, rerun_id: int, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, type: string, urgent: bool, window_length: int|null}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId]
         );
-        foreach ($result as &$row) {
-            // We need to get contest_id just to be able to ORDER BY it, but we
-            // should not return it to users.
-            unset($row['contest_id']);
+
+        /** @var list<array{contest: \OmegaUp\DAO\VO\Contests, problemset: \OmegaUp\DAO\VO\Problemsets}> */
+        $response = [];
+        foreach ($result as $contestProblemset) {
+            $response[] = [
+                'contest' => new \OmegaUp\DAO\VO\Contests(
+                    array_intersect_key(
+                        $contestProblemset,
+                        \OmegaUp\DAO\VO\Contests::FIELD_NAMES
+                    )
+                ),
+                'problemset' => new \OmegaUp\DAO\VO\Problemsets(
+                    array_intersect_key(
+                        $contestProblemset,
+                        \OmegaUp\DAO\VO\Problemsets::FIELD_NAMES
+                    )
+                ),
+            ];
         }
-        return $result;
+        return $response;
     }
 
     /**
