@@ -105,24 +105,24 @@
         </template>
         <omegaup-overlay
           v-if="user.loggedIn"
-          :show-overlay="popupDisplayed !== PopupDisplayed.None"
+          :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
           @hide-overlay="onPopupDismissed"
         >
           <template #popup>
             <omegaup-arena-runsubmit-popup
-              v-show="popupDisplayed === PopupDisplayed.RunSubmit"
+              v-show="currentPopupDisplayed === PopupDisplayed.RunSubmit"
               :preferred-language="problem.preferred_language"
               :languages="problem.languages"
               @dismiss="onPopupDismissed"
               @submit-run="onRunSubmitted"
             ></omegaup-arena-runsubmit-popup>
             <omegaup-arena-rundetails-popup
-              v-show="popupDisplayed === PopupDisplayed.RunDetails"
+              v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
               :data="currentRunDetailsData"
               @dismiss="onPopupDismissed"
             ></omegaup-arena-rundetails-popup>
             <omegaup-quality-nomination-promotion-popup
-              v-show="popupDisplayed === PopupDisplayed.Promotion"
+              v-show="currentPopupDisplayed === PopupDisplayed.Promotion"
               :solved="nominationStatus && nominationStatus.solved"
               :tried="nominationStatus && nominationStatus.tried"
               @submit="
@@ -138,15 +138,15 @@
               "
             ></omegaup-quality-nomination-promotion-popup>
             <omegaup-quality-nomination-demotion-popup
-              v-show="popupDisplayed === PopupDisplayed.Demotion"
-              @dismiss="popupDisplayed = PopupDisplayed.None"
+              v-show="currentPopupDisplayed === PopupDisplayed.Demotion"
+              @dismiss="currentPopupDisplayed = PopupDisplayed.None"
               @submit="
                 (qualityDemotionComponent) =>
                   $emit('submit-demotion', qualityDemotionComponent)
               "
             ></omegaup-quality-nomination-demotion-popup>
             <omegaup-quality-nomination-reviewer-popup
-              v-show="popupDisplayed === PopupDisplayed.Reviewer"
+              v-show="currentPopupDisplayed === PopupDisplayed.Reviewer"
               :allow-user-add-tags="allowUserAddTags"
               :level-tags="levelTags"
               :problem-level="problemLevel"
@@ -155,7 +155,7 @@
               :selected-private-tags="selectedPrivateTags"
               :problem-alias="problem.alias"
               :problem-title="problem.title"
-              @dismiss="popupDisplayed = PopupDisplayed.None"
+              @dismiss="currentPopupDisplayed = PopupDisplayed.None"
               @submit="
                 (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
               "
@@ -216,12 +216,12 @@
         ></omegaup-arena-runs>
         <omegaup-overlay
           v-if="user.loggedIn"
-          :show-overlay="popupDisplayed !== PopupDisplayed.None"
+          :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
           @hide-overlay="onPopupDismissed"
         >
           <template #popup>
             <omegaup-arena-rundetails-popup
-              v-show="popupDisplayed === PopupDisplayed.RunDetails"
+              v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
               :data="currentRunDetailsData"
               @dismiss="onPopupDismissed"
             ></omegaup-arena-rundetails-popup>
@@ -367,8 +367,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: 0 }) availableTokens!: number;
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
-  @Prop({ default: PopupDisplayed.None })
-  initialPopupDisplayed!: PopupDisplayed;
+  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
   @Prop() allowUserAddTags!: boolean;
   @Prop() levelTags!: string[];
@@ -391,7 +390,7 @@ export default class ProblemDetails extends Vue {
   time = time;
   selectedTab = this.activeTab;
   clarifications = this.initialClarifications || [];
-  popupDisplayed = this.initialPopupDisplayed;
+  currentPopupDisplayed = this.popupDisplayed;
   hasUnreadClarifications =
     this.initialClarifications?.length > 0 &&
     this.activeTab !== 'clarifications';
@@ -465,12 +464,12 @@ export default class ProblemDetails extends Vue {
       this.$emit('redirect-login-page');
       return;
     }
-    this.popupDisplayed = PopupDisplayed.RunSubmit;
+    this.currentPopupDisplayed = PopupDisplayed.RunSubmit;
   }
 
   onRunDetails(guid: string): void {
     this.$emit('show-run', this, guid);
-    this.popupDisplayed = PopupDisplayed.RunDetails;
+    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
   }
 
   onNewPromotion(): void {
@@ -478,19 +477,19 @@ export default class ProblemDetails extends Vue {
       this.$emit('redirect-login-page');
       return;
     }
-    this.popupDisplayed = PopupDisplayed.Promotion;
+    this.currentPopupDisplayed = PopupDisplayed.Promotion;
   }
 
   onNewPromotionAsReviewer(): void {
-    this.popupDisplayed = PopupDisplayed.Reviewer;
+    this.currentPopupDisplayed = PopupDisplayed.Reviewer;
   }
 
   onReportInappropriateProblem(): void {
-    this.popupDisplayed = PopupDisplayed.Demotion;
+    this.currentPopupDisplayed = PopupDisplayed.Demotion;
   }
 
   onPopupDismissed(): void {
-    this.popupDisplayed = PopupDisplayed.None;
+    this.currentPopupDisplayed = PopupDisplayed.None;
     this.$emit('update:activeTab', this.selectedTab);
   }
 
@@ -651,9 +650,9 @@ export default class ProblemDetails extends Vue {
     this.clarifications = newValue;
   }
 
-  @Watch('initialPopupDisplayed')
+  @Watch('popupDisplayed')
   onPopupDisplayedChanged(newValue: PopupDisplayed): void {
-    this.popupDisplayed = newValue;
+    this.currentPopupDisplayed = newValue;
     if (newValue === PopupDisplayed.None) return;
     if (newValue === PopupDisplayed.RunSubmit) {
       this.onNewSubmission();
