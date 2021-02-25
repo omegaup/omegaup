@@ -149,16 +149,16 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $identity = [];
         $numberOfStudents = 3;
-        foreach (range(0, $numberOfStudents - 1) as $studentIterator) {
+        foreach (range(0, $numberOfStudents - 1) as $studentIndex) {
             // Create users
             [
-                'identity' => $identity[$studentIterator],
+                'identity' => $identity[$studentIndex],
             ] = \OmegaUp\Test\Factories\User::createUser();
 
             // Add users to our private contest
             \OmegaUp\Test\Factories\Contest::addUser(
                 $contestData,
-                $identity[$studentIterator]
+                $identity[$studentIndex]
             );
         }
 
