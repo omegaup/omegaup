@@ -572,7 +572,6 @@ export class Arena {
         return createElement('omegaup-arena-contestsummary', {
           props: {
             contest: this.contest,
-            showRanking: false,
           },
         });
       },
@@ -782,17 +781,6 @@ export class Arena {
   }
 
   problemsetLoaded(problemset: types.Problemset): void {
-    if (
-      problemset.finish_time &&
-      Date.now() < problemset.finish_time.getTime()
-    ) {
-      window.location.pathname = window.location.pathname.replace(
-        /\/practice.*/,
-        '/',
-      );
-      return;
-    }
-
     if (typeof problemset.problemset_id !== 'undefined') {
       this.options.problemsetId = problemset.problemset_id;
     }

@@ -2,7 +2,7 @@
   <omegaup-arena
     :active-tab="activeTab"
     :contest-title="contest.title"
-    :is-admin="contestAdmin"
+    :should-show-runs="contestAdmin"
     :background-class="'practice'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
@@ -57,6 +57,19 @@
           <omegaup-markdown
             :markdown="
               ui.formatString(T.arenaContestPracticeOriginalScoreboardText, {
+                contestAlias: contest.alias,
+              })
+            "
+          ></omegaup-markdown>
+        </div>
+      </div>
+    </template>
+    <template #arena-runs>
+      <div class="card">
+        <div class="card-body">
+          <omegaup-markdown
+            :markdown="
+              ui.formatString(T.arenaContestPracticeOriginalRunsText, {
                 contestAlias: contest.alias,
               })
             "
