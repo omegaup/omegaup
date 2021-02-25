@@ -63,6 +63,37 @@ export namespace types {
       );
     }
 
+    export function AssignmentDetailsPayload(
+      elementId: string = 'payload',
+    ): types.AssignmentDetailsPayload {
+      return ((x) => {
+        x.courseDetails = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.courseDetails);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function AuthorRankTablePayload(
       elementId: string = 'payload',
     ): types.AuthorRankTablePayload {
@@ -1380,6 +1411,12 @@ export namespace types {
     statement?: types.ProblemStatement;
     title: string;
     visibility: number;
+  }
+
+  export interface AssignmentDetailsPayload {
+    courseDetails: types.CourseDetails;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    showRanking: boolean;
   }
 
   export interface AssignmentProgress {

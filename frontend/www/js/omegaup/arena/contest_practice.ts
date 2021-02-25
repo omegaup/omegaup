@@ -12,6 +12,7 @@ import problem_Details, {
 } from '../components/problem/Details.vue';
 import { myRunsStore } from '../arena/runsStore';
 import arena_NewClarification from '../components/arena/NewClarificationPopup.vue';
+import problemsStore from './problemStore';
 import JSZip from 'jszip';
 
 OmegaUp.on('ready', () => {
@@ -29,6 +30,9 @@ OmegaUp.on('ready', () => {
       problem: null as ActiveProblem | null,
       problems: payload.problems as types.NavbarProblemsetProblem[],
       clarifications: payload.clarifications,
+      popupDisplayed: PopupDisplayed.None,
+      showNewClarificationPopup: false,
+      guid: null as null | string,
     }),
     methods: {
       getMaxScore: (
@@ -56,10 +60,24 @@ OmegaUp.on('ready', () => {
           problemInfo: this.problemInfo,
           problem: this.problem,
           clarifications: this.clarifications,
+          popupDisplayed: this.popupDisplayed,
+          showNewClarificationPopup: this.showNewClarificationPopup,
           activeTab,
+          guid: this.guid,
         },
         on: {
           'navigate-to-problem': (request: ActiveProblem) => {
+            if (
+              Object.prototype.hasOwnProperty.call(
+                problemsStore.state.problems,
+                request.problem.alias,
+              )
+            ) {
+              contestPractice.problemInfo =
+                problemsStore.state.problems[request.problem.alias];
+              window.location.hash = `#problems/${request.problem.alias}`;
+              return;
+            }
             api.Problem.details({
               problem_alias: request.problem.alias,
               prevent_problemset_open: false,
@@ -80,6 +98,13 @@ OmegaUp.on('ready', () => {
                   problemInfo.alias,
                   0,
                 );
+                problemsStore.commit('addProblem', problemInfo);
+                if (
+                  contestPractice.popupDisplayed === PopupDisplayed.RunSubmit
+                ) {
+                  window.location.hash = `#problems/${request.problem.alias}/new-run`;
+                  return;
+                }
                 window.location.hash = `#problems/${request.problem.alias}`;
               })
               .catch(() => {
@@ -154,6 +179,12 @@ OmegaUp.on('ready', () => {
                 source.target.popupDisplayed = PopupDisplayed.None;
               });
           },
+          'change-show-run-location': (request: {
+            guid: string;
+            alias: string;
+          }) => {
+            window.location.hash = `#problems/${request.alias}/show-run:${request.guid}/`;
+          },
           'submit-run': (
             request: ActiveProblem & { code: string; selectedLanguage: string },
           ) => {
@@ -210,6 +241,9 @@ OmegaUp.on('ready', () => {
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
           },
+          'reset-hash': (request: { selectedTab: string; alias: string }) => {
+            window.location.replace(`#${request.selectedTab}/${request.alias}`);
+          },
           'clarification-response': (
             id: number,
             responseText: string,
@@ -240,24 +274,46 @@ OmegaUp.on('ready', () => {
       });
   }
 
-  // The hash is of the form `#problems/${alias}`.
-  const problemMatch = /#problems\/([^/]+)/.exec(window.location.hash);
-  const problemAlias = problemMatch?.[1] ?? null;
-  if (problemAlias) {
-    // This needs to be set here and not at the top because it depends
-    // on the `navigate-to-problem` callback being invoked, and that is
-    // not the case if this is set a priori.
-    contestPractice.problem = {
-      problem: {
-        alias: problemAlias,
-        text: '',
-        acceptsSubmissions: true,
-        bestScore: 0,
-        maxScore: 0,
-        hasRuns: false,
-      },
-      runs: [],
-    };
+  // The hash is of the forms:
+  // - `#problems/${alias}`
+  // - `#problems/${alias}/new-run`
+  // - `#problems/${alias}/show-run:xyz`
+  // - `#clarifications/${alias}/new`
+  // and all the matching forms in the following regex
+  const match = /#(?<tab>\w+)\/(?<alias>[^/]+)(?:\/(?<popup>[^/]+))?/g.exec(
+    window.location.hash,
+  );
+  switch (match?.groups?.tab) {
+    case 'problems':
+      // This needs to be set here and not at the top because it depends
+      // on the `navigate-to-problem` callback being invoked, and that is
+      // not the case if this is set a priori.
+      contestPractice.problem = {
+        problem: {
+          alias: match?.groups?.alias,
+          text: '',
+          acceptsSubmissions: true,
+          bestScore: 0,
+          maxScore: 0,
+          hasRuns: false,
+        },
+        runs: [],
+      };
+      if (match.groups.popup === 'new-run') {
+        contestPractice.popupDisplayed = PopupDisplayed.RunSubmit;
+      } else if (match.groups.popup?.startsWith('show-run')) {
+        contestPractice.guid = match.groups.popup.split(':')[1];
+        contestPractice.popupDisplayed = PopupDisplayed.RunDetails;
+      }
+      break;
+    case 'clarifications':
+      if (match.groups.popup === 'new') {
+        contestPractice.showNewClarificationPopup = true;
+      }
+      break;
+    default:
+      contestPractice.popupDisplayed = PopupDisplayed.None;
+      contestPractice.showNewClarificationPopup = false;
   }
 
   function updateRun(run: types.Run): void {
