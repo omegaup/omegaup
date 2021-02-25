@@ -32,6 +32,7 @@
               :runs="activeProblem.runs"
               :popup-displayed="popupDisplayed"
               :guid="guid"
+              :shouldShowRunDetails="shouldShowRunDetails"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', {
@@ -137,6 +138,7 @@ export default class ArenaContestPractice extends Vue {
   ui = ui;
   currentClarifications = this.clarifications;
   activeProblem: ActiveProblem | null = this.problem;
+  shouldShowRunDetails = false;
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.problem.alias ?? null;
@@ -181,6 +183,15 @@ export default class ArenaContestPractice extends Vue {
   @Watch('clarifications')
   onClarificationsChanged(newValue: types.Clarification[]): void {
     this.currentClarifications = newValue;
+  }
+
+  @Watch('popupDisplayed')
+  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
+    if (newValue === PopupDisplayed.RunDetails) {
+      this.$nextTick(() => {
+        this.shouldShowRunDetails = true;
+      });
+    }
   }
 }
 </script>

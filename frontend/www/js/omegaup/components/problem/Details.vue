@@ -381,6 +381,7 @@ export default class ProblemDetails extends Vue {
   @Prop() isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop({ default: false }) shouldShowTabs!: boolean;
+  @Prop({ default: false }) shouldShowRunDetails!: boolean;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
@@ -671,6 +672,13 @@ export default class ProblemDetails extends Vue {
   onClarificationsChanged(newValue: types.Clarification[]): void {
     if (this.selectedTab === 'clarifications' || newValue.length === 0) return;
     this.hasUnreadClarifications = true;
+  }
+
+  @Watch('shouldShowRunDetails')
+  onShouldShowRunDetailsChanged(newValue: boolean): void {
+    if (newValue && this.guid) {
+      this.$emit('show-run', this, this.guid);
+    }
   }
 }
 </script>
