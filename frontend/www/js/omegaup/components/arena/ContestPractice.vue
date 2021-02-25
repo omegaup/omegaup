@@ -32,7 +32,7 @@
               :runs="activeProblem.runs"
               :popup-displayed="popupDisplayed"
               :guid="guid"
-              :shouldShowRunDetails="shouldShowRunDetails"
+              :should-show-run-details="shouldShowRunDetails"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', {
