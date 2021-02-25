@@ -12,6 +12,7 @@ import problem_Details, {
 } from '../components/problem/Details.vue';
 import { myRunsStore } from '../arena/runsStore';
 import arena_NewClarification from '../components/arena/NewClarificationPopup.vue';
+import problemsStore from './problemStore';
 import JSZip from 'jszip';
 
 OmegaUp.on('ready', () => {
@@ -60,6 +61,17 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'navigate-to-problem': (request: ActiveProblem) => {
+            if (
+              Object.prototype.hasOwnProperty.call(
+                problemsStore.state.problems,
+                request.problem.alias,
+              )
+            ) {
+              contestPractice.problemInfo =
+                problemsStore.state.problems[request.problem.alias];
+              window.location.hash = `#problems/${request.problem.alias}`;
+              return;
+            }
             api.Problem.details({
               problem_alias: request.problem.alias,
               prevent_problemset_open: false,
@@ -80,6 +92,7 @@ OmegaUp.on('ready', () => {
                   problemInfo.alias,
                   0,
                 );
+                problemsStore.commit('addProblem', problemInfo);
                 window.location.hash = `#problems/${request.problem.alias}`;
               })
               .catch(() => {
