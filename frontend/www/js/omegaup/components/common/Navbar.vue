@@ -23,7 +23,10 @@
         /></a>
       </div>
       <div aria-expanded="false" class="navbar-collapse collapse">
-        <ul v-if="!omegaUpLockDown && !inContest" class="nav navbar-nav">
+        <ul
+          v-if="!omegaUpLockDown && (!inContest || isAdmin)"
+          class="nav navbar-nav"
+        >
           <li
             v-if="isLoggedIn"
             class="dropdown nav-contests"
@@ -202,7 +205,7 @@
               <span class="caret"></span
             ></a>
             <ul class="dropdown-menu">
-              <template v-if="!omegaUpLockDown && !inContest">
+              <template v-if="!omegaUpLockDown && (!inContest || isAdmin)">
                 <div class="text-center">
                   <img
                     :src="gravatarURL128"

@@ -2842,7 +2842,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{inContest: bool, smartyProperties: array{payload: CourseDetailsPayload}, template: string}
+     * @return array{smartyProperties: array{payload: CourseDetailsPayload}, template: string}
      *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
@@ -2886,7 +2886,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 ],
             ],
             'template' => 'arena.course.admin.tpl',
-            'inContest' => true,
         ];
     }
 
