@@ -38,7 +38,6 @@ export interface ArenaOptions {
   disableSockets: boolean;
   isInterview: boolean;
   isLockdownMode: boolean;
-  isPractice: boolean;
   originalContestAlias: string | null;
   originalProblemsetId?: number;
   payload: types.CommonPayload;
@@ -317,12 +316,12 @@ export class Arena {
         return createElement('omegaup-arena-runs', {
           props: {
             contestAlias: options.contestAlias,
-            isContestFinished: this.isContestFinished && !options.isPractice,
+            isContestFinished: this.isContestFinished,
             isProblemsetOpened: this.isProblemsetOpened,
             problemAlias: this.problemAlias,
             runs: myRunsStore.state.runs,
             showDetails: true,
-            showPoints: !options.isPractice,
+            showPoints: true,
           },
           on: {
             details: (run: types.Run) => {
@@ -573,7 +572,6 @@ export class Arena {
         return createElement('omegaup-arena-contestsummary', {
           props: {
             contest: this.contest,
-            showRanking: !options.isPractice,
           },
         });
       },
@@ -658,11 +656,7 @@ export class Arena {
   }
 
   connectSocket(): boolean {
-    if (
-      this.options.isPractice ||
-      this.options.disableSockets ||
-      this.options.contestAlias == 'admin'
-    ) {
+    if (this.options.disableSockets || this.options.contestAlias == 'admin') {
       this.updateSocketStatus('✗', '#800');
       return false;
     }
@@ -740,7 +734,7 @@ export class Arena {
     this.finishTime = finish;
     // Once the clock is ready, we can now connect to the socket.
     this.connectSocket();
-    if (this.options.isPractice || !this.finishTime) {
+    if (!this.finishTime) {
       setItemText(this.elements.clock, null, '∞');
       return;
     }
@@ -787,18 +781,6 @@ export class Arena {
   }
 
   problemsetLoaded(problemset: types.Problemset): void {
-    if (
-      this.options.isPractice &&
-      problemset.finish_time &&
-      Date.now() < problemset.finish_time.getTime()
-    ) {
-      window.location.pathname = window.location.pathname.replace(
-        /\/practice.*/,
-        '/',
-      );
-      return;
-    }
-
     if (typeof problemset.problemset_id !== 'undefined') {
       this.options.problemsetId = problemset.problemset_id;
     }
@@ -854,7 +836,7 @@ export class Arena {
       }
     }
 
-    if (!this.options.isPractice && !this.options.isInterview) {
+    if (!this.options.isInterview) {
       this.setupPolls();
     }
 
@@ -970,7 +952,7 @@ export class Arena {
       this.updateRunFallback(run.guid);
       return;
     }
-    if (!this.options.isPractice && this.options.contestAlias != 'admin') {
+    if (this.options.contestAlias != 'admin') {
       this.refreshRanking();
     }
   }
@@ -1684,17 +1666,8 @@ export class Arena {
           this.myRunsList.problemAlias = problem.alias;
         };
 
-        if (this.options.isPractice) {
-          api.Problem.runs({ problem_alias: problem.alias })
-            .then(time.remoteTimeAdapter)
-            .then((data) => {
-              updateRuns(data.runs);
-            })
-            .catch(ui.apiError);
-        } else {
-          updateRuns(problem.runs);
-          this.showQualityNominationPopup();
-        }
+        updateRuns(problem.runs);
+        this.showQualityNominationPopup();
 
         if (!this.options.courseAlias) {
           this.initSubmissionCountdown();
@@ -2017,9 +1990,7 @@ export class Arena {
   }
 
   submitRun(code: string, language: string): void {
-    const problemset = this.options.isPractice
-      ? {}
-      : this.computeProblemsetArg();
+    const problemset = this.computeProblemsetArg();
 
     api.Run.create(
       Object.assign(problemset, {
@@ -2239,7 +2210,6 @@ export function GetDefaultOptions(): ArenaOptions {
   return {
     isLockdownMode: false,
     isInterview: false,
-    isPractice: false,
     disableClarifications: false,
     disableSockets: false,
     assignmentAlias: null,
@@ -2290,10 +2260,6 @@ export function GetOptionsFromLocation(
       e.preventDefault();
       e.returnValue = T.lockdownMessageWarning;
     };
-  }
-
-  if (arenaLocation.pathname.indexOf('/practice') !== -1) {
-    options.isPractice = true;
   }
 
   if (arenaLocation.pathname.indexOf('/arena/problem/') === -1) {

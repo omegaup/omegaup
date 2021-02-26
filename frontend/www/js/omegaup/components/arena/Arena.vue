@@ -66,7 +66,7 @@ import { Tab } from '../problem/Details.vue';
 
 @Component
 export default class Arena extends Vue {
-  @Prop({ default: false }) isAdmin!: boolean;
+  @Prop({ default: false }) shouldShowRuns!: boolean;
   @Prop() contestTitle!: string;
   @Prop() activeTab!: string;
   @Prop() backgroundClass!: string;
@@ -89,7 +89,7 @@ export default class Arena extends Vue {
       {
         name: 'runs',
         text: T.wordsRuns,
-        visible: this.isAdmin,
+        visible: this.shouldShowRuns,
       },
       {
         name: 'clarifications',
