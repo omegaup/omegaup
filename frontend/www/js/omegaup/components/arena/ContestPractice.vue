@@ -2,7 +2,7 @@
   <omegaup-arena
     :active-tab="activeTab"
     :contest-title="contest.title"
-    :is-admin="isAdmin"
+    :should-show-runs="contestAdmin"
     :background-class="'practice'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
@@ -57,6 +57,19 @@
           <omegaup-markdown
             :markdown="
               ui.formatString(T.arenaContestPracticeOriginalScoreboardText, {
+                contestAlias: contest.alias,
+              })
+            "
+          ></omegaup-markdown>
+        </div>
+      </div>
+    </template>
+    <template #arena-runs>
+      <div class="card">
+        <div class="card-body">
+          <omegaup-markdown
+            :markdown="
+              ui.formatString(T.arenaContestPracticeOriginalRunsText, {
                 contestAlias: contest.alias,
               })
             "
@@ -123,12 +136,6 @@ export default class ArenaContestPractice extends Vue {
   @Prop() problemInfo!: types.ProblemInfo;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop({ default: false }) isEphemeralExperimentEnabled!: boolean;
-  @Prop({ default: false }) admin!: boolean;
-  @Prop({ default: true }) showNavigation!: boolean;
-  @Prop({ default: false }) showRanking!: boolean;
-  @Prop({ default: true }) showClarifications!: boolean;
-  @Prop({ default: true }) showDeadlines!: boolean;
-  @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
