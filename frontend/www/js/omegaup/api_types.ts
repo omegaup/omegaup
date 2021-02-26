@@ -193,6 +193,46 @@ export namespace types {
       );
     }
 
+    export function ContestDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestDetailsPayload {
+      return ((x) => {
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        x.users = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (x.access_time)
+              x.access_time = ((x: number) => new Date(x * 1000))(
+                x.access_time,
+              );
+            if (x.end_time)
+              x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+            return x;
+          });
+        })(x.users);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function ContestEditPayload(
       elementId: string = 'payload',
     ): types.ContestEditPayload {
@@ -252,16 +292,6 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
-        if (x.problemset)
-          x.problemset = ((x) => {
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-            if (x.submission_deadline)
-              x.submission_deadline = ((x: number) => new Date(x * 1000))(
-                x.submission_deadline,
-              );
-            return x;
-          })(x.problemset);
         return x;
       })(
         JSON.parse(
@@ -1722,6 +1752,15 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ContestDetailsPayload {
+    clarifications: types.Clarification[];
+    contest: types.ContestPublicDetails;
+    contestAdmin: boolean;
+    problems: types.NavbarProblemsetProblem[];
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    users: types.ContestUser[];
+  }
+
   export interface ContestEditPayload {
     admins: types.ContestAdmin[];
     details: types.ContestAdminDetails;
@@ -1745,10 +1784,9 @@ export namespace types {
 
   export interface ContestIntroPayload {
     contest: types.ContestPublicDetails;
-    needsBasicInformation?: boolean;
-    privacyStatement?: types.PrivacyStatement;
-    problemset?: types.ContestDetails;
-    requestsUserInformation?: string;
+    needsBasicInformation: boolean;
+    privacyStatement: types.PrivacyStatement;
+    requestsUserInformation: string;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
