@@ -481,46 +481,6 @@ export namespace types {
       );
     }
 
-    export function ContestPracticePayload(
-      elementId: string = 'payload',
-    ): types.ContestPracticePayload {
-      return ((x) => {
-        x.clarifications = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            x.time = ((x: number) => new Date(x * 1000))(x.time);
-            return x;
-          });
-        })(x.clarifications);
-        x.contest = ((x) => {
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        })(x.contest);
-        x.users = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            if (x.access_time)
-              x.access_time = ((x: number) => new Date(x * 1000))(
-                x.access_time,
-              );
-            if (x.end_time)
-              x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
-            return x;
-          });
-        })(x.users);
-        return x;
-      })(
-        JSON.parse(
-          (document.getElementById(elementId) as HTMLElement).innerText,
-        ),
-      );
-    }
-
     export function CourseCloneDetailsPayload(
       elementId: string = 'payload',
     ): types.CourseCloneDetailsPayload {
@@ -1835,15 +1795,6 @@ export namespace types {
     last_updated: Date;
     start_time: Date;
     title: string;
-  }
-
-  export interface ContestPracticePayload {
-    clarifications: types.Clarification[];
-    contest: types.ContestPublicDetails;
-    contestAdmin: boolean;
-    problems: types.NavbarProblemsetProblem[];
-    shouldShowFirstAssociatedIdentityRunWarning: boolean;
-    users: types.ContestUser[];
   }
 
   export interface ContestProblem {
