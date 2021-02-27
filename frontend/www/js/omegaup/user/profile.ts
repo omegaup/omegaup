@@ -2,15 +2,11 @@ import Vue from 'vue';
 
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
-import * as ui from '../ui';
 
 import user_Profile from '../components/user/Profilev2.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
-  if (payload.statusError) {
-    ui.error(payload.statusError);
-  }
   new Vue({
     el: '#main-container',
     components: {

@@ -61,34 +61,7 @@
           </div>
         </div>
       </div>
-      <div v-if="privateUser" class="col-md-10">
-        <div class="card">
-          <div class="card-header">
-            <nav class="nav nav-tabs" role="tablist">
-              <a
-                class="nav-item nav-link active"
-                data-toggle="tab"
-                @click="selectedTab = 'data'"
-                >{{ T.profilePersonalData }}</a
-              >
-            </nav>
-            <div class="tab-content">
-              <div
-                v-if="selectedTab == 'data'"
-                class="tab-pane fade show active"
-                role="tab"
-                aria-labelledby="nav-user-info-tab"
-              >
-                <omegaup-user-basicinfo
-                  :profile="profile"
-                  :rank="rank"
-                ></omegaup-user-basicinfo>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div v-else class="col-md-10">
+      <div class="col-md-10">
         <div class="card">
           <div class="card-header">
             <nav class="nav nav-tabs" role="tablist">
@@ -268,12 +241,8 @@ export default class UserProfile extends Vue {
   charts = this.data.stats;
   T = T;
   columns = 3;
-  selectedTab = this.data.statusError != undefined ? 'data' : 'badges';
+  selectedTab = 'badges';
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
-
-  get privateUser(): boolean {
-    return this.data.statusError != undefined;
-  }
 
   get createdProblems(): Problem[] {
     if (!this.data.createdProblems) return [];
