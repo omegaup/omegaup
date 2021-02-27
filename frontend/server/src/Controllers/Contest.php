@@ -517,7 +517,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{clarifications: list<Clarification>, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, users: list<ContestUser>}
+     * @return array{clarifications: list<Clarification>, problems: list<NavbarProblemsetProblem>, users: list<ContestUser>}
      */
     public static function getCommonDetails(
         \OmegaUp\DAO\VO\Contests $contest,
@@ -554,7 +554,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'users' => \OmegaUp\DAO\ProblemsetIdentities::getWithExtraInformation(
                 intval($contest->problemset_id)
             ),
-            'contestAdmin' => $contestAdmin,
             'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
                 intval($contest->problemset_id),
                 $contestAdmin,
@@ -650,6 +649,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $result['smartyProperties']['payload'],
                 [
                     'shouldShowFirstAssociatedIdentityRunWarning' => $shouldShowFirstAssociatedIdentityRunWarning,
+                    'contestAdmin' => $contestAdmin,
                 ],
                 self::getCommonDetails($contest, $contestAdmin, $r->identity)
             );
@@ -719,7 +719,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function getContestPracticeDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
-        // Only logged users can access to practice mode
+        // Only logged users can access practice mode
         $r->ensureIdentity();
 
         $contestAlias = $r->ensureString(
@@ -762,6 +762,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                             $contestWithDirector,
                             $r->identity
                         ),
+                        'contestAdmin' => $contestAdmin,
                     ],
                     self::getCommonDetails(
                         $contest,
