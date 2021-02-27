@@ -17,7 +17,7 @@ import JSZip from 'jszip';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
-  const payload = types.payloadParsers.ContestPracticePayload();
+  const payload = types.payloadParsers.ContestDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
