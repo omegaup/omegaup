@@ -29,7 +29,10 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse omegaup-navbar">
-          <ul v-if="!omegaUpLockDown && !inContest" class="navbar-nav mr-auto">
+          <ul
+            v-if="!omegaUpLockDown && (!inContest || isAdmin)"
+            class="navbar-nav mr-auto"
+          >
             <li
               v-if="isLoggedIn"
               class="nav-item dropdown nav-contests"
@@ -250,7 +253,7 @@
                 ></omegaup-common-grader-badge>
               </a>
               <div class="dropdown-menu dropdown-menu-right">
-                <template v-if="!omegaUpLockDown && !inContest">
+                <template v-if="!omegaUpLockDown && (!inContest || isAdmin)">
                   <div class="text-center mb-1">
                     <img
                       :src="gravatarURL128"
@@ -265,7 +268,7 @@
                     <h6 class="mx-2">{{ currentEmail }}</h6>
                   </div>
                   <a
-                    v-show="!omegaUpLockDown && !inContest"
+                    v-show="!omegaUpLockDown && (!inContest || isAdmin)"
                     class="dropdown-item text-center"
                     data-nav-profile
                     href="/profile/"

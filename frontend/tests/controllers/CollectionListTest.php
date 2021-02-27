@@ -185,8 +185,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Call getCollectionsDetailsByLevelForSmarty with a level tag collection type
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript with a level tag collection type
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
@@ -207,8 +207,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Call getCollectionsDetailsByAuthorForSmarty with an author collection type
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript with an author collection type
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -291,8 +291,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Call getCollectionsDetailsByLevelForSmarty with easy difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript with easy difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
@@ -302,8 +302,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(2, $result);
 
-        // Call getCollectionsDetailsByLevelForSmarty with medium difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript with medium difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
@@ -313,8 +313,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(1, $result);
 
-        // Call getCollectionsDetailsByLevelForSmarty with hard difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript with hard difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
@@ -324,8 +324,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(1, $result);
 
-        // Call getCollectionsDetailsByLevelForSmarty with all difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript with all difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
@@ -335,8 +335,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(4, $result);
 
-        // Call getCollectionsDetailsByLevelForSmarty without difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript without difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming'
@@ -345,8 +345,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(4, $result);
 
-        // Call getCollectionsDetailsByAuthorForSmarty with easy difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript with easy difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'difficulty' => 'easy'
@@ -355,8 +355,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(2, $result);
 
-        // Call getCollectionsDetailsByAuthorForSmarty with medium difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript with medium difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'difficulty' => 'medium'
@@ -365,8 +365,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(1, $result);
 
-        // Call getCollectionsDetailsByAuthorForSmarty with hard difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript with hard difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'difficulty' => 'hard'
@@ -375,8 +375,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(1, $result);
 
-        // Call getCollectionsDetailsByAuthorForSmarty with all difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript with all difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'difficulty' => 'all'
@@ -385,8 +385,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(4, $result);
 
-        // Call getCollectionsDetailsByAuthorForSmarty without difficulty parameter
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript without difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token
             ])
@@ -444,8 +444,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Call getCollectionsDetailsByLevelForSmarty
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
@@ -459,8 +459,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals('problem_2', $result[2]['alias']);
         $this->assertEquals('problem_3', $result[3]['alias']);
 
-        // Call getCollectionsDetailsByLevelForSmarty with 2 as rowcount and 1 as page
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript with 2 as rowcount and 1 as page
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
@@ -474,8 +474,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals('problem_0', $result[0]['alias']);
         $this->assertEquals('problem_1', $result[1]['alias']);
 
-        // Call getCollectionsDetailsByLevelForSmarty with 2 as rowcount and 2 as page
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+        // Call getCollectionsDetailsByLevelForTypeScript with 2 as rowcount and 2 as page
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
@@ -500,8 +500,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Call getCollectionsDetailsByAuthorForSmarty
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
@@ -509,8 +509,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(8, $result);
 
-        // Call getCollectionsDetailsByAuthorForSmarty with a username of an author
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        // Call getCollectionsDetailsByAuthorForTypeScript with a username of an author
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'author' => 'author_0'
@@ -519,9 +519,9 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(2, $result);
 
-        // Call getCollectionsDetailsByAuthorForSmarty with a username of an author, 1 as rowcount
+        // Call getCollectionsDetailsByAuthorForTypeScript with a username of an author, 1 as rowcount
         // and 2 as page
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'author' => 'author_0',

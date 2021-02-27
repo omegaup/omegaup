@@ -59,45 +59,52 @@
             active: showTab === 'report',
           }"
         >
-          <table class="table">
-            <thead>
-              <tr>
-                <th>{{ T.profileUsername }}</th>
-                <th>{{ T.wordsTime }}</th>
-                <th>{{ T.activityReportOrigin }}</th>
-                <th colspan="2">{{ T.activityReportEvent }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="event in report">
-                <td>
-                  <omegaup-user-username
-                    :classname="event.classname"
-                    :username="event.username"
-                    :linkify="true"
-                  ></omegaup-user-username>
-                </td>
-                <td>{{ time.formatDateTime(event.time) }}</td>
-                <td>{{ event.ip.toString() }}</td>
-                <td>{{ event.event.name }}</td>
-                <td>
-                  <span v-if="event.event.problem">
-                    <a :href="`/arena/problem/${event.event.problem}/`">{{
-                      event.event.problem
-                    }}</a>
-                  </span>
-                  <span v-if="event.event.courseAlias" class="mr-2">
-                    <a :href="`/course/${event.event.courseAlias}/`">{{
-                      event.event.courseName
-                    }}</a>
-                  </span>
-                  <span v-if="event.event.cloneResult">{{
-                    event.event.cloneResult
-                  }}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="card">
+            <table class="table mb-0">
+              <thead>
+                <tr>
+                  <th>{{ T.profileUsername }}</th>
+                  <th>{{ T.wordsTime }}</th>
+                  <th>{{ T.activityReportOrigin }}</th>
+                  <th colspan="2">{{ T.activityReportEvent }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="event in report">
+                  <td>
+                    <omegaup-user-username
+                      :classname="event.classname"
+                      :username="event.username"
+                      :linkify="true"
+                    ></omegaup-user-username>
+                  </td>
+                  <td>{{ time.formatDateTime(event.time) }}</td>
+                  <td>{{ event.ip.toString() }}</td>
+                  <td>{{ event.event.name }}</td>
+                  <td>
+                    <span v-if="event.event.problem">
+                      <a :href="`/arena/problem/${event.event.problem}/`">{{
+                        event.event.problem
+                      }}</a>
+                    </span>
+                    <span v-if="event.event.courseAlias" class="mr-2">
+                      <a :href="`/course/${event.event.courseAlias}/`">{{
+                        event.event.courseName
+                      }}</a>
+                    </span>
+                    <span v-if="event.event.cloneResult">{{
+                      event.event.cloneResult
+                    }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="card-footer">
+              <omegaup-common-paginator
+                :pager-items="pagerItems"
+              ></omegaup-common-paginator>
+            </div>
+          </div>
         </div>
         <div
           v-show="showTab === 'users'"
@@ -190,6 +197,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import user_Username from '../user/Username.vue';
+import common_Paginator from '../common/Paginatorv2.vue';
 
 interface Mapping {
   [key: string]: string[];
@@ -212,12 +220,16 @@ interface Origin {
 @Component({
   components: {
     'omegaup-user-username': user_Username,
+    'omegaup-common-paginator': common_Paginator,
   },
 })
 export default class ActivityFeed extends Vue {
+  @Prop() page!: number;
+  @Prop() length!: number;
   @Prop() type!: string;
   @Prop() alias!: string;
   @Prop() report!: types.ActivityEvent[];
+  @Prop() pagerItems!: types.PageItem[];
 
   T = T;
   time = time;

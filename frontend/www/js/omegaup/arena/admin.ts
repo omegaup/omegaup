@@ -39,18 +39,6 @@ OmegaUp.on('ready', () => {
           return;
         }
 
-        if (
-          arenaInstance.options.isPractice &&
-          contest.finish_time &&
-          Date.now() < contest.finish_time.getTime()
-        ) {
-          window.location.href = window.location.pathname.replace(
-            /\/practice\/.*/,
-            '/',
-          );
-          return;
-        }
-
         $('#title .contest-title').text(ui.contestTitle(contest));
         arenaInstance.updateSummary(contest as omegaup.Contest);
 

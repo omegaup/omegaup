@@ -606,7 +606,7 @@ if __name__ == \'__main__\':
 
         $problemsCount = [];
         $total = 0;
-        $response = \OmegaUp\Controllers\Problem::getProblemCollectionDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Problem::getProblemCollectionDetailsForTypeScript(
             new \OmegaUp\Request([])
         )['smartyProperties']['payload'];
         foreach ($response['problemCount'] as $levelTag) {

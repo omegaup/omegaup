@@ -109,8 +109,8 @@ export default class ArenaNavbarProblems extends Vue {
     return `/course/${this.courseAlias}/`;
   }
 
-  onNavigateToProblem(problem: types.ContestProblem) {
-    this.$emit('navigate-to-problem', problem.alias);
+  onNavigateToProblem(problem: types.NavbarProblemsetProblem) {
+    this.$emit('navigate-to-problem', { problem, runs: [] });
   }
 }
 </script>

@@ -19,11 +19,14 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-user-profile', {
         props: {
-          data: payload,
+          data: payload.extraProfileDetails,
+          profile: payload.profile,
           profileBadges: new Set(
-            payload.ownedBadges?.map((badge) => badge.badge_alias),
+            payload.extraProfileDetails?.ownedBadges?.map(
+              (badge) => badge.badge_alias,
+            ),
           ),
-          visitorBadges: new Set(payload.badges),
+          visitorBadges: new Set(payload.extraProfileDetails?.badges),
         },
       });
     },

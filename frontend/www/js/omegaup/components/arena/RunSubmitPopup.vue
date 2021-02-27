@@ -91,7 +91,7 @@ export default class ArenaRunSubmitPopup extends Vue {
   @Prop() languages!: string[];
   @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
-  @Prop() preferredLanguage!: string;
+  @Prop({ default: null }) preferredLanguage!: null | string;
 
   T = T;
   omegaup = omegaup;

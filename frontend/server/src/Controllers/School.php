@@ -61,7 +61,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param int $school_id
      */
-    public static function getSchoolProfileDetailsForSmarty(\OmegaUp\Request $r): array {
+    public static function getSchoolProfileDetailsForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureInt('school_id');
         $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
 
@@ -273,7 +273,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
-    public static function getRankForSmarty(\OmegaUp\Request $r): array {
+    public static function getRankForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('length');
 
@@ -317,7 +317,7 @@ class School extends \OmegaUp\Controllers\Controller {
      * of School of the Month
      * @return array{smartyProperties: array{payload: SchoolOfTheMonthPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getSchoolOfTheMonthDetailsForSmarty(\OmegaUp\Request $r): array {
+    public static function getSchoolOfTheMonthDetailsForTypeScript(\OmegaUp\Request $r): array {
         try {
             $r->ensureIdentity();
             $identity = $r->identity;
