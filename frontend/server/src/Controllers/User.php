@@ -3833,7 +3833,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         $response['smartyProperties']['payload'] = [
-            'privateProfile' => true,
+            'privateProfile' => false,
             'profile' => self::getProfileDetails(
                 $r->identity,
                 $identity
