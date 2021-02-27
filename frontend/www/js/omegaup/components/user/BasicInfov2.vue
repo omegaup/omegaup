@@ -14,7 +14,7 @@
           >/
         </div>
       </div>
-      <div class="form-group row padding-field">
+      <div v-if="profile.email" class="form-group row padding-field">
         <div class="col-sm-3">
           <strong>{{ T.profile }}</strong>
         </div>
@@ -92,7 +92,7 @@
         </div>
       </div>
     </div>
-    <a v-if="!profile.is_private" :href="`/submissions/${profile.username}/`">
+    <a v-if="!profile.email" :href="`/submissions/${profile.username}/`">
       {{ T.wordsSeeLatestSubmissions }}
     </a>
   </div>
@@ -113,6 +113,7 @@ export default class UserBasicInfo extends Vue {
   @Prop() profile!: types.UserProfile;
   @Prop() rank!: string;
   T = T;
+  privateProfile = !this.profile.email && this.profile.is_private;
 }
 </script>
 
