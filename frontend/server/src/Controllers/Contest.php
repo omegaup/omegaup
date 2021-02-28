@@ -20,13 +20,13 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type ContestListMinePayload=array{contests: list<Contest>, privateContestsAlert: bool}
- * @psalm-type ContestDetails=array{admin: bool, admission_mode: string, alias: string, description: string, director: null|string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
- * @psalm-type ContestAdminDetails=array{admin: bool, admission_mode: string, alias: string, available_languages: array<string, string>, description: string, director: null|string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
+ * @psalm-type ContestDetails=array{admin: bool, admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
+ * @psalm-type ContestAdminDetails=array{admin: bool, admission_mode: string, alias: string, available_languages: array<string, string>, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
- * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null}
+ * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null, window_length: int|null}
  * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<ContestProblem>, users: list<ContestUser>, groups: list<ContestGroup>, requests: list<ContestRequest>, admins: list<ContestAdmin>, group_admins: list<ContestGroupAdmin>}
- * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation?: bool, privacyStatement?: PrivacyStatement, problemset?: ContestDetails, requestsUserInformation?: string, shouldShowFirstAssociatedIdentityRunWarning: bool}
- * @psalm-type ContestPracticePayload=array{clarifications: list<Clarification>, contest: ContestPublicDetails, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, shouldShowFirstAssociatedIdentityRunWarning: bool, users: list<ContestUser>}
+ * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string, shouldShowFirstAssociatedIdentityRunWarning: bool}
+ * @psalm-type ContestDetailsPayload=array{clarifications: list<Clarification>, contest: ContestPublicDetails, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, shouldShowFirstAssociatedIdentityRunWarning: bool, users: list<ContestUser>}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestListPayload=array{contests: array{current: list<ContestListItem>, future: list<ContestListItem>, participating?: list<ContestListItem>, past: list<ContestListItem>, public: list<ContestListItem>, recommended_current: list<ContestListItem>, recommended_past: list<ContestListItem>}, isLogged: bool, query: string}
  * @psalm-type ContestNewPayload=array{languages: array<string, string>}
@@ -477,6 +477,29 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Validate a contest with contest alias and add its director
+     *
+     * @return array{contest: \OmegaUp\DAO\VO\Contests, contestWithDirector: ContestPublicDetails}
+     * @throws \OmegaUp\Exceptions\NotFoundException
+     */
+    public static function validateContestWithDirector(string $contestAlias) {
+        $contest = \OmegaUp\DAO\Contests::getByAliasWithDirector($contestAlias);
+        if (is_null($contest)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+
+        return [
+            'contest' => new \OmegaUp\DAO\VO\Contests(
+                array_intersect_key(
+                    $contest,
+                    \OmegaUp\DAO\VO\Contests::FIELD_NAMES
+                )
+            ),
+            'contestWithDirector' => $contest,
+        ];
+    }
+
+    /**
      * Validate if a contestant has explicit access to a contest.
      */
     private static function isInvitedToContest(
@@ -494,21 +517,73 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{clarifications: list<Clarification>, problems: list<NavbarProblemsetProblem>, users: list<ContestUser>}
+     */
+    public static function getCommonDetails(
+        \OmegaUp\DAO\VO\Contests $contest,
+        bool $contestAdmin,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): array {
+        if (is_null($identity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotExist'
+            );
+        }
+        $problemset = self::getContestDetails(
+            $contest,
+            $contestAdmin,
+            $identity
+        );
+        /** @var list<NavbarProblemsetProblem> */
+        $problems = [];
+        foreach ($problemset['problems'] as $problem) {
+            array_push(
+                $problems,
+                [
+                    'alias' => strval($problem['alias']),
+                    'text' => "{$problem['letter']}. {$problem['title']}",
+                    'acceptsSubmissions' => $problem['languages'] !== '',
+                    'bestScore' => 0,
+                    'maxScore' => floatval($problem['points']),
+                    'hasRuns' => false,
+                ]
+            );
+        }
+
+        return [
+            'users' => \OmegaUp\DAO\ProblemsetIdentities::getWithExtraInformation(
+                intval($contest->problemset_id)
+            ),
+            'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
+                intval($contest->problemset_id),
+                $contestAdmin,
+                $identity->identity_id,
+                /*$offset=*/ null,
+                /*$rowcount=*/ 100
+            ),
+            'problems' => $problems,
+        ];
+    }
+
+    /**
      * Get all the properties for smarty.
      *
-     * @return array{inContest: bool, smartyProperties: array{payload: ContestIntroPayload, title: \OmegaUp\TranslationString}, template: string}|array{entrypoint: string, smartyProperties: array{payload: ContestIntroPayload, title: \OmegaUp\TranslationString}}
+     * @return array{inContest: bool, smartyProperties: array{fullWidth: bool, payload: ContestDetailsPayload, title: \OmegaUp\TranslationString}, template: string}|array{entrypoint: string, smartyProperties: array{payload: ContestIntroPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $contest_alias
      */
-    public static function getContestDetailsForSmarty(
+    public static function getContestDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $contestAlias = $r->ensureString(
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $contest = self::validateContest($contestAlias);
+        [
+            'contest' => $contest,
+            'contestWithDirector' => $contestWithDirector,
+        ] = self::validateContestWithDirector($contestAlias);
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
@@ -534,14 +609,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => [
                     'shouldShowFirstAssociatedIdentityRunWarning' => false,
-                    'contest' => self::getPublicDetails($contest, $r->identity),
+                    'contest' => self::getPublicDetails(
+                        $contestWithDirector,
+                        $r->identity
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString('enterContest'),
             ],
             'entrypoint' => 'contest_intro',
         ];
         if (!$shouldShowIntro) {
-            $result['smartyProperties']['payload']['shouldShowFirstAssociatedIdentityRunWarning'] =
+            [
+                'contest' => $contest,
+                'contest_admin' => $contestAdmin,
+            ] = self::validateDetails($contestAlias, $r->identity);
+            if (is_null($contest->problemset_id)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'contestNotFound'
+                );
+            }
+            $shouldShowFirstAssociatedIdentityRunWarning = (
                 !is_null($r->identity) &&
                 !is_null($r->user) &&
                 !\OmegaUp\Controllers\User::isMainIdentity(
@@ -550,8 +637,30 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 ) &&
                 \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
                     $r->user
+                )
                 );
+            if (is_null($r->identity)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'userNotExist'
+                );
+            }
+
+            $result['smartyProperties']['payload'] = array_merge(
+                $result['smartyProperties']['payload'],
+                [
+                    'shouldShowFirstAssociatedIdentityRunWarning' => $shouldShowFirstAssociatedIdentityRunWarning,
+                    'contestAdmin' => $contestAdmin,
+                ],
+                self::getCommonDetails($contest, $contestAdmin, $r->identity)
+            );
+
+            $result['smartyProperties']['fullWidth'] = true;
             $result['inContest'] = true;
+            $result['smartyProperties']['title'] = new \OmegaUp\TranslationString(
+                'omegaupTitleContest'
+            );
+            // TODO: Replace next lines with: $result['entrypoint'] = 'arena_contest_contestant';
+            // when arena contest migration is over
             $result['template'] = 'arena.contest.contestant.tpl';
             unset($result['entrypoint']);
             return $result;
@@ -603,28 +712,30 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Get all the properties for smarty when user access to a contest in
      * practice mode.
      *
-     * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: ContestPracticePayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: ContestDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $contest_alias
      */
-    public static function getContestPracticeDetailsForSmarty(
+    public static function getContestPracticeDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
+        // Only logged users can access practice mode
+        $r->ensureIdentity();
+
         $contestAlias = $r->ensureString(
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $contest = \OmegaUp\Controllers\Contest::validateContest($contestAlias);
+        [
+            'contestWithDirector' => $contestWithDirector,
+        ] = self::validateContestWithDirector($contestAlias);
 
-        try {
-            $r->ensureIdentity();
-        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            if ($contest->admission_mode === 'private') {
-                throw $e;
-            }
-            $r->identity = null;
-            // Request can proceed unauthenticated.
+        if ($contestWithDirector['finish_time']->time > \OmegaUp\Time::get()) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'originalContestHasNotEnded'
+            );
         }
+
         [
             'contest' => $contest,
             'contest_admin' => $contestAdmin,
@@ -633,54 +744,36 @@ class Contest extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
-        $problemset = self::getContestDetails(
-            $contestAlias,
-            $contest,
-            $contestAdmin,
-            $r->identity
-        );
-        /** @var list<NavbarProblemsetProblem> */
-        $problems = [];
-        foreach ($problemset['problems'] as $problem) {
-            array_push($problems, [
-                    'alias' => $problem['alias'],
-                    'text' => "{$problem['letter']}. {$problem['title']}",
-                    'acceptsSubmissions' => $problem['languages'] !== '',
-                    'bestScore' => 0,
-                    'maxScore' => $problem['points'],
-                    'hasRuns' => false,
-                ]);
-        }
-
         return [
             'smartyProperties' => [
-                'payload' => [
-                    'shouldShowFirstAssociatedIdentityRunWarning' =>
-                        !is_null($r->identity) &&
-                        !is_null($r->user) &&
-                        !\OmegaUp\Controllers\User::isMainIdentity(
-                            $r->user,
-                            $r->identity
-                        ) &&
-                        \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
-                            $r->user
+                'payload' => array_merge(
+                    [
+                        'shouldShowFirstAssociatedIdentityRunWarning' => (
+                            !is_null($r->user) &&
+                            !\OmegaUp\Controllers\User::isMainIdentity(
+                                $r->user,
+                                $r->identity
+                            ) &&
+                            \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
+                                $r->user
+                            )
                         ),
-                    'contest' => self::getPublicDetails($contest, $r->identity),
-                    'problems' => $problems,
-                    'users' => $contestAdmin ? \OmegaUp\DAO\ProblemsetIdentities::getWithExtraInformation(
-                        intval($contest->problemset_id)
-                    ) : [],
-                    'contestAdmin' => $contestAdmin,
-                    'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
-                        intval($contest->problemset_id),
+                        'contest' => self::getPublicDetails(
+                            $contestWithDirector,
+                            $r->identity
+                        ),
+                        'contestAdmin' => $contestAdmin,
+                    ],
+                    self::getCommonDetails(
+                        $contest,
                         $contestAdmin,
-                        $r->identity->identity_id,
-                        /*$offset=*/ null,
-                        /*$rowcount=*/ 100
+                        $r->identity
                     ),
-                ],
+                ),
                 'fullWidth' => true,
-                'title' => new \OmegaUp\TranslationString('enterContest'),
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleContestPractice'
+                ),
             ],
             'entrypoint' => 'arena_contest_practice',
         ];
@@ -693,7 +786,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page_size
      * @omegaup-request-param string $query
      */
-    public static function getContestListDetailsForSmarty(
+    public static function getContestListDetailsForTypeScript(
         \OmegaUp\Request $r
     ) {
         try {
@@ -784,7 +877,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'contests' => $contests,
                 ],
                 'title' => new \OmegaUp\TranslationString(
-                    'omegaupTitleContest'
+                    'omegaupTitleContestList'
                 ),
             ],
             'entrypoint' => 'arena_contest_list',
@@ -798,7 +891,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page_size
      * @omegaup-request-param string $query
      */
-    public static function getContestListMineForSmarty(
+    public static function getContestListMineForTypeScript(
         \OmegaUp\Request $r
     ): array {
         // Authenticate user
@@ -849,7 +942,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{smartyProperties: array{payload: ContestNewPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getContestNewForSmarty(
+    public static function getContestNewForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -873,7 +966,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $contest_alias
      */
-    public static function getContestEditForSmarty(
+    public static function getContestEditForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -1086,70 +1179,45 @@ class Contest extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
+        [
+            'contestWithDirector' => $contestWithDirector,
+        ] = self::validateContestWithDirector($contestAlias);
         $contest = \OmegaUp\Controllers\Contest::validateContest($contestAlias);
 
-        return self::getPublicDetails($contest, $r->identity);
+        return self::getPublicDetails($contestWithDirector, $r->identity);
     }
 
     /**
+     * @param ContestPublicDetails $contest
      * @return ContestPublicDetails
      */
     private static function getPublicDetails(
-        \OmegaUp\DAO\VO\Contests $contest,
+        $contest,
         ?\OmegaUp\DAO\VO\Identities $identity
     ): array {
-        // Initialize response to be the contest information
-        /** @var array{admission_mode: string, alias: string, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null} */
-        $result = $contest->asFilteredArray([
-            'admission_mode',
-            'alias',
-            'description',
-            'feedback',
-            'finish_time',
-            'languages',
-            'partial_score',
-            'penalty',
-            'penalty_calc_policy',
-            'penalty_type',
-            'points_decay_factor',
-            'problemset_id',
-            'rerun_id',
-            'scoreboard',
-            'show_scoreboard_after',
-            'start_time',
-            'submissions_gap',
-            'time_start',
-            'title',
-            'window_length',
-        ]);
-
         // Whether the contest is private, verify that our user is invited
         if (
             !is_null($identity) &&
-            $result['admission_mode'] === 'registration'
+            $contest['admission_mode'] === 'registration'
         ) {
             $registration = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK(
                 $identity->identity_id,
-                $contest->problemset_id
+                $contest['problemset_id']
             );
 
-            $result['user_registration_requested'] = !is_null($registration);
+            $contest['user_registration_requested'] = !is_null($registration);
 
             if (is_null($registration)) {
-                $result['user_registration_answered'] = false;
+                $contest['user_registration_answered'] = false;
             } else {
-                $result['user_registration_answered'] = !is_null(
+                $contest['user_registration_answered'] = !is_null(
                     $registration->accepted
                 );
-                $result['user_registration_accepted'] = $registration->accepted;
+                $contest['user_registration_accepted'] = $registration->accepted;
             }
         }
-        $result['show_penalty'] = (
-            $result['penalty'] !== 0 ||
-            $result['penalty_type'] !== 'none'
-        );
 
-        return $result;
+        return $contest;
     }
 
     /**
@@ -1287,12 +1355,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return ContestDetails
      */
     private static function getCachedDetails(
-        string $contestAlias,
         \OmegaUp\DAO\VO\Contests $contest
     ) {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::CONTEST_INFO,
-            $contestAlias,
+            strval($contest->alias),
             /** @return ContestDetails */
             function () use ($contest, &$result) {
                 // Initialize response to be the contest information
@@ -1348,7 +1415,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $director = \OmegaUp\DAO\Identities::findByUserId(
                     $acl->owner_id
                 );
-                if (is_null($director)) {
+                if (is_null($director) || is_null($director->username)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
                         'userNotExist'
                     );
@@ -1433,7 +1500,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ] = self::validateDetails($contestAlias, $r->identity, $token);
 
         return self::getContestDetails(
-            $contestAlias,
             $contest,
             $contestAdmin,
             $r->identity,
@@ -1445,13 +1511,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return ContestDetails
      */
     private static function getContestDetails(
-        string $contestAlias,
         \OmegaUp\DAO\VO\Contests $contest,
         bool $contestAdmin,
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?string $token = null
     ) {
-        $result = self::getCachedDetails($contestAlias, $contest);
+        $result = self::getCachedDetails($contest);
         $result['opened'] = true;
         unset($result['scoreboard_url']);
         unset($result['scoreboard_url_admin']);
@@ -1527,10 +1592,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $result = self::getCachedDetails(
-            $contest->alias,
-            $contest
-        );
+        $result = self::getCachedDetails($contest);
         $result['opened'] = \OmegaUp\DAO\ProblemsetIdentities::checkProblemsetOpened(
             intval($adminIdentity->identity_id),
             $contest->problemset_id
@@ -1628,7 +1690,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
      */
-    public static function getActivityFeedDetailsForSmarty(
+    public static function getActivityFeedDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
@@ -3339,28 +3401,25 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest' => $contest,
             'problemset' => $problemset
         ] = self::validateBasicDetails($contestAlias);
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['token'],
-            'token'
+
+        $token = $r->ensureOptionalString(
+            'token',
+            /*$required=*/ false,
         );
+        $identity = null;
         try {
             $r->ensureIdentity();
+            $identity = $r->identity;
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing.
-            $r->identity = null;
         }
-        return self::getScoreboard(
-            $contest,
-            $problemset,
-            $r->identity,
-            $r['token']
-        );
+        return self::getScoreboard($contest, $problemset, $identity, $token);
     }
 
     /**
      * @return Scoreboard
      */
-    private static function getScoreboard(
+    public static function getScoreboard(
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Problemsets $problemset,
         ?\OmegaUp\DAO\VO\Identities $identity,
@@ -3369,7 +3428,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // If true, will override Scoreboard Pertentage to 100%
         $showAllRuns = false;
 
-        if (is_null($token)) {
+        if (empty($token)) {
             // User should be logged
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\UnauthorizedException();
@@ -4326,7 +4385,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $contest_alias
      */
-    public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
+    public static function getStatsDataForTypeScript(\OmegaUp\Request $r) {
         // Get user
         $r->ensureIdentity();
         $contestAlias = $r->ensureString(
@@ -4497,7 +4556,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param null|string $filterBy
      */
-    public static function getContestReportDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getContestReportDetailsForTypeScript(\OmegaUp\Request $r) {
         $contestReport = self::getContestReportDetails($r)['ranking'];
         foreach ($contestReport as &$user) {
             if (!isset($user['problems'])) {

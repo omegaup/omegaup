@@ -63,6 +63,37 @@ export namespace types {
       );
     }
 
+    export function AssignmentDetailsPayload(
+      elementId: string = 'payload',
+    ): types.AssignmentDetailsPayload {
+      return ((x) => {
+        x.courseDetails = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.courseDetails);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function AuthorRankTablePayload(
       elementId: string = 'payload',
     ): types.AuthorRankTablePayload {
@@ -162,6 +193,46 @@ export namespace types {
       );
     }
 
+    export function ContestDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestDetailsPayload {
+      return ((x) => {
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        x.users = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (x.access_time)
+              x.access_time = ((x: number) => new Date(x * 1000))(
+                x.access_time,
+              );
+            if (x.end_time)
+              x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+            return x;
+          });
+        })(x.users);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function ContestEditPayload(
       elementId: string = 'payload',
     ): types.ContestEditPayload {
@@ -221,16 +292,6 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
-        if (x.problemset)
-          x.problemset = ((x) => {
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-            if (x.submission_deadline)
-              x.submission_deadline = ((x: number) => new Date(x * 1000))(
-                x.submission_deadline,
-              );
-            return x;
-          })(x.problemset);
         return x;
       })(
         JSON.parse(
@@ -417,46 +478,6 @@ export namespace types {
     ): types.ContestNewPayload {
       return JSON.parse(
         (document.getElementById(elementId) as HTMLElement).innerText,
-      );
-    }
-
-    export function ContestPracticePayload(
-      elementId: string = 'payload',
-    ): types.ContestPracticePayload {
-      return ((x) => {
-        x.clarifications = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            x.time = ((x: number) => new Date(x * 1000))(x.time);
-            return x;
-          });
-        })(x.clarifications);
-        x.contest = ((x) => {
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        })(x.contest);
-        x.users = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            if (x.access_time)
-              x.access_time = ((x: number) => new Date(x * 1000))(
-                x.access_time,
-              );
-            if (x.end_time)
-              x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
-            return x;
-          });
-        })(x.users);
-        return x;
-      })(
-        JSON.parse(
-          (document.getElementById(elementId) as HTMLElement).innerText,
-        ),
       );
     }
 
@@ -1259,45 +1280,49 @@ export namespace types {
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
       return ((x) => {
-        x.contests = ((x) => {
-          if (x instanceof Object) {
-            Object.keys(x).forEach(
-              (y) =>
-                (x[y] = ((x) => {
-                  x.data = ((x) => {
-                    x.finish_time = ((x: number) => new Date(x * 1000))(
-                      x.finish_time,
-                    );
-                    x.last_updated = ((x: number) => new Date(x * 1000))(
-                      x.last_updated,
-                    );
-                    x.start_time = ((x: number) => new Date(x * 1000))(
-                      x.start_time,
-                    );
-                    return x;
-                  })(x.data);
-                  return x;
-                })(x[y])),
-            );
-          }
-          return x;
-        })(x.contests);
-        x.ownedBadges = ((x) => {
-          if (!Array.isArray(x)) {
+        if (x.extraProfileDetails)
+          x.extraProfileDetails = ((x) => {
+            x.contests = ((x) => {
+              if (x instanceof Object) {
+                Object.keys(x).forEach(
+                  (y) =>
+                    (x[y] = ((x) => {
+                      x.data = ((x) => {
+                        x.finish_time = ((x: number) => new Date(x * 1000))(
+                          x.finish_time,
+                        );
+                        x.last_updated = ((x: number) => new Date(x * 1000))(
+                          x.last_updated,
+                        );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      })(x.data);
+                      return x;
+                    })(x[y])),
+                );
+              }
+              return x;
+            })(x.contests);
+            x.ownedBadges = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.assignation_time)
+                  x.assignation_time = ((x: number) => new Date(x * 1000))(
+                    x.assignation_time,
+                  );
+                if (x.first_assignation)
+                  x.first_assignation = ((x: number) => new Date(x * 1000))(
+                    x.first_assignation,
+                  );
+                return x;
+              });
+            })(x.ownedBadges);
             return x;
-          }
-          return x.map((x) => {
-            if (x.assignation_time)
-              x.assignation_time = ((x: number) => new Date(x * 1000))(
-                x.assignation_time,
-              );
-            if (x.first_assignation)
-              x.first_assignation = ((x: number) => new Date(x * 1000))(
-                x.first_assignation,
-              );
-            return x;
-          });
-        })(x.ownedBadges);
+          })(x.extraProfileDetails);
         x.profile = ((x) => {
           if (x.birth_date)
             x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
@@ -1376,6 +1401,12 @@ export namespace types {
     statement?: types.ProblemStatement;
     title: string;
     visibility: number;
+  }
+
+  export interface AssignmentDetailsPayload {
+    courseDetails: types.CourseDetails;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    showRanking: boolean;
   }
 
   export interface AssignmentProgress {
@@ -1618,7 +1649,7 @@ export namespace types {
     alias: string;
     available_languages: { [key: string]: string };
     description: string;
-    director?: string;
+    director: string;
     feedback: string;
     finish_time: Date;
     languages: string[];
@@ -1652,7 +1683,7 @@ export namespace types {
     admission_mode: string;
     alias: string;
     description: string;
-    director?: string;
+    director: string;
     feedback: string;
     finish_time: Date;
     languages: string[];
@@ -1681,6 +1712,15 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ContestDetailsPayload {
+    clarifications: types.Clarification[];
+    contest: types.ContestPublicDetails;
+    contestAdmin: boolean;
+    problems: types.NavbarProblemsetProblem[];
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    users: types.ContestUser[];
+  }
+
   export interface ContestEditPayload {
     admins: types.ContestAdmin[];
     details: types.ContestAdminDetails;
@@ -1704,10 +1744,9 @@ export namespace types {
 
   export interface ContestIntroPayload {
     contest: types.ContestPublicDetails;
-    needsBasicInformation?: boolean;
-    privacyStatement?: types.PrivacyStatement;
-    problemset?: types.ContestDetails;
-    requestsUserInformation?: string;
+    needsBasicInformation: boolean;
+    privacyStatement: types.PrivacyStatement;
+    requestsUserInformation: string;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
@@ -1750,13 +1789,12 @@ export namespace types {
     languages: { [key: string]: string };
   }
 
-  export interface ContestPracticePayload {
-    clarifications: types.Clarification[];
-    contest: types.ContestPublicDetails;
-    contestAdmin: boolean;
-    problems: types.NavbarProblemsetProblem[];
-    shouldShowFirstAssociatedIdentityRunWarning: boolean;
-    users: types.ContestUser[];
+  export interface ContestParticipated {
+    alias: string;
+    finish_time: Date;
+    last_updated: Date;
+    start_time: Date;
+    title: string;
   }
 
   export interface ContestProblem {
@@ -1779,6 +1817,7 @@ export namespace types {
     admission_mode: string;
     alias: string;
     description: string;
+    director: string;
     feedback: string;
     finish_time: Date;
     languages: string;
@@ -2016,6 +2055,16 @@ export namespace types {
     courseName?: string;
     name: string;
     problem?: string;
+  }
+
+  export interface ExtraProfileDetails {
+    badges: string[];
+    contests: types.UserProfileContests;
+    createdProblems: types.Problem[];
+    ownedBadges: types.Badge[];
+    solvedProblems: types.Problem[];
+    stats: types.UserProfileStats[];
+    unsolvedProblems: types.Problem[];
   }
 
   export interface FilteredCourse {
@@ -2989,29 +3038,13 @@ export namespace types {
   }
 
   export interface UserProfileContests {
-    [key: string]: {
-      data: {
-        alias: string;
-        finish_time: Date;
-        last_updated: Date;
-        start_time: Date;
-        title: string;
-      };
-      place: number;
-    };
+    [key: string]: { data: types.ContestParticipated; place: number };
   }
 
   export interface UserProfileDetailsPayload {
-    badges: string[];
-    contests: types.UserProfileContests;
-    createdProblems: types.Problem[];
-    ownedBadges: types.Badge[];
+    extraProfileDetails?: types.ExtraProfileDetails;
     profile: types.UserProfileInfo;
-    programmingLanguages: { [key: string]: string };
-    solvedProblems: types.Problem[];
-    stats: types.UserProfileStats[];
     statusError?: string;
-    unsolvedProblems: types.Problem[];
   }
 
   export interface UserProfileInfo {
@@ -3939,16 +3972,7 @@ export namespace messages {
   export type _UserContestStatsServerResponse = any;
   export type UserContestStatsResponse = {
     contests: {
-      [key: string]: {
-        data: {
-          alias: string;
-          finish_time: Date;
-          last_updated: Date;
-          start_time: Date;
-          title: string;
-        };
-        place?: number;
-      };
+      [key: string]: { data: types.ContestParticipated; place?: number };
     };
   };
   export type UserCreateRequest = { [key: string]: any };
@@ -4006,9 +4030,7 @@ export namespace messages {
   export type UserSelectCoderOfTheMonthRequest = { [key: string]: any };
   export type UserSelectCoderOfTheMonthResponse = {};
   export type UserStatsRequest = { [key: string]: any };
-  export type UserStatsResponse = {
-    runs: { date?: string; runs: number; verdict: string }[];
-  };
+  export type UserStatsResponse = { runs: types.UserProfileStats[] };
   export type UserStatusVerifiedRequest = { [key: string]: any };
   export type UserStatusVerifiedResponse = {
     username: string;

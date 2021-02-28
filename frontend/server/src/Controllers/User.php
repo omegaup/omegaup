@@ -22,9 +22,16 @@ namespace OmegaUp\Controllers;
  * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
  * @psalm-type CoderOfTheMonthPayload=array{codersOfCurrentMonth: CoderOfTheMonthList, codersOfPreviousMonth: CoderOfTheMonthList, candidatesToCoderOfTheMonth: list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, username: string}>, isMentor: bool, category: string, options?: array{canChooseCoder: bool, coderIsSelected: bool}}
  * @psalm-type UserProfileInfo=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
- * @psalm-type UserProfileContests=array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place: int}>
+ * @psalm-type ContestParticipated=array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}
+ * @psalm-type UserProfileContests=array<string, array{data: ContestParticipated, place: int}>
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
- * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile: UserProfileInfo, contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, programmingLanguages: array<string,string>}
+ * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
+ * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
+ * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>}
+ * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
+ * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
+ * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
+ * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type LoginDetailsPayload=array{facebookUrl: string, linkedinUrl: string, statusError?: string, validateRecaptcha: bool}
  */
 class User extends \OmegaUp\Controllers\Controller {
@@ -1395,7 +1402,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $category
      * @omegaup-request-param bool|null $omit_rank
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      */
     public static function apiProfile(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1830,50 +1837,73 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get Contests which a certain user has participated in
      *
-     * @return array{contests: array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place?: int}>}
+     * @return array{contests: array<string, array{data: ContestParticipated, place?: int}>}
      *
-     * @omegaup-request-param mixed $auth_token
-     * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param null|string $token
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      */
     public static function apiContestStats(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
-        if (is_null($identity) || is_null($identity->identity_id)) {
+        if (
+            is_null($identity) ||
+            is_null($identity->identity_id) ||
+            is_null($identity->username)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
+        return [
+            'contests' => self::getContestStats($identity),
+        ];
+    }
+
+    /**
+     * @return UserProfileContests
+     */
+    private static function getContestStats(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): array {
         // Get contests where identity had at least 1 run
         $contestsParticipated = \OmegaUp\DAO\Contests::getContestsParticipated(
-            $identity->identity_id
+            intval($identity->identity_id)
         );
 
-        /** @var array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place?: int}> */
+        /** @var UserProfileContests */
         $contests = [];
 
-        foreach ($contestsParticipated as &$contest) {
+        foreach ($contestsParticipated as $contestProblemset) {
+            if (
+                is_null($contestProblemset['contest']->alias)
+                || is_null($contestProblemset['contest']->title)
+            ) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'contestNotFound'
+                );
+            }
             // Get identity ranking
-            $scoreboardResponse = \OmegaUp\Controllers\Contest::apiScoreboard(
-                new \OmegaUp\Request([
-                    'auth_token' => $r['auth_token'],
-                    'contest_alias' => $contest['alias'],
-                    'token' => $contest['scoreboard_url_admin'],
-                ])
+            $scoreboardResponse = \OmegaUp\Controllers\Contest::getScoreboard(
+                $contestProblemset['contest'],
+                $contestProblemset['problemset'],
+                $identity
             );
-
-            // Avoid divulging the scoreboard URL unnecessarily.
-            unset($contest['scoreboard_url_admin']);
+            $contest = [
+                'alias' => $contestProblemset['contest']->alias,
+                'title' => $contestProblemset['contest']->title,
+                'start_time' => $contestProblemset['contest']->start_time,
+                'finish_time' => $contestProblemset['contest']->finish_time,
+                'last_updated' => $contestProblemset['contest']->last_updated,
+            ];
 
             $contests[$contest['alias']] = [
                 'data' => $contest,
+                'place' => 0,
             ];
 
             // Grab the place of the current identity in the given contest
             foreach ($scoreboardResponse['ranking'] as $identityData) {
                 if (
-                    $identityData['username'] == $identity->username &&
+                    $identityData['username'] == strval($identity->username) &&
                     isset($identityData['place'])
                 ) {
                     $contests[$contest['alias']]['place'] = $identityData['place'];
@@ -1882,15 +1912,13 @@ class User extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        return [
-            'contests' => $contests,
-        ];
+        return $contests;
     }
 
     /**
      * Get Problems solved by user
      *
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      *
      * @return array{problems: list<Problem>}
      */
@@ -1901,9 +1929,17 @@ class User extends \OmegaUp\Controllers\Controller {
         if (is_null($identity) || is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-        $problems = \OmegaUp\DAO\Problems::getProblemsSolved(
-            $identity->identity_id
-        );
+
+        return [
+            'problems' => self::getSolvedProblems($identity->identity_id),
+        ];
+    }
+
+    /**
+     * @return list<Problem>
+     */
+    private static function getSolvedProblems(int $identityId): array {
+        $problems = \OmegaUp\DAO\Problems::getProblemsSolved($identityId);
 
         /** @var list<Problem> */
         $responseProblems = [];
@@ -1915,16 +1951,13 @@ class User extends \OmegaUp\Controllers\Controller {
             /** @var Problem */
             $responseProblems[] = $problem->asFilteredArray($relevantColumns);
         }
-
-        return [
-            'problems' => $responseProblems,
-        ];
+        return $responseProblems;
     }
 
     /**
      * Get Problems unsolved by user
      *
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      *
      * @return array{problems: list<Problem>}
      */
@@ -1936,8 +1969,17 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
+        return [
+            'problems' => self::getUnsolvedProblems($identity->identity_id),
+        ];
+    }
+
+    /**
+     * @return list<Problem>
+     */
+    private static function getUnsolvedProblems(int $identityId): array {
         $problems = \OmegaUp\DAO\Problems::getProblemsUnsolvedByIdentity(
-            $identity->identity_id
+            $identityId
         );
 
         $relevantColumns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
@@ -1951,16 +1993,13 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
             }
         }
-
-        return [
-            'problems' => $filteredProblems,
-        ];
+        return $filteredProblems;
     }
 
     /**
      * Get Problems created by user
      *
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      *
      * @return array{problems: list<Problem>}
      */
@@ -1968,16 +2007,25 @@ class User extends \OmegaUp\Controllers\Controller {
         self::authenticateOrAllowUnauthenticatedRequest($r);
 
         $identity = self::resolveTargetIdentity($r);
-        if (is_null($identity)) {
+        if (is_null($identity) || is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
+        return [
+            'problems' => self::getCreatedProblems($identity->identity_id),
+        ];
+    }
+
+    /**
+     * @return list<Problem>
+     */
+    private static function getCreatedProblems(int $identityId): array {
         $relevantColumns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
         /** @var list<Problem> */
         $filteredProblems = [];
         foreach (
             \OmegaUp\DAO\Problems::getPublicProblemsCreatedByIdentity(
-                intval($identity->identity_id)
+                $identityId
             ) as $problem
         ) {
             if (\OmegaUp\DAO\Problems::isVisible($problem)) {
@@ -1987,10 +2035,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
             }
         }
-
-        return [
-            'problems' => $filteredProblems,
-        ];
+        return $filteredProblems;
     }
 
     /**
@@ -2029,11 +2074,11 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get stats
      *
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{runs: list<array{date: null|string, runs: int, verdict: string}>}
+     * @return array{runs: list<UserProfileStats>}
      */
     public static function apiStats(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -2570,7 +2615,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
      */
-    public static function getAuthorRankForSmarty(\OmegaUp\Request $r) {
+    public static function getAuthorRankForTypeScript(\OmegaUp\Request $r) {
         $page = $r->ensureOptionalInt('page') ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
 
@@ -3137,7 +3182,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
      *
-     * @omegaup-request-param string $username
+     * @omegaup-request-param null|string $username
      */
     public static function getPrivacyPolicy(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3224,7 +3269,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{hasAccepted: bool}
      *
-     * @omegaup-request-param string $username
+     * @omegaup-request-param null|string $username
      */
     public static function apiLastPrivacyPolicyAccepted(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3256,7 +3301,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $privacy_git_object_id
      * @omegaup-request-param string $statement_type
-     * @omegaup-request-param string $username
+     * @omegaup-request-param null|string $username
      */
     public static function apiAcceptPrivacyPolicy(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3425,7 +3470,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
-    public static function getRankForSmarty(\OmegaUp\Request $r) {
+    public static function getRankForTypeScript(\OmegaUp\Request $r) {
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('length');
         \OmegaUp\Validators::validateOptionalInEnum(
@@ -3524,7 +3569,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: IndexPayload, title: \OmegaUp\TranslationString}}
      */
-    public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getIndexDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
@@ -3594,7 +3639,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{payload: CoderOfTheMonthPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getCoderOfTheMonthDetailsForSmarty(
+    public static function getCoderOfTheMonthDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         try {
@@ -3700,22 +3745,32 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{profile: UserProfileInfo}, entrypoint: string}
+     * @return array{entrypoint: string, smartyProperties: array{payload: UserProfileDetailsPayload, title: \OmegaUp\TranslationString}}
      *
-     * @omegaup-request-param mixed $auth_token
-     * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param null|string $token
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      */
-    public static function getProfileDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getProfileDetailsForTypeScript(\OmegaUp\Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
         $identity = self::resolveTargetIdentity($r);
-        if (is_null($identity)) {
+        if (
+            is_null($identity) ||
+            is_null($identity->identity_id) ||
+            is_null($identity->username)
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'username'
             );
         }
+        $user = null;
+        $ownedBadges = [];
+        if (!is_null($identity->user_id)) {
+            $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
+        }
+        if (!is_null($user)) {
+            $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges($user);
+        }
+
         try {
             return [
                 'smartyProperties' => [
@@ -3724,25 +3779,23 @@ class User extends \OmegaUp\Controllers\Controller {
                             $r->identity,
                             $identity
                         ),
-                        'contests' => self::apiContestStats($r)['contests'],
-                        'solvedProblems' => self::apiProblemsSolved(
-                            $r
-                        )['problems'],
-                        'unsolvedProblems' => self::apiListUnsolvedProblems(
-                            $r
-                        )['problems'],
-                        'createdProblems' => self::apiProblemsCreated(
-                            $r
-                        )['problems'],
-                        'stats' => self::apiStats($r),
-                        'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
-                        'ownedBadges' => (
-                            is_null($r->user) ?
-                            [] :
-                            \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
-                                $r->user
-                            )
-                        ),
+                        'extraProfileDetails' => [
+                            'contests' => self::getContestStats($identity),
+                            'solvedProblems' => self::getSolvedProblems(
+                                $identity->identity_id
+                            ),
+                            'unsolvedProblems' => self::getUnsolvedProblems(
+                                $identity->identity_id
+                            ),
+                            'createdProblems' => self::getCreatedProblems(
+                                $identity->identity_id
+                            ),
+                            'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
+                                $identity->identity_id
+                            ),
+                            'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
+                            'ownedBadges' => $ownedBadges,
+                        ],
                     ],
                     'title' => new \OmegaUp\TranslationString(
                         'omegaupTitleProfile'
@@ -3754,7 +3807,13 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\ApiCaller::logException($e);
             return [
                 'smartyProperties' => [
-                    'payload' => ['statusError' => $e->getErrorMessage()],
+                    'payload' => [
+                        'statusError' => $e->getErrorMessage(),
+                        'profile' => self::getProfileDetails(
+                            $r->identity,
+                            $identity
+                        ),
+                    ],
                     'title' => new \OmegaUp\TranslationString(
                         'omegaupTitleProfile'
                     )
@@ -3765,11 +3824,11 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      *
      * @return array{smartyProperties: array{STATUS_ERROR: string}|array{COUNTRIES: list<\OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: UserProfileInfo}, template: string}
      */
-    public static function getProfileEditDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getProfileEditDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
             self::authenticateOrAllowUnauthenticatedRequest($r);
 
@@ -3807,11 +3866,11 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * @omegaup-request-param null|string $auth_token
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      *
      * @return array{smartyProperties: array{STATUS_ERROR?: string, payload?: array{email: null|string}, profile?: UserProfileInfo}, template: string}
      */
-    public static function getEmailEditDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getEmailEditDetailsForTypeScript(\OmegaUp\Request $r) {
         $currentSession = \OmegaUp\Controllers\Session::getCurrentSession();
 
         try {
@@ -3846,11 +3905,11 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      *
      * @return array{smartyProperties: array{STATUS_ERROR?: string, admin?: true, practice?: false, profile?: UserProfileInfo}, template: string}
      */
-    public static function getInterviewResultsDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getInterviewResultsDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
             self::authenticateOrAllowUnauthenticatedRequest($r);
 
@@ -3951,7 +4010,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $state
      * @omegaup-request-param string $third_party_login
      */
-    public static function getLoginDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         if ($r->offsetExists('linkedin')) {
             $thirdPartyLogin = 'linkedin';

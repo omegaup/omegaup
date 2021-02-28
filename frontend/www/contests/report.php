@@ -4,7 +4,7 @@ require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 
 try {
-    $result = \OmegaUp\Controllers\Contest::getContestReportDetailsForSmarty(
+    $result = \OmegaUp\Controllers\Contest::getContestReportDetailsForTypeScript(
         new \OmegaUp\Request($_REQUEST)
     );
 } catch (\Exception $e) {

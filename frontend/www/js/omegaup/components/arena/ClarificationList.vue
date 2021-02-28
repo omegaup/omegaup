@@ -4,7 +4,7 @@
     <slot name="new-clarification">
       <div class="card-body">
         <a
-          href="#clarifications/new"
+          href="#clarifications/all/new"
           class="btn btn-primary"
           @click="currentPopupDisplayed = PopupDisplayed.NewClarification"
         >
@@ -91,6 +91,7 @@ export default class ArenaClarificationList extends Vue {
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() problemAlias!: null | string;
   @Prop() username!: null | string;
+  @Prop({ default: false }) showNewClarificationPopup!: boolean;
 
   T = T;
   PopupDisplayed = PopupDisplayed;
@@ -103,6 +104,16 @@ export default class ArenaClarificationList extends Vue {
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
     this.$emit('update:activeTab', 'clarifications');
+  }
+
+  @Watch('showNewClarificationPopup')
+  onShowNewClarificationPopupChanged(newValue: boolean): void {
+    if (!newValue) {
+      this.currentPopupDisplayed = PopupDisplayed.None;
+      return;
+    }
+    this.currentPopupDisplayed = PopupDisplayed.NewClarification;
+    this.onNewClarification();
   }
 
   @Watch('popupDisplayed')

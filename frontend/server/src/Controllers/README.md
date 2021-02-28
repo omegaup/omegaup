@@ -2594,11 +2594,11 @@ Returns the best score for a problem
 
 | Name             | Type           | Description |
 | ---------------- | -------------- | ----------- |
-| `username`       | `string`       |             |
 | `contest_alias`  | `null\|string` |             |
 | `problem_alias`  | `null\|string` |             |
 | `problemset_id`  | `mixed`        |             |
 | `statement_type` | `null\|string` |             |
+| `username`       | `null\|string` |             |
 
 ### Returns
 
@@ -3822,11 +3822,11 @@ Keeps a record of a user who accepts the privacy policy
 
 ### Parameters
 
-| Name                    | Type     | Description |
-| ----------------------- | -------- | ----------- |
-| `privacy_git_object_id` | `string` |             |
-| `statement_type`        | `string` |             |
-| `username`              | `string` |             |
+| Name                    | Type           | Description |
+| ----------------------- | -------------- | ----------- |
+| `privacy_git_object_id` | `string`       |             |
+| `statement_type`        | `string`       |             |
+| `username`              | `null\|string` |             |
 
 ### Returns
 
@@ -3964,18 +3964,15 @@ Get Contests which a certain user has participated in
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `auth_token`    | `mixed`        |             |
-| `token`         | `null\|string` |             |
-| `username`      | `mixed`        |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
 
 ### Returns
 
-| Name       | Type                                                                                                                                        |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `contests` | `{ [key: string]: { data: { alias: string; finish_time: Date; last_updated: Date; start_time: Date; title: string; }; place?: number; }; }` |
+| Name       | Type                                                                       |
+| ---------- | -------------------------------------------------------------------------- |
+| `contests` | `{ [key: string]: { data: types.ContestParticipated; place?: number; }; }` |
 
 ## `/api/user/create/`
 
@@ -4084,9 +4081,9 @@ Gets the last privacy policy accepted by user
 
 ### Parameters
 
-| Name       | Type     | Description |
-| ---------- | -------- | ----------- |
-| `username` | `string` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
 
 ### Returns
 
@@ -4134,9 +4131,9 @@ Get Problems unsolved by user
 
 ### Parameters
 
-| Name       | Type    | Description |
-| ---------- | ------- | ----------- |
-| `username` | `mixed` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
 
 ### Returns
 
@@ -4186,9 +4183,9 @@ Get Problems created by user
 
 ### Parameters
 
-| Name       | Type    | Description |
-| ---------- | ------- | ----------- |
-| `username` | `mixed` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
 
 ### Returns
 
@@ -4204,9 +4201,9 @@ Get Problems solved by user
 
 ### Parameters
 
-| Name       | Type    | Description |
-| ---------- | ------- | ----------- |
-| `username` | `mixed` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
 
 ### Returns
 
@@ -4222,11 +4219,11 @@ Get general user info
 
 ### Parameters
 
-| Name        | Type         | Description |
-| ----------- | ------------ | ----------- |
-| `category`  | `mixed`      |             |
-| `omit_rank` | `bool\|null` |             |
-| `username`  | `mixed`      |             |
+| Name        | Type           | Description |
+| ----------- | -------------- | ----------- |
+| `category`  | `mixed`        |             |
+| `omit_rank` | `bool\|null`   |             |
+| `username`  | `null\|string` |             |
 
 ### Returns
 
@@ -4307,15 +4304,15 @@ Get stats
 
 ### Parameters
 
-| Name       | Type    | Description |
-| ---------- | ------- | ----------- |
-| `username` | `mixed` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
 
 ### Returns
 
-| Name   | Type                                                 |
-| ------ | ---------------------------------------------------- |
-| `runs` | `{ date: string; runs: number; verdict: string; }[]` |
+| Name   | Type                       |
+| ------ | -------------------------- |
+| `runs` | `types.UserProfileStats[]` |
 
 ## `/api/user/statusVerified/`
 
