@@ -4876,6 +4876,42 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ];
     }
 
+    /**
+     * Removes a contest whether user is the creator
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $contest_alias
+     */
+    public static function apiDelete(\OmegaUp\Request $r): array {
+        // Authenticate logged user
+        $r->ensureIdentity();
+
+        // Check whether contest exists
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
+        if (is_null($contest) || is_null($contest->contest_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+
+        if (!\OmegaUp\Authorization::canEditContest($r->identity, $contest)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $contest->archived = true;
+        \OmegaUp\DAO\Contests::update($contest);
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
     public static function isPublic(string $admissionMode): bool {
         return $admissionMode !== 'private';
     }

@@ -3225,6 +3225,8 @@ export namespace messages {
   export type ContestCreateResponse = {};
   export type ContestCreateVirtualRequest = { [key: string]: any };
   export type ContestCreateVirtualResponse = { alias: string };
+  export type ContestDeleteRequest = { [key: string]: any };
+  export type ContestDeleteResponse = {};
   export type ContestDetailsRequest = { [key: string]: any };
   export type _ContestDetailsServerResponse = any;
   export type ContestDetailsResponse = types.ContestDetails;
@@ -4144,6 +4146,9 @@ export namespace controllers {
     createVirtual: (
       params?: messages.ContestCreateVirtualRequest,
     ) => Promise<messages.ContestCreateVirtualResponse>;
+    delete: (
+      params?: messages.ContestDeleteRequest,
+    ) => Promise<messages.ContestDeleteResponse>;
     details: (
       params?: messages.ContestDetailsRequest,
     ) => Promise<messages.ContestDetailsResponse>;

@@ -28,6 +28,7 @@
   - [`/api/contest/contestants/`](#apicontestcontestants)
   - [`/api/contest/create/`](#apicontestcreate)
   - [`/api/contest/createVirtual/`](#apicontestcreatevirtual)
+  - [`/api/contest/delete/`](#apicontestdelete)
   - [`/api/contest/details/`](#apicontestdetails)
   - [`/api/contest/list/`](#apicontestlist)
   - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
@@ -734,6 +735,22 @@ _Nothing_
 | Name    | Type     |
 | ------- | -------- |
 | `alias` | `string` |
+
+## `/api/contest/delete/`
+
+### Description
+
+Removes a contest whether user is the creator
+
+### Parameters
+
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `contest_alias` | `string` |             |
+
+### Returns
+
+_Nothing_
 
 ## `/api/contest/details/`
 

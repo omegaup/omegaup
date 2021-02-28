@@ -308,6 +308,10 @@ export const Contest = {
     messages.ContestCreateVirtualRequest,
     messages.ContestCreateVirtualResponse
   >('/api/contest/createVirtual/'),
+  delete: apiCall<
+    messages.ContestDeleteRequest,
+    messages.ContestDeleteResponse
+  >('/api/contest/delete/'),
   details: apiCall<
     messages.ContestDetailsRequest,
     messages._ContestDetailsServerResponse,
