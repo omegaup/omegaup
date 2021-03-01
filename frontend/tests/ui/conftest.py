@@ -207,7 +207,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes, disable=R0904
         tt_input.send_keys(value)
         self.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS,
+                (By.CSS_SELECTOR,
                  '%s ul.typeahead-dropdown li:first-of-type' %
                  (parent_selector)))).click()
 
