@@ -10,7 +10,6 @@ describe('arena', () => {
         new window.URL('http://localhost:8001/arena/test/'),
       );
       expect(options.contestAlias).toEqual('test');
-      expect(options.isPractice).toEqual(false);
       expect(options.disableClarifications).toEqual(false);
       expect(options.disableSockets).toEqual(false);
       expect(options.scoreboardToken).toEqual(null);
@@ -24,7 +23,6 @@ describe('arena', () => {
         new window.URL('http://localhost:8001/arena/test/practice'),
       );
       expect(options.contestAlias).toEqual('test');
-      expect(options.isPractice).toEqual(true);
     });
 
     it('Should detect only problems', () => {

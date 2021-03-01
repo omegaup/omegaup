@@ -22,10 +22,16 @@ namespace OmegaUp\Controllers;
  * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
  * @psalm-type CoderOfTheMonthPayload=array{codersOfCurrentMonth: CoderOfTheMonthList, codersOfPreviousMonth: CoderOfTheMonthList, candidatesToCoderOfTheMonth: list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, username: string}>, isMentor: bool, category: string, options?: array{canChooseCoder: bool, coderIsSelected: bool}}
  * @psalm-type UserProfileInfo=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
- * @psalm-type UserProfileContests=array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place: int}>
+ * @psalm-type ContestParticipated=array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}
+ * @psalm-type UserProfileContests=array<string, array{data: ContestParticipated, place: int}>
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
+ * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
+ * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>}
  * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
+ * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
+ * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
+ * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type LoginDetailsPayload=array{facebookUrl: string, linkedinUrl: string, statusError?: string, validateRecaptcha: bool}
  */
 class User extends \OmegaUp\Controllers\Controller {
@@ -1831,9 +1837,8 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get Contests which a certain user has participated in
      *
-     * @return array{contests: array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place?: int}>}
+     * @return array{contests: array<string, array{data: ContestParticipated, place?: int}>}
      *
-     * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param null|string $username
      */
     public static function apiContestStats(\OmegaUp\Request $r): array {
@@ -1848,17 +1853,8 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
-        $authToken = $r->ensureOptionalString(
-            'auth_token',
-            /*$required=*/false
-        );
-
         return [
-            'contests' => self::getContestStats(
-                $identity->identity_id,
-                $identity->username,
-                $authToken
-            ),
+            'contests' => self::getContestStats($identity),
         ];
     }
 
@@ -1866,30 +1862,38 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return UserProfileContests
      */
     private static function getContestStats(
-        int $identityId,
-        string $identityUsername,
-        ?string $authToken = null
+        \OmegaUp\DAO\VO\Identities $identity
     ): array {
         // Get contests where identity had at least 1 run
         $contestsParticipated = \OmegaUp\DAO\Contests::getContestsParticipated(
-            $identityId
+            intval($identity->identity_id)
         );
 
         /** @var UserProfileContests */
         $contests = [];
 
-        foreach ($contestsParticipated as &$contest) {
+        foreach ($contestsParticipated as $contestProblemset) {
+            if (
+                is_null($contestProblemset['contest']->alias)
+                || is_null($contestProblemset['contest']->title)
+            ) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'contestNotFound'
+                );
+            }
             // Get identity ranking
-            $scoreboardResponse = \OmegaUp\Controllers\Contest::apiScoreboard(
-                new \OmegaUp\Request([
-                    'auth_token' => $authToken,
-                    'contest_alias' => $contest['alias'],
-                    'token' => $contest['scoreboard_url_admin'],
-                ])
+            $scoreboardResponse = \OmegaUp\Controllers\Contest::getScoreboard(
+                $contestProblemset['contest'],
+                $contestProblemset['problemset'],
+                $identity
             );
-
-            // Avoid divulging the scoreboard URL unnecessarily.
-            unset($contest['scoreboard_url_admin']);
+            $contest = [
+                'alias' => $contestProblemset['contest']->alias,
+                'title' => $contestProblemset['contest']->title,
+                'start_time' => $contestProblemset['contest']->start_time,
+                'finish_time' => $contestProblemset['contest']->finish_time,
+                'last_updated' => $contestProblemset['contest']->last_updated,
+            ];
 
             $contests[$contest['alias']] = [
                 'data' => $contest,
@@ -1899,7 +1903,7 @@ class User extends \OmegaUp\Controllers\Controller {
             // Grab the place of the current identity in the given contest
             foreach ($scoreboardResponse['ranking'] as $identityData) {
                 if (
-                    $identityData['username'] == $identityUsername &&
+                    $identityData['username'] == strval($identity->username) &&
                     isset($identityData['place'])
                 ) {
                     $contests[$contest['alias']]['place'] = $identityData['place'];
@@ -3776,10 +3780,7 @@ class User extends \OmegaUp\Controllers\Controller {
                             $identity
                         ),
                         'extraProfileDetails' => [
-                            'contests' => self::getContestStats(
-                                $identity->identity_id,
-                                $identity->username
-                            ),
+                            'contests' => self::getContestStats($identity),
                             'solvedProblems' => self::getSolvedProblems(
                                 $identity->identity_id
                             ),
