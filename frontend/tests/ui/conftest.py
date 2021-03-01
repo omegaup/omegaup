@@ -16,6 +16,7 @@ import pytest
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -81,7 +82,7 @@ class JavaScriptLogCollector:
             yield entry
 
 
-class Driver:  # pylint: disable=too-many-instance-attributes
+class Driver:  # pylint: disable=too-many-instance-attributes, disable=R0904
     '''Wraps the state needed to run a test.'''
 
     # pylint: disable=too-many-arguments
@@ -196,6 +197,21 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                  '//%s//div[@data-value = "%s"]' %
                  (parent_xpath, value)))).click()
 
+    def typeahead_helper_v2(self, parent_selector, value):
+        '''Helper to interact with Typeahead elements.'''
+
+        tt_input = self.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS,
+                 '%s .tags-input input[type="text"]' % parent_selector)))
+        tt_input.click()
+        tt_input.send_keys(value)
+        # self.wait.until(
+        #     EC.element_to_be_clickable(
+        #         (By.CSS,
+        #          '%s ul.typeahead-dropdown li:first-of-type' %
+        #          (parent_selector)))).click()
+
     def send_keys(self,  # pylint: disable=no-self-use
                   element: WebElement,
                   value: str,
@@ -214,6 +230,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             element.clear()
             element.send_keys(value)
             if element.get_attribute('value') == value:
+                element.send_keys(Keys.RETURN)
                 return
         logging.error('Failed to send keys to the element')
 
