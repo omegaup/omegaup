@@ -86,6 +86,12 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.courseDetails);
+        x.currentAssignment = ((x) => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.currentAssignment);
         return x;
       })(
         JSON.parse(
@@ -1405,6 +1411,22 @@ export namespace types {
 
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
+    currentAssignment: {
+      alias?: string;
+      assignment_type: string;
+      description?: string;
+      finish_time?: Date;
+      name?: string;
+      problems: {
+        acceptSubmissions: boolean;
+        alias: string;
+        bestScore: number;
+        hasRuns: boolean;
+        maxScore: number;
+        text: string;
+      }[];
+      start_time: Date;
+    };
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
   }
