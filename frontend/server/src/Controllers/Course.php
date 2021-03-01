@@ -2775,7 +2775,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload, title: \OmegaUp\TranslationString}}|array{inContest: bool, showRanking: bool, smartyProperties: array{payload: CourseDetailsPayload}, template: string}
+     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload, title: \OmegaUp\TranslationString}}|array{smartyProperties: array{payload: AssignmentDetailsPayload, title: string, inContest: bool}, entrypoint: string}
      *
      * @omegaup-request-param null|string $assignment_alias
      * @omegaup-request-param string $course_alias
@@ -3864,7 +3864,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Refactor of apiIntroDetails in order to be called from php files and APIs
      *
-     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload, title: \OmegaUp\TranslationString}}|array{inContest: bool, showRanking: bool, smartyProperties: array{payload: CourseDetailsPayload}, template: string}
+     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload, title: \OmegaUp\TranslationString}}|array{smartyProperties: array{payload: AssignmentDetailsPayload, title: string, inContest: bool}, entrypoint: string}
      *
      * @omegaup-request-param null|string $assignment_alias
      * @omegaup-request-param string $course_alias
@@ -3901,7 +3901,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             return self::getCourseDetails($r, $course, $group, false);
         }
 
-        return self::getAssignmentDetails(
+        return self::getAssignmentDetailsForTypeScript(
             $r,
             $course,
             $group,
