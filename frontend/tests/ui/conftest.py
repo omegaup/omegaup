@@ -202,7 +202,7 @@ class Driver:  # pylint: disable=too-many-instance-attributes, disable=R0904
 
         tt_input = self.wait.until(
             EC.visibility_of_element_located(
-                (By.CSS,
+                (By.CSS_SELECTOR,
                  '%s .tags-input input[type="text"]' % parent_selector)))
         tt_input.click()
         tt_input.send_keys(value)
