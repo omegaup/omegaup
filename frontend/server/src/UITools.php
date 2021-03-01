@@ -298,6 +298,8 @@ class UITools {
                 is_a($smartyProperties['title'], 'OmegaUp\TranslationString')
             ) {
                 $titleVar = $smartyProperties['title']->message;
+                /** @var string */
+                $smartyProperties['title'] = $smarty->getConfigVars($titleVar);
             } elseif (
                 !isset($smartyProperties['title']) ||
                 !is_string($smartyProperties['title'])
@@ -306,11 +308,9 @@ class UITools {
                     'omegaupTitle' .
                     str_replace('_', '', ucwords($entrypoint, '_'))
                 );
-            } else {
-                $titleVar = $smartyProperties['title'];
+                /** @var string */
+                $smartyProperties['title'] = $smarty->getConfigVars($titleVar);
             }
-            /** @var string */
-            $smartyProperties['title'] = $smarty->getConfigVars($titleVar);
         }
 
         /** @var mixed $value */
