@@ -7,6 +7,7 @@
             <label>{{ T.wordsProblem }}</label>
             <omegaup-common-typeahead
               :existing-options="existingProblems"
+              :type="'problem'"
               @update-existing-options="
                 (query) => $emit('update-existing-problems', query)
               "
