@@ -4877,7 +4877,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Removes a contest whether user is the creator
+     * Archives a contest if user is the creator
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -4885,7 +4885,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $contest_alias
      */
-    public static function apiDelete(\OmegaUp\Request $r): array {
+    public static function apiArchive(\OmegaUp\Request $r): array {
         // Authenticate logged user
         $r->ensureIdentity();
 

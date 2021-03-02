@@ -1,23 +1,23 @@
 <?php
 
 /**
- * Description of ContestDeleteContest
+ * Description of ContestArchiveContest
  *
  * @author joemmanuel
  */
-class ContestDeleteTest extends \OmegaUp\Test\ControllerTestCase {
-    public function testDeleteContest() {
+class ContestArchiveTest extends \OmegaUp\Test\ControllerTestCase {
+    public function testArchiveContest() {
         // Create 5 contests
         $numberOfContests = 5;
         foreach (range(0, $numberOfContests - 1) as $i) {
             $contestData[] = \OmegaUp\Test\Factories\Contest::createContest();
         }
 
-        // Delete one contest.
+        // Archive one contest.
         $login = self::login($contestData[0]['director']);
 
         // Call API
-        $response = \OmegaUp\Controllers\Contest::apiDelete(
+        $response = \OmegaUp\Controllers\Contest::apiArchive(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData[0]['request']['alias'],
@@ -32,7 +32,7 @@ class ContestDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(4, $response['number_of_results']);
     }
 
-    public function testDeleteContestNonDirector() {
+    public function testArchiveContestAsNonDirector() {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
@@ -41,8 +41,8 @@ class ContestDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($identity);
 
         try {
-            // Non-director users can not delete contests
-            \OmegaUp\Controllers\Contest::apiDelete(new \OmegaUp\Request([
+            // Non-director users can not archive contests
+            \OmegaUp\Controllers\Contest::apiArchive(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ]));

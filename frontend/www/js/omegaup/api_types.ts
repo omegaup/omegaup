@@ -3203,6 +3203,8 @@ export namespace messages {
   };
   export type ContestArbitrateRequestRequest = { [key: string]: any };
   export type ContestArbitrateRequestResponse = {};
+  export type ContestArchiveRequest = { [key: string]: any };
+  export type ContestArchiveResponse = {};
   export type ContestClarificationsRequest = { [key: string]: any };
   export type _ContestClarificationsServerResponse = any;
   export type ContestClarificationsResponse = {
@@ -3225,8 +3227,6 @@ export namespace messages {
   export type ContestCreateResponse = {};
   export type ContestCreateVirtualRequest = { [key: string]: any };
   export type ContestCreateVirtualResponse = { alias: string };
-  export type ContestDeleteRequest = { [key: string]: any };
-  export type ContestDeleteResponse = {};
   export type ContestDetailsRequest = { [key: string]: any };
   export type _ContestDetailsServerResponse = any;
   export type ContestDetailsResponse = types.ContestDetails;
@@ -4131,6 +4131,9 @@ export namespace controllers {
     arbitrateRequest: (
       params?: messages.ContestArbitrateRequestRequest,
     ) => Promise<messages.ContestArbitrateRequestResponse>;
+    archive: (
+      params?: messages.ContestArchiveRequest,
+    ) => Promise<messages.ContestArchiveResponse>;
     clarifications: (
       params?: messages.ContestClarificationsRequest,
     ) => Promise<messages.ContestClarificationsResponse>;
@@ -4146,9 +4149,6 @@ export namespace controllers {
     createVirtual: (
       params?: messages.ContestCreateVirtualRequest,
     ) => Promise<messages.ContestCreateVirtualResponse>;
-    delete: (
-      params?: messages.ContestDeleteRequest,
-    ) => Promise<messages.ContestDeleteResponse>;
     details: (
       params?: messages.ContestDetailsRequest,
     ) => Promise<messages.ContestDetailsResponse>;

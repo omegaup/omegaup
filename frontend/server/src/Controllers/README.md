@@ -23,12 +23,12 @@
   - [`/api/contest/adminList/`](#apicontestadminlist)
   - [`/api/contest/admins/`](#apicontestadmins)
   - [`/api/contest/arbitrateRequest/`](#apicontestarbitraterequest)
+  - [`/api/contest/archive/`](#apicontestarchive)
   - [`/api/contest/clarifications/`](#apicontestclarifications)
   - [`/api/contest/clone/`](#apicontestclone)
   - [`/api/contest/contestants/`](#apicontestcontestants)
   - [`/api/contest/create/`](#apicontestcreate)
   - [`/api/contest/createVirtual/`](#apicontestcreatevirtual)
-  - [`/api/contest/delete/`](#apicontestdelete)
   - [`/api/contest/details/`](#apicontestdetails)
   - [`/api/contest/list/`](#apicontestlist)
   - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
@@ -621,6 +621,22 @@ Returns all contest administrators
 
 _Nothing_
 
+## `/api/contest/archive/`
+
+### Description
+
+Archives a contest if user is the creator
+
+### Parameters
+
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `contest_alias` | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/contest/clarifications/`
 
 ### Description
@@ -735,22 +751,6 @@ _Nothing_
 | Name    | Type     |
 | ------- | -------- |
 | `alias` | `string` |
-
-## `/api/contest/delete/`
-
-### Description
-
-Removes a contest whether user is the creator
-
-### Parameters
-
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-
-### Returns
-
-_Nothing_
 
 ## `/api/contest/details/`
 

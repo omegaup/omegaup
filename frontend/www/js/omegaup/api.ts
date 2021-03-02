@@ -277,6 +277,10 @@ export const Contest = {
     messages.ContestArbitrateRequestRequest,
     messages.ContestArbitrateRequestResponse
   >('/api/contest/arbitrateRequest/'),
+  archive: apiCall<
+    messages.ContestArchiveRequest,
+    messages.ContestArchiveResponse
+  >('/api/contest/archive/'),
   clarifications: apiCall<
     messages.ContestClarificationsRequest,
     messages._ContestClarificationsServerResponse,
@@ -308,10 +312,6 @@ export const Contest = {
     messages.ContestCreateVirtualRequest,
     messages.ContestCreateVirtualResponse
   >('/api/contest/createVirtual/'),
-  delete: apiCall<
-    messages.ContestDeleteRequest,
-    messages.ContestDeleteResponse
-  >('/api/contest/delete/'),
   details: apiCall<
     messages.ContestDetailsRequest,
     messages._ContestDetailsServerResponse,
