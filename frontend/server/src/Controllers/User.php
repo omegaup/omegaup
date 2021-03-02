@@ -1430,12 +1430,12 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * When logged user is not allowed to see the information of another user
-     * we just need to send an array with empty profile
+     * When the user is not allowed to see the information of another user
+     * we just need to send an array with almost empty profile
      *
      * @return UserProfileInfo
      */
-    private static function getEmptyUserProfile(
+    private static function getPrivateUserProfile(
         \OmegaUp\DAO\VO\Identities $identity
     ) {
         // We need the email to get the gravatar, even though it will be not
@@ -1497,7 +1497,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 $user
             )
         ) {
-            return self::getEmptyUserProfile($identity);
+            return self::getPrivateUserProfile($identity);
         }
         $response = \OmegaUp\Controllers\Identity::getProfile(
             $loggedIdentity,
@@ -2133,9 +2133,10 @@ class User extends \OmegaUp\Controllers\Controller {
      * It will return a boolean value indicating whether user can see
      * information of the given identity. There are three scenarios where this
      * function returns false:
-     *  - Logged user is a sysadmin
-     *  - Logged user is trying to see its own information
-     *  - Identity whose logged user wants to see its information is not private
+     *  - Logged user is a sysadmin.
+     *  - Logged user is trying to see their own information.
+     *  - The target identity has a user associated to it, and they have not}
+     *    marked their information as private.
      */
     private static function shouldUserInformationBeHidden(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
@@ -2145,12 +2146,12 @@ class User extends \OmegaUp\Controllers\Controller {
         return (
             is_null($loggedIdentity)
             || (
-                $loggedIdentity->username != $identity->username
+                $loggedIdentity->username !== $identity->username
                 && !\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
             )
         )
-        && (!is_null($user)
-        && $user->is_private == 1);
+        && !is_null($user)
+        && boolval($user->is_private);
     }
 
     /**
@@ -3826,7 +3827,7 @@ class User extends \OmegaUp\Controllers\Controller {
             self::shouldUserInformationBeHidden($r->identity, $identity, $user)
         ) {
             $response['smartyProperties']['payload'] = [
-                'profile' => self::getEmptyUserProfile($identity),
+                'profile' => self::getPrivateUserProfile($identity),
                 'privateProfile' => true,
             ];
             return $response;
