@@ -260,7 +260,7 @@ export default class AddProblem extends Vue {
 
   get addProblemButtonDisabled(): boolean {
     if (this.useLatestVersion) {
-      return this.alias === '';
+      return this.alias === '' || this.alias === null;
     }
     return this.selectedRevision.commit === '';
   }

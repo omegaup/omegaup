@@ -6,7 +6,7 @@
     :typeahead-style="'dropdown'"
     :typeahead-max-results="maxResults"
     :typeahead-activation-threshold="activationThreshold"
-    :placeholder="placeholder"
+    :placeholder="T.typeaheadSearchPlaceholder"
     :limit="1"
     :hide-input-on-limit="true"
     :only-existing-tags="true"
@@ -24,10 +24,6 @@ import VoerroTagsInput from '@voerro/vue-tagsinput';
 import '@voerro/vue-tagsinput/dist/style.css';
 import T from '../../lang';
 
-export enum TypeaheadType {
-  Problem = 'problem',
-}
-
 @Component({
   components: {
     'tags-input': VoerroTagsInput,
@@ -37,19 +33,9 @@ export default class Typeahead extends Vue {
   @Prop() existingOptions!: { key: string; value: string }[];
   @Prop({ default: 3 }) activationThreshold!: number;
   @Prop({ default: 5 }) maxResults!: number;
-  @Prop() type!: TypeaheadType;
 
   T = T;
   selectedOptions: { key: string; value: string }[] = [];
-
-  get placeholder(): string {
-    switch (this.type) {
-      case TypeaheadType.Problem:
-        return T.searchProblemTypeahead;
-      default:
-        return '';
-    }
-  }
 
   updateExistingOptions(query: string): void {
     if (query.length < this.activationThreshold) return;
@@ -62,7 +48,7 @@ export default class Typeahead extends Vue {
   }
 
   onTagRemoved(): void {
-    this.$emit('update-selected-option', '');
+    this.$emit('update-selected-option', null);
   }
 }
 </script>
