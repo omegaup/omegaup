@@ -89,6 +89,14 @@
             @click="showTab = 'clone'"
             >{{ T.courseEditClone }}</a
           >
+          <a
+            href="#"
+            data-toggle="tab"
+            class="dropdown-item"
+            :class="{ active: showTab === 'archive' }"
+            @click="showTab = 'archive'"
+            >{{ T.contestEditArchive }}</a
+          >
         </div>
       </li>
     </ul>
@@ -199,6 +207,20 @@
           "
         ></omegaup-contest-clone>
       </div>
+      <div v-if="showTab === 'archive'" class="tab-pane active">
+        <omegaup-common-archive
+          :already-archived="details.archived"
+          :archive-button-description="
+            details.archived
+              ? T.contestEditUnarchiveContest
+              : T.contestEditArchiveContest
+          "
+          :archive-confirm-text="T.contestEditArchiveConfirmText"
+          :archive-header-title="T.contestEditArchiveContest"
+          :archive-help-text="T.contestEditArchiveHelpText"
+          @archive="onArchiveContest"
+        ></omegaup-common-archive>
+      </div>
     </div>
   </div>
 </template>
@@ -214,11 +236,13 @@ import contest_AddContestant from './AddContestant.vue';
 import contest_Clone from './Clone.vue';
 import contest_Admins from '../common/Adminsv2.vue';
 import common_Requests from '../common/Requestsv2.vue';
+import common_Archive from '../common/Archive.vue';
 import contest_GroupAdmins from '../common/GroupAdminsv2.vue';
 import contest_Groups from './Groups.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
 import common_Publish from '../common/Publishv2.vue';
+import omegaup_Markdown from '../Markdown.vue';
 
 @Component({
   components: {
@@ -226,12 +250,14 @@ import common_Publish from '../common/Publishv2.vue';
     'omegaup-contest-admins': contest_Admins,
     'omegaup-contest-clone': contest_Clone,
     'omegaup-contest-add-contestant': contest_AddContestant,
+    'omegaup-common-archive': common_Archive,
     'omegaup-common-requests': common_Requests,
     'omegaup-contest-groups': contest_Groups,
     'omegaup-contest-group-admins': contest_GroupAdmins,
     'omegaup-contest-links': contest_Links,
     'omegaup-contest-new-form': contest_NewForm,
     'omegaup-common-publish': common_Publish,
+    'omegaup-markdown': omegaup_Markdown,
   },
 })
 export default class Edit extends Vue {
@@ -247,6 +273,7 @@ export default class Edit extends Vue {
   ui = ui;
   showTab = ui.isVirtual(this.details) ? 'contestants' : 'new_form';
   virtual = ui.isVirtual(this.details);
+  alreadyArchived = this.details.archived;
 
   get activeTab(): string {
     switch (this.showTab) {
@@ -264,9 +291,16 @@ export default class Edit extends Vue {
         return T.showLinks;
       case 'clone':
         return T.courseEditClone;
+      case 'archive':
+        return T.contestEditArchive;
       default:
         return T.contestEdit;
     }
+  }
+
+  onArchiveContest(archive: boolean): void {
+    this.$emit('archive-contest', this.details.alias, archive);
+    this.alreadyArchived = archive;
   }
 }
 </script>
