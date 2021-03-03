@@ -1417,14 +1417,7 @@ export namespace types {
       description?: string;
       finish_time?: Date;
       name?: string;
-      problems: {
-        acceptSubmissions: boolean;
-        alias: string;
-        bestScore: number;
-        hasRuns: boolean;
-        maxScore: number;
-        text: string;
-      }[];
+      problems: types.NavbarProblemsetProblem[];
       start_time: Date;
     };
     shouldShowFirstAssociatedIdentityRunWarning: boolean;

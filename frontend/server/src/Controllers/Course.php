@@ -47,7 +47,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type IntroDetailsPayload=array{alias: string, archived: boolean, description: string, details?: CourseDetails, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
- * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, courseDetails: CourseDetails, currentAssignment: array{alias: string|null, assignment_type: string, description: null|string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<array{acceptSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float, text: string}>, start_time: \OmegaUp\Timestamp}}
+ * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
+ * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, courseDetails: CourseDetails, currentAssignment: array{alias: string|null, assignment_type: string, description: null|string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, start_time: \OmegaUp\Timestamp}}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
@@ -3694,7 +3695,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $problem['languages']
             );
             $problemsResponseArray[] = [
-                'acceptSubmissions' => $problem['accepts_submissions'],
+                'acceptsSubmissions' => $problem['accepts_submissions'],
                 'alias' => strval($problem['alias']),
                 'text' => "{$problem['letter']}. {$problem['title']}",
                 'bestScore' => 0,
