@@ -1647,6 +1647,7 @@ export namespace types {
     admin: boolean;
     admission_mode: string;
     alias: string;
+    archived: boolean;
     available_languages: { [key: string]: string };
     description: string;
     director: string;
@@ -1682,6 +1683,7 @@ export namespace types {
     admin: boolean;
     admission_mode: string;
     alias: string;
+    archived: boolean;
     description: string;
     director: string;
     feedback: string;

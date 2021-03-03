@@ -35,7 +35,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                                 ';
 
     final public static function getByAlias(string $alias): ?\OmegaUp\DAO\VO\Contests {
-        $sql = 'SELECT * FROM Contests WHERE alias = ? AND archived = 0 LIMIT 1;';
+        $sql = 'SELECT * FROM Contests WHERE alias = ? LIMIT 1;';
 
         /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
@@ -84,7 +84,6 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     i.user_id = acl.owner_id
                 WHERE
                     c.alias = ?
-                    AND archived = 0
                 LIMIT
                     1;';
 
@@ -131,7 +130,6 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     p.problemset_id = c.problemset_id
                 WHERE
                     c.alias = ?
-                    AND archived = 0
                 LIMIT 1;';
         $params = [$alias];
 
@@ -146,7 +144,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     final public static function getByProblemset(
         int $problemsetId
     ): ?\OmegaUp\DAO\VO\Contests {
-        $sql = 'SELECT * FROM Contests WHERE problemset_id = ? AND archived = 0 LIMIT 0, 1;';
+        $sql = 'SELECT * FROM Contests WHERE problemset_id = ? LIMIT 0, 1;';
         /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,

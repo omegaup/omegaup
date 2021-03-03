@@ -625,13 +625,14 @@ _Nothing_
 
 ### Description
 
-Archives a contest if user is the creator
+Archives or Unarchives a contest if user is the creator
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
+| Name            | Type      | Description |
+| --------------- | --------- | ----------- |
+| `archive`       | `boolean` |             |
+| `contest_alias` | `string`  |             |
 
 ### Returns
 
