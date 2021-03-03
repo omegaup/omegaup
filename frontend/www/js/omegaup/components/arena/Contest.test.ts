@@ -4,9 +4,9 @@ import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
 import * as time from '../../time';
 
-import arena_ContestPractice from './ContestPractice.vue';
+import arena_Contest from './Contest.vue';
 
-describe('ContestPractice.vue', () => {
+describe('Contest.vue', () => {
   const date = new Date();
 
   const contestDetails = {
@@ -122,8 +122,8 @@ describe('ContestPractice.vue', () => {
     } as types.RunDetails,
   } as types.ProblemInfo;
 
-  it('Should handle details for a problem in a contest, practice mode', async () => {
-    const wrapper = mount(arena_ContestPractice, {
+  it('Should handle details for a problem in a contest', async () => {
+    const wrapper = mount(arena_Contest, {
       propsData: {
         contest: contestDetails,
         problems: [
@@ -148,8 +148,8 @@ describe('ContestPractice.vue', () => {
       },
     });
 
-    expect(wrapper.find('.clock').text()).toBe('∞');
-    expect(wrapper.find('.socket-status-error').text()).toBe('✗');
+    expect(wrapper.find('.clock').text()).toBe('00:00:00');
+    expect(wrapper.find('.socket-status-ok').text()).toBe('•');
     expect(wrapper.find('a[data-problem=problemOmegaUp]').text()).toBe(
       'A. hello problem omegaUp',
     );
