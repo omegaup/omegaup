@@ -1,11 +1,11 @@
 -- Certificates
 CREATE TABLE `Certificates` (
-  `certificate_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Identificador del diploma',
-  `identity_id` int(11) NOT NULL COMMENT 'Identificador del usuario acreedor del diploma',
+  `certificate_id` int(11) NOT NULL AUTO_INCREMENT,
+  `identity_id` int(11) NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora del otorgamiento del diploma',
   `certificate_type` enum('course','contest','coder_of_the_month','coder_of_the_month_female') NOT NULL COMMENT 'Tipo de diploma',
-  `course_id` int(11) DEFAULT NULL COMMENT 'ID del curso',
-  `contest_id` int(11) DEFAULT NULL COMMENT 'ID del concurso',
+  `course_id` int(11) DEFAULT NULL,
+  `contest_id` int(11) DEFAULT NULL,
   `verification_code` varchar(10) NOT NULL UNIQUE COMMENT 'Código de verificación del diploma',
   PRIMARY KEY (`certificate_id`),
   KEY `identity_id` (`identity_id`),

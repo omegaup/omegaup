@@ -83,7 +83,7 @@ class Certificates extends \OmegaUp\DAO\VO\VO {
     }
 
     /**
-     * Identificador del diploma
+     * [Campo no documentado]
      * Llave Primaria
      * Auto Incremento
      *
@@ -92,7 +92,7 @@ class Certificates extends \OmegaUp\DAO\VO\VO {
     public $certificate_id = 0;
 
     /**
-     * Identificador del usuario acreedor del diploma
+     * [Campo no documentado]
      *
      * @var int|null
      */
@@ -113,14 +113,14 @@ class Certificates extends \OmegaUp\DAO\VO\VO {
     public $certificate_type = null;
 
     /**
-     * ID del curso
+     * [Campo no documentado]
      *
      * @var int|null
      */
     public $course_id = null;
 
     /**
-     * ID del concurso
+     * [Campo no documentado]
      *
      * @var int|null
      */
