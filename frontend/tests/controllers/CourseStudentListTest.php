@@ -165,7 +165,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
+        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
             $courseData['course']->course_id,
             $courseData['course']->group_id,
             1,
@@ -176,65 +176,65 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals(
             $participants[0]->name,
-            $results['allProgress'][0]['name']
+            $results['studentsProgress'][0]['name']
         );
         $this->assertArrayHasKey(
             $assignment,
-            $results['allProgress'][0]['progress']
+            $results['studentsProgress'][0]['allProgress']
         );
         $this->assertEquals(
             100,
-            $results['allProgress'][0]['progress'][$assignment][$problemsData[0]['problem']->alias]
+            $results['studentsProgress'][0]['allProgress'][$assignment][$problemsData[0]['problem']->alias]['points']
         );
         $this->assertEquals(
             100,
-            $results['allProgress'][0]['progress'][$assignment][$problemsData[1]['problem']->alias]
+            $results['studentsProgress'][0]['allProgress'][$assignment][$problemsData[1]['problem']->alias]['points']
         );
         $this->assertEquals(
             0,
-            $results['allProgress'][0]['progress'][$assignment][$problemsData[2]['problem']->alias]
+            $results['studentsProgress'][0]['allProgress'][$assignment][$problemsData[2]['problem']->alias]['points']
         );
 
         $this->assertEquals(
             $participants[1]->name,
-            $results['allProgress'][1]['name']
+            $results['studentsProgress'][1]['name']
         );
         $this->assertArrayHasKey(
             $assignment,
-            $results['allProgress'][1]['progress']
+            $results['studentsProgress'][1]['allProgress']
         );
         $this->assertEquals(
             0,
-            $results['allProgress'][1]['progress'][$assignment][$problemsData[0]['problem']->alias]
+            $results['studentsProgress'][1]['allProgress'][$assignment][$problemsData[0]['problem']->alias]['points']
         );
         $this->assertEquals(
             100,
-            $results['allProgress'][1]['progress'][$assignment][$problemsData[1]['problem']->alias]
+            $results['studentsProgress'][1]['allProgress'][$assignment][$problemsData[1]['problem']->alias]['points']
         );
         $this->assertEquals(
             0,
-            $results['allProgress'][1]['progress'][$assignment][$problemsData[2]['problem']->alias]
+            $results['studentsProgress'][1]['allProgress'][$assignment][$problemsData[2]['problem']->alias]['points']
         );
 
         $this->assertEquals(
             $participants[2]->name,
-            $results['allProgress'][2]['name']
+            $results['studentsProgress'][2]['name']
         );
         $this->assertArrayHasKey(
             $assignment,
-            $results['allProgress'][2]['progress']
+            $results['studentsProgress'][2]['allProgress']
         );
         $this->assertEquals(
             0,
-            $results['allProgress'][2]['progress'][$assignment][$problemsData[0]['problem']->alias]
+            $results['studentsProgress'][2]['allProgress'][$assignment][$problemsData[0]['problem']->alias]['points']
         );
         $this->assertEquals(
             0,
-            $results['allProgress'][2]['progress'][$assignment][$problemsData[1]['problem']->alias]
+            $results['studentsProgress'][2]['allProgress'][$assignment][$problemsData[1]['problem']->alias]['points']
         );
         $this->assertEquals(
             100,
-            $results['allProgress'][2]['progress'][$assignment][$problemsData[2]['problem']->alias]
+            $results['studentsProgress'][2]['allProgress'][$assignment][$problemsData[2]['problem']->alias]['points']
         );
     }
 
@@ -273,7 +273,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
+        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
             $courseData['course']->course_id,
             $courseData['course']->group_id,
             1,
@@ -283,15 +283,15 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(1, $results['totalRows']);
         $this->assertEquals(
             $participant->name,
-            $results['allProgress'][0]['name']
+            $results['studentsProgress'][0]['name']
         );
         $this->assertArrayHasKey(
             $assignment,
-            $results['allProgress'][0]['progress']
+            $results['studentsProgress'][0]['allProgress']
         );
         $this->assertEquals(
             0,
-            $results['allProgress'][0]['progress'][$assignment][$problemData['problem']->alias]
+            $results['studentsProgress'][0]['allProgress'][$assignment][$problemData['problem']->alias]['points']
         );
     }
 }
