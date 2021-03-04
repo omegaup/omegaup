@@ -3058,8 +3058,8 @@ export namespace types {
 
   export interface UserProfileDetailsPayload {
     extraProfileDetails?: types.ExtraProfileDetails;
+    privateProfile: boolean;
     profile: types.UserProfileInfo;
-    statusError?: string;
   }
 
   export interface UserProfileInfo {
@@ -3986,9 +3986,7 @@ export namespace messages {
   export type UserContestStatsRequest = { [key: string]: any };
   export type _UserContestStatsServerResponse = any;
   export type UserContestStatsResponse = {
-    contests: {
-      [key: string]: { data: types.ContestParticipated; place?: number };
-    };
+    contests: types.UserProfileContests;
   };
   export type UserCreateRequest = { [key: string]: any };
   export type UserCreateResponse = { username: string };
