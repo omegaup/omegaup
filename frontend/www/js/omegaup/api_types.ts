@@ -211,6 +211,13 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
+        x.scoreboard = ((x) => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.scoreboard);
         x.users = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -1717,6 +1724,7 @@ export namespace types {
     contest: types.ContestPublicDetails;
     contestAdmin: boolean;
     problems: types.NavbarProblemsetProblem[];
+    scoreboard: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     users: types.ContestUser[];
   }

@@ -26,7 +26,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null, window_length: int|null}
  * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<ContestProblem>, users: list<ContestUser>, groups: list<ContestGroup>, requests: list<ContestRequest>, admins: list<ContestAdmin>, group_admins: list<ContestGroupAdmin>}
  * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string, shouldShowFirstAssociatedIdentityRunWarning: bool}
- * @psalm-type ContestDetailsPayload=array{clarifications: list<Clarification>, contest: ContestPublicDetails, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, shouldShowFirstAssociatedIdentityRunWarning: bool, users: list<ContestUser>}
+ * @psalm-type ContestDetailsPayload=array{clarifications: list<Clarification>, contest: ContestPublicDetails, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, shouldShowFirstAssociatedIdentityRunWarning: bool, users: list<ContestUser>}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestListPayload=array{contests: array{current: list<ContestListItem>, future: list<ContestListItem>, participating?: list<ContestListItem>, past: list<ContestListItem>, public: list<ContestListItem>, recommended_current: list<ContestListItem>, recommended_past: list<ContestListItem>}, isLogged: bool, query: string}
  * @psalm-type ContestNewPayload=array{languages: array<string, string>}
@@ -517,10 +517,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{clarifications: list<Clarification>, problems: list<NavbarProblemsetProblem>, users: list<ContestUser>}
+     * @return array{clarifications: list<Clarification>, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, users: list<ContestUser>}
      */
     public static function getCommonDetails(
         \OmegaUp\DAO\VO\Contests $contest,
+        \OmegaUp\DAO\VO\Problemsets $problemset,
         bool $contestAdmin,
         \OmegaUp\DAO\VO\Identities $identity
     ): array {
@@ -529,14 +530,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'userNotExist'
             );
         }
-        $problemset = self::getContestDetails(
+        $contestDetails = self::getContestDetails(
             $contest,
             $contestAdmin,
             $identity
         );
         /** @var list<NavbarProblemsetProblem> */
         $problems = [];
-        foreach ($problemset['problems'] as $problem) {
+        foreach ($contestDetails['problems'] as $problem) {
             array_push(
                 $problems,
                 [
@@ -562,6 +563,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 /*$rowcount=*/ 100
             ),
             'problems' => $problems,
+            'scoreboard' => self::getScoreboard(
+                $contest,
+                $problemset,
+                $identity
+            ),
         ];
     }
 
@@ -622,6 +628,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             [
                 'contest' => $contest,
                 'contest_admin' => $contestAdmin,
+                'problemset' => $problemset,
             ] = self::validateDetails($contestAlias, $r->identity);
             if (is_null($contest->problemset_id)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
@@ -651,7 +658,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'shouldShowFirstAssociatedIdentityRunWarning' => $shouldShowFirstAssociatedIdentityRunWarning,
                     'contestAdmin' => $contestAdmin,
                 ],
-                self::getCommonDetails($contest, $contestAdmin, $r->identity)
+                self::getCommonDetails(
+                    $contest,
+                    $problemset,
+                    $contestAdmin,
+                    $r->identity
+                )
             );
 
             $result['smartyProperties']['fullWidth'] = true;
@@ -739,6 +751,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         [
             'contest' => $contest,
             'contest_admin' => $contestAdmin,
+            'problemset' => $problemset,
         ] = self::validateDetails($contestAlias, $r->identity);
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
@@ -766,6 +779,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     ],
                     self::getCommonDetails(
                         $contest,
+                        $problemset,
                         $contestAdmin,
                         $r->identity
                     ),
@@ -1103,7 +1117,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\PreconditionFailedException
      * @throws \OmegaUp\Exceptions\UnauthorizedException
      *
-     * @return array{contest: \OmegaUp\DAO\VO\Contests, contest_admin: bool, contest_alias: string}
+     * @return array{contest: \OmegaUp\DAO\VO\Contests, contest_admin: bool, contest_alias: string, problemset: \OmegaUp\DAO\VO\Problemsets}
      */
     public static function validateDetails(
         string $contestAlias,
@@ -1159,6 +1173,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest' => $contest,
             'contest_admin' => $contestAdmin,
             'contest_alias' => $contestAlias,
+            'problemset' => $problemset,
         ];
     }
 
