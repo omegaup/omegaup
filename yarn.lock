@@ -1864,11 +1864,9 @@
     eslint-visitor-keys "^2.0.0"
 
 "@voerro/vue-tagsinput@^2.0.2":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@voerro/vue-tagsinput/-/vue-tagsinput-2.1.0.tgz#5250be05fc83dd4bf732dfdb65b38ba28d60efc7"
-  integrity sha512-Sm05urpfRkY65IBcpIM7CFumB1+TcoOqP9AzAgdClQPIQn2yAxmV0zFoQ/ZOGmS2SLNok/LyKWFSPSP52Zor1w==
-  dependencies:
-    vue "^2.5.0"
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/@voerro/vue-tagsinput/-/vue-tagsinput-2.4.3.tgz#a4e9bdd1cf2f3248584380c8491799059dca5b73"
+  integrity sha512-r+4CJmuzrTgcHWit+vdnuiBdPRoEm7r361DMpSkGBlth/Cvf1vOdF/0WRI1vdstQc0r9j/Ifce34ImuzoFKqLw==
 
 "@vue/component-compiler-utils@^3.1.0":
   version "3.2.0"
@@ -6676,10 +6674,10 @@ pretty@^2.0.0:
     extend-shallow "^2.0.1"
     js-beautify "^1.6.12"
 
-prismjs@^1.21.0:
-  version "1.21.0"
-  resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.21.0.tgz#36c086ec36b45319ec4218ee164c110f9fc015a3"
-  integrity sha512-uGdSIu1nk3kej2iZsLyDoJ7e9bnPzIgY0naW/HdknGj61zScaprVEVGHrPoXqI+M9sP0NDnTK2jpkvmldpuqDw==
+prismjs@^1.23.0:
+  version "1.23.0"
+  resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.23.0.tgz#d3b3967f7d72440690497652a9d40ff046067f33"
+  integrity sha512-c29LVsqOaLbBHuIbsTxaKENh1N2EQBOHaWv7gkHN4dgRbxSREqDnDbtFJYdpPauS4YCplMSNCABQ6Eeor69bAA==
   optionalDependencies:
     clipboard "^2.0.0"
 
@@ -8503,11 +8501,6 @@ vue-typeahead-bootstrap@^2.1.2:
   dependencies:
     resize-observer-polyfill "^1.5.0"
     vue "^2.5.17"
-
-vue@^2.5.0:
-  version "2.6.10"
-  resolved "https://registry.yarnpkg.com/vue/-/vue-2.6.10.tgz#a72b1a42a4d82a721ea438d1b6bf55e66195c637"
-  integrity sha512-ImThpeNU9HbdZL3utgMCq0oiMzAkt1mcgy3/E6zWC/G6AaQoeuFdsl9nDhTDU3X1R6FK7nsIUuRACVcjI+A2GQ==
 
 vue@^2.5.17:
   version "2.6.11"
