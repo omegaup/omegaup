@@ -48,7 +48,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component
-export default class CommonArchive extends Vue {
+export default class Archive extends Vue {
   @Prop() alreadyArchived!: boolean;
   @Prop() archiveHelpText!: string;
   @Prop() archiveHeaderTitle!: string;
