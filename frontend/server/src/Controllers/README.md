@@ -3970,9 +3970,9 @@ Get Contests which a certain user has participated in
 
 ### Returns
 
-| Name       | Type                                                                       |
-| ---------- | -------------------------------------------------------------------------- |
-| `contests` | `{ [key: string]: { data: types.ContestParticipated; place?: number; }; }` |
+| Name       | Type                        |
+| ---------- | --------------------------- |
+| `contests` | `types.UserProfileContests` |
 
 ## `/api/user/create/`
 

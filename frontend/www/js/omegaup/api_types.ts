@@ -86,6 +86,12 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.courseDetails);
+        x.currentAssignment = ((x) => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.currentAssignment);
         return x;
       })(
         JSON.parse(
@@ -1405,6 +1411,15 @@ export namespace types {
 
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
+    currentAssignment: {
+      alias?: string;
+      assignment_type: string;
+      description?: string;
+      finish_time?: Date;
+      name?: string;
+      problems: types.NavbarProblemsetProblem[];
+      start_time: Date;
+    };
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
   }
@@ -3043,8 +3058,8 @@ export namespace types {
 
   export interface UserProfileDetailsPayload {
     extraProfileDetails?: types.ExtraProfileDetails;
+    privateProfile: boolean;
     profile: types.UserProfileInfo;
-    statusError?: string;
   }
 
   export interface UserProfileInfo {
@@ -3971,9 +3986,7 @@ export namespace messages {
   export type UserContestStatsRequest = { [key: string]: any };
   export type _UserContestStatsServerResponse = any;
   export type UserContestStatsResponse = {
-    contests: {
-      [key: string]: { data: types.ContestParticipated; place?: number };
-    };
+    contests: types.UserProfileContests;
   };
   export type UserCreateRequest = { [key: string]: any };
   export type UserCreateResponse = { username: string };
