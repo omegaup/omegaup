@@ -2135,7 +2135,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * function returns false:
      *  - Logged user is a sysadmin.
      *  - Logged user is trying to see their own information.
-     *  - The target identity has a user associated to it, and they have not}
+     *  - The target identity has a user associated to it, and they have not
      *    marked their information as private.
      */
     private static function shouldUserInformationBeHidden(
