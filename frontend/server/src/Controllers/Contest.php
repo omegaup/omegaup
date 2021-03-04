@@ -246,15 +246,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
+     * @omegaup-request-param bool|null $show_archived
      */
     public static function apiAdminList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('page_size');
-
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
+        $showArchived = $r->ensureOptionalBool('show_archived') ?? false;
 
         // Create array of relevant columns
         $contests = null;
@@ -263,7 +262,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $page,
                 $pageSize,
                 'contest_id',
-                'DESC'
+                'DESC',
+                $showArchived
             );
         } else {
             $contests = \OmegaUp\DAO\Contests::getAllContestsAdminedByIdentity(
@@ -282,13 +282,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Callback to get contests list, depending on a given method
      *
      * @param \OmegaUp\Request $r
-     * @param Closure(int, int, int, null|string):list<Contest> $callbackUserFunction
+     * @param Closure(int, int, int, bool, null|string):list<Contest> $callbackUserFunction
      *
      * @return array{contests: list<Contest>}
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      * @omegaup-request-param string $query
+     * @omegaup-request-param bool|null $show_archived
      */
     private static function getContestListInternal(
         \OmegaUp\Request $r,
@@ -299,10 +300,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
         $query = $r->ensureOptionalString('query');
+        $showArchived = $r->ensureOptionalBool('show_archived') ?? false;
         $contests = $callbackUserFunction(
             $r->identity->identity_id,
             $page,
             $pageSize,
+            $showArchived,
             $query
         );
 
@@ -325,6 +328,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      * @omegaup-request-param string $query
+     * @omegaup-request-param bool|null $show_archived
      */
     public static function apiMyList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -335,11 +339,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 int $identityId,
                 int $page,
                 int $pageSize,
+                bool $showArchived,
                 ?string $query
             ) => \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
                 $identityId,
                 $page,
-                $pageSize
+                $pageSize,
+                $showArchived
             )
         );
     }
@@ -352,6 +358,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      * @omegaup-request-param string $query
+     * @omegaup-request-param bool|null $show_archived
      */
     public static function apiListParticipating(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -361,6 +368,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 int $identityId,
                 int $page,
                 int $pageSize,
+                bool $showArchived,
                 ?string $query
             ) => \OmegaUp\DAO\Contests::getContestsParticipating(
                 $identityId,
@@ -890,6 +898,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      * @omegaup-request-param string $query
+     * @omegaup-request-param bool|null $show_archived
      */
     public static function getContestListMineForTypeScript(
         \OmegaUp\Request $r
@@ -917,11 +926,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 int $identityId,
                 int $page,
                 int $pageSize,
+                bool $showArchived,
                 ?string $query
             ) => \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
                 $identityId,
                 $page,
-                $pageSize
+                $pageSize,
+                $showArchived
             )
         );
 
@@ -4885,7 +4896,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param boolean $archive
+     * @omegaup-request-param bool|null $archive
      */
     public static function apiArchive(\OmegaUp\Request $r): array {
         // Authenticate logged user

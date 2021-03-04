@@ -574,10 +574,11 @@ the director).
 
 ### Parameters
 
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `page`      | `int` |             |
-| `page_size` | `int` |             |
+| Name            | Type         | Description |
+| --------------- | ------------ | ----------- |
+| `page`          | `int`        |             |
+| `page_size`     | `int`        |             |
+| `show_archived` | `bool\|null` |             |
 
 ### Returns
 
@@ -629,10 +630,10 @@ Archives or Unarchives a contest if user is the creator
 
 ### Parameters
 
-| Name            | Type      | Description |
-| --------------- | --------- | ----------- |
-| `archive`       | `boolean` |             |
-| `contest_alias` | `string`  |             |
+| Name            | Type         | Description |
+| --------------- | ------------ | ----------- |
+| `contest_alias` | `string`     |             |
+| `archive`       | `bool\|null` |             |
 
 ### Returns
 
@@ -807,11 +808,12 @@ Returns a list of contests where current user is participating in
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `page`      | `int`    |             |
-| `page_size` | `int`    |             |
-| `query`     | `string` |             |
+| Name            | Type         | Description |
+| --------------- | ------------ | ----------- |
+| `page`          | `int`        |             |
+| `page_size`     | `int`        |             |
+| `query`         | `string`     |             |
+| `show_archived` | `bool\|null` |             |
 
 ### Returns
 
@@ -827,11 +829,12 @@ Returns a list of contests where current user is the director
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `page`      | `int`    |             |
-| `page_size` | `int`    |             |
-| `query`     | `string` |             |
+| Name            | Type         | Description |
+| --------------- | ------------ | ----------- |
+| `page`          | `int`        |             |
+| `page_size`     | `int`        |             |
+| `query`         | `string`     |             |
+| `show_archived` | `bool\|null` |             |
 
 ### Returns
 

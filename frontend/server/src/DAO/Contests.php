@@ -318,7 +318,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         ?int $page = 1,
         int $pageSize = 1000,
         ?string $order = null,
-        string $orderType = 'ASC'
+        string $orderType = 'ASC',
+        bool $showArchived = false
     ) {
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
         $sql = "
@@ -331,7 +332,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             INNER JOIN
                 Problemsets ps ON ps.problemset_id = Contests.problemset_id
             WHERE
-                archived = 0;";
+                archived = ?";
 
         if (!is_null($order)) {
             $sql .= ' ORDER BY `Contests`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
@@ -346,7 +347,10 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
 
         /** @var list<Contest> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$showArchived]
+        );
     }
 
     /**
@@ -357,7 +361,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     final public static function getAllContestsOwnedByUser(
         int $identityId,
         int $page = 1,
-        int $pageSize = 1000
+        int $pageSize = 1000,
+        bool $showArchived = false
     ): array {
         $offset = ($page - 1) * $pageSize;
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
@@ -376,12 +381,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 Problemsets p ON p.problemset_id = Contests.problemset_id
             WHERE
                 u.main_identity_id = ?
-                AND archived = 0
+                AND archived = ?
             ORDER BY
                 Contests.contest_id DESC
             LIMIT ?, ?;";
         $params = [
             $identityId,
+            $showArchived,
             intval($offset),
             intval($pageSize),
         ];
