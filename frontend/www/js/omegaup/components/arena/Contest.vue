@@ -114,6 +114,19 @@ export interface ActiveProblem {
   problem: types.NavbarProblemsetProblem;
 }
 
+export const scoreboardColors = [
+  '#FB3F51',
+  '#FF5D40',
+  '#FFA240',
+  '#FFC740',
+  '#59EA3A',
+  '#37DD6F',
+  '#34D0BA',
+  '#3AAACF',
+  '#8144D6',
+  '#CD35D3',
+];
+
 @Component({
   components: {
     'omegaup-arena-clarification-list': arena_ClarificationList,
@@ -147,11 +160,10 @@ export default class ArenaContest extends Vue {
   @Prop({ default: null }) guid!: null | string;
   @Prop() minirankingUsers!: omegaup.UserRank[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
-  @Prop() scoreboardColors!: string[];
   @Prop() lastUpdated!: Date;
-  @Prop() digitsAfterDecimalPoint!: number;
-  @Prop() showPenalty!: boolean;
-  @Prop({ default: true }) socketStatus!: boolean;
+  @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
+  @Prop({ default: true }) showPenalty!: boolean;
+  @Prop({ default: true }) socketConnected!: boolean;
 
   T = T;
   ui = ui;
@@ -159,14 +171,15 @@ export default class ArenaContest extends Vue {
   activeProblem: ActiveProblem | null = this.problem;
   shouldShowRunDetails = false;
   clock = '00:00:00';
+  scoreboardColors = scoreboardColors;
 
   get socketIcon(): string {
-    if (this.socketStatus) return '•';
+    if (this.socketConnected) return '•';
     return '✗';
   }
 
   get socketClass(): string {
-    if (this.socketStatus) return 'socket-status-ok';
+    if (this.socketConnected) return 'socket-status-ok';
     return 'socket-status-error';
   }
 
@@ -229,23 +242,23 @@ export default class ArenaContest extends Vue {
 <style lang="scss" scoped>
 .navleft {
   overflow: hidden;
+  .navbar {
+    width: 21em;
+    float: left;
+    background: transparent;
+  }
+  .main {
+    margin-left: 20em;
+    border: 1px solid #ccc;
+    border-width: 0 0 1px 1px;
+  }
 }
 
-.nav-tabs .nav-link {
-  background-color: #ddd;
-  border-top-color: #ddd;
-}
-
-.navleft .navbar {
-  width: 21em;
-  float: left;
-  background: transparent;
-}
-
-.navleft .main {
-  margin-left: 20em;
-  border: 1px solid #ccc;
-  border-width: 0 0 1px 1px;
+.nav-tabs {
+  .nav-link {
+    background-color: #ddd;
+    border-top-color: #ddd;
+  }
 }
 
 .problem {

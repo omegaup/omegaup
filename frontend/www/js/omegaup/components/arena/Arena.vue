@@ -4,7 +4,7 @@
       <h2>
         <span>{{ contestTitle }}</span>
         <slot name="socket-status">
-          <sup class="socket-status-error" title="WebSocket"> ✗ </sup>
+          <sup class="socket-status-error" title="WebSocket">✗</sup>
         </slot>
       </h2>
       <slot name="clock"><div class="clock">∞</div></slot>
