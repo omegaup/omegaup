@@ -81,7 +81,8 @@ class JavaScriptLogCollector:
             yield entry
 
 
-class Driver:  # pylint: disable=too-many-instance-attributes, disable=R0904
+class Driver:  # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-public-methods
     '''Wraps the state needed to run a test.'''
 
     # pylint: disable=too-many-arguments
