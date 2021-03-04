@@ -576,8 +576,8 @@ the director).
 
 | Name            | Type         | Description |
 | --------------- | ------------ | ----------- |
-| `page`          | `int`        |             |
-| `page_size`     | `int`        |             |
+| `page`          | `int\|null`  |             |
+| `page_size`     | `int\|null`  |             |
 | `show_archived` | `bool\|null` |             |
 
 ### Returns
@@ -808,12 +808,12 @@ Returns a list of contests where current user is participating in
 
 ### Parameters
 
-| Name            | Type         | Description |
-| --------------- | ------------ | ----------- |
-| `page`          | `int`        |             |
-| `page_size`     | `int`        |             |
-| `query`         | `string`     |             |
-| `show_archived` | `bool\|null` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `page`          | `int\|null`    |             |
+| `page_size`     | `int\|null`    |             |
+| `query`         | `null\|string` |             |
+| `show_archived` | `bool\|null`   |             |
 
 ### Returns
 
@@ -829,12 +829,12 @@ Returns a list of contests where current user is the director
 
 ### Parameters
 
-| Name            | Type         | Description |
-| --------------- | ------------ | ----------- |
-| `page`          | `int`        |             |
-| `page_size`     | `int`        |             |
-| `query`         | `string`     |             |
-| `show_archived` | `bool\|null` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `page`          | `int\|null`    |             |
+| `page_size`     | `int\|null`    |             |
+| `query`         | `null\|string` |             |
+| `show_archived` | `bool\|null`   |             |
 
 ### Returns
 

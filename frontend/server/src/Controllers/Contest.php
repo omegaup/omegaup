@@ -244,8 +244,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return array{contests: list<Contest>}
      *
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
      * @omegaup-request-param bool|null $show_archived
      */
     public static function apiAdminList(\OmegaUp\Request $r): array {
@@ -286,9 +286,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return array{contests: list<Contest>}
      *
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
-     * @omegaup-request-param string $query
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param null|string $query
      * @omegaup-request-param bool|null $show_archived
      */
     private static function getContestListInternal(
@@ -325,9 +325,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return array{contests: list<Contest>}
      *
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
-     * @omegaup-request-param string $query
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param null|string $query
      * @omegaup-request-param bool|null $show_archived
      */
     public static function apiMyList(\OmegaUp\Request $r): array {
@@ -355,9 +355,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return array{contests: list<Contest>}
      *
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
-     * @omegaup-request-param string $query
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param null|string $query
      * @omegaup-request-param bool|null $show_archived
      */
     public static function apiListParticipating(\OmegaUp\Request $r): array {
@@ -895,9 +895,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{smartyProperties: array{payload: ContestListMinePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
-     * @omegaup-request-param string $query
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param null|string $query
      * @omegaup-request-param bool|null $show_archived
      */
     public static function getContestListMineForTypeScript(
