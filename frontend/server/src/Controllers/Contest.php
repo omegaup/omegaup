@@ -20,8 +20,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type ContestListMinePayload=array{contests: list<Contest>, privateContestsAlert: bool}
- * @psalm-type ContestDetails=array{admin: bool, admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
- * @psalm-type ContestAdminDetails=array{admin: bool, admission_mode: string, alias: string, available_languages: array<string, string>, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
+ * @psalm-type ContestDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
+ * @psalm-type ContestAdminDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, available_languages: array<string, string>, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null, window_length: int|null}
  * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<ContestProblem>, users: list<ContestUser>, groups: list<ContestGroup>, requests: list<ContestRequest>, admins: list<ContestAdmin>, group_admins: list<ContestGroupAdmin>}
@@ -244,17 +244,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return array{contests: list<Contest>}
      *
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param bool|null $show_archived
      */
     public static function apiAdminList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('page_size');
-
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
+        $showArchived = $r->ensureOptionalBool('show_archived') ?? false;
 
         // Create array of relevant columns
         $contests = null;
@@ -263,7 +262,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $page,
                 $pageSize,
                 'contest_id',
-                'DESC'
+                'DESC',
+                $showArchived
             );
         } else {
             $contests = \OmegaUp\DAO\Contests::getAllContestsAdminedByIdentity(
@@ -282,13 +282,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Callback to get contests list, depending on a given method
      *
      * @param \OmegaUp\Request $r
-     * @param Closure(int, int, int, null|string):list<Contest> $callbackUserFunction
+     * @param Closure(int, int, int, bool, null|string):list<Contest> $callbackUserFunction
      *
      * @return array{contests: list<Contest>}
      *
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
-     * @omegaup-request-param string $query
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param bool|null $show_archived
      */
     private static function getContestListInternal(
         \OmegaUp\Request $r,
@@ -299,10 +300,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
         $query = $r->ensureOptionalString('query');
+        $showArchived = $r->ensureOptionalBool('show_archived') ?? false;
         $contests = $callbackUserFunction(
             $r->identity->identity_id,
             $page,
             $pageSize,
+            $showArchived,
             $query
         );
 
@@ -322,9 +325,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return array{contests: list<Contest>}
      *
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
-     * @omegaup-request-param string $query
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param bool|null $show_archived
      */
     public static function apiMyList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -335,11 +339,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 int $identityId,
                 int $page,
                 int $pageSize,
+                bool $showArchived,
                 ?string $query
             ) => \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
                 $identityId,
                 $page,
-                $pageSize
+                $pageSize,
+                $showArchived
             )
         );
     }
@@ -349,9 +355,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return array{contests: list<Contest>}
      *
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
-     * @omegaup-request-param string $query
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param bool|null $show_archived
      */
     public static function apiListParticipating(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -361,6 +368,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 int $identityId,
                 int $page,
                 int $pageSize,
+                bool $showArchived,
                 ?string $query
             ) => \OmegaUp\DAO\Contests::getContestsParticipating(
                 $identityId,
@@ -887,9 +895,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{smartyProperties: array{payload: ContestListMinePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
-     * @omegaup-request-param string $query
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param int|null $page_size
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param bool|null $show_archived
      */
     public static function getContestListMineForTypeScript(
         \OmegaUp\Request $r
@@ -917,11 +926,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 int $identityId,
                 int $page,
                 int $pageSize,
+                bool $showArchived,
                 ?string $query
             ) => \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
                 $identityId,
                 $page,
-                $pageSize
+                $pageSize,
+                $showArchived
             )
         );
 
@@ -1363,10 +1374,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             /** @return ContestDetails */
             function () use ($contest, &$result) {
                 // Initialize response to be the contest information
-                /** @var array{admission_mode: string, alias: string, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null} */
+                /** @var array{admission_mode: string, alias: string, archived: bool, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null} */
                 $result = $contest->asFilteredArray([
                     'admission_mode',
                     'alias',
+                    'archived',
                     'description',
                     'feedback',
                     'finish_time',
@@ -4873,6 +4885,43 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
             'contestants' => $contestants,
+        ];
+    }
+
+    /**
+     * Archives or Unarchives a contest if user is the creator
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param bool|null $archive
+     */
+    public static function apiArchive(\OmegaUp\Request $r): array {
+        // Authenticate logged user
+        $r->ensureIdentity();
+
+        // Check whether contest exists
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
+        if (is_null($contest) || is_null($contest->contest_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+
+        if (!\OmegaUp\Authorization::canEditContest($r->identity, $contest)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $contest->archived = $r->ensureOptionalBool('archive') ?? true;
+        \OmegaUp\DAO\Contests::update($contest);
+
+        return [
+            'status' => 'ok',
         ];
     }
 
