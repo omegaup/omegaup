@@ -54,7 +54,8 @@ abstract class Contests {
                 `show_scoreboard_after` = ?,
                 `urgent` = ?,
                 `languages` = ?,
-                `recommended` = ?
+                `recommended` = ?,
+                `archived` = ?
             WHERE
                 (
                     `contest_id` = ?
@@ -105,6 +106,7 @@ abstract class Contests {
             intval($Contests->urgent),
             $Contests->languages,
             intval($Contests->recommended),
+            intval($Contests->archived),
             intval($Contests->contest_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -149,7 +151,8 @@ abstract class Contests {
                 `Contests`.`show_scoreboard_after`,
                 `Contests`.`urgent`,
                 `Contests`.`languages`,
-                `Contests`.`recommended`
+                `Contests`.`recommended`,
+                `Contests`.`archived`
             FROM
                 `Contests`
             WHERE
@@ -254,7 +257,8 @@ abstract class Contests {
                 `Contests`.`show_scoreboard_after`,
                 `Contests`.`urgent`,
                 `Contests`.`languages`,
-                `Contests`.`recommended`
+                `Contests`.`recommended`,
+                `Contests`.`archived`
             FROM
                 `Contests`
         ';
@@ -327,8 +331,10 @@ abstract class Contests {
                     `show_scoreboard_after`,
                     `urgent`,
                     `languages`,
-                    `recommended`
+                    `recommended`,
+                    `archived`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -399,6 +405,7 @@ abstract class Contests {
             intval($Contests->urgent),
             $Contests->languages,
             intval($Contests->recommended),
+            intval($Contests->archived),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

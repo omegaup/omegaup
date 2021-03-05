@@ -158,6 +158,7 @@ CREATE TABLE `Contests` (
   `urgent` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el concurso es de alta prioridad y requiere mejor QoS.',
   `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar en un concurso',
   `recommended` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Mostrar el concurso en la lista de recomendados.',
+  `archived` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el concurso ha sido archivado por el administrador.',
   PRIMARY KEY (`contest_id`),
   UNIQUE KEY `contests_alias` (`alias`),
   KEY `rerun_id` (`contest_id`),
