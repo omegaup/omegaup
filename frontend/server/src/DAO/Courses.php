@@ -644,7 +644,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ORDER BY
                 a.`order`, psp.`order` ASC';
 
-        /** @var list<array{assignment_alias: string, order: int, problemset_id: int, problem_id: int, problem_alias: string, problem_points: float, problem_title: string}> */
+        /** @var list<array{assignment_alias: string, order: int, problem_alias: string, problem_id: int, problem_points: float, problem_title: string, problemset_id: int}> */
         $problems = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sqlAssignmentsProblems,
             [ $courseId ]
@@ -717,7 +717,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 'points' => $problem['problem_points'],
             ];
 
-            /** @var list<array{username: string, name: null|string, country_id: null|string, score: float, classname: string}> */
+            /** @var list<array{classname: string, country_id: null|string, name: null|string, score: float, username: string}> */
             $studentsScores  = \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sqlStudentsScores,
                 [
