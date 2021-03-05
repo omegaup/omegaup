@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <div class="card-header">
+    <div v-if="title" class="card-header">
       <h4 class="card-title">
         {{ title }}
         <span class="badge badge-secondary">{{ badges.length }} </span>
@@ -65,9 +65,7 @@ export default class BadgeList extends Vue {
   }
 
   get title(): string {
-    return this.showAllBadgesLink
-      ? T.wordsBadgesObtained
-      : T.omegaupTitleBadges;
+    return this.showAllBadgesLink ? '' : T.omegaupTitleBadges;
   }
 
   getBadgeName(alias: string): string {
