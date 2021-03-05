@@ -63,9 +63,9 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      * Test apiProfile with is_private enabled
      */
     public function testUserPrivateDataAnotherUser() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         // Mark user2's profile as private (5th argument)
-        ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['isPrivate' => true]
             )
@@ -82,6 +82,8 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'is_private',
             'username',
             'rankinfo',
+            'country_id',
+            'gravatar_92',
             'classname',
             'hide_problem_tags',
             'verified',

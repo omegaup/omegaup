@@ -123,7 +123,11 @@
           :contest-alias="details.alias"
           :initial-points="details.partial_score ? 100 : 1"
           :initial-problems="problems"
+          :existing-problems="existingProblems"
           @add-problem="(problem) => $emit('add-problem', problem)"
+          @update-existing-problems="
+            (query) => $emit('update-existing-problems', query)
+          "
           @get-versions="
             (problemAlias, addProblemComponent) =>
               $emit('get-versions', problemAlias, addProblemComponent)
@@ -242,6 +246,7 @@ export default class Edit extends Vue {
   @Prop() problems!: types.ContestProblem[];
   @Prop() requests!: types.ContestRequest[];
   @Prop() users!: types.ContestUser[];
+  @Prop() existingProblems!: { key: string; value: string }[];
 
   T = T;
   ui = ui;
