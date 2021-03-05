@@ -1390,6 +1390,16 @@ export namespace types {
     };
   }
 
+  export interface ArenaAssignment {
+    alias?: string;
+    assignment_type: string;
+    description?: string;
+    finish_time?: Date;
+    name?: string;
+    problems: types.NavbarProblemsetProblem[];
+    start_time: Date;
+  }
+
   export interface ArenaProblemDetails {
     accepts_submissions: boolean;
     alias: string;
@@ -1411,15 +1421,7 @@ export namespace types {
 
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
-    currentAssignment: {
-      alias?: string;
-      assignment_type: string;
-      description?: string;
-      finish_time?: Date;
-      name?: string;
-      problems: types.NavbarProblemsetProblem[];
-      start_time: Date;
-    };
+    currentAssignment: types.ArenaAssignment;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
   }
