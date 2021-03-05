@@ -5,7 +5,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ACLs` (
   `acl_id` int NOT NULL AUTO_INCREMENT,
   `owner_id` int NOT NULL COMMENT 'El usuario que creó el objeto y que tiene un rol de administrador implícito',
@@ -15,7 +15,7 @@ CREATE TABLE `ACLs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Lista de control de acceso.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Announcement` (
   `announcement_id` int NOT NULL AUTO_INCREMENT COMMENT 'Identificador del aviso',
   `user_id` int NOT NULL COMMENT 'UserID del autor de este aviso',
@@ -27,7 +27,7 @@ CREATE TABLE `Announcement` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Sistema de mensajería dentro del sitio.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Assignments` (
   `assignment_id` int NOT NULL AUTO_INCREMENT,
   `course_id` int NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE `Assignments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Un alumno resuelve assignments durante su curso, por ahora pueden ser examenes o tareas';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Auth_Tokens` (
   `user_id` int DEFAULT NULL,
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
@@ -68,7 +68,7 @@ CREATE TABLE `Auth_Tokens` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tokens de autorización para los logins.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Clarifications` (
   `clarification_id` int NOT NULL AUTO_INCREMENT,
   `author_id` int NOT NULL COMMENT 'Autor de la clarificación.',
@@ -91,7 +91,7 @@ CREATE TABLE `Clarifications` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Se guardan las clarificaciones.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Coder_Of_The_Month` (
   `coder_of_the_month_id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
@@ -116,7 +116,7 @@ CREATE TABLE `Coder_Of_The_Month` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guardar histórico de coders del mes de forma sencilla.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Contest_Log` (
   `public_contest_id` int NOT NULL AUTO_INCREMENT,
   `contest_id` int NOT NULL,
@@ -132,7 +132,7 @@ CREATE TABLE `Contest_Log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Esta tabla funcionará para poder ordenar los concursos que se vuelven públicos y no se pierdan entre el resto';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Contests` (
   `contest_id` int NOT NULL AUTO_INCREMENT COMMENT 'El identificador unico para cada concurso',
   `problemset_id` int NOT NULL COMMENT 'La lista de problemas de este concurso',
@@ -170,7 +170,7 @@ CREATE TABLE `Contests` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Concursos que se llevan a cabo en el juez.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Countries` (
   `country_id` char(3) NOT NULL,
   `name` varchar(50) NOT NULL,
@@ -178,7 +178,7 @@ CREATE TABLE `Countries` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Catálogos para la normalización';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Course_Clone_Log` (
   `course_clone_log_id` int NOT NULL AUTO_INCREMENT COMMENT 'Identificador del intento de clonar curso',
   `ip` varchar(40) NOT NULL COMMENT 'Dirección IP desde la cual se intentó clonar el curso.',
@@ -198,7 +198,7 @@ CREATE TABLE `Course_Clone_Log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de registro para cursos clonados';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Course_Identity_Request` (
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
   `course_id` int NOT NULL COMMENT 'Curso al cual se necesita un request para ingresar',
@@ -214,7 +214,7 @@ CREATE TABLE `Course_Identity_Request` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Usado cuando un curso se registra con admission_mode = registration';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Course_Identity_Request_History` (
   `history_id` int NOT NULL AUTO_INCREMENT,
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
@@ -230,7 +230,7 @@ CREATE TABLE `Course_Identity_Request_History` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tabla para almacenar la respuesta de cada una de las peticiones hechas al curso con admission_mode = registration';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Courses` (
   `course_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
@@ -258,7 +258,7 @@ CREATE TABLE `Courses` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Un curso/clase que un maestro da.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Emails` (
   `email_id` int NOT NULL AUTO_INCREMENT,
   `email` varchar(100) DEFAULT NULL,
@@ -270,7 +270,7 @@ CREATE TABLE `Emails` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Esta tabla permite tener varios emails por persona';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Favorites` (
   `user_id` int NOT NULL,
   `problem_id` int NOT NULL,
@@ -282,7 +282,7 @@ CREATE TABLE `Favorites` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Problemas favoritos de los usuarios';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Group_Roles` (
   `group_id` int NOT NULL,
   `role_id` int NOT NULL,
@@ -297,7 +297,7 @@ CREATE TABLE `Group_Roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Establece los roles que se pueden dar a los grupos.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Groups_` (
   `group_id` int NOT NULL AUTO_INCREMENT,
   `acl_id` int NOT NULL,
@@ -312,7 +312,7 @@ CREATE TABLE `Groups_` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Groups_Identities` (
   `group_id` int NOT NULL,
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
@@ -330,7 +330,7 @@ CREATE TABLE `Groups_Identities` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Groups_Scoreboards` (
   `group_scoreboard_id` int NOT NULL AUTO_INCREMENT,
   `group_id` int NOT NULL,
@@ -345,7 +345,7 @@ CREATE TABLE `Groups_Scoreboards` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Groups_Scoreboards_Problemsets` (
   `group_scoreboard_id` int NOT NULL,
   `problemset_id` int NOT NULL COMMENT 'Conjunto de problemas del scoreboard',
@@ -359,7 +359,7 @@ CREATE TABLE `Groups_Scoreboards_Problemsets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Identities` (
   `identity_id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL,
@@ -387,7 +387,7 @@ CREATE TABLE `Identities` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Identidades registradas.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Identities_Schools` (
   `identity_school_id` int NOT NULL AUTO_INCREMENT,
   `identity_id` int NOT NULL,
@@ -403,7 +403,7 @@ CREATE TABLE `Identities_Schools` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Todas las escuelas por las que un usuario ha estudiado desde que se unió a omegaUp';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Identity_Login_Log` (
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
   `ip` int unsigned NOT NULL,
@@ -413,7 +413,7 @@ CREATE TABLE `Identity_Login_Log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de inicios de sesión exitosos';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Interviews` (
   `interview_id` int NOT NULL AUTO_INCREMENT,
   `problemset_id` int NOT NULL,
@@ -430,7 +430,7 @@ CREATE TABLE `Interviews` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Lista de id_concuros que se usan para entrevista';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Languages` (
   `language_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
@@ -442,7 +442,7 @@ CREATE TABLE `Languages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Lista de idiomas que potencialmente se soportarían.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Messages` (
   `message_id` int NOT NULL AUTO_INCREMENT,
   `read` tinyint(1) NOT NULL DEFAULT '0',
@@ -458,7 +458,7 @@ CREATE TABLE `Messages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Sistema de mensajería dentro del sitio.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Notifications` (
   `notification_id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL COMMENT 'Identificador de usuario',
@@ -471,7 +471,7 @@ CREATE TABLE `Notifications` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Notificaciones';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Permissions` (
   `permission_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL COMMENT 'El nombre corto del permiso.',
@@ -480,7 +480,7 @@ CREATE TABLE `Permissions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Establece los permisos que se pueden dar a los roles.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `PrivacyStatement_Consent_Log` (
   `privacystatement_consent_id` int NOT NULL AUTO_INCREMENT COMMENT 'Id del consentimiento de privacidad almacenado en el log',
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
@@ -494,7 +494,7 @@ CREATE TABLE `PrivacyStatement_Consent_Log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Log para auditar las identidades que han aceptado los documentos de privacidad de omegaUp.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `PrivacyStatements` (
   `privacystatement_id` int NOT NULL AUTO_INCREMENT COMMENT 'Id del documento de privacidad',
   `git_object_id` varchar(50) NOT NULL COMMENT 'Id de la versión del documento en el que se almacena la nueva política',
@@ -504,7 +504,7 @@ CREATE TABLE `PrivacyStatements` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tabla encargada de almacenar cada una de las versiones en git de los documentos de privacidad.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problem_Of_The_Week` (
   `problem_of_the_week_id` int NOT NULL AUTO_INCREMENT,
   `problem_id` int NOT NULL COMMENT 'El id del problema escogido como problema de la semana.',
@@ -517,7 +517,7 @@ CREATE TABLE `Problem_Of_The_Week` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Lista de problemas de la semana.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problem_Viewed` (
   `problem_id` int NOT NULL,
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
@@ -530,7 +530,7 @@ CREATE TABLE `Problem_Viewed` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tabla de vistas de problemas';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problems` (
   `problem_id` int NOT NULL AUTO_INCREMENT,
   `acl_id` int NOT NULL,
@@ -564,7 +564,7 @@ CREATE TABLE `Problems` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Se crea un registro por cada prob externo.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problems_Forfeited` (
   `user_id` int NOT NULL COMMENT 'Identificador de usuario',
   `problem_id` int NOT NULL,
@@ -577,7 +577,7 @@ CREATE TABLE `Problems_Forfeited` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Problemas que no cuentan para el ranking';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problems_Languages` (
   `problem_id` int NOT NULL,
   `language_id` int NOT NULL,
@@ -589,7 +589,7 @@ CREATE TABLE `Problems_Languages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Las traducciones viven en el filesystem y no en la bdd.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problems_Tags` (
   `problem_id` int NOT NULL,
   `tag_id` int NOT NULL,
@@ -602,7 +602,7 @@ CREATE TABLE `Problems_Tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tags privados para los problemas.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problemset_Access_Log` (
   `problemset_id` int NOT NULL,
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
@@ -615,7 +615,7 @@ CREATE TABLE `Problemset_Access_Log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de acceso a listas de problemas';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problemset_Identities` (
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
   `problemset_id` int NOT NULL,
@@ -636,7 +636,7 @@ CREATE TABLE `Problemset_Identities` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Concursantes que pueden interactuar con una lista de problemas.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problemset_Identity_Request` (
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
   `problemset_id` int NOT NULL,
@@ -652,7 +652,7 @@ CREATE TABLE `Problemset_Identity_Request` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Used when admission_mode = registration';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problemset_Identity_Request_History` (
   `history_id` int NOT NULL AUTO_INCREMENT,
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
@@ -668,7 +668,7 @@ CREATE TABLE `Problemset_Identity_Request_History` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problemset_Problem_Opened` (
   `problemset_id` int NOT NULL,
   `problem_id` int NOT NULL,
@@ -684,7 +684,7 @@ CREATE TABLE `Problemset_Problem_Opened` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Registro de primer acceso a problemas de un conjunto.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problemset_Problems` (
   `problemset_id` int NOT NULL,
   `problem_id` int NOT NULL,
@@ -701,7 +701,7 @@ CREATE TABLE `Problemset_Problems` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Los problemas de cada conjunto';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Problemsets` (
   `problemset_id` int NOT NULL AUTO_INCREMENT COMMENT 'El identificador único para cada conjunto de problemas',
   `acl_id` int NOT NULL COMMENT 'La lista de control de acceso compartida con su container',
@@ -729,7 +729,7 @@ CREATE TABLE `Problemsets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Conjunto de problemas.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `QualityNomination_Comments` (
   `qualitynomination_comment_id` int NOT NULL AUTO_INCREMENT,
   `qualitynomination_id` int NOT NULL,
@@ -745,7 +745,7 @@ CREATE TABLE `QualityNomination_Comments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Comentarios para una nominación';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `QualityNomination_Log` (
   `qualitynomination_log_id` int NOT NULL AUTO_INCREMENT,
   `qualitynomination_id` int NOT NULL,
@@ -762,7 +762,7 @@ CREATE TABLE `QualityNomination_Log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de cambios a nominaciones';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `QualityNomination_Reviewers` (
   `qualitynomination_id` int NOT NULL,
   `user_id` int NOT NULL COMMENT 'El revisor al que fue asignado esta nominación',
@@ -773,7 +773,7 @@ CREATE TABLE `QualityNomination_Reviewers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='La lista de revisores para cada nominación';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `QualityNominations` (
   `qualitynomination_id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL COMMENT 'El usuario que nominó el problema',
@@ -792,7 +792,7 @@ CREATE TABLE `QualityNominations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='La cola de nominación a promoción / democión de problemas';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Roles` (
   `role_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL COMMENT 'El nombre corto del rol.',
@@ -801,7 +801,7 @@ CREATE TABLE `Roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Establece los roles que se pueden dar a los usuarios.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Roles_Permissions` (
   `role_id` int NOT NULL,
   `permission_id` int NOT NULL,
@@ -813,7 +813,7 @@ CREATE TABLE `Roles_Permissions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Establece los roles que se pueden dar a los usuarios.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Run_Counts` (
   `date` date NOT NULL,
   `total` int NOT NULL DEFAULT '0',
@@ -822,7 +822,7 @@ CREATE TABLE `Run_Counts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda la cantidad de runs que se han realizado hasta la fecha.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Runs` (
   `run_id` int NOT NULL AUTO_INCREMENT,
   `submission_id` int NOT NULL COMMENT 'El envío',
@@ -845,7 +845,7 @@ CREATE TABLE `Runs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Estado de todas las ejecuciones.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `School_Of_The_Month` (
   `school_of_the_month_id` int NOT NULL AUTO_INCREMENT,
   `school_id` int NOT NULL,
@@ -863,7 +863,7 @@ CREATE TABLE `School_Of_The_Month` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Escuelas del Mes';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Schools` (
   `school_id` int NOT NULL AUTO_INCREMENT,
   `country_id` char(3) DEFAULT NULL,
@@ -880,7 +880,7 @@ CREATE TABLE `Schools` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Catálogos para la normalización';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Schools_Problems_Solved_Per_Month` (
   `school_pspm_id` int NOT NULL AUTO_INCREMENT,
   `school_id` int NOT NULL COMMENT 'Identificador de escuela',
@@ -893,7 +893,7 @@ CREATE TABLE `Schools_Problems_Solved_Per_Month` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='La cantidad de problemas que resolvieron los usuarios de una escuela en un mes y año determinados.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `States` (
   `country_id` char(3) NOT NULL,
   `state_id` char(3) NOT NULL,
@@ -904,7 +904,7 @@ CREATE TABLE `States` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Catálogos para la normalización';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Submission_Feedback` (
   `submission_feedback_id` int NOT NULL AUTO_INCREMENT,
   `identity_id` int NOT NULL COMMENT 'Identidad de quien envió el feedback',
@@ -919,7 +919,7 @@ CREATE TABLE `Submission_Feedback` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Almacena el feedback dejado por los profesores para los envíos de los estudiantes.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Submission_Log` (
   `problemset_id` int DEFAULT NULL,
   `submission_id` int NOT NULL,
@@ -936,7 +936,7 @@ CREATE TABLE `Submission_Log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de envíos';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Submissions` (
   `submission_id` int NOT NULL AUTO_INCREMENT,
   `current_run_id` int DEFAULT NULL COMMENT 'La evaluación actual del envío',
@@ -965,7 +965,7 @@ CREATE TABLE `Submissions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Envíos';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Tags` (
   `tag_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(75) NOT NULL,
@@ -975,7 +975,7 @@ CREATE TABLE `Tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tags privados para los problemas.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `User_Rank` (
   `user_id` int NOT NULL,
   `ranking` int DEFAULT NULL,
@@ -999,7 +999,7 @@ CREATE TABLE `User_Rank` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda el ranking de usuarios por problemas resueltos.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `User_Rank_Cutoffs` (
   `score` double NOT NULL,
   `percentile` double NOT NULL,
@@ -1007,7 +1007,7 @@ CREATE TABLE `User_Rank_Cutoffs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Guarda los valores del ranking para los cuales hay un cambio de color.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `User_Roles` (
   `user_id` int NOT NULL,
   `role_id` int NOT NULL,
@@ -1022,7 +1022,7 @@ CREATE TABLE `User_Roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Establece los roles que se pueden dar a los usuarios.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Users` (
   `user_id` int NOT NULL AUTO_INCREMENT,
   `facebook_user_id` varchar(20) DEFAULT NULL COMMENT 'Facebook ID for this user.',
@@ -1047,7 +1047,7 @@ CREATE TABLE `Users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Usuarios registrados.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Users_Badges` (
   `user_badge_id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL COMMENT 'Identificador de usuario',
@@ -1059,7 +1059,7 @@ CREATE TABLE `Users_Badges` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Badges de Usuario';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Users_Experiments` (
   `user_id` int NOT NULL,
   `experiment` varchar(256) NOT NULL,
