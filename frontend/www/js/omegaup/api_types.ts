@@ -1662,6 +1662,7 @@ export namespace types {
     admin: boolean;
     admission_mode: string;
     alias: string;
+    archived: boolean;
     available_languages: { [key: string]: string };
     description: string;
     director: string;
@@ -1697,6 +1698,7 @@ export namespace types {
     admin: boolean;
     admission_mode: string;
     alias: string;
+    archived: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -3218,6 +3220,8 @@ export namespace messages {
   };
   export type ContestArbitrateRequestRequest = { [key: string]: any };
   export type ContestArbitrateRequestResponse = {};
+  export type ContestArchiveRequest = { [key: string]: any };
+  export type ContestArchiveResponse = {};
   export type ContestClarificationsRequest = { [key: string]: any };
   export type _ContestClarificationsServerResponse = any;
   export type ContestClarificationsResponse = {
@@ -4142,6 +4146,9 @@ export namespace controllers {
     arbitrateRequest: (
       params?: messages.ContestArbitrateRequestRequest,
     ) => Promise<messages.ContestArbitrateRequestResponse>;
+    archive: (
+      params?: messages.ContestArchiveRequest,
+    ) => Promise<messages.ContestArchiveResponse>;
     clarifications: (
       params?: messages.ContestClarificationsRequest,
     ) => Promise<messages.ContestClarificationsResponse>;
