@@ -186,6 +186,7 @@ const translations: { [key: string]: string; } = {
   contestEditTagDelete: "Eliminar",
   contestEditTagName: "Nombre de la etiqueta",
   contestEditUnarchiveContest: "Desarchivar concurso",
+  contestEditUnarchiveHelpText: "Este concurso ya se encuentra archivado. Si quieres regresarlo al listado de concursos no archivados, da clic en el bot\u00f3n.",
   contestEditUnarchivedSuccess: "Concurso desarchivado exitosamente.",
   contestEditWithTitle: "Editar concurso %(title)",
   contestGroupAdded: "Grupo agregado correctamente",

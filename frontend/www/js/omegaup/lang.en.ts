@@ -186,6 +186,7 @@ const translations: { [key: string]: string; } = {
   contestEditTagDelete: "Delete",
   contestEditTagName: "Tag name",
   contestEditUnarchiveContest: "Unarchive contest",
+  contestEditUnarchiveHelpText: "This contest is already archived, if you want to return it back to the unarchived contests list, click in the button",
   contestEditUnarchivedSuccess: "Contest unarchived succesfully",
   contestEditWithTitle: "Edit contest %(title)",
   contestGroupAdded: "Group successfully added.",

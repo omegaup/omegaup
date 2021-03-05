@@ -213,15 +213,11 @@
       </div>
       <div v-if="showTab === 'archive'" class="tab-pane active">
         <omegaup-common-archive
-          :already-archived="details.archived"
-          :archive-button-description="
-            details.archived
-              ? T.contestEditUnarchiveContest
-              : T.contestEditArchiveContest
-          "
+          :already-archived="alreadyArchived"
+          :archive-button-description="buttonDescription"
           :archive-confirm-text="T.contestEditArchiveConfirmText"
           :archive-header-title="T.contestEditArchiveContest"
-          :archive-help-text="T.contestEditArchiveHelpText"
+          :archive-help-text="archiveUnarchiveDescription"
           @archive="onArchiveContest"
         ></omegaup-common-archive>
       </div>
@@ -301,6 +297,20 @@ export default class Edit extends Vue {
       default:
         return T.contestEdit;
     }
+  }
+
+  get buttonDescription(): string {
+    if (this.alreadyArchived) {
+      return T.contestEditUnarchiveContest;
+    }
+    return T.contestEditArchiveContest;
+  }
+
+  get archiveUnarchiveDescription(): string {
+    if (this.alreadyArchived) {
+      return T.contestEditUnarchiveHelpText;
+    }
+    return T.contestEditArchiveHelpText;
   }
 
   onArchiveContest(archive: boolean): void {
