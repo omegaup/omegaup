@@ -1159,6 +1159,7 @@ const translations: { [key: string]: string; } = {
   tokenDecodeInvalid: "O token n\u00e3o pertence a este curso.",
   tokenDecodeUnknown: "O token n\u00e3o \u00e9 v\u00e1lido para este curso.",
   totalRuns: "Execu\u00e7\u00f5es totais: %(numRuns)",
+  typeaheadSearchPlaceholder: "Pesquisar...",
   unableToVerifyCaptcha: "N\u00e3o pudemos verificar o captcha. Recarregue a p\u00e1gina e tente novamente",
   unnecessaryTokenForPublicCourses: "O token \u00e9 desnecess\u00e1rio para cursos p\u00fablicos",
   unsupportedBrowser: "Seu navegador n\u00e3o suporta todos os recursos desta p\u00e1gina. Por favor tente atualizar a um <a href=\"https://github.com/omegaup/omegaup#navegadores-soportados\" target=\"blank\">navegador suportado</a>.",

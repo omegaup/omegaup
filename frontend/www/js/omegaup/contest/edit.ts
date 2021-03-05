@@ -22,6 +22,7 @@ OmegaUp.on('ready', () => {
       problems: payload.problems,
       requests: payload.requests,
       users: payload.users,
+      existingProblems: [] as { key: string; value: string }[],
     }),
     methods: {
       arbitrateRequest: (username: string, resolution: boolean): void => {
@@ -112,8 +113,24 @@ OmegaUp.on('ready', () => {
           problems: this.problems,
           requests: this.requests,
           users: this.users,
+          existingProblems: this.existingProblems,
         },
         on: {
+          'update-existing-problems': (query: string) => {
+            api.Problem.list({
+              query,
+            })
+              .then((data) => {
+                this.existingProblems = [];
+                data.results.forEach((problem: types.ProblemListItem) => {
+                  this.existingProblems.push({
+                    key: problem.alias,
+                    value: problem.title,
+                  });
+                });
+              })
+              .catch();
+          },
           'update-contest': function (contest: omegaup.Contest) {
             api.Contest.update(
               Object.assign({}, contest, {

@@ -40,6 +40,7 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         'urgent' => true,
         'languages' => true,
         'recommended' => true,
+        'archived' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -200,6 +201,11 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         if (isset($data['recommended'])) {
             $this->recommended = boolval(
                 $data['recommended']
+            );
+        }
+        if (isset($data['archived'])) {
+            $this->archived = boolval(
+                $data['archived']
             );
         }
     }
@@ -373,4 +379,11 @@ class Contests extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $recommended = false;
+
+    /**
+     * Indica si el concurso ha sido archivado por el administrador.
+     *
+     * @var bool
+     */
+    public $archived = false;
 }
