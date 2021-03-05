@@ -92,9 +92,22 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 
+export const defaultScoreboardColors = [
+  '#FB3F51',
+  '#FF5D40',
+  '#FFA240',
+  '#FFC740',
+  '#59EA3A',
+  '#37DD6F',
+  '#34D0BA',
+  '#3AAACF',
+  '#8144D6',
+  '#CD35D3',
+];
+
 @Component
 export default class ArenaScoreboard extends Vue {
-  @Prop() scoreboardColors!: string[];
+  @Prop({ default: () => defaultScoreboardColors }) scoreboardColors!: string[];
   @Prop() problems!: omegaup.Problem[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
   @Prop() lastUpdated!: Date;

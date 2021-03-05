@@ -3,9 +3,11 @@
     <div class="text-center mt-4 pt-2">
       <h2>
         <span>{{ contestTitle }}</span>
-        <sup class="socket-status" title="WebSocket">✗</sup>
+        <slot name="socket-status">
+          <sup class="socket-status-error" title="WebSocket">✗</sup>
+        </slot>
       </h2>
-      <div class="clock">∞</div>
+      <slot name="clock"><div class="clock">∞</div></slot>
     </div>
     <ul class="nav justify-content-center nav-tabs mt-4">
       <li
@@ -39,14 +41,13 @@
         class="tab-pane fade"
         :class="{ 'show active': selectedTab === 'ranking' }"
       >
-        <!-- TODO: Add Scoreboard component when we migrate arena.contest.tpl-->
         <slot name="arena-scoreboard"></slot>
       </div>
       <div
         class="tab-pane fade"
         :class="{ 'show active': selectedTab === 'runs' }"
       >
-        <!-- TODO: Add Runs component when we migrate arena.contest.tpl-->
+        <!-- TODO: Add Runs component when we migrate arena.contest.admin.tpl-->
         <slot name="arena-runs"></slot>
       </div>
       <div
@@ -119,8 +120,12 @@ export default class Arena extends Vue {
   overflow-y: auto;
 }
 
-.socket-status {
+.socket-status-error {
   color: #800;
+}
+
+.socket-status-ok {
+  color: #080;
 }
 
 .clock {
