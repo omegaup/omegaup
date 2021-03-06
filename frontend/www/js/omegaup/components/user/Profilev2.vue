@@ -146,7 +146,7 @@
                 ></omegaup-grid-paginator>
               </div>
               <div
-                v-if="selectedTab == 'contests'"
+                v-show="selectedTab == 'contests'"
                 class="tab-pane fade show active"
                 role="tab"
                 aria-labelledby="nav-contests-tab"
@@ -157,7 +157,7 @@
                   :items-per-page="15"
                 >
                   <template #table-header>
-                    <thead v-if="selectedTab == 'contests'">
+                    <thead>
                       <tr>
                         <th>{{ T.profileContestsTableContest }}</th>
                         <th class="numericColumn">
