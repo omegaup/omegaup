@@ -157,7 +157,7 @@
                   :items-per-page="15"
                 >
                   <template #table-header>
-                    <thead>
+                    <thead v-if="selectedTab == 'contests'">
                       <tr>
                         <th>{{ T.profileContestsTableContest }}</th>
                         <th class="numericColumn">
