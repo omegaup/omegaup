@@ -1039,6 +1039,19 @@ class User extends \OmegaUp\Controllers\Controller {
                 'OMIZAC-Sec' => 60,
                 'OMIZAC-Prepa' => 60
             ];
+        } elseif ($r['contest_type'] == 'OMIZAC2021') {
+            if (
+                $r->identity->username != 'rsolis'
+                && !$is_system_admin
+            ) {
+                throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            }
+
+            $keys =  [
+                'OMIZAC2021-Prim' => 40,
+                'OMIZAC2021-Sec' => 50,
+                'OMIZAC2021-Prepa' => 40
+            ];
         } elseif ($r['contest_type'] == 'ProgUAIE') {
             if (
                 $r->identity->username != 'rsolis'
@@ -1264,7 +1277,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'contest_type',
                 [
                     'bad_elements' => $r['contest_type'],
-                    'expected_set' => 'CONTESTCAC, OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE, CAPKnuth, CAPVirtualKnuth, OMIZAC, ProgUAIE, CCUPTECNM',
+                    'expected_set' => 'CONTESTCAC, OMI, OMIAGS, OMIP-AGS, OMIS-AGS, ORIG, OSI, OVI, UDCCUP, CCUPITSUR, CONALEP, OMIQROO, OMIAGS-2017, OMIAGS-2018, PYE-AGS, OMIZAC-2018, Pr8oUAIE, CAPKnuth, CAPVirtualKnuth, OMIZAC, OMIZAC2021,ProgUAIE, CCUPTECNM',
                 ]
             );
         }
