@@ -1,8 +1,8 @@
 <template>
   <div class="card">
-    <div v-if="title" class="card-header">
+    <div v-if="!isProfile" class="card-header">
       <h4 class="card-title">
-        {{ title }}
+        {{ T.omegaupTitleBadges }}
         <span class="badge badge-secondary">{{ badges.length }} </span>
       </h4>
     </div>
@@ -43,6 +43,7 @@ export default class BadgeList extends Vue {
   @Prop() showAllBadgesLink!: boolean;
 
   T = T;
+  isProfile = this.showAllBadgesLink;
 
   get badges(): types.Badge[] {
     return Array.from(this.allBadges)
@@ -62,10 +63,6 @@ export default class BadgeList extends Vue {
         }
         return aName < bName ? -1 : 1;
       });
-  }
-
-  get title(): string {
-    return this.showAllBadgesLink ? '' : T.omegaupTitleBadges;
   }
 
   getBadgeName(alias: string): string {
