@@ -69,6 +69,26 @@ CREATE TABLE `Auth_Tokens` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Certificates` (
+  `certificate_id` int NOT NULL AUTO_INCREMENT,
+  `identity_id` int NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora del otorgamiento del diploma',
+  `certificate_type` enum('course','contest','coder_of_the_month','coder_of_the_month_female') NOT NULL COMMENT 'Tipo de diploma',
+  `course_id` int DEFAULT NULL,
+  `contest_id` int DEFAULT NULL,
+  `verification_code` varchar(10) NOT NULL COMMENT 'Código de verificación del diploma',
+  PRIMARY KEY (`certificate_id`),
+  UNIQUE KEY `verification_code` (`verification_code`),
+  KEY `identity_id` (`identity_id`),
+  KEY `course_id` (`course_id`),
+  KEY `contest_id` (`contest_id`),
+  CONSTRAINT `fk_cc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`),
+  CONSTRAINT `fk_cc_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`),
+  CONSTRAINT `fk_ci_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Diplomas';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Clarifications` (
   `clarification_id` int NOT NULL AUTO_INCREMENT,
   `author_id` int NOT NULL COMMENT 'Autor de la clarificación.',
