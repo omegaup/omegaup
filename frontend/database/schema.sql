@@ -905,6 +905,21 @@ CREATE TABLE `States` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Submission_Feedback` (
+  `submission_feedback_id` int NOT NULL AUTO_INCREMENT,
+  `identity_id` int NOT NULL COMMENT 'Identidad de quien envió el feedback',
+  `submission_id` int NOT NULL COMMENT 'Identificador del envío asociado',
+  `feedback` text NOT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Hora en la que se envió el feedback',
+  PRIMARY KEY (`submission_feedback_id`),
+  UNIQUE KEY `submission_id` (`submission_id`),
+  KEY `fk_sfi_identity_id` (`identity_id`),
+  CONSTRAINT `fk_sfi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
+  CONSTRAINT `fk_sfs_submission_id` FOREIGN KEY (`submission_id`) REFERENCES `Submissions` (`submission_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Almacena el feedback dejado por los profesores para los envíos de los estudiantes.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Submission_Log` (
   `problemset_id` int DEFAULT NULL,
   `submission_id` int NOT NULL,
