@@ -31,6 +31,7 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         'show_scoreboard' => true,
         'languages' => true,
         'archived' => true,
+        'minimum_progress_for_certificate' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -132,6 +133,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         if (isset($data['archived'])) {
             $this->archived = boolval(
                 $data['archived']
+            );
+        }
+        if (isset($data['minimum_progress_for_certificate'])) {
+            $this->minimum_progress_for_certificate = intval(
+                $data['minimum_progress_for_certificate']
             );
         }
     }
@@ -242,4 +248,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $archived = false;
+
+    /**
+     * Progreso mínimo que debe cumplir el estudiante para que se le otorgue el diploma del curso. NULL indica que el curso no da diplomas.
+     *
+     * @var int|null
+     */
+    public $minimum_progress_for_certificate = null;
 }

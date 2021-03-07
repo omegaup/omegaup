@@ -41,6 +41,8 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         'languages' => true,
         'recommended' => true,
         'archived' => true,
+        'certificate_cutoff' => true,
+        'certificates_status' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -207,6 +209,16 @@ class Contests extends \OmegaUp\DAO\VO\VO {
             $this->archived = boolval(
                 $data['archived']
             );
+        }
+        if (isset($data['certificate_cutoff'])) {
+            $this->certificate_cutoff = intval(
+                $data['certificate_cutoff']
+            );
+        }
+        if (isset($data['certificates_status'])) {
+            $this->certificates_status = is_scalar(
+                $data['certificates_status']
+            ) ? strval($data['certificates_status']) : '';
         }
     }
 
@@ -386,4 +398,18 @@ class Contests extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $archived = false;
+
+    /**
+     * Número de concursantes a premiar con diplomas que mencionan su lugar en el ranking
+     *
+     * @var int|null
+     */
+    public $certificate_cutoff = null;
+
+    /**
+     * Estado de la petición de generar diplomas
+     *
+     * @var string|null
+     */
+    public $certificates_status = null;
 }
