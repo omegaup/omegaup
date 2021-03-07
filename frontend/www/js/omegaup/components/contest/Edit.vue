@@ -265,7 +265,7 @@ export default class Edit extends Vue {
   @Prop() details!: types.ContestAdminDetails;
   @Prop() groups!: types.ContestGroup[];
   @Prop() groupAdmins!: types.ContestGroupAdmin[];
-  @Prop() problems!: types.ContestProblem[];
+  @Prop() problems!: types.ProblemsetProblem[];
   @Prop() requests!: types.ContestRequest[];
   @Prop() users!: types.ContestUser[];
   @Prop() existingProblems!: { key: string; value: string }[];
