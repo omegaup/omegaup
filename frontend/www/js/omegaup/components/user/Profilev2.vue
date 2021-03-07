@@ -146,7 +146,7 @@
                 ></omegaup-grid-paginator>
               </div>
               <div
-                v-if="selectedTab == 'contests'"
+                v-show="selectedTab == 'contests'"
                 class="tab-pane fade show active"
                 role="tab"
                 aria-labelledby="nav-contests-tab"
