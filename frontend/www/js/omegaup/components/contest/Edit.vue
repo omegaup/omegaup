@@ -217,7 +217,7 @@ import contest_AddProblem from './AddProblem.vue';
 import contest_AddContestant from './AddContestant.vue';
 import contest_Clone from './Clone.vue';
 import contest_Admins from '../common/Adminsv2.vue';
-import common_Requests from '../common/Requestsv2.vue';
+import common_Requests from '../common/Requests.vue';
 import contest_GroupAdmins from '../common/GroupAdminsv2.vue';
 import contest_Groups from './Groups.vue';
 import contest_Links from './Links.vue';
