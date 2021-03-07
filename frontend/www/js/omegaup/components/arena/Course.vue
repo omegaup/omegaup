@@ -60,33 +60,3 @@ export default class ArenaContestPractice extends Vue {
   }
 }
 </script>
-
-<style lang="scss">
-.navleft {
-  overflow: hidden;
-}
-
-.nav-tabs .nav-link {
-  background-color: #ddd;
-  border-top-color: #ddd;
-}
-
-.navleft .navbar {
-  width: 21em;
-  float: left;
-  background: transparent;
-}
-
-.navleft .main {
-  margin-left: 20em;
-  border: 1px solid #ccc;
-  border-width: 0 0 1px 1px;
-}
-
-.problem {
-  background: #fff;
-  padding: 1em;
-  margin-top: -1.5em;
-  margin-right: -1em;
-}
-</style>

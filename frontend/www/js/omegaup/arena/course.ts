@@ -14,7 +14,6 @@ import { PopupDisplayed } from '../components/problem/Details.vue';
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.AssignmentDetailsPayload();
-  console.log(payload);
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
