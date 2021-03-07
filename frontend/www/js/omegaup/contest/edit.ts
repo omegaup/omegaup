@@ -145,7 +145,7 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'add-problem': (problem: types.ContestProblem) => {
+          'add-problem': (problem: types.ProblemsetProblem) => {
             api.Contest.addProblem({
               contest_alias: payload.details.alias,
               order_in_contest: problem.order,
@@ -163,7 +163,7 @@ OmegaUp.on('ready', () => {
             problemAlias: string,
             addProblemComponent: {
               versionLog: types.ProblemVersion[];
-              problems: types.ContestProblem[];
+              problems: types.ProblemsetProblem[];
               selectedRevision: types.ProblemVersion;
               publishedRevision: types.ProblemVersion;
             },
@@ -381,6 +381,17 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.contestEditContestClonedSuccessfully);
+              })
+              .catch(ui.apiError);
+          },
+          'archive-contest': (contestAlias: string, archive: string) => {
+            api.Contest.archive({ contest_alias: contestAlias, archive })
+              .then(() => {
+                if (archive) {
+                  ui.success(T.contestEditArchivedSuccess);
+                  return;
+                }
+                ui.success(T.contestEditUnarchivedSuccess);
               })
               .catch(ui.apiError);
           },
