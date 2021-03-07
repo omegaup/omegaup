@@ -4,15 +4,16 @@ import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
 import * as time from '../../time';
 
-import arena_ContestPractice from './ContestPractice.vue';
+import arena_Contest from './Contest.vue';
 
-describe('ContestPractice.vue', () => {
+describe('Contest.vue', () => {
   const date = new Date();
 
-  const contestDetails = {
+  const contestDetails: types.ContestPublicDetails = {
     admission_mode: 'public',
     alias: 'omegaUp',
     description: 'hello omegaUp',
+    director: 'omegaUpDirector',
     feedback: 'detailed',
     finish_time: date,
     languages: 'py',
@@ -29,9 +30,9 @@ describe('ContestPractice.vue', () => {
     start_time: date,
     submissions_gap: 1200,
     title: 'hello omegaUp',
-  } as types.ContestPublicDetails;
+  };
 
-  const sampleProblem = {
+  const sampleProblem: types.ProblemInfo = {
     alias: 'triangulos',
     accepts_submissions: true,
     karel_problem: false,
@@ -83,47 +84,10 @@ describe('ContestPractice.vue', () => {
     title: 'Triangulos',
     visibility: 2,
     input_limit: 1000,
-    guid: '80bbe93bc01c1d47ff9fb396dfaff741',
-    runDetailsData: {
-      admin: false,
-      alias: 'sumas',
-      cases: {},
-      details: {
-        compile_meta: {
-          Main: {
-            memory: 12091392,
-            sys_time: 0.029124,
-            time: 0.174746,
-            verdict: 'OK',
-            wall_time: 0.51659,
-          },
-        },
-        contest_score: 5,
-        groups: [],
-        judged_by: 'localhost',
-        max_score: 100,
-        memory: 10407936,
-        score: 0.05,
-        time: 0.31891,
-        verdict: 'PA',
-        wall_time: 0.699709,
-      },
-      feedback: 'none',
-      groups: [],
-      guid: '80bbe93bc01c1d47ff9fb396dfaff741',
-      judged_by: '',
-      language: 'py3',
-      logs: '',
-      show_diff: 'none',
-      source: 'print(3)',
-      source_link: false,
-      source_name: 'Main.py3',
-      source_url: 'blob:http://localhost:8001/url',
-    } as types.RunDetails,
-  } as types.ProblemInfo;
+  };
 
-  it('Should handle details for a problem in a contest, practice mode', async () => {
-    const wrapper = mount(arena_ContestPractice, {
+  it('Should handle details for a problem in a contest', async () => {
+    const wrapper = mount(arena_Contest, {
       propsData: {
         contest: contestDetails,
         problems: [
@@ -148,8 +112,8 @@ describe('ContestPractice.vue', () => {
       },
     });
 
-    expect(wrapper.find('.clock').text()).toBe('∞');
-    expect(wrapper.find('.socket-status-error').text()).toBe('✗');
+    expect(wrapper.find('.clock').text()).toBe('00:00:00');
+    expect(wrapper.find('.socket-status-ok').text()).toBe('•');
     expect(wrapper.find('a[data-problem=problemOmegaUp]').text()).toBe(
       'A. hello problem omegaUp',
     );
