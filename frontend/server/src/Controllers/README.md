@@ -876,9 +876,9 @@ Gets the problems from a contest
 
 ### Returns
 
-| Name       | Type                     |
-| ---------- | ------------------------ |
-| `problems` | `types.ContestProblem[]` |
+| Name       | Type                        |
+| ---------- | --------------------------- |
+| `problems` | `types.ProblemsetProblem[]` |
 
 ## `/api/contest/publicDetails/`
 

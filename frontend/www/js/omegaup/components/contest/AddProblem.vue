@@ -170,7 +170,7 @@ const emptyCommit: types.ProblemVersion = {
 export default class AddProblem extends Vue {
   @Prop() contestAlias!: string;
   @Prop() initialPoints!: number;
-  @Prop() initialProblems!: types.ContestProblem[];
+  @Prop() initialProblems!: types.ProblemsetProblem[];
   @Prop() existingProblems!: { key: string; value: string }[];
 
   T = T;
@@ -178,21 +178,6 @@ export default class AddProblem extends Vue {
   points = this.initialPoints;
   order = this.initialProblems.length + 1;
   problems = this.initialProblems;
-  selected: types.ContestProblem = {
-    accepted: 0,
-    alias: '',
-    commit: '',
-    difficulty: 0,
-    languages: '',
-    order: 1,
-    points: this.points,
-    problem_id: 0,
-    submissions: 0,
-    title: '',
-    version: '',
-    visibility: 0,
-    visits: 0,
-  };
   versionLog: types.ProblemVersion[] = [];
   useLatestVersion = true;
   publishedRevision = emptyCommit;
@@ -218,13 +203,13 @@ export default class AddProblem extends Vue {
     });
   }
 
-  onEdit(problem: types.ContestProblem): void {
+  onEdit(problem: types.ProblemsetProblem): void {
     this.alias = problem.alias;
     this.points = problem.points;
     this.order = problem.order;
   }
 
-  onRemove(problem: types.ContestProblem): void {
+  onRemove(problem: types.ProblemsetProblem): void {
     this.$emit('remove-problem', problem.alias);
   }
 
@@ -266,7 +251,7 @@ export default class AddProblem extends Vue {
   }
 
   @Watch('initialProblems')
-  onInitialProblemsChange(newValue: types.ContestProblem[]): void {
+  onInitialProblemsChange(newValue: types.ProblemsetProblem[]): void {
     this.problems = newValue;
     this.order = newValue.length + 1;
   }
