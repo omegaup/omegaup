@@ -14,6 +14,7 @@ import { myRunsStore } from '../arena/runsStore';
 import arena_NewClarification from '../components/arena/NewClarificationPopup.vue';
 import problemsStore from './problemStore';
 import JSZip from 'jszip';
+import { getOptionsFromLocation } from './location';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -262,6 +263,14 @@ OmegaUp.on('ready', () => {
     },
   });
 
+  const locationOptions = getOptionsFromLocation(window.location.hash);
+
+  contestPractice.problem = locationOptions.problem;
+  contestPractice.popupDisplayed = locationOptions.popupDisplayed;
+  contestPractice.showNewClarificationPopup =
+    locationOptions.showNewClarificationPopup;
+  contestPractice.guid = locationOptions.guid;
+
   function refreshClarifications() {
     api.Contest.clarifications({
       contest_alias: payload.contest.alias,
@@ -272,48 +281,6 @@ OmegaUp.on('ready', () => {
       .then((data) => {
         contestPractice.clarifications = data.clarifications;
       });
-  }
-
-  // The hash is of the forms:
-  // - `#problems/${alias}`
-  // - `#problems/${alias}/new-run`
-  // - `#problems/${alias}/show-run:xyz`
-  // - `#clarifications/${alias}/new`
-  // and all the matching forms in the following regex
-  const match = /#(?<tab>\w+)\/(?<alias>[^/]+)(?:\/(?<popup>[^/]+))?/g.exec(
-    window.location.hash,
-  );
-  switch (match?.groups?.tab) {
-    case 'problems':
-      // This needs to be set here and not at the top because it depends
-      // on the `navigate-to-problem` callback being invoked, and that is
-      // not the case if this is set a priori.
-      contestPractice.problem = {
-        problem: {
-          alias: match?.groups?.alias,
-          text: '',
-          acceptsSubmissions: true,
-          bestScore: 0,
-          maxScore: 0,
-          hasRuns: false,
-        },
-        runs: [],
-      };
-      if (match.groups.popup === 'new-run') {
-        contestPractice.popupDisplayed = PopupDisplayed.RunSubmit;
-      } else if (match.groups.popup?.startsWith('show-run')) {
-        contestPractice.guid = match.groups.popup.split(':')[1];
-        contestPractice.popupDisplayed = PopupDisplayed.RunDetails;
-      }
-      break;
-    case 'clarifications':
-      if (match.groups.popup === 'new') {
-        contestPractice.showNewClarificationPopup = true;
-      }
-      break;
-    default:
-      contestPractice.popupDisplayed = PopupDisplayed.None;
-      contestPractice.showNewClarificationPopup = false;
   }
 
   function updateRun(run: types.Run): void {
