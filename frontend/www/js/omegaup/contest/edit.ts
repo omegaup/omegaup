@@ -384,6 +384,17 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'archive-contest': (contestAlias: string, archive: string) => {
+            api.Contest.archive({ contest_alias: contestAlias, archive })
+              .then(() => {
+                if (archive) {
+                  ui.success(T.contestEditArchivedSuccess);
+                  return;
+                }
+                ui.success(T.contestEditUnarchivedSuccess);
+              })
+              .catch(ui.apiError);
+          },
         },
       });
     },

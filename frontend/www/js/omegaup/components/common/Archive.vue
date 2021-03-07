@@ -1,9 +1,9 @@
 <template>
   <div class="card">
-    <h4 class="card-header">{{ T.wordsArchiveCourse }}</h4>
+    <h4 class="card-header">{{ archiveHeaderTitle }}</h4>
     <div class="card-body">
       <p class="card-text">
-        {{ T.courseArchiveHelpText }}
+        {{ archiveHelpText }}
       </p>
       <button
         type="button"
@@ -11,13 +11,13 @@
         data-toggle="modal"
         data-target=".modal"
       >
-        {{ alreadyArchived ? T.wordsUnarchiveCourse : T.wordsArchiveCourse }}
+        {{ archiveButtonDescription }}
       </button>
       <div class="modal fade" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-body">
-              {{ T.courseArchiveConfirmText }}
+              {{ archiveConfirmText }}
               <div class="d-flex justify-content-around mt-4">
                 <button
                   type="button"
@@ -30,7 +30,7 @@
                   type="button"
                   class="btn btn-primary"
                   data-dismiss="modal"
-                  @click="onArchiveCourse"
+                  @click="onArchive"
                 >
                   {{ T.wordsConfirm }}
                 </button>
@@ -48,13 +48,17 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component
-export default class CourseArchive extends Vue {
+export default class Archive extends Vue {
   @Prop() alreadyArchived!: boolean;
+  @Prop() archiveHelpText!: string;
+  @Prop() archiveHeaderTitle!: string;
+  @Prop() archiveButtonDescription!: string;
+  @Prop() archiveConfirmText!: string;
 
   T = T;
 
-  onArchiveCourse(): void {
-    this.$emit('archive-course', !this.alreadyArchived);
+  onArchive(): void {
+    this.$emit('archive', !this.alreadyArchived);
   }
 }
 </script>

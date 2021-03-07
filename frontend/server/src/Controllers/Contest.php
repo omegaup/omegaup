@@ -4919,6 +4919,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contest->archived = $r->ensureOptionalBool('archive') ?? true;
         \OmegaUp\DAO\Contests::update($contest);
 
+        // Expire contest-list cache
+        \OmegaUp\Cache::invalidateAllKeys(\OmegaUp\Cache::CONTESTS_LIST_PUBLIC);
+        \OmegaUp\Cache::invalidateAllKeys(
+            \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN
+        );
+
         return [
             'status' => 'ok',
         ];
