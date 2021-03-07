@@ -200,6 +200,7 @@ const translations: { [key: string]: string; } = {
   contestIntroSubmissionsSeparationDesc: "For each incorrect submission you must wait %(window_length) to make a new submission.",
   contestJoin: "Join contest",
   contestLengthTooLong: "Contests can't last more than 31 days.",
+  contestListArchivedContests: "Archived contests",
   contestListEmpty: "No contests in this list",
   contestListShowAdminContests: "Also show contests I manage",
   contestListSubmissions: "Submissions",

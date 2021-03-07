@@ -19,7 +19,7 @@
       <h5 class="card-header">{{ T.wordsMyContests }}</h5>
       <div class="card-body">
         <div class="row align-items-center justify-content-between">
-          <div class="form-check col-7">
+          <div class="form-check col-md-4">
             <label class="form-check-label">
               <input
                 v-model="shouldShowAllContests"
@@ -32,9 +32,22 @@
               <span>{{ T.contestListShowAdminContests }}</span>
             </label>
           </div>
+          <div class="form-check col-md-3">
+            <label class="form-check-label">
+              <input
+                v-model="shouldShowArchivedContests"
+                class="form-check-input"
+                type="checkbox"
+                @change.prevent="
+                  $emit('show-archived-contests', shouldShowArchivedContests)
+                "
+              />
+              <span>{{ T.contestListArchivedContests }}</span>
+            </label>
+          </div>
           <select
             v-model="allContestsVisibilityOption"
-            class="custom-select col-5"
+            class="custom-select col-md-5"
             @change="onChangeAdmissionMode"
           >
             <option selected value="none">{{ T.forSelectedItems }}</option>
@@ -69,7 +82,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="contest in contests">
+            <tr v-for="contest in contests" :key="contest.alias">
               <td class="d-flex align-items-center">
                 <input
                   v-model="selectedContests"
@@ -205,6 +218,7 @@ export default class List extends Vue {
   ui = ui;
   time = time;
   shouldShowAllContests = false;
+  shouldShowArchivedContests = false;
   allContestsVisibilityOption = 'none';
   selectedContests: string[] = [];
 
