@@ -214,7 +214,7 @@
       <div v-if="showTab === 'archive'" class="tab-pane active">
         <omegaup-common-archive
           :already-archived="alreadyArchived"
-          :archive-button-description="buttonDescription"
+          :archive-button-description="archiveButtonDescription"
           :archive-confirm-text="T.contestEditArchiveConfirmText"
           :archive-header-title="T.contestEditArchiveContest"
           :archive-help-text="archiveUnarchiveDescription"
@@ -235,8 +235,8 @@ import contest_AddProblem from './AddProblem.vue';
 import contest_AddContestant from './AddContestant.vue';
 import contest_Clone from './Clone.vue';
 import contest_Admins from '../common/Adminsv2.vue';
-import common_Requests from '../common/Requestsv2.vue';
 import common_Archive from '../common/Archive.vue';
+import common_Requests from '../common/Requests.vue';
 import contest_GroupAdmins from '../common/GroupAdminsv2.vue';
 import contest_Groups from './Groups.vue';
 import contest_Links from './Links.vue';
@@ -299,7 +299,7 @@ export default class Edit extends Vue {
     }
   }
 
-  get buttonDescription(): string {
+  get archiveButtonDescription(): string {
     if (this.alreadyArchived) {
       return T.contestEditUnarchiveContest;
     }

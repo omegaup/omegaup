@@ -146,7 +146,7 @@
                 ></omegaup-grid-paginator>
               </div>
               <div
-                v-if="selectedTab == 'contests'"
+                v-show="selectedTab == 'contests'"
                 class="tab-pane fade show active"
                 role="tab"
                 aria-labelledby="nav-contests-tab"
@@ -223,11 +223,11 @@ import { Problem, ContestResult } from '../../linkable_resource';
   },
 })
 export default class UserProfile extends Vue {
-  @Prop() data!: types.ExtraProfileDetails;
+  @Prop() data!: types.ExtraProfileDetails | undefined;
   @Prop() profile!: types.UserProfileInfo;
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
-  contests = this.data.contests
+  contests = this.data?.contests
     ? Object.values(this.data.contests)
         .map((contest) => {
           const now = new Date();
@@ -238,22 +238,22 @@ export default class UserProfile extends Vue {
         })
         .filter((contest) => !!contest)
     : [];
-  charts = this.data.stats;
+  charts = this.data?.stats ?? null;
   T = T;
   columns = 3;
   selectedTab = 'badges';
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
 
   get createdProblems(): Problem[] {
-    if (!this.data.createdProblems) return [];
+    if (!this.data?.createdProblems) return [];
     return this.data.createdProblems.map((problem) => new Problem(problem));
   }
   get unsolvedProblems(): Problem[] {
-    if (!this.data.unsolvedProblems) return [];
+    if (!this.data?.unsolvedProblems) return [];
     return this.data.unsolvedProblems.map((problem) => new Problem(problem));
   }
   get solvedProblems(): Problem[] {
-    if (!this.data.solvedProblems) return [];
+    if (!this.data?.solvedProblems) return [];
     return this.data.solvedProblems.map((problem) => new Problem(problem));
   }
   get rank(): string {

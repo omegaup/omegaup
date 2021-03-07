@@ -12,7 +12,7 @@ describe('Arena.vue', () => {
     });
 
     expect(wrapper.find('.clock').text()).toBe('∞');
-    expect(wrapper.find('.socket-status').text()).toBe('✗');
+    expect(wrapper.find('.socket-status-error').text()).toBe('✗');
     expect(wrapper.find('div[data-arena-wrapper]>div>h2>span').text()).toBe(
       'Hello omegaUp',
     );
