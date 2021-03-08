@@ -196,6 +196,20 @@ class Authorization {
     }
 
     /**
+     * Returns whether the identity can edit or remove the contest. Only contest
+     * admins can do so.
+     */
+    public static function canEditContest(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Contests $contest
+    ): bool {
+        if (is_null($contest->acl_id)) {
+            return false;
+        }
+        return self::isContestAdmin($identity, $contest);
+    }
+
+    /**
      * Returns whether the identity can view the problem solution. Only problem
      * admins and identities that have solved the problem can do so.
      */

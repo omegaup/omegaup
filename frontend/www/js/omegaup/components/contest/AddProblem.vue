@@ -5,10 +5,15 @@
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.wordsProblem }}</label>
-            <omegaup-autocomplete
-              v-model="alias"
-              :init="(el) => typeahead.problemTypeahead(el)"
-            ></omegaup-autocomplete>
+            <omegaup-common-typeahead
+              :existing-options="existingProblems"
+              :type="'problem'"
+              @update-existing-options="
+                (query) => $emit('update-existing-problems', query)
+              "
+              @update-selected-option="onSelectProblem"
+            >
+            </omegaup-common-typeahead>
           </div>
           <div class="form-group col-md-6">
             <label for="use-latest-version">{{
@@ -142,9 +147,9 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+
 import problem_Versions from '../problem/Versions.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 
 const emptyCommit: types.ProblemVersion = {
   author: {},
@@ -158,36 +163,21 @@ const emptyCommit: types.ProblemVersion = {
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
     'omegaup-problem-versions': problem_Versions,
+    'omegaup-common-typeahead': common_Typeahead,
   },
 })
 export default class AddProblem extends Vue {
   @Prop() contestAlias!: string;
   @Prop() initialPoints!: number;
-  @Prop() initialProblems!: types.ContestProblem[];
+  @Prop() initialProblems!: types.ProblemsetProblem[];
+  @Prop() existingProblems!: { key: string; value: string }[];
 
   T = T;
-  typeahead = typeahead;
   alias = '';
   points = this.initialPoints;
   order = this.initialProblems.length + 1;
   problems = this.initialProblems;
-  selected: types.ContestProblem = {
-    accepted: 0,
-    alias: '',
-    commit: '',
-    difficulty: 0,
-    languages: '',
-    order: 1,
-    points: this.points,
-    problem_id: 0,
-    submissions: 0,
-    title: '',
-    version: '',
-    visibility: 0,
-    visits: 0,
-  };
   versionLog: types.ProblemVersion[] = [];
   useLatestVersion = true;
   publishedRevision = emptyCommit;
@@ -213,13 +203,13 @@ export default class AddProblem extends Vue {
     });
   }
 
-  onEdit(problem: types.ContestProblem): void {
+  onEdit(problem: types.ProblemsetProblem): void {
     this.alias = problem.alias;
     this.points = problem.points;
     this.order = problem.order;
   }
 
-  onRemove(problem: types.ContestProblem): void {
+  onRemove(problem: types.ProblemsetProblem): void {
     this.$emit('remove-problem', problem.alias);
   }
 
@@ -240,6 +230,10 @@ export default class AddProblem extends Vue {
     this.$emit('runs-diff', this.alias, versions, selectedCommit);
   }
 
+  onSelectProblem(alias: string) {
+    this.alias = alias;
+  }
+
   get addProblemButtonLabel(): string {
     for (const problem of this.problems) {
       if (this.alias === problem.alias) {
@@ -251,15 +245,14 @@ export default class AddProblem extends Vue {
 
   get addProblemButtonDisabled(): boolean {
     if (this.useLatestVersion) {
-      return this.alias === '';
+      return this.alias === '' || this.alias === null;
     }
     return this.selectedRevision.commit === '';
   }
 
   @Watch('initialProblems')
-  onInitialProblemsChange(newValue: types.ContestProblem[]): void {
+  onInitialProblemsChange(newValue: types.ProblemsetProblem[]): void {
     this.problems = newValue;
-    this.alias = '';
     this.order = newValue.length + 1;
   }
 
