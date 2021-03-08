@@ -313,4 +313,34 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             'submissions' => $submissions,
         ];
     }
+
+    /** @return list<array{time: \OmegaUp\Timestamp}> */
+    public static function getLastSubmissionByProblem(
+        int $problemId,
+        ?int $identityId
+    ): array {
+        $params = [$problemId];
+        $sql = '
+            SELECT
+                s.time
+            FROM 
+                Submissions s
+            WHERE
+                s.problem_id = ?
+        ';
+
+        if (!is_null($identityId)) {
+            $params[] = $identityId;
+            $sql .= ' AND s.identity_id = ?';
+        }
+
+        $sql .= '
+            ORDER BY
+                s.time DESC
+            LIMIT 1
+        ';
+
+        /** @var list<array{time: \OmegaUp\Timestamp}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+    }
 }

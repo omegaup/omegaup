@@ -4507,28 +4507,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        $runsPayload = \OmegaUp\DAO\Runs::getForProblemDetails(
-            intval($problem->problem_id),
-            /*$problemsetId=*/null,
-            intval($r->identity->identity_id)
-        );
-
-        $nextSubmissionTimestamp = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
-
-        if (($n = count($runsPayload)) > 0) {
-            $lastRun = $runsPayload[$n - 1];
-            $lastRunTime = $lastRun['time'];
-            $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
-            $nextSubmissionTimestamp = new \OmegaUp\Timestamp(
-                $lastRunTime->time + $submissionGap
-            );
-        }
-
         $response['smartyProperties']['payload'] = array_merge(
             $response['smartyProperties']['payload'],
             [
                 'nominationStatus' => $nominationPayload,
-                'runs' => $runsPayload,
+                'runs' => \OmegaUp\DAO\Runs::getForProblemDetails(
+                    intval($problem->problem_id),
+                    /*$problemsetId=*/null,
+                    intval($r->identity->identity_id)
+                ),
                 'solutionStatus' => self::getProblemSolutionStatus(
                     $problem,
                     $r->identity
@@ -4543,10 +4530,23 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ]
         );
 
-        $response['smartyProperties']['payload']['problem'] = array_merge(
-            $response['smartyProperties']['payload']['problem'],
-            ['nextSubmissionTimestamp' => $nextSubmissionTimestamp]
+        $lastSubmissionPayload = \OmegaUp\DAO\Submissions::getLastSubmissionByProblem(
+            intval($problem->problem_id),
+            intval($r->identity->identity_id)
         );
+
+        if (count($lastSubmissionPayload) > 0) {
+            $lastSubmission = $lastSubmissionPayload[0];
+            $lastSubmissionTime = $lastSubmission['time'];
+
+            $nextSubmissionTimestamp =
+            \OmegaUp\DAO\Runs::nextSubmissionTimestamp(null, $lastSubmissionTime);
+
+            $response['smartyProperties']['payload']['problem'] = array_merge(
+                $response['smartyProperties']['payload']['problem'],
+                ['nextSubmissionTimestamp' => $nextSubmissionTimestamp]
+            );
+        }
 
         if ($isAdmin) {
             $allRuns = [];
