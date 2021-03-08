@@ -187,10 +187,10 @@ export const Clarification = {
     messages.ClarificationCreateRequest,
     messages.ClarificationCreateResponse
   >('/api/clarification/create/'),
-  createForAssignment: apiCall<
-    messages.ClarificationCreateForAssignmentRequest,
-    messages.ClarificationCreateForAssignmentResponse
-  >('/api/clarification/createForAssignment/'),
+  createForCourse: apiCall<
+    messages.ClarificationCreateForCourseRequest,
+    messages.ClarificationCreateForCourseResponse
+  >('/api/clarification/createForCourse/'),
   details: apiCall<
     messages.ClarificationDetailsRequest,
     messages.ClarificationDetailsResponse

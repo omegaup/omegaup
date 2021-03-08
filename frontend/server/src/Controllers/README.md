@@ -10,7 +10,7 @@
   - [`/api/badge/userList/`](#apibadgeuserlist)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
-  - [`/api/clarification/createForAssignment/`](#apiclarificationcreateforassignment)
+  - [`/api/clarification/createForCourse/`](#apiclarificationcreateforcourse)
   - [`/api/clarification/details/`](#apiclarificationdetails)
   - [`/api/clarification/update/`](#apiclarificationupdate)
 - [Contest](#contest)
@@ -388,7 +388,7 @@ Creates a Clarification
 | ------------------ | -------- |
 | `clarification_id` | `number` |
 
-## `/api/clarification/createForAssignment/`
+## `/api/clarification/createForCourse/`
 
 ### Description
 

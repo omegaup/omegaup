@@ -119,7 +119,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $problem_alias
      * @omegaup-request-param string $message
      */
-    public static function apiCreateForAssignment(\OmegaUp\Request $r): array {
+    public static function apiCreateForCourse(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
         $courseAlias = $r->ensureString(
@@ -152,7 +152,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         if (
             is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
                 $course->group_id,
-                $r->identity_id
+                $r->identity->identity_id
             ))
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -214,7 +214,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
                                     'problemAlias' => $problem->alias,
                                     'courseName' => $course->name,
                                 ],
-                                'url' => "/course/{$course->alias}/assignment/{$assignment->alias}/#problems/{$problem->alias}/",
+                                'url' => "/course/{$course->alias}/assignment/{$assignmentAlias}/#problems/{$problem->alias}/",
                                 'iconUrl' => '/media/info.png',
                             ],
                         ]

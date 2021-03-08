@@ -3171,8 +3171,8 @@ export namespace messages {
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
   export type ClarificationCreateResponse = { clarification_id: number };
-  export type ClarificationCreateForAssignmentRequest = { [key: string]: any };
-  export type ClarificationCreateForAssignmentResponse = types.ClarificationDetails;
+  export type ClarificationCreateForCourseRequest = { [key: string]: any };
+  export type ClarificationCreateForCourseResponse = types.ClarificationDetails;
   export type ClarificationDetailsRequest = { [key: string]: any };
   export type ClarificationDetailsResponse = types.ClarificationDetails;
   export type ClarificationUpdateRequest = { [key: string]: any };
@@ -4095,9 +4095,9 @@ export namespace controllers {
     create: (
       params?: messages.ClarificationCreateRequest,
     ) => Promise<messages.ClarificationCreateResponse>;
-    createForAssignment: (
-      params?: messages.ClarificationCreateForAssignmentRequest,
-    ) => Promise<messages.ClarificationCreateForAssignmentResponse>;
+    createForCourse: (
+      params?: messages.ClarificationCreateForCourseRequest,
+    ) => Promise<messages.ClarificationCreateForCourseResponse>;
     details: (
       params?: messages.ClarificationDetailsRequest,
     ) => Promise<messages.ClarificationDetailsResponse>;
