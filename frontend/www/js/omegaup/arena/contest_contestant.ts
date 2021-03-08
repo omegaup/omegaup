@@ -13,6 +13,7 @@ import { myRunsStore } from '../arena/runsStore';
 import arena_NewClarification from '../components/arena/NewClarificationPopup.vue';
 import problemsStore from './problemStore';
 import JSZip from 'jszip';
+import { getOptionsFromLocation } from './location';
 
 export interface Problem {
   accepts_submissions: boolean;
@@ -42,18 +43,6 @@ OmegaUp.on('ready', () => {
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
-  const scoreboardColors = [
-    '#FB3F51',
-    '#FF5D40',
-    '#FFA240',
-    '#FFC740',
-    '#59EA3A',
-    '#37DD6F',
-    '#34D0BA',
-    '#3AAACF',
-    '#8144D6',
-    '#CD35D3',
-  ];
 
   function getMaxScore(
     runs: types.Run[],
@@ -99,7 +88,7 @@ OmegaUp.on('ready', () => {
       return ranking;
     });
 
-    contestPractice.ranking = scoreboardRanking;
+    contestContestant.ranking = scoreboardRanking;
 
     const currentProblem = payload.problems.find(
       (problem) => problem.alias === alias,
@@ -178,7 +167,7 @@ OmegaUp.on('ready', () => {
 
   const { ranking, users } = onRankingChanged(payload.scoreboard);
 
-  const contestPractice = new Vue({
+  const contestContestant = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest-practice': arena_Contest },
     data: () => ({
@@ -211,7 +200,6 @@ OmegaUp.on('ready', () => {
           guid: this.guid,
           minirankingUsers: this.users,
           ranking: this.ranking,
-          scoreboardColors,
           lastUpdated: this.lastUpdated,
           digitsAfterDecimalPoint: this.digitsAfterDecimalPoint,
           showPenalty: this.showPenalty,
@@ -224,7 +212,7 @@ OmegaUp.on('ready', () => {
                 request.problem.alias,
               )
             ) {
-              contestPractice.problemInfo =
+              contestContestant.problemInfo =
                 problemsStore.state.problems[request.problem.alias];
               window.location.hash = `#problems/${request.problem.alias}`;
               return;
@@ -241,7 +229,7 @@ OmegaUp.on('ready', () => {
                   ({ alias }) => alias == problemInfo.alias,
                 );
                 problemInfo.title = currentProblem?.text ?? '';
-                contestPractice.problemInfo = problemInfo;
+                contestContestant.problemInfo = problemInfo;
                 request.problem.alias = problemInfo.alias;
                 request.runs = myRunsStore.state.runs;
                 request.problem.bestScore = getMaxScore(
@@ -251,7 +239,7 @@ OmegaUp.on('ready', () => {
                 );
                 problemsStore.commit('addProblem', problemInfo);
                 if (
-                  contestPractice.popupDisplayed === PopupDisplayed.RunSubmit
+                  contestContestant.popupDisplayed === PopupDisplayed.RunSubmit
                 ) {
                   window.location.hash = `#problems/${request.problem.alias}/new-run`;
                   return;
@@ -261,7 +249,7 @@ OmegaUp.on('ready', () => {
               .catch(() => {
                 ui.dismissNotifications();
                 window.location.hash = '#problems';
-                contestPractice.problem = null;
+                contestContestant.problem = null;
               });
           },
           'show-run': (source: {
@@ -421,51 +409,17 @@ OmegaUp.on('ready', () => {
     })
       .then(time.remoteTimeAdapter)
       .then((data) => {
-        contestPractice.clarifications = data.clarifications;
+        contestContestant.clarifications = data.clarifications;
       });
   }
 
-  // The hash is of the forms:
-  // - `#problems/${alias}`
-  // - `#problems/${alias}/new-run`
-  // - `#problems/${alias}/show-run:xyz`
-  // - `#clarifications/${alias}/new`
-  // and all the matching forms in the following regex
-  const match = /#(?<tab>\w+)\/(?<alias>[^/]+)(?:\/(?<popup>[^/]+))?/g.exec(
-    window.location.hash,
+  // This needs to be set here and not at the top because it depends
+  // on the `navigate-to-problem` callback being invoked, and that is
+  // not the case if this is set a priori.
+  Object.assign(
+    contestContestant,
+    getOptionsFromLocation(window.location.hash),
   );
-  switch (match?.groups?.tab) {
-    case 'problems':
-      // This needs to be set here and not at the top because it depends
-      // on the `navigate-to-problem` callback being invoked, and that is
-      // not the case if this is set a priori.
-      contestPractice.problem = {
-        problem: {
-          alias: match?.groups?.alias,
-          text: '',
-          acceptsSubmissions: true,
-          bestScore: 0,
-          maxScore: 0,
-          hasRuns: false,
-        },
-        runs: [],
-      };
-      if (match.groups.popup === 'new-run') {
-        contestPractice.popupDisplayed = PopupDisplayed.RunSubmit;
-      } else if (match.groups.popup?.startsWith('show-run')) {
-        contestPractice.guid = match.groups.popup.split(':')[1];
-        contestPractice.popupDisplayed = PopupDisplayed.RunDetails;
-      }
-      break;
-    case 'clarifications':
-      if (match.groups.popup === 'new') {
-        contestPractice.showNewClarificationPopup = true;
-      }
-      break;
-    default:
-      contestPractice.popupDisplayed = PopupDisplayed.None;
-      contestPractice.showNewClarificationPopup = false;
-  }
 
   function updateRun(run: types.Run): void {
     trackRun(run);
