@@ -4540,7 +4540,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $lastSubmissionTime = $lastSubmission['time'];
 
             $nextSubmissionTimestamp =
-            \OmegaUp\DAO\Runs::nextSubmissionTimestamp(null, $lastSubmissionTime);
+            \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
+                null,
+                $lastSubmissionTime
+            );
 
             $response['smartyProperties']['payload']['problem'] = array_merge(
                 $response['smartyProperties']['payload']['problem'],

@@ -950,7 +950,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $lastSubmissionTime = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
         }
 
-        return new \OmegaUp\Timestamp($lastSubmissionTime->time + $submissionGap);
+        return new \OmegaUp\Timestamp(
+            $lastSubmissionTime->time + $submissionGap
+        );
     }
 
     /**

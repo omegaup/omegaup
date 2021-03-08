@@ -165,7 +165,10 @@ class Run extends \OmegaUp\Controllers\Controller {
             $lastSubmissionTime = $lastSubmission['time'];
 
             $nextSubmissionTimestamp =
-            \OmegaUp\DAO\Runs::nextSubmissionTimestamp(null, $lastSubmissionTime);
+            \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
+                null,
+                $lastSubmissionTime
+            );
 
             if ($nextSubmissionTimestamp->time > \OmegaUp\Time::get()) {
                 throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(

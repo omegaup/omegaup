@@ -323,7 +323,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         $sql = '
             SELECT
                 s.time
-            FROM 
+            FROM
                 Submissions s
             WHERE
                 s.problem_id = ?
