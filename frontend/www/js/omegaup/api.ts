@@ -187,6 +187,10 @@ export const Clarification = {
     messages.ClarificationCreateRequest,
     messages.ClarificationCreateResponse
   >('/api/clarification/create/'),
+  createForAssignment: apiCall<
+    messages.ClarificationCreateForAssignmentRequest,
+    messages.ClarificationCreateForAssignmentResponse
+  >('/api/clarification/createForAssignment/'),
   details: apiCall<
     messages.ClarificationDetailsRequest,
     messages.ClarificationDetailsResponse

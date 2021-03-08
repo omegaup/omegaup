@@ -10,6 +10,7 @@
   - [`/api/badge/userList/`](#apibadgeuserlist)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
+  - [`/api/clarification/createForAssignment/`](#apiclarificationcreateforassignment)
   - [`/api/clarification/details/`](#apiclarificationdetails)
   - [`/api/clarification/update/`](#apiclarificationupdate)
 - [Contest](#contest)
@@ -387,6 +388,27 @@ Creates a Clarification
 | ------------------ | -------- |
 | `clarification_id` | `number` |
 
+## `/api/clarification/createForAssignment/`
+
+### Description
+
+Creates a Clarification for an assignment of a course
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `message`          | `string` |             |
+| `problem_alias`    | `string` |             |
+
+### Returns
+
+```typescript
+types.ClarificationDetails;
+```
+
 ## `/api/clarification/details/`
 
 ### Description
@@ -401,13 +423,9 @@ API for getting a clarification
 
 ### Returns
 
-| Name            | Type     |
-| --------------- | -------- |
-| `answer`        | `string` |
-| `message`       | `string` |
-| `problem_id`    | `number` |
-| `problemset_id` | `number` |
-| `time`          | `number` |
+```typescript
+types.ClarificationDetails;
+```
 
 ## `/api/clarification/update/`
 

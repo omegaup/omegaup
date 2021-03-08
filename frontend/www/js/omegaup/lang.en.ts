@@ -584,6 +584,7 @@ const translations: { [key: string]: string; } = {
   nominationsRangeHeader: "Problem reports (from %(lowCount) to %(highCount))",
   notProblemLevelTag: "The tag sent is not a level tag.",
   notificationCourseAddAdmin: "You have been invited to be an administrator for course %(courseName).",
+  notificationCourseClarificationRequest: "A new clarification has been requested for problem %(problemAlias) of the course %(courseName), that you manage.",
   notificationCourseRegistrationAccepted: "Your registration request for course %(courseName) has been **accepted**.",
   notificationCourseRegistrationManual: "You have been invited to join the course %(courseName).",
   notificationCourseRegistrationRejected: "Your registration request for course %(courseName) has been **rejected**.",

@@ -6,6 +6,8 @@
  * Description of ClarificationController
  *
  * @author joemmanuel
+ *
+ * @psalm-type ClarificationDetails=array{message: string, answer: null|string, time: int, problem_id: int, problemset_id: int|null}
  */
 class Clarification extends \OmegaUp\Controllers\Controller {
     /** @var null|\OmegaUp\Broadcaster */
@@ -108,9 +110,132 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Creates a Clarification for an assignment of a course
+     *
+     * @return ClarificationDetails
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param string $message
+     */
+    public static function apiCreateForAssignment(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $assignmentAlias = $r->ensureString(
+            'assignment_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $message = $r->ensureString(
+            'message',
+            fn (string $message) => \OmegaUp\Validators::stringOfLengthInRange(
+                $message,
+                1,
+                200
+            )
+        );
+
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
+
+        if (is_null($course)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        if (
+            is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
+                $course->group_id,
+                $r->identity_id
+            ))
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseStudentNotInCourse'
+            );
+        }
+
+        $assignment = \OmegaUp\DAO\Assignments::getProblemset(
+            $course->course_id,
+            $assignmentAlias
+        );
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
+
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        // Is the combination problemset_id and problem_id valid?
+        if (
+            is_null(
+                \OmegaUp\DAO\ProblemsetProblems::getByPK(
+                    $assignment->problemset_id,
+                    $problem->problem_id
+                )
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFoundInProblemset'
+            );
+        }
+
+        $clarification = new \OmegaUp\DAO\VO\Clarifications([
+            'author_id' => $r->identity->identity_id,
+            'receiver_id' => null, // the course admins will always be the receivers
+            'problemset_id' => $assignment->problemset_id,
+            'problem_id' => $problem->problem_id,
+            'message' => $message,
+            'time' => \OmegaUp\Time::get(),
+            'public' => false,
+        ]);
+
+        \OmegaUp\DAO\Clarifications::create($clarification);
+
+        $courseAdmins = \OmegaUp\DAO\UserRoles::getCourseAdmins($course);
+
+        /** @var array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string} */
+        foreach ($courseAdmins as $admin) {
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $admin['user_id'],
+                    'contents' =>  json_encode(
+                        [
+                            'type' => \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_REQUEST,
+                            'body' => [
+                                'localizationString' => new \OmegaUp\TranslationString(
+                                    'notificationCourseRegistrationAccepted'
+                                ),
+                                'localizationParams' => [
+                                    'problemAlias' => $problem->alias,
+                                    'courseName' => $course->name,
+                                ],
+                                'url' => "/course/{$course->alias}/assignment/{$assignment->alias}/#problems/{$problem->alias}/",
+                                'iconUrl' => '/media/info.png',
+                            ],
+                        ]
+                    ),
+                ])
+            );
+        }
+
+        return $clarification->asFilteredArray([
+            'message',
+            'answer',
+            'time',
+            'problem_id',
+            'problemset_id',
+        ]);
+    }
+
+    /**
      * API for getting a clarification
      *
-     * @return array{message: string, answer: null|string, time: int, problem_id: int, problemset_id: int|null}
+     * @return ClarificationDetails
      *
      * @omegaup-request-param int $clarification_id
      */
@@ -143,7 +268,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        /** @var array{message: string, answer: null|string, time: int, problem_id: int, problemset_id: int|null} */
+        /** @var ClarificationDetails */
         return $clarification->asFilteredArray([
             'message',
             'answer',

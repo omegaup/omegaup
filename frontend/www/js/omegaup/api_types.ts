@@ -1504,6 +1504,14 @@ export namespace types {
     time: Date;
   }
 
+  export interface ClarificationDetails {
+    answer?: string;
+    message: string;
+    problem_id: number;
+    problemset_id?: number;
+    time: number;
+  }
+
   export interface CoderOfTheMonth {
     category: string;
     classname: string;
@@ -3163,14 +3171,10 @@ export namespace messages {
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
   export type ClarificationCreateResponse = { clarification_id: number };
+  export type ClarificationCreateForAssignmentRequest = { [key: string]: any };
+  export type ClarificationCreateForAssignmentResponse = types.ClarificationDetails;
   export type ClarificationDetailsRequest = { [key: string]: any };
-  export type ClarificationDetailsResponse = {
-    answer?: string;
-    message: string;
-    problem_id: number;
-    problemset_id?: number;
-    time: number;
-  };
+  export type ClarificationDetailsResponse = types.ClarificationDetails;
   export type ClarificationUpdateRequest = { [key: string]: any };
   export type ClarificationUpdateResponse = {};
 
@@ -4091,6 +4095,9 @@ export namespace controllers {
     create: (
       params?: messages.ClarificationCreateRequest,
     ) => Promise<messages.ClarificationCreateResponse>;
+    createForAssignment: (
+      params?: messages.ClarificationCreateForAssignmentRequest,
+    ) => Promise<messages.ClarificationCreateForAssignmentResponse>;
     details: (
       params?: messages.ClarificationDetailsRequest,
     ) => Promise<messages.ClarificationDetailsResponse>;
