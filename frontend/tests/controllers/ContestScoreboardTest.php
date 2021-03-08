@@ -19,13 +19,18 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         int $nUsers,
         array $runMap,
         bool $runForAdmin = true,
-        bool $runForDirector = true
+        bool $runForDirector = true,
+        string $admissionMode = 'public'
     ) {
         $problemData = [
             \OmegaUp\Test\Factories\Problem::createProblem(),
             \OmegaUp\Test\Factories\Problem::createProblem(),
         ];
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => $admissionMode]
+            )
+        );
 
         // Add the problems to the contest
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
@@ -37,14 +42,17 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData
         );
 
-        // Create our contestants
+        // Create our contestants and add them explictly to contest
         $contestants = [];
         $identities = [];
         for ($i = 0; $i < $nUsers; $i++) {
             [
-                'user' => $contestants[],
-                'identity' => $identities[],
+                'identity' => $identities[$i],
             ] = \OmegaUp\Test\Factories\User::createUser();
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $contestData,
+                $identities[$i]
+            );
         }
         $contestDirector = $contestData['director'];
         [
@@ -1007,5 +1015,82 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(1, count($response['ranking']));
         $this->assertEquals(1, count($response['problems']));
         $this->assertEquals(1, count($response['ranking'][0]['problems']));
+    }
+
+    /**
+     * A user who was removed for a contest can not see their scoreboard
+     */
+    public function testScoreboardForRemovedUser() {
+        $runMap = [
+            [
+                'problem_idx' => 0,
+                'contestant_idx' => 0,
+                'points' => 0,
+                'verdict' => 'CE',
+                'submit_delay' => 60,
+            ],
+        ];
+        $testData = $this->prepareContestScoreboardData(
+            /*$nUsers=*/            3,
+            $runMap,
+            /*$runForAdmin=*/ true,
+            /*$runForDirector=*/ true,
+            /*$admissionMode=*/ 'private'
+        );
+
+        // Create request
+        $identityToRemove = $testData['contestants'][0];
+        $login = self::login($identityToRemove);
+
+        // Create API
+        $contestAlias = $testData['contestData']['contest']->alias;
+        $response = \OmegaUp\Controllers\Contest::apiScoreboard(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestAlias,
+            ])
+        );
+
+        $this->assertArrayHasKey('ranking', $response);
+        $this->assertArrayHasKey('problems', $response);
+
+        // Admin removes user from contest
+        $login = self::login($testData['contestData']['director']);
+
+        $response = \OmegaUp\Controllers\Contest::apiUsers(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestAlias,
+            ])
+        );
+
+        \OmegaUp\Controllers\Contest::apiRemoveUser(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestAlias,
+                'usernameOrEmail' => $identityToRemove->username,
+            ])
+        );
+
+        $response = \OmegaUp\Controllers\Contest::apiUsers(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestAlias,
+            ])
+        );
+
+        $login = self::login($identityToRemove);
+
+        try {
+            \OmegaUp\Controllers\Contest::apiScoreboard(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $contestAlias,
+                ])
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 }

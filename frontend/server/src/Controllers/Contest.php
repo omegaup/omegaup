@@ -391,7 +391,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
-    private static function canAccessContest(
+    private static function validateAccessContest(
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Identities $identity
     ): void {
@@ -434,6 +434,53 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 );
             }
         }
+    }
+
+    /**
+     * Checks if user can access contests: If the contest is private then the
+     * user must be added to the contest (an entry ProblemsetIdentities must
+     * exists) OR the user should be a Contest Admin.
+     */
+    private static function canAccessContest(
+        \OmegaUp\DAO\VO\Contests $contest,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): bool {
+        if (is_null($contest->problemset_id)) {
+            return false;
+        }
+        if ($contest->admission_mode === 'private') {
+            if (
+                !is_null(\OmegaUp\DAO\ProblemsetIdentities::getByPK(
+                    $identity->identity_id,
+                    $contest->problemset_id
+                ))
+            ) {
+                return true;
+            }
+            if (
+                \OmegaUp\Authorization::canSubmitToProblemset(
+                    $identity,
+                    \OmegaUp\DAO\Problemsets::getByPK(
+                        $contest->problemset_id
+                    )
+                )
+            ) {
+                return true;
+            }
+            return false;
+        } elseif (
+            $contest->admission_mode === 'registration' &&
+            !\OmegaUp\Authorization::isContestAdmin($identity, $contest)
+        ) {
+            $req = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK(
+                $identity->identity_id,
+                $contest->problemset_id
+            );
+            if (is_null($req) || !$req->accepted) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -1081,7 +1128,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 // No session, show the intro (if public), so that they can login.
                 return self::isPublic($contest->admission_mode);
             }
-            self::canAccessContest($contest, $identity);
+            self::validateAccessContest($contest, $identity);
         } catch (\Exception $e) {
             // Could not access contest. Private contests must not be leaked, so
             // unless they were manually added beforehand, show them a 404 error.
@@ -1137,7 +1184,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\UnauthorizedException();
             }
-            self::canAccessContest($contest, $identity);
+            self::validateAccessContest($contest, $identity);
 
             $contestAdmin = \OmegaUp\Authorization::isContestAdmin(
                 $identity,
@@ -3428,6 +3475,34 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return null|Scoreboard
+     */
+    public static function getScoreboardForUserProfile(
+        \OmegaUp\DAO\VO\Contests $contest,
+        \OmegaUp\DAO\VO\Problemsets $problemset,
+        \OmegaUp\DAO\VO\Identities $identity
+    ) {
+        // If true, will override Scoreboard Pertentage to 100%
+        $showAllRuns = \OmegaUp\Authorization::isContestAdmin(
+            $identity,
+            $contest
+        );
+
+        $result = self::canAccessContest($contest, $identity);
+
+        if (!self::canAccessContest($contest, $identity)) {
+            return null;
+        }
+
+        // Create scoreboard
+        $params = \OmegaUp\ScoreboardParams::fromContest($contest);
+        $params->admin = $showAllRuns;
+        $scoreboard = new \OmegaUp\Scoreboard($params);
+
+        return $scoreboard->generate();
+    }
+
+    /**
      * @return Scoreboard
      */
     public static function getScoreboard(
@@ -3445,7 +3520,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\UnauthorizedException();
             }
 
-            self::canAccessContest($contest, $identity);
+            self::validateAccessContest($contest, $identity);
 
             if (
                 \OmegaUp\Authorization::isContestAdmin(

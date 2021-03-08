@@ -1905,11 +1905,14 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
             }
             // Get identity ranking
-            $scoreboardResponse = \OmegaUp\Controllers\Contest::getScoreboard(
+            $scoreboardResponse = \OmegaUp\Controllers\Contest::getScoreboardForUserProfile(
                 $contestProblemset['contest'],
                 $contestProblemset['problemset'],
                 $identity
             );
+            if (is_null($scoreboardResponse)) {
+                continue;
+            }
             $contest = [
                 'alias' => $contestProblemset['contest']->alias,
                 'title' => $contestProblemset['contest']->title,
@@ -3832,7 +3835,6 @@ class User extends \OmegaUp\Controllers\Controller {
             ];
             return $response;
         }
-
         $response['smartyProperties']['payload'] = [
             'privateProfile' => false,
             'profile' => self::getProfileDetails(

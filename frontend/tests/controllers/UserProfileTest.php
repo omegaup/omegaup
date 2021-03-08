@@ -174,11 +174,19 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      * Test the contest which a certain user has participated
      */
     public function testUserContests() {
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $contests = [];
-        $contests[0] = \OmegaUp\Test\Factories\Contest::createContest();
-        $contests[1] = \OmegaUp\Test\Factories\Contest::createContest();
+        $contests[0] = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+        $contests[1] = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
 
         \OmegaUp\Test\Factories\Contest::addUser($contests[0], $identity);
         \OmegaUp\Test\Factories\Contest::addUser($contests[1], $identity);
@@ -198,11 +206,11 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Get ContestStats
         $login = self::login($identity);
-        $response = \OmegaUp\Controllers\User::apiContestStats(new \OmegaUp\Request(
-            [
+        $response = \OmegaUp\Controllers\User::apiContestStats(
+            new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-            ]
-        ));
+            ])
+        );
 
         // Result should be 1 since user has only actually participated in 1 contest (submitted run)
         $this->assertEquals(1, count($response['contests']));
@@ -223,6 +231,30 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'scoreboard_url_admin',
             $response['contests'][$alias]['data']
         );
+
+        $login = self::login($contests[0]['director']);
+
+        // When user is removed from the contest, is no longer able to see their
+        // contest stats, but no exception is thrown.
+        \OmegaUp\Controllers\Contest::apiRemoveUser(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $alias,
+                'usernameOrEmail' => $identity->username,
+            ])
+        );
+
+        // Get ContestStats
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\User::apiContestStats(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        // Result should be 0 since user was removed from the only contest who
+        // participated (submitted run)
+        $this->assertEquals(0, count($response['contests']));
     }
 
     /*
