@@ -263,13 +263,10 @@ OmegaUp.on('ready', () => {
     },
   });
 
-  const locationOptions = getOptionsFromLocation(window.location.hash);
-
-  contestPractice.problem = locationOptions.problem;
-  contestPractice.popupDisplayed = locationOptions.popupDisplayed;
-  contestPractice.showNewClarificationPopup =
-    locationOptions.showNewClarificationPopup;
-  contestPractice.guid = locationOptions.guid;
+  // This needs to be set here and not at the top because it depends
+  // on the `navigate-to-problem` callback being invoked, and that is
+  // not the case if this is set a priori.
+  Object.assign(contestPractice, getOptionsFromLocation(window.location.hash));
 
   function refreshClarifications() {
     api.Contest.clarifications({

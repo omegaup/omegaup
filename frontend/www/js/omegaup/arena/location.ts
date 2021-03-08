@@ -16,7 +16,7 @@ export function getOptionsFromLocation(location: string): LocationOptions {
     showNewClarificationPopup: false,
   };
 
-  // The hash is of the forms:
+  // Location string is of the forms:
   // - `#problems/${alias}`
   // - `#problems/${alias}/new-run`
   // - `#problems/${alias}/show-run:xyz`
@@ -27,9 +27,6 @@ export function getOptionsFromLocation(location: string): LocationOptions {
   );
   switch (match?.groups?.tab) {
     case 'problems':
-      // This needs to be set here and not at the top because it depends
-      // on the `navigate-to-problem` callback being invoked, and that is
-      // not the case if this is set a priori.
       response.problem = {
         problem: {
           alias: match?.groups?.alias,
