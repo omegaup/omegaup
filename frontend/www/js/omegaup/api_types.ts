@@ -217,13 +217,6 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
-        x.scoreboard = ((x) => {
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
-          return x;
-        })(x.scoreboard);
         x.users = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -1669,6 +1662,7 @@ export namespace types {
     admin: boolean;
     admission_mode: string;
     alias: string;
+    archived: boolean;
     available_languages: { [key: string]: string };
     description: string;
     director: string;
@@ -1704,6 +1698,7 @@ export namespace types {
     admin: boolean;
     admission_mode: string;
     alias: string;
+    archived: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -1739,7 +1734,6 @@ export namespace types {
     contest: types.ContestPublicDetails;
     contestAdmin: boolean;
     problems: types.NavbarProblemsetProblem[];
-    scoreboard: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     users: types.ContestUser[];
   }
@@ -1749,7 +1743,7 @@ export namespace types {
     details: types.ContestAdminDetails;
     group_admins: types.ContestGroupAdmin[];
     groups: types.ContestGroup[];
-    problems: types.ContestProblem[];
+    problems: types.ProblemsetProblem[];
     requests: types.ContestRequest[];
     users: types.ContestUser[];
   }
@@ -1818,22 +1812,6 @@ export namespace types {
     last_updated: Date;
     start_time: Date;
     title: string;
-  }
-
-  export interface ContestProblem {
-    accepted: number;
-    alias: string;
-    commit: string;
-    difficulty: number;
-    languages: string;
-    order: number;
-    points: number;
-    problem_id: number;
-    submissions: number;
-    title: string;
-    version: string;
-    visibility: number;
-    visits: number;
   }
 
   export interface ContestPublicDetails {
@@ -2688,7 +2666,7 @@ export namespace types {
     difficulty: number;
     input_limit: number;
     languages: string;
-    letter: string;
+    letter?: string;
     order: number;
     points: number;
     problem_id?: number;
@@ -3226,6 +3204,8 @@ export namespace messages {
   };
   export type ContestArbitrateRequestRequest = { [key: string]: any };
   export type ContestArbitrateRequestResponse = {};
+  export type ContestArchiveRequest = { [key: string]: any };
+  export type ContestArchiveResponse = {};
   export type ContestClarificationsRequest = { [key: string]: any };
   export type _ContestClarificationsServerResponse = any;
   export type ContestClarificationsResponse = {
@@ -3280,7 +3260,7 @@ export namespace messages {
   export type ContestOpenRequest = { [key: string]: any };
   export type ContestOpenResponse = {};
   export type ContestProblemsRequest = { [key: string]: any };
-  export type ContestProblemsResponse = { problems: types.ContestProblem[] };
+  export type ContestProblemsResponse = { problems: types.ProblemsetProblem[] };
   export type ContestPublicDetailsRequest = { [key: string]: any };
   export type _ContestPublicDetailsServerResponse = any;
   export type ContestPublicDetailsResponse = types.ContestPublicDetails;
@@ -4150,6 +4130,9 @@ export namespace controllers {
     arbitrateRequest: (
       params?: messages.ContestArbitrateRequestRequest,
     ) => Promise<messages.ContestArbitrateRequestResponse>;
+    archive: (
+      params?: messages.ContestArchiveRequest,
+    ) => Promise<messages.ContestArchiveResponse>;
     clarifications: (
       params?: messages.ContestClarificationsRequest,
     ) => Promise<messages.ContestClarificationsResponse>;

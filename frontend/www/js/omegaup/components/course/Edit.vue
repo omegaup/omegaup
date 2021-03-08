@@ -261,10 +261,16 @@
         </div>
       </div>
       <div v-if="showTab === 'archive'" class="tab-pane active" role="tabpanel">
-        <omegaup-course-archive
+        <omegaup-common-archive
           :already-archived="alreadyArchived"
-          @archive-course="onArchiveCourse"
-        ></omegaup-course-archive>
+          :archive-button-description="
+            alreadyArchived ? T.wordsUnarchiveCourse : T.wordsArchiveCourse
+          "
+          :archive-confirm-text="T.courseArchiveConfirmText"
+          :archive-header-title="T.wordsArchiveCourse"
+          :archive-help-text="T.courseArchiveHelpText"
+          @archive="onArchiveCourse"
+        ></omegaup-common-archive>
       </div>
     </div>
   </div>
@@ -274,7 +280,7 @@
 import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import course_Form from './Form.vue';
 import course_AssignmentList from './AssignmentList.vue';
-import course_Archive from './Archive.vue';
+import common_Archive from '../common/Archive.vue';
 import course_AssignmentDetails from './AssignmentDetails.vue';
 import course_AdmissionMode from './AdmissionMode.vue';
 import course_AddStudents from './AddStudents.vue';
@@ -318,7 +324,7 @@ const emptyAssignment: types.CourseAssignment = {
 @Component({
   components: {
     'omegaup-course-form': course_Form,
-    'omegaup-course-archive': course_Archive,
+    'omegaup-common-archive': common_Archive,
     'omegaup-course-assignment-list': course_AssignmentList,
     'omegaup-course-assignment-details': course_AssignmentDetails,
     'omegaup-course-admision-mode': course_AdmissionMode,

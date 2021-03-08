@@ -23,6 +23,7 @@
   - [`/api/contest/adminList/`](#apicontestadminlist)
   - [`/api/contest/admins/`](#apicontestadmins)
   - [`/api/contest/arbitrateRequest/`](#apicontestarbitraterequest)
+  - [`/api/contest/archive/`](#apicontestarchive)
   - [`/api/contest/clarifications/`](#apicontestclarifications)
   - [`/api/contest/clone/`](#apicontestclone)
   - [`/api/contest/contestants/`](#apicontestcontestants)
@@ -573,10 +574,11 @@ the director).
 
 ### Parameters
 
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `page`      | `int` |             |
-| `page_size` | `int` |             |
+| Name            | Type         | Description |
+| --------------- | ------------ | ----------- |
+| `page`          | `int\|null`  |             |
+| `page_size`     | `int\|null`  |             |
+| `show_archived` | `bool\|null` |             |
 
 ### Returns
 
@@ -615,6 +617,23 @@ Returns all contest administrators
 | `username`      | `string`       |             |
 | `note`          | `null\|string` |             |
 | `resolution`    | `mixed`        |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/contest/archive/`
+
+### Description
+
+Archives or Unarchives a contest if user is the creator
+
+### Parameters
+
+| Name            | Type         | Description |
+| --------------- | ------------ | ----------- |
+| `contest_alias` | `string`     |             |
+| `archive`       | `bool\|null` |             |
 
 ### Returns
 
@@ -789,11 +808,12 @@ Returns a list of contests where current user is participating in
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `page`      | `int`    |             |
-| `page_size` | `int`    |             |
-| `query`     | `string` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `page`          | `int\|null`    |             |
+| `page_size`     | `int\|null`    |             |
+| `query`         | `null\|string` |             |
+| `show_archived` | `bool\|null`   |             |
 
 ### Returns
 
@@ -809,11 +829,12 @@ Returns a list of contests where current user is the director
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `page`      | `int`    |             |
-| `page_size` | `int`    |             |
-| `query`     | `string` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `page`          | `int\|null`    |             |
+| `page_size`     | `int\|null`    |             |
+| `query`         | `null\|string` |             |
+| `show_archived` | `bool\|null`   |             |
 
 ### Returns
 
@@ -855,9 +876,9 @@ Gets the problems from a contest
 
 ### Returns
 
-| Name       | Type                     |
-| ---------- | ------------------------ |
-| `problems` | `types.ContestProblem[]` |
+| Name       | Type                        |
+| ---------- | --------------------------- |
+| `problems` | `types.ProblemsetProblem[]` |
 
 ## `/api/contest/publicDetails/`
 

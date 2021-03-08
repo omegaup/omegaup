@@ -82,6 +82,7 @@ class JavaScriptLogCollector:
 
 
 class Driver:  # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-public-methods
     '''Wraps the state needed to run a test.'''
 
     # pylint: disable=too-many-arguments
@@ -195,6 +196,21 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 (By.XPATH,
                  '//%s//div[@data-value = "%s"]' %
                  (parent_xpath, value)))).click()
+
+    def typeahead_helper_v2(self, parent_selector, value):
+        '''Helper to interact with Typeahead elements.'''
+
+        tt_input = self.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 '%s .tags-input input[type="text"]' % parent_selector)))
+        tt_input.click()
+        tt_input.send_keys(value)
+        self.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                 '%s ul.typeahead-dropdown li:first-of-type' %
+                 (parent_selector)))).click()
 
     def send_keys(self,  # pylint: disable=no-self-use
                   element: WebElement,

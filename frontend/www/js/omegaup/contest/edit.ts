@@ -22,6 +22,7 @@ OmegaUp.on('ready', () => {
       problems: payload.problems,
       requests: payload.requests,
       users: payload.users,
+      existingProblems: [] as { key: string; value: string }[],
     }),
     methods: {
       arbitrateRequest: (username: string, resolution: boolean): void => {
@@ -112,8 +113,24 @@ OmegaUp.on('ready', () => {
           problems: this.problems,
           requests: this.requests,
           users: this.users,
+          existingProblems: this.existingProblems,
         },
         on: {
+          'update-existing-problems': (query: string) => {
+            api.Problem.list({
+              query,
+            })
+              .then((data) => {
+                this.existingProblems = [];
+                data.results.forEach((problem: types.ProblemListItem) => {
+                  this.existingProblems.push({
+                    key: problem.alias,
+                    value: problem.title,
+                  });
+                });
+              })
+              .catch();
+          },
           'update-contest': function (contest: omegaup.Contest) {
             api.Contest.update(
               Object.assign({}, contest, {
@@ -128,7 +145,7 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'add-problem': (problem: types.ContestProblem) => {
+          'add-problem': (problem: types.ProblemsetProblem) => {
             api.Contest.addProblem({
               contest_alias: payload.details.alias,
               order_in_contest: problem.order,
@@ -146,7 +163,7 @@ OmegaUp.on('ready', () => {
             problemAlias: string,
             addProblemComponent: {
               versionLog: types.ProblemVersion[];
-              problems: types.ContestProblem[];
+              problems: types.ProblemsetProblem[];
               selectedRevision: types.ProblemVersion;
               publishedRevision: types.ProblemVersion;
             },
@@ -364,6 +381,17 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.contestEditContestClonedSuccessfully);
+              })
+              .catch(ui.apiError);
+          },
+          'archive-contest': (contestAlias: string, archive: string) => {
+            api.Contest.archive({ contest_alias: contestAlias, archive })
+              .then(() => {
+                if (archive) {
+                  ui.success(T.contestEditArchivedSuccess);
+                  return;
+                }
+                ui.success(T.contestEditUnarchivedSuccess);
               })
               .catch(ui.apiError);
           },
