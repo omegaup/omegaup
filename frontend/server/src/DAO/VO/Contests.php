@@ -409,7 +409,7 @@ class Contests extends \OmegaUp\DAO\VO\VO {
     /**
      * Estado de la petición de generar diplomas
      *
-     * @var string|null
+     * @var string
      */
-    public $certificates_status = null;
+    public $certificates_status = 'uninitiated';
 }

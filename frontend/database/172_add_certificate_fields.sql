@@ -7,5 +7,5 @@ ALTER TABLE `Courses`
 ALTER TABLE `Contests`
   ADD COLUMN `certificate_cutoff` int(11) DEFAULT NULL
     COMMENT 'Número de concursantes a premiar con diplomas que mencionan su lugar en el ranking',
-  ADD COLUMN `certificates_status` enum('uninitiated', 'queued', 'generated', 'retryable_error', 'fatal_error')
+  ADD COLUMN `certificates_status` enum('uninitiated', 'queued', 'generated', 'retryable_error', 'fatal_error') NOT NULL DEFAULT 'uninitiated'
     COMMENT 'Estado de la petición de generar diplomas';
