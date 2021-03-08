@@ -10,6 +10,7 @@ import contest_Mine from '../components/contest/Mine.vue';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestListMinePayload();
   let showAllContests = false;
+  let showArchivedContests = false;
   const contestMine = new Vue({
     el: '#main-container',
     components: {
@@ -25,9 +26,15 @@ OmegaUp.on('ready', () => {
           privateContestsAlert: payload.privateContestsAlert,
         },
         on: {
+          'change-show-archived-contests': (
+            shouldShowArchivedContests: boolean,
+          ) => {
+            showArchivedContests = shouldShowArchivedContests;
+            fillContestsTable({ showAllContests, showArchivedContests });
+          },
           'change-show-all-contests': (shouldShowAll: boolean) => {
             showAllContests = shouldShowAll;
-            fillContestsTable(shouldShowAll);
+            fillContestsTable({ showAllContests, showArchivedContests });
           },
           'change-admission-mode': (
             selectedContests: string[],
@@ -48,7 +55,7 @@ OmegaUp.on('ready', () => {
                 ui.error(ui.formatString(T.bulkOperationError, error));
               })
               .finally(() => {
-                fillContestsTable(showAllContests);
+                fillContestsTable({ showAllContests, showArchivedContests });
               });
           },
           'download-csv-users': (contestAlias: string) => {
@@ -100,8 +107,15 @@ OmegaUp.on('ready', () => {
     },
   });
 
-  function fillContestsTable(showAllContests: boolean): void {
-    (showAllContests ? api.Contest.adminList() : api.Contest.myList())
+  function fillContestsTable({
+    showAllContests,
+    showArchivedContests,
+  }: {
+    showAllContests: boolean;
+    showArchivedContests: boolean;
+  }): void {
+    const param = { show_archived: showArchivedContests };
+    (showAllContests ? api.Contest.adminList(param) : api.Contest.myList(param))
       .then((result) => {
         contestMine.contests = result.contests;
       })
