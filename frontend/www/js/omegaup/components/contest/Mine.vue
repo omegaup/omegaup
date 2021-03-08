@@ -39,7 +39,10 @@
                 class="form-check-input"
                 type="checkbox"
                 @change.prevent="
-                  $emit('show-archived-contests', shouldShowArchivedContests)
+                  $emit(
+                    'change-show-archived-contests',
+                    shouldShowArchivedContests,
+                  )
                 "
               />
               <span>{{ T.contestListArchivedContests }}</span>

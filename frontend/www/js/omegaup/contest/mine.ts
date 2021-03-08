@@ -26,13 +26,15 @@ OmegaUp.on('ready', () => {
           privateContestsAlert: payload.privateContestsAlert,
         },
         on: {
-          'show-archived-contests': (shouldShowArchivedContests: boolean) => {
+          'change-show-archived-contests': (
+            shouldShowArchivedContests: boolean,
+          ) => {
             showArchivedContests = shouldShowArchivedContests;
-            fillContestsTable(showAllContests, showArchivedContests);
+            fillContestsTable({ showAllContests, showArchivedContests });
           },
           'change-show-all-contests': (shouldShowAll: boolean) => {
             showAllContests = shouldShowAll;
-            fillContestsTable(showAllContests, showArchivedContests);
+            fillContestsTable({ showAllContests, showArchivedContests });
           },
           'change-admission-mode': (
             selectedContests: string[],
@@ -53,7 +55,7 @@ OmegaUp.on('ready', () => {
                 ui.error(ui.formatString(T.bulkOperationError, error));
               })
               .finally(() => {
-                fillContestsTable(showAllContests, showArchivedContests);
+                fillContestsTable({ showAllContests, showArchivedContests });
               });
           },
           'download-csv-users': (contestAlias: string) => {
@@ -105,10 +107,13 @@ OmegaUp.on('ready', () => {
     },
   });
 
-  function fillContestsTable(
-    showAllContests: boolean,
-    showArchivedContests: boolean,
-  ): void {
+  function fillContestsTable({
+    showAllContests,
+    showArchivedContests,
+  }: {
+    showAllContests: boolean;
+    showArchivedContests: boolean;
+  }): void {
     const param = { show_archived: showArchivedContests };
     (showAllContests ? api.Contest.adminList(param) : api.Contest.myList(param))
       .then((result) => {
