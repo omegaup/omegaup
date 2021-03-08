@@ -1,22 +1,22 @@
 <template>
-  <div v-if="requests.length !== 0" class="panel panel-primary">
-    <div class="panel-body">
+  <div v-if="requests.length" class="card mt-3">
+    <h5 class="card-header">
       {{ T.pendingRegistrations }}
-    </div>
-    <table class="table">
+    </h5>
+    <table class="table mb-0">
       <thead>
         <tr>
-          <th>{{ T.wordsUser }}</th>
-          <th>{{ T.userEditCountry }}</th>
-          <th>{{ T.requestDate }}</th>
-          <th>{{ T.currentStatus }}</th>
-          <th>{{ T.lastUpdate }}</th>
-          <th>{{ textAddParticipant }}</th>
+          <th class="text-center">{{ T.wordsUser }}</th>
+          <th class="text-center">{{ T.userEditCountry }}</th>
+          <th class="text-center">{{ T.requestDate }}</th>
+          <th class="text-center">{{ T.currentStatus }}</th>
+          <th class="text-center">{{ T.lastUpdate }}</th>
+          <th class="text-center">{{ textAddParticipant }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="request in requests" :key="request.username">
-          <td>
+          <td class="text-center">
             <omegaup-username
               :classname="request.classname"
               :username="request.username"
@@ -24,31 +24,35 @@
               :linkify="true"
             ></omegaup-username>
           </td>
-          <td>{{ request.country }}</td>
-          <td>{{ time.formatTimestamp(request.request_time) }}</td>
-          <td v-if="request.last_update === null">{{ T.wordsPending }}</td>
-          <td v-else-if="request.accepted">
+          <td class="text-center">{{ request.country }}</td>
+          <td class="text-center">
+            {{ time.formatTimestamp(request.request_time) }}
+          </td>
+          <td v-if="request.last_update === null" class="text-center">
+            {{ T.wordsPending }}
+          </td>
+          <td v-else-if="request.accepted" class="text-center">
             {{ T.wordAccepted }}
           </td>
-          <td v-else>{{ T.wordsDenied }}</td>
+          <td v-else class="text-center">{{ T.wordsDenied }}</td>
           <td v-if="request.last_update !== null">
             {{ time.formatTimestamp(request.last_update) }} ({{
               request.admin.username
             }})
           </td>
           <td v-else></td>
-          <td v-if="!request.accepted">
+          <td v-if="!request.accepted" class="text-center">
             <button
-              class="close"
+              class="close float-none"
               style="color: red"
-              @click="onDenyRequest(request.username)"
+              @click="$emit('emit-deny-request', request.username)"
             >
               ×
             </button>
             <button
-              class="close"
+              class="close float-none"
               style="color: green"
-              @click="onAcceptRequest(request.username)"
+              @click="$emit('emit-accept-request', request.username)"
             >
               ✓
             </button>
@@ -79,13 +83,6 @@ export default class Requests extends Vue {
   T = T;
   time = time;
   requests: types.IdentityRequest[] = this.data;
-
-  onAcceptRequest(username: string): void {
-    this.$emit('emit-accept-request', this, username);
-  }
-  onDenyRequest(username: string): void {
-    this.$emit('emit-deny-request', this, username);
-  }
 
   @Watch('data')
   onDataChange(): void {

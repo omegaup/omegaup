@@ -1745,7 +1745,7 @@ export namespace types {
     details: types.ContestAdminDetails;
     group_admins: types.ContestGroupAdmin[];
     groups: types.ContestGroup[];
-    problems: types.ContestProblem[];
+    problems: types.ProblemsetProblem[];
     requests: types.ContestRequest[];
     users: types.ContestUser[];
   }
@@ -1814,22 +1814,6 @@ export namespace types {
     last_updated: Date;
     start_time: Date;
     title: string;
-  }
-
-  export interface ContestProblem {
-    accepted: number;
-    alias: string;
-    commit: string;
-    difficulty: number;
-    languages: string;
-    order: number;
-    points: number;
-    problem_id: number;
-    submissions: number;
-    title: string;
-    version: string;
-    visibility: number;
-    visits: number;
   }
 
   export interface ContestPublicDetails {
@@ -2684,7 +2668,7 @@ export namespace types {
     difficulty: number;
     input_limit: number;
     languages: string;
-    letter: string;
+    letter?: string;
     order: number;
     points: number;
     problem_id?: number;
@@ -3278,7 +3262,7 @@ export namespace messages {
   export type ContestOpenRequest = { [key: string]: any };
   export type ContestOpenResponse = {};
   export type ContestProblemsRequest = { [key: string]: any };
-  export type ContestProblemsResponse = { problems: types.ContestProblem[] };
+  export type ContestProblemsResponse = { problems: types.ProblemsetProblem[] };
   export type ContestPublicDetailsRequest = { [key: string]: any };
   export type _ContestPublicDetailsServerResponse = any;
   export type ContestPublicDetailsResponse = types.ContestPublicDetails;
