@@ -42,13 +42,16 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData
         );
 
-        // Create our contestants and add them explictly to contest
+        // Create our contestants and add them explictly to private contest
         $contestants = [];
         $identities = [];
         for ($i = 0; $i < $nUsers; $i++) {
             [
                 'identity' => $identities[$i],
             ] = \OmegaUp\Test\Factories\User::createUser();
+            if ($admissionMode !== 'private') {
+                continue;
+            }
             \OmegaUp\Test\Factories\Contest::addUser(
                 $contestData,
                 $identities[$i]
