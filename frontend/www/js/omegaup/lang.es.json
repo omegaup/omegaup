@@ -199,6 +199,7 @@
 	"contestIntroSubmissionsSeparationDesc": "Por cada env\u00edo incorrecto se deber\u00e1 esperar %(window_length) para hacer un nuevo env\u00edo.",
 	"contestJoin": "Unirse al concurso",
 	"contestLengthTooLong": "La duraci\u00f3n del concurso no puede ser mayor a 31 d\u00edas.",
+	"contestListArchivedContests": "Concursos archivados",
 	"contestListEmpty": "No hay concursos en esta lista",
 	"contestListShowAdminContests": "Tambi\u00e9n muestra concursos que administro",
 	"contestListSubmissions": "Env\u00edos",

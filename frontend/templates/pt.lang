@@ -198,6 +198,7 @@ contestIntroScoreboardTimePercentZero = "O painel não será mostrado durante o 
 contestIntroSubmissionsSeparationDesc = "Para cada envio incorreto, você deve aguardar %(window_length) para fazer um novo envio."
 contestJoin = "Entrar no concurso"
 contestLengthTooLong = "A duração do concurso não podem ser maior á 31 dias."
+contestListArchivedContests = "Concursos arquivados"
 contestListEmpty = "Não há concursos nesta lista"
 contestListShowAdminContests = "Também mostrar concursos que eu gerencio"
 contestListSubmissions = "Soluções"
