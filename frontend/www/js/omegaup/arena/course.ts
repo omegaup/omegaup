@@ -3,6 +3,7 @@ import { types } from '../api_types';
 import * as api from '../api';
 import * as time from '../time';
 import * as ui from '../ui';
+import { getOptionsFromLocation } from './location';
 
 import problemsStore from './problemStore';
 import { myRunsStore } from '../arena/runsStore';
@@ -114,47 +115,10 @@ OmegaUp.on('ready', () => {
     },
   });
 
-  // The hash is of the forms:
-  // - `#problems/${alias}`
-  // - `#problems/${alias}/new-run`
-  // - `#problems/${alias}/show-run:xyz`
-  // - `#clarifications/${alias}/new`
-  // and all the matching forms in the following regex
-  const match = /#(?<tab>\w+)\/(?<alias>[^/]+)(?:\/(?<popup>[^/]+))?/g.exec(
-    window.location.hash,
-  );
-  switch (match?.groups?.tab) {
-    case 'problems':
-      // This needs to be set here and not at the top because it depends
-      // on the `navigate-to-problem` callback being invoked, and that is
-      // not the case if this is set a priori.
-      arenaCourse.problem = {
-        problem: {
-          alias: match?.groups?.alias,
-          text: '',
-          acceptsSubmissions: true,
-          bestScore: 0,
-          maxScore: 0,
-          hasRuns: false,
-        },
-        runs: [],
-      };
-      if (match.groups.popup === 'new-run') {
-        arenaCourse.popUpDisplayed = PopupDisplayed.RunSubmit;
-      } else if (match.groups.popup?.startsWith('show-run')) {
-        arenaCourse.guid = match.groups.popup.split(':')[1];
-        arenaCourse.popUpDisplayed = PopupDisplayed.RunDetails;
-      }
-      break;
-    case 'clarifications':
-      if (match.groups.popup === 'new') {
-        arenaCourse.showNewClarificationPopup = true;
-      }
-      break;
-    default:
-      arenaCourse.popUpDisplayed = PopupDisplayed.None;
-      arenaCourse.showNewClarificationPopup = false;
-  }
+  // This needs to be set here and not at the top because it depends
+  // on the `navigate-to-problem` callback being invoked, and that is
+  // not the case if this is set a priori.
+  Object.assign(arenaCourse, getOptionsFromLocation(window.location.hash));
 
   function trackRun(run: types.Run): void {
     myRunsStore.commit('addRun', run);
