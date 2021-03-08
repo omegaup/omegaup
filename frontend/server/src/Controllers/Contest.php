@@ -395,58 +395,32 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Identities $identity
     ): void {
-        if (is_null($contest->problemset_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        if (self::canAccessContest($contest, $identity)) {
+            return;
         }
         if ($contest->admission_mode === 'private') {
-            if (
-                !is_null(\OmegaUp\DAO\ProblemsetIdentities::getByPK(
-                    $identity->identity_id,
-                    $contest->problemset_id
-                ))
-            ) {
-                return;
-            }
-            if (
-                \OmegaUp\Authorization::canSubmitToProblemset(
-                    $identity,
-                    \OmegaUp\DAO\Problemsets::getByPK(
-                        $contest->problemset_id
-                    )
-                )
-            ) {
-                return;
-            }
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
-        } elseif (
-            $contest->admission_mode === 'registration' &&
-            !\OmegaUp\Authorization::isContestAdmin($identity, $contest)
-        ) {
-            $req = \OmegaUp\DAO\ProblemsetIdentityRequest::getByPK(
-                $identity->identity_id,
-                $contest->problemset_id
-            );
-            if (is_null($req) || !$req->accepted) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                    'contestNotRegistered'
-                );
-            }
         }
+        throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+            'contestNotRegistered'
+        );
     }
 
     /**
      * Checks if user can access contests: If the contest is private then the
      * user must be added to the contest (an entry ProblemsetIdentities must
      * exists) OR the user should be a Contest Admin.
+     *
+     * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function canAccessContest(
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Identities $identity
     ): bool {
         if (is_null($contest->problemset_id)) {
-            return false;
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
         if ($contest->admission_mode === 'private') {
             if (
@@ -3482,13 +3456,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Problemsets $problemset,
         \OmegaUp\DAO\VO\Identities $identity
     ) {
-        // If true, will override Scoreboard Pertentage to 100%
+        // If true, will override Scoreboard Percentage to 100%
         $showAllRuns = \OmegaUp\Authorization::isContestAdmin(
             $identity,
             $contest
         );
-
-        $result = self::canAccessContest($contest, $identity);
 
         if (!self::canAccessContest($contest, $identity)) {
             return null;
@@ -3511,7 +3483,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?string $token = null
     ) {
-        // If true, will override Scoreboard Pertentage to 100%
+        // If true, will override Scoreboard Percentage to 100%
         $showAllRuns = false;
 
         if (empty($token)) {
