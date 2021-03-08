@@ -150,7 +150,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{smartyProperties: array{payload: BadgeListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getBadgeListForSmarty(\OmegaUp\Request $r) {
+    public static function getBadgeListForTypeScript(\OmegaUp\Request $r) {
         $r->ensureIdentity();
         $badges = self::apiList($r);
         $ownedBadges = self::apiMyList($r);
@@ -171,7 +171,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $badge_alias
      */
-    public static function getDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getDetailsForTypeScript(\OmegaUp\Request $r) {
         $r->ensureIdentity();
         $badgeAlias = $r->ensureString(
             'badge_alias',

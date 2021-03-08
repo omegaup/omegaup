@@ -46,30 +46,33 @@ OmegaUp.on('ready', () => {
       arenaInstance.refreshClarifications();
     });
 
-  document.querySelector('#clarification')?.addEventListener('submit', () => {
-    document
-      .querySelectorAll('#clarification input')
-      .forEach((input) => input.setAttribute('disabled', 'disabled'));
-    api.Clarification.create({
-      contest_alias: arenaInstance.options.contestAlias,
-      problem_alias: getInputValue('#clarification select[name="problem"]'),
-      message: getInputValue('#clarification textarea[name="message"]'),
-    })
-      .then(() => {
-        arenaInstance.hideOverlay();
-        arenaInstance.refreshClarifications();
+  document
+    .querySelector('#clarification')
+    ?.addEventListener('submit', (ev: Event) => {
+      ev.preventDefault();
+      document
+        .querySelectorAll('#clarification input')
+        .forEach((input) => input.setAttribute('disabled', 'disabled'));
+      api.Clarification.create({
+        contest_alias: arenaInstance.options.contestAlias,
+        problem_alias: getInputValue('#clarification select[name="problem"]'),
+        message: getInputValue('#clarification textarea[name="message"]'),
       })
-      .catch((e) => {
-        alert(e.error);
-      })
-      .finally(() => {
-        document
-          .querySelectorAll('#clarification input')
-          .forEach((input) => input.removeAttribute('disabled'));
-      });
+        .then(() => {
+          arenaInstance.hideOverlay();
+          arenaInstance.refreshClarifications();
+        })
+        .catch((e) => {
+          alert(e.error);
+        })
+        .finally(() => {
+          document
+            .querySelectorAll('#clarification input')
+            .forEach((input) => input.removeAttribute('disabled'));
+        });
 
-    return false;
-  });
+      return false;
+    });
 
   window.addEventListener('hashchange', () => {
     arenaInstance.onHashChanged();

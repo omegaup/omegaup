@@ -19,7 +19,7 @@ module.exports = {
     ],
     activity_feed: './frontend/www/js/omegaup/activity/feed.ts',
     admin_roles: './frontend/www/js/omegaup/admin/roles.js',
-    admin_support: './frontend/www/js/omegaup/admin/support.js',
+    admin_support: './frontend/www/js/omegaup/admin/support.ts',
     admin_user: './frontend/www/js/omegaup/admin/user.js',
     arena: './frontend/www/js/omegaup/arena/arena.ts',
     arena_admin: './frontend/www/js/omegaup/arena/admin.ts',
@@ -30,6 +30,7 @@ module.exports = {
     arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
     arena_contest_practice:
       './frontend/www/js/omegaup/arena/contest_practice.ts',
+    arena_course: './frontend/www/js/omegaup/arena/course.ts',
     arena_scoreboard: './frontend/www/js/omegaup/arena/scoreboard.ts',
     arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
     authors_rank: './frontend/www/js/omegaup/user/authors_rank.ts',

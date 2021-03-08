@@ -1,13 +1,15 @@
 <template>
-  <div data-contest-wrapper>
-    <div class="title">
-      <h1>
+  <div data-arena-wrapper :class="backgroundClass">
+    <div class="text-center mt-4 pt-2">
+      <h2>
         <span>{{ contestTitle }}</span>
-        <sup class="socket-status" title="WebSocket">✗</sup>
-      </h1>
-      <div class="clock">∞</div>
+        <slot name="socket-status">
+          <sup class="socket-status-error" title="WebSocket">✗</sup>
+        </slot>
+      </h2>
+      <slot name="clock"><div class="clock">∞</div></slot>
     </div>
-    <ul class="nav justify-content-center nav-tabs">
+    <ul class="nav justify-content-center nav-tabs mt-4">
       <li
         v-for="tab in availableTabs"
         :key="tab.name"
@@ -39,14 +41,13 @@
         class="tab-pane fade"
         :class="{ 'show active': selectedTab === 'ranking' }"
       >
-        <!-- TODO: Add Scoreboard component when we migrate arena.contest.tpl-->
         <slot name="arena-scoreboard"></slot>
       </div>
       <div
         class="tab-pane fade"
         :class="{ 'show active': selectedTab === 'runs' }"
       >
-        <!-- TODO: Add Runs component when we migrate arena.contest.tpl-->
+        <!-- TODO: Add Runs component when we migrate arena.contest.admin.tpl-->
         <slot name="arena-runs"></slot>
       </div>
       <div
@@ -66,9 +67,10 @@ import { Tab } from '../problem/Details.vue';
 
 @Component
 export default class Arena extends Vue {
-  @Prop({ default: false }) isAdmin!: boolean;
+  @Prop({ default: false }) shouldShowRuns!: boolean;
   @Prop() contestTitle!: string;
   @Prop() activeTab!: string;
+  @Prop() backgroundClass!: string;
 
   T = T;
   selectedTab = this.activeTab;
@@ -88,7 +90,7 @@ export default class Arena extends Vue {
       {
         name: 'runs',
         text: T.wordsRuns,
-        visible: this.isAdmin,
+        visible: this.shouldShowRuns,
       },
       {
         name: 'clarifications',
@@ -108,40 +110,27 @@ export default class Arena extends Vue {
 </script>
 
 <style lang="scss" scoped>
-[data-contest-practice] {
-  background: #668 url(/media/gradient.png) repeat-x 0 0;
-  font-family: sans-serif;
-  overflow-y: auto;
+.practice {
+  background: #668 url(/media/gradient.png) repeat-x 0 0 !important;
 }
 
-[data-contest-wrapper] {
+[data-arena-wrapper] {
   background: #ebeff2;
   font-family: sans-serif;
   overflow-y: auto;
 }
 
-.title {
-  min-height: 80px;
-  h1 {
-    text-align: center;
-    font-size: 2em;
-    margin: 0.5em;
-  }
-}
-
-.socket-status {
+.socket-status-error {
   color: #800;
 }
 
-.title,
-.clock {
-  text-align: center;
+.socket-status-ok {
+  color: #080;
 }
 
 .clock {
-  font-size: 6em;
+  font-size: 3em;
   line-height: 0.4em;
-  margin-bottom: 0.2em;
 }
 
 .navleft {

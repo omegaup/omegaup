@@ -23,6 +23,7 @@
   - [`/api/contest/adminList/`](#apicontestadminlist)
   - [`/api/contest/admins/`](#apicontestadmins)
   - [`/api/contest/arbitrateRequest/`](#apicontestarbitraterequest)
+  - [`/api/contest/archive/`](#apicontestarchive)
   - [`/api/contest/clarifications/`](#apicontestclarifications)
   - [`/api/contest/clone/`](#apicontestclone)
   - [`/api/contest/contestants/`](#apicontestcontestants)
@@ -376,8 +377,8 @@ Creates a Clarification
 | Name            | Type           | Description |
 | --------------- | -------------- | ----------- |
 | `contest_alias` | `string`       |             |
+| `message`       | `string`       |             |
 | `problem_alias` | `string`       |             |
-| `message`       | `null\|string` |             |
 | `username`      | `null\|string` |             |
 
 ### Returns
@@ -442,13 +443,16 @@ Returns a report with all user activity for a contest.
 | Name            | Type           | Description |
 | --------------- | -------------- | ----------- |
 | `contest_alias` | `string`       |             |
+| `length`        | `int\|null`    |             |
+| `page`          | `int\|null`    |             |
 | `token`         | `null\|string` |             |
 
 ### Returns
 
-| Name     | Type                                                                                  |
-| -------- | ------------------------------------------------------------------------------------- |
-| `events` | `{ alias?: string; classname?: string; ip: number; time: Date; username: string; }[]` |
+| Name         | Type                    |
+| ------------ | ----------------------- |
+| `events`     | `types.ActivityEvent[]` |
+| `pagerItems` | `types.PageItem[]`      |
 
 ## `/api/contest/addAdmin/`
 
@@ -570,10 +574,11 @@ the director).
 
 ### Parameters
 
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `page`      | `int` |             |
-| `page_size` | `int` |             |
+| Name            | Type         | Description |
+| --------------- | ------------ | ----------- |
+| `page`          | `int\|null`  |             |
+| `page_size`     | `int\|null`  |             |
+| `show_archived` | `bool\|null` |             |
 
 ### Returns
 
@@ -612,6 +617,23 @@ Returns all contest administrators
 | `username`      | `string`       |             |
 | `note`          | `null\|string` |             |
 | `resolution`    | `mixed`        |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/contest/archive/`
+
+### Description
+
+Archives or Unarchives a contest if user is the creator
+
+### Parameters
+
+| Name            | Type         | Description |
+| --------------- | ------------ | ----------- |
+| `contest_alias` | `string`     |             |
+| `archive`       | `bool\|null` |             |
 
 ### Returns
 
@@ -786,11 +808,12 @@ Returns a list of contests where current user is participating in
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `page`      | `int`    |             |
-| `page_size` | `int`    |             |
-| `query`     | `string` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `page`          | `int\|null`    |             |
+| `page_size`     | `int\|null`    |             |
+| `query`         | `null\|string` |             |
+| `show_archived` | `bool\|null`   |             |
 
 ### Returns
 
@@ -806,11 +829,12 @@ Returns a list of contests where current user is the director
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `page`      | `int`    |             |
-| `page_size` | `int`    |             |
-| `query`     | `string` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `page`          | `int\|null`    |             |
+| `page_size`     | `int\|null`    |             |
+| `query`         | `null\|string` |             |
+| `show_archived` | `bool\|null`   |             |
 
 ### Returns
 
@@ -852,9 +876,9 @@ Gets the problems from a contest
 
 ### Returns
 
-| Name       | Type                     |
-| ---------- | ------------------------ |
-| `problems` | `types.ContestProblem[]` |
+| Name       | Type                        |
+| ---------- | --------------------------- |
+| `problems` | `types.ProblemsetProblem[]` |
 
 ## `/api/contest/publicDetails/`
 
@@ -1285,15 +1309,18 @@ Returns a report with all user activity for a course.
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
+| Name           | Type        | Description |
+| -------------- | ----------- | ----------- |
+| `course_alias` | `string`    |             |
+| `length`       | `int\|null` |             |
+| `page`         | `int\|null` |             |
 
 ### Returns
 
-| Name     | Type                                                                                  |
-| -------- | ------------------------------------------------------------------------------------- |
-| `events` | `{ alias?: string; classname?: string; ip: number; time: Date; username: string; }[]` |
+| Name         | Type                    |
+| ------------ | ----------------------- |
+| `events`     | `types.ActivityEvent[]` |
+| `pagerItems` | `types.PageItem[]`      |
 
 ## `/api/course/addAdmin/`
 
@@ -2588,11 +2615,11 @@ Returns the best score for a problem
 
 | Name             | Type           | Description |
 | ---------------- | -------------- | ----------- |
-| `username`       | `string`       |             |
 | `contest_alias`  | `null\|string` |             |
 | `problem_alias`  | `null\|string` |             |
 | `problemset_id`  | `mixed`        |             |
 | `statement_type` | `null\|string` |             |
+| `username`       | `null\|string` |             |
 
 ### Returns
 
@@ -3816,11 +3843,11 @@ Keeps a record of a user who accepts the privacy policy
 
 ### Parameters
 
-| Name                    | Type     | Description |
-| ----------------------- | -------- | ----------- |
-| `privacy_git_object_id` | `string` |             |
-| `statement_type`        | `string` |             |
-| `username`              | `string` |             |
+| Name                    | Type           | Description |
+| ----------------------- | -------------- | ----------- |
+| `privacy_git_object_id` | `string`       |             |
+| `statement_type`        | `string`       |             |
+| `username`              | `null\|string` |             |
 
 ### Returns
 
@@ -3958,18 +3985,15 @@ Get Contests which a certain user has participated in
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `auth_token`    | `mixed`        |             |
-| `token`         | `null\|string` |             |
-| `username`      | `mixed`        |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
 
 ### Returns
 
-| Name       | Type                                                                                                                                        |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `contests` | `{ [key: string]: { data: { alias: string; finish_time: Date; last_updated: Date; start_time: Date; title: string; }; place?: number; }; }` |
+| Name       | Type                        |
+| ---------- | --------------------------- |
+| `contests` | `types.UserProfileContests` |
 
 ## `/api/user/create/`
 
@@ -3991,6 +4015,7 @@ Gets extra information of the identity:
 
 - last password change request
 - verify status
+- birth date to verify the user identity
 
 ### Parameters
 
@@ -4002,6 +4027,7 @@ Gets extra information of the identity:
 
 | Name              | Type      |
 | ----------------- | --------- |
+| `birth_date`      | `Date`    |
 | `last_login`      | `Date`    |
 | `username`        | `string`  |
 | `verified`        | `boolean` |
@@ -4076,9 +4102,9 @@ Gets the last privacy policy accepted by user
 
 ### Parameters
 
-| Name       | Type     | Description |
-| ---------- | -------- | ----------- |
-| `username` | `string` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
 
 ### Returns
 
@@ -4126,9 +4152,9 @@ Get Problems unsolved by user
 
 ### Parameters
 
-| Name       | Type    | Description |
-| ---------- | ------- | ----------- |
-| `username` | `mixed` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
 
 ### Returns
 
@@ -4178,9 +4204,9 @@ Get Problems created by user
 
 ### Parameters
 
-| Name       | Type    | Description |
-| ---------- | ------- | ----------- |
-| `username` | `mixed` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
 
 ### Returns
 
@@ -4196,9 +4222,9 @@ Get Problems solved by user
 
 ### Parameters
 
-| Name       | Type    | Description |
-| ---------- | ------- | ----------- |
-| `username` | `mixed` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
 
 ### Returns
 
@@ -4214,11 +4240,11 @@ Get general user info
 
 ### Parameters
 
-| Name        | Type         | Description |
-| ----------- | ------------ | ----------- |
-| `category`  | `mixed`      |             |
-| `omit_rank` | `bool\|null` |             |
-| `username`  | `mixed`      |             |
+| Name        | Type           | Description |
+| ----------- | -------------- | ----------- |
+| `category`  | `mixed`        |             |
+| `omit_rank` | `bool\|null`   |             |
+| `username`  | `null\|string` |             |
 
 ### Returns
 
@@ -4299,15 +4325,15 @@ Get stats
 
 ### Parameters
 
-| Name       | Type    | Description |
-| ---------- | ------- | ----------- |
-| `username` | `mixed` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `username` | `null\|string` |             |
 
 ### Returns
 
-| Name   | Type                                                 |
-| ------ | ---------------------------------------------------- |
-| `runs` | `{ date: string; runs: number; verdict: string; }[]` |
+| Name   | Type                       |
+| ------ | -------------------------- |
+| `runs` | `types.UserProfileStats[]` |
 
 ## `/api/user/statusVerified/`
 
@@ -4382,9 +4408,10 @@ Updates the main email of the current user
 
 ### Parameters
 
-| Name    | Type     | Description |
-| ------- | -------- | ----------- |
-| `email` | `string` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `email`         | `string`       |             |
+| `originalEmail` | `null\|string` |             |
 
 ### Returns
 

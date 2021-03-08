@@ -26,7 +26,7 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       initialClarifications: payload.clarifications,
-      initialPopupDisplayed: PopupDisplayed.None,
+      popupDisplayed: PopupDisplayed.None,
       runDetailsData: null as types.RunDetails | null,
       solutionStatus: payload.solutionStatus,
       solution: null as types.ProblemStatement | null,
@@ -58,7 +58,7 @@ OmegaUp.on('ready', () => {
           solution: this.solution,
           availableTokens: this.availableTokens,
           allTokens: this.allTokens,
-          initialPopupDisplayed: this.initialPopupDisplayed,
+          popupDisplayed: this.popupDisplayed,
           runDetailsData: this.runDetailsData,
           allowUserAddTags: payload.allowUserAddTags,
           levelTags: payload.levelTags,
@@ -133,7 +133,7 @@ OmegaUp.on('ready', () => {
               })
               .catch((error) => {
                 ui.apiError(error);
-                source.popupDisplayed = PopupDisplayed.None;
+                source.currentPopupDisplayed = PopupDisplayed.None;
               });
           },
           'apply-filter': (
@@ -363,8 +363,8 @@ OmegaUp.on('ready', () => {
               window.location.pathname,
             )}`;
           },
-          'change-show-run-location': (guid: string) => {
-            window.location.hash = `#problems/show-run:${guid}/`;
+          'change-show-run-location': (request: { guid: string }) => {
+            window.location.hash = `#problems/show-run:${request.guid}/`;
           },
           rejudge: (run: types.Run) => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
@@ -481,12 +481,12 @@ OmegaUp.on('ready', () => {
     }, 5 * 60 * 1000);
   }
   if (locationHash.includes('new-run')) {
-    problemDetailsView.initialPopupDisplayed = PopupDisplayed.RunSubmit;
+    problemDetailsView.popupDisplayed = PopupDisplayed.RunSubmit;
   } else if (locationHash[1] && locationHash[1].includes('show-run:')) {
     const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
     const showRunMatch = window.location.hash.match(showRunRegex);
     problemDetailsView.guid = showRunMatch ? showRunMatch[1] : null;
-    problemDetailsView.initialPopupDisplayed = PopupDisplayed.RunDetails;
+    problemDetailsView.popupDisplayed = PopupDisplayed.RunDetails;
   } else if (
     (payload.nominationStatus?.solved || payload.nominationStatus?.tried) &&
     !(
@@ -501,6 +501,6 @@ OmegaUp.on('ready', () => {
     ) &&
     payload.nominationStatus?.canNominateProblem
   ) {
-    problemDetailsView.initialPopupDisplayed = PopupDisplayed.Promotion;
+    problemDetailsView.popupDisplayed = PopupDisplayed.Promotion;
   }
 });

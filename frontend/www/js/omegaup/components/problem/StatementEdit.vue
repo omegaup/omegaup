@@ -7,6 +7,7 @@
           <select v-model="currentLanguage" class="form-control">
             <option
               v-for="language in languages"
+              :key="language"
               :markdown-contents="currentMarkdown"
               :value="language"
             >
@@ -27,7 +28,7 @@
           <div ref="markdownButtonBar" class="wmd-button-bar"></div>
           <textarea
             ref="markdownInput"
-            v-model="currentMarkdown"
+            v-model.lazy="currentMarkdown"
             class="wmd-input"
           ></textarea>
         </div>
@@ -120,8 +121,7 @@ const markdownConverter = new markdown.Converter({
 })
 export default class ProblemStatementEdit extends Vue {
   @Ref() readonly markdownButtonBar!: HTMLDivElement;
-  @Ref() readonly markdownInput!: HTMLDivElement;
-  @Ref() readonly markdownPreview!: HTMLDivElement;
+  @Ref() readonly markdownInput!: HTMLTextAreaElement;
   @Prop() alias!: string;
   @Prop() title!: string;
   @Prop() source!: string;
@@ -129,13 +129,13 @@ export default class ProblemStatementEdit extends Vue {
   @Prop() statement!: types.ProblemStatement;
   @Prop() markdownType!: string;
   @Prop({ default: true }) showEditControls!: boolean;
+  @Prop({ default: () => ['es', 'en', 'pt'] }) languages!: string[];
 
   T = T;
   commitMessage = T.updateStatementsCommitMessage;
   currentLanguage = this.statement.language;
   currentMarkdown = this.statement.markdown;
   errors: string[] = [];
-  languages = ['es', 'en', 'pt'];
   statements: types.Statements = {};
   markdownEditor: Markdown.Editor | null = null;
 
@@ -173,7 +173,7 @@ export default class ProblemStatementEdit extends Vue {
   onCurrentLanguageChange(newLanguage: string, oldLanguage: string): void {
     if (oldLanguage) this.statements[oldLanguage] = this.currentMarkdown;
     this.$emit(
-      'emit-update-markdown-contents',
+      'update-markdown-contents',
       this.statements,
       newLanguage,
       this.currentMarkdown,
@@ -206,6 +206,7 @@ export default class ProblemStatementEdit extends Vue {
 
 <style lang="scss">
 @import '../../../../third_party/js/pagedown/demo/browser/demo.css';
+
 .wmd-preview,
 .wmd-button-bar {
   background-color: #fff;

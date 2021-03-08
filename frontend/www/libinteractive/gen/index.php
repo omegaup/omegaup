@@ -7,7 +7,7 @@ if (OMEGAUP_LOCKDOWN) {
 }
 
 \OmegaUp\UITools::render(
-    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Problem::getLibinteractiveGenForSmarty(
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Problem::getLibinteractiveGenForTypeScript(
         $r
     )
 );

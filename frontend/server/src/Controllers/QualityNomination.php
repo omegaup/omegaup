@@ -862,7 +862,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'email' => $email,
             'name' => $username,
         ] = $adminUser;
-        $user = \OmegaUp\DAO\Identities::findByUsernameOrName($username)[0];
+        $user = \OmegaUp\DAO\Identities::findByUsername($username);
+        if (is_null($user)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
 
         $emailParams = [
             'reason' => htmlspecialchars($rationale),
@@ -1249,7 +1252,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param int $qualitynomination_id
      */
-    public static function getDetailsForSmarty(
+    public static function getDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -1282,7 +1285,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
-    public static function getListForSmarty(\OmegaUp\Request $r): array {
+    public static function getListForTypeScript(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
@@ -1321,7 +1324,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
-    public static function getMyListForSmarty(\OmegaUp\Request $r): array {
+    public static function getMyListForTypeScript(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();

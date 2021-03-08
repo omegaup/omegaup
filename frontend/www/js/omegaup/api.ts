@@ -277,6 +277,10 @@ export const Contest = {
     messages.ContestArbitrateRequestRequest,
     messages.ContestArbitrateRequestResponse
   >('/api/contest/arbitrateRequest/'),
+  archive: apiCall<
+    messages.ContestArchiveRequest,
+    messages.ContestArchiveResponse
+  >('/api/contest/archive/'),
   clarifications: apiCall<
     messages.ContestClarificationsRequest,
     messages._ContestClarificationsServerResponse,
@@ -1663,6 +1667,8 @@ export const User = {
     messages._UserExtraInformationServerResponse,
     messages.UserExtraInformationResponse
   >('/api/user/extraInformation/', (x) => {
+    if (x.birth_date)
+      x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
     if (x.last_login)
       x.last_login = ((x: number) => new Date(x * 1000))(x.last_login);
     return x;

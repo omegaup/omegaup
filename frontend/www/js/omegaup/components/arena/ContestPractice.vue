@@ -2,7 +2,8 @@
   <omegaup-arena
     :active-tab="activeTab"
     :contest-title="contest.title"
-    :is-admin="isAdmin"
+    :should-show-runs="contestAdmin"
+    :background-class="'practice'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #arena-problems>
@@ -29,6 +30,19 @@
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="activeProblem.runs"
+              :popup-displayed="popupDisplayed"
+              :guid="guid"
+              :should-show-run-details="shouldShowRunDetails"
+              @update:activeTab="
+                (selectedTab) =>
+                  $emit('reset-hash', {
+                    selectedTab,
+                    alias: activeProblem.problem.alias,
+                  })
+              "
+              @change-show-run-location="onChangeShowRunLocation"
+              @submit-run="onRunSubmitted"
+              @show-run="onShowRunDetails"
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -50,13 +64,36 @@
         </div>
       </div>
     </template>
+    <template #arena-runs>
+      <div class="card">
+        <div class="card-body">
+          <omegaup-markdown
+            :markdown="
+              ui.formatString(T.arenaContestPracticeOriginalRunsText, {
+                contestAlias: contest.alias,
+              })
+            "
+          ></omegaup-markdown>
+        </div>
+      </div>
+    </template>
     <template #arena-clarifications>
       <omegaup-arena-clarification-list
+        :problems="problems"
+        :users="users"
+        :problem-alias="problems.length != 0 ? problems[0].alias : null"
+        :username="contestAdmin && users.length != 0 ? users[0].username : null"
         :clarifications="currentClarifications"
+        :is-admin="contestAdmin"
         :in-contest="true"
+        :show-new-clarification-popup="showNewClarificationPopup"
+        @new-clarification="(request) => $emit('new-clarification', request)"
         @clarification-response="
           (id, responseText, isPublic) =>
             $emit('clarification-response', id, responseText, isPublic)
+        "
+        @update:activeTab="
+          (selectedTab) => $emit('update:activeTab', selectedTab)
         "
       ></omegaup-arena-clarification-list>
     </template>
@@ -73,11 +110,11 @@ import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_ContestSummary from './ContestSummaryV2.vue';
 import omegaup_Markdown from '../Markdown.vue';
-import problem_Details from '../problem/Details.vue';
+import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 
 export interface ActiveProblem {
   runs: types.Run[];
-  alias: string;
+  problem: types.NavbarProblemsetProblem;
 }
 
 @Component({
@@ -92,31 +129,53 @@ export interface ActiveProblem {
 })
 export default class ArenaContestPractice extends Vue {
   @Prop() contest!: types.ContestPublicDetails;
-  @Prop() problems!: types.NavbarContestProblem[];
+  @Prop() contestAdmin!: boolean;
+  @Prop() problems!: types.NavbarProblemsetProblem[];
+  @Prop({ default: () => [] }) users!: types.ContestUser[];
   @Prop({ default: null }) problem!: ActiveProblem | null;
   @Prop() problemInfo!: types.ProblemInfo;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop({ default: false }) isEphemeralExperimentEnabled!: boolean;
-  @Prop({ default: false }) admin!: boolean;
-  @Prop({ default: true }) showNavigation!: boolean;
-  @Prop({ default: false }) showRanking!: boolean;
-  @Prop({ default: true }) showClarifications!: boolean;
-  @Prop({ default: true }) showDeadlines!: boolean;
-  @Prop({ default: false }) isAdmin!: boolean;
+  @Prop({ default: false }) showNewClarificationPopup!: boolean;
+  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
+  @Prop({ default: null }) guid!: null | string;
 
   T = T;
   ui = ui;
   currentClarifications = this.clarifications;
   activeProblem: ActiveProblem | null = this.problem;
+  shouldShowRunDetails = false;
 
   get activeProblemAlias(): null | string {
-    return this.activeProblem?.alias ?? null;
+    return this.activeProblem?.problem.alias ?? null;
   }
 
-  onNavigateToProblem(problemAlias: string) {
-    this.activeProblem = { alias: problemAlias, runs: [] };
-    this.$emit('navigate-to-problem', this.activeProblem);
+  onNavigateToProblem(request: ActiveProblem) {
+    this.activeProblem = request;
+    this.$emit('navigate-to-problem', request);
+  }
+
+  onRunSubmitted(code: string, selectedLanguage: string): void {
+    const request = Object.assign({}, this.activeProblem, {
+      code,
+      selectedLanguage,
+    });
+    this.$emit('submit-run', request);
+  }
+
+  onShowRunDetails(target: problem_Details, guid: string): void {
+    this.$emit('show-run', { target, request: { guid } });
+  }
+
+  onChangeShowRunLocation(request: { guid: string }): void {
+    if (!this.activeProblem) {
+      return;
+    }
+    this.$emit(
+      'change-show-run-location',
+      Object.assign({}, request, { alias: this.activeProblem.problem.alias }),
+    );
   }
 
   @Watch('problem')
@@ -125,20 +184,33 @@ export default class ArenaContestPractice extends Vue {
       this.activeProblem = null;
       return;
     }
-    this.onNavigateToProblem(newValue.alias);
+    this.onNavigateToProblem(newValue);
+  }
+
+  @Watch('clarifications')
+  onClarificationsChanged(newValue: types.Clarification[]): void {
+    this.currentClarifications = newValue;
+  }
+
+  @Watch('popupDisplayed')
+  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
+    if (newValue === PopupDisplayed.RunDetails) {
+      this.$nextTick(() => {
+        this.shouldShowRunDetails = true;
+      });
+    }
   }
 }
 </script>
 
-<style lang="scss" scoped>
-[data-contest-practice] {
-  background: #668 url(/media/gradient.png) repeat-x 0 0;
-  font-family: sans-serif;
-  overflow-y: auto;
-}
-
+<style lang="scss">
 .navleft {
   overflow: hidden;
+}
+
+.nav-tabs .nav-link {
+  background-color: #ddd;
+  border-top-color: #ddd;
 }
 
 .navleft .navbar {

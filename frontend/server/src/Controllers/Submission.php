@@ -22,7 +22,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
-    public static function getLatestSubmissionsForSmarty(\OmegaUp\Request $r): array {
+    public static function getLatestSubmissionsForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('length');
 
@@ -69,7 +69,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      * @omegaup-request-param mixed $username
      */
-    public static function getLatestUserSubmissionsForSmarty(\OmegaUp\Request $r): array {
+    public static function getLatestUserSubmissionsForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('length');
 

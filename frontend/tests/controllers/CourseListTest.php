@@ -98,7 +98,7 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
     public function testListCoursesMine() {
         $adminLogin = self::login($this->adminUser);
 
-        $archivedCourses = \OmegaUp\Controllers\Course::getCourseMineDetailsForSmarty(
+        $archivedCourses = \OmegaUp\Controllers\Course::getCourseMineDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
             ])
@@ -133,7 +133,7 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    public function testGetCourseListForSmarty() {
+    public function testGetCourseListForTypeScript() {
         $userLogin = self::login($this->identity);
 
         // Public courses are visible in student courses list when users were
@@ -163,7 +163,7 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         int $numberOfStudentCourses,
         int $numberOfPublicCourses
     ) {
-        $response = \OmegaUp\Controllers\Course::getCourseSummaryListDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Course::getCourseSummaryListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
             ])
