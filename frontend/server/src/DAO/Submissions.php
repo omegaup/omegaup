@@ -314,33 +314,25 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         ];
     }
 
-    /** @return list<array{time: \OmegaUp\Timestamp}> */
+    /** @return \OmegaUp\Timestamp|null */
     public static function getLastSubmissionByProblem(
         int $problemId,
         ?int $identityId
-    ): array {
-        $params = [$problemId];
+    ) {
+        $params = [$problemId, $identityId];
         $sql = '
             SELECT
                 s.time
             FROM
                 Submissions s
             WHERE
-                s.problem_id = ?
-        ';
-
-        if (!is_null($identityId)) {
-            $params[] = $identityId;
-            $sql .= ' AND s.identity_id = ?';
-        }
-
-        $sql .= '
+                s.problem_id = ? AND s.identity_id = ?
             ORDER BY
                 s.time DESC
             LIMIT 1
         ';
 
-        /** @var list<array{time: \OmegaUp\Timestamp}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+        /** @var \OmegaUp\Timestamp|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
     }
 }

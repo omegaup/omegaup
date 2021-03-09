@@ -963,17 +963,14 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         int $problemId,
         int $identityId
     ): \OmegaUp\Timestamp {
-        $lastSubmissionPayload = \OmegaUp\DAO\Submissions::getLastSubmissionByProblem(
+        $lastSubmissionTime = \OmegaUp\DAO\Submissions::getLastSubmissionByProblem(
             $problemId,
             $identityId
         );
 
-        if (count($lastSubmissionPayload) == 0) {
+        if (is_null($lastSubmissionTime)) {
             return new \OmegaUp\Timestamp(\OmegaUp\Time::get());
         }
-
-        $lastSubmission = $lastSubmissionPayload[0];
-        $lastSubmissionTime = $lastSubmission['time'];
 
         return \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
             null,
