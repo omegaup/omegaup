@@ -215,7 +215,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
                             'type' => \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_REQUEST,
                             'body' => [
                                 'localizationString' => new \OmegaUp\TranslationString(
-                                    'notificationCourseRegistrationAccepted'
+                                    'notificationCourseClarificationRequest'
                                 ),
                                 'localizationParams' => [
                                     'problemAlias' => $problem->alias,
