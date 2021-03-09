@@ -956,7 +956,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * Helper that returns the time of the next submission 
+     * Helper that returns the time of the next submission
      * to the given problem (identity required).
      */
     final public static function nextSubmissionTimestampByProblem(
