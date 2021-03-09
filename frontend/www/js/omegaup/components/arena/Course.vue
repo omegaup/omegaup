@@ -18,6 +18,10 @@
               @navigate-to-problem="onNavigateToProblem"
             ></omegaup-arena-navbar-problems>
           </div>
+          <omegaup-arena-assignment-summary
+            v-if="activeProblem === null"
+            :assignment="currentAssignment"
+          ></omegaup-arena-assignment-summary>
         </div>
       </div>
     </template>
@@ -30,6 +34,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import arena_Arena from './Arena.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
+import arena_AssignmentSummary from './AssignmentSummary.vue';
 
 export interface ActiveProblem {
   runs: types.Run[];
@@ -40,6 +45,7 @@ export interface ActiveProblem {
   components: {
     'omegaup-arena': arena_Arena,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
+    'omegaup-arena-assignment-summary': arena_AssignmentSummary,
   },
 })
 export default class ArenaContestPractice extends Vue {
@@ -57,6 +63,11 @@ export default class ArenaContestPractice extends Vue {
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.problem.alias ?? null;
+  }
+
+  onNavigateToProblem(request: ActiveProblem) {
+    this.activeProblem = request;
+    this.$emit('navigate-to-problem', request);
   }
 }
 </script>
