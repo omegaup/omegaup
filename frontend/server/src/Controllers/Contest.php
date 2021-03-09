@@ -524,14 +524,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{clarifications: list<Clarification>, problems: list<NavbarProblemsetProblem>, scoreboard?: Scoreboard, users: list<ContestUser>}
+     * @return array{clarifications: list<Clarification>, problems: list<NavbarProblemsetProblem>, users: list<ContestUser>}
      */
     private static function getCommonDetails(
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Problemsets $problemset,
         bool $contestAdmin,
-        \OmegaUp\DAO\VO\Identities $identity,
-        bool $shouldReturnScoreboard = false
+        \OmegaUp\DAO\VO\Identities $identity
     ): array {
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -575,14 +574,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ),
             'problems' => $problems,
         ];
-
-        if ($shouldReturnScoreboard) {
-            $response['scoreboard'] = self::getScoreboard(
-                $contest,
-                $problemset,
-                $identity
-            );
-        }
 
         return $response;
     }
@@ -673,14 +664,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 [
                     'shouldShowFirstAssociatedIdentityRunWarning' => $shouldShowFirstAssociatedIdentityRunWarning,
                     'contestAdmin' => $contestAdmin,
+                    'scoreboard' => self::getScoreboard(
+                        $contest,
+                        $problemset,
+                        $r->identity
+                    ),
                 ],
                 self::getCommonDetails(
                     $contest,
                     $problemset,
                     $contestAdmin,
-                    $r->identity,
-                    /*$shouldReturnScoreboard=*/ true
-                )
+                    $r->identity
+                ),
             );
 
             $result['smartyProperties']['fullWidth'] = true;
