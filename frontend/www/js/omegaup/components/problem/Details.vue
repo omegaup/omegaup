@@ -584,7 +584,7 @@ export default class ProblemDetails extends Vue {
   }
 
   onRunSubmitted(code: string, selectedLanguage: string): void {
-    this.$emit('submit-run', code, selectedLanguage);
+    this.$emit('submit-run', { code, language: selectedLanguage });
     this.onPopupDismissed();
   }
 

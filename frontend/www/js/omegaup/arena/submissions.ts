@@ -1,6 +1,4 @@
 import Vue from 'vue';
-import arena_ContestPractice from '../components/arena/ContestPractice.vue';
-import problem_Details from '../components/problem/Details.vue';
 import * as api from '../api';
 import * as ui from '../ui';
 import * as time from '../time';
@@ -8,7 +6,18 @@ import { types } from '../api_types';
 import { myRunsStore, runsStore } from './runsStore';
 import { OmegaUp } from '../omegaup';
 
-export function submitRun(request: any): void {
+interface RunSubmit {
+  classname: string;
+  username: string;
+  code: string;
+  language: string;
+  problemAlias: string;
+  target: Vue & { nominationStatus?: types.NominationStatus };
+  runs?: types.Run[];
+  problem?: types.NavbarProblemsetProblem;
+}
+
+export function submitRun(request: RunSubmit): void {
   api.Run.create({
     problem_alias: request.problemAlias,
     language: request.language,
@@ -16,26 +25,23 @@ export function submitRun(request: any): void {
   })
     .then((response) => {
       ui.reportEvent('submission', 'submit');
-
-      updateRun(
-        {
-          guid: response.guid,
-          submit_delay: response.submit_delay,
-          username: request.username,
-          classname: request.classname,
-          country: 'xx',
-          status: 'new',
-          alias: request.problemAlias,
-          time: new Date(),
-          penalty: 0,
-          runtime: 0,
-          memory: 0,
-          verdict: 'JE',
-          score: 0,
-          language: request.selectedLanguage,
-        },
-        request.target,
-      );
+      const run = {
+        guid: response.guid,
+        submit_delay: response.submit_delay,
+        username: request.username,
+        classname: request.classname,
+        country: 'xx',
+        status: 'new',
+        alias: request.problemAlias,
+        time: new Date(),
+        penalty: 0,
+        runtime: 0,
+        memory: 0,
+        verdict: 'JE',
+        score: 0,
+        language: request.language,
+      };
+      updateRun({ run, target: request.target });
     })
     .catch((run) => {
       ui.error(run.error ?? run);
@@ -45,56 +51,69 @@ export function submitRun(request: any): void {
     });
 }
 
-export function updateRun(
-  run: types.Run,
-  target: arena_ContestPractice | problem_Details,
-): void {
-  trackRun(run, target);
+export function updateRun(request: {
+  run: types.Run;
+  target: Vue & { nominationStatus?: types.NominationStatus };
+}): void {
+  trackRun(request);
 
   // TODO: Implement websocket support
 
-  if (run.status != 'ready') {
-    updateRunFallback(run.guid, target);
+  if (request.run.status != 'ready') {
+    updateRunFallback(request);
     return;
   }
 }
 
-export function updateRunFallback(guid: string, target: any): void {
+export function updateRunFallback(request: {
+  run: types.Run;
+  target: Vue & { nominationStatus?: types.NominationStatus };
+}): void {
   setTimeout(() => {
-    api.Run.status({ run_alias: guid })
+    api.Run.status({ run_alias: request.run.guid })
       .then(time.remoteTimeAdapter)
-      .then((response) => updateRun(response, target))
+      .then((response) => updateRun({ run: response, target: request.target }))
       .catch(ui.ignoreError);
   }, 5000);
 }
 
-export function trackRun(run: types.Run, target: any): void {
-  runsStore.commit('addRun', run);
-  if (run.username !== OmegaUp.username) {
+export function trackRun(request: {
+  run: types.Run;
+  target: Vue & { nominationStatus?: types.NominationStatus };
+}): void {
+  runsStore.commit('addRun', request.run);
+  if (request.run.username !== OmegaUp.username) {
     return;
   }
-  myRunsStore.commit('addRun', run);
+  myRunsStore.commit('addRun', request.run);
 
-  if (!target.nominationStatus) {
+  if (!request.target.nominationStatus) {
     return;
   }
-  if (run.verdict !== 'AC' && run.verdict !== 'CE' && run.verdict !== 'JE') {
-    target.nominationStatus.tried = true;
+  if (
+    request.run.verdict !== 'AC' &&
+    request.run.verdict !== 'CE' &&
+    request.run.verdict !== 'JE'
+  ) {
+    request.target.nominationStatus.tried = true;
   }
-  if (run.verdict === 'AC') {
+  if (request.run.verdict === 'AC') {
     Vue.set(
-      target,
+      request.target,
       'nominationStatus',
-      Object.assign({}, target.nominationStatus, {
+      Object.assign({}, request.target.nominationStatus, {
         solved: true,
       }),
     );
   }
 }
 
-export function refreshRuns(problemAlias: string, target: any): void {
+export function refreshRuns(request: {
+  problemAlias: string;
+  target: Vue & { nominationStatus?: types.NominationStatus };
+}): void {
   api.Problem.runs({
-    problem_alias: problemAlias,
+    problem_alias: request.problemAlias,
     show_all: true,
     offset: runsStore.state.filters?.offset,
     rowcount: runsStore.state.filters?.rowcount,
@@ -107,7 +126,7 @@ export function refreshRuns(problemAlias: string, target: any): void {
     .then((response) => {
       runsStore.commit('clear');
       for (const run of response.runs) {
-        trackRun(run, target);
+        trackRun({ run, target: request.target });
       }
     })
     .catch(ui.apiError);

@@ -86,7 +86,7 @@ OmegaUp.on('ready', () => {
             })
               .then((problemInfo) => {
                 for (const run of problemInfo.runs ?? []) {
-                  trackRun(run, contestPractice);
+                  trackRun({ run, target: contestPractice });
                 }
                 const currentProblem = payload.problems?.find(
                   ({ alias }) => alias == problemInfo.alias,
@@ -188,14 +188,13 @@ OmegaUp.on('ready', () => {
             window.location.hash = `#problems/${request.alias}/show-run:${request.guid}/`;
           },
           'submit-run': (
-            request: ActiveProblem & { code: string; selectedLanguage: string },
+            request: ActiveProblem & { code: string; language: string },
           ) => {
             submitRun(
               Object.assign({}, request, {
                 username: commonPayload.currentUsername,
                 classname: commonPayload.userClassname,
                 problemAlias: request.problem.alias,
-                language: request.selectedLanguage,
                 target: contestPractice,
               }),
             );

@@ -149,21 +149,19 @@ OmegaUp.on('ready', () => {
             } else {
               runsStore.commit('removeFilter', filter);
             }
-            refreshRuns(payload.problem.alias, problemDetailsView);
+            refreshRuns({
+              problemAlias: payload.problem.alias,
+              target: problemDetailsView,
+            });
           },
-          'submit-run': (code: string, language: string) => {
+          'submit-run': (request: { code: string; language: string }) => {
             submitRun(
-              Object.assign(
-                {},
-                {
-                  code,
-                  language,
-                  username: commonPayload.currentUsername,
-                  classname: commonPayload.userClassname,
-                  problemAlias: payload.problem.alias,
-                  target: problemDetailsView,
-                },
-              ),
+              Object.assign({}, request, {
+                username: commonPayload.currentUsername,
+                classname: commonPayload.userClassname,
+                problemAlias: payload.problem.alias,
+                target: problemDetailsView,
+              }),
             );
           },
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
@@ -343,7 +341,7 @@ OmegaUp.on('ready', () => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
               .then(() => {
                 run.status = 'rejudging';
-                updateRunFallback(run.guid, problemDetailsView);
+                updateRunFallback({ run, target: problemDetailsView });
               })
               .catch(ui.ignoreError);
           },
@@ -354,7 +352,7 @@ OmegaUp.on('ready', () => {
             api.Run.disqualify({ run_alias: run.guid })
               .then(() => {
                 run.type = 'disqualified';
-                updateRunFallback(run.guid, problemDetailsView);
+                updateRunFallback({ run, target: problemDetailsView });
               })
               .catch(ui.ignoreError);
           },
@@ -379,12 +377,15 @@ OmegaUp.on('ready', () => {
 
   if (runs) {
     for (const run of runs) {
-      trackRun(run, problemDetailsView);
+      trackRun({ run, target: problemDetailsView });
     }
   }
   if (payload.user.admin) {
     setInterval(() => {
-      refreshRuns(payload.problem.alias, problemDetailsView);
+      refreshRuns({
+        problemAlias: payload.problem.alias,
+        target: problemDetailsView,
+      });
       refreshClarifications();
     }, 5 * 60 * 1000);
   }
