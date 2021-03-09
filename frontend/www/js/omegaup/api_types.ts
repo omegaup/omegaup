@@ -1390,6 +1390,16 @@ export namespace types {
     };
   }
 
+  export interface ArenaAssignment {
+    alias?: string;
+    assignment_type: string;
+    description?: string;
+    finish_time?: Date;
+    name?: string;
+    problems: types.NavbarProblemsetProblem[];
+    start_time: Date;
+  }
+
   export interface ArenaProblemDetails {
     accepts_submissions: boolean;
     alias: string;
@@ -1411,15 +1421,7 @@ export namespace types {
 
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
-    currentAssignment: {
-      alias?: string;
-      assignment_type: string;
-      description?: string;
-      finish_time?: Date;
-      name?: string;
-      problems: types.NavbarProblemsetProblem[];
-      start_time: Date;
-    };
+    currentAssignment: types.ArenaAssignment;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
   }
@@ -1743,7 +1745,7 @@ export namespace types {
     details: types.ContestAdminDetails;
     group_admins: types.ContestGroupAdmin[];
     groups: types.ContestGroup[];
-    problems: types.ContestProblem[];
+    problems: types.ProblemsetProblem[];
     requests: types.ContestRequest[];
     users: types.ContestUser[];
   }
@@ -1812,22 +1814,6 @@ export namespace types {
     last_updated: Date;
     start_time: Date;
     title: string;
-  }
-
-  export interface ContestProblem {
-    accepted: number;
-    alias: string;
-    commit: string;
-    difficulty: number;
-    languages: string;
-    order: number;
-    points: number;
-    problem_id: number;
-    submissions: number;
-    title: string;
-    version: string;
-    visibility: number;
-    visits: number;
   }
 
   export interface ContestPublicDetails {
@@ -2682,7 +2668,7 @@ export namespace types {
     difficulty: number;
     input_limit: number;
     languages: string;
-    letter: string;
+    letter?: string;
     order: number;
     points: number;
     problem_id?: number;
@@ -3276,7 +3262,7 @@ export namespace messages {
   export type ContestOpenRequest = { [key: string]: any };
   export type ContestOpenResponse = {};
   export type ContestProblemsRequest = { [key: string]: any };
-  export type ContestProblemsResponse = { problems: types.ContestProblem[] };
+  export type ContestProblemsResponse = { problems: types.ProblemsetProblem[] };
   export type ContestPublicDetailsRequest = { [key: string]: any };
   export type _ContestPublicDetailsServerResponse = any;
   export type ContestPublicDetailsResponse = types.ContestPublicDetails;
