@@ -155,26 +155,15 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $lastSubmissionPayload = \OmegaUp\DAO\Submissions::getLastSubmissionByProblem(
+        $nextSubmissionTimestamp = \OmegaUp\DAO\Runs::nextSubmissionTimestampByProblem(
             intval($problem->problem_id),
             intval($r->identity->identity_id)
         );
 
-        if (count($lastSubmissionPayload) > 0) {
-            $lastSubmission = $lastSubmissionPayload[0];
-            $lastSubmissionTime = $lastSubmission['time'];
-
-            $nextSubmissionTimestamp =
-            \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
-                null,
-                $lastSubmissionTime
+        if ($nextSubmissionTimestamp->time > \OmegaUp\Time::get()) {
+            throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
+                'runWaitGap'
             );
-
-            if ($nextSubmissionTimestamp->time > \OmegaUp\Time::get()) {
-                throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
-                    'runWaitGap'
-                );
-            }
         }
 
         if ($problem->deprecated) {

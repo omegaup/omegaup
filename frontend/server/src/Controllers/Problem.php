@@ -4530,26 +4530,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ]
         );
 
-        $lastSubmissionPayload = \OmegaUp\DAO\Submissions::getLastSubmissionByProblem(
+        $nextSubmissionTimestamp = \OmegaUp\DAO\Runs::nextSubmissionTimestampByProblem(
             intval($problem->problem_id),
             intval($r->identity->identity_id)
         );
 
-        if (count($lastSubmissionPayload) > 0) {
-            $lastSubmission = $lastSubmissionPayload[0];
-            $lastSubmissionTime = $lastSubmission['time'];
-
-            $nextSubmissionTimestamp =
-            \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
-                null,
-                $lastSubmissionTime
-            );
-
-            $response['smartyProperties']['payload']['problem'] = array_merge(
-                $response['smartyProperties']['payload']['problem'],
-                ['nextSubmissionTimestamp' => $nextSubmissionTimestamp]
-            );
-        }
+        $response['smartyProperties']['payload']['problem'] = array_merge(
+            $response['smartyProperties']['payload']['problem'],
+            ['nextSubmissionTimestamp' => $nextSubmissionTimestamp]
+        );
 
         if ($isAdmin) {
             $allRuns = [];

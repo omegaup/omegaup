@@ -956,6 +956,32 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
+     * Helper that returns the time of the next submission 
+     * to the given problem (identity required).
+     */
+    final public static function nextSubmissionTimestampByProblem(
+        int $problemId,
+        int $identityId
+    ): \OmegaUp\Timestamp {
+        $lastSubmissionPayload = \OmegaUp\DAO\Submissions::getLastSubmissionByProblem(
+            $problemId,
+            $identityId
+        );
+
+        if (count($lastSubmissionPayload) == 0) {
+            return new \OmegaUp\Timestamp(\OmegaUp\Time::get());
+        }
+
+        $lastSubmission = $lastSubmissionPayload[0];
+        $lastSubmissionTime = $lastSubmission['time'];
+
+        return \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
+            null,
+            $lastSubmissionTime
+        );
+    }
+
+    /**
      * @return list<\OmegaUp\DAO\VO\Runs>
      */
     final public static function searchWithRunIdGreaterThan(
