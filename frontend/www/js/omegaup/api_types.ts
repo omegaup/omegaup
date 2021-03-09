@@ -1511,7 +1511,7 @@ export namespace types {
     message: string;
     problem_id: number;
     problemset_id?: number;
-    time: number;
+    time: Date;
   }
 
   export interface CoderOfTheMonth {
@@ -3174,8 +3174,10 @@ export namespace messages {
   export type ClarificationCreateRequest = { [key: string]: any };
   export type ClarificationCreateResponse = { clarification_id: number };
   export type ClarificationCreateForCourseRequest = { [key: string]: any };
+  export type _ClarificationCreateForCourseServerResponse = any;
   export type ClarificationCreateForCourseResponse = types.ClarificationDetails;
   export type ClarificationDetailsRequest = { [key: string]: any };
+  export type _ClarificationDetailsServerResponse = any;
   export type ClarificationDetailsResponse = types.ClarificationDetails;
   export type ClarificationUpdateRequest = { [key: string]: any };
   export type ClarificationUpdateResponse = {};

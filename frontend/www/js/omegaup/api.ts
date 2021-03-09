@@ -189,12 +189,20 @@ export const Clarification = {
   >('/api/clarification/create/'),
   createForCourse: apiCall<
     messages.ClarificationCreateForCourseRequest,
+    messages._ClarificationCreateForCourseServerResponse,
     messages.ClarificationCreateForCourseResponse
-  >('/api/clarification/createForCourse/'),
+  >('/api/clarification/createForCourse/', (x) => {
+    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    return x;
+  }),
   details: apiCall<
     messages.ClarificationDetailsRequest,
+    messages._ClarificationDetailsServerResponse,
     messages.ClarificationDetailsResponse
-  >('/api/clarification/details/'),
+  >('/api/clarification/details/', (x) => {
+    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    return x;
+  }),
   update: apiCall<
     messages.ClarificationUpdateRequest,
     messages.ClarificationUpdateResponse

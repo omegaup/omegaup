@@ -7,7 +7,7 @@
  *
  * @author joemmanuel
  *
- * @psalm-type ClarificationDetails=array{message: string, answer: null|string, time: int, problem_id: int, problemset_id: int|null}
+ * @psalm-type ClarificationDetails=array{message: string, answer: null|string, time: \OmegaUp\Timestamp, problem_id: int, problemset_id: int|null}
  */
 class Clarification extends \OmegaUp\Controllers\Controller {
     /** @var null|\OmegaUp\Broadcaster */
@@ -160,10 +160,17 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $assignment = \OmegaUp\DAO\Assignments::getProblemset(
-            $course->course_id,
+        $problemset = \OmegaUp\DAO\Assignments::getProblemset(
+            intval($course->course_id),
             $assignmentAlias
         );
+
+        if (is_null($problemset)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemsetNotFound'
+            );
+        }
+
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
 
         if (is_null($problem)) {
@@ -174,7 +181,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         if (
             is_null(
                 \OmegaUp\DAO\ProblemsetProblems::getByPK(
-                    $assignment->problemset_id,
+                    $problemset->problemset_id,
                     $problem->problem_id
                 )
             )
@@ -187,7 +194,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         $clarification = new \OmegaUp\DAO\VO\Clarifications([
             'author_id' => $r->identity->identity_id,
             'receiver_id' => null, // the course admins will always be the receivers
-            'problemset_id' => $assignment->problemset_id,
+            'problemset_id' => $problemset->problemset_id,
             'problem_id' => $problem->problem_id,
             'message' => $message,
             'time' => \OmegaUp\Time::get(),
@@ -223,6 +230,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        /** @var ClarificationDetails */
         return $clarification->asFilteredArray([
             'message',
             'answer',
