@@ -14,6 +14,7 @@ import { myRunsStore } from '../arena/runsStore';
 import arena_NewClarification from '../components/arena/NewClarificationPopup.vue';
 import problemsStore from './problemStore';
 import JSZip from 'jszip';
+import { submitRun, trackRun } from './submissions';
 import { getOptionsFromLocation } from './location';
 
 OmegaUp.on('ready', () => {
@@ -85,7 +86,7 @@ OmegaUp.on('ready', () => {
             })
               .then((problemInfo) => {
                 for (const run of problemInfo.runs ?? []) {
-                  trackRun(run);
+                  trackRun(run, contestPractice);
                 }
                 const currentProblem = payload.problems?.find(
                   ({ alias }) => alias == problemInfo.alias,
@@ -189,37 +190,15 @@ OmegaUp.on('ready', () => {
           'submit-run': (
             request: ActiveProblem & { code: string; selectedLanguage: string },
           ) => {
-            api.Run.create({
-              problem_alias: request.problem.alias,
-              language: request.selectedLanguage,
-              source: request.code,
-            })
-              .then((response) => {
-                ui.reportEvent('submission', 'submit');
-
-                updateRun({
-                  guid: response.guid,
-                  submit_delay: response.submit_delay,
-                  username: commonPayload.currentUsername,
-                  classname: commonPayload.userClassname,
-                  country: 'xx',
-                  status: 'new',
-                  alias: request.problem.alias,
-                  time: new Date(),
-                  penalty: 0,
-                  runtime: 0,
-                  memory: 0,
-                  verdict: 'JE',
-                  score: 0,
-                  language: request.selectedLanguage,
-                });
-              })
-              .catch((run) => {
-                ui.error(run.error ?? run);
-                if (run.errorname) {
-                  ui.reportEvent('submission', 'submit-fail', run.errorname);
-                }
-              });
+            submitRun(
+              Object.assign({}, request, {
+                username: commonPayload.currentUsername,
+                classname: commonPayload.userClassname,
+                problemAlias: request.problem.alias,
+                language: request.selectedLanguage,
+                target: contestPractice,
+              }),
+            );
           },
           'new-clarification': (request: {
             request: types.Clarification;
@@ -278,30 +257,6 @@ OmegaUp.on('ready', () => {
       .then((data) => {
         contestPractice.clarifications = data.clarifications;
       });
-  }
-
-  function updateRun(run: types.Run): void {
-    trackRun(run);
-
-    // TODO: Implement websocket support
-
-    if (run.status != 'ready') {
-      updateRunFallback(run.guid);
-      return;
-    }
-  }
-
-  function updateRunFallback(guid: string): void {
-    setTimeout(() => {
-      api.Run.status({ run_alias: guid })
-        .then(time.remoteTimeAdapter)
-        .then((response) => updateRun(response))
-        .catch(ui.ignoreError);
-    }, 5000);
-  }
-
-  function trackRun(run: types.Run): void {
-    myRunsStore.commit('addRun', run);
   }
 
   setInterval(() => {

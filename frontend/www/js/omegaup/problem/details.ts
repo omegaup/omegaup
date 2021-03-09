@@ -12,6 +12,12 @@ import * as ui from '../ui';
 import * as time from '../time';
 import JSZip from 'jszip';
 import T from '../lang';
+import {
+  refreshRuns,
+  submitRun,
+  trackRun,
+  updateRunFallback,
+} from '../arena/submissions';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsPayload();
@@ -143,40 +149,22 @@ OmegaUp.on('ready', () => {
             } else {
               runsStore.commit('removeFilter', filter);
             }
-            refreshRuns();
+            refreshRuns(payload.problem.alias, problemDetailsView);
           },
           'submit-run': (code: string, language: string) => {
-            api.Run.create({
-              problem_alias: payload.problem.alias,
-              language: language,
-              source: code,
-            })
-              .then((response) => {
-                ui.reportEvent('submission', 'submit');
-
-                updateRun({
-                  guid: response.guid,
-                  submit_delay: response.submit_delay,
+            submitRun(
+              Object.assign(
+                {},
+                {
+                  code,
+                  language,
                   username: commonPayload.currentUsername,
                   classname: commonPayload.userClassname,
-                  country: 'xx',
-                  status: 'new',
-                  alias: payload.problem.alias,
-                  time: new Date(),
-                  penalty: 0,
-                  runtime: 0,
-                  memory: 0,
-                  verdict: 'JE',
-                  score: 0,
-                  language: language,
-                });
-              })
-              .catch((run) => {
-                ui.error(run.error ?? run);
-                if (run.errorname) {
-                  ui.reportEvent('submission', 'submit-fail', run.errorname);
-                }
-              });
+                  problemAlias: payload.problem.alias,
+                  target: problemDetailsView,
+                },
+              ),
+            );
           },
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
             const contents: { quality_seal?: boolean; tag?: string } = {};
@@ -355,7 +343,7 @@ OmegaUp.on('ready', () => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
               .then(() => {
                 run.status = 'rejudging';
-                updateRunFallback(run.guid);
+                updateRunFallback(run.guid, problemDetailsView);
               })
               .catch(ui.ignoreError);
           },
@@ -366,7 +354,7 @@ OmegaUp.on('ready', () => {
             api.Run.disqualify({ run_alias: run.guid })
               .then(() => {
                 run.type = 'disqualified';
-                updateRunFallback(run.guid);
+                updateRunFallback(run.guid, problemDetailsView);
               })
               .catch(ui.ignoreError);
           },
@@ -374,71 +362,6 @@ OmegaUp.on('ready', () => {
       });
     },
   });
-
-  function updateRun(run: types.Run): void {
-    trackRun(run);
-
-    // TODO: Implement websocket support
-
-    if (run.status != 'ready') {
-      updateRunFallback(run.guid);
-      return;
-    }
-  }
-
-  function updateRunFallback(guid: string): void {
-    setTimeout(() => {
-      api.Run.status({ run_alias: guid })
-        .then(time.remoteTimeAdapter)
-        .then((response) => updateRun(response))
-        .catch(ui.ignoreError);
-    }, 5000);
-  }
-
-  function trackRun(run: types.Run): void {
-    runsStore.commit('addRun', run);
-    if (run.username !== OmegaUp.username) {
-      return;
-    }
-    myRunsStore.commit('addRun', run);
-
-    if (!problemDetailsView.nominationStatus) {
-      return;
-    }
-    if (run.verdict !== 'AC' && run.verdict !== 'CE' && run.verdict !== 'JE') {
-      problemDetailsView.nominationStatus.tried = true;
-    }
-    if (run.verdict === 'AC') {
-      Vue.set(
-        problemDetailsView,
-        'nominationStatus',
-        Object.assign({}, problemDetailsView.nominationStatus, {
-          solved: true,
-        }),
-      );
-    }
-  }
-
-  function refreshRuns(): void {
-    api.Problem.runs({
-      problem_alias: payload.problem.alias,
-      show_all: true,
-      offset: runsStore.state.filters?.offset,
-      rowcount: runsStore.state.filters?.rowcount,
-      verdict: runsStore.state.filters?.verdict,
-      language: runsStore.state.filters?.language,
-      username: runsStore.state.filters?.username,
-      status: runsStore.state.filters?.status,
-    })
-      .then(time.remoteTimeAdapter)
-      .then((response) => {
-        runsStore.commit('clear');
-        for (const run of response.runs) {
-          trackRun(run);
-        }
-      })
-      .catch(ui.apiError);
-  }
 
   function refreshClarifications(): void {
     api.Problem.clarifications({
@@ -456,12 +379,12 @@ OmegaUp.on('ready', () => {
 
   if (runs) {
     for (const run of runs) {
-      trackRun(run);
+      trackRun(run, problemDetailsView);
     }
   }
   if (payload.user.admin) {
     setInterval(() => {
-      refreshRuns();
+      refreshRuns(payload.problem.alias, problemDetailsView);
       refreshClarifications();
     }, 5 * 60 * 1000);
   }
