@@ -11,8 +11,6 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  *
- * @psalm-type StudentProgress=array{classname: string, country_id: null|string, name: null|string, username: string, allProgress: array<string, array<string, array{progress: float, points: float}>>}
- * @psalm-type ProgressAssignments=array{alias: string, order: int, total_points: float, problems: list<array{alias: string, title: string, points: float}>}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  */
@@ -539,7 +537,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 $courseId,
             ]
         );
-        print_r($rs);
 
         $allProgress = [];
         $problemTitles = [];
