@@ -45,13 +45,13 @@ OmegaUp.on('ready', () => {
           guid: this.guid,
         },
         on: {
-          'navigate-to-problem': (request: ActiveProblem) => {
-            navigateToProblem(
-              Object.assign({}, request, {
-                target: arenaCourse,
-                problems: this.problems,
-              }),
-            );
+          'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
+            navigateToProblem({
+              problem,
+              runs,
+              target: arenaCourse,
+              problems: this.problems,
+            });
           },
         },
       });

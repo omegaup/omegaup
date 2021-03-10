@@ -19,77 +19,76 @@ interface Navigation {
   problems: types.NavbarProblemsetProblem[];
 }
 
-export function navigateToProblem(request: Navigation): void {
+export function navigateToProblem({
+  target,
+  runs,
+  problem,
+  problems,
+}: Navigation): void {
   if (
     Object.prototype.hasOwnProperty.call(
       problemsStore.state.problems,
-      request.problem.alias,
+      problem.alias,
     )
   ) {
-    request.target.problemInfo =
-      problemsStore.state.problems[request.problem.alias];
-    window.location.hash = `#problems/${request.problem.alias}`;
+    target.problemInfo = problemsStore.state.problems[problem.alias];
+    window.location.hash = `#problems/${problem.alias}`;
     return;
   }
   api.Problem.details({
-    problem_alias: request.problem.alias,
+    problem_alias: problem.alias,
     prevent_problemset_open: false,
   })
     .then((problemInfo) => {
       for (const run of problemInfo.runs ?? []) {
         trackRun({ run });
       }
-      const currentProblem = request.problems?.find(
+      const currentProblem = problems?.find(
         ({ alias }: { alias: string }) => alias === problemInfo.alias,
       );
       problemInfo.title = currentProblem?.text ?? '';
-      request.target.problemInfo = problemInfo;
-      request.problem.alias = problemInfo.alias;
-      request.runs = myRunsStore.state.runs;
-      request.problem.bestScore = getMaxScore(
-        request.runs,
-        problemInfo.alias,
-        0,
-      );
+      target.problemInfo = problemInfo;
+      problem.alias = problemInfo.alias;
+      runs = myRunsStore.state.runs;
+      problem.bestScore = getMaxScore(runs, problemInfo.alias, 0);
       problemsStore.commit('addProblem', problemInfo);
-      if (request.target.popupDisplayed === PopupDisplayed.RunSubmit) {
-        window.location.hash = `#problems/${request.problem.alias}/new-run`;
+      if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
+        window.location.hash = `#problems/${problem.alias}/new-run`;
         return;
       }
-      window.location.hash = `#problems/${request.problem.alias}`;
+      window.location.hash = `#problems/${problem.alias}`;
     })
     .catch(() => {
       ui.dismissNotifications();
-      request.target.problem = null;
+      target.problem = null;
       window.location.hash = '#problems';
     });
 }
 
-export function trackRun(request: {
+export function trackRun({
+  run,
+  target,
+}: {
   run: types.Run;
   target?: Vue & { nominationStatus?: types.NominationStatus };
 }): void {
-  runsStore.commit('addRun', request.run);
-  if (request.run.username !== OmegaUp.username) {
+  runsStore.commit('addRun', run);
+  if (run.username !== OmegaUp.username) {
     return;
   }
-  myRunsStore.commit('addRun', request.run);
+  myRunsStore.commit('addRun', run);
 
-  if (!request.target?.nominationStatus) {
+  if (!target?.nominationStatus) {
     return;
   }
-  if (
-    request.run.verdict !== 'AC' &&
-    request.run.verdict !== 'CE' &&
-    request.run.verdict !== 'JE'
-  ) {
-    request.target.nominationStatus.tried = true;
+  if (run.verdict !== 'AC' && run.verdict !== 'CE' && run.verdict !== 'JE') {
+    target.nominationStatus.tried = true;
   }
-  if (request.run.verdict === 'AC') {
+  if (run.verdict === 'AC') {
     Vue.set(
-      request.target,
+      target,
       'nominationStatus',
-      Object.assign({}, request.target.nominationStatus, {
+      Object.assign({}, target.nominationStatus, {
         solved: true,
       }),
     );
