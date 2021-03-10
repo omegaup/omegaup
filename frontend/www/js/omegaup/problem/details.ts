@@ -154,15 +154,21 @@ OmegaUp.on('ready', () => {
               target: problemDetailsView,
             });
           },
-          'submit-run': (request: { code: string; language: string }) => {
-            submitRun(
-              Object.assign({}, request, {
-                username: commonPayload.currentUsername,
-                classname: commonPayload.userClassname,
-                problemAlias: payload.problem.alias,
-                target: problemDetailsView,
-              }),
-            );
+          'submit-run': ({
+            code,
+            language,
+          }: {
+            code: string;
+            language: string;
+          }) => {
+            submitRun({
+              code,
+              language,
+              username: commonPayload.currentUsername,
+              classname: commonPayload.userClassname,
+              problemAlias: payload.problem.alias,
+              target: problemDetailsView,
+            });
           },
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
             const contents: { quality_seal?: boolean; tag?: string } = {};

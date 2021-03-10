@@ -187,17 +187,21 @@ OmegaUp.on('ready', () => {
           }) => {
             window.location.hash = `#problems/${request.alias}/show-run:${request.guid}/`;
           },
-          'submit-run': (
-            request: ActiveProblem & { code: string; language: string },
-          ) => {
-            submitRun(
-              Object.assign({}, request, {
-                username: commonPayload.currentUsername,
-                classname: commonPayload.userClassname,
-                problemAlias: request.problem.alias,
-                target: contestPractice,
-              }),
-            );
+          'submit-run': ({
+            problem,
+            runs,
+            code,
+            language,
+          }: ActiveProblem & { code: string; language: string }) => {
+            submitRun({
+              runs,
+              code,
+              language,
+              username: commonPayload.currentUsername,
+              classname: commonPayload.userClassname,
+              problemAlias: problem.alias,
+              target: contestPractice,
+            });
           },
           'new-clarification': (request: {
             request: types.Clarification;
