@@ -25,91 +25,6 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Creates a Clarification
-     *
-     * @return array{clarification_id: int}
-     *
-     * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param string $message
-     * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param null|string $username
-     */
-    public static function apiCreate(\OmegaUp\Request $r): array {
-        // Authenticate user
-        $r->ensureIdentity();
-
-        // Validate request
-        $contestAlias = $r->ensureString(
-            'contest_alias',
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
-        $problemAlias = $r->ensureString(
-            'problem_alias',
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
-        $username = $r->ensureOptionalString('username');
-        $message = $r->ensureString(
-            'message',
-            fn (string $message) => \OmegaUp\Validators::stringOfLengthInRange(
-                $message,
-                1,
-                200
-            )
-        );
-
-        $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
-        if (is_null($contest)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
-        }
-
-        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
-        }
-
-        $identity = !is_null($username) ?
-            \OmegaUp\DAO\Identities::findByUsername($username) : null;
-
-        // Is the combination problemset_id and problem_id valid?
-        if (
-            is_null(
-                \OmegaUp\DAO\ProblemsetProblems::getByPK(
-                    $contest->problemset_id,
-                    $problem->problem_id
-                )
-            )
-        ) {
-            throw new \OmegaUp\Exceptions\NotFoundException(
-                'problemNotFoundInContest'
-            );
-        }
-
-        $receiverId = $identity ? $identity->identity_id : null;
-        $clarification = new \OmegaUp\DAO\VO\Clarifications([
-            'author_id' => $r->identity->identity_id,
-            'receiver_id' => $receiverId,
-            'problemset_id' => $contest->problemset_id,
-            'problem_id' => $problem->problem_id,
-            'message' => $message,
-            'time' => \OmegaUp\Time::get(),
-            'public' => $receiverId == $r->identity->identity_id,
-        ]);
-
-        \OmegaUp\DAO\Clarifications::create($clarification);
-        self::clarificationUpdated(
-            $r,
-            $clarification,
-            $r->identity,
-            $problem,
-            $contest
-        );
-
-        return [
-            'clarification_id' => intval($clarification->clarification_id),
-        ];
-    }
-
-    /**
      * Creates a Clarification for a contest or an assignment of a course
      *
      * @return Clarification
@@ -121,7 +36,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $problem_alias
      * @omegaup-request-param string $message
      */
-    public static function apiCreatev2(\OmegaUp\Request $r): array {
+    public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
         $problemAlias = $r->ensureString(
@@ -152,6 +67,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
+        $contest = null;
         $problemsetId = null;
         $admins = [];
         /** @var array{type: string, body: array{localizationString: \OmegaUp\TranslationString, localizationParams: array{problemAlias: string, contestAlias?: string, courseAlias?: string}, url: string, iconUrl: string}}*/
@@ -274,6 +190,16 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         ]);
 
         \OmegaUp\DAO\Clarifications::create($clarification);
+
+        if (!is_null($contest)) {
+            self::clarificationUpdated(
+                $r,
+                $clarification,
+                $r->identity,
+                $problem,
+                $contest
+            );
+        }
 
         /** @var array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string} */
         foreach ($admins as $admin) {

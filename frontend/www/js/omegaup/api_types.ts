@@ -3164,10 +3164,8 @@ export namespace messages {
 
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
-  export type ClarificationCreateResponse = { clarification_id: number };
-  export type ClarificationCreatev2Request = { [key: string]: any };
-  export type _ClarificationCreatev2ServerResponse = any;
-  export type ClarificationCreatev2Response = types.Clarification;
+  export type _ClarificationCreateServerResponse = any;
+  export type ClarificationCreateResponse = types.Clarification;
   export type ClarificationDetailsRequest = { [key: string]: any };
   export type _ClarificationDetailsServerResponse = any;
   export type ClarificationDetailsResponse = {
@@ -4097,9 +4095,6 @@ export namespace controllers {
     create: (
       params?: messages.ClarificationCreateRequest,
     ) => Promise<messages.ClarificationCreateResponse>;
-    createv2: (
-      params?: messages.ClarificationCreatev2Request,
-    ) => Promise<messages.ClarificationCreatev2Response>;
     details: (
       params?: messages.ClarificationDetailsRequest,
     ) => Promise<messages.ClarificationDetailsResponse>;

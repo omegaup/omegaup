@@ -185,13 +185,9 @@ export const Badge = {
 export const Clarification = {
   create: apiCall<
     messages.ClarificationCreateRequest,
+    messages._ClarificationCreateServerResponse,
     messages.ClarificationCreateResponse
-  >('/api/clarification/create/'),
-  createv2: apiCall<
-    messages.ClarificationCreatev2Request,
-    messages._ClarificationCreatev2ServerResponse,
-    messages.ClarificationCreatev2Response
-  >('/api/clarification/createv2/', (x) => {
+  >('/api/clarification/create/', (x) => {
     x.time = ((x: number) => new Date(x * 1000))(x.time);
     return x;
   }),

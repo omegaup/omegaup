@@ -396,7 +396,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $message = 'Test message';
-        $clarification = \OmegaUp\Controllers\Clarification::apiCreatev2(
+        $clarification = \OmegaUp\Controllers\Clarification::apiCreate(
             new \OmegaUp\Request([
                 'auth_token' => self::login($student['identity'])->auth_token,
                 'course_alias' => $courseData['course_alias'],

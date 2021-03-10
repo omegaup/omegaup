@@ -10,7 +10,6 @@
   - [`/api/badge/userList/`](#apibadgeuserlist)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
-  - [`/api/clarification/createv2/`](#apiclarificationcreatev2)
   - [`/api/clarification/details/`](#apiclarificationdetails)
   - [`/api/clarification/update/`](#apiclarificationupdate)
 - [Contest](#contest)
@@ -368,27 +367,6 @@ Returns a list of badges owned by a certain user
 Description of ClarificationController
 
 ## `/api/clarification/create/`
-
-### Description
-
-Creates a Clarification
-
-### Parameters
-
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `message`       | `string`       |             |
-| `problem_alias` | `string`       |             |
-| `username`      | `null\|string` |             |
-
-### Returns
-
-| Name               | Type     |
-| ------------------ | -------- |
-| `clarification_id` | `number` |
-
-## `/api/clarification/createv2/`
 
 ### Description
 
