@@ -3667,7 +3667,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the course and specific assignment details
      *
-     * @return array{smartyProperties: array{payload: AssignmentDetailsPayload, title: string, inContest: bool}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: AssignmentDetailsPayload, fullWidth: bool, title: string, inContest: bool}, entrypoint: string}
      */
     private static function getAssignmentDetailsForTypeScript(
         \OmegaUp\Request $r,
@@ -3737,6 +3737,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'problems' => $problemsResponseArray,
                     ],
                 ],
+                'fullWidth' => true,
                 'title' => strval($assignment->name),
                 // Navbar is only hidden during exams.
                 'inContest' => $assignment->assignment_type === 'test',
@@ -3935,7 +3936,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             return self::getCourseDetails($r, $course, $group, false);
         }
 
-        return self::getAssignmentDetailsForTypeScript(
+        return self::getAssignmentDetails(
             $r,
             $course,
             $group,
