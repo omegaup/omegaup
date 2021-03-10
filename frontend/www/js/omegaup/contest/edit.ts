@@ -131,6 +131,23 @@ OmegaUp.on('ready', () => {
               })
               .catch();
           },
+          'update-existing-users': (query: string) => {
+            api.User.list({
+              query,
+            })
+              .then((data) => {
+                this.existingProblems = [];
+                data.forEach((user: types.UserListItem) => {
+                  this.existingProblems.push({
+                    key: user.label,
+                    value: user.value,
+                  });
+                });
+              })
+              .catch((e) => {
+                console.error(e);
+              });
+          },
           'update-contest': function (contest: omegaup.Contest) {
             api.Contest.update(
               Object.assign({}, contest, {

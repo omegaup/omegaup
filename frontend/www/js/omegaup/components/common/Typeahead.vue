@@ -7,7 +7,7 @@
     :typeahead-max-results="maxResults"
     :typeahead-activation-threshold="activationThreshold"
     :placeholder="T.typeaheadSearchPlaceholder"
-    :limit="1"
+    :limit="limit"
     :hide-input-on-limit="true"
     :only-existing-tags="true"
     :typeahead-hide-discard="true"
@@ -33,6 +33,7 @@ export default class Typeahead extends Vue {
   @Prop() existingOptions!: { key: string; value: string }[];
   @Prop({ default: 3 }) activationThreshold!: number;
   @Prop({ default: 5 }) maxResults!: number;
+  @Prop({ default: 1 }) limit!: number;
 
   T = T;
   selectedOptions: { key: string; value: string }[] = [];

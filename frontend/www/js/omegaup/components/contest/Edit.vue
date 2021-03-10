@@ -164,9 +164,13 @@
         <omegaup-contest-add-contestant
           :contest="details"
           :initial-users="users"
+          :existing-users="existingUsers"
           @emit-add-user="
             (contestants, contestant) =>
               $emit('add-user', contestants, contestant)
+          "
+          @update-existing-users="
+            (query) => $emit('update-existing-users', query)
           "
           @emit-remove-user="(contestant) => $emit('remove-user', contestant)"
           @emit-save-end-time="(user) => $emit('save-end-time', user)"
@@ -269,6 +273,7 @@ export default class Edit extends Vue {
   @Prop() requests!: types.ContestRequest[];
   @Prop() users!: types.ContestUser[];
   @Prop() existingProblems!: { key: string; value: string }[];
+  @Prop() existingUsers!: { key: string; value: string }[];
 
   T = T;
   ui = ui;

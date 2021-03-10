@@ -5,10 +5,15 @@
         <form class="form" @submit.prevent="onSubmit">
           <div class="form-group">
             <label>{{ T.wordsUser }}</label>
-            <omegaup-autocomplete
-              v-model="contestant"
-              :init="(el) => typeahead.userTypeahead(el)"
-            ></omegaup-autocomplete>
+            <omegaup-common-typeahead
+              :existing-options="existingUsers"
+              :limit="10"
+              @update-existing-options="
+                (query) => $emit('update-existing-users', query)
+              "
+              @update-selected-option="onSelectUser"
+            >
+            </omegaup-common-typeahead>
           </div>
           <button class="btn btn-primary user-add-single" type="submit">
             {{ T.contestAdduserAddUser }}
@@ -94,29 +99,29 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
 import * as time from '../../time';
-import Autocomplete from '../Autocomplete.vue';
 import DateTimePicker from '../DateTimePicker.vue';
 import user_Username from '../user/Username.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
     'omegaup-datetimepicker': DateTimePicker,
     'omegaup-user-username': user_Username,
+    'omegaup-common-typeahead': common_Typeahead,
   },
 })
 export default class AddContestant extends Vue {
   @Prop() initialUsers!: types.ContestUser[];
   @Prop() contest!: types.ContestAdminDetails;
+  @Prop() existingUsers!: { key: string; value: string }[];
 
   T = T;
   time = time;
-  typeahead = typeahead;
   contestant = '';
   contestants = '';
   users = this.initialUsers;
+  username = '';
 
   onSubmit(): void {
     let users: string[] = [];
@@ -132,6 +137,10 @@ export default class AddContestant extends Vue {
         users.map((user) => user.trim()),
       );
     }
+  }
+
+  onSelectUser(username: string) {
+    this.username = username;
   }
 
   @Watch('initialUsers')
