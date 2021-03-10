@@ -16,6 +16,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
  * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, hide_problem_tags: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type UserListItem=array{label: string, value: string}
+ * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>}
  * @psalm-type CoderOfTheMonth=array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}
  * @psalm-type CoderOfTheMonthList=list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>
@@ -2068,30 +2069,36 @@ class User extends \OmegaUp\Controllers\Controller {
      * Gets a list of users. This returns an array instead of an object since
      * it is used by typeahead.
      *
-     * @omegaup-request-param mixed $query
-     * @omegaup-request-param mixed $term
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param null|string $term
      *
      * @return list<UserListItem>
      */
     public static function apiList(\OmegaUp\Request $r): array {
-        $param = '';
-        if (is_string($r['term'])) {
-            $param = $r['term'];
-        } elseif (is_string($r['query'])) {
-            $param = $r['query'];
-        } else {
+        $term = $r->ensureOptionalString(
+            'term',
+            /*$required=*/false,
+            fn (string $term) => \OmegaUp\Validators::stringNonEmpty($term)
+        );
+        $query = $r->ensureOptionalString(
+            'query',
+            /*$required=*/false,
+            fn (string $query) => \OmegaUp\Validators::stringNonEmpty($query)
+        );
+        if (is_null($term) && is_null($query)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 'query'
             );
         }
+        $param = $term ?? $query;
 
         $identities = \OmegaUp\DAO\Identities::findByUsernameOrName($param);
         $response = [];
         foreach ($identities as $identity) {
             $response[] = [
-                'label' => strval($identity->username),
-                'value' => strval($identity->username)
+                'label' => $identity->username,
+                'value' => $identity->name ?: $identity->username,
             ];
         }
         return $response;

@@ -13,6 +13,7 @@ const translations: { [key: string]: string; } = {
   activityReportSummaryContest: "This is a report of the activity that happened within this contest. In order to protect contestants' privacy, their IP addresses have been obfuscated using a perfect hash. That means that there is a one-to-one correspondence between IP addresses and Origin IDs.",
   activityReportSummaryCourse: "This is a report of the activity that happened within this course. In order to protect participants' privacy, their IP addresses have been obfuscated using a perfect hash. That means that there is a one-to-one correspondence between IP addresses and Origin IDs.",
   activityReportUsers: "Users",
+  addUsersMultipleOrSingleUser: "Add single or multiple users",
   addUsersToReviewerGroup: "Click to add a user to the list of reviewers.",
   adminAdded: "Admin successfully added.",
   adminRemoved: "Admin successfully removed.",

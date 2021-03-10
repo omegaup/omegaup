@@ -163,17 +163,14 @@
       <div v-if="showTab === 'contestants'" class="tab-pane active contestants">
         <omegaup-contest-add-contestant
           :contest="details"
-          :initial-users="users"
+          :users="users"
           :existing-users="existingUsers"
-          @emit-add-user="
-            (contestants, contestant) =>
-              $emit('add-user', contestants, contestant)
-          "
+          @add-user="(contestants) => $emit('add-user', contestants)"
           @update-existing-users="
             (query) => $emit('update-existing-users', query)
           "
-          @emit-remove-user="(contestant) => $emit('remove-user', contestant)"
-          @emit-save-end-time="(user) => $emit('save-end-time', user)"
+          @remove-user="(contestant) => $emit('remove-user', contestant)"
+          @save-end-time="(user) => $emit('save-end-time', user)"
         ></omegaup-contest-add-contestant>
         <omegaup-common-requests
           :data="requests"
@@ -272,8 +269,8 @@ export default class Edit extends Vue {
   @Prop() problems!: types.ProblemsetProblem[];
   @Prop() requests!: types.ContestRequest[];
   @Prop() users!: types.ContestUser[];
-  @Prop() existingProblems!: { key: string; value: string }[];
-  @Prop() existingUsers!: { key: string; value: string }[];
+  @Prop() existingProblems!: types.ListItem[];
+  @Prop() existingUsers!: types.ListItem[];
 
   T = T;
   ui = ui;

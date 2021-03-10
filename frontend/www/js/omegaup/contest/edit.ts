@@ -22,7 +22,8 @@ OmegaUp.on('ready', () => {
       problems: payload.problems,
       requests: payload.requests,
       users: payload.users,
-      existingProblems: [] as { key: string; value: string }[],
+      existingProblems: [] as types.ListItem[],
+      existingUsers: [] as types.ListItem[],
     }),
     methods: {
       arbitrateRequest: (username: string, resolution: boolean): void => {
@@ -114,6 +115,7 @@ OmegaUp.on('ready', () => {
           requests: this.requests,
           users: this.users,
           existingProblems: this.existingProblems,
+          existingUsers: this.existingUsers,
         },
         on: {
           'update-existing-problems': (query: string) => {
@@ -122,7 +124,15 @@ OmegaUp.on('ready', () => {
             })
               .then((data) => {
                 this.existingProblems = [];
-                data.results.forEach((problem: types.ProblemListItem) => {
+                // Problems previously added into the contest should not be
+                // shown in the dropdown
+                const filteredProblems = data.results.filter(
+                  (result) =>
+                    !this.problems.find(
+                      (problem) => problem.alias === result.alias,
+                    ),
+                );
+                filteredProblems.forEach((problem: types.ProblemListItem) => {
                   this.existingProblems.push({
                     key: problem.alias,
                     value: problem.title,
@@ -132,17 +142,20 @@ OmegaUp.on('ready', () => {
               .catch();
           },
           'update-existing-users': (query: string) => {
-            api.User.list({
-              query,
-            })
+            api.User.list({ query })
               .then((data) => {
-                this.existingProblems = [];
-                data.forEach((user: types.UserListItem) => {
-                  this.existingProblems.push({
-                    key: user.label,
-                    value: user.value,
-                  });
-                });
+                this.existingUsers = [];
+                // Users previously invited to the contest should not be shown
+                // in the dropdown
+                const filteredUsers = data.filter(
+                  (result) =>
+                    !this.users.find((user) => user.username === result.label),
+                );
+                filteredUsers.forEach(
+                  ({ label, value }: types.UserListItem) => {
+                    this.existingUsers.push({ key: label, value });
+                  },
+                );
               })
               .catch((e) => {
                 console.error(e);

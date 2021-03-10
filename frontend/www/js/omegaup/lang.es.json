@@ -12,6 +12,7 @@
 	"activityReportSummaryContest": "Este es el reporte de actividades que ocurrieron durante el concurso. Para proteger la privacidad de los concursantes, sus direcciones IP han sido ofuscadas utilizando un hash perfecto. Esto quiere decir que hay una correspondencia uno-a-uno entre direcciones IP y los ID de origen.",
 	"activityReportSummaryCourse": "Este es el reporte de actividades que ocurrieron durante el curso. Para proteger la privacidad de los participantes, sus direcciones IP han sido ofuscadas utilizando un hash perfecto. Esto quiere decir que hay una correspondencia uno-a-uno entre direcciones IP y los ID de origen.",
 	"activityReportUsers": "Usuarios",
+	"addUsersMultipleOrSingleUser": "Agregar uno o m\u00faltiples usuarios",
 	"addUsersToReviewerGroup": "Clic para agregar un usuario a la lista de revisores.",
 	"adminAdded": "Administrador agregado correctamente",
 	"adminRemoved": "Administrador eliminado correctamente",

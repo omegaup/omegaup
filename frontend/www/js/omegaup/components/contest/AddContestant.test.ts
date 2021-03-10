@@ -17,6 +17,6 @@ describe('AddContestant.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(T.wordsMultipleUser);
+    expect(wrapper.text()).toContain(T.addUsersMultipleOrSingleUser);
   });
 });

@@ -4,28 +4,16 @@
       <div class="card-body">
         <form class="form" @submit.prevent="onSubmit">
           <div class="form-group">
-            <label>{{ T.wordsUser }}</label>
+            <label>{{ T.addUsersMultipleOrSingleUser }}</label>
             <omegaup-common-typeahead
               :existing-options="existingUsers"
-              :limit="10"
+              :limit="0"
               @update-existing-options="
                 (query) => $emit('update-existing-users', query)
               "
               @update-selected-option="onSelectUser"
             >
             </omegaup-common-typeahead>
-          </div>
-          <button class="btn btn-primary user-add-single" type="submit">
-            {{ T.contestAdduserAddUser }}
-          </button>
-          <hr />
-          <div class="form-group">
-            <label>{{ T.wordsMultipleUser }}</label>
-            <textarea
-              v-model="contestants"
-              class="form-control contestants"
-              rows="4"
-            ></textarea>
           </div>
           <button class="btn btn-primary user-add-bulk" type="submit">
             {{ T.contestAdduserAddUsers }}
@@ -48,7 +36,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in users" :key="user.username">
+          <tr v-for="user in currentUsers" :key="user.username">
             <td class="text-center">
               <omegaup-user-username
                 :linkify="true"
@@ -72,7 +60,7 @@
                 <div class="col-xs-2">
                   <button
                     class="btn-link glyphicon glyphicon-floppy-disk"
-                    @click="$emit('emit-save-end-time', user)"
+                    @click="$emit('save-end-time', user)"
                   ></button>
                 </div>
               </div>
@@ -82,7 +70,7 @@
                 class="close float-none"
                 type="button"
                 :title="T.contestAdduserRegisteredUserDelete"
-                @click="$emit('emit-remove-user', user)"
+                @click="$emit('remove-user', user)"
               >
                 ×
               </button>
@@ -112,42 +100,34 @@ import common_Typeahead from '../common/Typeahead.vue';
   },
 })
 export default class AddContestant extends Vue {
-  @Prop() initialUsers!: types.ContestUser[];
+  @Prop() users!: types.ContestUser[];
   @Prop() contest!: types.ContestAdminDetails;
-  @Prop() existingUsers!: { key: string; value: string }[];
+  @Prop() existingUsers!: types.ListItem[];
 
   T = T;
   time = time;
-  contestant = '';
-  contestants = '';
-  users = this.initialUsers;
-  username = '';
+  contestants: null | string = null;
+  currentUsers = this.users;
 
   onSubmit(): void {
-    let users: string[] = [];
-    if (this.contestants !== '') {
-      users = this.contestants.split(',');
-    }
-    if (this.contestant !== '') {
-      users.push(this.contestant);
-    }
+    if (this.contestants === null) return;
+    const users = this.contestants.split(',');
     if (users.length) {
       this.$emit(
-        'emit-add-user',
+        'add-user',
         users.map((user) => user.trim()),
       );
     }
   }
 
-  onSelectUser(username: string) {
-    this.username = username;
+  onSelectUser(contestants: string) {
+    this.contestants = contestants;
   }
 
-  @Watch('initialUsers')
-  onInitialUsersChange(newUsers: types.ContestUser[]): void {
-    this.users = newUsers;
-    this.contestant = '';
-    this.contestants = '';
+  @Watch('users')
+  onUsersChange(newUsers: types.ContestUser[]): void {
+    this.currentUsers = newUsers;
+    this.contestants = null;
   }
 }
 </script>

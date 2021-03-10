@@ -13,6 +13,7 @@ const translations: { [key: string]: string; } = {
   activityReportSummaryContest: "Este \u00e9 um relat\u00f3rio da atividade que aconteceu neste concurso. Para proteger a privacidade dos participantes, seus endere\u00e7os IP foram ofuscados utilizando um hash perfeito. Isso significa que h\u00e1 uma correspond\u00eancia de um-para-um entre os endere\u00e7os IP e as identifica\u00e7\u00f5es de Origem.",
   activityReportSummaryCourse: "Este \u00e9 um relat\u00f3rio da atividade que aconteceu neste curso. Para proteger a privacidade dos participantes, seus endere\u00e7os IP foram ofuscados utilizando um hash perfeito. Isso significa que h\u00e1 uma correspond\u00eancia de um-para-um entre os endere\u00e7os IP e as identifica\u00e7\u00f5es de Origem.",
   activityReportUsers: "Usu\u00e1rios",
+  addUsersMultipleOrSingleUser: "Adicionar um ou v\u00e1rios usu\u00e1rios",
   addUsersToReviewerGroup: "Clic para agregar un usuario a la lista de revisores.",
   adminAdded: "Administrador adicionado com sucesso",
   adminRemoved: "Administrador removido com sucesso",

@@ -170,7 +170,7 @@ export default class AddProblem extends Vue {
   @Prop() contestAlias!: string;
   @Prop() initialPoints!: number;
   @Prop() initialProblems!: types.ProblemsetProblem[];
-  @Prop() existingProblems!: { key: string; value: string }[];
+  @Prop() existingProblems!: types.ListItem[];
 
   T = T;
   alias = '';
