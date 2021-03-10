@@ -23,9 +23,7 @@
       </tr>
       <tr
         v-if="
-          showRanking &&
-          typeof scoreboard === 'number' &&
-          duration != Infinity
+          showRanking && typeof scoreboard === 'number' && duration != Infinity
         "
       >
         <td>
@@ -34,10 +32,7 @@
         <td>
           {{
             time.formatTimestamp(
-              new Date(
-                starTime.getTime() +
-                  (duration * scoreboard) / 100,
-              ),
+              new Date(starTime.getTime() + (duration * scoreboard) / 100),
             )
           }}
         </td>
@@ -63,7 +58,6 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import * as time from '../../time';
 
@@ -80,7 +74,7 @@ export default class Summary extends Vue {
   @Prop() startTime!: Date;
   @Prop() finishTime!: Date;
   @Prop() scoreboard!: number;
-  @Prop() windowLength!: null|number;
+  @Prop() windowLength!: null | number;
   @Prop() admin!: string;
   @Prop({ default: true }) showDeadlines!: boolean;
   @Prop({ default: true }) showRanking!: boolean;
@@ -93,9 +87,7 @@ export default class Summary extends Vue {
     if (!this.startTime || !this.finishTime) {
       return Infinity;
     }
-    return (
-      this.finishTime.getTime() - this.startTime.getTime()
-    );
+    return this.finishTime.getTime() - this.startTime.getTime();
   }
 
   get eventWindowLength(): string {

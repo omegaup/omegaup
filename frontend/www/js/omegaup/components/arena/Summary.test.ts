@@ -1,16 +1,12 @@
 import { shallowMount } from '@vue/test-utils';
-
-import T from '../../lang';
-
 import arena_Summary from './Summary.vue';
-import type { types } from '../../api_types';
 
 describe('Summary.vue', () => {
   it('Should handle summary', () => {
     const event = {
       title: 'Event title',
       description: 'Event description',
-    }
+    };
     const wrapper = shallowMount(arena_Summary, {
       propsData: {
         title: event.title,
@@ -18,7 +14,7 @@ describe('Summary.vue', () => {
         startTime: new Date(),
         finishTime: new Date(),
         scoreboard: null,
-        windowLength!: null,
+        windowLength: null,
         admin: 'omegaUp',
       },
     });

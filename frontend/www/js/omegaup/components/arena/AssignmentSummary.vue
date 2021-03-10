@@ -67,7 +67,8 @@ export default class AssignmentSummary extends Vue {
       return Infinity;
     }
     return (
-      this.assignment.finish_time.getTime() - this.assignment.start_time.getTime()
+      this.assignment.finish_time.getTime() -
+      this.assignment.start_time.getTime()
     );
   }
 
