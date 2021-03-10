@@ -12,6 +12,7 @@ import * as ui from '../ui';
 import * as time from '../time';
 import JSZip from 'jszip';
 import T from '../lang';
+import { Clarification, clarificationResponse } from '../arena/clarifications';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsPayload();
@@ -317,28 +318,12 @@ OmegaUp.on('ready', () => {
                 });
             }
           },
-          'clarification-response': (
-            id: number,
-            responseText: string,
-            isPublic: boolean,
-          ) => {
-            api.Clarification.update({
-              clarification_id: id,
-              answer: responseText,
-              public: isPublic,
-            })
-              .then(() => {
-                api.Problem.clarifications({
-                  problem_alias: payload.problem.alias,
-                })
-                  .then(time.remoteTimeAdapter)
-                  .then(
-                    (response) =>
-                      (this.initialClarifications = response.clarifications),
-                  )
-                  .catch(ui.apiError);
-              })
-              .catch(ui.apiError);
+          'clarification-response': ({
+            contestAlias,
+            clarification,
+            target,
+          }: Clarification) => {
+            clarificationResponse({ contestAlias, clarification, target });
           },
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);

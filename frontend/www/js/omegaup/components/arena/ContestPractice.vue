@@ -88,10 +88,7 @@
         :in-contest="true"
         :show-new-clarification-popup="showNewClarificationPopup"
         @new-clarification="(request) => $emit('new-clarification', request)"
-        @clarification-response="
-          (id, responseText, isPublic) =>
-            $emit('clarification-response', id, responseText, isPublic)
-        "
+        @clarification-response="onClarificationResponse"
         @update:activeTab="
           (selectedTab) => $emit('update:activeTab', selectedTab)
         "
@@ -176,6 +173,14 @@ export default class ArenaContestPractice extends Vue {
       'change-show-run-location',
       Object.assign({}, request, { alias: this.activeProblem.problem.alias }),
     );
+  }
+
+  onClarificationResponse(response: types.Clarification): void {
+    this.$emit('clarification-response', {
+      contestAlias: this.contest.alias,
+      clarification: response,
+      target: this,
+    });
   }
 
   @Watch('problem')
