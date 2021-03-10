@@ -1394,6 +1394,7 @@ export namespace types {
     alias?: string;
     assignment_type: string;
     description?: string;
+    director?: string;
     finish_time?: Date;
     name?: string;
     problems: types.NavbarProblemsetProblem[];
