@@ -10,7 +10,7 @@
   - [`/api/badge/userList/`](#apibadgeuserlist)
 - [Clarification](#clarification)
   - [`/api/clarification/create/`](#apiclarificationcreate)
-  - [`/api/clarification/createForCourse/`](#apiclarificationcreateforcourse)
+  - [`/api/clarification/createv2/`](#apiclarificationcreatev2)
   - [`/api/clarification/details/`](#apiclarificationdetails)
   - [`/api/clarification/update/`](#apiclarificationupdate)
 - [Contest](#contest)
@@ -388,25 +388,27 @@ Creates a Clarification
 | ------------------ | -------- |
 | `clarification_id` | `number` |
 
-## `/api/clarification/createForCourse/`
+## `/api/clarification/createv2/`
 
 ### Description
 
-Creates a Clarification for an assignment of a course
+Creates a Clarification for a contest or an assignment of a course
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
-| `message`          | `string` |             |
-| `problem_alias`    | `string` |             |
+| Name               | Type           | Description |
+| ------------------ | -------------- | ----------- |
+| `message`          | `string`       |             |
+| `problem_alias`    | `string`       |             |
+| `assignment_alias` | `string\|null` |             |
+| `contest_alias`    | `string\|null` |             |
+| `course_alias`     | `string\|null` |             |
+| `username`         | `null\|string` |             |
 
 ### Returns
 
 ```typescript
-types.ClarificationDetails;
+types.Clarification;
 ```
 
 ## `/api/clarification/details/`
@@ -423,9 +425,13 @@ API for getting a clarification
 
 ### Returns
 
-```typescript
-types.ClarificationDetails;
-```
+| Name            | Type     |
+| --------------- | -------- |
+| `answer`        | `string` |
+| `message`       | `string` |
+| `problem_id`    | `number` |
+| `problemset_id` | `number` |
+| `time`          | `Date`   |
 
 ## `/api/clarification/update/`
 

@@ -187,11 +187,11 @@ export const Clarification = {
     messages.ClarificationCreateRequest,
     messages.ClarificationCreateResponse
   >('/api/clarification/create/'),
-  createForCourse: apiCall<
-    messages.ClarificationCreateForCourseRequest,
-    messages._ClarificationCreateForCourseServerResponse,
-    messages.ClarificationCreateForCourseResponse
-  >('/api/clarification/createForCourse/', (x) => {
+  createv2: apiCall<
+    messages.ClarificationCreatev2Request,
+    messages._ClarificationCreatev2ServerResponse,
+    messages.ClarificationCreatev2Response
+  >('/api/clarification/createv2/', (x) => {
     x.time = ((x: number) => new Date(x * 1000))(x.time);
     return x;
   }),

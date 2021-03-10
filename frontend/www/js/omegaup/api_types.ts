@@ -1506,14 +1506,6 @@ export namespace types {
     time: Date;
   }
 
-  export interface ClarificationDetails {
-    answer?: string;
-    message: string;
-    problem_id: number;
-    problemset_id?: number;
-    time: Date;
-  }
-
   export interface CoderOfTheMonth {
     category: string;
     classname: string;
@@ -3173,12 +3165,18 @@ export namespace messages {
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
   export type ClarificationCreateResponse = { clarification_id: number };
-  export type ClarificationCreateForCourseRequest = { [key: string]: any };
-  export type _ClarificationCreateForCourseServerResponse = any;
-  export type ClarificationCreateForCourseResponse = types.ClarificationDetails;
+  export type ClarificationCreatev2Request = { [key: string]: any };
+  export type _ClarificationCreatev2ServerResponse = any;
+  export type ClarificationCreatev2Response = types.Clarification;
   export type ClarificationDetailsRequest = { [key: string]: any };
   export type _ClarificationDetailsServerResponse = any;
-  export type ClarificationDetailsResponse = types.ClarificationDetails;
+  export type ClarificationDetailsResponse = {
+    answer?: string;
+    message: string;
+    problem_id: number;
+    problemset_id?: number;
+    time: Date;
+  };
   export type ClarificationUpdateRequest = { [key: string]: any };
   export type ClarificationUpdateResponse = {};
 
@@ -4099,9 +4097,9 @@ export namespace controllers {
     create: (
       params?: messages.ClarificationCreateRequest,
     ) => Promise<messages.ClarificationCreateResponse>;
-    createForCourse: (
-      params?: messages.ClarificationCreateForCourseRequest,
-    ) => Promise<messages.ClarificationCreateForCourseResponse>;
+    createv2: (
+      params?: messages.ClarificationCreatev2Request,
+    ) => Promise<messages.ClarificationCreatev2Response>;
     details: (
       params?: messages.ClarificationDetailsRequest,
     ) => Promise<messages.ClarificationDetailsResponse>;

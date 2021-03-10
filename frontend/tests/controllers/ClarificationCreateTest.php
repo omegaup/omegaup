@@ -396,7 +396,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $message = 'Test message';
-        $clarification = \OmegaUp\Controllers\Clarification::apiCreateForCourse(
+        $clarification = \OmegaUp\Controllers\Clarification::apiCreatev2(
             new \OmegaUp\Request([
                 'auth_token' => self::login($student['identity'])->auth_token,
                 'course_alias' => $courseData['course_alias'],
@@ -415,6 +415,10 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(1, $notifications);
 
         $contents = json_decode($notifications[0]['contents'], true);
+        $this->assertEquals(
+            \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_REQUEST,
+            $contents['type']
+        );
         $this->assertEquals(
             $courseData['course']->name,
             $contents['body']['localizationParams']['courseName']
