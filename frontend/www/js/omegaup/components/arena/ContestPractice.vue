@@ -87,7 +87,7 @@
         :is-admin="contestAdmin"
         :in-contest="true"
         :show-new-clarification-popup="showNewClarificationPopup"
-        @new-clarification="(request) => $emit('new-clarification', request)"
+        @new-clarification="(request) => onNewClarification(request)"
         @clarification-response="onClarificationResponse"
         @update:activeTab="
           (selectedTab) => $emit('update:activeTab', selectedTab)
@@ -108,6 +108,7 @@ import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_ContestSummary from './ContestSummaryV2.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
+import { ClarificationEvent } from '../../arena/clarifications';
 
 export interface ActiveProblem {
   runs: types.Run[];
@@ -181,6 +182,10 @@ export default class ArenaContestPractice extends Vue {
       clarification: response,
       target: this,
     });
+  }
+
+  onNewClarification(request: ClarificationEvent): void {
+    this.$emit('new-clarification', { ...request, target: this });
   }
 
   @Watch('problem')

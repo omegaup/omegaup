@@ -12,7 +12,10 @@ import * as ui from '../ui';
 import * as time from '../time';
 import JSZip from 'jszip';
 import T from '../lang';
-import { ClarificationEvent } from '../arena/clarifications';
+import {
+  ClarificationEvent,
+  refreshClarifications,
+} from '../arena/clarifications';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsPayload();
@@ -26,7 +29,7 @@ OmegaUp.on('ready', () => {
       'omegaup-problem-details': problem_Details,
     },
     data: () => ({
-      initialClarifications: payload.clarifications,
+      clarifications: payload.clarifications,
       popupDisplayed: PopupDisplayed.None,
       runDetailsData: null as types.RunDetails | null,
       solutionStatus: payload.solutionStatus,
@@ -52,7 +55,7 @@ OmegaUp.on('ready', () => {
           user: payload.user,
           nominationStatus: this.nominationStatus,
           histogram: payload.histogram,
-          initialClarifications: this.initialClarifications,
+          clarifications: this.clarifications,
           solutionStatus: this.solutionStatus,
           solution: this.solution,
           availableTokens: this.availableTokens,
@@ -321,7 +324,10 @@ OmegaUp.on('ready', () => {
           'clarification-response': ({ clarification }: ClarificationEvent) => {
             api.Clarification.update(clarification)
               .then(() => {
-                refreshClarifications();
+                refreshClarifications({
+                  problemAlias: payload.problem.alias,
+                  target: problemDetailsView,
+                });
               })
               .catch(ui.apiError);
           },
@@ -425,20 +431,6 @@ OmegaUp.on('ready', () => {
       .catch(ui.apiError);
   }
 
-  function refreshClarifications(): void {
-    api.Problem.clarifications({
-      problem_alias: payload.problem.alias,
-      offset: 0, // TODO: Updating offset is missing
-      rowcount: 0, // TODO: Updating rowcount is missing
-    })
-      .then(time.remoteTimeAdapter)
-      .then(
-        (response) =>
-          (problemDetailsView.initialClarifications = response.clarifications),
-      )
-      .catch(ui.apiError);
-  }
-
   if (runs) {
     for (const run of runs) {
       trackRun(run);
@@ -447,7 +439,10 @@ OmegaUp.on('ready', () => {
   if (payload.user.admin) {
     setInterval(() => {
       refreshRuns();
-      refreshClarifications();
+      refreshClarifications({
+        problemAlias: payload.problem.alias,
+        target: problemDetailsView,
+      });
     }, 5 * 60 * 1000);
   }
   if (locationHash.includes('new-run')) {

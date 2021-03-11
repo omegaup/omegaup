@@ -7,19 +7,21 @@ export interface ClarificationEvent {
   target: Vue & {
     clearForm?: () => void;
     currentClarifications?: types.Clarification[];
+    clarifications?: types.Clarification[];
   };
   contestAlias?: string;
+  problemAlias?: string;
   clarification?: types.Clarification;
 }
 
 export function refreshClarifications({
-  clarification,
   contestAlias,
+  problemAlias,
   target,
 }: ClarificationEvent) {
   const params = {
     contest_alias: contestAlias,
-    problem_alias: clarification?.problem_alias,
+    problem_alias: problemAlias,
     rowcount: 100,
     offset: null,
   };
@@ -29,6 +31,9 @@ export function refreshClarifications({
   )
     .then(time.remoteTimeAdapter)
     .then((data) => {
+      if (!contestAlias) {
+        target.clarifications = data.clarifications;
+      }
       target.currentClarifications = data.clarifications;
     });
 }

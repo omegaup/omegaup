@@ -224,10 +224,12 @@ OmegaUp.on('ready', () => {
           },
           'new-clarification': ({
             clarification,
+            targetForm,
             target,
           }: {
             clarification: types.Clarification;
-            target: arena_NewClarification;
+            targetForm: arena_NewClarification;
+            target: arena_ContestPractice;
           }) => {
             if (!clarification) {
               return;
@@ -240,8 +242,12 @@ OmegaUp.on('ready', () => {
               message: clarification.message,
             })
               .then(() => {
-                target.clearForm();
-                refreshClarifications({ clarification, contestAlias, target });
+                targetForm.clearForm();
+                refreshClarifications({
+                  problemAlias: clarification?.problem_alias,
+                  contestAlias,
+                  target,
+                });
               })
               .catch(ui.apiError);
           },
@@ -252,7 +258,11 @@ OmegaUp.on('ready', () => {
           }: ClarificationEvent) => {
             api.Clarification.update(clarification)
               .then(() => {
-                refreshClarifications({ clarification, contestAlias, target });
+                refreshClarifications({
+                  problemAlias: clarification?.problem_alias,
+                  contestAlias,
+                  target,
+                });
               })
               .catch(ui.apiError);
           },
@@ -298,6 +308,7 @@ OmegaUp.on('ready', () => {
 
   setInterval(() => {
     refreshClarifications({
+      problemAlias: contestPractice.problem?.problem.alias,
       contestAlias: payload.contest.alias,
       target: contestPractice,
     });
