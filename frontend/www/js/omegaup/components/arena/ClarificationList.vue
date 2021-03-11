@@ -51,8 +51,11 @@
             :is-admin="isAdmin"
             :clarification="clarification"
             @clarification-response="
-              (id, responseText, isPublic) =>
-                $emit('clarification-response', id, responseText, isPublic)
+              (response) =>
+                $emit('clarification-response', {
+                  ...response,
+                  message: clarification.message,
+                })
             "
           ></omegaup-clarification>
         </tbody>
