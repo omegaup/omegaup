@@ -15,7 +15,7 @@ import arena_NewClarification from '../components/arena/NewClarificationPopup.vu
 import problemsStore from './problemStore';
 import JSZip from 'jszip';
 import { getOptionsFromLocation } from './location';
-import { Clarification, refreshClarifications } from './clarifications';
+import { ClarificationEvent, refreshClarifications } from './clarifications';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -249,7 +249,7 @@ OmegaUp.on('ready', () => {
             contestAlias,
             clarification,
             target,
-          }: Clarification) => {
+          }: ClarificationEvent) => {
             api.Clarification.update(clarification)
               .then(() => {
                 refreshClarifications({ clarification, contestAlias, target });

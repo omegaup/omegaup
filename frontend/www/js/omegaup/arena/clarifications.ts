@@ -3,7 +3,7 @@ import * as api from '../api';
 import * as time from '../time';
 import { types } from '../api_types';
 
-export interface Clarification {
+export interface ClarificationEvent {
   target: Vue & {
     clearForm?: () => void;
     currentClarifications?: types.Clarification[];
@@ -16,7 +16,7 @@ export function refreshClarifications({
   clarification,
   contestAlias,
   target,
-}: Clarification) {
+}: ClarificationEvent) {
   const params = {
     contest_alias: contestAlias,
     problem_alias: clarification?.problem_alias,

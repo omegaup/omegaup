@@ -12,7 +12,7 @@ import * as ui from '../ui';
 import * as time from '../time';
 import JSZip from 'jszip';
 import T from '../lang';
-import { Clarification } from '../arena/clarifications';
+import { ClarificationEvent } from '../arena/clarifications';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsPayload();
@@ -318,7 +318,7 @@ OmegaUp.on('ready', () => {
                 });
             }
           },
-          'clarification-response': ({ clarification }: Clarification) => {
+          'clarification-response': ({ clarification }: ClarificationEvent) => {
             api.Clarification.update(clarification)
               .then(() => {
                 refreshClarifications();
