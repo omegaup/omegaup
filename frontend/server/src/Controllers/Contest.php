@@ -582,7 +582,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $response = [
+        return [
             'users' => \OmegaUp\DAO\ProblemsetIdentities::getWithExtraInformation(
                 intval($contest->problemset_id)
             ),
@@ -595,8 +595,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ),
             'problems' => $problems,
         ];
-
-        return $response;
     }
 
     /**
@@ -791,6 +789,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
         $commonDetails = self::getCommonDetails(
             $contest,
+            $problemset,
             $contestAdmin,
             $r->identity
         );
