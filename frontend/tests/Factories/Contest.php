@@ -211,7 +211,7 @@ class Contest {
     /**
      * @return array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}
      */
-    public static function createContest(?ContestParams $params = null) {
+    public static function createContest(?ContestParams $params = null): array {
         if (is_null($params)) {
             $params = new ContestParams();
         }

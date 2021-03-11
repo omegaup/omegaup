@@ -201,7 +201,7 @@ class Problem {
     public static function createProblem(
         ?\OmegaUp\Test\Factories\ProblemParams $params = null,
         \OmegaUp\Test\ScopedLoginToken $login = null
-    ) {
+    ): array {
         if (is_null($params)) {
             $params = new \OmegaUp\Test\Factories\ProblemParams();
         }
