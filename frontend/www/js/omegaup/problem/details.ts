@@ -14,8 +14,10 @@ import JSZip from 'jszip';
 import T from '../lang';
 import {
   ClarificationEvent,
-  refreshClarifications,
+  refreshProblemClarifications,
+  trackClarifications,
 } from '../arena/clarifications';
+import clarificationStore from '../arena/clarificationsStore';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsPayload();
@@ -23,13 +25,15 @@ OmegaUp.on('ready', () => {
   const locationHash = window.location.hash.substr(1).split('/');
   const runs =
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
+
+  trackClarifications(payload.clarifications ?? []);
+
   const problemDetailsView = new Vue({
     el: '#main-container',
     components: {
       'omegaup-problem-details': problem_Details,
     },
     data: () => ({
-      clarifications: payload.clarifications,
       popupDisplayed: PopupDisplayed.None,
       runDetailsData: null as types.RunDetails | null,
       solutionStatus: payload.solutionStatus,
@@ -55,7 +59,7 @@ OmegaUp.on('ready', () => {
           user: payload.user,
           nominationStatus: this.nominationStatus,
           histogram: payload.histogram,
-          clarifications: this.clarifications,
+          clarifications: clarificationStore.state.clarifications,
           solutionStatus: this.solutionStatus,
           solution: this.solution,
           availableTokens: this.availableTokens,
@@ -324,9 +328,8 @@ OmegaUp.on('ready', () => {
           'clarification-response': ({ clarification }: ClarificationEvent) => {
             api.Clarification.update(clarification)
               .then(() => {
-                refreshClarifications({
+                refreshProblemClarifications({
                   problemAlias: payload.problem.alias,
-                  target: problemDetailsView,
                 });
               })
               .catch(ui.apiError);
@@ -439,9 +442,8 @@ OmegaUp.on('ready', () => {
   if (payload.user.admin) {
     setInterval(() => {
       refreshRuns();
-      refreshClarifications({
+      refreshProblemClarifications({
         problemAlias: payload.problem.alias,
-        target: problemDetailsView,
       });
     }, 5 * 60 * 1000);
   }

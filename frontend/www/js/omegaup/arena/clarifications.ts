@@ -1,39 +1,51 @@
-import Vue from 'vue';
 import * as api from '../api';
 import * as time from '../time';
 import { types } from '../api_types';
+import clarificationStore from './clarificationsStore';
 
 export interface ClarificationEvent {
-  target: Vue & {
-    clearForm?: () => void;
-    currentClarifications?: types.Clarification[];
-    clarifications?: types.Clarification[];
-  };
-  contestAlias?: string;
-  problemAlias?: string;
-  clarification?: types.Clarification;
+  contestAlias: string;
+  clarification: types.Clarification;
 }
 
-export function refreshClarifications({
+export function refreshContestClarifications({
   contestAlias,
   problemAlias,
-  target,
-}: ClarificationEvent) {
-  const params = {
+}: {
+  contestAlias: string;
+  problemAlias?: string;
+}) {
+  api.Contest.clarifications({
     contest_alias: contestAlias,
     problem_alias: problemAlias,
     rowcount: 100,
     offset: null,
-  };
-  (contestAlias
-    ? api.Contest.clarifications(params)
-    : api.Problem.clarifications(params)
-  )
+  })
     .then(time.remoteTimeAdapter)
     .then((data) => {
-      if (!contestAlias) {
-        target.clarifications = data.clarifications;
-      }
-      target.currentClarifications = data.clarifications;
+      trackClarifications(data.clarifications);
     });
+}
+
+export function refreshProblemClarifications({
+  problemAlias,
+}: {
+  problemAlias: string;
+}) {
+  api.Problem.clarifications({
+    problem_alias: problemAlias,
+    rowcount: 100,
+    offset: null,
+  })
+    .then(time.remoteTimeAdapter)
+    .then((data) => {
+      trackClarifications(data.clarifications);
+    });
+}
+
+export function trackClarifications(clarifications: types.Clarification[]) {
+  clarificationStore.commit('clear');
+  for (const clarification of clarifications) {
+    clarificationStore.commit('addClarification', clarification);
+  }
 }
