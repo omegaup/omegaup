@@ -52,7 +52,10 @@
             :clarification="clarification"
             @clarification-response="
               (response) =>
-                onClarificationResponse(response, clarification.message)
+                $emit('clarification-response', {
+                  ...response,
+                  message: clarification.message,
+                })
             "
           ></omegaup-clarification>
         </tbody>
@@ -104,14 +107,6 @@ export default class ArenaClarificationList extends Vue {
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
     this.$emit('update:activeTab', 'clarifications');
-  }
-
-  onClarificationResponse(
-    response: types.Clarification,
-    message: string,
-  ): void {
-    response.message = message;
-    this.$emit('clarification-response', response);
   }
 
   @Watch('showNewClarificationPopup')

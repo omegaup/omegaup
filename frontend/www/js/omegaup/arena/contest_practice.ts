@@ -15,12 +15,7 @@ import arena_NewClarification from '../components/arena/NewClarificationPopup.vu
 import problemsStore from './problemStore';
 import JSZip from 'jszip';
 import { getOptionsFromLocation } from './location';
-import {
-  Clarification,
-  clarificationResponse,
-  newClarification,
-  refreshClarifications,
-} from './clarifications';
+import { Clarification, refreshClarifications } from './clarifications';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -234,18 +229,32 @@ OmegaUp.on('ready', () => {
             clarification: types.Clarification;
             target: arena_NewClarification;
           }) => {
-            newClarification({
-              clarification,
-              target,
-              contestAlias: payload.contest.alias,
-            });
+            if (!clarification) {
+              return;
+            }
+            const contestAlias = payload.contest.alias;
+            api.Clarification.create({
+              contest_alias: contestAlias,
+              problem_alias: clarification.problem_alias,
+              username: clarification.author,
+              message: clarification.message,
+            })
+              .then(() => {
+                target.clearForm();
+                refreshClarifications({ clarification, contestAlias, target });
+              })
+              .catch(ui.apiError);
           },
           'clarification-response': ({
             contestAlias,
             clarification,
             target,
           }: Clarification) => {
-            clarificationResponse({ contestAlias, clarification, target });
+            api.Clarification.update(clarification)
+              .then(() => {
+                refreshClarifications({ clarification, contestAlias, target });
+              })
+              .catch(ui.apiError);
           },
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);

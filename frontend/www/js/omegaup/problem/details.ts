@@ -12,7 +12,7 @@ import * as ui from '../ui';
 import * as time from '../time';
 import JSZip from 'jszip';
 import T from '../lang';
-import { Clarification, clarificationResponse } from '../arena/clarifications';
+import { Clarification } from '../arena/clarifications';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsPayload();
@@ -318,12 +318,12 @@ OmegaUp.on('ready', () => {
                 });
             }
           },
-          'clarification-response': ({
-            contestAlias,
-            clarification,
-            target,
-          }: Clarification) => {
-            clarificationResponse({ contestAlias, clarification, target });
+          'clarification-response': ({ clarification }: Clarification) => {
+            api.Clarification.update(clarification)
+              .then(() => {
+                refreshClarifications();
+              })
+              .catch(ui.apiError);
           },
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
