@@ -369,4 +369,63 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals(2, count($response['clarifications']));
         }
     }
+
+    public function testCourseClarification() {
+        $admin = \OmegaUp\Test\Factories\User::createUser();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $admin['identity'],
+            self::login($admin['identity']),
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+
+        $login = self::login($admin['identity']);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+
+        $student = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student['identity']
+        );
+
+        $message = 'Test message';
+        $clarification = \OmegaUp\Controllers\Clarification::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($student['identity'])->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'problem_alias' => $problemData['problem']->alias,
+                'message' => $message,
+            ])
+        );
+
+        $this->assertEquals($message, $clarification['message']);
+
+        // Verify notification for admin
+        $notifications = \OmegaUp\DAO\Notifications::getUnreadNotifications(
+            $admin['user']
+        );
+        $this->assertCount(1, $notifications);
+
+        $contents = json_decode($notifications[0]['contents'], true);
+        $this->assertEquals(
+            \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_REQUEST,
+            $contents['type']
+        );
+        $this->assertEquals(
+            $courseData['course']->name,
+            $contents['body']['localizationParams']['courseName']
+        );
+        $this->assertEquals(
+            $problemData['problem']->alias,
+            $contents['body']['localizationParams']['problemAlias']
+        );
+    }
 }

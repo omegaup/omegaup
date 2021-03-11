@@ -1390,6 +1390,16 @@ export namespace types {
     };
   }
 
+  export interface ArenaAssignment {
+    alias?: string;
+    assignment_type: string;
+    description?: string;
+    finish_time?: Date;
+    name?: string;
+    problems: types.NavbarProblemsetProblem[];
+    start_time: Date;
+  }
+
   export interface ArenaProblemDetails {
     accepts_submissions: boolean;
     alias: string;
@@ -1411,15 +1421,7 @@ export namespace types {
 
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
-    currentAssignment: {
-      alias?: string;
-      assignment_type: string;
-      description?: string;
-      finish_time?: Date;
-      name?: string;
-      problems: types.NavbarProblemsetProblem[];
-      start_time: Date;
-    };
+    currentAssignment: types.ArenaAssignment;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
   }
@@ -3162,14 +3164,16 @@ export namespace messages {
 
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
-  export type ClarificationCreateResponse = { clarification_id: number };
+  export type _ClarificationCreateServerResponse = any;
+  export type ClarificationCreateResponse = types.Clarification;
   export type ClarificationDetailsRequest = { [key: string]: any };
+  export type _ClarificationDetailsServerResponse = any;
   export type ClarificationDetailsResponse = {
     answer?: string;
     message: string;
     problem_id: number;
     problemset_id?: number;
-    time: number;
+    time: Date;
   };
   export type ClarificationUpdateRequest = { [key: string]: any };
   export type ClarificationUpdateResponse = {};
