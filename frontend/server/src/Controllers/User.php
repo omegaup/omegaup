@@ -2092,13 +2092,21 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
         $param = $term ?? $query;
+        if (is_null($param)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'query'
+            );
+        }
 
         $identities = \OmegaUp\DAO\Identities::findByUsernameOrName($param);
         $response = [];
         foreach ($identities as $identity) {
+            $username = strval($identity->username);
+            $name = strval($identity->name);
             $response[] = [
-                'label' => $identity->username,
-                'value' => $identity->name ?: $identity->username,
+                'label' => $username,
+                'value' => $name ?: $username,
             ];
         }
         return $response;
