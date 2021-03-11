@@ -15,6 +15,7 @@ import T from '../lang';
 import {
   refreshRuns,
   submitRun,
+  submitRunFailed,
   trackRun,
   updateRunFallback,
 } from '../arena/submissions';
@@ -162,14 +163,30 @@ OmegaUp.on('ready', () => {
             code: string;
             language: string;
           }) => {
-            submitRun({
-              code,
-              language,
-              username: commonPayload.currentUsername,
-              classname: commonPayload.userClassname,
-              problemAlias: payload.problem.alias,
-              target: problemDetailsView,
-            });
+            api.Run.create({
+              problem_alias: payload.problem.alias,
+              language: language,
+              source: code,
+            })
+              .then((response) => {
+                submitRun({
+                  runs,
+                  guid: response.guid,
+                  submitDelay: response.submit_delay,
+                  language,
+                  username: commonPayload.currentUsername,
+                  classname: commonPayload.userClassname,
+                  problemAlias: payload.problem.alias,
+                  target: problemDetailsView,
+                });
+              })
+              .catch((run) => {
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
+              });
           },
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
             const contents: { quality_seal?: boolean; tag?: string } = {};

@@ -9,7 +9,8 @@ import { OmegaUp } from '../omegaup';
 interface RunSubmit {
   classname: string;
   username: string;
-  code: string;
+  guid: string;
+  submitDelay: number;
   language: string;
   problemAlias: string;
   target: Vue & { nominationStatus?: types.NominationStatus };
@@ -20,42 +21,45 @@ interface RunSubmit {
 export function submitRun({
   classname,
   username,
-  code,
+  guid,
   language,
   problemAlias,
+  submitDelay,
   target,
 }: RunSubmit): void {
-  api.Run.create({
-    problem_alias: problemAlias,
-    language: language,
-    source: code,
-  })
-    .then((response) => {
-      ui.reportEvent('submission', 'submit');
-      const run = {
-        guid: response.guid,
-        submit_delay: response.submit_delay,
-        username,
-        classname,
-        country: 'xx',
-        status: 'new',
-        alias: problemAlias,
-        time: new Date(),
-        penalty: 0,
-        runtime: 0,
-        memory: 0,
-        verdict: 'JE',
-        score: 0,
-        language,
-      };
-      updateRun({ run, target });
-    })
-    .catch((run) => {
-      ui.error(run.error ?? run);
-      if (run.errorname) {
-        ui.reportEvent('submission', 'submit-fail', run.errorname);
-      }
-    });
+  ui.reportEvent('submission', 'submit');
+  const run: types.Run = {
+    guid: guid,
+    submit_delay: submitDelay,
+    username,
+    classname,
+    country: 'xx',
+    status: 'new',
+    alias: problemAlias,
+    time: new Date(),
+    penalty: 0,
+    runtime: 0,
+    memory: 0,
+    verdict: 'JE',
+    score: 0,
+    language,
+  };
+  updateRun({ run, target });
+}
+
+export function submitRunFailed({
+  error,
+  errorname,
+  run,
+}: {
+  error: string;
+  errorname: string;
+  run: types.Run;
+}): void {
+  ui.error(error ?? run);
+  if (errorname) {
+    ui.reportEvent('submission', 'submit-fail', errorname);
+  }
 }
 
 export function updateRun({

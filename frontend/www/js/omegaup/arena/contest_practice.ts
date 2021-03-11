@@ -14,7 +14,7 @@ import { myRunsStore } from '../arena/runsStore';
 import arena_NewClarification from '../components/arena/NewClarificationPopup.vue';
 import problemsStore from './problemStore';
 import JSZip from 'jszip';
-import { submitRun, trackRun } from './submissions';
+import { submitRun, submitRunFailed, trackRun } from './submissions';
 import { getOptionsFromLocation } from './location';
 import { ClarificationEvent, refreshClarifications } from './clarifications';
 
@@ -194,15 +194,30 @@ OmegaUp.on('ready', () => {
             code,
             language,
           }: ActiveProblem & { code: string; language: string }) => {
-            submitRun({
-              runs,
-              code,
-              language,
-              username: commonPayload.currentUsername,
-              classname: commonPayload.userClassname,
-              problemAlias: problem.alias,
-              target: contestPractice,
-            });
+            api.Run.create({
+              problem_alias: problem.alias,
+              language: language,
+              source: code,
+            })
+              .then((response) => {
+                submitRun({
+                  runs,
+                  guid: response.guid,
+                  submitDelay: response.submit_delay,
+                  language,
+                  username: commonPayload.currentUsername,
+                  classname: commonPayload.userClassname,
+                  problemAlias: problem.alias,
+                  target: contestPractice,
+                });
+              })
+              .catch((run) => {
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
+              });
           },
           'new-clarification': ({
             clarification,
