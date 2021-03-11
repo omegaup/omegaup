@@ -774,6 +774,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
+        $commonDetails = self::getCommonDetails(
+            $contest,
+            $contestAdmin,
+            $r->identity
+        );
+        if (!$contestAdmin) {
+            $commonDetails['users'] = [];
+        }
 
         return [
             'smartyProperties' => [
@@ -795,11 +803,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                         ),
                         'contestAdmin' => $contestAdmin,
                     ],
-                    self::getCommonDetails(
-                        $contest,
-                        $contestAdmin,
-                        $r->identity
-                    ),
+                    $commonDetails,
                 ),
                 'fullWidth' => true,
                 'title' => new \OmegaUp\TranslationString(
