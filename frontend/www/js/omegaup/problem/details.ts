@@ -13,7 +13,7 @@ import * as time from '../time';
 import JSZip from 'jszip';
 import T from '../lang';
 import {
-  refreshRuns,
+  onRefreshRuns,
   submitRun,
   submitRunFailed,
   trackRun,
@@ -152,7 +152,6 @@ OmegaUp.on('ready', () => {
               runsStore.commit('removeFilter', filter);
             }
             refreshRuns({
-              problemAlias: payload.problem.alias,
               target: problemDetailsView,
             });
           },
@@ -383,6 +382,26 @@ OmegaUp.on('ready', () => {
       .catch(ui.apiError);
   }
 
+  function refreshRuns(request: {
+    target: Vue & { nominationStatus?: types.NominationStatus };
+  }): void {
+    api.Problem.runs({
+      problem_alias: payload.problem.alias,
+      show_all: true,
+      offset: runsStore.state.filters?.offset,
+      rowcount: runsStore.state.filters?.rowcount,
+      verdict: runsStore.state.filters?.verdict,
+      language: runsStore.state.filters?.language,
+      username: runsStore.state.filters?.username,
+      status: runsStore.state.filters?.status,
+    })
+      .then(time.remoteTimeAdapter)
+      .then((response) => {
+        onRefreshRuns({ ...request, runs: response.runs });
+      })
+      .catch(ui.apiError);
+  }
+
   if (runs) {
     for (const run of runs) {
       trackRun({ run, target: problemDetailsView });
@@ -391,7 +410,6 @@ OmegaUp.on('ready', () => {
   if (payload.user.admin) {
     setInterval(() => {
       refreshRuns({
-        problemAlias: payload.problem.alias,
         target: problemDetailsView,
       });
       refreshClarifications();

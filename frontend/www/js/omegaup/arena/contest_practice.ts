@@ -10,12 +10,11 @@ import arena_ContestPractice, {
 import problem_Details, {
   PopupDisplayed,
 } from '../components/problem/Details.vue';
-import { myRunsStore } from '../arena/runsStore';
 import arena_NewClarification from '../components/arena/NewClarificationPopup.vue';
-import problemsStore from './problemStore';
 import JSZip from 'jszip';
-import { submitRun, submitRunFailed, trackRun } from './submissions';
+import { submitRun, submitRunFailed } from './submissions';
 import { getOptionsFromLocation } from './location';
+import { navigateToProblem } from './navigation';
 import { ClarificationEvent, refreshClarifications } from './clarifications';
 
 OmegaUp.on('ready', () => {
@@ -37,22 +36,6 @@ OmegaUp.on('ready', () => {
       showNewClarificationPopup: false,
       guid: null as null | string,
     }),
-    methods: {
-      getMaxScore: (
-        runs: types.Run[],
-        alias: string,
-        previousScore: number,
-      ): number => {
-        let maxScore = previousScore;
-        for (const run of runs) {
-          if (alias != run.alias) {
-            continue;
-          }
-          maxScore = Math.max(maxScore, run.contest_score || 0);
-        }
-        return maxScore;
-      },
-    },
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
         props: {
@@ -69,52 +52,13 @@ OmegaUp.on('ready', () => {
           guid: this.guid,
         },
         on: {
-          'navigate-to-problem': (request: ActiveProblem) => {
-            if (
-              Object.prototype.hasOwnProperty.call(
-                problemsStore.state.problems,
-                request.problem.alias,
-              )
-            ) {
-              contestPractice.problemInfo =
-                problemsStore.state.problems[request.problem.alias];
-              window.location.hash = `#problems/${request.problem.alias}`;
-              return;
-            }
-            api.Problem.details({
-              problem_alias: request.problem.alias,
-              prevent_problemset_open: false,
-            })
-              .then((problemInfo) => {
-                for (const run of problemInfo.runs ?? []) {
-                  trackRun({ run, target: contestPractice });
-                }
-                const currentProblem = payload.problems?.find(
-                  ({ alias }) => alias == problemInfo.alias,
-                );
-                problemInfo.title = currentProblem?.text ?? '';
-                contestPractice.problemInfo = problemInfo;
-                request.problem.alias = problemInfo.alias;
-                request.runs = myRunsStore.state.runs;
-                request.problem.bestScore = this.getMaxScore(
-                  request.runs,
-                  problemInfo.alias,
-                  0,
-                );
-                problemsStore.commit('addProblem', problemInfo);
-                if (
-                  contestPractice.popupDisplayed === PopupDisplayed.RunSubmit
-                ) {
-                  window.location.hash = `#problems/${request.problem.alias}/new-run`;
-                  return;
-                }
-                window.location.hash = `#problems/${request.problem.alias}`;
-              })
-              .catch(() => {
-                ui.dismissNotifications();
-                window.location.hash = '#problems';
-                contestPractice.problem = null;
-              });
+          'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
+            navigateToProblem({
+              problem,
+              runs,
+              target: contestPractice,
+              problems: this.problems,
+            });
           },
           'show-run': (source: {
             target: problem_Details;

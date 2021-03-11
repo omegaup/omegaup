@@ -124,29 +124,15 @@ export function trackRun({
   }
 }
 
-export function refreshRuns({
-  problemAlias,
+export function onRefreshRuns({
+  runs,
   target,
 }: {
-  problemAlias: string;
+  runs: types.Run[];
   target: Vue & { nominationStatus?: types.NominationStatus };
 }): void {
-  api.Problem.runs({
-    problem_alias: problemAlias,
-    show_all: true,
-    offset: runsStore.state.filters?.offset,
-    rowcount: runsStore.state.filters?.rowcount,
-    verdict: runsStore.state.filters?.verdict,
-    language: runsStore.state.filters?.language,
-    username: runsStore.state.filters?.username,
-    status: runsStore.state.filters?.status,
-  })
-    .then(time.remoteTimeAdapter)
-    .then((response) => {
-      runsStore.commit('clear');
-      for (const run of response.runs) {
-        trackRun({ run, target });
-      }
-    })
-    .catch(ui.apiError);
+  runsStore.commit('clear');
+  for (const run of runs) {
+    trackRun({ run, target });
+  }
 }
