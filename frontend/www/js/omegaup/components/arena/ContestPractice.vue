@@ -153,8 +153,8 @@ export default class ArenaContestPractice extends Vue {
     this.$emit('navigate-to-problem', request);
   }
 
-  onRunSubmitted(request: { code: string; language: string }): void {
-    this.$emit('submit-run', Object.assign({}, request, this.activeProblem));
+  onRunSubmitted(run: { code: string; language: string }): void {
+    this.$emit('submit-run', Object.assign({}, run, this.activeProblem));
   }
 
   onShowRunDetails(target: problem_Details, guid: string): void {
