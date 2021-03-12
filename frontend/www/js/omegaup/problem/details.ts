@@ -14,6 +14,7 @@ import JSZip from 'jszip';
 import T from '../lang';
 import {
   onRefreshRuns,
+  onSetNominationStatus,
   submitRun,
   submitRunFailed,
   trackRun,
@@ -151,16 +152,18 @@ OmegaUp.on('ready', () => {
             } else {
               runsStore.commit('removeFilter', filter);
             }
-            refreshRuns({
-              target: problemDetailsView,
-            });
+            refreshRuns();
           },
           'submit-run': ({
             code,
             language,
+            runs,
+            nominationStatus,
           }: {
             code: string;
             language: string;
+            runs: types.Run[];
+            nominationStatus: types.NominationStatus;
           }) => {
             api.Run.create({
               problem_alias: payload.problem.alias,
@@ -176,8 +179,8 @@ OmegaUp.on('ready', () => {
                   username: commonPayload.currentUsername,
                   classname: commonPayload.userClassname,
                   problemAlias: payload.problem.alias,
-                  target: problemDetailsView,
                 });
+                setNominationStatus({ runs, nominationStatus });
               })
               .catch((run) => {
                 submitRunFailed({
@@ -348,7 +351,7 @@ OmegaUp.on('ready', () => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
               .then(() => {
                 run.status = 'rejudging';
-                updateRunFallback({ run, target: problemDetailsView });
+                updateRunFallback({ run });
               })
               .catch(ui.ignoreError);
           },
@@ -359,7 +362,7 @@ OmegaUp.on('ready', () => {
             api.Run.disqualify({ run_alias: run.guid })
               .then(() => {
                 run.type = 'disqualified';
-                updateRunFallback({ run, target: problemDetailsView });
+                updateRunFallback({ run });
               })
               .catch(ui.ignoreError);
           },
@@ -382,9 +385,22 @@ OmegaUp.on('ready', () => {
       .catch(ui.apiError);
   }
 
-  function refreshRuns(request: {
-    target: Vue & { nominationStatus?: types.NominationStatus };
-  }): void {
+  function setNominationStatus({
+    runs,
+    nominationStatus,
+  }: {
+    runs: types.Run[];
+    nominationStatus: types.NominationStatus;
+  }) {
+    for (const run of runs) {
+      onSetNominationStatus({
+        run,
+        nominationStatus,
+      });
+    }
+  }
+
+  function refreshRuns(): void {
     api.Problem.runs({
       problem_alias: payload.problem.alias,
       show_all: true,
@@ -397,21 +413,30 @@ OmegaUp.on('ready', () => {
     })
       .then(time.remoteTimeAdapter)
       .then((response) => {
-        onRefreshRuns({ ...request, runs: response.runs });
+        if (!problemDetailsView.nominationStatus) return;
+        onRefreshRuns({ runs: response.runs });
+        setNominationStatus({
+          runs: response.runs,
+          nominationStatus: problemDetailsView.nominationStatus,
+        });
       })
       .catch(ui.apiError);
   }
 
   if (runs) {
     for (const run of runs) {
-      trackRun({ run, target: problemDetailsView });
+      trackRun({ run });
+    }
+    if (problemDetailsView.nominationStatus) {
+      setNominationStatus({
+        runs,
+        nominationStatus: problemDetailsView.nominationStatus,
+      });
     }
   }
   if (payload.user.admin) {
     setInterval(() => {
-      refreshRuns({
-        target: problemDetailsView,
-      });
+      refreshRuns();
       refreshClarifications();
     }, 5 * 60 * 1000);
   }

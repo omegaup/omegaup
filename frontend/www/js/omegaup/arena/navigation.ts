@@ -2,11 +2,11 @@ import Vue from 'vue';
 import * as api from '../api';
 import * as ui from '../ui';
 import { types } from '../api_types';
-import { myRunsStore, runsStore } from './runsStore';
-import { OmegaUp } from '../omegaup';
+import { myRunsStore } from './runsStore';
 import problemsStore from './problemStore';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
+import { trackRun } from './submissions';
 
 interface Navigation {
   target: Vue & {
@@ -64,36 +64,6 @@ export function navigateToProblem({
       target.problem = null;
       window.location.hash = '#problems';
     });
-}
-
-export function trackRun({
-  run,
-  target,
-}: {
-  run: types.Run;
-  target?: Vue & { nominationStatus?: types.NominationStatus };
-}): void {
-  runsStore.commit('addRun', run);
-  if (run.username !== OmegaUp.username) {
-    return;
-  }
-  myRunsStore.commit('addRun', run);
-
-  if (!target?.nominationStatus) {
-    return;
-  }
-  if (run.verdict !== 'AC' && run.verdict !== 'CE' && run.verdict !== 'JE') {
-    target.nominationStatus.tried = true;
-  }
-  if (run.verdict === 'AC') {
-    Vue.set(
-      target,
-      'nominationStatus',
-      Object.assign({}, target.nominationStatus, {
-        solved: true,
-      }),
-    );
-  }
 }
 
 function getMaxScore(

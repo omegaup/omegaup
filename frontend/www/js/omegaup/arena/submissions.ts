@@ -13,9 +13,7 @@ interface RunSubmit {
   submitDelay: number;
   language: string;
   problemAlias: string;
-  target: Vue & { nominationStatus?: types.NominationStatus };
-  runs?: types.Run[];
-  problem?: types.NavbarProblemsetProblem;
+  runs: types.Run[];
 }
 
 export function submitRun({
@@ -25,7 +23,6 @@ export function submitRun({
   language,
   problemAlias,
   submitDelay,
-  target,
 }: RunSubmit): void {
   ui.reportEvent('submission', 'submit');
   const run: types.Run = {
@@ -44,7 +41,7 @@ export function submitRun({
     score: 0,
     language,
   };
-  updateRun({ run, target });
+  updateRun({ run });
 }
 
 export function submitRunFailed({
@@ -62,77 +59,52 @@ export function submitRunFailed({
   }
 }
 
-export function updateRun({
-  run,
-  target,
-}: {
-  run: types.Run;
-  target: Vue & { nominationStatus?: types.NominationStatus };
-}): void {
-  trackRun({ run, target });
+export function updateRun({ run }: { run: types.Run }): void {
+  trackRun({ run });
 
   // TODO: Implement websocket support
 
   if (run.status != 'ready') {
-    updateRunFallback({ run, target });
+    updateRunFallback({ run });
     return;
   }
 }
 
-export function updateRunFallback({
-  run,
-  target,
-}: {
-  run: types.Run;
-  target: Vue & { nominationStatus?: types.NominationStatus };
-}): void {
+export function updateRunFallback({ run }: { run: types.Run }): void {
   setTimeout(() => {
     api.Run.status({ run_alias: run.guid })
       .then(time.remoteTimeAdapter)
-      .then((response) => updateRun({ run: response, target }))
+      .then((response) => updateRun({ run: response }))
       .catch(ui.ignoreError);
   }, 5000);
 }
 
-export function trackRun({
-  run,
-  target,
-}: {
-  run: types.Run;
-  target: Vue & { nominationStatus?: types.NominationStatus };
-}): void {
+export function trackRun({ run }: { run: types.Run }): void {
   runsStore.commit('addRun', run);
   if (run.username !== OmegaUp.username) {
     return;
   }
   myRunsStore.commit('addRun', run);
+}
 
-  if (!target.nominationStatus) {
-    return;
-  }
+export function onSetNominationStatus({
+  run,
+  nominationStatus,
+}: {
+  run: types.Run;
+  nominationStatus: types.NominationStatus;
+}): void {
   if (run.verdict !== 'AC' && run.verdict !== 'CE' && run.verdict !== 'JE') {
-    target.nominationStatus.tried = true;
+    Vue.set(nominationStatus, 'tried', true);
   }
   if (run.verdict === 'AC') {
-    Vue.set(
-      target,
-      'nominationStatus',
-      Object.assign({}, target.nominationStatus, {
-        solved: true,
-      }),
-    );
+    Vue.set(nominationStatus, 'solved', true);
   }
 }
 
-export function onRefreshRuns({
-  runs,
-  target,
-}: {
-  runs: types.Run[];
-  target: Vue & { nominationStatus?: types.NominationStatus };
-}): void {
+export function onRefreshRuns({ runs }: { runs: types.Run[] }): void {
   runsStore.commit('clear');
   for (const run of runs) {
-    trackRun({ run, target });
+    trackRun({ run });
   }
 }

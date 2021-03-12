@@ -152,7 +152,6 @@ OmegaUp.on('ready', () => {
                   username: commonPayload.currentUsername,
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
-                  target: contestPractice,
                 });
               })
               .catch((run) => {
