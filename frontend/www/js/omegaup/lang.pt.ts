@@ -1147,6 +1147,7 @@ const translations: { [key: string]: string; } = {
   studentProgressTooltipDescription: "%(problem):\n\n%(score) of %(points) pontos\n\n%(progress)% de progresso",
   submissionFeedbackAlreadyExists: "J\u00e1 existe um feedback para esta submis\u00e3o.",
   submissionMemoryInMegabytes: "%(value) MiB",
+  submissionNotAssociatedToProblem: "A submis\u00e3o n\u00e3o est\u00e1 asociada ao problema.",
   submissionNotFound: "Envio n\u00e3o encontrado.",
   submissionRunTimeInSeconds: "%(value) s",
   submissionsListTitle: "Submiss\u00f5es realizadas nas \u00faltimas 24 horas",

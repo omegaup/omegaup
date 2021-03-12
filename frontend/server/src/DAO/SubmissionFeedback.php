@@ -29,7 +29,7 @@ class SubmissionFeedback extends \OmegaUp\DAO\Base\SubmissionFeedback {
             WHERE
                 sf.submission_id = ?';
 
-        /** @var null|array{submission_feedback_id: int, identity_id: int, submission_id: int, feedback: string, date: \OmegaUp\Timestamp} */
+        /** @var array{date: \OmegaUp\Timestamp, feedback: string, identity_id: int, submission_feedback_id: int, submission_id: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->getRow(
             $sql,
             [ $submission->submission_id ]

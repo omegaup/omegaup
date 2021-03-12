@@ -1147,6 +1147,7 @@ const translations: { [key: string]: string; } = {
   studentProgressTooltipDescription: "%(problem):\n\n%(score) de %(points) puntos\n\n%(progress)% de progreso",
   submissionFeedbackAlreadyExists: "Ya existe retroalimentaci\u00f3n para este env\u00edo.",
   submissionMemoryInMegabytes: "%(value) MiB",
+  submissionNotAssociatedToProblem: "El env\u00edo no est\u00e1 asociado al problema.",
   submissionNotFound: "No se encontr\u00f3 el env\u00edo.",
   submissionRunTimeInSeconds: "%(value) s",
   submissionsListTitle: "Env\u00edos realizados en las \u00faltimas 24 horas",

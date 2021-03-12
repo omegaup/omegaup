@@ -22,9 +22,9 @@ class SubmissionFeedback extends \OmegaUp\Controllers\Controller {
     public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $submissionId = $r->ensureInt('submission_id');
-
-        $submission = \OmegaUp\DAO\Submissions::getByPK($submissionId);
+        $submission = \OmegaUp\DAO\Submissions::getByPK(
+            $r->ensureInt('submission_id')
+        );
         if (is_null($submission)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'submissionNotFound'
@@ -96,6 +96,15 @@ class SubmissionFeedback extends \OmegaUp\Controllers\Controller {
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFoundInProblemset'
+            );
+        }
+
+        if (
+            $submission->problem_id !== $problem->problem_id ||
+            $submission->problemset_id !== $assignment->problemset_id
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'submissionNotAssociatedToProblem'
             );
         }
 

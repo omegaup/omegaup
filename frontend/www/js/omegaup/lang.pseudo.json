@@ -1146,6 +1146,7 @@
 	"studentProgressTooltipDescription": "(%(problem):\n\n%(score) 0f %(points) p0in75\n\n%(progress)% pr0gr355)",
 	"submissionFeedbackAlreadyExists": "(Th3 f33dback f0r 7hi5 5ubmi55i0n a1r3ady 3xi575.)",
 	"submissionMemoryInMegabytes": "(%(value) MiB)",
+	"submissionNotAssociatedToProblem": "(Th3 5ubmi55i0n i5 n07 a550cia73d 70 7h3 pr0b13m.)",
 	"submissionNotFound": "(Submi55i0n n07 f0und.)",
 	"submissionRunTimeInSeconds": "(%(value) 5)",
 	"submissionsListTitle": "(Submi55i0n5 0n 7h3 1a57 24 h0ur5)",
