@@ -284,21 +284,21 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         // Authenticate user
         $r->ensureIdentity();
 
-        // Validate request
-        $r->ensureInt('clarification_id');
-        $r->ensureOptionalBool('public');
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['answer'],
-            'answer'
+        $public = $r->ensureOptionalBool('public');
+        $answer = $r->ensureOptionalString(
+            'answer',
+            /*$required=*/false,
+            fn (string $answer) => !empty($answer)
         );
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['message'],
-            'message'
+        $message = $r->ensureOptionalString(
+            'message',
+            /*$required=*/false,
+            fn (string $message) => !empty($message)
         );
 
         // Check that clarification exists
         $clarification = \OmegaUp\DAO\Clarifications::GetByPK(
-            intval($r['clarification_id'])
+            $r->ensureInt('clarification_id')
         );
         if (is_null($clarification)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -316,18 +316,119 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         }
 
         // Update clarification
-        $valueProperties = [
-            'message',
-            'answer',
-            'public',
-        ];
-        self::updateValueProperties($r, $clarification, $valueProperties);
+        if (!is_null($public)) {
+            $clarification->public = $public;
+        }
+
+        if (!is_null($message)) {
+            $clarification->message = $message;
+        }
+
+        if (!is_null($answer)) {
+            $clarification->answer = $answer;
+        }
+
+        $author = \OmegaUp\DAO\Identities::getByPK(
+            intval(
+                $clarification->author_id
+            )
+        );
+        if (is_null($author)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotExist'
+            );
+        }
+
+        $problem = \OmegaUp\DAO\Problems::GetByPK(
+            intval($clarification->problem_id)
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+
+        $contest = \OmegaUp\DAO\Contests::getByProblemset(
+            intval($clarification->problemset_id)
+        );
+        $assignment = null;
+        $course = null;
+        if (is_null($contest)) {
+            $assignment = \OmegaUp\DAO\Assignments::getByProblemset(
+                intval($clarification->problemset_id)
+            );
+            if (is_null($assignment)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'assignmentNotFound'
+                );
+            }
+            $course = \OmegaUp\DAO\Courses::getByPK(
+                intval($assignment->course_id)
+            );
+            if (is_null($course)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'courseNotFound'
+                );
+            }
+        }
 
         // Save the clarification
         $clarification->time = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
         \OmegaUp\DAO\Clarifications::update($clarification);
 
-        self::clarificationUpdated($r, $clarification, null, null, null);
+        // Send notification to author
+        if (!is_null($author->user_id) && !is_null($answer)) {
+            if ($contest) {
+                \OmegaUp\DAO\Notifications::create(
+                    new \OmegaUp\DAO\VO\Notifications([
+                        'user_id' => $author->user_id,
+                        'contents' =>  json_encode([
+                            'type' => \OmegaUp\DAO\Notifications::CONTEST_CLARIFICATION_RESPONSE,
+                            'body' => [
+                                'localizationString' => new \OmegaUp\TranslationString(
+                                    'notificationContestClarificationResponse'
+                                ),
+                                'localizationParams' => [
+                                    'problemAlias' => $problem->alias,
+                                    'contestAlias' => $contest->alias,
+                                ],
+                                'url' => "/arena/{$contest->alias}/#problems/{$problem->alias}/",
+                                'iconUrl' => '/media/info.png',
+                            ],
+                        ]),
+                    ])
+                );
+            }
+            if ($course && $assignment) {
+                \OmegaUp\DAO\Notifications::create(
+                    new \OmegaUp\DAO\VO\Notifications([
+                        'user_id' => $author->user_id,
+                        'contents' =>  json_encode([
+                            'type' => \OmegaUp\DAO\Notifications::COURSE_CLARIFICATION_RESPONSE,
+                            'body' => [
+                                'localizationString' => new \OmegaUp\TranslationString(
+                                    'notificationCourseClarificationResponse'
+                                ),
+                                'localizationParams' => [
+                                    'problemAlias' => $problem->alias,
+                                    'courseName' => $course->name,
+                                ],
+                                'url' => "/course/{$course->alias}/assignment/{$assignment->alias}/#problems/{$problem->alias}/",
+                                'iconUrl' => '/media/info.png',
+                            ],
+                        ]),
+                    ])
+                );
+            }
+        }
+
+        self::clarificationUpdated(
+            $r,
+            $clarification,
+            $author,
+            $problem,
+            $contest
+        );
 
         return [
             'status' => 'ok',
