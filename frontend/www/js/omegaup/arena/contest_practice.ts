@@ -180,17 +180,22 @@ OmegaUp.on('ready', () => {
               return;
             }
             const contestAlias = payload.contest.alias;
+            const problemAlias = clarification.problem_alias;
             api.Clarification.create({
               contest_alias: contestAlias,
-              problem_alias: clarification.problem_alias,
+              problem_alias: problemAlias,
               username: clarification.author,
               message: clarification.message,
             })
               .then(() => {
                 clearForm();
+                const type = problemAlias
+                  ? ContestClarificationType.WithProblem
+                  : ContestClarificationType.AllProblems;
                 refreshContestClarifications({
-                  type: ContestClarificationType.AllProblems,
+                  type,
                   contestAlias,
+                  problemAlias,
                 });
               })
               .catch(ui.apiError);
@@ -199,11 +204,16 @@ OmegaUp.on('ready', () => {
             contestAlias,
             clarification,
           }: ContestClarification) => {
+            const problemAlias = clarification.problem_alias;
+            const type = problemAlias
+              ? ContestClarificationType.WithProblem
+              : ContestClarificationType.AllProblems;
             api.Clarification.update(clarification)
               .then(() => {
                 refreshContestClarifications({
-                  type: ContestClarificationType.AllProblems,
+                  type,
                   contestAlias,
+                  problemAlias,
                 });
               })
               .catch(ui.apiError);

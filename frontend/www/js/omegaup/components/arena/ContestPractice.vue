@@ -178,7 +178,6 @@ export default class ArenaContestPractice extends Vue {
     this.$emit('clarification-response', {
       contestAlias: this.contest.alias,
       clarification: response,
-      target: this,
     });
   }
 
