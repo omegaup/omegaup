@@ -17,6 +17,7 @@ import { navigateToProblem } from './navigation';
 import {
   ContestClarification,
   ContestClarificationType,
+  ContestClarificationRequest,
   refreshContestClarifications,
   trackClarifications,
 } from './clarifications';
@@ -172,49 +173,35 @@ OmegaUp.on('ready', () => {
           'new-clarification': ({
             clarification,
             clearForm,
+            contestClarificationRequest,
           }: {
             clarification: types.Clarification;
             clearForm: () => void;
+            contestClarificationRequest: ContestClarificationRequest;
           }) => {
             if (!clarification) {
               return;
             }
             const contestAlias = payload.contest.alias;
-            const problemAlias = clarification.problem_alias;
             api.Clarification.create({
               contest_alias: contestAlias,
-              problem_alias: problemAlias,
+              problem_alias: clarification.problem_alias,
               username: clarification.author,
               message: clarification.message,
             })
               .then(() => {
                 clearForm();
-                const type = problemAlias
-                  ? ContestClarificationType.WithProblem
-                  : ContestClarificationType.AllProblems;
-                refreshContestClarifications({
-                  type,
-                  contestAlias,
-                  problemAlias,
-                });
+                refreshContestClarifications(contestClarificationRequest);
               })
               .catch(ui.apiError);
           },
           'clarification-response': ({
-            contestAlias,
             clarification,
+            contestClarificationRequest,
           }: ContestClarification) => {
-            const problemAlias = clarification.problem_alias;
-            const type = problemAlias
-              ? ContestClarificationType.WithProblem
-              : ContestClarificationType.AllProblems;
             api.Clarification.update(clarification)
               .then(() => {
-                refreshContestClarifications({
-                  type,
-                  contestAlias,
-                  problemAlias,
-                });
+                refreshContestClarifications(contestClarificationRequest);
               })
               .catch(ui.apiError);
           },

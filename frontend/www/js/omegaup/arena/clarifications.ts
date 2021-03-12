@@ -6,6 +6,7 @@ import clarificationStore from './clarificationsStore';
 export interface ContestClarification {
   contestAlias: string;
   clarification: types.Clarification;
+  contestClarificationRequest: ContestClarificationRequest;
 }
 
 export enum ContestClarificationType {
@@ -24,12 +25,12 @@ interface ContestClarificationAllProblems {
   contestAlias: string;
 }
 
-type contestClarificationRequest =
+export type ContestClarificationRequest =
   | ContestClarificationWithProblem
   | ContestClarificationAllProblems;
 
 export function refreshContestClarifications(
-  request: contestClarificationRequest,
+  request: ContestClarificationRequest,
 ) {
   let problemAlias;
   if (request.type === ContestClarificationType.WithProblem) {
