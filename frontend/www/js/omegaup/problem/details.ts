@@ -180,7 +180,10 @@ OmegaUp.on('ready', () => {
                   classname: commonPayload.userClassname,
                   problemAlias: payload.problem.alias,
                 });
-                setNominationStatus({ runs, nominationStatus });
+                setNominationStatus({
+                  runs: myRunsStore.state.runs,
+                  nominationStatus,
+                });
               })
               .catch((run) => {
                 submitRunFailed({
@@ -429,7 +432,7 @@ OmegaUp.on('ready', () => {
     }
     if (problemDetailsView.nominationStatus) {
       setNominationStatus({
-        runs,
+        runs: myRunsStore.state.runs,
         nominationStatus: problemDetailsView.nominationStatus,
       });
     }
