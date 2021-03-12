@@ -94,10 +94,7 @@
         :in-contest="true"
         :show-new-clarification-popup="showNewClarificationPopup"
         @new-clarification="(request) => $emit('new-clarification', request)"
-        @clarification-response="
-          (id, responseText, isPublic) =>
-            $emit('clarification-response', id, responseText, isPublic)
-        "
+        @clarification-response="onClarificationResponse"
         @update:activeTab="
           (selectedTab) => $emit('update:activeTab', selectedTab)
         "
@@ -162,12 +159,8 @@ export default class ArenaContestPractice extends Vue {
     this.$emit('navigate-to-problem', request);
   }
 
-  onRunSubmitted(code: string, selectedLanguage: string): void {
-    const request = Object.assign({}, this.activeProblem, {
-      code,
-      selectedLanguage,
-    });
-    this.$emit('submit-run', request);
+  onRunSubmitted(run: { code: string; language: string }): void {
+    this.$emit('submit-run', Object.assign({}, run, this.activeProblem));
   }
 
   onShowRunDetails(target: problem_Details, guid: string): void {
@@ -182,6 +175,14 @@ export default class ArenaContestPractice extends Vue {
       'change-show-run-location',
       Object.assign({}, request, { alias: this.activeProblem.problem.alias }),
     );
+  }
+
+  onClarificationResponse(response: types.Clarification): void {
+    this.$emit('clarification-response', {
+      contestAlias: this.contest.alias,
+      clarification: response,
+      target: this,
+    });
   }
 
   @Watch('problem')

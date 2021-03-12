@@ -136,13 +136,16 @@ export default class ArenaClarificationForm extends Vue {
   }
 
   sendClarificationResponse(): void {
-    this.$emit(
-      'clarification-response',
-      this.clarification.clarification_id,
-      this.responseText,
-      this.isPublic,
-    );
+    const response: types.Clarification = {
+      clarification_id: this.clarification.clarification_id,
+      answer: this.responseText,
+      public: this.isPublic,
+      message: this.message,
+      problem_alias: this.clarification.problem_alias,
+      time: new Date(),
+    };
     this.showUpdateAnswer = false;
+    this.$emit('clarification-response', response);
   }
 }
 </script>
