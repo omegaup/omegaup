@@ -69,9 +69,9 @@ export default class ArenaCourse extends Vue {
     return this.activeProblem?.problem.alias ?? null;
   }
 
-  onNavigateToProblem(request: ActiveProblem) {
-    this.activeProblem = request;
-    this.$emit('navigate-to-problem', request);
+  onNavigateToProblem(activeProblem: ActiveProblem) {
+    this.activeProblem = activeProblem;
+    this.$emit('navigate-to-problem', activeProblem);
   }
 }
 </script>
