@@ -371,20 +371,6 @@ OmegaUp.on('ready', () => {
     },
   });
 
-  function refreshClarifications(): void {
-    api.Problem.clarifications({
-      problem_alias: payload.problem.alias,
-      offset: 0, // TODO: Updating offset is missing
-      rowcount: 0, // TODO: Updating rowcount is missing
-    })
-      .then(time.remoteTimeAdapter)
-      .then(
-        (response) =>
-          (problemDetailsView.initialClarifications = response.clarifications),
-      )
-      .catch(ui.apiError);
-  }
-
   function setNominationStatus({
     runs,
     nominationStatus,
@@ -420,6 +406,20 @@ OmegaUp.on('ready', () => {
           nominationStatus: problemDetailsView.nominationStatus,
         });
       })
+      .catch(ui.apiError);
+  }
+
+  function refreshClarifications(): void {
+    api.Problem.clarifications({
+      problem_alias: payload.problem.alias,
+      offset: 0, // TODO: Updating offset is missing
+      rowcount: 0, // TODO: Updating rowcount is missing
+    })
+      .then(time.remoteTimeAdapter)
+      .then(
+        (response) =>
+          (problemDetailsView.initialClarifications = response.clarifications),
+      )
       .catch(ui.apiError);
   }
 
