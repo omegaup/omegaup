@@ -284,8 +284,6 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         // Authenticate user
         $r->ensureIdentity();
 
-        // Validate request
-        $r->ensureInt('clarification_id');
         $public = $r->ensureOptionalBool('public');
         $answer = $r->ensureOptionalString(
             'answer',
@@ -300,7 +298,9 @@ class Clarification extends \OmegaUp\Controllers\Controller {
 
         // Check that clarification exists
         $clarification = \OmegaUp\DAO\Clarifications::GetByPK(
-            intval($r['clarification_id'])
+            intval(
+                $r->ensureInt('clarification_id')
+            )
         );
         if (is_null($clarification)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
