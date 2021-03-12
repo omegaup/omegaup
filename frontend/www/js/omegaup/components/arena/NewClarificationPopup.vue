@@ -128,7 +128,7 @@ export default class ArenaNewClarificationPopup extends Vue {
       time: new Date(),
     };
     this.$emit('new-clarification', {
-      request: clarificationRequest,
+      clarification: clarificationRequest,
       target: this,
     });
   }

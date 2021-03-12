@@ -12,9 +12,10 @@ import problem_Details, {
 } from '../components/problem/Details.vue';
 import { myRunsStore } from '../arena/runsStore';
 import arena_NewClarification from '../components/arena/NewClarificationPopup.vue';
-import problemsStore from './problemStore';
 import JSZip from 'jszip';
 import { getOptionsFromLocation } from './location';
+import { navigateToProblem } from './navigation';
+import { ClarificationEvent, refreshClarifications } from './clarifications';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -35,22 +36,6 @@ OmegaUp.on('ready', () => {
       showNewClarificationPopup: false,
       guid: null as null | string,
     }),
-    methods: {
-      getMaxScore: (
-        runs: types.Run[],
-        alias: string,
-        previousScore: number,
-      ): number => {
-        let maxScore = previousScore;
-        for (const run of runs) {
-          if (alias != run.alias) {
-            continue;
-          }
-          maxScore = Math.max(maxScore, run.contest_score || 0);
-        }
-        return maxScore;
-      },
-    },
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
         props: {
@@ -67,52 +52,13 @@ OmegaUp.on('ready', () => {
           guid: this.guid,
         },
         on: {
-          'navigate-to-problem': (request: ActiveProblem) => {
-            if (
-              Object.prototype.hasOwnProperty.call(
-                problemsStore.state.problems,
-                request.problem.alias,
-              )
-            ) {
-              contestPractice.problemInfo =
-                problemsStore.state.problems[request.problem.alias];
-              window.location.hash = `#problems/${request.problem.alias}`;
-              return;
-            }
-            api.Problem.details({
-              problem_alias: request.problem.alias,
-              prevent_problemset_open: false,
-            })
-              .then((problemInfo) => {
-                for (const run of problemInfo.runs ?? []) {
-                  trackRun(run);
-                }
-                const currentProblem = payload.problems?.find(
-                  ({ alias }) => alias == problemInfo.alias,
-                );
-                problemInfo.title = currentProblem?.text ?? '';
-                contestPractice.problemInfo = problemInfo;
-                request.problem.alias = problemInfo.alias;
-                request.runs = myRunsStore.state.runs;
-                request.problem.bestScore = this.getMaxScore(
-                  request.runs,
-                  problemInfo.alias,
-                  0,
-                );
-                problemsStore.commit('addProblem', problemInfo);
-                if (
-                  contestPractice.popupDisplayed === PopupDisplayed.RunSubmit
-                ) {
-                  window.location.hash = `#problems/${request.problem.alias}/new-run`;
-                  return;
-                }
-                window.location.hash = `#problems/${request.problem.alias}`;
-              })
-              .catch(() => {
-                ui.dismissNotifications();
-                window.location.hash = '#problems';
-                contestPractice.problem = null;
-              });
+          'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
+            navigateToProblem({
+              problem,
+              runs,
+              target: contestPractice,
+              problems: this.problems,
+            });
           },
           'show-run': (source: {
             target: problem_Details;
@@ -221,42 +167,45 @@ OmegaUp.on('ready', () => {
                 }
               });
           },
-          'new-clarification': (request: {
-            request: types.Clarification;
+          'new-clarification': ({
+            clarification,
+            target,
+          }: {
+            clarification: types.Clarification;
             target: arena_NewClarification;
           }) => {
+            if (!clarification) {
+              return;
+            }
+            const contestAlias = payload.contest.alias;
             api.Clarification.create({
-              contest_alias: payload.contest.alias,
-              problem_alias: request.request.problem_alias,
-              username: request.request.author,
-              message: request.request.message,
+              contest_alias: contestAlias,
+              problem_alias: clarification.problem_alias,
+              username: clarification.author,
+              message: clarification.message,
             })
               .then(() => {
-                request.target.clearForm();
-                refreshClarifications();
+                target.clearForm();
+                refreshClarifications({ clarification, contestAlias, target });
               })
               .catch(ui.apiError);
-
-            return false;
+          },
+          'clarification-response': ({
+            contestAlias,
+            clarification,
+            target,
+          }: ClarificationEvent) => {
+            api.Clarification.update(clarification)
+              .then(() => {
+                refreshClarifications({ clarification, contestAlias, target });
+              })
+              .catch(ui.apiError);
           },
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
           },
           'reset-hash': (request: { selectedTab: string; alias: string }) => {
             window.location.replace(`#${request.selectedTab}/${request.alias}`);
-          },
-          'clarification-response': (
-            id: number,
-            responseText: string,
-            isPublic: boolean,
-          ) => {
-            api.Clarification.update({
-              clarification_id: id,
-              answer: responseText,
-              public: isPublic,
-            })
-              .then(refreshClarifications)
-              .catch(ui.apiError);
           },
         },
       });
@@ -267,18 +216,6 @@ OmegaUp.on('ready', () => {
   // on the `navigate-to-problem` callback being invoked, and that is
   // not the case if this is set a priori.
   Object.assign(contestPractice, getOptionsFromLocation(window.location.hash));
-
-  function refreshClarifications() {
-    api.Contest.clarifications({
-      contest_alias: payload.contest.alias,
-      rowcount: 100,
-      offset: null,
-    })
-      .then(time.remoteTimeAdapter)
-      .then((data) => {
-        contestPractice.clarifications = data.clarifications;
-      });
-  }
 
   function updateRun(run: types.Run): void {
     trackRun(run);
@@ -305,6 +242,9 @@ OmegaUp.on('ready', () => {
   }
 
   setInterval(() => {
-    refreshClarifications();
+    refreshClarifications({
+      contestAlias: payload.contest.alias,
+      target: contestPractice,
+    });
   }, 5 * 60 * 1000);
 });

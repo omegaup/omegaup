@@ -370,22 +370,24 @@ Description of ClarificationController
 
 ### Description
 
-Creates a Clarification
+Creates a Clarification for a contest or an assignment of a course
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `message`       | `string`       |             |
-| `problem_alias` | `string`       |             |
-| `username`      | `null\|string` |             |
+| Name               | Type           | Description |
+| ------------------ | -------------- | ----------- |
+| `message`          | `string`       |             |
+| `problem_alias`    | `string`       |             |
+| `assignment_alias` | `string\|null` |             |
+| `contest_alias`    | `string\|null` |             |
+| `course_alias`     | `string\|null` |             |
+| `username`         | `null\|string` |             |
 
 ### Returns
 
-| Name               | Type     |
-| ------------------ | -------- |
-| `clarification_id` | `number` |
+```typescript
+types.Clarification;
+```
 
 ## `/api/clarification/details/`
 
@@ -407,7 +409,7 @@ API for getting a clarification
 | `message`       | `string` |
 | `problem_id`    | `number` |
 | `problemset_id` | `number` |
-| `time`          | `number` |
+| `time`          | `Date`   |
 
 ## `/api/clarification/update/`
 
