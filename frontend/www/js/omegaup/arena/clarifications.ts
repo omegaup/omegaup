@@ -3,21 +3,49 @@ import * as time from '../time';
 import { types } from '../api_types';
 import clarificationStore from './clarificationsStore';
 
-export interface ClarificationEvent {
+export interface ContestClarification {
   contestAlias: string;
   clarification: types.Clarification;
 }
 
-export function refreshContestClarifications({
-  contestAlias,
-  problemAlias,
-}: {
+export enum ContestClarificationType {
+  WithProblem,
+  AllProblems,
+}
+
+interface ContestClarificationWithProblem {
+  type: ContestClarificationType.WithProblem;
   contestAlias: string;
-  problemAlias?: string;
-}) {
+  problemAlias: string;
+}
+
+interface ContestClarificationAllProblems {
+  type: ContestClarificationType.AllProblems;
+  contestAlias: string;
+}
+
+type contestClarificationRequest =
+  | ContestClarificationWithProblem
+  | ContestClarificationAllProblems;
+
+export function refreshContestClarifications(
+  request: contestClarificationRequest,
+) {
+  if (request.type === ContestClarificationType.WithProblem) {
+    api.Contest.clarifications({
+      contest_alias: request.contestAlias,
+      problem_alias: request.problemAlias,
+      rowcount: 100,
+      offset: null,
+    })
+      .then(time.remoteTimeAdapter)
+      .then((data) => {
+        trackClarifications(data.clarifications);
+      });
+    return;
+  }
   api.Contest.clarifications({
-    contest_alias: contestAlias,
-    problem_alias: problemAlias,
+    contest_alias: request.contestAlias,
     rowcount: 100,
     offset: null,
   })

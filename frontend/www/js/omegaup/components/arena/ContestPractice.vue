@@ -87,7 +87,10 @@
         :is-admin="contestAdmin"
         :in-contest="true"
         :show-new-clarification-popup="showNewClarificationPopup"
-        @new-clarification="(request) => onNewClarification(request)"
+        @new-clarification="
+          (contestClarification) =>
+            $emit('new-clarification', contestClarification)
+        "
         @clarification-response="onClarificationResponse"
         @update:activeTab="
           (selectedTab) => $emit('update:activeTab', selectedTab)
@@ -108,7 +111,6 @@ import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_ContestSummary from './ContestSummaryV2.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
-import { ClarificationEvent } from '../../arena/clarifications';
 
 export interface ActiveProblem {
   runs: types.Run[];
@@ -154,12 +156,8 @@ export default class ArenaContestPractice extends Vue {
     this.$emit('navigate-to-problem', request);
   }
 
-  onRunSubmitted(code: string, selectedLanguage: string): void {
-    const request = Object.assign({}, this.activeProblem, {
-      code,
-      selectedLanguage,
-    });
-    this.$emit('submit-run', request);
+  onRunSubmitted(run: { code: string; language: string }): void {
+    this.$emit('submit-run', Object.assign({}, run, this.activeProblem));
   }
 
   onShowRunDetails(target: problem_Details, guid: string): void {
@@ -182,10 +180,6 @@ export default class ArenaContestPractice extends Vue {
       clarification: response,
       target: this,
     });
-  }
-
-  onNewClarification(request: ClarificationEvent): void {
-    this.$emit('new-clarification', { ...request, target: this });
   }
 
   @Watch('problem')

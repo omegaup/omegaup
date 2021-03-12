@@ -13,11 +13,19 @@ import * as time from '../time';
 import JSZip from 'jszip';
 import T from '../lang';
 import {
-  ClarificationEvent,
+  ContestClarification,
   refreshProblemClarifications,
   trackClarifications,
 } from '../arena/clarifications';
 import clarificationStore from '../arena/clarificationsStore';
+import {
+  onRefreshRuns,
+  onSetNominationStatus,
+  submitRun,
+  submitRunFailed,
+  trackRun,
+  updateRunFallback,
+} from '../arena/submissions';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsPayload();
@@ -153,37 +161,43 @@ OmegaUp.on('ready', () => {
             }
             refreshRuns();
           },
-          'submit-run': (code: string, language: string) => {
+          'submit-run': ({
+            code,
+            language,
+            runs,
+            nominationStatus,
+          }: {
+            code: string;
+            language: string;
+            runs: types.Run[];
+            nominationStatus: types.NominationStatus;
+          }) => {
             api.Run.create({
               problem_alias: payload.problem.alias,
               language: language,
               source: code,
             })
               .then((response) => {
-                ui.reportEvent('submission', 'submit');
-
-                updateRun({
+                submitRun({
+                  runs,
                   guid: response.guid,
-                  submit_delay: response.submit_delay,
+                  submitDelay: response.submit_delay,
+                  language,
                   username: commonPayload.currentUsername,
                   classname: commonPayload.userClassname,
-                  country: 'xx',
-                  status: 'new',
-                  alias: payload.problem.alias,
-                  time: new Date(),
-                  penalty: 0,
-                  runtime: 0,
-                  memory: 0,
-                  verdict: 'JE',
-                  score: 0,
-                  language: language,
+                  problemAlias: payload.problem.alias,
+                });
+                setNominationStatus({
+                  runs: myRunsStore.state.runs,
+                  nominationStatus,
                 });
               })
               .catch((run) => {
-                ui.error(run.error ?? run);
-                if (run.errorname) {
-                  ui.reportEvent('submission', 'submit-fail', run.errorname);
-                }
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
               });
           },
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
@@ -325,7 +339,9 @@ OmegaUp.on('ready', () => {
                 });
             }
           },
-          'clarification-response': ({ clarification }: ClarificationEvent) => {
+          'clarification-response': ({
+            clarification,
+          }: ContestClarification) => {
             api.Clarification.update(clarification)
               .then(() => {
                 refreshProblemClarifications({
@@ -349,7 +365,7 @@ OmegaUp.on('ready', () => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
               .then(() => {
                 run.status = 'rejudging';
-                updateRunFallback(run.guid);
+                updateRunFallback({ run });
               })
               .catch(ui.ignoreError);
           },
@@ -360,7 +376,7 @@ OmegaUp.on('ready', () => {
             api.Run.disqualify({ run_alias: run.guid })
               .then(() => {
                 run.type = 'disqualified';
-                updateRunFallback(run.guid);
+                updateRunFallback({ run });
               })
               .catch(ui.ignoreError);
           },
@@ -369,47 +385,18 @@ OmegaUp.on('ready', () => {
     },
   });
 
-  function updateRun(run: types.Run): void {
-    trackRun(run);
-
-    // TODO: Implement websocket support
-
-    if (run.status != 'ready') {
-      updateRunFallback(run.guid);
-      return;
-    }
-  }
-
-  function updateRunFallback(guid: string): void {
-    setTimeout(() => {
-      api.Run.status({ run_alias: guid })
-        .then(time.remoteTimeAdapter)
-        .then((response) => updateRun(response))
-        .catch(ui.ignoreError);
-    }, 5000);
-  }
-
-  function trackRun(run: types.Run): void {
-    runsStore.commit('addRun', run);
-    if (run.username !== OmegaUp.username) {
-      return;
-    }
-    myRunsStore.commit('addRun', run);
-
-    if (!problemDetailsView.nominationStatus) {
-      return;
-    }
-    if (run.verdict !== 'AC' && run.verdict !== 'CE' && run.verdict !== 'JE') {
-      problemDetailsView.nominationStatus.tried = true;
-    }
-    if (run.verdict === 'AC') {
-      Vue.set(
-        problemDetailsView,
-        'nominationStatus',
-        Object.assign({}, problemDetailsView.nominationStatus, {
-          solved: true,
-        }),
-      );
+  function setNominationStatus({
+    runs,
+    nominationStatus,
+  }: {
+    runs: types.Run[];
+    nominationStatus: types.NominationStatus;
+  }) {
+    for (const run of runs) {
+      onSetNominationStatus({
+        run,
+        nominationStatus,
+      });
     }
   }
 
@@ -426,17 +413,25 @@ OmegaUp.on('ready', () => {
     })
       .then(time.remoteTimeAdapter)
       .then((response) => {
-        runsStore.commit('clear');
-        for (const run of response.runs) {
-          trackRun(run);
-        }
+        if (!problemDetailsView.nominationStatus) return;
+        onRefreshRuns({ runs: response.runs });
+        setNominationStatus({
+          runs: response.runs,
+          nominationStatus: problemDetailsView.nominationStatus,
+        });
       })
       .catch(ui.apiError);
   }
 
   if (runs) {
     for (const run of runs) {
-      trackRun(run);
+      trackRun({ run });
+    }
+    if (problemDetailsView.nominationStatus) {
+      setNominationStatus({
+        runs: myRunsStore.state.runs,
+        nominationStatus: problemDetailsView.nominationStatus,
+      });
     }
   }
   if (payload.user.admin) {

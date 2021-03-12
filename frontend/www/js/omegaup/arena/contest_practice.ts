@@ -10,12 +10,13 @@ import arena_ContestPractice, {
 import problem_Details, {
   PopupDisplayed,
 } from '../components/problem/Details.vue';
-import { myRunsStore } from '../arena/runsStore';
 import JSZip from 'jszip';
+import { submitRun, submitRunFailed } from './submissions';
 import { getOptionsFromLocation } from './location';
 import { navigateToProblem } from './navigation';
 import {
-  ClarificationEvent,
+  ContestClarification,
+  ContestClarificationType,
   refreshContestClarifications,
   trackClarifications,
 } from './clarifications';
@@ -138,39 +139,34 @@ OmegaUp.on('ready', () => {
           }) => {
             window.location.hash = `#problems/${request.alias}/show-run:${request.guid}/`;
           },
-          'submit-run': (
-            request: ActiveProblem & { code: string; selectedLanguage: string },
-          ) => {
+          'submit-run': ({
+            problem,
+            runs,
+            code,
+            language,
+          }: ActiveProblem & { code: string; language: string }) => {
             api.Run.create({
-              problem_alias: request.problem.alias,
-              language: request.selectedLanguage,
-              source: request.code,
+              problem_alias: problem.alias,
+              language: language,
+              source: code,
             })
               .then((response) => {
-                ui.reportEvent('submission', 'submit');
-
-                updateRun({
+                submitRun({
+                  runs,
                   guid: response.guid,
-                  submit_delay: response.submit_delay,
+                  submitDelay: response.submit_delay,
+                  language,
                   username: commonPayload.currentUsername,
                   classname: commonPayload.userClassname,
-                  country: 'xx',
-                  status: 'new',
-                  alias: request.problem.alias,
-                  time: new Date(),
-                  penalty: 0,
-                  runtime: 0,
-                  memory: 0,
-                  verdict: 'JE',
-                  score: 0,
-                  language: request.selectedLanguage,
+                  problemAlias: problem.alias,
                 });
               })
               .catch((run) => {
-                ui.error(run.error ?? run);
-                if (run.errorname) {
-                  ui.reportEvent('submission', 'submit-fail', run.errorname);
-                }
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
               });
           },
           'new-clarification': ({
@@ -191,9 +187,9 @@ OmegaUp.on('ready', () => {
               message: clarification.message,
             })
               .then(() => {
-                clearForm;
+                clearForm();
                 refreshContestClarifications({
-                  problemAlias: clarification?.problem_alias,
+                  type: ContestClarificationType.AllProblems,
                   contestAlias,
                 });
               })
@@ -202,11 +198,11 @@ OmegaUp.on('ready', () => {
           'clarification-response': ({
             contestAlias,
             clarification,
-          }: ClarificationEvent) => {
+          }: ContestClarification) => {
             api.Clarification.update(clarification)
               .then(() => {
                 refreshContestClarifications({
-                  problemAlias: clarification?.problem_alias,
+                  type: ContestClarificationType.AllProblems,
                   contestAlias,
                 });
               })
@@ -228,32 +224,9 @@ OmegaUp.on('ready', () => {
   // not the case if this is set a priori.
   Object.assign(contestPractice, getOptionsFromLocation(window.location.hash));
 
-  function updateRun(run: types.Run): void {
-    trackRun(run);
-
-    // TODO: Implement websocket support
-
-    if (run.status != 'ready') {
-      updateRunFallback(run.guid);
-      return;
-    }
-  }
-
-  function updateRunFallback(guid: string): void {
-    setTimeout(() => {
-      api.Run.status({ run_alias: guid })
-        .then(time.remoteTimeAdapter)
-        .then((response) => updateRun(response))
-        .catch(ui.ignoreError);
-    }, 5000);
-  }
-
-  function trackRun(run: types.Run): void {
-    myRunsStore.commit('addRun', run);
-  }
-
   setInterval(() => {
     refreshContestClarifications({
+      type: ContestClarificationType.AllProblems,
       contestAlias: payload.contest.alias,
     });
   }, 5 * 60 * 1000);
