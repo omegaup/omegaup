@@ -298,9 +298,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
 
         // Check that clarification exists
         $clarification = \OmegaUp\DAO\Clarifications::GetByPK(
-            intval(
-                $r->ensureInt('clarification_id')
-            )
+            $r->ensureInt('clarification_id')
         );
         if (is_null($clarification)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
