@@ -153,7 +153,10 @@ OmegaUp.on('ready', () => {
                 );
                 filteredUsers.forEach(
                   ({ label, value }: types.UserListItem) => {
-                    this.existingUsers.push({ key: label, value });
+                    this.existingUsers.push({
+                      key: label,
+                      value: `${value} <strong>(${label})</strong>`,
+                    });
                   },
                 );
               })
@@ -288,7 +291,11 @@ OmegaUp.on('ready', () => {
                 this.refreshUsers();
                 this.refreshRequests();
                 if (!contestantsWithError.length) {
-                  ui.success(T.bulkUserAddSuccess);
+                  ui.success(
+                    contestants.length === 1
+                      ? T.singleUserAddSuccess
+                      : T.bulkUserAddSuccess,
+                  );
                 } else {
                   ui.error(
                     ui.formatString(T.bulkUserAddError, {

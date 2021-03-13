@@ -229,8 +229,13 @@ export default class AddProblem extends Vue {
     this.$emit('runs-diff', this.alias, versions, selectedCommit);
   }
 
-  onSelectProblem(alias: string) {
-    this.alias = alias;
+  onSelectProblem(aliases: null | types.ListItem[]) {
+    if (!aliases) {
+      this.alias = '';
+      return;
+    }
+    // Getting always position 0, because problems only can be added one by one
+    this.alias = aliases[0].key;
   }
 
   get addProblemButtonLabel(): string {

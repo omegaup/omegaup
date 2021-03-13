@@ -2,6 +2,7 @@
   <tags-input
     v-model="selectedOptions"
     :existing-tags="existingOptions"
+    :allow-duplicates="true"
     :typeahead="true"
     :typeahead-style="'dropdown'"
     :typeahead-max-results="maxResults"
@@ -45,10 +46,7 @@ export default class Typeahead extends Vue {
   }
 
   onTagAdded(): void {
-    this.$emit(
-      'update-selected-option',
-      this.selectedOptions.map((option) => option.key).join(','),
-    );
+    this.$emit('update-selected-option', this.selectedOptions);
   }
 
   onTagRemoved(): void {

@@ -106,21 +106,20 @@ export default class AddContestant extends Vue {
 
   T = T;
   time = time;
-  contestants: null | string = null;
+  contestants: null | types.ListItem[] = null;
   currentUsers = this.users;
 
   onSubmit(): void {
     if (this.contestants === null) return;
-    const users = this.contestants.split(',');
-    if (users.length) {
+    if (this.contestants.length) {
       this.$emit(
         'add-user',
-        users.map((user) => user.trim()),
+        this.contestants.map((user) => user.key.trim()),
       );
     }
   }
 
-  onSelectUser(contestants: string) {
+  onSelectUser(contestants: null | types.ListItem[]) {
     this.contestants = contestants;
   }
 
