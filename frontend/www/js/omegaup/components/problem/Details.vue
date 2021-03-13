@@ -233,13 +233,10 @@
         :class="{ 'show active': selectedTab === 'clarifications' }"
       >
         <omegaup-arena-clarification-list
-          :clarifications="clarifications"
+          :clarifications="currentClarifications"
           :in-contest="false"
           :is-admin="true"
-          @clarification-response="
-            (id, responseText, isPublic) =>
-              $emit('clarification-response', id, responseText, isPublic)
-          "
+          @clarification-response="onClarificationResponse"
         >
           <template #new-clarification><div></div></template>
           <template #table-title>
@@ -356,7 +353,7 @@ export default class ProblemDetails extends Vue {
     },
   })
   allRuns!: types.Run[];
-  @Prop() initialClarifications!: types.Clarification[];
+  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() problem!: types.ProblemInfo;
   @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
@@ -390,11 +387,10 @@ export default class ProblemDetails extends Vue {
   ui = ui;
   time = time;
   selectedTab = this.activeTab;
-  clarifications = this.initialClarifications || [];
+  currentClarifications = this.clarifications;
   currentPopupDisplayed = this.popupDisplayed;
   hasUnreadClarifications =
-    this.initialClarifications?.length > 0 &&
-    this.activeTab !== 'clarifications';
+    this.clarifications?.length > 0 && this.activeTab !== 'clarifications';
   currentRunDetailsData = this.runDetailsData;
 
   get availableTabs(): Tab[] {
@@ -424,9 +420,9 @@ export default class ProblemDetails extends Vue {
   }
 
   get clarificationsCount(): string {
-    if (this.clarifications.length === 0) return '';
-    if (this.clarifications.length > 9) return '(9+)';
-    return `(${this.clarifications.length})`;
+    if (this.currentClarifications.length === 0) return '';
+    if (this.currentClarifications.length > 9) return '(9+)';
+    return `(${this.currentClarifications.length})`;
   }
 
   get visibilityOfPromotionButton(): boolean {
@@ -584,8 +580,20 @@ export default class ProblemDetails extends Vue {
   }
 
   onRunSubmitted(code: string, selectedLanguage: string): void {
-    this.$emit('submit-run', code, selectedLanguage);
+    this.$emit('submit-run', {
+      code,
+      language: selectedLanguage,
+      runs: this.runs,
+      nominationStatus: this.nominationStatus,
+    });
     this.onPopupDismissed();
+  }
+
+  onClarificationResponse(response: types.Clarification): void {
+    this.$emit('clarification-response', {
+      clarification: response,
+      target: this,
+    });
   }
 
   displayRunDetails(guid: string, data: messages.RunDetailsResponse): void {
@@ -646,9 +654,9 @@ export default class ProblemDetails extends Vue {
     return this.selectedTab;
   }
 
-  @Watch('initialClarifications')
+  @Watch('clarifications')
   onInitialClarificationsChanged(newValue: types.Clarification[]): void {
-    this.clarifications = newValue;
+    this.currentClarifications = newValue;
   }
 
   @Watch('popupDisplayed')
@@ -668,7 +676,7 @@ export default class ProblemDetails extends Vue {
     }
   }
 
-  @Watch('clarifications')
+  @Watch('currentClarifications')
   onClarificationsChanged(newValue: types.Clarification[]): void {
     if (this.selectedTab === 'clarifications' || newValue.length === 0) return;
     this.hasUnreadClarifications = true;
