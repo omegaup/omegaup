@@ -102,7 +102,7 @@ def add_students(driver, users, *, tab_xpath,
 
 def add_students_to_contest(driver, users, *, tab_xpath, container_xpath,
                             parent_selector, submit_locator):
-    '''Add students to a recently contest.'''
+    '''Add students to a recently created contest.'''
 
     driver.wait.until(
         EC.element_to_be_clickable(
