@@ -32,6 +32,7 @@
               :runs="activeProblem.runs"
               :popup-displayed="popupDisplayed"
               :guid="guid"
+              :problem-alias="problemAlias"
               :should-show-run-details="shouldShowRunDetails"
               @update:activeTab="
                 (selectedTab) =>
@@ -40,9 +41,8 @@
                     alias: activeProblem.problem.alias,
                   })
               "
-              @change-show-run-location="onChangeShowRunLocation"
               @submit-run="onRunSubmitted"
-              @show-run="onShowRunDetails"
+              @show-run="(source) => $emit('show-run', source)"
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -137,6 +137,7 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
   @Prop({ default: null }) guid!: null | string;
+  @Prop({ default: null }) problemAlias!: null | string;
 
   T = T;
   ui = ui;
@@ -155,20 +156,6 @@ export default class ArenaContestPractice extends Vue {
 
   onRunSubmitted(run: { code: string; language: string }): void {
     this.$emit('submit-run', Object.assign({}, run, this.activeProblem));
-  }
-
-  onShowRunDetails(target: problem_Details, guid: string): void {
-    this.$emit('show-run', { target, request: { guid } });
-  }
-
-  onChangeShowRunLocation(request: { guid: string }): void {
-    if (!this.activeProblem) {
-      return;
-    }
-    this.$emit(
-      'change-show-run-location',
-      Object.assign({}, request, { alias: this.activeProblem.problem.alias }),
-    );
   }
 
   onClarificationResponse(response: types.Clarification): void {

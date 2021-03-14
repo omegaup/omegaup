@@ -7,12 +7,14 @@ import Vue from 'vue';
 import arena_ContestPractice, {
   ActiveProblem,
 } from '../components/arena/ContestPractice.vue';
-import problem_Details, {
-  PopupDisplayed,
-} from '../components/problem/Details.vue';
+import { PopupDisplayed } from '../components/problem/Details.vue';
 import arena_NewClarification from '../components/arena/NewClarificationPopup.vue';
-import JSZip from 'jszip';
-import { submitRun, submitRunFailed } from './submissions';
+import {
+  showSubmission,
+  SubmissionRequest,
+  submitRun,
+  submitRunFailed,
+} from './submissions';
 import { getOptionsFromLocation } from './location';
 import { navigateToProblem } from './navigation';
 import { ClarificationEvent, refreshClarifications } from './clarifications';
@@ -35,6 +37,8 @@ OmegaUp.on('ready', () => {
       popupDisplayed: PopupDisplayed.None,
       showNewClarificationPopup: false,
       guid: null as null | string,
+      problemAlias: null as null | string,
+      isAdmin: false,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
@@ -50,6 +54,8 @@ OmegaUp.on('ready', () => {
           showNewClarificationPopup: this.showNewClarificationPopup,
           activeTab,
           guid: this.guid,
+          problemAlias: this.problemAlias,
+          isAdmin: this.isAdmin,
         },
         on: {
           'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
@@ -60,77 +66,23 @@ OmegaUp.on('ready', () => {
               problems: this.problems,
             });
           },
-          'show-run': (source: {
-            target: problem_Details;
-            request: { guid: string };
-          }) => {
-            api.Run.details({ run_alias: source.request.guid })
+          'show-run': ({ request, target }: SubmissionRequest) => {
+            const redirect = `#problems/${
+              this.problemAlias ?? request.problemAlias
+            }/show-run:${request.guid}/`;
+            api.Run.details({ run_alias: request.guid })
               .then((data) => {
-                if (data.show_diff === 'none' || !commonPayload.isAdmin) {
-                  source.target.displayRunDetails(source.request.guid, data);
-                  return;
-                }
-                fetch(
-                  `/api/run/download/run_alias/${source.request.guid}/show_diff/true/`,
-                )
-                  .then((response) => {
-                    if (!response.ok) {
-                      return Promise.reject(new Error(response.statusText));
-                    }
-                    return Promise.resolve(response.blob());
-                  })
-                  .then(JSZip.loadAsync)
-                  .then((zip: JSZip) => {
-                    const result: {
-                      cases: string[];
-                      promises: Promise<string>[];
-                    } = { cases: [], promises: [] };
-                    zip.forEach(async (relativePath, zipEntry) => {
-                      const pos = relativePath.lastIndexOf('.');
-                      const basename = relativePath.substring(0, pos);
-                      const extension = relativePath.substring(pos + 1);
-                      if (
-                        extension !== 'out' ||
-                        relativePath.indexOf('/') !== -1
-                      ) {
-                        return;
-                      }
-                      if (
-                        data.show_diff === 'examples' &&
-                        relativePath.indexOf('sample/') === 0
-                      ) {
-                        return;
-                      }
-                      result.cases.push(basename);
-                      result.promises.push(
-                        zip.file(zipEntry.name).async('text'),
-                      );
-                    });
-                    return result;
-                  })
-                  .then((response) => {
-                    Promise.allSettled(response.promises).then((results) => {
-                      results.forEach((result: any, index: number) => {
-                        if (data.cases[response.cases[index]]) {
-                          data.cases[response.cases[index]].contestantOutput =
-                            result.value;
-                        }
-                      });
-                    });
-                    source.target.displayRunDetails(source.request.guid, data);
-                  })
-                  .catch(ui.apiError);
+                showSubmission({
+                  request,
+                  target,
+                  data,
+                  redirect,
+                });
               })
               .catch((error) => {
                 ui.apiError(error);
-                source.target.popupDisplayed = PopupDisplayed.None;
+                this.popupDisplayed = PopupDisplayed.None;
               });
-          },
-          'change-show-run-location': (request: {
-            guid: string;
-            alias: string;
-          }) => {
-            window.location.hash = `#problems/${request.alias}/show-run:${request.guid}/`;
           },
           'submit-run': ({
             problem,

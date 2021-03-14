@@ -10,11 +10,12 @@ import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import * as time from '../time';
-import JSZip from 'jszip';
 import T from '../lang';
 import {
   onRefreshRuns,
   onSetNominationStatus,
+  showSubmission,
+  SubmissionRequest,
   submitRun,
   submitRunFailed,
   trackRun,
@@ -80,65 +81,20 @@ OmegaUp.on('ready', () => {
           shouldShowTabs: true,
         },
         on: {
-          'show-run': (source: problem_Details, guid: string) => {
-            api.Run.details({ run_alias: guid })
+          'show-run': ({ request, target }: SubmissionRequest) => {
+            const redirect = `#problems/show-run:${request.guid}/`;
+            api.Run.details({ run_alias: request.guid })
               .then((data) => {
-                if (data.show_diff === 'none' || !commonPayload.isAdmin) {
-                  source.displayRunDetails(guid, data);
-                  return;
-                }
-                fetch(`/api/run/download/run_alias/${guid}/show_diff/true/`)
-                  .then((response) => {
-                    if (!response.ok) {
-                      return Promise.reject(new Error(response.statusText));
-                    }
-                    return Promise.resolve(response.blob());
-                  })
-                  .then(JSZip.loadAsync)
-                  .then((zip: JSZip) => {
-                    const result: {
-                      cases: string[];
-                      promises: Promise<string>[];
-                    } = { cases: [], promises: [] };
-                    zip.forEach(async (relativePath, zipEntry) => {
-                      const pos = relativePath.lastIndexOf('.');
-                      const basename = relativePath.substring(0, pos);
-                      const extension = relativePath.substring(pos + 1);
-                      if (
-                        extension !== 'out' ||
-                        relativePath.indexOf('/') !== -1
-                      ) {
-                        return;
-                      }
-                      if (
-                        data.show_diff === 'examples' &&
-                        relativePath.indexOf('sample/') === 0
-                      ) {
-                        return;
-                      }
-                      result.cases.push(basename);
-                      result.promises.push(
-                        zip.file(zipEntry.name).async('text'),
-                      );
-                    });
-                    return result;
-                  })
-                  .then((response) => {
-                    Promise.allSettled(response.promises).then((results) => {
-                      results.forEach((result: any, index: number) => {
-                        if (data.cases[response.cases[index]]) {
-                          data.cases[response.cases[index]].contestantOutput =
-                            result.value;
-                        }
-                      });
-                    });
-                    source.displayRunDetails(guid, data);
-                  })
-                  .catch(ui.apiError);
+                showSubmission({
+                  request,
+                  target,
+                  data,
+                  redirect,
+                });
               })
               .catch((error) => {
                 ui.apiError(error);
-                source.currentPopupDisplayed = PopupDisplayed.None;
+                this.popupDisplayed = PopupDisplayed.None;
               });
           },
           'apply-filter': (
@@ -346,9 +302,6 @@ OmegaUp.on('ready', () => {
             window.location.href = `/login/?redirect=${encodeURIComponent(
               window.location.pathname,
             )}`;
-          },
-          'change-show-run-location': (request: { guid: string }) => {
-            window.location.hash = `#problems/show-run:${request.guid}/`;
           },
           rejudge: (run: types.Run) => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
