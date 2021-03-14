@@ -2256,6 +2256,11 @@ export namespace types {
     TimeLimit: string;
   }
 
+  export interface ListItem {
+    key: string;
+    value: string;
+  }
+
   export interface LoginDetailsPayload {
     facebookUrl: string;
     linkedinUrl: string;
