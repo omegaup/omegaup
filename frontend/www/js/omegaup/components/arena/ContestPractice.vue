@@ -19,11 +19,17 @@
               @navigate-to-problem="onNavigateToProblem"
             ></omegaup-arena-navbar-problems>
           </div>
-          <omegaup-arena-contest-summary
+          <omegaup-arena-summary
             v-if="activeProblem === null"
-            :contest="contest"
+            :title="ui.contestTitle(contest)"
+            :description="contest.description"
+            :start-time="contest.start_time"
+            :finish-time="contest.finish_time"
+            :scoreboard="contest.scoreboard"
+            :window-length="contest.window_length"
+            :admin="contest.director"
             :show-ranking="false"
-          ></omegaup-arena-contest-summary>
+          ></omegaup-arena-summary>
           <div v-else class="problem main">
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
@@ -114,7 +120,7 @@ import T from '../../lang';
 import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
-import arena_ContestSummary from './ContestSummaryV2.vue';
+import arena_Summary from './Summary.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { ContestClarificationType } from '../../arena/clarifications';
@@ -128,7 +134,7 @@ export interface ActiveProblem {
   components: {
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena': arena_Arena,
-    'omegaup-arena-contest-summary': arena_ContestSummary,
+    'omegaup-arena-summary': arena_Summary,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-problem-details': problem_Details,
