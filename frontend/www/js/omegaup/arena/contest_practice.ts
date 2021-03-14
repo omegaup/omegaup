@@ -10,12 +10,18 @@ import arena_ContestPractice, {
 import problem_Details, {
   PopupDisplayed,
 } from '../components/problem/Details.vue';
-import arena_NewClarification from '../components/arena/NewClarificationPopup.vue';
 import JSZip from 'jszip';
 import { submitRun, submitRunFailed } from './submissions';
 import { getOptionsFromLocation } from './location';
 import { navigateToProblem } from './navigation';
-import { ClarificationEvent, refreshClarifications } from './clarifications';
+import {
+  ContestClarification,
+  ContestClarificationType,
+  ContestClarificationRequest,
+  refreshContestClarifications,
+  trackClarifications,
+} from './clarifications';
+import clarificationStore from './clarificationsStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -24,6 +30,9 @@ OmegaUp.on('ready', () => {
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
+
+  trackClarifications(payload.clarifications);
+
   const contestPractice = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
@@ -31,7 +40,6 @@ OmegaUp.on('ready', () => {
       problemInfo: null as types.ProblemInfo | null,
       problem: null as ActiveProblem | null,
       problems: payload.problems as types.NavbarProblemsetProblem[],
-      clarifications: payload.clarifications,
       popupDisplayed: PopupDisplayed.None,
       showNewClarificationPopup: false,
       guid: null as null | string,
@@ -45,7 +53,7 @@ OmegaUp.on('ready', () => {
           users: payload.users,
           problemInfo: this.problemInfo,
           problem: this.problem,
-          clarifications: this.clarifications,
+          clarifications: clarificationStore.state.clarifications,
           popupDisplayed: this.popupDisplayed,
           showNewClarificationPopup: this.showNewClarificationPopup,
           activeTab,
@@ -164,10 +172,12 @@ OmegaUp.on('ready', () => {
           },
           'new-clarification': ({
             clarification,
-            target,
+            clearForm,
+            contestClarificationRequest,
           }: {
             clarification: types.Clarification;
-            target: arena_NewClarification;
+            clearForm: () => void;
+            contestClarificationRequest: ContestClarificationRequest;
           }) => {
             if (!clarification) {
               return;
@@ -180,19 +190,18 @@ OmegaUp.on('ready', () => {
               message: clarification.message,
             })
               .then(() => {
-                target.clearForm();
-                refreshClarifications({ clarification, contestAlias, target });
+                clearForm();
+                refreshContestClarifications(contestClarificationRequest);
               })
               .catch(ui.apiError);
           },
           'clarification-response': ({
-            contestAlias,
             clarification,
-            target,
-          }: ClarificationEvent) => {
+            contestClarificationRequest,
+          }: ContestClarification) => {
             api.Clarification.update(clarification)
               .then(() => {
-                refreshClarifications({ clarification, contestAlias, target });
+                refreshContestClarifications(contestClarificationRequest);
               })
               .catch(ui.apiError);
           },
@@ -213,9 +222,9 @@ OmegaUp.on('ready', () => {
   Object.assign(contestPractice, getOptionsFromLocation(window.location.hash));
 
   setInterval(() => {
-    refreshClarifications({
+    refreshContestClarifications({
+      type: ContestClarificationType.AllProblems,
       contestAlias: payload.contest.alias,
-      target: contestPractice,
     });
   }, 5 * 60 * 1000);
 });
