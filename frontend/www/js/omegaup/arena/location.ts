@@ -44,8 +44,8 @@ export function getOptionsFromLocation(location: string): LocationOptions {
         response.popupDisplayed = PopupDisplayed.RunSubmit;
       } else if (match.groups.popup?.startsWith('show-run')) {
         response.guid = match.groups.popup.split(':')[1];
-        (response.problemAlias = response.problem.problem.alias),
-          (response.popupDisplayed = PopupDisplayed.RunDetails);
+        response.problemAlias = response.problem.problem.alias;
+        response.popupDisplayed = PopupDisplayed.RunDetails;
       }
       break;
     case 'clarifications':

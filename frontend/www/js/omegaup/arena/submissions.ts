@@ -6,7 +6,7 @@ import { types } from '../api_types';
 import { myRunsStore, runsStore } from './runsStore';
 import { OmegaUp } from '../omegaup';
 import JSZip from 'jszip';
-import problem_Details from '../components/problem/Details.vue';
+import type problem_Details from '../components/problem/Details.vue';
 import { omegaup } from '../omegaup';
 import T from '../lang';
 
@@ -20,11 +20,10 @@ interface RunSubmit {
   runs: types.Run[];
 }
 
-interface SubmissionRequestWithExtraData {
-  redirect: string;
-  request: { guid: string; isAdmin: boolean; problemAlias: string };
-  target: problem_Details;
-  data: types.RunDetails;
+interface SubmissionResponse {
+  hash: string;
+  request: SubmissionRequest;
+  runDetails: types.RunDetails;
 }
 
 export interface SubmissionRequest {
@@ -77,20 +76,18 @@ export function submitRunFailed({
 
 export function showSubmission({
   request,
-  target,
-  data,
-  redirect,
-}: SubmissionRequestWithExtraData) {
-  if (data.show_diff === 'none' || !request.isAdmin) {
+  runDetails,
+  hash,
+}: SubmissionResponse) {
+  if (runDetails.show_diff === 'none' || !request.request.isAdmin) {
     displayRunDetails({
       request,
-      data,
-      target,
-      redirect,
+      runDetails,
+      hash,
     });
     return;
   }
-  fetch(`/api/run/download/run_alias/${request.guid}/show_diff/true/`)
+  fetch(`/api/run/download/run_alias/${request.request.guid}/show_diff/true/`)
     .then((response) => {
       if (!response.ok) {
         return Promise.reject(new Error(response.statusText));
@@ -111,7 +108,7 @@ export function showSubmission({
           return;
         }
         if (
-          data.show_diff === 'examples' &&
+          runDetails.show_diff === 'examples' &&
           relativePath.indexOf('sample/') === 0
         ) {
           return;
@@ -124,67 +121,63 @@ export function showSubmission({
     .then((response) => {
       Promise.allSettled(response.promises).then((results) => {
         results.forEach((result: any, index: number) => {
-          if (data.cases[response.cases[index]]) {
-            data.cases[response.cases[index]].contestantOutput = result.value;
+          if (runDetails.cases[response.cases[index]]) {
+            runDetails.cases[response.cases[index]].contestantOutput =
+              result.value;
           }
         });
       });
-      displayRunDetails({
-        request,
-        data,
-        target,
-        redirect,
-      });
+      displayRunDetails({ request, runDetails, hash });
     })
     .catch(ui.apiError);
 }
 
+function numericSort<T extends { [key: string]: any }>(key: string) {
+  const isDigit = (ch: string) => '0' <= ch && ch <= '9';
+  return (x: T, y: T) => {
+    let i = 0,
+      j = 0;
+    for (; i < x[key].length && j < y[key].length; i++, j++) {
+      if (isDigit(x[key][i]) && isDigit(x[key][j])) {
+        let nx = 0,
+          ny = 0;
+        while (i < x[key].length && isDigit(x[key][i]))
+          nx = nx * 10 + parseInt(x[key][i++]);
+        while (j < y[key].length && isDigit(y[key][j]))
+          ny = ny * 10 + parseInt(y[key][j++]);
+        i--;
+        j--;
+        if (nx != ny) return nx - ny;
+      } else if (x[key][i] < y[key][j]) {
+        return -1;
+      } else if (x[key][i] > y[key][j]) {
+        return 1;
+      }
+    }
+    return x[key].length - i - (y[key].length - j);
+  };
+}
+
 function displayRunDetails({
-  request,
-  target,
-  data,
-  redirect,
-}: SubmissionRequestWithExtraData): void {
+  request: { request, target },
+  runDetails,
+  hash,
+}: SubmissionResponse): void {
   let sourceHTML,
     sourceLink = false;
-  if (data.source?.indexOf('data:') === 0) {
+  if (runDetails.source?.indexOf('data:') === 0) {
     sourceLink = true;
-    sourceHTML = data.source;
-  } else if (data.source == 'lockdownDetailsDisabled') {
+    sourceHTML = runDetails.source;
+  } else if (runDetails.source == 'lockdownDetailsDisabled') {
     sourceHTML =
       (typeof sessionStorage !== 'undefined' &&
         sessionStorage.getItem(`run:${request.guid}`)) ||
       T.lockdownDetailsDisabled;
   } else {
-    sourceHTML = data.source;
+    sourceHTML = runDetails.source;
   }
 
-  const detailsGroups = data.details && data.details.groups;
-  const numericSort = <T extends { [key: string]: any }>(key: string) => {
-    const isDigit = (ch: string) => '0' <= ch && ch <= '9';
-    return (x: T, y: T) => {
-      let i = 0,
-        j = 0;
-      for (; i < x[key].length && j < y[key].length; i++, j++) {
-        if (isDigit(x[key][i]) && isDigit(x[key][j])) {
-          let nx = 0,
-            ny = 0;
-          while (i < x[key].length && isDigit(x[key][i]))
-            nx = nx * 10 + parseInt(x[key][i++]);
-          while (j < y[key].length && isDigit(y[key][j]))
-            ny = ny * 10 + parseInt(y[key][j++]);
-          i--;
-          j--;
-          if (nx != ny) return nx - ny;
-        } else if (x[key][i] < y[key][j]) {
-          return -1;
-        } else if (x[key][i] > y[key][j]) {
-          return 1;
-        }
-      }
-      return x[key].length - i - (y[key].length - j);
-    };
-  };
+  const detailsGroups = runDetails.details && runDetails.details.groups;
 
   let groups = undefined;
   if (detailsGroups && detailsGroups.length) {
@@ -201,21 +194,21 @@ function displayRunDetails({
   Vue.set(
     target,
     'currentRunDetailsData',
-    Object.assign({}, data, {
-      logs: data.logs || '',
-      judged_by: data.judged_by || '',
+    Object.assign({}, runDetails, {
+      logs: runDetails.logs || '',
+      judged_by: runDetails.judged_by || '',
       source: sourceHTML,
       source_link: sourceLink,
       source_url: window.URL.createObjectURL(
-        new Blob([data.source || ''], { type: 'text/plain' }),
+        new Blob([runDetails.source || ''], { type: 'text/plain' }),
       ),
-      source_name: `Main.${data.language}`,
+      source_name: `Main.${runDetails.language}`,
       groups: groups,
-      show_diff: request.isAdmin ? data.show_diff : 'none',
+      show_diff: request.isAdmin ? runDetails.show_diff : 'none',
       feedback: omegaup.SubmissionFeedback.None as omegaup.SubmissionFeedback,
     }),
   );
-  window.location.hash = redirect;
+  window.location.hash = hash;
 }
 
 export function updateRun({ run }: { run: types.Run }): void {

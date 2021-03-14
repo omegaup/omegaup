@@ -347,8 +347,8 @@ export default class ProblemDetails extends Vue {
   @Prop() selectedPrivateTags!: string[];
   @Prop() hasBeenNominated!: boolean;
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
-  @Prop({ default: null }) guid!: string;
-  @Prop({ default: null }) problemAlias!: string;
+  @Prop({ default: null }) guid!: null | string;
+  @Prop({ default: null }) problemAlias!: null | string;
   @Prop() isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop({ default: false }) shouldShowTabs!: boolean;

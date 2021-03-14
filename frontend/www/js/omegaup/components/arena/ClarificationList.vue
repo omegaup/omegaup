@@ -22,7 +22,8 @@
               :problem-alias="problemAlias"
               :username="username"
               @new-clarification="
-                (request) => $emit('new-clarification', request)
+                (contestClarification) =>
+                  $emit('new-clarification', contestClarification)
               "
               @dismiss="onPopupDismissed"
             ></omegaup-arena-new-clarification-popup>

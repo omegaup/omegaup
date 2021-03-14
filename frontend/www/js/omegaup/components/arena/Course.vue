@@ -18,6 +18,14 @@
               @navigate-to-problem="onNavigateToProblem"
             ></omegaup-arena-navbar-problems>
           </div>
+          <omegaup-arena-summary
+            v-if="activeProblem === null"
+            :title="currentAssignment.name"
+            :description="currentAssignment.description"
+            :start-time="currentAssignment.start_time"
+            :finish-time="currentAssignment.finish_time"
+            :admin="currentAssignment.director"
+          ></omegaup-arena-summary>
         </div>
       </div>
     </template>
@@ -30,6 +38,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import arena_Arena from './Arena.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
+import arena_Summary from './Summary.vue';
 
 export interface ActiveProblem {
   runs: types.Run[];
@@ -40,9 +49,10 @@ export interface ActiveProblem {
   components: {
     'omegaup-arena': arena_Arena,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
+    'omegaup-arena-summary': arena_Summary,
   },
 })
-export default class ArenaContestPractice extends Vue {
+export default class ArenaCourse extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() currentAssignment!: types.ArenaAssignment;
   @Prop() problems!: types.NavbarProblemsetProblem[];
@@ -57,6 +67,11 @@ export default class ArenaContestPractice extends Vue {
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.problem.alias ?? null;
+  }
+
+  onNavigateToProblem(activeProblem: ActiveProblem) {
+    this.activeProblem = activeProblem;
+    this.$emit('navigate-to-problem', activeProblem);
   }
 }
 </script>
