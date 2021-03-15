@@ -12,8 +12,8 @@
     :only-existing-tags="true"
     :typeahead-hide-discard="true"
     @change="updateExistingOptions"
-    @tag-added="onTagAdded"
-    @tag-removed="onTagRemoved"
+    @tag-added="$emit('update:value', selectedOptions)"
+    @tag-removed="$emit('update:value', selectedOptions)"
   >
   </tags-input>
 </template>
@@ -41,14 +41,6 @@ export default class Typeahead extends Vue {
   updateExistingOptions(query: string): void {
     if (query.length < this.activationThreshold) return;
     this.$emit('update-existing-options', query);
-  }
-
-  onTagAdded(): void {
-    this.$emit('update-selected-option', this.selectedOptions);
-  }
-
-  onTagRemoved(): void {
-    this.$emit('update-selected-option', this.selectedOptions);
   }
 }
 </script>
