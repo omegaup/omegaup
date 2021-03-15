@@ -5,14 +5,14 @@
         <form class="form" @submit.prevent="onSubmit">
           <div class="form-group">
             <label>{{ T.addUsersMultipleOrSingleUser }}</label>
-            <omegaup-common-typeahead
+            <omegaup-common-multi-typeahead
               :existing-options="existingUsers"
+              :value.sync="contestants"
               @update-existing-options="
                 (query) => $emit('update-existing-users', query)
               "
-              :value.sync="contestants"
             >
-            </omegaup-common-typeahead>
+            </omegaup-common-multi-typeahead>
           </div>
           <button class="btn btn-primary user-add-bulk" type="submit">
             {{ T.contestAdduserAddUsers }}
@@ -20,7 +20,8 @@
           <hr />
           <div class="form-group">
             <label>{{ T.wordsMultipleUser }}</label>
-            <textarea v-model="participants"
+            <textarea
+              v-model="participants"
               class="form-control contestants"
               rows="4"
             ></textarea>
@@ -100,13 +101,13 @@ import T from '../../lang';
 import * as time from '../../time';
 import DateTimePicker from '../DateTimePicker.vue';
 import user_Username from '../user/Username.vue';
-import common_Typeahead from '../common/Typeahead.vue';
+import common_MultiTypeahead from '../common/MultiTypeahead.vue';
 
 @Component({
   components: {
     'omegaup-datetimepicker': DateTimePicker,
     'omegaup-user-username': user_Username,
-    'omegaup-common-typeahead': common_Typeahead,
+    'omegaup-common-multi-typeahead': common_MultiTypeahead,
   },
 })
 export default class AddContestant extends Vue {
@@ -125,13 +126,13 @@ export default class AddContestant extends Vue {
     if (this.participants !== '') {
       users = this.participants.split(',');
     }
-    //const contestants = this.contestants.map((user) => user.key.trim());
-    if (this.contestants?.length) {
-      this.$emit('add-user', [...users.map((user) => user.trim()), this.contestants],
-      );
-    } else {
-      this.$emit('add-user', users.map((user) => user.trim()));
+    if (this.contestants) {
+      users = [...users, ...this.contestants.map((user) => user.key)];
     }
+    this.$emit(
+      'add-user',
+      users.map((user) => user.trim()),
+    );
   }
 
   @Watch('users')

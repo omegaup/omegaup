@@ -8,6 +8,7 @@
             <omegaup-common-typeahead
               :existing-options="existingProblems"
               :value.sync="alias"
+              @update-existing-options="
                 (query) => $emit('update-existing-problems', query)
               "
             >
