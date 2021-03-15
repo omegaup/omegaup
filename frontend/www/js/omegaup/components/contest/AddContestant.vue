@@ -139,6 +139,7 @@ export default class AddContestant extends Vue {
   onUsersChange(newUsers: types.ContestUser[]): void {
     this.currentUsers = newUsers;
     this.contestants = [];
+    this.participants = '';
   }
 }
 </script>
