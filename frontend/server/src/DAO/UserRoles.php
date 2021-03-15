@@ -15,6 +15,31 @@ namespace OmegaUp\DAO;
  */
 class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
     /**
+     * Gets the username of the owner of an ACL
+     *
+     * @return null|string
+     */
+    public static function getOwner(int $aclId): ?string {
+        $sql = '
+            SELECT
+                i.username
+            FROM
+                ACLs a
+            INNER JOIN
+                Users u ON u.user_id = a.owner_id
+            INNER JOIN
+                Identities i ON u.main_identity_id = i.identity_id
+            WHERE
+                a.acl_id = ?;';
+
+        /** @var string|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [ $aclId ]
+        );
+    }
+
+    /**
      * @return list<array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string}>
      */
     private static function getAdmins(int $aclId): array {
