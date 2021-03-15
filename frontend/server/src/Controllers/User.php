@@ -2103,10 +2103,9 @@ class User extends \OmegaUp\Controllers\Controller {
         $response = [];
         foreach ($identities as $identity) {
             $username = strval($identity->username);
-            $name = strval($identity->name);
             $response[] = [
                 'label' => $username,
-                'value' => $name ?: $username,
+                'value' => $identity->name ?: $username,
             ];
         }
         return $response;

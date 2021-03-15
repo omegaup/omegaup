@@ -2,13 +2,12 @@
   <tags-input
     v-model="selectedOptions"
     :existing-tags="existingOptions"
-    :allow-duplicates="true"
     :typeahead="true"
     :typeahead-style="'dropdown'"
     :typeahead-max-results="maxResults"
     :typeahead-activation-threshold="activationThreshold"
     :placeholder="T.typeaheadSearchPlaceholder"
-    :limit="limit"
+    :limit="1"
     :hide-input-on-limit="true"
     :only-existing-tags="true"
     :typeahead-hide-discard="true"
@@ -34,8 +33,7 @@ import { types } from '../../api_types';
 export default class Typeahead extends Vue {
   @Prop() existingOptions!: types.ListItem[];
   @Prop({ default: 3 }) activationThreshold!: number;
-  @Prop({ default: 10 }) maxResults!: number;
-  @Prop({ default: 1 }) limit!: number;
+  @Prop({ default: 5 }) maxResults!: number;
 
   T = T;
   selectedOptions: types.ListItem[] = [];
@@ -46,11 +44,12 @@ export default class Typeahead extends Vue {
   }
 
   onTagAdded(): void {
-    this.$emit('update-selected-option', this.selectedOptions);
+    if (this.selectedOptions.length < 1) return;
+    this.$emit('update:value', this.selectedOptions[0].key);
   }
 
   onTagRemoved(): void {
-    this.$emit('update-selected-option', null);
+    this.$emit('update:value', null);
   }
 }
 </script>

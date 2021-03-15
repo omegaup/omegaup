@@ -7,13 +7,23 @@
             <label>{{ T.addUsersMultipleOrSingleUser }}</label>
             <omegaup-common-typeahead
               :existing-options="existingUsers"
-              :limit="0"
               @update-existing-options="
                 (query) => $emit('update-existing-users', query)
               "
-              @update-selected-option="onSelectUser"
+              :value.sync="contestants"
             >
             </omegaup-common-typeahead>
+          </div>
+          <button class="btn btn-primary user-add-bulk" type="submit">
+            {{ T.contestAdduserAddUsers }}
+          </button>
+          <hr />
+          <div class="form-group">
+            <label>{{ T.wordsMultipleUser }}</label>
+            <textarea v-model="participants"
+              class="form-control contestants"
+              rows="4"
+            ></textarea>
           </div>
           <button class="btn btn-primary user-add-bulk" type="submit">
             {{ T.contestAdduserAddUsers }}
@@ -106,27 +116,28 @@ export default class AddContestant extends Vue {
 
   T = T;
   time = time;
-  contestants: null | types.ListItem[] = null;
+  participants = '';
+  contestants: types.ListItem[] = [];
   currentUsers = this.users;
 
   onSubmit(): void {
-    if (this.contestants === null) return;
-    if (this.contestants.length) {
-      this.$emit(
-        'add-user',
-        this.contestants.map((user) => user.key.trim()),
-      );
+    let users: string[] = [];
+    if (this.participants !== '') {
+      users = this.participants.split(',');
     }
-  }
-
-  onSelectUser(contestants: null | types.ListItem[]) {
-    this.contestants = contestants;
+    //const contestants = this.contestants.map((user) => user.key.trim());
+    if (this.contestants?.length) {
+      this.$emit('add-user', [...users.map((user) => user.trim()), this.contestants],
+      );
+    } else {
+      this.$emit('add-user', users.map((user) => user.trim()));
+    }
   }
 
   @Watch('users')
   onUsersChange(newUsers: types.ContestUser[]): void {
     this.currentUsers = newUsers;
-    this.contestants = null;
+    this.contestants = [];
   }
 }
 </script>

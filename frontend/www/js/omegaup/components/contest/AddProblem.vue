@@ -7,10 +7,9 @@
             <label>{{ T.wordsProblem }}</label>
             <omegaup-common-typeahead
               :existing-options="existingProblems"
-              @update-existing-options="
+              :value.sync="alias"
                 (query) => $emit('update-existing-problems', query)
               "
-              @update-selected-option="onSelectProblem"
             >
             </omegaup-common-typeahead>
           </div>
@@ -227,15 +226,6 @@ export default class AddProblem extends Vue {
       return;
     }
     this.$emit('runs-diff', this.alias, versions, selectedCommit);
-  }
-
-  onSelectProblem(aliases: null | types.ListItem[]) {
-    if (!aliases) {
-      this.alias = '';
-      return;
-    }
-    // Getting always position 0, because problems only can be added one by one
-    this.alias = aliases[0].key;
   }
 
   get addProblemButtonLabel(): string {
