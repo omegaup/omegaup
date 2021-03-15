@@ -44,11 +44,11 @@ export default class Typeahead extends Vue {
 
   onTagAdded(): void {
     if (this.selectedOptions.length < 1) return;
-    this.$emit('update-selected-option', this.selectedOptions[0].key);
+    this.$emit('update:value', this.selectedOptions[0].key);
   }
 
   onTagRemoved(): void {
-    this.$emit('update-selected-option', null);
+    this.$emit('update:value', null);
   }
 }
 </script>
