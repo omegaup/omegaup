@@ -45,13 +45,12 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         $feedback = 'Test feedback';
-        \OmegaUp\Controllers\SubmissionFeedback::apiCreate(
+        \OmegaUp\Controllers\Submission::apiCreateFeedback(
             new \OmegaUp\Request([
                 'auth_token' => self::login($admin['identity'])->auth_token,
-                'submission_id' => $run->submission_id,
+                'guid' => $runData['response']['guid'],
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment_alias'],
-                'problem_alias' => $problemData['problem']->alias,
                 'feedback' => $feedback,
             ])
         );

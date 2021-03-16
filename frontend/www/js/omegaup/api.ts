@@ -1576,11 +1576,11 @@ export const Session = {
   >('/api/session/googleLogin/'),
 };
 
-export const SubmissionFeedback = {
-  create: apiCall<
-    messages.SubmissionFeedbackCreateRequest,
-    messages.SubmissionFeedbackCreateResponse
-  >('/api/submissionFeedback/create/'),
+export const Submission = {
+  createFeedback: apiCall<
+    messages.SubmissionCreateFeedbackRequest,
+    messages.SubmissionCreateFeedbackResponse
+  >('/api/submission/createFeedback/'),
 };
 
 export const Tag = {
