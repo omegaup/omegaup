@@ -129,4 +129,121 @@ class Submission extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'submissions_list',
         ];
     }
+
+    /**
+     * Adds admin feedback to a submission
+     *
+     * @omegaup-request-param string $guid
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $feedback
+     *
+     * @return array{status: string}
+     */
+    public static function apiCreateFeedback(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        $submission = \OmegaUp\DAO\Submissions::getByGuid(
+            $r->ensureString('guid')
+        );
+        if (is_null($submission)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'submissionNotFound'
+            );
+        }
+
+        $feedback = $r->ensureString(
+            'feedback',
+            fn (string $feedback) => \OmegaUp\Validators::stringOfLengthInRange(
+                $feedback,
+                1,
+                200
+            )
+        );
+
+        $courseSubmissionInfo = \OmegaUp\DAO\Submissions::getCourseSubmissionInfo(
+            $submission,
+            $r->ensureString(
+                'assignment_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            ),
+            $r->ensureString(
+                'course_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            )
+        );
+        if (is_null($courseSubmissionInfo)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseSubmissionNotFound'
+            );
+        }
+
+        $course = \OmegaUp\DAO\Courses::getByPK(
+            $courseSubmissionInfo['course_id']
+        );
+        if (is_null($course)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseNotFound'
+            );
+        }
+
+        if (
+            !\OmegaUp\Authorization::isCourseAdmin(
+                $r->identity,
+                $course
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+
+            \OmegaUp\DAO\Base\SubmissionFeedback::create(
+                new \OmegaUp\DAO\VO\SubmissionFeedback([
+                    'identity_id' => $r->identity->identity_id,
+                    'submission_id' => $submission->submission_id,
+                    'feedback' => $feedback,
+                ])
+            );
+
+            if (!is_null($courseSubmissionInfo['author_id'])) {
+                \OmegaUp\DAO\Notifications::create(
+                    new \OmegaUp\DAO\VO\Notifications([
+                        'user_id' => $courseSubmissionInfo['author_id'],
+                        'contents' =>  json_encode([
+                            'type' => \OmegaUp\DAO\Notifications::COURSE_SUBMISSION_FEEDBACK,
+                            'body' => [
+                                'localizationString' => new \OmegaUp\TranslationString(
+                                    'notificationCourseSubmissionFeedback'
+                                ),
+                                'localizationParams' => [
+                                    'problemAlias' => $courseSubmissionInfo['problem_alias'],
+                                    'courseName' => $course->name,
+                                ],
+                                'url' => "/course/{$course->alias}/assignment/{$courseSubmissionInfo['assignment_alias']}/#problems/{$courseSubmissionInfo['problem_alias']}/",
+                                'iconUrl' => '/media/info.png',
+                            ]
+                        ]),
+                    ])
+                );
+            }
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'submissionFeedbackAlreadyExists'
+                );
+            }
+
+            throw $e;
+        }
+
+        return [
+            'status' => 'ok',
+        ];
+    }
 }

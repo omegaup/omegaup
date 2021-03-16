@@ -16,6 +16,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
  * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, hide_problem_tags: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type UserListItem=array{label: string, value: string}
+ * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>}
  * @psalm-type CoderOfTheMonth=array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}
  * @psalm-type CoderOfTheMonthList=list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>
@@ -1905,11 +1906,14 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
             }
             // Get identity ranking
-            $scoreboardResponse = \OmegaUp\Controllers\Contest::getScoreboard(
+            $scoreboardResponse = \OmegaUp\Controllers\Contest::getScoreboardForUserProfile(
                 $contestProblemset['contest'],
                 $contestProblemset['problemset'],
                 $identity
             );
+            if (is_null($scoreboardResponse)) {
+                continue;
+            }
             $contest = [
                 'alias' => $contestProblemset['contest']->alias,
                 'title' => $contestProblemset['contest']->title,
@@ -3832,7 +3836,6 @@ class User extends \OmegaUp\Controllers\Controller {
             ];
             return $response;
         }
-
         $response['smartyProperties']['payload'] = [
             'privateProfile' => false,
             'profile' => self::getProfileDetails(

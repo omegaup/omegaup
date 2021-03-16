@@ -19,11 +19,17 @@
               @navigate-to-problem="onNavigateToProblem"
             ></omegaup-arena-navbar-problems>
           </div>
-          <omegaup-arena-contest-summary
+          <omegaup-arena-summary
             v-if="activeProblem === null"
-            :contest="contest"
+            :title="ui.contestTitle(contest)"
+            :description="contest.description"
+            :start-time="contest.start_time"
+            :finish-time="contest.finish_time"
+            :scoreboard="contest.scoreboard"
+            :window-length="contest.window_length"
+            :admin="contest.director"
             :show-ranking="false"
-          ></omegaup-arena-contest-summary>
+          ></omegaup-arena-summary>
           <div v-else class="problem main">
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
@@ -32,6 +38,7 @@
               :runs="activeProblem.runs"
               :popup-displayed="popupDisplayed"
               :guid="guid"
+              :problem-alias="problemAlias"
               :should-show-run-details="shouldShowRunDetails"
               @update:activeTab="
                 (selectedTab) =>
@@ -40,9 +47,8 @@
                     alias: activeProblem.problem.alias,
                   })
               "
-              @change-show-run-location="onChangeShowRunLocation"
               @submit-run="onRunSubmitted"
-              @show-run="onShowRunDetails"
+              @show-run="(source) => $emit('show-run', source)"
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -87,11 +93,17 @@
         :is-admin="contestAdmin"
         :in-contest="true"
         :show-new-clarification-popup="showNewClarificationPopup"
-        @new-clarification="(request) => $emit('new-clarification', request)"
-        @clarification-response="
-          (id, responseText, isPublic) =>
-            $emit('clarification-response', id, responseText, isPublic)
+        @new-clarification="
+          (contestClarification) =>
+            $emit('new-clarification', {
+              ...contestClarification,
+              contestClarificationRequest: {
+                type: ContestClarificationType.AllProblems,
+                contestAlias: contest.alias,
+              },
+            })
         "
+        @clarification-response="onClarificationResponse"
         @update:activeTab="
           (selectedTab) => $emit('update:activeTab', selectedTab)
         "
@@ -108,9 +120,10 @@ import T from '../../lang';
 import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
-import arena_ContestSummary from './ContestSummaryV2.vue';
+import arena_Summary from './Summary.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
+import { ContestClarificationType } from '../../arena/clarifications';
 
 export interface ActiveProblem {
   runs: types.Run[];
@@ -121,7 +134,7 @@ export interface ActiveProblem {
   components: {
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena': arena_Arena,
-    'omegaup-arena-contest-summary': arena_ContestSummary,
+    'omegaup-arena-summary': arena_Summary,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-problem-details': problem_Details,
@@ -140,10 +153,12 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
   @Prop({ default: null }) guid!: null | string;
+  @Prop({ default: null }) problemAlias!: null | string;
 
   T = T;
   ui = ui;
   currentClarifications = this.clarifications;
+  ContestClarificationType = ContestClarificationType;
   activeProblem: ActiveProblem | null = this.problem;
   shouldShowRunDetails = false;
 
@@ -156,26 +171,19 @@ export default class ArenaContestPractice extends Vue {
     this.$emit('navigate-to-problem', request);
   }
 
-  onRunSubmitted(code: string, selectedLanguage: string): void {
-    const request = Object.assign({}, this.activeProblem, {
-      code,
-      selectedLanguage,
+  onRunSubmitted(run: { code: string; language: string }): void {
+    this.$emit('submit-run', Object.assign({}, run, this.activeProblem));
+  }
+
+  onClarificationResponse(response: types.Clarification): void {
+    this.$emit('clarification-response', {
+      contestAlias: this.contest.alias,
+      clarification: response,
+      contestClarificationRequest: {
+        type: ContestClarificationType.AllProblems,
+        contestAlias: this.contest.alias,
+      },
     });
-    this.$emit('submit-run', request);
-  }
-
-  onShowRunDetails(target: problem_Details, guid: string): void {
-    this.$emit('show-run', { target, request: { guid } });
-  }
-
-  onChangeShowRunLocation(request: { guid: string }): void {
-    if (!this.activeProblem) {
-      return;
-    }
-    this.$emit(
-      'change-show-run-location',
-      Object.assign({}, request, { alias: this.activeProblem.problem.alias }),
-    );
   }
 
   @Watch('problem')

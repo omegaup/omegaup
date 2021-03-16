@@ -217,6 +217,16 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
+        if (x.scoreboard)
+          x.scoreboard = ((x) => {
+            if (x.finish_time)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          })(x.scoreboard);
         x.users = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -1390,6 +1400,17 @@ export namespace types {
     };
   }
 
+  export interface ArenaAssignment {
+    alias?: string;
+    assignment_type: string;
+    description?: string;
+    director: string;
+    finish_time?: Date;
+    name?: string;
+    problems: types.NavbarProblemsetProblem[];
+    start_time: Date;
+  }
+
   export interface ArenaProblemDetails {
     accepts_submissions: boolean;
     alias: string;
@@ -1411,15 +1432,7 @@ export namespace types {
 
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
-    currentAssignment: {
-      alias?: string;
-      assignment_type: string;
-      description?: string;
-      finish_time?: Date;
-      name?: string;
-      problems: types.NavbarProblemsetProblem[];
-      start_time: Date;
-    };
+    currentAssignment: types.ArenaAssignment;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
   }
@@ -1734,6 +1747,7 @@ export namespace types {
     contest: types.ContestPublicDetails;
     contestAdmin: boolean;
     problems: types.NavbarProblemsetProblem[];
+    scoreboard?: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     users: types.ContestUser[];
   }
@@ -2240,6 +2254,11 @@ export namespace types {
     OutputLimit: number | string;
     OverallWallTimeLimit: string;
     TimeLimit: string;
+  }
+
+  export interface ListItem {
+    key: string;
+    value: string;
   }
 
   export interface LoginDetailsPayload {
@@ -3162,14 +3181,16 @@ export namespace messages {
 
   // Clarification
   export type ClarificationCreateRequest = { [key: string]: any };
-  export type ClarificationCreateResponse = { clarification_id: number };
+  export type _ClarificationCreateServerResponse = any;
+  export type ClarificationCreateResponse = types.Clarification;
   export type ClarificationDetailsRequest = { [key: string]: any };
+  export type _ClarificationDetailsServerResponse = any;
   export type ClarificationDetailsResponse = {
     answer?: string;
     message: string;
     problem_id: number;
     problemset_id?: number;
-    time: number;
+    time: Date;
   };
   export type ClarificationUpdateRequest = { [key: string]: any };
   export type ClarificationUpdateResponse = {};
@@ -3939,6 +3960,10 @@ export namespace messages {
   export type SessionGoogleLoginRequest = { [key: string]: any };
   export type SessionGoogleLoginResponse = { isAccountCreation: boolean };
 
+  // Submission
+  export type SubmissionCreateFeedbackRequest = { [key: string]: any };
+  export type SubmissionCreateFeedbackResponse = {};
+
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
   export type TagFrequentTagsResponse = {
@@ -4634,6 +4659,12 @@ export namespace controllers {
     googleLogin: (
       params?: messages.SessionGoogleLoginRequest,
     ) => Promise<messages.SessionGoogleLoginResponse>;
+  }
+
+  export interface Submission {
+    createFeedback: (
+      params?: messages.SubmissionCreateFeedbackRequest,
+    ) => Promise<messages.SubmissionCreateFeedbackResponse>;
   }
 
   export interface Tag {

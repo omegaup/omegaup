@@ -233,13 +233,10 @@
         :class="{ 'show active': selectedTab === 'clarifications' }"
       >
         <omegaup-arena-clarification-list
-          :clarifications="clarifications"
+          :clarifications="currentClarifications"
           :in-contest="false"
           :is-admin="true"
-          @clarification-response="
-            (id, responseText, isPublic) =>
-              $emit('clarification-response', id, responseText, isPublic)
-          "
+          @clarification-response="onClarificationResponse"
         >
           <template #new-clarification><div></div></template>
           <template #table-title>
@@ -253,8 +250,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Ref, Emit, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
-import { messages, types } from '../../api_types';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
@@ -304,32 +300,6 @@ export enum PopupDisplayed {
   Reviewer,
 }
 
-const numericSort = <T extends { [key: string]: any }>(key: string) => {
-  const isDigit = (ch: string) => '0' <= ch && ch <= '9';
-  return (x: T, y: T) => {
-    let i = 0,
-      j = 0;
-    for (; i < x[key].length && j < y[key].length; i++, j++) {
-      if (isDigit(x[key][i]) && isDigit(x[key][j])) {
-        let nx = 0,
-          ny = 0;
-        while (i < x[key].length && isDigit(x[key][i]))
-          nx = nx * 10 + parseInt(x[key][i++]);
-        while (j < y[key].length && isDigit(y[key][j]))
-          ny = ny * 10 + parseInt(y[key][j++]);
-        i--;
-        j--;
-        if (nx != ny) return nx - ny;
-      } else if (x[key][i] < y[key][j]) {
-        return -1;
-      } else if (x[key][i] > y[key][j]) {
-        return 1;
-      }
-    }
-    return x[key].length - i - (y[key].length - j);
-  };
-};
-
 @Component({
   components: {
     FontAwesomeIcon,
@@ -356,7 +326,7 @@ export default class ProblemDetails extends Vue {
     },
   })
   allRuns!: types.Run[];
-  @Prop() initialClarifications!: types.Clarification[];
+  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() problem!: types.ProblemInfo;
   @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
@@ -377,7 +347,8 @@ export default class ProblemDetails extends Vue {
   @Prop() selectedPrivateTags!: string[];
   @Prop() hasBeenNominated!: boolean;
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
-  @Prop() guid!: string;
+  @Prop({ default: null }) guid!: null | string;
+  @Prop({ default: null }) problemAlias!: null | string;
   @Prop() isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop({ default: false }) shouldShowTabs!: boolean;
@@ -390,11 +361,10 @@ export default class ProblemDetails extends Vue {
   ui = ui;
   time = time;
   selectedTab = this.activeTab;
-  clarifications = this.initialClarifications || [];
+  currentClarifications = this.clarifications;
   currentPopupDisplayed = this.popupDisplayed;
   hasUnreadClarifications =
-    this.initialClarifications?.length > 0 &&
-    this.activeTab !== 'clarifications';
+    this.clarifications?.length > 0 && this.activeTab !== 'clarifications';
   currentRunDetailsData = this.runDetailsData;
 
   get availableTabs(): Tab[] {
@@ -424,9 +394,9 @@ export default class ProblemDetails extends Vue {
   }
 
   get clarificationsCount(): string {
-    if (this.clarifications.length === 0) return '';
-    if (this.clarifications.length > 9) return '(9+)';
-    return `(${this.clarifications.length})`;
+    if (this.currentClarifications.length === 0) return '';
+    if (this.currentClarifications.length > 9) return '(9+)';
+    return `(${this.currentClarifications.length})`;
   }
 
   get visibilityOfPromotionButton(): boolean {
@@ -469,7 +439,14 @@ export default class ProblemDetails extends Vue {
   }
 
   onRunDetails(guid: string): void {
-    this.$emit('show-run', this, guid);
+    this.$emit('show-run', {
+      request: {
+        guid,
+        isAdmin: this.isAdmin,
+        problemAlias: this.problem.alias,
+      },
+      target: this,
+    });
     this.currentPopupDisplayed = PopupDisplayed.RunDetails;
   }
 
@@ -584,57 +561,20 @@ export default class ProblemDetails extends Vue {
   }
 
   onRunSubmitted(code: string, selectedLanguage: string): void {
-    this.$emit('submit-run', code, selectedLanguage);
+    this.$emit('submit-run', {
+      code,
+      language: selectedLanguage,
+      runs: this.runs,
+      nominationStatus: this.nominationStatus,
+    });
     this.onPopupDismissed();
   }
 
-  displayRunDetails(guid: string, data: messages.RunDetailsResponse): void {
-    let sourceHTML,
-      sourceLink = false;
-    if (data.source?.indexOf('data:') === 0) {
-      sourceLink = true;
-      sourceHTML = data.source;
-    } else if (data.source == 'lockdownDetailsDisabled') {
-      sourceHTML =
-        (typeof sessionStorage !== 'undefined' &&
-          sessionStorage.getItem(`run:${guid}`)) ||
-        T.lockdownDetailsDisabled;
-    } else {
-      sourceHTML = data.source;
-    }
-
-    const detailsGroups = data.details && data.details.groups;
-    let groups = undefined;
-    if (detailsGroups && detailsGroups.length) {
-      detailsGroups.sort(numericSort('group'));
-      for (const detailGroup of detailsGroups) {
-        if (!detailGroup.cases) {
-          continue;
-        }
-        detailGroup.cases.sort(numericSort('name'));
-      }
-      groups = detailsGroups;
-    }
-
-    Vue.set(
-      this,
-      'currentRunDetailsData',
-      Object.assign({}, data, {
-        logs: data.logs || '',
-        judged_by: data.judged_by || '',
-        source: sourceHTML,
-        source_link: sourceLink,
-        source_url: window.URL.createObjectURL(
-          new Blob([data.source || ''], { type: 'text/plain' }),
-        ),
-        source_name: `Main.${data.language}`,
-        groups: groups,
-        show_diff: this.isAdmin ? data.show_diff : 'none',
-        feedback: omegaup.SubmissionFeedback.None as omegaup.SubmissionFeedback,
-      }),
-    );
-
-    this.$emit('change-show-run-location', { guid });
+  onClarificationResponse(response: types.Clarification): void {
+    this.$emit('clarification-response', {
+      clarification: response,
+      target: this,
+    });
   }
 
   @Emit('update:activeTab')
@@ -646,9 +586,9 @@ export default class ProblemDetails extends Vue {
     return this.selectedTab;
   }
 
-  @Watch('initialClarifications')
+  @Watch('clarifications')
   onInitialClarificationsChanged(newValue: types.Clarification[]): void {
-    this.clarifications = newValue;
+    this.currentClarifications = newValue;
   }
 
   @Watch('popupDisplayed')
@@ -668,7 +608,7 @@ export default class ProblemDetails extends Vue {
     }
   }
 
-  @Watch('clarifications')
+  @Watch('currentClarifications')
   onClarificationsChanged(newValue: types.Clarification[]): void {
     if (this.selectedTab === 'clarifications' || newValue.length === 0) return;
     this.hasUnreadClarifications = true;
@@ -677,7 +617,14 @@ export default class ProblemDetails extends Vue {
   @Watch('shouldShowRunDetails')
   onShouldShowRunDetailsChanged(newValue: boolean): void {
     if (newValue && this.guid) {
-      this.$emit('show-run', this, this.guid);
+      this.$emit('show-run', {
+        request: {
+          guid: this.guid,
+          isAdmin: this.isAdmin,
+          problemAlias: this.currentRunDetailsData?.alias,
+        },
+        target: this,
+      });
     }
   }
 }

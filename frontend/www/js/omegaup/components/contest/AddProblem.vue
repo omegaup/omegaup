@@ -8,10 +8,10 @@
             <omegaup-common-typeahead
               :existing-options="existingProblems"
               :type="'problem'"
+              :value.sync="alias"
               @update-existing-options="
                 (query) => $emit('update-existing-problems', query)
               "
-              @update-selected-option="onSelectProblem"
             >
             </omegaup-common-typeahead>
           </div>
@@ -228,10 +228,6 @@ export default class AddProblem extends Vue {
       return;
     }
     this.$emit('runs-diff', this.alias, versions, selectedCommit);
-  }
-
-  onSelectProblem(alias: string) {
-    this.alias = alias;
   }
 
   get addProblemButtonLabel(): string {

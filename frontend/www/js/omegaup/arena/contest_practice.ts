@@ -7,14 +7,23 @@ import Vue from 'vue';
 import arena_ContestPractice, {
   ActiveProblem,
 } from '../components/arena/ContestPractice.vue';
-import problem_Details, {
-  PopupDisplayed,
-} from '../components/problem/Details.vue';
-import { myRunsStore } from '../arena/runsStore';
-import arena_NewClarification from '../components/arena/NewClarificationPopup.vue';
-import problemsStore from './problemStore';
-import JSZip from 'jszip';
+import { PopupDisplayed } from '../components/problem/Details.vue';
+import {
+  showSubmission,
+  SubmissionRequest,
+  submitRun,
+  submitRunFailed,
+} from './submissions';
 import { getOptionsFromLocation } from './location';
+import { navigateToProblem } from './navigation';
+import {
+  ContestClarification,
+  ContestClarificationType,
+  ContestClarificationRequest,
+  refreshContestClarifications,
+  trackClarifications,
+} from './clarifications';
+import clarificationStore from './clarificationsStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -23,6 +32,9 @@ OmegaUp.on('ready', () => {
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
+
+  trackClarifications(payload.clarifications);
+
   const contestPractice = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
@@ -30,27 +42,12 @@ OmegaUp.on('ready', () => {
       problemInfo: null as types.ProblemInfo | null,
       problem: null as ActiveProblem | null,
       problems: payload.problems as types.NavbarProblemsetProblem[],
-      clarifications: payload.clarifications,
       popupDisplayed: PopupDisplayed.None,
       showNewClarificationPopup: false,
       guid: null as null | string,
+      problemAlias: null as null | string,
+      isAdmin: false,
     }),
-    methods: {
-      getMaxScore: (
-        runs: types.Run[],
-        alias: string,
-        previousScore: number,
-      ): number => {
-        let maxScore = previousScore;
-        for (const run of runs) {
-          if (alias != run.alias) {
-            continue;
-          }
-          maxScore = Math.max(maxScore, run.contest_score || 0);
-        }
-        return maxScore;
-      },
-    },
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
         props: {
@@ -60,203 +57,106 @@ OmegaUp.on('ready', () => {
           users: payload.users,
           problemInfo: this.problemInfo,
           problem: this.problem,
-          clarifications: this.clarifications,
+          clarifications: clarificationStore.state.clarifications,
           popupDisplayed: this.popupDisplayed,
           showNewClarificationPopup: this.showNewClarificationPopup,
           activeTab,
           guid: this.guid,
+          problemAlias: this.problemAlias,
+          isAdmin: this.isAdmin,
         },
         on: {
-          'navigate-to-problem': (request: ActiveProblem) => {
-            if (
-              Object.prototype.hasOwnProperty.call(
-                problemsStore.state.problems,
-                request.problem.alias,
-              )
-            ) {
-              contestPractice.problemInfo =
-                problemsStore.state.problems[request.problem.alias];
-              window.location.hash = `#problems/${request.problem.alias}`;
-              return;
-            }
-            api.Problem.details({
-              problem_alias: request.problem.alias,
-              prevent_problemset_open: false,
-            })
-              .then((problemInfo) => {
-                for (const run of problemInfo.runs ?? []) {
-                  trackRun(run);
-                }
-                const currentProblem = payload.problems?.find(
-                  ({ alias }) => alias == problemInfo.alias,
-                );
-                problemInfo.title = currentProblem?.text ?? '';
-                contestPractice.problemInfo = problemInfo;
-                request.problem.alias = problemInfo.alias;
-                request.runs = myRunsStore.state.runs;
-                request.problem.bestScore = this.getMaxScore(
-                  request.runs,
-                  problemInfo.alias,
-                  0,
-                );
-                problemsStore.commit('addProblem', problemInfo);
-                if (
-                  contestPractice.popupDisplayed === PopupDisplayed.RunSubmit
-                ) {
-                  window.location.hash = `#problems/${request.problem.alias}/new-run`;
-                  return;
-                }
-                window.location.hash = `#problems/${request.problem.alias}`;
-              })
-              .catch(() => {
-                ui.dismissNotifications();
-                window.location.hash = '#problems';
-                contestPractice.problem = null;
-              });
+          'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
+            navigateToProblem({
+              problem,
+              runs,
+              target: contestPractice,
+              problems: this.problems,
+            });
           },
-          'show-run': (source: {
-            target: problem_Details;
-            request: { guid: string };
-          }) => {
-            api.Run.details({ run_alias: source.request.guid })
-              .then((data) => {
-                if (data.show_diff === 'none' || !commonPayload.isAdmin) {
-                  source.target.displayRunDetails(source.request.guid, data);
-                  return;
-                }
-                fetch(
-                  `/api/run/download/run_alias/${source.request.guid}/show_diff/true/`,
-                )
-                  .then((response) => {
-                    if (!response.ok) {
-                      return Promise.reject(new Error(response.statusText));
-                    }
-                    return Promise.resolve(response.blob());
-                  })
-                  .then(JSZip.loadAsync)
-                  .then((zip: JSZip) => {
-                    const result: {
-                      cases: string[];
-                      promises: Promise<string>[];
-                    } = { cases: [], promises: [] };
-                    zip.forEach(async (relativePath, zipEntry) => {
-                      const pos = relativePath.lastIndexOf('.');
-                      const basename = relativePath.substring(0, pos);
-                      const extension = relativePath.substring(pos + 1);
-                      if (
-                        extension !== 'out' ||
-                        relativePath.indexOf('/') !== -1
-                      ) {
-                        return;
-                      }
-                      if (
-                        data.show_diff === 'examples' &&
-                        relativePath.indexOf('sample/') === 0
-                      ) {
-                        return;
-                      }
-                      result.cases.push(basename);
-                      result.promises.push(
-                        zip.file(zipEntry.name).async('text'),
-                      );
-                    });
-                    return result;
-                  })
-                  .then((response) => {
-                    Promise.allSettled(response.promises).then((results) => {
-                      results.forEach((result: any, index: number) => {
-                        if (data.cases[response.cases[index]]) {
-                          data.cases[response.cases[index]].contestantOutput =
-                            result.value;
-                        }
-                      });
-                    });
-                    source.target.displayRunDetails(source.request.guid, data);
-                  })
-                  .catch(ui.apiError);
+          'show-run': (request: SubmissionRequest) => {
+            const hash = `#problems/${
+              this.problemAlias ?? request.request.problemAlias
+            }/show-run:${request.request.guid}/`;
+            api.Run.details({ run_alias: request.request.guid })
+              .then((runDetails) => {
+                showSubmission({ request, runDetails, hash });
               })
               .catch((error) => {
                 ui.apiError(error);
-                source.target.popupDisplayed = PopupDisplayed.None;
+                this.popupDisplayed = PopupDisplayed.None;
               });
           },
-          'change-show-run-location': (request: {
-            guid: string;
-            alias: string;
-          }) => {
-            window.location.hash = `#problems/${request.alias}/show-run:${request.guid}/`;
-          },
-          'submit-run': (
-            request: ActiveProblem & { code: string; selectedLanguage: string },
-          ) => {
+          'submit-run': ({
+            problem,
+            runs,
+            code,
+            language,
+          }: ActiveProblem & { code: string; language: string }) => {
             api.Run.create({
-              problem_alias: request.problem.alias,
-              language: request.selectedLanguage,
-              source: request.code,
+              problem_alias: problem.alias,
+              language: language,
+              source: code,
             })
               .then((response) => {
-                ui.reportEvent('submission', 'submit');
-
-                updateRun({
+                submitRun({
+                  runs,
                   guid: response.guid,
-                  submit_delay: response.submit_delay,
+                  submitDelay: response.submit_delay,
+                  language,
                   username: commonPayload.currentUsername,
                   classname: commonPayload.userClassname,
-                  country: 'xx',
-                  status: 'new',
-                  alias: request.problem.alias,
-                  time: new Date(),
-                  penalty: 0,
-                  runtime: 0,
-                  memory: 0,
-                  verdict: 'JE',
-                  score: 0,
-                  language: request.selectedLanguage,
+                  problemAlias: problem.alias,
                 });
               })
               .catch((run) => {
-                ui.error(run.error ?? run);
-                if (run.errorname) {
-                  ui.reportEvent('submission', 'submit-fail', run.errorname);
-                }
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
               });
           },
-          'new-clarification': (request: {
-            request: types.Clarification;
-            target: arena_NewClarification;
+          'new-clarification': ({
+            clarification,
+            clearForm,
+            contestClarificationRequest,
+          }: {
+            clarification: types.Clarification;
+            clearForm: () => void;
+            contestClarificationRequest: ContestClarificationRequest;
           }) => {
+            if (!clarification) {
+              return;
+            }
+            const contestAlias = payload.contest.alias;
             api.Clarification.create({
-              contest_alias: payload.contest.alias,
-              problem_alias: request.request.problem_alias,
-              username: request.request.author,
-              message: request.request.message,
+              contest_alias: contestAlias,
+              problem_alias: clarification.problem_alias,
+              username: clarification.author,
+              message: clarification.message,
             })
               .then(() => {
-                request.target.clearForm();
-                refreshClarifications();
+                clearForm();
+                refreshContestClarifications(contestClarificationRequest);
               })
               .catch(ui.apiError);
-
-            return false;
+          },
+          'clarification-response': ({
+            clarification,
+            contestClarificationRequest,
+          }: ContestClarification) => {
+            api.Clarification.update(clarification)
+              .then(() => {
+                refreshContestClarifications(contestClarificationRequest);
+              })
+              .catch(ui.apiError);
           },
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
           },
           'reset-hash': (request: { selectedTab: string; alias: string }) => {
             window.location.replace(`#${request.selectedTab}/${request.alias}`);
-          },
-          'clarification-response': (
-            id: number,
-            responseText: string,
-            isPublic: boolean,
-          ) => {
-            api.Clarification.update({
-              clarification_id: id,
-              answer: responseText,
-              public: isPublic,
-            })
-              .then(refreshClarifications)
-              .catch(ui.apiError);
           },
         },
       });
@@ -268,43 +168,10 @@ OmegaUp.on('ready', () => {
   // not the case if this is set a priori.
   Object.assign(contestPractice, getOptionsFromLocation(window.location.hash));
 
-  function refreshClarifications() {
-    api.Contest.clarifications({
-      contest_alias: payload.contest.alias,
-      rowcount: 100,
-      offset: null,
-    })
-      .then(time.remoteTimeAdapter)
-      .then((data) => {
-        contestPractice.clarifications = data.clarifications;
-      });
-  }
-
-  function updateRun(run: types.Run): void {
-    trackRun(run);
-
-    // TODO: Implement websocket support
-
-    if (run.status != 'ready') {
-      updateRunFallback(run.guid);
-      return;
-    }
-  }
-
-  function updateRunFallback(guid: string): void {
-    setTimeout(() => {
-      api.Run.status({ run_alias: guid })
-        .then(time.remoteTimeAdapter)
-        .then((response) => updateRun(response))
-        .catch(ui.ignoreError);
-    }, 5000);
-  }
-
-  function trackRun(run: types.Run): void {
-    myRunsStore.commit('addRun', run);
-  }
-
   setInterval(() => {
-    refreshClarifications();
+    refreshContestClarifications({
+      type: ContestClarificationType.AllProblems,
+      contestAlias: payload.contest.alias,
+    });
   }, 5 * 60 * 1000);
 });

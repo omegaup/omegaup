@@ -191,6 +191,8 @@
 - [Session](#session)
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
   - [`/api/session/googleLogin/`](#apisessiongooglelogin)
+- [Submission](#submission)
+  - [`/api/submission/createFeedback/`](#apisubmissioncreatefeedback)
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
@@ -370,22 +372,24 @@ Description of ClarificationController
 
 ### Description
 
-Creates a Clarification
+Creates a Clarification for a contest or an assignment of a course
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `message`       | `string`       |             |
-| `problem_alias` | `string`       |             |
-| `username`      | `null\|string` |             |
+| Name               | Type           | Description |
+| ------------------ | -------------- | ----------- |
+| `message`          | `string`       |             |
+| `problem_alias`    | `string`       |             |
+| `assignment_alias` | `string\|null` |             |
+| `contest_alias`    | `string\|null` |             |
+| `course_alias`     | `string\|null` |             |
+| `username`         | `null\|string` |             |
 
 ### Returns
 
-| Name               | Type     |
-| ------------------ | -------- |
-| `clarification_id` | `number` |
+```typescript
+types.Clarification;
+```
 
 ## `/api/clarification/details/`
 
@@ -407,7 +411,7 @@ API for getting a clarification
 | `message`       | `string` |
 | `problem_id`    | `number` |
 | `problemset_id` | `number` |
-| `time`          | `number` |
+| `time`          | `Date`   |
 
 ## `/api/clarification/update/`
 
@@ -3767,6 +3771,29 @@ contestant's machine and the server.
 | Name                | Type      |
 | ------------------- | --------- |
 | `isAccountCreation` | `boolean` |
+
+# Submission
+
+SubmissionController
+
+## `/api/submission/createFeedback/`
+
+### Description
+
+Adds admin feedback to a submission
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `feedback`         | `string` |             |
+| `guid`             | `string` |             |
+
+### Returns
+
+_Nothing_
 
 # Tag
 
