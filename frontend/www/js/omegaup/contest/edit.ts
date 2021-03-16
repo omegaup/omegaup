@@ -22,8 +22,8 @@ OmegaUp.on('ready', () => {
       problems: payload.problems,
       requests: payload.requests,
       users: payload.users,
-      existingProblems: [] as types.ListItem[],
-      existingUsers: [] as types.ListItem[],
+      searchResultProblems: [] as types.ListItem[],
+      searchResultUsers: [] as types.ListItem[],
     }),
     methods: {
       arbitrateRequest: (username: string, resolution: boolean): void => {
@@ -114,55 +114,51 @@ OmegaUp.on('ready', () => {
           problems: this.problems,
           requests: this.requests,
           users: this.users,
-          existingProblems: this.existingProblems,
-          existingUsers: this.existingUsers,
+          searchResultProblems: this.searchResultProblems,
+          searchResultUsers: this.searchResultUsers,
         },
         on: {
-          'update-existing-problems': (query: string) => {
+          'update-search-result-problems': (query: string) => {
             api.Problem.list({
               query,
             })
               .then((data) => {
-                this.existingProblems = [];
                 // Problems previously added into the contest should not be
                 // shown in the dropdown
-                const filteredProblems = data.results.filter(
-                  (result) =>
-                    !this.problems.find(
-                      (problem) => problem.alias === result.alias,
-                    ),
+                const addedProblems = new Set(
+                  this.problems.map((problem) => problem.alias),
                 );
-                filteredProblems.forEach((problem: types.ProblemListItem) => {
-                  this.existingProblems.push({
-                    key: problem.alias,
-                    value: problem.title,
-                  });
-                });
+                const searchedProblems = new Set(
+                  data.results.map((problem) => problem.alias),
+                );
+                this.searchResultProblems = [...searchedProblems]
+                  .filter((problem) => !addedProblems.has(problem))
+                  .map((key) => ({ key, value: key }));
               })
-              .catch();
+              .catch(ui.apiError);
           },
-          'update-existing-users': (query: string) => {
+          'update-search-result-users': (query: string) => {
             api.User.list({ query })
               .then((data) => {
-                this.existingUsers = [];
                 // Users previously invited to the contest should not be shown
                 // in the dropdown
-                const filteredUsers = data.filter(
-                  (result) =>
-                    !this.users.find((user) => user.username === result.label),
+                const addedUsers = new Set(
+                  this.users.map((user) => user.username),
                 );
-                filteredUsers.forEach(
-                  ({ label, value }: types.UserListItem) => {
-                    this.existingUsers.push({
-                      key: label,
-                      value: `${value} <strong>(${label})</strong>`,
-                    });
-                  },
-                );
+                const searchedUsers = new Set(data.map((user) => user.label));
+                const algo = [...searchedUsers]
+                  .filter((user) => !addedUsers.has(user))
+                  .map((key: string) => {
+                    const value =
+                      data.find((user) => user.label === key)?.value ?? key;
+                    return {
+                      key,
+                      value: `${value} (<strong>${key}</strong>)`,
+                    };
+                  });
+                this.searchResultUsers = algo;
               })
-              .catch((e) => {
-                console.error(e);
-              });
+              .catch(ui.apiError);
           },
           'update-contest': function (contest: omegaup.Contest) {
             api.Contest.update(

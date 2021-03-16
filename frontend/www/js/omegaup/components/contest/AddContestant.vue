@@ -6,22 +6,22 @@
           <div class="form-group">
             <label>{{ T.addUsersMultipleOrSingleUser }}</label>
             <omegaup-common-multi-typeahead
-              :existing-options="existingUsers"
-              :value.sync="contestants"
+              :existing-options="searchResultUsers"
+              :value.sync="typeaheadContestants"
               @update-existing-options="
-                (query) => $emit('update-existing-users', query)
+                (query) => $emit('update-search-result-users', query)
               "
             >
             </omegaup-common-multi-typeahead>
           </div>
-          <button class="btn btn-primary user-add-bulk" type="submit">
+          <button class="btn btn-primary user-add-typeahead" type="submit">
             {{ T.contestAdduserAddUsers }}
           </button>
           <hr />
           <div class="form-group">
             <label>{{ T.wordsMultipleUser }}</label>
             <textarea
-              v-model="participants"
+              v-model="bulkContestants"
               class="form-control contestants"
               rows="4"
             ></textarea>
@@ -113,21 +113,21 @@ import common_MultiTypeahead from '../common/MultiTypeahead.vue';
 export default class AddContestant extends Vue {
   @Prop() users!: types.ContestUser[];
   @Prop() contest!: types.ContestAdminDetails;
-  @Prop() existingUsers!: types.ListItem[];
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   time = time;
-  participants = '';
-  contestants: types.ListItem[] = [];
+  bulkContestants = '';
+  typeaheadContestants: types.ListItem[] = [];
   currentUsers = this.users;
 
   onSubmit(): void {
     let users: string[] = [];
-    if (this.participants !== '') {
-      users = this.participants.split(',');
+    if (this.bulkContestants !== '') {
+      users = this.bulkContestants.split(',');
     }
-    if (this.contestants) {
-      users = [...users, ...this.contestants.map((user) => user.key)];
+    if (this.typeaheadContestants) {
+      users = [...users, ...this.typeaheadContestants.map((user) => user.key)];
     }
     this.$emit(
       'add-user',
@@ -138,8 +138,8 @@ export default class AddContestant extends Vue {
   @Watch('users')
   onUsersChange(newUsers: types.ContestUser[]): void {
     this.currentUsers = newUsers;
-    this.contestants = [];
-    this.participants = '';
+    this.typeaheadContestants = [];
+    this.bulkContestants = '';
   }
 }
 </script>

@@ -31,9 +31,9 @@ def test_create_contest(driver):
         identity, *_ = util.add_identities_group(driver, group_alias)
 
     driver.register_user(user, password)
-    invited_users = [user, identity.username, driver.user_username]
+    invited_users = [user, identity.username]
     create_contest_admin(driver, contest_alias, problem, invited_users,
-                         access_mode='Private')
+                         driver.user_username, access_mode='Private')
 
     with driver.login(identity.username, identity.password):
         create_run_user(driver, contest_alias, problem, 'Main.cpp17-gcc',
@@ -90,8 +90,8 @@ def test_user_ranking_contest(driver):
     driver.register_user(user2, password)
     driver.register_user(user3, password)
 
-    create_contest_admin(driver, contest_alias, problem,
-                         [user1, user2, driver.user_username])
+    create_contest_admin(driver, contest_alias, problem, [user1, user2],
+                         driver.user_username)
 
     with driver.login(user1, password):
         create_run_user(driver, contest_alias, problem, 'Main.cpp17-gcc',
@@ -201,10 +201,9 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
 
     driver.register_user(user1, password)
     driver.register_user(user2, password)
-    users = [user1, user2, driver.user_username]
 
-    create_contest_admin(driver, alias, problem, users,
-                         scoreboard_time_percent=1)
+    create_contest_admin(driver, alias, problem, [user1, user2],
+                         driver.user_username, scoreboard_time_percent=1)
 
     with driver.login(user1, password):
         create_run_user(driver, alias, problem, 'Main.cpp17-gcc',
@@ -273,9 +272,9 @@ def test_user_clarifications_contest(driver):
     password = 'P@55w0rd'
 
     driver.register_user(user1, password)
-    users = [user1, driver.user_username]
 
-    create_contest_admin(driver, contest_alias, problem, users)
+    create_contest_admin(driver, contest_alias, problem, [user1],
+                         driver.user_username)
 
     with driver.login(user1, password):
         enter_contest(driver, contest_alias)
@@ -302,7 +301,7 @@ def test_user_clarifications_contest(driver):
 
 # pylint: disable=too-many-arguments
 @util.annotate
-def create_contest_admin(driver, contest_alias, problem, users,
+def create_contest_admin(driver, contest_alias, problem, users, user,
                          access_mode='Public', **kwargs):
     '''Creates a contest as an admin.'''
 
@@ -328,7 +327,8 @@ def create_contest_admin(driver, contest_alias, problem, users,
 
         add_problem_to_contest(driver, problem)
 
-        add_students_contest(driver, users)
+        add_students_bulk(driver, users)
+        add_students_contest(driver, [user])
 
         change_contest_admission_mode(driver, access_mode)
 
@@ -492,7 +492,40 @@ def add_students_contest(driver, users):
         tab_xpath='//a[@data-nav-contestant]',
         container_xpath='//div[contains(@class, "contestants-input-area")]',
         parent_selector='.contestants',
-        submit_locator=(By.CLASS_NAME, 'user-add-bulk'))
+        submit_locator=(By.CLASS_NAME, 'user-add-typeahead'))
+
+
+@util.annotate
+def add_students_bulk(driver, users):
+    '''Add students to a recently created contest.'''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'a[data-nav-contest-edit]'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             ('a.contestants')))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, 'div.contestants')))
+
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH, (
+                '//textarea[contains(@class, "contestants")]')))).send_keys(
+                    ', '.join(users))
+    with util.dismiss_status(driver):
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CLASS_NAME, ('user-add-bulk')))).click()
+    for user in users:
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//table[contains(@class, "participants")]//a[text()="%s"]'
+                 % user)))
 
 
 @util.annotate
