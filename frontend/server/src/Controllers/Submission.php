@@ -152,6 +152,15 @@ class Submission extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $feedback = $r->ensureString(
+            'feedback',
+            fn (string $feedback) => \OmegaUp\Validators::stringOfLengthInRange(
+                $feedback,
+                1,
+                200
+            )
+        );
+
         $courseSubmissionInfo = \OmegaUp\DAO\Submissions::getCourseSubmissionInfo(
             $submission,
             $r->ensureString(
@@ -169,17 +178,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $feedback = $r->ensureString(
-            'feedback',
-            fn (string $feedback) => \OmegaUp\Validators::stringOfLengthInRange(
-                $feedback,
-                1,
-                200
-            )
-        );
-
-        $course = \OmegaUp\DAO\Courses::getByAlias(
-            $courseSubmissionInfo['course_alias']
+        $course = \OmegaUp\DAO\Courses::getByPK(
+            $courseSubmissionInfo['course_id']
         );
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -196,11 +196,10 @@ class Submission extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        // Verificar si ya existe un feedback para esto.
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
-            \OmegaUp\DAO\SubmissionFeedback::create(
+            \OmegaUp\DAO\Base\SubmissionFeedback::create(
                 new \OmegaUp\DAO\VO\SubmissionFeedback([
                     'identity_id' => $r->identity->identity_id,
                     'submission_id' => $submission->submission_id,
@@ -229,6 +228,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
                     ])
                 );
             }
+
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
 
@@ -237,6 +238,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
                     'submissionFeedbackAlreadyExists'
                 );
             }
+
+            throw $e;
         }
 
         return [

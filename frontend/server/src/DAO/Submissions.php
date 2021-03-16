@@ -319,7 +319,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
      * and course, along with the author's user_id
      * for a certain course submission
      *
-     * @return array{assignment_alias: string, course_alias: string, problem_alias: string, author_id: null|int}|null
+     * @return array{assignment_alias: string, author_id: int|null, course_alias: string, course_id: int, problem_alias: string}|null
      */
     public static function getCourseSubmissionInfo(
         \OmegaUp\DAO\VO\Submissions $submission,
@@ -329,6 +329,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         $sql = '
             SELECT
                 a.alias as assignment_alias,
+                c.course_id,
                 c.alias as course_alias,
                 p.alias as problem_alias,
                 i.user_id as author_id
@@ -352,7 +353,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 AND c.alias = ?
         ';
 
-        /** @var array{assignment_alias: string, course_alias: string, problem_alias: string, author_id: null|int}|null */
+        /** @var array{assignment_alias: string, author_id: int|null, course_alias: string, course_id: int, problem_alias: string}|null */
         return \OmegaUp\MySQLConnection::getInstance()->getRow(
             $sql,
             [
