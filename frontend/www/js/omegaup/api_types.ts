@@ -1404,6 +1404,7 @@ export namespace types {
     alias?: string;
     assignment_type: string;
     description?: string;
+    director: string;
     finish_time?: Date;
     name?: string;
     problems: types.NavbarProblemsetProblem[];
@@ -2253,6 +2254,11 @@ export namespace types {
     OutputLimit: number | string;
     OverallWallTimeLimit: string;
     TimeLimit: string;
+  }
+
+  export interface ListItem {
+    key: string;
+    value: string;
   }
 
   export interface LoginDetailsPayload {

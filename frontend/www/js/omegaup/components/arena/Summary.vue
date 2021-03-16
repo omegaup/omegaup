@@ -1,13 +1,13 @@
 <template>
   <div class="summary main">
-    <h1>{{ ui.contestTitle(contest) }}</h1>
-    <omegaup-markdown :markdown="contestDescription"></omegaup-markdown>
+    <h1>{{ title }}</h1>
+    <omegaup-markdown :markdown="eventDescription"></omegaup-markdown>
     <table class="table table-bordered mx-auto w-50 mb-0">
       <tr v-if="showDeadlines">
         <td>
           <strong>{{ T.arenaPracticeStartTime }}</strong>
         </td>
-        <td>{{ time.formatTimestamp(contest.start_time) }}</td>
+        <td>{{ time.formatTimestamp(startTime) }}</td>
       </tr>
       <tr v-if="showDeadlines">
         <td>
@@ -15,17 +15,15 @@
         </td>
         <td>
           {{
-            contest.finish_time
-              ? time.formatTimestamp(contest.finish_time)
+            finishTime
+              ? time.formatTimestamp(finishTime)
               : T.wordsUnlimitedDuration
           }}
         </td>
       </tr>
       <tr
         v-if="
-          showRanking &&
-          typeof contest.scoreboard === 'number' &&
-          duration != Infinity
+          showRanking && typeof scoreboard === 'number' && duration != Infinity
         "
       >
         <td>
@@ -34,10 +32,7 @@
         <td>
           {{
             time.formatTimestamp(
-              new Date(
-                contest.start_time.getTime() +
-                  (duration * contest.scoreboard) / 100,
-              ),
+              new Date(starTime.getTime() + (duration * scoreboard) / 100),
             )
           }}
         </td>
@@ -46,14 +41,14 @@
         <td>
           <strong>{{ T.arenaContestWindowLength }}</strong>
         </td>
-        <td>{{ windowLength }}</td>
+        <td>{{ eventWindowLength }}</td>
       </tr>
       <tr>
         <td>
           <strong>{{ T.arenaContestOrganizer }}</strong>
         </td>
         <td>
-          <a :href="`/profile/${contest.director}/`">{{ contest.director }}</a>
+          <a :href="`/profile/${admin}/`">{{ admin }}</a>
         </td>
       </tr>
     </table>
@@ -63,7 +58,6 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import * as time from '../../time';
 
@@ -74,8 +68,14 @@ import omegaup_Markdown from '../Markdown.vue';
     'omegaup-markdown': omegaup_Markdown,
   },
 })
-export default class ContestSummary extends Vue {
-  @Prop() contest!: omegaup.Contest;
+export default class Summary extends Vue {
+  @Prop() title!: string;
+  @Prop() description!: string;
+  @Prop() startTime!: Date;
+  @Prop() finishTime!: Date;
+  @Prop() scoreboard!: number;
+  @Prop() windowLength!: null | number;
+  @Prop() admin!: string;
   @Prop({ default: true }) showDeadlines!: boolean;
   @Prop({ default: true }) showRanking!: boolean;
 
@@ -84,26 +84,24 @@ export default class ContestSummary extends Vue {
   time = time;
 
   get duration(): number {
-    if (!this.contest.start_time || !this.contest.finish_time) {
+    if (!this.startTime || !this.finishTime) {
       return Infinity;
     }
-    return (
-      this.contest.finish_time.getTime() - this.contest.start_time.getTime()
-    );
+    return this.finishTime.getTime() - this.startTime.getTime();
   }
 
-  get windowLength(): string {
+  get eventWindowLength(): string {
     if (this.duration === Infinity) {
       return T.wordsUnlimitedDuration;
     }
-    if (this.contest.window_length) {
-      return time.formatDelta(this.contest.window_length);
+    if (this.windowLength) {
+      return time.formatDelta(this.windowLength);
     }
     return time.formatDelta(this.duration);
   }
 
-  get contestDescription(): string {
-    return this.contest?.description || '';
+  get eventDescription(): string {
+    return this.description || '';
   }
 }
 </script>

@@ -28,11 +28,17 @@
               :show-ranking="true"
             ></omegaup-arena-navbar-miniranking>
           </div>
-          <omegaup-arena-contest-summary
+          <omegaup-arena-summary
             v-if="activeProblem === null"
-            :contest="contest"
+            :title="ui.contestTitle(contest)"
+            :description="contest.description"
+            :start-time="contest.start_time"
+            :finish-time="contest.finish_time"
+            :scoreboard="contest.scoreboard"
+            :window-length="contest.window_length"
+            :admin="contest.director"
             :show-ranking="false"
-          ></omegaup-arena-contest-summary>
+          ></omegaup-arena-summary>
           <div v-else class="problem main">
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
@@ -49,7 +55,6 @@
                     alias: activeProblem.problem.alias,
                   })
               "
-              @change-show-run-location="onChangeShowRunLocation"
               @submit-run="onRunSubmitted"
               @show-run="onShowRunDetails"
             >
@@ -102,7 +107,7 @@ import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_NavbarMiniranking from './NavbarMiniranking.vue';
-import arena_ContestSummary from './ContestSummaryV2.vue';
+import arena_Summary from './Summary.vue';
 import arena_Scoreboard from './Scoreboard.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
@@ -117,7 +122,7 @@ export interface ActiveProblem {
   components: {
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena': arena_Arena,
-    'omegaup-arena-contest-summary': arena_ContestSummary,
+    'omegaup-arena-summary': arena_Summary,
     'omegaup-arena-navbar-miniranking': arena_NavbarMiniranking,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
     'omegaup-arena-scoreboard': arena_Scoreboard,
@@ -187,16 +192,6 @@ export default class ArenaContest extends Vue {
 
   onShowRunDetails(target: problem_Details, guid: string): void {
     this.$emit('show-run', { target, request: { guid } });
-  }
-
-  onChangeShowRunLocation(request: { guid: string }): void {
-    if (!this.activeProblem) {
-      return;
-    }
-    this.$emit(
-      'change-show-run-location',
-      Object.assign({}, request, { alias: this.activeProblem.problem.alias }),
-    );
   }
 
   @Watch('problem')

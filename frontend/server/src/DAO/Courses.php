@@ -440,36 +440,50 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         // - the one with the information of the problem in the assignment/course.
         $sql = '
                 SELECT
-                i.username,
-                i.name,
-                i.country_id,
-                pr.assignment_alias,
-                pr.problem_alias,
-                pr.problem_title,
-                problem_points,
-                MAX(r.contest_score) AS problem_score,
-                IFNULL(
-                    (
-                        SELECT urc.classname FROM
-                            User_Rank_Cutoffs urc
-                        WHERE
-                            urc.score <= (
-                                    SELECT
-                                        ur.score
-                                    FROM
-                                        User_Rank ur
-                                    WHERE
-                                        ur.user_id = i.user_id
-                                )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) AS classname
+                    students.username,
+                    students.name,
+                    students.country_id,
+                    pr.assignment_alias,
+                    pr.problem_alias,
+                    pr.problem_title,
+                    problem_points,
+                    MAX(r.contest_score) AS problem_score,
+                    students.classname
                 FROM
-                    Groups_Identities AS gi
+                    (
+                        SELECT
+                            i.identity_id,
+                            i.username,
+                            i.name,
+                            i.country_id,
+                            IFNULL(
+                                (
+                                    SELECT urc.classname FROM
+                                        User_Rank_Cutoffs urc
+                                    WHERE
+                                        urc.score <= (
+                                                SELECT
+                                                    ur.score
+                                                FROM
+                                                    User_Rank ur
+                                                WHERE
+                                                    ur.user_id = i.user_id
+                                            )
+                                    ORDER BY
+                                        urc.percentile ASC
+                                    LIMIT
+                                        1
+                                ),
+                                "user-rank-unranked"
+                            ) AS classname
+                        FROM
+                            Groups_Identities AS gi
+                        INNER JOIN Identities i
+                            ON i.identity_id = gi.identity_id
+                        WHERE
+                            gi.group_id = ?
+                        LIMIT ?, ?
+                    ) AS students
                 CROSS JOIN
                     (
                         SELECT
@@ -481,31 +495,31 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             p.alias AS problem_alias,
                             `psp`.`order`,
                             psp.points AS problem_points
-                        FROM Assignments a
-                        INNER JOIN Problemsets ps
-                        ON a.problemset_id = ps.problemset_id
-                        INNER JOIN Problemset_Problems psp
-                        ON psp.problemset_id = ps.problemset_id
-                        INNER JOIN Problems p
-                        ON p.problem_id = psp.problem_id
-                        WHERE a.course_id = ?
-                        GROUP BY a.assignment_id, p.problem_id
+                        FROM
+                            Assignments a
+                        INNER JOIN
+                            Problemsets ps ON a.problemset_id = ps.problemset_id
+                        INNER JOIN
+                            Problemset_Problems psp ON psp.problemset_id = ps.problemset_id
+                        INNER JOIN
+                            Problems p ON p.problem_id = psp.problem_id
+                        WHERE
+                            a.course_id = ?
+                        GROUP BY
+                            a.assignment_id, p.problem_id
                     ) AS pr
-                INNER JOIN Identities i
-                    ON i.identity_id = gi.identity_id
-                LEFT JOIN Submissions s
-                    ON s.problem_id = pr.problem_id
-                    AND s.identity_id = i.identity_id
+                LEFT JOIN
+                    Submissions s
+                ON
+                    s.problem_id = pr.problem_id
+                    AND s.identity_id = students.identity_id
                     AND s.problemset_id = pr.problemset_id
-                LEFT JOIN Runs r
-                    ON r.run_id = s.current_run_id
-                WHERE
-                    gi.group_id = ?
+                LEFT JOIN
+                    Runs r ON r.run_id = s.current_run_id
                 GROUP BY
-                    i.identity_id, pr.assignment_id, pr.problem_id
+                    students.identity_id, pr.assignment_id, pr.problem_id
                 ORDER BY
-                    `pr`.`order`
-                LIMIT ?, ?';
+                    `pr`.`order`';
 
         /** @var int */
         $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
@@ -517,10 +531,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
-                $courseId,
                 $groupId,
                 $offset,
-                $rowsPerPage
+                $rowsPerPage,
+                $courseId,
             ]
         );
 
