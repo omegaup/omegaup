@@ -3960,6 +3960,10 @@ export namespace messages {
   export type SessionGoogleLoginRequest = { [key: string]: any };
   export type SessionGoogleLoginResponse = { isAccountCreation: boolean };
 
+  // Submission
+  export type SubmissionCreateFeedbackRequest = { [key: string]: any };
+  export type SubmissionCreateFeedbackResponse = {};
+
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
   export type TagFrequentTagsResponse = {
@@ -4655,6 +4659,12 @@ export namespace controllers {
     googleLogin: (
       params?: messages.SessionGoogleLoginRequest,
     ) => Promise<messages.SessionGoogleLoginResponse>;
+  }
+
+  export interface Submission {
+    createFeedback: (
+      params?: messages.SubmissionCreateFeedbackRequest,
+    ) => Promise<messages.SubmissionCreateFeedbackResponse>;
   }
 
   export interface Tag {
