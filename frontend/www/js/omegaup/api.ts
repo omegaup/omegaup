@@ -1576,6 +1576,13 @@ export const Session = {
   >('/api/session/googleLogin/'),
 };
 
+export const Submission = {
+  createFeedback: apiCall<
+    messages.SubmissionCreateFeedbackRequest,
+    messages.SubmissionCreateFeedbackResponse
+  >('/api/submission/createFeedback/'),
+};
+
 export const Tag = {
   frequentTags: apiCall<
     messages.TagFrequentTagsRequest,
