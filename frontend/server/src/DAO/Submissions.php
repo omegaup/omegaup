@@ -335,4 +335,54 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         /** @var \OmegaUp\Timestamp|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
     }
+
+    /**
+     * Gets the alias of the problem, assignment
+     * and course, along with the author's user_id
+     * for a certain course submission
+     *
+     * @return array{assignment_alias: string, author_id: int|null, course_alias: string, course_id: int, problem_alias: string}|null
+     */
+    public static function getCourseSubmissionInfo(
+        \OmegaUp\DAO\VO\Submissions $submission,
+        string $assignmentAlias,
+        string $courseAlias
+    ): ?array {
+        $sql = '
+            SELECT
+                a.alias as assignment_alias,
+                c.course_id,
+                c.alias as course_alias,
+                p.alias as problem_alias,
+                i.user_id as author_id
+            FROM
+                Submissions s
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            INNER JOIN
+                Problems p ON p.problem_id = s.problem_id
+            INNER JOIN
+                Problemsets ps ON ps.problemset_id = s.problemset_id
+            INNER JOIN
+                Problemset_Problems pp ON pp.problemset_id = ps.problemset_id AND pp.problem_id = p.problem_id
+            INNER JOIN
+                Assignments a ON a.problemset_id = ps.problemset_id
+            INNER JOIN
+                Courses c ON c.course_id = a.course_id
+            WHERE
+                s.submission_id = ?
+                AND a.alias = ?
+                AND c.alias = ?
+        ';
+
+        /** @var array{assignment_alias: string, author_id: int|null, course_alias: string, course_id: int, problem_alias: string}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->getRow(
+            $sql,
+            [
+                $submission->submission_id,
+                $assignmentAlias,
+                $courseAlias
+            ]
+        );
+    }
 }

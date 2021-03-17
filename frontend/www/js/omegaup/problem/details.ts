@@ -10,8 +10,23 @@ import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import * as time from '../time';
-import JSZip from 'jszip';
 import T from '../lang';
+import {
+  ContestClarification,
+  refreshProblemClarifications,
+  trackClarifications,
+} from '../arena/clarifications';
+import clarificationStore from '../arena/clarificationsStore';
+import {
+  onRefreshRuns,
+  onSetNominationStatus,
+  showSubmission,
+  SubmissionRequest,
+  submitRun,
+  submitRunFailed,
+  trackRun,
+  updateRunFallback,
+} from '../arena/submissions';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsPayload();
@@ -20,13 +35,15 @@ OmegaUp.on('ready', () => {
   const runs =
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
   const MAX_DATE = new Date(8640000000000000);
+
+  trackClarifications(payload.clarifications ?? []);
+
   const problemDetailsView = new Vue({
     el: '#main-container',
     components: {
       'omegaup-problem-details': problem_Details,
     },
     data: () => ({
-      initialClarifications: payload.clarifications,
       popupDisplayed: PopupDisplayed.None,
       runDetailsData: null as types.RunDetails | null,
       solutionStatus: payload.solutionStatus,
@@ -53,7 +70,7 @@ OmegaUp.on('ready', () => {
           user: payload.user,
           nominationStatus: this.nominationStatus,
           histogram: payload.histogram,
-          initialClarifications: this.initialClarifications,
+          clarifications: clarificationStore.state.clarifications,
           solutionStatus: this.solutionStatus,
           solution: this.solution,
           availableTokens: this.availableTokens,
@@ -74,65 +91,15 @@ OmegaUp.on('ready', () => {
           shouldShowTabs: true,
         },
         on: {
-          'show-run': (source: problem_Details, guid: string) => {
-            api.Run.details({ run_alias: guid })
-              .then((data) => {
-                if (data.show_diff === 'none' || !commonPayload.isAdmin) {
-                  source.displayRunDetails(guid, data);
-                  return;
-                }
-                fetch(`/api/run/download/run_alias/${guid}/show_diff/true/`)
-                  .then((response) => {
-                    if (!response.ok) {
-                      return Promise.reject(new Error(response.statusText));
-                    }
-                    return Promise.resolve(response.blob());
-                  })
-                  .then(JSZip.loadAsync)
-                  .then((zip: JSZip) => {
-                    const result: {
-                      cases: string[];
-                      promises: Promise<string>[];
-                    } = { cases: [], promises: [] };
-                    zip.forEach(async (relativePath, zipEntry) => {
-                      const pos = relativePath.lastIndexOf('.');
-                      const basename = relativePath.substring(0, pos);
-                      const extension = relativePath.substring(pos + 1);
-                      if (
-                        extension !== 'out' ||
-                        relativePath.indexOf('/') !== -1
-                      ) {
-                        return;
-                      }
-                      if (
-                        data.show_diff === 'examples' &&
-                        relativePath.indexOf('sample/') === 0
-                      ) {
-                        return;
-                      }
-                      result.cases.push(basename);
-                      result.promises.push(
-                        zip.file(zipEntry.name).async('text'),
-                      );
-                    });
-                    return result;
-                  })
-                  .then((response) => {
-                    Promise.allSettled(response.promises).then((results) => {
-                      results.forEach((result: any, index: number) => {
-                        if (data.cases[response.cases[index]]) {
-                          data.cases[response.cases[index]].contestantOutput =
-                            result.value;
-                        }
-                      });
-                    });
-                    source.displayRunDetails(guid, data);
-                  })
-                  .catch(ui.apiError);
+          'show-run': (request: SubmissionRequest) => {
+            const hash = `#problems/show-run:${request.request.guid}/`;
+            api.Run.details({ run_alias: request.request.guid })
+              .then((runDetails) => {
+                showSubmission({ request, runDetails, hash });
               })
               .catch((error) => {
                 ui.apiError(error);
-                source.currentPopupDisplayed = PopupDisplayed.None;
+                this.popupDisplayed = PopupDisplayed.None;
               });
           },
           'apply-filter': (
@@ -148,7 +115,17 @@ OmegaUp.on('ready', () => {
             }
             refreshRuns();
           },
-          'submit-run': (code: string, language: string) => {
+          'submit-run': ({
+            code,
+            language,
+            runs,
+            nominationStatus,
+          }: {
+            code: string;
+            language: string;
+            runs: types.Run[];
+            nominationStatus: types.NominationStatus;
+          }) => {
             problemDetailsView.nextSubmissionTimestamp = MAX_DATE;
 
             api.Run.create({
@@ -157,32 +134,29 @@ OmegaUp.on('ready', () => {
               source: code,
             })
               .then((response) => {
-                ui.reportEvent('submission', 'submit');
                 problemDetailsView.nextSubmissionTimestamp =
                   response.nextSubmissionTimestamp;
 
-                updateRun({
+                submitRun({
+                  runs,
                   guid: response.guid,
-                  submit_delay: response.submit_delay,
+                  submitDelay: response.submit_delay,
+                  language,
                   username: commonPayload.currentUsername,
                   classname: commonPayload.userClassname,
-                  country: 'xx',
-                  status: 'new',
-                  alias: payload.problem.alias,
-                  time: new Date(),
-                  penalty: 0,
-                  runtime: 0,
-                  memory: 0,
-                  verdict: 'JE',
-                  score: 0,
-                  language: language,
+                  problemAlias: payload.problem.alias,
+                });
+                setNominationStatus({
+                  runs: myRunsStore.state.runs,
+                  nominationStatus,
                 });
               })
               .catch((run) => {
-                ui.error(run.error ?? run);
-                if (run.errorname) {
-                  ui.reportEvent('submission', 'submit-fail', run.errorname);
-                }
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
               });
           },
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
@@ -324,26 +298,14 @@ OmegaUp.on('ready', () => {
                 });
             }
           },
-          'clarification-response': (
-            id: number,
-            responseText: string,
-            isPublic: boolean,
-          ) => {
-            api.Clarification.update({
-              clarification_id: id,
-              answer: responseText,
-              public: isPublic,
-            })
+          'clarification-response': ({
+            clarification,
+          }: ContestClarification) => {
+            api.Clarification.update(clarification)
               .then(() => {
-                api.Problem.clarifications({
-                  problem_alias: payload.problem.alias,
-                })
-                  .then(time.remoteTimeAdapter)
-                  .then(
-                    (response) =>
-                      (this.initialClarifications = response.clarifications),
-                  )
-                  .catch(ui.apiError);
+                refreshProblemClarifications({
+                  problemAlias: payload.problem.alias,
+                });
               })
               .catch(ui.apiError);
           },
@@ -355,14 +317,11 @@ OmegaUp.on('ready', () => {
               window.location.pathname,
             )}`;
           },
-          'change-show-run-location': (request: { guid: string }) => {
-            window.location.hash = `#problems/show-run:${request.guid}/`;
-          },
           rejudge: (run: types.Run) => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
               .then(() => {
                 run.status = 'rejudging';
-                updateRunFallback(run.guid);
+                updateRunFallback({ run });
               })
               .catch(ui.ignoreError);
           },
@@ -373,7 +332,7 @@ OmegaUp.on('ready', () => {
             api.Run.disqualify({ run_alias: run.guid })
               .then(() => {
                 run.type = 'disqualified';
-                updateRunFallback(run.guid);
+                updateRunFallback({ run });
               })
               .catch(ui.ignoreError);
           },
@@ -382,47 +341,18 @@ OmegaUp.on('ready', () => {
     },
   });
 
-  function updateRun(run: types.Run): void {
-    trackRun(run);
-
-    // TODO: Implement websocket support
-
-    if (run.status != 'ready') {
-      updateRunFallback(run.guid);
-      return;
-    }
-  }
-
-  function updateRunFallback(guid: string): void {
-    setTimeout(() => {
-      api.Run.status({ run_alias: guid })
-        .then(time.remoteTimeAdapter)
-        .then((response) => updateRun(response))
-        .catch(ui.ignoreError);
-    }, 5000);
-  }
-
-  function trackRun(run: types.Run): void {
-    runsStore.commit('addRun', run);
-    if (run.username !== OmegaUp.username) {
-      return;
-    }
-    myRunsStore.commit('addRun', run);
-
-    if (!problemDetailsView.nominationStatus) {
-      return;
-    }
-    if (run.verdict !== 'AC' && run.verdict !== 'CE' && run.verdict !== 'JE') {
-      problemDetailsView.nominationStatus.tried = true;
-    }
-    if (run.verdict === 'AC') {
-      Vue.set(
-        problemDetailsView,
-        'nominationStatus',
-        Object.assign({}, problemDetailsView.nominationStatus, {
-          solved: true,
-        }),
-      );
+  function setNominationStatus({
+    runs,
+    nominationStatus,
+  }: {
+    runs: types.Run[];
+    nominationStatus: types.NominationStatus;
+  }) {
+    for (const run of runs) {
+      onSetNominationStatus({
+        run,
+        nominationStatus,
+      });
     }
   }
 
@@ -439,37 +369,33 @@ OmegaUp.on('ready', () => {
     })
       .then(time.remoteTimeAdapter)
       .then((response) => {
-        runsStore.commit('clear');
-        for (const run of response.runs) {
-          trackRun(run);
-        }
+        if (!problemDetailsView.nominationStatus) return;
+        onRefreshRuns({ runs: response.runs });
+        setNominationStatus({
+          runs: response.runs,
+          nominationStatus: problemDetailsView.nominationStatus,
+        });
       })
-      .catch(ui.apiError);
-  }
-
-  function refreshClarifications(): void {
-    api.Problem.clarifications({
-      problem_alias: payload.problem.alias,
-      offset: 0, // TODO: Updating offset is missing
-      rowcount: 0, // TODO: Updating rowcount is missing
-    })
-      .then(time.remoteTimeAdapter)
-      .then(
-        (response) =>
-          (problemDetailsView.initialClarifications = response.clarifications),
-      )
       .catch(ui.apiError);
   }
 
   if (runs) {
     for (const run of runs) {
-      trackRun(run);
+      trackRun({ run });
+    }
+    if (problemDetailsView.nominationStatus) {
+      setNominationStatus({
+        runs: myRunsStore.state.runs,
+        nominationStatus: problemDetailsView.nominationStatus,
+      });
     }
   }
   if (payload.user.admin) {
     setInterval(() => {
       refreshRuns();
-      refreshClarifications();
+      refreshProblemClarifications({
+        problemAlias: payload.problem.alias,
+      });
     }, 5 * 60 * 1000);
   }
   if (locationHash.includes('new-run')) {

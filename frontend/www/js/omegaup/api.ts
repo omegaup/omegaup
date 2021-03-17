@@ -185,12 +185,20 @@ export const Badge = {
 export const Clarification = {
   create: apiCall<
     messages.ClarificationCreateRequest,
+    messages._ClarificationCreateServerResponse,
     messages.ClarificationCreateResponse
-  >('/api/clarification/create/'),
+  >('/api/clarification/create/', (x) => {
+    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    return x;
+  }),
   details: apiCall<
     messages.ClarificationDetailsRequest,
+    messages._ClarificationDetailsServerResponse,
     messages.ClarificationDetailsResponse
-  >('/api/clarification/details/'),
+  >('/api/clarification/details/', (x) => {
+    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    return x;
+  }),
   update: apiCall<
     messages.ClarificationUpdateRequest,
     messages.ClarificationUpdateResponse
@@ -1566,6 +1574,13 @@ export const Session = {
     messages.SessionGoogleLoginRequest,
     messages.SessionGoogleLoginResponse
   >('/api/session/googleLogin/'),
+};
+
+export const Submission = {
+  createFeedback: apiCall<
+    messages.SubmissionCreateFeedbackRequest,
+    messages.SubmissionCreateFeedbackResponse
+  >('/api/submission/createFeedback/'),
 };
 
 export const Tag = {
