@@ -3538,9 +3538,10 @@ Gets the details of a run. Includes admin details if admin.
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `run_alias` | `string` |             |
+| Name               | Type      | Description |
+| ------------------ | --------- | ----------- |
+| `include_feedback` | `boolean` |             |
+| `run_alias`        | `string`  |             |
 
 ### Returns
 
