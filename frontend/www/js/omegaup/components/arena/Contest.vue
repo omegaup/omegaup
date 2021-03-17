@@ -56,7 +56,7 @@
                   })
               "
               @submit-run="onRunSubmitted"
-              @show-run="onShowRunDetails"
+              @show-run="(source) => $emit('show-run', source)"
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -85,10 +85,26 @@
         :is-admin="contestAdmin"
         :in-contest="true"
         :show-new-clarification-popup="showNewClarificationPopup"
-        @new-clarification="(request) => $emit('new-clarification', request)"
+        @new-clarification="
+          (contestClarification) =>
+            $emit('new-clarification', {
+              ...contestClarification,
+              contestClarificationRequest: {
+                type: ContestClarificationType.AllProblems,
+                contestAlias: contest.alias,
+              },
+            })
+        "
         @clarification-response="
-          (id, responseText, isPublic) =>
-            $emit('clarification-response', id, responseText, isPublic)
+          (response) =>
+            $emit('clarification-response', {
+              contestAlias: contest.alias,
+              clarification: response,
+              contestClarificationRequest: {
+                type: ContestClarificationType.AllProblems,
+                contestAlias: contest.alias,
+              },
+            })
         "
         @update:activeTab="
           (selectedTab) => $emit('update:activeTab', selectedTab)
@@ -112,6 +128,7 @@ import arena_Scoreboard from './Scoreboard.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { omegaup } from '../../omegaup';
+import { ContestClarificationType } from '../../arena/clarifications';
 
 export interface ActiveProblem {
   runs: types.Run[];
@@ -158,6 +175,7 @@ export default class ArenaContest extends Vue {
 
   T = T;
   ui = ui;
+  ContestClarificationType = ContestClarificationType;
   currentClarifications = this.clarifications;
   activeProblem: ActiveProblem | null = this.problem;
   shouldShowRunDetails = false;
@@ -182,16 +200,8 @@ export default class ArenaContest extends Vue {
     this.$emit('navigate-to-problem', request);
   }
 
-  onRunSubmitted(code: string, selectedLanguage: string): void {
-    const request = Object.assign({}, this.activeProblem, {
-      code,
-      selectedLanguage,
-    });
-    this.$emit('submit-run', request);
-  }
-
-  onShowRunDetails(target: problem_Details, guid: string): void {
-    this.$emit('show-run', { target, request: { guid } });
+  onRunSubmitted(run: { code: string; language: string }): void {
+    this.$emit('submit-run', Object.assign({}, run, this.activeProblem));
   }
 
   @Watch('problem')
