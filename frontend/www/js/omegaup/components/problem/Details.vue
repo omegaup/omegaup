@@ -113,7 +113,6 @@
               v-show="currentPopupDisplayed === PopupDisplayed.RunSubmit"
               :preferred-language="problem.preferred_language"
               :languages="problem.languages"
-              :waiting-for-server-response="waitingForServerResponse"
               :next-submission-timestamp="nextSubmissionTimestamp"
               @dismiss="onPopupDismissed"
               @submit-run="onRunSubmitted"
@@ -382,7 +381,6 @@ export default class ProblemDetails extends Vue {
   @Prop() guid!: string;
   @Prop() isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
-  @Prop({ default: false }) waitingForServerResponse!: boolean;
   @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
   @Prop({ default: false }) shouldShowTabs!: boolean;
   @Prop({ default: false }) shouldShowRunDetails!: boolean;

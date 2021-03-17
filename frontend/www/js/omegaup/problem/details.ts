@@ -19,6 +19,7 @@ OmegaUp.on('ready', () => {
   const locationHash = window.location.hash.substr(1).split('/');
   const runs =
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
+  const MAX_DATE = new Date(8640000000000000);
   const problemDetailsView = new Vue({
     el: '#main-container',
     components: {
@@ -39,7 +40,6 @@ OmegaUp.on('ready', () => {
         (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
       guid: null as null | string,
-      waitingForServerResponse: false,
       nextSubmissionTimestamp: payload.problem.nextSubmissionTimestamp,
     }),
     render: function (createElement) {
@@ -70,7 +70,6 @@ OmegaUp.on('ready', () => {
           guid: this.guid,
           isAdmin: commonPayload.isAdmin,
           showVisibilityIndicators: true,
-          waitingForServerResponse: this.waitingForServerResponse,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           shouldShowTabs: true,
         },
@@ -150,7 +149,7 @@ OmegaUp.on('ready', () => {
             refreshRuns();
           },
           'submit-run': (code: string, language: string) => {
-            problemDetailsView.waitingForServerResponse = true;
+            problemDetailsView.nextSubmissionTimestamp = MAX_DATE;
 
             api.Run.create({
               problem_alias: payload.problem.alias,
@@ -184,9 +183,6 @@ OmegaUp.on('ready', () => {
                 if (run.errorname) {
                   ui.reportEvent('submission', 'submit-fail', run.errorname);
                 }
-              })
-              .finally(() => {
-                problemDetailsView.waitingForServerResponse = false;
               });
           },
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {

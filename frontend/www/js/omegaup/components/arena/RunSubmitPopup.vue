@@ -56,7 +56,7 @@
           <button
             type="submit"
             class="btn btn-primary"
-            :disabled="!canSubmit || waitingForServerResponse"
+            :disabled="!canSubmit || nextSubmissionTimestamp == MAX_DATE"
           >
             <omegaup-countdown
               v-if="!canSubmit"
@@ -93,7 +93,6 @@ import omegaup_OverlayPopup from '../OverlayPopup.vue';
 export default class ArenaRunSubmitPopup extends Vue {
   @Ref() inputFile!: HTMLInputElement;
   @Prop() languages!: string[];
-  @Prop({ default: false }) waitingForServerResponse!: boolean;
   @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
   @Prop({ default: null }) preferredLanguage!: null | string;
@@ -103,6 +102,7 @@ export default class ArenaRunSubmitPopup extends Vue {
   selectedLanguage = this.preferredLanguage;
   code = '';
   now: number = Date.now();
+  MAX_DATE = new Date(8640000000000000);
 
   get canSubmit(): boolean {
     return this.nextSubmissionTimestamp.getTime() <= this.now;
