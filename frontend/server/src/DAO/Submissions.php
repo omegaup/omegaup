@@ -385,4 +385,36 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             ]
         );
     }
+
+    /**
+     * Gets the feedback of a certain submission
+     *
+     * @return array{author: string, date: \OmegaUp\Timestamp, feedback: string}|null
+     */
+    public static function getSubmissionFeedback(
+        \OmegaUp\DAO\VO\Submissions $submission
+    ): ?array {
+        $sql = '
+            SELECT
+                i.username as author,
+                sf.feedback,
+                sf.date
+            FROM
+                Submissions s
+            INNER JOIN
+                Submission_Feedback sf ON sf.submission_id = s.submission_id
+            INNER JOIN
+                Identities i ON i.identity_id = sf.identity_id
+            WHERE
+                s.submission_id = ?
+        ';
+
+        /** @var array{author: string, date: \OmegaUp\Timestamp, feedback: string}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [
+               $submission->submission_id
+            ]
+        );
+    }
 }

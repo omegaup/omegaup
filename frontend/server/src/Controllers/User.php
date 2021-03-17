@@ -2069,18 +2069,30 @@ class User extends \OmegaUp\Controllers\Controller {
      * Gets a list of users. This returns an array instead of an object since
      * it is used by typeahead.
      *
-     * @omegaup-request-param mixed $query
-     * @omegaup-request-param mixed $term
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param null|string $term
      *
      * @return list<UserListItem>
      */
     public static function apiList(\OmegaUp\Request $r): array {
-        $param = '';
-        if (is_string($r['term'])) {
-            $param = $r['term'];
-        } elseif (is_string($r['query'])) {
-            $param = $r['query'];
-        } else {
+        $term = $r->ensureOptionalString(
+            'term',
+            /*$required=*/false,
+            fn (string $term) => \OmegaUp\Validators::stringNonEmpty($term)
+        );
+        $query = $r->ensureOptionalString(
+            'query',
+            /*$required=*/false,
+            fn (string $query) => \OmegaUp\Validators::stringNonEmpty($query)
+        );
+        if (is_null($term) && is_null($query)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'query'
+            );
+        }
+        $param = $term ?? $query;
+        if (is_null($param)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 'query'
@@ -2090,9 +2102,10 @@ class User extends \OmegaUp\Controllers\Controller {
         $identities = \OmegaUp\DAO\Identities::findByUsernameOrName($param);
         $response = [];
         foreach ($identities as $identity) {
+            $username = strval($identity->username);
             $response[] = [
-                'label' => strval($identity->username),
-                'value' => strval($identity->username)
+                'label' => $username,
+                'value' => $identity->name ?: $username,
             ];
         }
         return $response;
