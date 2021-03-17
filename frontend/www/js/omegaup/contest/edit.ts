@@ -128,12 +128,14 @@ OmegaUp.on('ready', () => {
                 const addedProblems = new Set(
                   this.problems.map((problem) => problem.alias),
                 );
-                const searchedProblems = new Set(
-                  data.results.map((problem) => problem.alias),
-                );
-                this.searchResultProblems = [...searchedProblems]
-                  .filter((problem) => !addedProblems.has(problem))
-                  .map((key) => ({ key, value: key }));
+                this.searchResultProblems = data.results
+                  .filter((problem) => !addedProblems.has(problem.alias))
+                  .map((problem) => ({
+                    key: problem.alias,
+                    value: `${ui.escape(problem.title)} (<strong>${ui.escape(
+                      problem.alias,
+                    )}</strong>)`,
+                  }));
               })
               .catch(ui.apiError);
           },
@@ -145,18 +147,15 @@ OmegaUp.on('ready', () => {
                 const addedUsers = new Set(
                   this.users.map((user) => user.username),
                 );
-                const searchedUsers = new Set(data.map((user) => user.label));
-                const algo = [...searchedUsers]
-                  .filter((user) => !addedUsers.has(user))
-                  .map((key: string) => {
-                    const value =
-                      data.find((user) => user.label === key)?.value ?? key;
-                    return {
-                      key,
-                      value: `${value} (<strong>${key}</strong>)`,
-                    };
-                  });
-                this.searchResultUsers = algo;
+
+                this.searchResultUsers = data
+                  .filter((user) => !addedUsers.has(user.label))
+                  .map((user) => ({
+                    key: user.label,
+                    value: `${ui.escape(user.label)} (<strong>${ui.escape(
+                      user.value,
+                    )}</strong>)`,
+                  }));
               })
               .catch(ui.apiError);
           },
