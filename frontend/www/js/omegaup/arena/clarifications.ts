@@ -18,11 +18,15 @@ interface ContestClarificationWithProblem {
   type: ContestClarificationType.WithProblem;
   contestAlias: string;
   problemAlias: string;
+  offset: number;
+  rowcount: number;
 }
 
 interface ContestClarificationAllProblems {
   type: ContestClarificationType.AllProblems;
   contestAlias: string;
+  offset: number;
+  rowcount: number;
 }
 
 export type ContestClarificationRequest =
@@ -39,8 +43,8 @@ export function refreshContestClarifications(
   api.Contest.clarifications({
     contest_alias: request.contestAlias,
     problem_alias: problemAlias,
-    rowcount: 100,
-    offset: null,
+    rowcount: request.rowcount,
+    offset: request.offset,
   })
     .then(time.remoteTimeAdapter)
     .then((data) => {
@@ -50,13 +54,17 @@ export function refreshContestClarifications(
 
 export function refreshProblemClarifications({
   problemAlias,
+  offset,
+  rowcount,
 }: {
   problemAlias: string;
+  offset: number;
+  rowcount: number;
 }) {
   api.Problem.clarifications({
     problem_alias: problemAlias,
-    rowcount: 100,
-    offset: null,
+    rowcount: rowcount,
+    offset: offset,
   })
     .then(time.remoteTimeAdapter)
     .then((data) => {
