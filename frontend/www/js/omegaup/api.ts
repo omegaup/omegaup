@@ -1506,9 +1506,18 @@ export const Run = {
     );
     return x;
   }),
-  details: apiCall<messages.RunDetailsRequest, messages.RunDetailsResponse>(
-    '/api/run/details/',
-  ),
+  details: apiCall<
+    messages.RunDetailsRequest,
+    messages._RunDetailsServerResponse,
+    messages.RunDetailsResponse
+  >('/api/run/details/', (x) => {
+    if (x.feedback)
+      x.feedback = ((x) => {
+        x.date = ((x: number) => new Date(x * 1000))(x.date);
+        return x;
+      })(x.feedback);
+    return x;
+  }),
   disqualify: apiCall<
     messages.RunDisqualifyRequest,
     messages.RunDisqualifyResponse
@@ -1574,6 +1583,13 @@ export const Session = {
     messages.SessionGoogleLoginRequest,
     messages.SessionGoogleLoginResponse
   >('/api/session/googleLogin/'),
+};
+
+export const Submission = {
+  createFeedback: apiCall<
+    messages.SubmissionCreateFeedbackRequest,
+    messages.SubmissionCreateFeedbackResponse
+  >('/api/submission/createFeedback/'),
 };
 
 export const Tag = {

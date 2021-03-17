@@ -191,6 +191,8 @@
 - [Session](#session)
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
   - [`/api/session/googleLogin/`](#apisessiongooglelogin)
+- [Submission](#submission)
+  - [`/api/submission/createFeedback/`](#apisubmissioncreatefeedback)
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
@@ -3769,6 +3771,29 @@ contestant's machine and the server.
 | Name                | Type      |
 | ------------------- | --------- |
 | `isAccountCreation` | `boolean` |
+
+# Submission
+
+SubmissionController
+
+## `/api/submission/createFeedback/`
+
+### Description
+
+Adds admin feedback to a submission
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `feedback`         | `string` |             |
+| `guid`             | `string` |             |
+
+### Returns
+
+_Nothing_
 
 # Tag
 

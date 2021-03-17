@@ -5,6 +5,7 @@ export interface LocationOptions {
   problem: ActiveProblem | null;
   popupDisplayed: PopupDisplayed;
   guid: null | string;
+  problemAlias: null | string;
   showNewClarificationPopup: boolean;
 }
 
@@ -13,6 +14,7 @@ export function getOptionsFromLocation(location: string): LocationOptions {
     problem: null,
     popupDisplayed: PopupDisplayed.None,
     guid: null,
+    problemAlias: null,
     showNewClarificationPopup: false,
   };
 
@@ -42,6 +44,7 @@ export function getOptionsFromLocation(location: string): LocationOptions {
         response.popupDisplayed = PopupDisplayed.RunSubmit;
       } else if (match.groups.popup?.startsWith('show-run')) {
         response.guid = match.groups.popup.split(':')[1];
+        response.problemAlias = response.problem.problem.alias;
         response.popupDisplayed = PopupDisplayed.RunDetails;
       }
       break;
