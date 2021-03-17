@@ -113,6 +113,16 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             return;
         }
 
+        // Without the feedback
+        $response = \OmegaUp\Controllers\Run::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($admin['identity'])->auth_token,
+                'problemset_id' => $courseData['assignment']->problemset_id,
+                'run_alias' => $runData['response']['guid'],
+            ])
+        );
+        $this->assertNull($response['feedback']);
+
         $feedback = 'Test feedback';
         \OmegaUp\Controllers\Submission::apiCreateFeedback(
             new \OmegaUp\Request([
@@ -124,17 +134,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        // Without the include_feedback flag
-        $response = \OmegaUp\Controllers\Run::apiDetails(
-            new \OmegaUp\Request([
-                'auth_token' => self::login($admin['identity'])->auth_token,
-                'problemset_id' => $courseData['assignment']->problemset_id,
-                'run_alias' => $runData['response']['guid'],
-            ])
-        );
-        $this->assertNull($response['feedback']);
-
-        // With the include feedback flag
+        // After adding the feedback
         $response = \OmegaUp\Controllers\Run::apiDetails(
             new \OmegaUp\Request([
                 'auth_token' => self::login($admin['identity'])->auth_token,

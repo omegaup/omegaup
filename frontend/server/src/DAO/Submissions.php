@@ -367,7 +367,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     /**
      * Gets the feedback of a certain submission
      *
-     * @return array{author: string, feedback: string, date: \OmegaUp\Timestamp}|null
+     * @return array{author: string, date: \OmegaUp\Timestamp, feedback: string}|null
      */
     public static function getSubmissionFeedback(
         \OmegaUp\DAO\VO\Submissions $submission
@@ -387,7 +387,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 s.submission_id = ?
         ';
 
-        /** @var array{author: string, feedback: string, date: \OmegaUp\Timestamp}|null */
+        /** @var array{author: string, date: \OmegaUp\Timestamp, feedback: string}|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [

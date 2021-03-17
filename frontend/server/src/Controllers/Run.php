@@ -854,7 +854,6 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @return RunDetails
      *
      * @omegaup-request-param string $run_alias
-     * @omegaup-request-param boolean $include_feedback
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -868,10 +867,6 @@ class Run extends \OmegaUp\Controllers\Controller {
                 fn (string $alias) => \OmegaUp\Validators::alias($alias)
             )
         );
-
-        $includeFeedback = $r->ensureOptionalBool(
-            'include_feedback'
-        ) ?? false;
 
         if (is_null($submission->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
@@ -909,13 +904,6 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $feedback = null;
-        if ($includeFeedback) {
-            $feedback = \OmegaUp\DAO\Submissions::getSubmissionFeedback(
-                $submission
-            );
-        }
-
         // Get the source
         $response = [
             'admin' => \OmegaUp\Authorization::isProblemAdmin(
@@ -925,7 +913,9 @@ class Run extends \OmegaUp\Controllers\Controller {
             'guid' => strval($submission->guid),
             'language' => strval($submission->language),
             'alias' => strval($problem->alias),
-            'feedback' => $feedback,
+            'feedback' => \OmegaUp\DAO\Submissions::getSubmissionFeedback(
+                $submission
+            ),
         ];
         $showRunDetails = !$response['admin'] ? self::shouldShowRunDetails(
             $r->identity->identity_id,
