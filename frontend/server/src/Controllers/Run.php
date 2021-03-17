@@ -155,17 +155,6 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $nextSubmissionTimestamp = \OmegaUp\DAO\Runs::nextSubmissionTimestampByProblem(
-            intval($problem->problem_id),
-            intval($r->identity->identity_id)
-        );
-
-        if ($nextSubmissionTimestamp->time > \OmegaUp\Time::get()) {
-            throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
-                'runWaitGap'
-            );
-        }
-
         if ($problem->deprecated) {
             throw new \OmegaUp\Exceptions\PreconditionFailedException(
                 'problemDeprecated'
@@ -582,8 +571,12 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         // Happy ending
-        $response['nextSubmissionTimestamp'] =
-            \OmegaUp\DAO\Runs::nextSubmissionTimestamp($contest);
+        $response['nextSubmissionTimestamp'] = \OmegaUp\DAO\Runs::nextSubmissionTimestampByProblem(
+            intval($problem->problem_id),
+            intval($r->identity->identity_id),
+            $contest
+        );
+
         if (is_null($submission->guid)) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }

@@ -4507,15 +4507,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
+        $runsPayload = \OmegaUp\DAO\Runs::getForProblemDetails(
+            intval($problem->problem_id),
+            /*$problemsetId=*/null,
+            intval($r->identity->identity_id)
+        );
+
         $response['smartyProperties']['payload'] = array_merge(
             $response['smartyProperties']['payload'],
             [
                 'nominationStatus' => $nominationPayload,
-                'runs' => \OmegaUp\DAO\Runs::getForProblemDetails(
-                    intval($problem->problem_id),
-                    /*$problemsetId=*/null,
-                    intval($r->identity->identity_id)
-                ),
+                'runs' => $runsPayload,
                 'solutionStatus' => self::getProblemSolutionStatus(
                     $problem,
                     $r->identity
@@ -4530,9 +4532,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ]
         );
 
-        $nextSubmissionTimestamp = \OmegaUp\DAO\Runs::nextSubmissionTimestampByProblem(
-            intval($problem->problem_id),
-            intval($r->identity->identity_id)
+        $lastRunTime = null;
+
+        if (($n = count($runsPayload)) > 0) {
+            $lastRun = $runsPayload[$n - 1];
+            $lastRunTime = $lastRun['time'];
+        }
+
+        $nextSubmissionTimestamp = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
+            null,
+            $lastRunTime
         );
 
         $response['smartyProperties']['payload']['problem'] = array_merge(

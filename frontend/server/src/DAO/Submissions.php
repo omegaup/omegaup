@@ -315,7 +315,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     }
 
     /** @return \OmegaUp\Timestamp|null */
-    public static function getLastSubmissionByProblem(
+    public static function getLastSubmissionTimestampByProblem(
         int $problemId,
         ?int $identityId
     ) {
@@ -328,7 +328,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             WHERE
                 s.problem_id = ? AND s.identity_id = ?
             ORDER BY
-                s.time DESC
+                s.submission_id DESC
             LIMIT 1
         ';
 

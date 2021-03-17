@@ -947,7 +947,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         }
 
         if (is_null($lastSubmissionTime)) {
-            $lastSubmissionTime = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
+            return new \OmegaUp\Timestamp(\OmegaUp\Time::get());
         }
 
         return new \OmegaUp\Timestamp(
@@ -961,19 +961,16 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      */
     final public static function nextSubmissionTimestampByProblem(
         int $problemId,
-        int $identityId
+        int $identityId,
+        \OmegaUp\DAO\VO\Contests $contest = null
     ): \OmegaUp\Timestamp {
-        $lastSubmissionTime = \OmegaUp\DAO\Submissions::getLastSubmissionByProblem(
+        $lastSubmissionTime = \OmegaUp\DAO\Submissions::getLastSubmissionTimestampByProblem(
             $problemId,
             $identityId
         );
 
-        if (is_null($lastSubmissionTime)) {
-            return new \OmegaUp\Timestamp(\OmegaUp\Time::get());
-        }
-
         return \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
-            null,
+            $contest,
             $lastSubmissionTime
         );
     }
