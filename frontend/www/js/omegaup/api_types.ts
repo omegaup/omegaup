@@ -2764,7 +2764,7 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback?: string;
+    feedback?: { author: string; date: Date; feedback: string };
     guid: string;
     judged_by?: string;
     language: string;
@@ -3915,6 +3915,7 @@ export namespace messages {
     submit_delay: number;
   };
   export type RunDetailsRequest = { [key: string]: any };
+  export type _RunDetailsServerResponse = any;
   export type RunDetailsResponse = types.RunDetails;
   export type RunDisqualifyRequest = { [key: string]: any };
   export type RunDisqualifyResponse = {};

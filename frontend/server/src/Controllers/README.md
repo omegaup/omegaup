@@ -4170,10 +4170,10 @@ it is used by typeahead.
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `query` | `mixed` |             |
-| `term`  | `mixed` |             |
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+| `term`  | `null\|string` |             |
 
 ### Returns
 

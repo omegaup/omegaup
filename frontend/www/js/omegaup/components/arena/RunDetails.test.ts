@@ -35,7 +35,6 @@ describe('RunDetails.vue', () => {
             verdict: 'PA',
             wall_time: 0.699709,
           },
-          feedback: 'none',
           groups: [],
           guid: '80bbe93bc01c1d47ff9fb396dfaff741',
           judged_by: '',
