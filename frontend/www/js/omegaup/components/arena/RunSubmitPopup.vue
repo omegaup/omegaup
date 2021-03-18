@@ -56,7 +56,7 @@
           <button
             type="submit"
             class="btn btn-primary"
-            :disabled="!canSubmit || nextSubmissionTimestamp == MAX_DATE"
+            :disabled="!canSubmit || nextSubmissionTimestamp === null"
           >
             <omegaup-countdown
               v-if="!canSubmit"
@@ -102,7 +102,6 @@ export default class ArenaRunSubmitPopup extends Vue {
   selectedLanguage = this.preferredLanguage;
   code = '';
   now: number = Date.now();
-  MAX_DATE = new Date(8640000000000000);
 
   get canSubmit(): boolean {
     return this.nextSubmissionTimestamp.getTime() <= this.now;

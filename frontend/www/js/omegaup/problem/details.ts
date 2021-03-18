@@ -34,7 +34,6 @@ OmegaUp.on('ready', () => {
   const locationHash = window.location.hash.substr(1).split('/');
   const runs =
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
-  const MAX_DATE = new Date(8640000000000000);
 
   trackClarifications(payload.clarifications ?? []);
 
@@ -126,7 +125,7 @@ OmegaUp.on('ready', () => {
             runs: types.Run[];
             nominationStatus: types.NominationStatus;
           }) => {
-            problemDetailsView.nextSubmissionTimestamp = MAX_DATE;
+            problemDetailsView.nextSubmissionTimestamp = null;
 
             api.Run.create({
               problem_alias: payload.problem.alias,
