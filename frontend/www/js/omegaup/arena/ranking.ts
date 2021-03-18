@@ -1,4 +1,5 @@
 import * as ui from '../ui';
+import * as api from '../api';
 import { types } from '../api_types';
 import { getMaxScore } from './navigation';
 import { myRunsStore } from './runsStore';
@@ -25,15 +26,85 @@ interface Problem {
   visibility: number;
 }
 
-function updateProblemScore(
-  alias: string,
-  maxScore: number,
-  previousScore: number,
-  scoreboard: types.Scoreboard,
-  username: string,
-  currentProblem: types.NavbarProblemsetProblem | undefined,
-): types.ScoreboardRankingEntry[] {
-  const scoreboardRanking = scoreboard.ranking.map((rank) => {
+export interface RankingRequest {
+  problemsetId: number;
+  scoreboardToken: string;
+  currentUsername: string;
+  navbarProblems: types.NavbarProblemsetProblem[];
+}
+
+export function refreshRanking({
+  problemsetId,
+  scoreboardToken,
+  currentUsername,
+  navbarProblems,
+}: RankingRequest): void {
+  api.Problemset.scoreboard({
+    problemset_id: problemsetId,
+    token: scoreboardToken,
+  })
+    .then((scoreboard) => {
+      const rankingEvent = true;
+      rankingChange({
+        scoreboard,
+        problemsetId,
+        scoreboardToken,
+        rankingEvent,
+        currentUsername,
+        navbarProblems,
+      });
+    })
+    .catch(ui.ignoreError);
+}
+
+export function rankingChange({
+  problemsetId,
+  scoreboardToken,
+  scoreboard,
+  rankingEvent,
+  currentUsername,
+  navbarProblems,
+}: {
+  problemsetId: number;
+  scoreboard: types.Scoreboard;
+  scoreboardToken: string;
+  rankingEvent: boolean;
+  currentUsername: string;
+  navbarProblems: types.NavbarProblemsetProblem[];
+}): void {
+  onRankingChanged({ scoreboard, currentUsername, navbarProblems });
+
+  if (rankingEvent) {
+    api.Problemset.scoreboardEvents({
+      problemset_id: problemsetId,
+      token: scoreboardToken,
+    })
+      .then(() => onRankingEvents())
+      .catch(ui.ignoreError);
+  }
+}
+
+// Implement this function in a new PR
+function onRankingEvents(): void {
+  createChart();
+}
+
+function createChart(): void {
+  // Implement this function in a new PR
+}
+
+export function updateProblemScore({
+  alias,
+  previousScore,
+  scoreboard,
+  username,
+}: {
+  alias: string;
+  previousScore: number;
+  scoreboard: types.Scoreboard;
+  username: string;
+}): types.ScoreboardRankingEntry[] {
+  return scoreboard.ranking.map((rank) => {
     const ranking = rank;
     if (ranking.username === username) {
       ranking.problems = rank.problems.map((problem) => {
@@ -55,17 +126,6 @@ function updateProblemScore(
     }
     return ranking;
   });
-
-  if (currentProblem) {
-    currentProblem.bestScore = getMaxScore(
-      myRunsStore.state.runs,
-      alias,
-      previousScore,
-    );
-    currentProblem.maxScore = maxScore;
-  }
-
-  return scoreboardRanking;
 }
 
 export function onRankingChanged({
@@ -110,20 +170,16 @@ export function onRankingChanged({
         const currentProblem = navbarProblems.find(
           (problem) => problem.alias === alias,
         );
+
         if (currentProblem) {
           currentProblem.hasRuns = problem.runs > 0;
-          currentProblem.bestScore = problem.points;
+          currentProblem.bestScore = getMaxScore(
+            myRunsStore.state.runs,
+            alias,
+            problem.points,
+          );
           currentProblem.maxScore = currentPoints;
         }
-
-        updateProblemScore(
-          alias,
-          currentPoints,
-          problem.points,
-          scoreboard,
-          currentUsername,
-          currentProblem,
-        );
       }
     }
 
@@ -131,7 +187,7 @@ export function onRankingChanged({
     if (i < 10) {
       const username = ui.rankingUsername(rank);
       users.push({
-        position: rank.place,
+        position: currentRankingState[username].place,
         username,
         country: rank.country,
         classname: rank.classname,
