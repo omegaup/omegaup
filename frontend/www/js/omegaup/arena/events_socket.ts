@@ -73,7 +73,7 @@ export class EventsSocket {
           accept();
         };
         socket.onclose = (e: Event) => {
-          this.onclose(e);
+          this.onclose();
           reject(e);
         };
 
