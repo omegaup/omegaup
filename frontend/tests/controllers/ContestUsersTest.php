@@ -299,11 +299,12 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Test\Factories\ContestParams([
                 'startTime' => $startTime,
                 'finishTime' => $finishTime,
+                'admission_mode' => 'public',
             ])
         );
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        // Add user to our private contest
+        // Add user to our contest
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
         $userLogin = self::login($identity);
@@ -314,6 +315,23 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
 
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestPracticeDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertEquals(
+            $contestData['director']->username,
+            $contestDetails['contest']['director']
+        );
+
+        // No-registered users can access to contest in practice mode
+        [
+            'identity' => $noRegisteredIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $userLogin = self::login($noRegisteredIdentity);
         $contestDetails = \OmegaUp\Controllers\Contest::getContestPracticeDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
