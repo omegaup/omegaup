@@ -12,6 +12,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, classname: string, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, name: null|string, request_time: \OmegaUp\Timestamp, username: string}
  * @psalm-type CourseAdmin=array{role: string, username: string}
+ * @psalm-type CourseClarification=array{answer: null|string, assignment_alias: string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, languages: list<string>|null, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
@@ -4841,6 +4842,49 @@ class Course extends \OmegaUp\Controllers\Controller {
         self::$log->info("Course updated (alias): {$courseAlias}");
         return [
             'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Gets the clarifications of all assignments in a course
+     *
+     * @return array{clarifications: list<CourseClarification>}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param int $offset
+     * @omegaup-request-param int $rowcount
+     */
+    public static function apiClarifications(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        $offset = $r->ensureOptionalInt('offset');
+        $rowcount = $r->ensureOptionalInt('rowcount') ?? 1000;
+
+        $course = self::validateCourseExists(
+            $r->ensureString(
+                'course_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            )
+        );
+
+        if (
+            !\OmegaUp\Authorization::canViewCourse(
+                $r->identity,
+                $course,
+                self::resolveGroup($course)
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return [
+            'clarifications' => \OmegaUp\DAO\Clarifications::getCourseClarifications(
+                $course,
+                \OmegaUp\Authorization::isCourseAdmin($r->identity, $course),
+                $r->identity,
+                $offset,
+                $rowcount
+            ),
         ];
     }
 
