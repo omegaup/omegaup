@@ -1,5 +1,4 @@
 import * as ui from '../ui';
-import * as api from '../api';
 import { types } from '../api_types';
 import { getMaxScore } from './navigation';
 import { myRunsStore } from './runsStore';
@@ -33,63 +32,12 @@ export interface RankingRequest {
   navbarProblems: types.NavbarProblemsetProblem[];
 }
 
-export function refreshRanking({
-  problemsetId,
-  scoreboardToken,
-  currentUsername,
-  navbarProblems,
-}: RankingRequest): void {
-  api.Problemset.scoreboard({
-    problemset_id: problemsetId,
-    token: scoreboardToken,
-  })
-    .then((scoreboard) => {
-      const rankingEvent = true;
-      rankingChange({
-        scoreboard,
-        problemsetId,
-        scoreboardToken,
-        rankingEvent,
-        currentUsername,
-        navbarProblems,
-      });
-    })
-    .catch(ui.ignoreError);
-}
-
-export function rankingChange({
-  problemsetId,
-  scoreboardToken,
-  scoreboard,
-  rankingEvent,
-  currentUsername,
-  navbarProblems,
-}: {
-  problemsetId: number;
-  scoreboard: types.Scoreboard;
-  scoreboardToken: string;
-  rankingEvent: boolean;
-  currentUsername: string;
-  navbarProblems: types.NavbarProblemsetProblem[];
-}): void {
-  onRankingChanged({ scoreboard, currentUsername, navbarProblems });
-
-  if (rankingEvent) {
-    api.Problemset.scoreboardEvents({
-      problemset_id: problemsetId,
-      token: scoreboardToken,
-    })
-      .then(() => onRankingEvents())
-      .catch(ui.ignoreError);
-  }
-}
-
 // Implement this function in a new PR
-function onRankingEvents(): void {
+export function onRankingEvents(): void {
   createChart();
 }
 
-function createChart(): void {
+export function createChart(): void {
   // Implement this function in a new PR
 }
 

@@ -4,7 +4,7 @@ import { types } from '../api_types';
 import { onRankingChanged, updateProblemScore } from './ranking';
 
 describe('ranking', () => {
-  const scoreboard = {
+  const scoreboard: types.Scoreboard = {
     problems: [
       {
         alias: 'problem_alias',
@@ -46,8 +46,8 @@ describe('ranking', () => {
     start_time: new Date(),
     time: new Date(),
     title: 'contest',
-  } as types.Scoreboard;
-  const navbarProblems = [
+  };
+  const navbarProblems: types.NavbarProblemsetProblem[] = [
     {
       acceptsSubmissions: true,
       alias: 'problem_alias',
@@ -64,7 +64,7 @@ describe('ranking', () => {
       maxScore: 100,
       text: 'B. Problem 2',
     },
-  ] as types.NavbarProblemsetProblem[];
+  ];
 
   describe('updateProblemScore', () => {
     it('Should update problem score in a contest', () => {
@@ -75,14 +75,37 @@ describe('ranking', () => {
         scoreboard: scoreboard,
       };
       const scoreboardRanking = updateProblemScore(params);
-      expect(scoreboardRanking[0].username).toEqual('omegaUp');
-      expect(scoreboardRanking[0].classname).toEqual('user-rank-unranked');
-      expect(scoreboardRanking[0].is_invited).toEqual(true);
-      expect(scoreboardRanking[0].total.penalty).toEqual(0);
-      expect(scoreboardRanking[0].total.points).toEqual(200);
+      expect(scoreboardRanking).toEqual([
+        {
+          classname: 'user-rank-unranked',
+          country: 'MX',
+          is_invited: true,
+          problems: [
+            {
+              alias: 'problem_alias',
+              penalty: 3,
+              percent: 0,
+              points: 100,
+              runs: 1,
+            },
+            {
+              alias: 'problem_alias_2',
+              penalty: 5,
+              percent: 0,
+              points: 100,
+              runs: 3,
+            },
+          ],
+          total: {
+            penalty: 0,
+            points: 200,
+          },
+          username: 'omegaUp',
+        },
+      ]);
     });
 
-    it('Should update problem when rankign change', () => {
+    it('Should update problem when ranking change', () => {
       const params = {
         currentUsername: 'omegaUp',
         scoreboard: scoreboard,
