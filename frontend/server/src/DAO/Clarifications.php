@@ -80,7 +80,6 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $sql = '
             SELECT
                 c.clarification_id,
-                p.alias AS problem_alias,
                 i.username AS author,
                 r.username AS receiver,
                 c.message,
