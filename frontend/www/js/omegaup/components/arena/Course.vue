@@ -28,21 +28,13 @@
           ></omegaup-arena-summary>
           <div v-else class="problem main">
             <omegaup-problem-details
-              :user="{ loggedIn: true, admin: false, reviewerR: false }"
+              :user="{ loggedIn: true, admin: false, reviewer: false }"
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="activeProblem.runs"
-              :popup-displayed="popupDisplayed"
               :guid="guid"
               :problem-alias="problemAlias"
               :should-show-run-details="shouldShowRunDetails"
-              @update:activeTab="
-                (selectedTab) =>
-                  $emit('reset-hash', {
-                    selectedTab,
-                    alias: activeProblem.problem.alias,
-                  })
-              "
               @submit-run="onRunSubmitted"
               @show-run="(source) => $emit('show-run', source)"
             >
@@ -67,7 +59,7 @@ import T from '../../lang';
 import arena_Arena from './Arena.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_Summary from './Summary.vue';
-import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
+import problem_Details from '../problem/Details.vue';
 
 export interface ActiveProblem {
   runs: types.Run[];
@@ -91,7 +83,6 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() activeTab!: string;
   @Prop({ default: null }) guid!: null | string;
-  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop({ default: null }) problemAlias!: null | string;
 
   T = T;
@@ -109,15 +100,6 @@ export default class ArenaCourse extends Vue {
 
   onRunSubmitted(run: { code: string; language: string }): void {
     this.$emit('submit-run', Object.assign({}, run, this.activeProblem));
-  }
-
-  @Watch('popupDisplayed')
-  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
-    if (newValue === PopupDisplayed.RunDetails) {
-      this.$nextTick(() => {
-        this.shouldShowRunDetails = true;
-      });
-    }
   }
 
   @Watch('problem')

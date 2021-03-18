@@ -3945,7 +3945,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             return self::getCourseDetails($r, $course, $group, false);
         }
 
-        return self::getAssignmentDetails(
+        return self::getAssignmentDetailsForTypeScript(
             $r,
             $course,
             $group,

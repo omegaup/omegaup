@@ -6,7 +6,6 @@ import * as ui from '../ui';
 
 import Vue from 'vue';
 import arena_Course, { ActiveProblem } from '../components/arena/Course.vue';
-import { PopupDisplayed } from '../components/problem/Details.vue';
 import { getOptionsFromLocation } from './location';
 import { navigateToProblem } from './navigation';
 import {
@@ -18,18 +17,19 @@ import {
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
+
   const commonPayload = types.payloadParsers.CommonPayload();
   const payload = types.payloadParsers.AssignmentDetailsPayload();
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
+
   const arenaCourse = new Vue({
     el: '#main-container',
     components: {
       'omegaup-arena-course': arena_Course,
     },
     data: () => ({
-      popUpDisplayed: PopupDisplayed.None,
       problemInfo: null as types.ProblemInfo | null,
       problem: null as ActiveProblem | null,
       problems: payload.currentAssignment
@@ -43,7 +43,6 @@ OmegaUp.on('ready', () => {
         props: {
           course: payload.courseDetails,
           currentAssignment: payload.currentAssignment,
-          popupDisplayed: this.popUpDisplayed,
           problemInfo: this.problemInfo,
           problem: this.problem,
           problemAlias: this.problemAlias,
@@ -64,9 +63,6 @@ OmegaUp.on('ready', () => {
               problems: this.problems,
             });
           },
-          'reset-hash': (request: { selectedTab: string; alias: string }) => {
-            window.location.replace(`#${request.selectedTab}/${request.alias}`);
-          },
           'show-run': (request: SubmissionRequest) => {
             const hash = `#problems/${
               this.problemAlias ?? request.request.problemAlias
@@ -77,7 +73,6 @@ OmegaUp.on('ready', () => {
               })
               .catch((error) => {
                 ui.apiError(error);
-                this.popUpDisplayed = PopupDisplayed.None;
               });
           },
           'submit-run': ({
