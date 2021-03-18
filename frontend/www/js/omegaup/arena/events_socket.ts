@@ -1,42 +1,83 @@
 import * as time from '../time';
+import * as ui from '../ui';
+import {
+  ContestClarificationType,
+  refreshContestClarifications,
+} from './clarifications';
 import clarificationStore from './clarificationsStore';
-import { Socket, SocketStatus } from './socket';
 import { updateRun } from './submissions';
 
+export enum SocketStatus {
+  Waiting = '↻',
+  Failed = '✗',
+  Ok = '•',
+}
+
 export class EventsSocket {
-  uri: string;
+  uri: string = '';
   shouldRetry: boolean = false;
   socket: WebSocket | null = null;
   socketKeepalive: ReturnType<typeof setTimeout> | null = null;
   retries: number = 10;
 
-  constructor(uri: string) {
-    this.uri = uri;
+  disableSockets: boolean = false;
+  problemsetAlias: string | null = null;
+  locationProtocol: null | string = null;
+  locationHost: null | string = null;
+  problemsetId: null | number = null;
+  scoreboardToken: null | string = null;
+  socketStatus: SocketStatus = SocketStatus.Waiting;
+  clarificationInterval: ReturnType<typeof setTimeout> | null = null;
+  rankingInterval: ReturnType<typeof setTimeout> | null = null;
+  clarificationsOffset: number = 0;
+  clarificationsRowcount: number = 20;
+
+  constructor(options?: {
+    disableSockets: boolean;
+    problemsetAlias: string;
+    locationProtocol: string;
+    locationHost: string;
+    problemsetId: number;
+    scoreboardToken: string;
+    clarificationsOffset: number;
+    clarificationsRowcount: number;
+  }) {
+    this.socket = null;
+
+    if (options) {
+      this.disableSockets = options.disableSockets;
+      this.problemsetAlias = options.problemsetAlias;
+      this.locationProtocol = options.locationProtocol;
+      this.locationHost = options.locationHost;
+      this.problemsetId = options.problemsetId;
+      this.scoreboardToken = options.scoreboardToken;
+      this.clarificationsOffset = options.clarificationsOffset;
+      this.clarificationsRowcount = options.clarificationsRowcount;
+    }
   }
 
   connect(): Promise<void> {
     this.shouldRetry = false;
     return new Promise((accept, reject) => {
       try {
-        const webSocket = new WebSocket(this.uri, 'com.omegaup.events');
-        const socket = new Socket();
+        const socket = new WebSocket(this.uri, 'com.omegaup.events');
 
-        webSocket.onmessage = (message) => this.onmessage(message);
-        webSocket.onopen = () => {
+        socket.onmessage = (message) => this.onmessage(message);
+        socket.onopen = () => {
           this.shouldRetry = true;
-          socket.socketStatus = SocketStatus.Ok;
+          this.socketStatus = SocketStatus.Ok;
           this.socketKeepalive = setInterval(
-            () => webSocket.send('"ping"'),
+            () => socket.send('"ping"'),
             30000,
           );
           accept();
         };
-        webSocket.onclose = (e: Event) => {
+        socket.onclose = (e: Event) => {
           this.onclose(e);
           reject(e);
         };
 
-        this.socket = webSocket;
+        this.socket = socket;
       } catch (e) {
         reject(e);
         return;
@@ -66,9 +107,7 @@ export class EventsSocket {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onclose(e: Event) {
-    const socket = new Socket();
+  onclose() {
     this.socket = null;
     if (this.socketKeepalive) {
       clearInterval(this.socketKeepalive);
@@ -76,10 +115,71 @@ export class EventsSocket {
     }
     if (this.shouldRetry && this.retries > 0) {
       this.retries--;
-      socket.socketStatus = SocketStatus.Waiting;
+      this.socketStatus = SocketStatus.Waiting;
       setTimeout(() => this.connect(), Math.random() * 15000);
       return;
     }
-    socket.socketStatus = SocketStatus.Failed;
+    this.socketStatus = SocketStatus.Failed;
+  }
+
+  connectSocket(): void {
+    if (this.disableSockets || this.problemsetAlias == 'admin') {
+      this.socketStatus = SocketStatus.Failed;
+      return;
+    }
+
+    this.uri =
+      `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${
+        window.location.host
+      }/events/?filter=/problemset/${this.problemsetId}` +
+      (this.scoreboardToken ? `/${this.scoreboardToken}` : '');
+    this.socketStatus = SocketStatus.Waiting;
+    ui.reportEvent('events-socket', 'attempt');
+
+    this.connect()
+      .then(() => {
+        ui.reportEvent('events-socket', 'connected');
+      })
+      .catch((e) => {
+        ui.reportEvent('events-socket', 'fallback');
+        console.log(e);
+        setTimeout(() => {
+          this.setupPolls();
+        }, Math.random() * 15000);
+      });
+  }
+
+  setupPolls(): void {
+    // TODO: Add refreshRanking function in PR #5230 and then, uncomment next line
+    //refreshRanking();
+    if (!this.problemsetAlias) {
+      return;
+    }
+    refreshContestClarifications({
+      type: ContestClarificationType.AllProblems,
+      contestAlias: this.problemsetAlias,
+      rowcount: this.clarificationsRowcount,
+      offset: this.clarificationsOffset,
+    });
+
+    if (!this.socket) {
+      this.clarificationInterval = setInterval(() => {
+        this.clarificationsOffset = 0; // Return pagination to start on refresh
+        if (this.problemsetAlias) {
+          refreshContestClarifications({
+            type: ContestClarificationType.AllProblems,
+            contestAlias: this.problemsetAlias,
+            rowcount: this.clarificationsRowcount,
+            offset: this.clarificationsOffset,
+          });
+        }
+      }, 5 * 60 * 1000);
+
+      // TODO: Add refreshRanking function in PR #5230 and then, uncomment next block
+      /*this.rankingInterval = setInterval(
+        () => refreshRanking(),
+        5 * 60 * 1000,
+      );*/
+    }
   }
 }
