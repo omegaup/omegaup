@@ -1599,8 +1599,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ),
         ]));
 
-        // When user join to contest in practice mode, save first time access is
-        // not necessary
+        // When the user joins a contest in practice mode, saving first access
+        // time is not necessary
         if ($isPracticeMode) {
             return $result;
         }
