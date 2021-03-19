@@ -69,6 +69,7 @@
   - [`/api/course/assignmentDetails/`](#apicourseassignmentdetails)
   - [`/api/course/assignmentScoreboard/`](#apicourseassignmentscoreboard)
   - [`/api/course/assignmentScoreboardEvents/`](#apicourseassignmentscoreboardevents)
+  - [`/api/course/clarifications/`](#apicourseclarifications)
   - [`/api/course/clone/`](#apicourseclone)
   - [`/api/course/create/`](#apicoursecreate)
   - [`/api/course/createAssignment/`](#apicoursecreateassignment)
@@ -1544,6 +1545,26 @@ Returns the Scoreboard events
 | Name     | Type                      |
 | -------- | ------------------------- |
 | `events` | `types.ScoreboardEvent[]` |
+
+## `/api/course/clarifications/`
+
+### Description
+
+Gets the clarifications of all assignments in a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+| `offset`       | `int`    |             |
+| `rowcount`     | `int`    |             |
+
+### Returns
+
+| Name             | Type                          |
+| ---------------- | ----------------------------- |
+| `clarifications` | `types.CourseClarification[]` |
 
 ## `/api/course/clone/`
 
