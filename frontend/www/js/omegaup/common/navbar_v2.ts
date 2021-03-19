@@ -7,6 +7,20 @@ import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload('header-payload');
+  const localMetaData = JSON.parse(
+    localStorage.getItem('toggle-bootstrap-theme') ?? '',
+  );
+  const isDark = localMetaData?.isDark;
+  if (isDark) {
+    document
+      .getElementById('dark-theme-style')
+      ?.setAttribute(
+        'href',
+        'https://bootswatch.com/4/cyborg/bootstrap.min.css',
+      );
+  } else {
+    document.getElementById('dark-theme-style')?.setAttribute('href', '');
+  }
   const commonNavbar = new Vue({
     el: '#common-navbar',
     components: {
@@ -41,6 +55,7 @@ OmegaUp.on('ready', () => {
           graderQueueLength: this.graderQueueLength,
           errorMessage: this.errorMessage,
           initialClarifications: [],
+          isDark,
         },
         on: {
           'read-notifications': (

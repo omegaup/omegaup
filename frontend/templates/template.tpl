@@ -95,5 +95,6 @@
     {js_include entrypoint="common_footer_v2"}
 
   </body>
+  <link id="dark-theme-style" rel="stylesheet" />
   <script type="text/javascript" src="{version_hash src="/js/status.dismiss.js"}" defer></script>
 </html>

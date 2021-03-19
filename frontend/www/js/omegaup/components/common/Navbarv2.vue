@@ -227,6 +227,19 @@
               v-if="inContest"
             ></omegaup-notifications-clarifications>
             -->
+            <li class="nav-item d-flex align-items-center">
+              <div class="nav-link custom-control custom-switch">
+                <label class="custom-control-label">
+                  <input
+                    v-model="toggleSwitch"
+                    :checked="toggleSwitch"
+                    type="checkbox"
+                    class="custom-control-input"
+                  />
+                  {{ T.navbarDarkMode }}
+                </label>
+              </div>
+            </li>
             <omegaup-notification-list
               :notifications="notifications"
               @read="readNotifications"
@@ -355,7 +368,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import notifications_List from '../notification/List.vue';
@@ -398,9 +411,11 @@ export default class Navbar extends Vue {
   @Prop() errorMessage!: string | null;
   @Prop({ default: 0 }) profileProgress!: number;
   @Prop() initialClarifications!: types.Clarification[];
+  @Prop() isDark!: boolean;
 
   clarifications: types.Clarification[] = this.initialClarifications;
   T = T;
+  toggleSwitch = this.isDark;
 
   get formattedLoginURL(): string {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
@@ -414,6 +429,22 @@ export default class Navbar extends Vue {
 
   readNotifications(notifications: types.Notification[], url?: string): void {
     this.$emit('read-notifications', notifications, url);
+  }
+
+  @Watch('toggleSwitch')
+  onSwitchChanged(newValue: boolean) {
+    const isDark = !newValue;
+    if (isDark) {
+      document
+        .getElementById('dark-theme-style')
+        ?.setAttribute(
+          'href',
+          'https://bootswatch.com/4/cyborg/bootstrap.min.css',
+        );
+    } else {
+      document.getElementById('dark-theme-style')?.setAttribute('href', '');
+    }
+    localStorage.setItem('toggle-bootstrap-theme', JSON.stringify({ isDark }));
   }
 }
 </script>
