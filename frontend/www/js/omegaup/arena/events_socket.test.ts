@@ -3,7 +3,6 @@ jest.mock('../../../third_party/js/diff_match_patch.js');
 import { OmegaUp } from '../omegaup';
 import * as socket from './events_socket';
 import { SocketStatus } from './events_socket';
-//import { OmegaUp } from '../omegaup';
 
 describe('socket', () => {
   describe('EventsSocket', () => {

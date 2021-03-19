@@ -1,10 +1,12 @@
 import * as time from '../time';
 import * as ui from '../ui';
+import * as api from '../api';
 import {
   ContestClarificationType,
   refreshContestClarifications,
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
+import { onRankingChanged, onRankingEvents } from './ranking';
 import { updateRun } from './submissions';
 
 export enum SocketStatus {
@@ -102,8 +104,14 @@ export class EventsSocket {
         virtualRankingChange(data.scoreboard);
         return;
       }*/
-      // TODO: Add refreshRanking function in PR #5230 and then, uncomment next line
-      //rankingChange(data.scoreboard);
+      onRankingChanged({ scoreboard: data.scoreboard });
+
+      api.Problemset.scoreboardEvents({
+        problemset_id: this.problemsetId,
+        token: this.scoreboardToken,
+      })
+        .then((response) => onRankingEvents(response.events))
+        .catch(ui.ignoreError);
     }
   }
 
@@ -150,8 +158,21 @@ export class EventsSocket {
   }
 
   setupPolls(): void {
-    // TODO: Add refreshRanking function in PR #5230 and then, uncomment next line
-    //refreshRanking();
+    api.Problemset.scoreboard({
+      problemset_id: this.problemsetId,
+      token: this.scoreboardToken,
+    })
+      .then((scoreboard) => {
+        onRankingChanged({ scoreboard });
+
+        api.Problemset.scoreboardEvents({
+          problemset_id: this.problemsetId,
+          token: this.scoreboardToken,
+        })
+          .then((response) => onRankingEvents(response.events))
+          .catch(ui.ignoreError);
+      })
+      .catch(ui.ignoreError);
     if (!this.problemsetAlias) {
       return;
     }
@@ -175,11 +196,23 @@ export class EventsSocket {
         }
       }, 5 * 60 * 1000);
 
-      // TODO: Add refreshRanking function in PR #5230 and then, uncomment next block
-      /*this.rankingInterval = setInterval(
-        () => refreshRanking(),
-        5 * 60 * 1000,
-      );*/
+      this.rankingInterval = setInterval(() => {
+        api.Problemset.scoreboard({
+          problemset_id: this.problemsetId,
+          token: this.scoreboardToken,
+        })
+          .then((scoreboard) => {
+            onRankingChanged({ scoreboard });
+
+            api.Problemset.scoreboardEvents({
+              problemset_id: this.problemsetId,
+              token: this.scoreboardToken,
+            })
+              .then((response) => onRankingEvents(response.events))
+              .catch(ui.ignoreError);
+          })
+          .catch(ui.ignoreError);
+      }, 5 * 60 * 1000);
     }
   }
 }
