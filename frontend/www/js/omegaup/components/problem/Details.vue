@@ -167,6 +167,7 @@
           :runs="runs"
           :show-details="true"
           :problemset-problems="[]"
+          :is-contest-finished="isContestFinished"
           @details="(run) => onRunDetails(run.guid)"
           @new-submission="onNewSubmission"
         ></omegaup-arena-runs>
@@ -353,6 +354,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop({ default: false }) shouldShowTabs!: boolean;
   @Prop({ default: false }) shouldShowRunDetails!: boolean;
+  @Prop({ default: false }) isContestFinished!: boolean;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 

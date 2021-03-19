@@ -9,7 +9,14 @@
       <sup :class="socketClass" title="WebSocket">{{ socketIcon }}</sup>
     </template>
     <template #clock>
-      <div class="clock">{{ clock }}</div>
+      <omegaup-countdown
+        v-if="deadline"
+        class="clock"
+        :target-time="deadline"
+      ></omegaup-countdown>
+      <div v-else class="alert alert-warning" role="alert">
+        <a :href="urlPractice">{{ T.arenaContestEndedUsePractice }}</a>
+      </div>
     </template>
     <template #arena-problems>
       <div data-contest>
@@ -48,6 +55,7 @@
               :popup-displayed="popupDisplayed"
               :guid="guid"
               :should-show-run-details="shouldShowRunDetails"
+              :is-contest-finished="!deadline"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', {
@@ -125,6 +133,7 @@ import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_NavbarMiniranking from './NavbarMiniranking.vue';
 import arena_Summary from './Summary.vue';
 import arena_Scoreboard from './Scoreboard.vue';
+import omegaup_Countdown from '../Countdown.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { omegaup } from '../../omegaup';
@@ -143,6 +152,7 @@ export interface ActiveProblem {
     'omegaup-arena-navbar-miniranking': arena_NavbarMiniranking,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
     'omegaup-arena-scoreboard': arena_Scoreboard,
+    'omegaup-countdown': omegaup_Countdown,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-problem-details': problem_Details,
   },
@@ -169,6 +179,7 @@ export default class ArenaContest extends Vue {
   @Prop() minirankingUsers!: omegaup.UserRank[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
   @Prop() lastUpdated!: Date;
+  @Prop() submissionDeadline!: Date;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   @Prop({ default: true }) showPenalty!: boolean;
   @Prop({ default: true }) socketConnected!: boolean;
@@ -179,7 +190,6 @@ export default class ArenaContest extends Vue {
   currentClarifications = this.clarifications;
   activeProblem: ActiveProblem | null = this.problem;
   shouldShowRunDetails = false;
-  clock = '00:00:00';
 
   get socketIcon(): string {
     if (this.socketConnected) return '•';
@@ -193,6 +203,19 @@ export default class ArenaContest extends Vue {
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.problem.alias ?? null;
+  }
+
+  get deadline(): Date | boolean {
+    const deadline = this.submissionDeadline || this.contest.finish_time;
+    const now = new Date();
+    if (deadline < now) {
+      return false;
+    }
+    return deadline;
+  }
+
+  get urlPractice(): string {
+    return `/arena/${this.contest.alias}/practice/`;
   }
 
   onNavigateToProblem(request: ActiveProblem) {

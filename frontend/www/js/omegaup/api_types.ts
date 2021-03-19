@@ -20,6 +20,21 @@ export namespace dao {
     username?: string;
   }
 
+  export interface Problemsets {
+    access_mode?: string;
+    acl_id?: number;
+    assignment_id?: number;
+    contest_id?: number;
+    interview_id?: number;
+    languages?: string;
+    needs_basic_information?: boolean;
+    problemset_id?: number;
+    requests_user_information?: string;
+    scoreboard_url?: string;
+    scoreboard_url_admin?: string;
+    type?: string;
+  }
+
   export interface Users {
     birth_date?: string;
     facebook_user_id?: string;
@@ -227,6 +242,10 @@ export namespace types {
             x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           })(x.scoreboard);
+        if (x.submissionDeadline)
+          x.submissionDeadline = ((x: number) => new Date(x * 1000))(
+            x.submissionDeadline,
+          );
         x.users = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -1747,8 +1766,10 @@ export namespace types {
     contest: types.ContestPublicDetails;
     contestAdmin: boolean;
     problems: types.NavbarProblemsetProblem[];
+    problemset: dao.Problemsets;
     scoreboard?: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    submissionDeadline?: Date;
     users: types.ContestUser[];
   }
 

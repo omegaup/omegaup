@@ -35,7 +35,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
- * @psalm-type ContestDetailsPayload=array{clarifications: list<Clarification>, contest: ContestPublicDetails, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, scoreboard?: Scoreboard, shouldShowFirstAssociatedIdentityRunWarning: bool, users: list<ContestUser>}
+ * @psalm-type ContestDetailsPayload=array{clarifications: list<Clarification>, contest: ContestPublicDetails, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, problemset: \OmegaUp\DAO\VO\Problemsets, scoreboard?: Scoreboard, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null, users: list<ContestUser>}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
@@ -545,7 +545,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{clarifications: list<Clarification>, problems: list<NavbarProblemsetProblem>, users: list<ContestUser>}
+     * @return array{clarifications: list<Clarification>, problems: list<NavbarProblemsetProblem>, submissionDeadline: \OmegaUp\Timestamp|null, users: list<ContestUser>}
      */
     private static function getCommonDetails(
         \OmegaUp\DAO\VO\Contests $contest,
@@ -594,6 +594,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 /*$rowcount=*/ 100
             ),
             'problems' => $problems,
+            'submissionDeadline' => $contestDetails['submission_deadline'],
         ];
     }
 
@@ -683,6 +684,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 [
                     'shouldShowFirstAssociatedIdentityRunWarning' => $shouldShowFirstAssociatedIdentityRunWarning,
                     'contestAdmin' => $contestAdmin,
+                    'problemset' => $problemset,
                     'scoreboard' => self::getScoreboard(
                         $contest,
                         $problemset,
@@ -814,6 +816,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                                 $r->user
                             )
                         ),
+                        'problemset' => $problemset,
                         'contest' => self::getPublicDetails(
                             $contestWithDirector,
                             $r->identity
