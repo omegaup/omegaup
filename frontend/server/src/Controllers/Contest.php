@@ -696,6 +696,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $r->identity
                 ),
             );
+            if (!$contestAdmin) {
+                $result['smartyProperties']['payload']['users'] = [];
+            }
 
             $result['smartyProperties']['fullWidth'] = true;
             $result['inContest'] = true;
