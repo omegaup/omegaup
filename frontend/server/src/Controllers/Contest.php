@@ -3412,28 +3412,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
             )
         );
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias(
+        $problem = \OmegaUp\DAO\Problems::getByAliasAndProblemset(
             $r->ensureString(
                 'problem_alias',
                 fn (string $alias) => \OmegaUp\Validators::alias($alias)
-            )
+            ),
+            intval($contest->problemset_id)
         );
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
-            );
-        }
-
-        if (
-            is_null(
-                \OmegaUp\DAO\ProblemsetProblems::getByPK(
-                    $contest->problemset_id,
-                    $problem->problem_id
-                )
-            )
-        ) {
-            throw new \OmegaUp\Exceptions\NotFoundException(
-                'problemNotFoundInProblemset'
             );
         }
 

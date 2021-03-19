@@ -205,10 +205,6 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         );
     }
 
-
-
-
-
     /**
      * @return list<Clarification>
      */
