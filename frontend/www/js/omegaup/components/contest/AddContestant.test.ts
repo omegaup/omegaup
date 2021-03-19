@@ -63,9 +63,8 @@ describe('AddContestant.vue', () => {
     await wrapper
       .find('form button[type="submit"].user-add-bulk')
       .trigger('click');
-    expect(wrapper.emitted('add-user')).toBeDefined();
-    expect(wrapper.emitted()['add-user']?.[0]).toStrictEqual([
-      ['user', 'test_user_1', 'user_1', 'test_user_2'],
+    expect(wrapper.emitted()['add-user']).toStrictEqual([
+      [['user', 'test_user_1', 'user_1', 'test_user_2']],
     ]);
 
     wrapper.destroy();
