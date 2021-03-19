@@ -16,7 +16,7 @@ OmegaUp.on('ready', () => {
       .getElementById('dark-theme-style')
       ?.setAttribute(
         'href',
-        'https://bootswatch.com/4/cyborg/bootstrap.min.css',
+        '/third_party/bootswatch-4.6.0/cyborg/bootstrap.min.css',
       );
   } else {
     document.getElementById('dark-theme-style')?.setAttribute('href', '');
