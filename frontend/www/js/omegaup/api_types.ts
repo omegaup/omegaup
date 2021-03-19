@@ -1893,6 +1893,18 @@ export namespace types {
     start_time: Date;
   }
 
+  export interface CourseClarification {
+    answer?: string;
+    assignment_alias: string;
+    author: string;
+    clarification_id: number;
+    message: string;
+    problem_alias: string;
+    public: boolean;
+    receiver?: string;
+    time: Date;
+  }
+
   export interface CourseCloneDetailsPayload {
     creator: { classname: string; username: string };
     details: types.CourseDetails;
@@ -3450,6 +3462,11 @@ export namespace messages {
   export type CourseAssignmentScoreboardEventsResponse = {
     events: types.ScoreboardEvent[];
   };
+  export type CourseClarificationsRequest = { [key: string]: any };
+  export type _CourseClarificationsServerResponse = any;
+  export type CourseClarificationsResponse = {
+    clarifications: types.CourseClarification[];
+  };
   export type CourseCloneRequest = { [key: string]: any };
   export type CourseCloneResponse = { alias: string };
   export type CourseCreateRequest = { [key: string]: any };
@@ -4294,6 +4311,9 @@ export namespace controllers {
     assignmentScoreboardEvents: (
       params?: messages.CourseAssignmentScoreboardEventsRequest,
     ) => Promise<messages.CourseAssignmentScoreboardEventsResponse>;
+    clarifications: (
+      params?: messages.CourseClarificationsRequest,
+    ) => Promise<messages.CourseClarificationsResponse>;
     clone: (
       params?: messages.CourseCloneRequest,
     ) => Promise<messages.CourseCloneResponse>;
