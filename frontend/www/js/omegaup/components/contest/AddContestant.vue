@@ -120,21 +120,18 @@ export default class AddContestant extends Vue {
   bulkContestants = '';
   typeaheadContestants: types.ListItem[] = [];
   currentUsers = this.users;
-  usersToBeAdded: string[] = [];
 
   onSubmit(): void {
+    let users: string[] = [];
     if (this.bulkContestants !== '') {
-      this.usersToBeAdded = this.bulkContestants.split(',');
+      users = this.bulkContestants.split(',');
     }
     if (this.typeaheadContestants) {
-      this.usersToBeAdded = [
-        ...this.usersToBeAdded,
-        ...this.typeaheadContestants.map((user) => user.key),
-      ];
+      users = [...users, ...this.typeaheadContestants.map((user) => user.key)];
     }
     this.$emit(
       'add-user',
-      this.usersToBeAdded.map((user) => user.trim()),
+      users.map((user) => user.trim()),
     );
   }
 
