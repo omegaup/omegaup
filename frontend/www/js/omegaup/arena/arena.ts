@@ -655,43 +655,34 @@ export class Arena {
     );
   }
 
-  connectSocket(): boolean {
+  connectSocket() {
     if (this.options.disableSockets || this.options.contestAlias == 'admin') {
       this.updateSocketStatus('✗', '#800');
-      return false;
+      return;
     }
 
-    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    const uris = [];
-    // Backendv2 uri
-    uris.push(
-      `${protocol}${window.location.host}/events/?filter=/problemset/${this.options.problemsetId}` +
-        (this.options.scoreboardToken
-          ? `/${this.options.scoreboardToken}`
-          : ''),
-    );
-
-    const connect = (uris: string[], index: number) => {
-      this.socket = new EventsSocket(uris[index], this);
-      this.socket.connect().catch((e) => {
-        console.log(e);
-        // Try the next uri.
-        index++;
-        if (index < uris.length) {
-          connect(uris, index);
-        } else {
-          // Out of options. Falling back to polls.
-          this.socket = null;
-          setTimeout(() => {
-            this.setupPolls();
-          }, Math.random() * 15000);
-        }
-      });
-    };
+    const uri =
+      `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${
+        window.location.host
+      }/events/?filter=/problemset/${this.options.problemsetId}` +
+      (this.options.scoreboardToken ? `/${this.options.scoreboardToken}` : '');
 
     this.updateSocketStatus('↻', '#888');
-    connect(uris, 0);
-    return false;
+    ui.reportEvent('events-socket', 'attempt');
+    this.socket = new EventsSocket(uri, this);
+    this.socket
+      .connect()
+      .then(() => {
+        ui.reportEvent('events-socket', 'connected');
+      })
+      .catch((e) => {
+        ui.reportEvent('events-socket', 'fallback');
+        console.log(e);
+        this.socket = null;
+        setTimeout(() => {
+          this.setupPolls();
+        }, Math.random() * 15000);
+      });
   }
 
   updateSocketStatus(status: string, color: string): void {

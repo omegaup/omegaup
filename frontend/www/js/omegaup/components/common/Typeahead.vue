@@ -23,6 +23,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import VoerroTagsInput from '@voerro/vue-tagsinput';
 import '@voerro/vue-tagsinput/dist/style.css';
 import T from '../../lang';
+import { types } from '../../api_types';
 
 @Component({
   components: {
@@ -30,12 +31,12 @@ import T from '../../lang';
   },
 })
 export default class Typeahead extends Vue {
-  @Prop() existingOptions!: { key: string; value: string }[];
+  @Prop() existingOptions!: types.ListItem[];
   @Prop({ default: 3 }) activationThreshold!: number;
   @Prop({ default: 5 }) maxResults!: number;
 
   T = T;
-  selectedOptions: { key: string; value: string }[] = [];
+  selectedOptions: types.ListItem[] = [];
 
   updateExistingOptions(query: string): void {
     if (query.length < this.activationThreshold) return;

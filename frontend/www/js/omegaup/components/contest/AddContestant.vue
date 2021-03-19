@@ -4,20 +4,24 @@
       <div class="card-body">
         <form class="form" @submit.prevent="onSubmit">
           <div class="form-group">
-            <label>{{ T.wordsUser }}</label>
-            <omegaup-autocomplete
-              v-model="contestant"
-              :init="(el) => typeahead.userTypeahead(el)"
-            ></omegaup-autocomplete>
+            <label>{{ T.addUsersMultipleOrSingleUser }}</label>
+            <omegaup-common-multi-typeahead
+              :existing-options="searchResultUsers"
+              :value.sync="typeaheadContestants"
+              @update-existing-options="
+                (query) => $emit('update-search-result-users', query)
+              "
+            >
+            </omegaup-common-multi-typeahead>
           </div>
-          <button class="btn btn-primary user-add-single" type="submit">
-            {{ T.contestAdduserAddUser }}
+          <button class="btn btn-primary user-add-typeahead" type="submit">
+            {{ T.contestAdduserAddUsers }}
           </button>
           <hr />
           <div class="form-group">
             <label>{{ T.wordsMultipleUser }}</label>
             <textarea
-              v-model="contestants"
+              v-model="bulkContestants"
               class="form-control contestants"
               rows="4"
             ></textarea>
@@ -43,7 +47,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in users" :key="user.username">
+          <tr v-for="user in currentUsers" :key="user.username">
             <td class="text-center">
               <omegaup-user-username
                 :linkify="true"
@@ -67,7 +71,7 @@
                 <div class="col-xs-2">
                   <button
                     class="btn-link glyphicon glyphicon-floppy-disk"
-                    @click="$emit('emit-save-end-time', user)"
+                    @click="$emit('save-end-time', user)"
                   ></button>
                 </div>
               </div>
@@ -77,7 +81,7 @@
                 class="close float-none"
                 type="button"
                 :title="T.contestAdduserRegisteredUserDelete"
-                @click="$emit('emit-remove-user', user)"
+                @click="$emit('remove-user', user)"
               >
                 ×
               </button>
@@ -94,51 +98,48 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
 import * as time from '../../time';
-import Autocomplete from '../Autocomplete.vue';
 import DateTimePicker from '../DateTimePicker.vue';
 import user_Username from '../user/Username.vue';
+import common_MultiTypeahead from '../common/MultiTypeahead.vue';
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
     'omegaup-datetimepicker': DateTimePicker,
     'omegaup-user-username': user_Username,
+    'omegaup-common-multi-typeahead': common_MultiTypeahead,
   },
 })
 export default class AddContestant extends Vue {
-  @Prop() initialUsers!: types.ContestUser[];
+  @Prop() users!: types.ContestUser[];
   @Prop() contest!: types.ContestAdminDetails;
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   time = time;
-  typeahead = typeahead;
-  contestant = '';
-  contestants = '';
-  users = this.initialUsers;
+  bulkContestants = '';
+  typeaheadContestants: types.ListItem[] = [];
+  currentUsers = this.users;
 
   onSubmit(): void {
     let users: string[] = [];
-    if (this.contestants !== '') {
-      users = this.contestants.split(',');
+    if (this.bulkContestants !== '') {
+      users = this.bulkContestants.split(',');
     }
-    if (this.contestant !== '') {
-      users.push(this.contestant);
+    if (this.typeaheadContestants) {
+      users = [...users, ...this.typeaheadContestants.map((user) => user.key)];
     }
-    if (users.length) {
-      this.$emit(
-        'emit-add-user',
-        users.map((user) => user.trim()),
-      );
-    }
+    this.$emit(
+      'add-user',
+      users.map((user) => user.trim()),
+    );
   }
 
-  @Watch('initialUsers')
-  onInitialUsersChange(newUsers: types.ContestUser[]): void {
-    this.users = newUsers;
-    this.contestant = '';
-    this.contestants = '';
+  @Watch('users')
+  onUsersChange(newUsers: types.ContestUser[]): void {
+    this.currentUsers = newUsers;
+    this.typeaheadContestants = [];
+    this.bulkContestants = '';
   }
 }
 </script>
