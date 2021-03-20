@@ -21,8 +21,8 @@ flags:
       - frontend/www/
 
 ignore:
-  - frontend/www/js/omegaup/api.ts
-  - frontend/www/js/omegaup/api_types.ts
+  - ^frontend/www/js/omegaup/api.ts$
+  - ^frontend/www/js/omegaup/api_types.ts$
   - ^frontend/www/third_party/.*
   - ^frontend/server/src/DAO/Base/.*
   - ^frontend/server/lib/third_party/.*
