@@ -164,6 +164,7 @@
         </omegaup-overlay>
         <omegaup-arena-runs
           :problem-alias="problem.alias"
+          :contest-alias="contestAlias"
           :runs="runs"
           :show-details="true"
           :problemset-problems="[]"
@@ -355,6 +356,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) shouldShowTabs!: boolean;
   @Prop({ default: false }) shouldShowRunDetails!: boolean;
   @Prop({ default: false }) isContestFinished!: boolean;
+  @Prop({ default: null }) contestAlias!: string | null;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 

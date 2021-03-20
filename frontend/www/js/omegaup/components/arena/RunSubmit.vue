@@ -56,7 +56,7 @@
             :countdown-format="
               omegaup.CountdownFormat.WaitBetweenUploadsSeconds
             "
-            @emit-finish="now = Date.now()"
+            @finish="now = Date.now()"
           ></omegaup-countdown>
           <span v-else>{{ T.wordsSend }}</span>
         </button>

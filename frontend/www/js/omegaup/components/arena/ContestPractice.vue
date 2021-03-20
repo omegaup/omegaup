@@ -39,6 +39,7 @@
               :popup-displayed="popupDisplayed"
               :guid="guid"
               :problem-alias="problemAlias"
+              :contest-alias="contest.alias"
               :should-show-run-details="shouldShowRunDetails"
               @update:activeTab="
                 (selectedTab) =>

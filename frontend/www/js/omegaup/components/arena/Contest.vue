@@ -9,14 +9,15 @@
       <sup :class="socketClass" title="WebSocket">{{ socketIcon }}</sup>
     </template>
     <template #clock>
-      <omegaup-countdown
-        v-if="deadline"
-        class="clock"
-        :target-time="deadline"
-      ></omegaup-countdown>
-      <div v-else class="alert alert-warning" role="alert">
+      <div v-if="isContestFinished" class="alert alert-warning" role="alert">
         <a :href="urlPractice">{{ T.arenaContestEndedUsePractice }}</a>
       </div>
+      <omegaup-countdown
+        v-else
+        class="clock"
+        :target-time="deadline"
+        @finish="now = Date.now()"
+      ></omegaup-countdown>
     </template>
     <template #arena-problems>
       <div data-contest>
@@ -55,7 +56,8 @@
               :popup-displayed="popupDisplayed"
               :guid="guid"
               :should-show-run-details="shouldShowRunDetails"
-              :is-contest-finished="!deadline"
+              :contest-alias="contest.alias"
+              :is-contest-finished="isContestFinished"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', {
@@ -190,6 +192,7 @@ export default class ArenaContest extends Vue {
   currentClarifications = this.clarifications;
   activeProblem: ActiveProblem | null = this.problem;
   shouldShowRunDetails = false;
+  now = new Date();
 
   get socketIcon(): string {
     if (this.socketConnected) return '•';
@@ -205,13 +208,12 @@ export default class ArenaContest extends Vue {
     return this.activeProblem?.problem.alias ?? null;
   }
 
-  get deadline(): Date | boolean {
-    const deadline = this.submissionDeadline || this.contest.finish_time;
-    const now = new Date();
-    if (deadline < now) {
-      return false;
-    }
-    return deadline;
+  get deadline(): Date {
+    return this.submissionDeadline || this.contest.finish_time;
+  }
+
+  get isContestFinished(): boolean {
+    return this.deadline < this.now;
   }
 
   get urlPractice(): string {
