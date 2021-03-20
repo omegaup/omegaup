@@ -26,6 +26,26 @@
             :finish-time="currentAssignment.finish_time"
             :admin="currentAssignment.director"
           ></omegaup-arena-summary>
+          <div v-else class="problem main">
+            <omegaup-problem-details
+              :user="{ loggedIn: true, admin: false, reviewer: false }"
+              :problem="problemInfo"
+              :active-tab="'problems'"
+              :runs="activeProblem.runs"
+              :guid="guid"
+              :problem-alias="problemAlias"
+              :should-show-run-details="shouldShowRunDetails"
+              @submit-run="onRunSubmitted"
+              @show-run="(source) => $emit('show-run', source)"
+            >
+              <template #quality-nomination-buttons>
+                <div></div>
+              </template>
+              <template #best-solvers-list>
+                <div></div>
+              </template>
+            </omegaup-problem-details>
+          </div>
         </div>
       </div>
     </template>
@@ -33,12 +53,13 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import arena_Arena from './Arena.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_Summary from './Summary.vue';
+import problem_Details from '../problem/Details.vue';
 
 export interface ActiveProblem {
   runs: types.Run[];
@@ -50,6 +71,7 @@ export interface ActiveProblem {
     'omegaup-arena': arena_Arena,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
     'omegaup-arena-summary': arena_Summary,
+    'omegaup-problem-details': problem_Details,
   },
 })
 export default class ArenaCourse extends Vue {
@@ -61,9 +83,11 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() activeTab!: string;
   @Prop({ default: null }) guid!: null | string;
+  @Prop({ default: null }) problemAlias!: null | string;
 
   T = T;
   activeProblem: ActiveProblem | null = this.problem;
+  shouldShowRunDetails = false;
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.problem.alias ?? null;
@@ -72,6 +96,19 @@ export default class ArenaCourse extends Vue {
   onNavigateToProblem(activeProblem: ActiveProblem) {
     this.activeProblem = activeProblem;
     this.$emit('navigate-to-problem', activeProblem);
+  }
+
+  onRunSubmitted(run: { code: string; language: string }): void {
+    this.$emit('submit-run', Object.assign({}, run, this.activeProblem));
+  }
+
+  @Watch('problem')
+  onActiveProblemChanged(newValue: ActiveProblem | null): void {
+    if (!newValue) {
+      this.activeProblem = null;
+      return;
+    }
+    this.onNavigateToProblem(newValue);
   }
 }
 </script>
