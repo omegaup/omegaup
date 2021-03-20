@@ -594,7 +594,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 /*$rowcount=*/ 100
             ),
             'problems' => $problems,
-            'submissionDeadline' => $contestDetails['submission_deadline'],
+            'submissionDeadline' => $contestDetails['submission_deadline'] ?? $contest->finish_time,
         ];
     }
 

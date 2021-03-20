@@ -2,6 +2,7 @@ jest.mock('../../../../third_party/js/diff_match_patch.js');
 
 import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
+import T from '../../lang';
 import * as time from '../../time';
 
 import arena_Contest from './Contest.vue';
@@ -112,7 +113,9 @@ describe('Contest.vue', () => {
       },
     });
 
-    expect(wrapper.find('.clock').text()).toBe('00:00:00');
+    expect(wrapper.find('.alert-warning').text()).toBe(
+      T.arenaContestEndedUsePractice,
+    );
     expect(wrapper.find('.socket-status-ok').text()).toBe('•');
     expect(wrapper.find('a[data-problem=problemOmegaUp]').text()).toBe(
       'A. hello problem omegaUp',
