@@ -17,6 +17,7 @@ class TranslationStringChecker implements
         'generalError',
         'loginRequired',
         'problemDeployerFailed',
+        'rateLimitExceeded',
         'resourceNotFound',
         'unableToVerifyCaptcha',
         'userNotAllowed',
