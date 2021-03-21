@@ -2386,6 +2386,16 @@ export namespace types {
     [key: string]: { contestantOutput?: string; in: string; out: string };
   }
 
+  export interface ProblemClarification {
+    answer?: string;
+    author: string;
+    clarification_id: number;
+    message: string;
+    public: boolean;
+    receiver?: string;
+    time: Date;
+  }
+
   export interface ProblemDetails {
     accepted: number;
     accepts_submissions: boolean;
@@ -3308,6 +3318,11 @@ export namespace messages {
   export type ContestMyListResponse = { contests: types.Contest[] };
   export type ContestOpenRequest = { [key: string]: any };
   export type ContestOpenResponse = {};
+  export type ContestProblemClarificationsRequest = { [key: string]: any };
+  export type _ContestProblemClarificationsServerResponse = any;
+  export type ContestProblemClarificationsResponse = {
+    clarifications: types.ProblemClarification[];
+  };
   export type ContestProblemsRequest = { [key: string]: any };
   export type ContestProblemsResponse = { problems: types.ProblemsetProblem[] };
   export type ContestPublicDetailsRequest = { [key: string]: any };
@@ -4225,6 +4240,9 @@ export namespace controllers {
     open: (
       params?: messages.ContestOpenRequest,
     ) => Promise<messages.ContestOpenResponse>;
+    problemClarifications: (
+      params?: messages.ContestProblemClarificationsRequest,
+    ) => Promise<messages.ContestProblemClarificationsResponse>;
     problems: (
       params?: messages.ContestProblemsRequest,
     ) => Promise<messages.ContestProblemsResponse>;

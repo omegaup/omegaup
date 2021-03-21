@@ -34,6 +34,8 @@ jobs:
       - name: Use PHP 7.4
         run: |
           sudo update-alternatives --install /usr/bin/php php /usr/bin/php7.4 100
+          # Enable coverage for XDebug so that codecov can do its magic.
+          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/7.4/cli/conf.d/20-xdebug.ini >/dev/null
 
       - name: Download gitserver
         run: |
