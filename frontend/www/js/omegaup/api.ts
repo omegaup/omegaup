@@ -305,6 +305,22 @@ export const Contest = {
     })(x.clarifications);
     return x;
   }),
+  clarificationsv2: apiCall<
+    messages.ContestClarificationsv2Request,
+    messages._ContestClarificationsv2ServerResponse,
+    messages.ContestClarificationsv2Response
+  >('/api/contest/clarificationsv2/', (x) => {
+    x.clarifications = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.clarifications);
+    return x;
+  }),
   clone: apiCall<messages.ContestCloneRequest, messages.ContestCloneResponse>(
     '/api/contest/clone/',
   ),

@@ -25,6 +25,7 @@
   - [`/api/contest/arbitrateRequest/`](#apicontestarbitraterequest)
   - [`/api/contest/archive/`](#apicontestarchive)
   - [`/api/contest/clarifications/`](#apicontestclarifications)
+  - [`/api/contest/clarificationsv2/`](#apicontestclarificationsv2)
   - [`/api/contest/clone/`](#apicontestclone)
   - [`/api/contest/contestants/`](#apicontestcontestants)
   - [`/api/contest/create/`](#apicontestcreate)
@@ -663,6 +664,26 @@ Get clarifications of a contest
 | Name             | Type                    |
 | ---------------- | ----------------------- |
 | `clarifications` | `types.Clarification[]` |
+
+## `/api/contest/clarificationsv2/`
+
+### Description
+
+Get clarifications of a contest
+
+### Parameters
+
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `contest_alias` | `string` |             |
+| `offset`        | `int`    |             |
+| `rowcount`      | `int`    |             |
+
+### Returns
+
+| Name             | Type                           |
+| ---------------- | ------------------------------ |
+| `clarifications` | `types.ContestClarification[]` |
 
 ## `/api/contest/clone/`
 

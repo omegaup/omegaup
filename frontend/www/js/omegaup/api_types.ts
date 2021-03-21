@@ -1707,6 +1707,17 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ContestClarification {
+    answer?: string;
+    author: string;
+    clarification_id: number;
+    message: string;
+    problem_alias: string;
+    public: boolean;
+    receiver?: string;
+    time: Date;
+  }
+
   export interface ContestDetails {
     admin: boolean;
     admission_mode: string;
@@ -3244,6 +3255,11 @@ export namespace messages {
   export type ContestClarificationsResponse = {
     clarifications: types.Clarification[];
   };
+  export type ContestClarificationsv2Request = { [key: string]: any };
+  export type _ContestClarificationsv2ServerResponse = any;
+  export type ContestClarificationsv2Response = {
+    clarifications: types.ContestClarification[];
+  };
   export type ContestCloneRequest = { [key: string]: any };
   export type ContestCloneResponse = { alias: string };
   export type ContestContestantsRequest = { [key: string]: any };
@@ -4179,6 +4195,9 @@ export namespace controllers {
     clarifications: (
       params?: messages.ContestClarificationsRequest,
     ) => Promise<messages.ContestClarificationsResponse>;
+    clarificationsv2: (
+      params?: messages.ContestClarificationsv2Request,
+    ) => Promise<messages.ContestClarificationsv2Response>;
     clone: (
       params?: messages.ContestCloneRequest,
     ) => Promise<messages.ContestCloneResponse>;
