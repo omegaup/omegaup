@@ -401,6 +401,22 @@ export const Contest = {
   open: apiCall<messages.ContestOpenRequest, messages.ContestOpenResponse>(
     '/api/contest/open/',
   ),
+  problemClarifications: apiCall<
+    messages.ContestProblemClarificationsRequest,
+    messages._ContestProblemClarificationsServerResponse,
+    messages.ContestProblemClarificationsResponse
+  >('/api/contest/problemClarifications/', (x) => {
+    x.clarifications = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.clarifications);
+    return x;
+  }),
   problems: apiCall<
     messages.ContestProblemsRequest,
     messages.ContestProblemsResponse
@@ -656,6 +672,22 @@ export const Course = {
     messages.CourseAssignmentScoreboardEventsRequest,
     messages.CourseAssignmentScoreboardEventsResponse
   >('/api/course/assignmentScoreboardEvents/'),
+  clarifications: apiCall<
+    messages.CourseClarificationsRequest,
+    messages._CourseClarificationsServerResponse,
+    messages.CourseClarificationsResponse
+  >('/api/course/clarifications/', (x) => {
+    x.clarifications = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.clarifications);
+    return x;
+  }),
   clone: apiCall<messages.CourseCloneRequest, messages.CourseCloneResponse>(
     '/api/course/clone/',
   ),
@@ -1506,9 +1538,18 @@ export const Run = {
     );
     return x;
   }),
-  details: apiCall<messages.RunDetailsRequest, messages.RunDetailsResponse>(
-    '/api/run/details/',
-  ),
+  details: apiCall<
+    messages.RunDetailsRequest,
+    messages._RunDetailsServerResponse,
+    messages.RunDetailsResponse
+  >('/api/run/details/', (x) => {
+    if (x.feedback)
+      x.feedback = ((x) => {
+        x.date = ((x: number) => new Date(x * 1000))(x.date);
+        return x;
+      })(x.feedback);
+    return x;
+  }),
   disqualify: apiCall<
     messages.RunDisqualifyRequest,
     messages.RunDisqualifyResponse
@@ -1574,6 +1615,13 @@ export const Session = {
     messages.SessionGoogleLoginRequest,
     messages.SessionGoogleLoginResponse
   >('/api/session/googleLogin/'),
+};
+
+export const Submission = {
+  createFeedback: apiCall<
+    messages.SubmissionCreateFeedbackRequest,
+    messages.SubmissionCreateFeedbackResponse
+  >('/api/submission/createFeedback/'),
 };
 
 export const Tag = {

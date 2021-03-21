@@ -6,11 +6,10 @@
           <div class="form-group col-md-6">
             <label>{{ T.wordsProblem }}</label>
             <omegaup-common-typeahead
-              :existing-options="existingProblems"
-              :type="'problem'"
+              :existing-options="searchResultProblems"
               :value.sync="alias"
               @update-existing-options="
-                (query) => $emit('update-existing-problems', query)
+                (query) => $emit('update-search-result-problems', query)
               "
             >
             </omegaup-common-typeahead>
@@ -171,7 +170,7 @@ export default class AddProblem extends Vue {
   @Prop() contestAlias!: string;
   @Prop() initialPoints!: number;
   @Prop() initialProblems!: types.ProblemsetProblem[];
-  @Prop() existingProblems!: { key: string; value: string }[];
+  @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
   alias = '';

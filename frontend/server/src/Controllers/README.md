@@ -34,6 +34,7 @@
   - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
   - [`/api/contest/myList/`](#apicontestmylist)
   - [`/api/contest/open/`](#apicontestopen)
+  - [`/api/contest/problemClarifications/`](#apicontestproblemclarifications)
   - [`/api/contest/problems/`](#apicontestproblems)
   - [`/api/contest/publicDetails/`](#apicontestpublicdetails)
   - [`/api/contest/registerForContest/`](#apicontestregisterforcontest)
@@ -69,6 +70,7 @@
   - [`/api/course/assignmentDetails/`](#apicourseassignmentdetails)
   - [`/api/course/assignmentScoreboard/`](#apicourseassignmentscoreboard)
   - [`/api/course/assignmentScoreboardEvents/`](#apicourseassignmentscoreboardevents)
+  - [`/api/course/clarifications/`](#apicourseclarifications)
   - [`/api/course/clone/`](#apicourseclone)
   - [`/api/course/create/`](#apicoursecreate)
   - [`/api/course/createAssignment/`](#apicoursecreateassignment)
@@ -191,6 +193,8 @@
 - [Session](#session)
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
   - [`/api/session/googleLogin/`](#apisessiongooglelogin)
+- [Submission](#submission)
+  - [`/api/submission/createFeedback/`](#apisubmissioncreatefeedback)
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
@@ -863,6 +867,27 @@ Joins a contest - explicitly adds a identity to a contest.
 ### Returns
 
 _Nothing_
+
+## `/api/contest/problemClarifications/`
+
+### Description
+
+Get clarifications of problem in a contest
+
+### Parameters
+
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `contest_alias` | `string` |             |
+| `offset`        | `int`    |             |
+| `problem_alias` | `string` |             |
+| `rowcount`      | `int`    |             |
+
+### Returns
+
+| Name             | Type                           |
+| ---------------- | ------------------------------ |
+| `clarifications` | `types.ProblemClarification[]` |
 
 ## `/api/contest/problems/`
 
@@ -1542,6 +1567,26 @@ Returns the Scoreboard events
 | Name     | Type                      |
 | -------- | ------------------------- |
 | `events` | `types.ScoreboardEvent[]` |
+
+## `/api/course/clarifications/`
+
+### Description
+
+Gets the clarifications of all assignments in a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+| `offset`       | `int`    |             |
+| `rowcount`     | `int`    |             |
+
+### Returns
+
+| Name             | Type                          |
+| ---------------- | ----------------------------- |
+| `clarifications` | `types.CourseClarification[]` |
 
 ## `/api/course/clone/`
 
@@ -3770,6 +3815,29 @@ contestant's machine and the server.
 | ------------------- | --------- |
 | `isAccountCreation` | `boolean` |
 
+# Submission
+
+SubmissionController
+
+## `/api/submission/createFeedback/`
+
+### Description
+
+Adds admin feedback to a submission
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `feedback`         | `string` |             |
+| `guid`             | `string` |             |
+
+### Returns
+
+_Nothing_
+
 # Tag
 
 TagController
@@ -4123,10 +4191,10 @@ it is used by typeahead.
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `query` | `mixed` |             |
-| `term`  | `mixed` |             |
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+| `term`  | `null\|string` |             |
 
 ### Returns
 

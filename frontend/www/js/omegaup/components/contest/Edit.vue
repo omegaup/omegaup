@@ -131,10 +131,10 @@
           :contest-alias="details.alias"
           :initial-points="details.partial_score ? 100 : 1"
           :initial-problems="problems"
-          :existing-problems="existingProblems"
+          :search-result-problems="searchResultProblems"
           @add-problem="(problem) => $emit('add-problem', problem)"
-          @update-existing-problems="
-            (query) => $emit('update-existing-problems', query)
+          @update-search-result-problems="
+            (query) => $emit('update-search-result-problems', query)
           "
           @get-versions="
             (problemAlias, addProblemComponent) =>
@@ -163,13 +163,14 @@
       <div v-if="showTab === 'contestants'" class="tab-pane active contestants">
         <omegaup-contest-add-contestant
           :contest="details"
-          :initial-users="users"
-          @emit-add-user="
-            (contestants, contestant) =>
-              $emit('add-user', contestants, contestant)
+          :users="users"
+          :search-result-users="searchResultUsers"
+          @add-user="(contestants) => $emit('add-user', contestants)"
+          @update-search-result-users="
+            (query) => $emit('update-search-result-users', query)
           "
-          @emit-remove-user="(contestant) => $emit('remove-user', contestant)"
-          @emit-save-end-time="(user) => $emit('save-end-time', user)"
+          @remove-user="(contestant) => $emit('remove-user', contestant)"
+          @save-end-time="(user) => $emit('save-end-time', user)"
         ></omegaup-contest-add-contestant>
         <omegaup-common-requests
           :data="requests"
@@ -268,7 +269,8 @@ export default class Edit extends Vue {
   @Prop() problems!: types.ProblemsetProblem[];
   @Prop() requests!: types.ContestRequest[];
   @Prop() users!: types.ContestUser[];
-  @Prop() existingProblems!: { key: string; value: string }[];
+  @Prop() searchResultProblems!: types.ListItem[];
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   ui = ui;

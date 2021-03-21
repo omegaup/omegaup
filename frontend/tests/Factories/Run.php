@@ -105,7 +105,7 @@ class Run {
         $courseAssignmentData,
         $participant,
         $language = 'c11-gcc'
-    ) {
+    ): array {
         // Our participant has to open the course before sending a run
         \OmegaUp\Test\Factories\Course::openCourse(
             $courseAssignmentData,

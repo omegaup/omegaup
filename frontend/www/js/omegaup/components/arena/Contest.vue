@@ -55,7 +55,6 @@
                     alias: activeProblem.problem.alias,
                   })
               "
-              @change-show-run-location="onChangeShowRunLocation"
               @submit-run="onRunSubmitted"
               @show-run="onShowRunDetails"
             >
@@ -193,16 +192,6 @@ export default class ArenaContest extends Vue {
 
   onShowRunDetails(target: problem_Details, guid: string): void {
     this.$emit('show-run', { target, request: { guid } });
-  }
-
-  onChangeShowRunLocation(request: { guid: string }): void {
-    if (!this.activeProblem) {
-      return;
-    }
-    this.$emit(
-      'change-show-run-location',
-      Object.assign({}, request, { alias: this.activeProblem.problem.alias }),
-    );
   }
 
   @Watch('problem')
