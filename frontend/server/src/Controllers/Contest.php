@@ -16,6 +16,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type ConsentStatement=array{contest_alias: string, privacy_git_object_id?: string, share_user_information: bool|null, statement_type?: string}
  * @psalm-type Clarification=array{answer: null|string, author: null|string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
+ * @psalm-type ProblemClarification=array{answer: null|string, author: string, clarification_id: int, message: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type ContestListMinePayload=array{contests: list<Contest>, privateContestsAlert: bool}
@@ -551,7 +552,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Problemsets $problemset,
         bool $contestAdmin,
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity,
+        bool $isPracticeMode = false
     ): array {
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -561,7 +563,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contestDetails = self::getContestDetails(
             $contest,
             $contestAdmin,
-            $identity
+            $identity,
+            /*$token=*/ null,
+            $isPracticeMode
         );
         /** @var list<NavbarProblemsetProblem> */
         $problems = [];
@@ -791,7 +795,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $contest,
             $problemset,
             $contestAdmin,
-            $r->identity
+            $r->identity,
+            /*$isPracticeMode=*/ true
         );
         if (!$contestAdmin) {
             $commonDetails['users'] = [];
@@ -1565,7 +1570,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Contests $contest,
         bool $contestAdmin,
         ?\OmegaUp\DAO\VO\Identities $identity,
-        ?string $token = null
+        ?string $token = null,
+        bool $isPracticeMode = false
     ) {
         $result = self::getCachedDetails($contest);
         $result['opened'] = true;
@@ -1578,6 +1584,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
+        }
+
+        $result['admin'] = \OmegaUp\Authorization::isContestAdmin(
+            $identity,
+            $contest
+        );
+
+        // Log the operation.
+        \OmegaUp\DAO\ProblemsetAccessLog::create(new \OmegaUp\DAO\VO\ProblemsetAccessLog([
+            'identity_id' => $identity->identity_id,
+            'problemset_id' => $contest->problemset_id,
+            'ip' => ip2long(
+                \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+            ),
+        ]));
+
+        // When the user joins a contest in practice mode, saving first access
+        // time is not necessary
+        if ($isPracticeMode) {
+            return $result;
         }
 
         // Adding timer info separately as it depends on the current user and we
@@ -1602,19 +1628,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         } else {
             $result['submission_deadline'] = $contest->finish_time;
         }
-        $result['admin'] = \OmegaUp\Authorization::isContestAdmin(
-            $identity,
-            $contest
-        );
-
-        // Log the operation.
-        \OmegaUp\DAO\ProblemsetAccessLog::create(new \OmegaUp\DAO\VO\ProblemsetAccessLog([
-            'identity_id' => $identity->identity_id,
-            'problemset_id' => $contest->problemset_id,
-            'ip' => ip2long(
-                \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
-            ),
-        ]));
 
         return $result;
     }
@@ -3382,6 +3395,57 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 intval($contest->problemset_id),
                 $isContestDirector,
                 $r->identity->identity_id,
+                $offset,
+                $rowcount
+            ),
+        ];
+    }
+
+    /**
+     * Get clarifications of problem in a contest
+     *
+     * @return array{clarifications: list<ProblemClarification>}
+     *
+     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param int $offset
+     * @omegaup-request-param int $rowcount
+     */
+    public static function apiProblemClarifications(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        $offset = $r->ensureOptionalInt('offset');
+        $rowcount = $r->ensureOptionalInt('rowcount') ?? 1000;
+
+        $contest = self::validateContest(
+            $r->ensureString(
+                'contest_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            )
+        );
+
+        $problem = \OmegaUp\DAO\Problems::getByAliasAndProblemset(
+            $r->ensureString(
+                'problem_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            ),
+            intval($contest->problemset_id)
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+
+        return [
+            'clarifications' => \OmegaUp\DAO\Clarifications::getProblemInProblemsetClarifications(
+                $problem,
+                intval($contest->problemset_id),
+                \OmegaUp\Authorization::isContestAdmin(
+                    $r->identity,
+                    $contest
+                ),
+                /* currentIdentity */ $r->identity,
                 $offset,
                 $rowcount
             ),

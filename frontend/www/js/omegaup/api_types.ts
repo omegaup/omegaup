@@ -1893,6 +1893,18 @@ export namespace types {
     start_time: Date;
   }
 
+  export interface CourseClarification {
+    answer?: string;
+    assignment_alias: string;
+    author: string;
+    clarification_id: number;
+    message: string;
+    problem_alias: string;
+    public: boolean;
+    receiver?: string;
+    time: Date;
+  }
+
   export interface CourseCloneDetailsPayload {
     creator: { classname: string; username: string };
     details: types.CourseDetails;
@@ -2361,6 +2373,16 @@ export namespace types {
 
   export interface ProblemCasesContents {
     [key: string]: { contestantOutput?: string; in: string; out: string };
+  }
+
+  export interface ProblemClarification {
+    answer?: string;
+    author: string;
+    clarification_id: number;
+    message: string;
+    public: boolean;
+    receiver?: string;
+    time: Date;
   }
 
   export interface ProblemDetails {
@@ -3280,6 +3302,11 @@ export namespace messages {
   export type ContestMyListResponse = { contests: types.Contest[] };
   export type ContestOpenRequest = { [key: string]: any };
   export type ContestOpenResponse = {};
+  export type ContestProblemClarificationsRequest = { [key: string]: any };
+  export type _ContestProblemClarificationsServerResponse = any;
+  export type ContestProblemClarificationsResponse = {
+    clarifications: types.ProblemClarification[];
+  };
   export type ContestProblemsRequest = { [key: string]: any };
   export type ContestProblemsResponse = { problems: types.ProblemsetProblem[] };
   export type ContestPublicDetailsRequest = { [key: string]: any };
@@ -3449,6 +3476,11 @@ export namespace messages {
   export type CourseAssignmentScoreboardEventsRequest = { [key: string]: any };
   export type CourseAssignmentScoreboardEventsResponse = {
     events: types.ScoreboardEvent[];
+  };
+  export type CourseClarificationsRequest = { [key: string]: any };
+  export type _CourseClarificationsServerResponse = any;
+  export type CourseClarificationsResponse = {
+    clarifications: types.CourseClarification[];
   };
   export type CourseCloneRequest = { [key: string]: any };
   export type CourseCloneResponse = { alias: string };
@@ -4189,6 +4221,9 @@ export namespace controllers {
     open: (
       params?: messages.ContestOpenRequest,
     ) => Promise<messages.ContestOpenResponse>;
+    problemClarifications: (
+      params?: messages.ContestProblemClarificationsRequest,
+    ) => Promise<messages.ContestProblemClarificationsResponse>;
     problems: (
       params?: messages.ContestProblemsRequest,
     ) => Promise<messages.ContestProblemsResponse>;
@@ -4294,6 +4329,9 @@ export namespace controllers {
     assignmentScoreboardEvents: (
       params?: messages.CourseAssignmentScoreboardEventsRequest,
     ) => Promise<messages.CourseAssignmentScoreboardEventsResponse>;
+    clarifications: (
+      params?: messages.CourseClarificationsRequest,
+    ) => Promise<messages.CourseClarificationsResponse>;
     clone: (
       params?: messages.CourseCloneRequest,
     ) => Promise<messages.CourseCloneResponse>;
