@@ -271,3 +271,26 @@ export function rankingUsername(
     username = formatString(T.virtualSuffix, { username: username });
   return username;
 }
+
+export function updateTheme(): boolean {
+  const darkThemeStyleElement = document.getElementById('dark-theme-style');
+  if (!darkThemeStyleElement) {
+    return false;
+  }
+  const themePreferences = JSON.parse(
+    localStorage.getItem('theme-preferences') ?? '{}',
+  );
+  const isDark = !themePreferences?.isDark;
+  const htmlElement = document.getElementsByTagName('html')[0];
+  if (isDark) {
+    htmlElement.dataset.colorMode = 'dark';
+    darkThemeStyleElement.setAttribute(
+      'href',
+      '/third_party/bootswatch-4.6.0/cyborg/bootstrap.min.css',
+    );
+  } else {
+    htmlElement.dataset.colorMode = 'light';
+    darkThemeStyleElement.setAttribute('href', '');
+  }
+  return isDark;
+}

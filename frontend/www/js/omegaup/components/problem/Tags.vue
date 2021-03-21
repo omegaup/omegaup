@@ -257,7 +257,7 @@ export default class ProblemTags extends Vue {
 }
 </script>
 
-<style>
+<style scoped lang="scss">
 /* The switch - the box around the slider */
 .switch {
   position: relative;

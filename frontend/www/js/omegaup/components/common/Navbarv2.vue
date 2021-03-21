@@ -229,13 +229,11 @@
             -->
             <li class="nav-item d-flex align-items-center">
               <div class="nav-link custom-control custom-switch">
-                <label class="custom-control-label">
-                  <input
-                    v-model="toggleSwitch"
-                    :checked="toggleSwitch"
-                    type="checkbox"
-                    class="custom-control-input"
-                  />
+                <label class="switch-container font-weight-bold">
+                  <div class="switch">
+                    <input v-model="toggleSwitch" type="checkbox" />
+                    <span class="slider round"></span>
+                  </div>
                   {{ T.navbarDarkMode }}
                 </label>
               </div>
@@ -371,6 +369,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 import notifications_List from '../notification/List.vue';
 import notifications_Clarifications from '../notification/Clarifications.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
@@ -411,7 +410,7 @@ export default class Navbar extends Vue {
   @Prop() errorMessage!: string | null;
   @Prop({ default: 0 }) profileProgress!: number;
   @Prop() initialClarifications!: types.Clarification[];
-  @Prop() isDark!: boolean;
+  @Prop({ default: false }) isDark!: boolean;
 
   clarifications: types.Clarification[] = this.initialClarifications;
   T = T;
@@ -434,17 +433,8 @@ export default class Navbar extends Vue {
   @Watch('toggleSwitch')
   onSwitchChanged(newValue: boolean) {
     const isDark = !newValue;
-    if (isDark) {
-      document
-        .getElementById('dark-theme-style')
-        ?.setAttribute(
-          'href',
-          'https://bootswatch.com/4/cyborg/bootstrap.min.css',
-        );
-    } else {
-      document.getElementById('dark-theme-style')?.setAttribute('href', '');
-    }
-    localStorage.setItem('toggle-bootstrap-theme', JSON.stringify({ isDark }));
+    localStorage.setItem('theme-preferences', JSON.stringify({ isDark }));
+    ui.updateTheme();
   }
 }
 </script>
@@ -457,9 +447,78 @@ nav.navbar {
   .navbar-brand {
     background-color: #f2f2f2;
   }
+}
 
-  a.dropdown-item {
-    color: black;
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  &:before {
+    position: absolute;
+    content: '';
+    height: 14px;
+    width: 14px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+  }
+}
+input {
+  &:checked {
+    + {
+      .slider {
+        background-color: #2196f3;
+        &:before {
+          -webkit-transform: translateX(26px);
+          -ms-transform: translateX(26px);
+          transform: translateX(26px);
+        }
+      }
+    }
+  }
+  &:focus {
+    + {
+      .slider {
+        box-shadow: 0 0 1px #2196f3;
+      }
+    }
+  }
+}
+.slider.round {
+  border-radius: 34px;
+  &:before {
+    border-radius: 50%;
+  }
+}
+.switch-container {
+  width: 100%;
+  position: relative;
+  span.switch-text {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    margin-left: 5px;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
   }
 }
 </style>

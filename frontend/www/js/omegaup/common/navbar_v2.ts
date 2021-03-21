@@ -7,20 +7,7 @@ import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload('header-payload');
-  const localMetaData = JSON.parse(
-    localStorage.getItem('toggle-bootstrap-theme') ?? '',
-  );
-  const isDark = localMetaData?.isDark;
-  if (isDark) {
-    document
-      .getElementById('dark-theme-style')
-      ?.setAttribute(
-        'href',
-        '/third_party/bootswatch-4.6.0/cyborg/bootstrap.min.css',
-      );
-  } else {
-    document.getElementById('dark-theme-style')?.setAttribute('href', '');
-  }
+  const isDark = ui.updateTheme();
   const commonNavbar = new Vue({
     el: '#common-navbar',
     components: {
