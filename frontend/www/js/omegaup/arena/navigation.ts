@@ -66,7 +66,7 @@ export function navigateToProblem({
     });
 }
 
-function getMaxScore(
+export function getMaxScore(
   runs: types.Run[],
   alias: string,
   previousScore: number,

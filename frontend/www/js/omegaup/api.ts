@@ -401,6 +401,22 @@ export const Contest = {
   open: apiCall<messages.ContestOpenRequest, messages.ContestOpenResponse>(
     '/api/contest/open/',
   ),
+  problemClarifications: apiCall<
+    messages.ContestProblemClarificationsRequest,
+    messages._ContestProblemClarificationsServerResponse,
+    messages.ContestProblemClarificationsResponse
+  >('/api/contest/problemClarifications/', (x) => {
+    x.clarifications = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.clarifications);
+    return x;
+  }),
   problems: apiCall<
     messages.ContestProblemsRequest,
     messages.ContestProblemsResponse
@@ -656,6 +672,22 @@ export const Course = {
     messages.CourseAssignmentScoreboardEventsRequest,
     messages.CourseAssignmentScoreboardEventsResponse
   >('/api/course/assignmentScoreboardEvents/'),
+  clarifications: apiCall<
+    messages.CourseClarificationsRequest,
+    messages._CourseClarificationsServerResponse,
+    messages.CourseClarificationsResponse
+  >('/api/course/clarifications/', (x) => {
+    x.clarifications = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.clarifications);
+    return x;
+  }),
   clone: apiCall<messages.CourseCloneRequest, messages.CourseCloneResponse>(
     '/api/course/clone/',
   ),
@@ -1686,6 +1718,10 @@ export const User = {
   create: apiCall<messages.UserCreateRequest, messages.UserCreateResponse>(
     '/api/user/create/',
   ),
+  createAPIToken: apiCall<
+    messages.UserCreateAPITokenRequest,
+    messages.UserCreateAPITokenResponse
+  >('/api/user/createAPIToken/'),
   extraInformation: apiCall<
     messages.UserExtraInformationRequest,
     messages._UserExtraInformationServerResponse,
@@ -1716,6 +1752,27 @@ export const User = {
   list: apiCall<messages.UserListRequest, messages.UserListResponse>(
     '/api/user/list/',
   ),
+  listAPITokens: apiCall<
+    messages.UserListAPITokensRequest,
+    messages._UserListAPITokensServerResponse,
+    messages.UserListAPITokensResponse
+  >('/api/user/listAPITokens/', (x) => {
+    x.tokens = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.last_used = ((x: number) => new Date(x * 1000))(x.last_used);
+        x.rate_limit = ((x) => {
+          x.reset = ((x: number) => new Date(x * 1000))(x.reset);
+          return x;
+        })(x.rate_limit);
+        x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+        return x;
+      });
+    })(x.tokens);
+    return x;
+  }),
   listAssociatedIdentities: apiCall<
     messages.UserListAssociatedIdentitiesRequest,
     messages.UserListAssociatedIdentitiesResponse
@@ -1764,6 +1821,10 @@ export const User = {
     messages.UserRemoveRoleRequest,
     messages.UserRemoveRoleResponse
   >('/api/user/removeRole/'),
+  revokeAPIToken: apiCall<
+    messages.UserRevokeAPITokenRequest,
+    messages.UserRevokeAPITokenResponse
+  >('/api/user/revokeAPIToken/'),
   selectCoderOfTheMonth: apiCall<
     messages.UserSelectCoderOfTheMonthRequest,
     messages.UserSelectCoderOfTheMonthResponse

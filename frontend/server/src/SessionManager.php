@@ -31,6 +31,8 @@ class ScopedSession {
 }
 
 class SessionManager {
+    private const TOKEN_AUTHORIZATION_PREFIX = 'token ';
+
     public function setCookie(
         string $name,
         string $value,
@@ -100,6 +102,27 @@ class SessionManager {
         }
 
         return strval($_COOKIE[$name]);
+    }
+
+    public function getTokenAuthorization(): ?string {
+        if (!array_key_exists('HTTP_AUTHORIZATION', $_SERVER)) {
+            return null;
+        }
+        /** @psalm-suppress MixedArgument If this is defined, it is a string */
+        $authorization = strval($_SERVER['HTTP_AUTHORIZATION']);
+        if (strpos($authorization, self::TOKEN_AUTHORIZATION_PREFIX) !== 0) {
+            return null;
+        }
+        return trim(
+            substr($authorization, strlen(self::TOKEN_AUTHORIZATION_PREFIX))
+        );
+    }
+
+    /**
+     * Sets a header. Normally just forwards the parameter to `header()`.
+     */
+    public function setHeader(string $header): void {
+        header($header);
     }
 
     public function sessionStart(): ScopedSession {

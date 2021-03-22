@@ -1450,6 +1450,11 @@ export namespace types {
     username: string;
   }
 
+  export interface AuthIdentityExt {
+    currentIdentity: types.IdentityExt;
+    loginIdentity: types.IdentityExt;
+  }
+
   export interface AuthorRankTablePayload {
     length: number;
     page: number;
@@ -1897,6 +1902,18 @@ export namespace types {
     start_time: Date;
   }
 
+  export interface CourseClarification {
+    answer?: string;
+    assignment_alias: string;
+    author: string;
+    clarification_id: number;
+    message: string;
+    problem_alias: string;
+    public: boolean;
+    receiver?: string;
+    time: Date;
+  }
+
   export interface CourseCloneDetailsPayload {
     creator: { classname: string; username: string };
     details: types.CourseDetails;
@@ -2058,8 +2075,10 @@ export namespace types {
   }
 
   export interface CurrentSession {
+    apiTokenId?: number;
     associated_identities: types.AssociatedIdentity[];
     auth_token?: string;
+    cacheKey?: string;
     classname: string;
     email?: string;
     identity?: dao.Identities;
@@ -2167,6 +2186,20 @@ export namespace types {
     school_name?: string;
     state?: string;
     state_id?: string;
+    username: string;
+  }
+
+  export interface IdentityExt {
+    classname: string;
+    country_id?: string;
+    current_identity_school_id?: number;
+    gender?: string;
+    identity_id: number;
+    language_id?: number;
+    name?: string;
+    password?: string;
+    state_id?: string;
+    user_id?: number;
     username: string;
   }
 
@@ -2365,6 +2398,16 @@ export namespace types {
 
   export interface ProblemCasesContents {
     [key: string]: { contestantOutput?: string; in: string; out: string };
+  }
+
+  export interface ProblemClarification {
+    answer?: string;
+    author: string;
+    clarification_id: number;
+    message: string;
+    public: boolean;
+    receiver?: string;
+    time: Date;
   }
 
   export interface ProblemDetails {
@@ -3285,6 +3328,11 @@ export namespace messages {
   export type ContestMyListResponse = { contests: types.Contest[] };
   export type ContestOpenRequest = { [key: string]: any };
   export type ContestOpenResponse = {};
+  export type ContestProblemClarificationsRequest = { [key: string]: any };
+  export type _ContestProblemClarificationsServerResponse = any;
+  export type ContestProblemClarificationsResponse = {
+    clarifications: types.ProblemClarification[];
+  };
   export type ContestProblemsRequest = { [key: string]: any };
   export type ContestProblemsResponse = { problems: types.ProblemsetProblem[] };
   export type ContestPublicDetailsRequest = { [key: string]: any };
@@ -3454,6 +3502,11 @@ export namespace messages {
   export type CourseAssignmentScoreboardEventsRequest = { [key: string]: any };
   export type CourseAssignmentScoreboardEventsResponse = {
     events: types.ScoreboardEvent[];
+  };
+  export type CourseClarificationsRequest = { [key: string]: any };
+  export type _CourseClarificationsServerResponse = any;
+  export type CourseClarificationsResponse = {
+    clarifications: types.CourseClarification[];
   };
   export type CourseCloneRequest = { [key: string]: any };
   export type CourseCloneResponse = { alias: string };
@@ -4009,6 +4062,8 @@ export namespace messages {
   };
   export type UserCreateRequest = { [key: string]: any };
   export type UserCreateResponse = { username: string };
+  export type UserCreateAPITokenRequest = { [key: string]: any };
+  export type UserCreateAPITokenResponse = { token: string };
   export type UserExtraInformationRequest = { [key: string]: any };
   export type _UserExtraInformationServerResponse = any;
   export type UserExtraInformationResponse = {
@@ -4034,6 +4089,16 @@ export namespace messages {
   export type UserLastPrivacyPolicyAcceptedResponse = { hasAccepted: boolean };
   export type UserListRequest = { [key: string]: any };
   export type UserListResponse = types.UserListItem[];
+  export type UserListAPITokensRequest = { [key: string]: any };
+  export type _UserListAPITokensServerResponse = any;
+  export type UserListAPITokensResponse = {
+    tokens: {
+      last_used: Date;
+      name: string;
+      rate_limit: { limit: number; remaining: number; reset: Date };
+      timestamp: Date;
+    }[];
+  };
   export type UserListAssociatedIdentitiesRequest = { [key: string]: any };
   export type UserListAssociatedIdentitiesResponse = {
     identities: types.AssociatedIdentity[];
@@ -4059,6 +4124,8 @@ export namespace messages {
   export type UserRemoveGroupResponse = {};
   export type UserRemoveRoleRequest = { [key: string]: any };
   export type UserRemoveRoleResponse = {};
+  export type UserRevokeAPITokenRequest = { [key: string]: any };
+  export type UserRevokeAPITokenResponse = {};
   export type UserSelectCoderOfTheMonthRequest = { [key: string]: any };
   export type UserSelectCoderOfTheMonthResponse = {};
   export type UserStatsRequest = { [key: string]: any };
@@ -4194,6 +4261,9 @@ export namespace controllers {
     open: (
       params?: messages.ContestOpenRequest,
     ) => Promise<messages.ContestOpenResponse>;
+    problemClarifications: (
+      params?: messages.ContestProblemClarificationsRequest,
+    ) => Promise<messages.ContestProblemClarificationsResponse>;
     problems: (
       params?: messages.ContestProblemsRequest,
     ) => Promise<messages.ContestProblemsResponse>;
@@ -4299,6 +4369,9 @@ export namespace controllers {
     assignmentScoreboardEvents: (
       params?: messages.CourseAssignmentScoreboardEventsRequest,
     ) => Promise<messages.CourseAssignmentScoreboardEventsResponse>;
+    clarifications: (
+      params?: messages.CourseClarificationsRequest,
+    ) => Promise<messages.CourseClarificationsResponse>;
     clone: (
       params?: messages.CourseCloneRequest,
     ) => Promise<messages.CourseCloneResponse>;
@@ -4719,6 +4792,9 @@ export namespace controllers {
     create: (
       params?: messages.UserCreateRequest,
     ) => Promise<messages.UserCreateResponse>;
+    createAPIToken: (
+      params?: messages.UserCreateAPITokenRequest,
+    ) => Promise<messages.UserCreateAPITokenResponse>;
     extraInformation: (
       params?: messages.UserExtraInformationRequest,
     ) => Promise<messages.UserExtraInformationResponse>;
@@ -4737,6 +4813,9 @@ export namespace controllers {
     list: (
       params?: messages.UserListRequest,
     ) => Promise<messages.UserListResponse>;
+    listAPITokens: (
+      params?: messages.UserListAPITokensRequest,
+    ) => Promise<messages.UserListAPITokensResponse>;
     listAssociatedIdentities: (
       params?: messages.UserListAssociatedIdentitiesRequest,
     ) => Promise<messages.UserListAssociatedIdentitiesResponse>;
@@ -4767,6 +4846,9 @@ export namespace controllers {
     removeRole: (
       params?: messages.UserRemoveRoleRequest,
     ) => Promise<messages.UserRemoveRoleResponse>;
+    revokeAPIToken: (
+      params?: messages.UserRevokeAPITokenRequest,
+    ) => Promise<messages.UserRevokeAPITokenResponse>;
     selectCoderOfTheMonth: (
       params?: messages.UserSelectCoderOfTheMonthRequest,
     ) => Promise<messages.UserSelectCoderOfTheMonthResponse>;
