@@ -9,7 +9,9 @@ namespace OmegaUp\DAO;
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\AuthTokens}.
  *
- * @author alanboy
+ * @psalm-type IdentityExt=array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}
+ * @psalm-type AuthIdentityExt=array{currentIdentity: IdentityExt, loginIdentity: IdentityExt}
+ *
  * @access public
  * @package docs
  */
@@ -37,7 +39,7 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
     }
 
     /**
-     * @return array{currentIdentity: array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}, loginIdentity: array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}}|null
+     * @return AuthIdentityExt|null
      */
     public static function getIdentityByToken(string $authToken) {
         $sql = "SELECT
