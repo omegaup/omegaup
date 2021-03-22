@@ -218,6 +218,7 @@
   - [`/api/user/interviewStats/`](#apiuserinterviewstats)
   - [`/api/user/lastPrivacyPolicyAccepted/`](#apiuserlastprivacypolicyaccepted)
   - [`/api/user/list/`](#apiuserlist)
+  - [`/api/user/listAPITokens/`](#apiuserlistapitokens)
   - [`/api/user/listAssociatedIdentities/`](#apiuserlistassociatedidentities)
   - [`/api/user/listUnsolvedProblems/`](#apiuserlistunsolvedproblems)
   - [`/api/user/login/`](#apiuserlogin)
@@ -4247,6 +4248,18 @@ it is used by typeahead.
 ```typescript
 types.UserListItem[]
 ```
+
+## `/api/user/listAPITokens/`
+
+### Description
+
+Returns a list of all the API tokens associated with the user.
+
+### Returns
+
+| Name     | Type                                                                                                                    |
+| -------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `tokens` | `{ last_used: Date; name: string; rate_limit: { limit: number; remaining: number; reset: Date; }; timestamp: Date; }[]` |
 
 ## `/api/user/listAssociatedIdentities/`
 

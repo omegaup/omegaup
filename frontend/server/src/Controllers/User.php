@@ -4178,6 +4178,20 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Returns a list of all the API tokens associated with the user.
+     *
+     * @return array{tokens: list<array{name: string, timestamp: \OmegaUp\Timestamp, last_used: \OmegaUp\Timestamp, rate_limit: array{reset: \OmegaUp\Timestamp, limit: int, remaining: int}}>}
+     */
+    public static function apiListAPITokens(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        $r->ensureMainUserIdentity();
+
+        return [
+            'tokens' => \OmegaUp\DAO\APITokens::getAllByUser($r->user->user_id),
+        ];
+    }
+
+    /**
      * Revokes an API token associated with the user.
      *
      * @return array{status: string}
