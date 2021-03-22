@@ -21,7 +21,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
         $apiToken = new \OmegaUp\DAO\VO\APITokens([
             'user_id' => $user->user_id,
             'token' => \OmegaUp\Test\Utils::CreateRandomString(),
-            'name' => 'my token',
+            'name' => 'my-token',
         ]);
         \OmegaUp\DAO\APITokens::create($apiToken);
 
@@ -48,6 +48,75 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
         $_SERVER['HTTP_AUTHORIZATION'] = "token {$apiToken->token}";
         $session = \OmegaUp\Controllers\Session::apiCurrentSession();
         $this->assertTrue($session['session']['valid']);
+    }
+
+    public function testAPITokensListWork() {
+        ['user' => $user] = \OmegaUp\Test\Factories\User::createUser();
+
+        $token = \OmegaUp\Test\Utils::CreateRandomString();
+        \OmegaUp\DAO\APITokens::create(
+            new \OmegaUp\DAO\VO\APITokens([
+                'user_id' => $user->user_id,
+                'token' => $token,
+                'name' => 'my-token',
+                'last_used' => new \OmegaUp\Timestamp(1234566000),
+                'use_count' => 1,
+            ]),
+        );
+        \OmegaUp\DAO\APITokens::create(
+            new \OmegaUp\DAO\VO\APITokens([
+                'user_id' => $user->user_id,
+                'token' => \OmegaUp\Test\Utils::CreateRandomString(),
+                'name' => 'my-token-2',
+                'last_used' => new \OmegaUp\Timestamp(1234562400),
+                'use_count' => OMEGAUP_SESSION_API_HOURLY_LIMIT,
+            ]),
+        );
+
+        $mockSessionManager = $this->getMockBuilder(
+            \OmegaUp\SessionManager::class
+        )
+            ->setMethods(['setHeader'])
+            ->getMock();
+        $mockSessionManager
+            ->expects($this->any())
+            ->method('setHeader');
+        \OmegaUp\Controllers\Session::setSessionManagerForTesting(
+            $mockSessionManager
+        );
+
+        $_SERVER['HTTP_AUTHORIZATION'] = "token {$token}";
+        $this->assertEquals(
+            [
+                'tokens' => [
+                    [
+                        'name' => 'my-token',
+                        'timestamp' => new \OmegaUp\Timestamp(1234567890),
+                        'last_used' => new \OmegaUp\Timestamp(1234566000),
+                        'rate_limit' => [
+                            'reset' => new \OmegaUp\Timestamp(1234569600),
+                            'limit' => OMEGAUP_SESSION_API_HOURLY_LIMIT,
+                            'remaining' => OMEGAUP_SESSION_API_HOURLY_LIMIT - 2,
+                        ],
+                    ],
+                    [
+                        'name' => 'my-token-2',
+                        'timestamp' => new \OmegaUp\Timestamp(1234567890),
+                        'last_used' => new \OmegaUp\Timestamp(1234562400),
+                        'rate_limit' => [
+                            'reset' => new \OmegaUp\Timestamp(1234569600),
+                            'limit' => OMEGAUP_SESSION_API_HOURLY_LIMIT,
+                            'remaining' => OMEGAUP_SESSION_API_HOURLY_LIMIT,
+                        ],
+                    ],
+                ],
+            ],
+            \OmegaUp\Controllers\User::apiListAPITokens(
+                new \OmegaUp\Request(
+                    []
+                )
+            ),
+        );
     }
 
     public function testAPITokensRateLimitsWork() {
