@@ -35,6 +35,7 @@ export interface RankingRequest {
 // Implement this function in a new PR
 export function onRankingEvents(events: types.ScoreboardEvent[]): void {
   // Don't trust input data (data might not be sorted)
+  // TODO: use events
   events.sort((a, b) => a.delta - b.delta);
   createChart();
 }
@@ -84,8 +85,8 @@ export function onRankingChanged({
   navbarProblems,
 }: {
   scoreboard: types.Scoreboard;
-  currentUsername?: string;
-  navbarProblems?: types.NavbarProblemsetProblem[];
+  currentUsername: string;
+  navbarProblems: types.NavbarProblemsetProblem[];
 }): {
   ranking: types.ScoreboardRankingEntry[];
   users: omegaup.UserRank[];
@@ -117,7 +118,7 @@ export function onRankingChanged({
       ) {
         const currentPoints = problems[alias].points;
 
-        const currentProblem = navbarProblems?.find(
+        const currentProblem = navbarProblems.find(
           (problem) => problem.alias === alias,
         );
 

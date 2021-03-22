@@ -8,6 +8,7 @@ import {
 import clarificationStore from './clarificationsStore';
 import { onRankingChanged, onRankingEvents } from './ranking';
 import { updateRun } from './submissions';
+import { types } from '../api_types';
 
 export enum SocketStatus {
   Waiting = '↻',
@@ -15,50 +16,117 @@ export enum SocketStatus {
   Ok = '•',
 }
 
+export interface SocketOptions {
+  disableSockets: boolean;
+  problemsetAlias: string;
+  locationProtocol: string;
+  locationHost: string;
+  problemsetId: number;
+  scoreboardToken: null | string;
+  clarificationsOffset: number;
+  clarificationsRowcount: number;
+  currentUsername: string;
+  navbarProblems: types.NavbarProblemsetProblem[];
+}
+
 export class EventsSocket {
-  uri: string = '';
+  private readonly uri: string;
   shouldRetry: boolean = false;
-  socket: WebSocket | null = null;
-  socketKeepalive: ReturnType<typeof setTimeout> | null = null;
+  private socket: WebSocket | null = null;
+  private socketKeepalive: ReturnType<typeof setTimeout> | null = null;
   retries: number = 10;
 
-  disableSockets: boolean = false;
-  problemsetAlias: string | null = null;
-  locationProtocol: null | string = null;
-  locationHost: null | string = null;
-  problemsetId: null | number = null;
-  scoreboardToken: null | string = null;
+  private readonly disableSockets: boolean;
+  private readonly problemsetAlias: string;
+  private readonly problemsetId: number;
+  private readonly scoreboardToken: null | string;
   socketStatus: SocketStatus = SocketStatus.Waiting;
-  clarificationInterval: ReturnType<typeof setTimeout> | null = null;
-  rankingInterval: ReturnType<typeof setTimeout> | null = null;
-  clarificationsOffset: number = 0;
-  clarificationsRowcount: number = 20;
+  private clarificationInterval: ReturnType<typeof setTimeout> | null = null;
+  private rankingInterval: ReturnType<typeof setTimeout> | null = null;
+  private clarificationsOffset: number;
+  private readonly clarificationsRowcount: number;
+  private readonly currentUsername: string;
+  private readonly navbarProblems: types.NavbarProblemsetProblem[];
 
-  constructor(options?: {
-    disableSockets: boolean;
-    problemsetAlias: string;
-    locationProtocol: string;
-    locationHost: string;
-    problemsetId: number;
-    scoreboardToken: string;
-    clarificationsOffset: number;
-    clarificationsRowcount: number;
-  }) {
+  constructor({
+    disableSockets = false,
+    problemsetAlias,
+    locationProtocol,
+    locationHost,
+    problemsetId,
+    scoreboardToken = null,
+    clarificationsOffset = 0,
+    clarificationsRowcount = 20,
+    currentUsername,
+    navbarProblems,
+  }: SocketOptions) {
     this.socket = null;
 
-    if (options) {
-      this.disableSockets = options.disableSockets;
-      this.problemsetAlias = options.problemsetAlias;
-      this.locationProtocol = options.locationProtocol;
-      this.locationHost = options.locationHost;
-      this.problemsetId = options.problemsetId;
-      this.scoreboardToken = options.scoreboardToken;
-      this.clarificationsOffset = options.clarificationsOffset;
-      this.clarificationsRowcount = options.clarificationsRowcount;
+    this.disableSockets = disableSockets;
+    this.problemsetAlias = problemsetAlias;
+    this.problemsetId = problemsetId;
+    this.scoreboardToken = scoreboardToken;
+    this.clarificationsOffset = clarificationsOffset;
+    this.clarificationsRowcount = clarificationsRowcount;
+    this.currentUsername = currentUsername;
+    this.navbarProblems = navbarProblems;
+
+    const protocol = locationProtocol === 'https:' ? 'wss:' : 'ws:';
+    const host = locationHost;
+    this.uri = `${protocol}//${host}/events/?filter=/problemset/${problemsetId}`;
+    if (this.scoreboardToken) {
+      this.uri = this.uri.concat('/', this.scoreboardToken);
     }
   }
 
-  connect(): Promise<void> {
+  onmessage(message: MessageEvent) {
+    const data = JSON.parse(message.data);
+
+    if (data.message == '/run/update/') {
+      data.run.time = time.remoteTime(data.run.time * 1000);
+      updateRun(data.run);
+    } else if (data.message == '/clarification/update/') {
+      data.clarification.time = time.remoteTime(data.clarification.time * 1000);
+      clarificationStore.commit('addClarification', data.clarification);
+    } else if (data.message == '/scoreboard/update/') {
+      data.time = time.remoteTime(data.time * 1000);
+      // TODO: Uncomment next block when virtual contest is migrated
+      /*if (problemsetAdmin && data.scoreboard_type != 'admin') {
+        if (options.originalContestAlias == null) return;
+        virtualRankingChange(data.scoreboard);
+        return;
+      }*/
+      onRankingChanged({
+        scoreboard: data.scoreboard,
+        currentUsername: this.currentUsername,
+        navbarProblems: this.navbarProblems,
+      });
+
+      api.Problemset.scoreboardEvents({
+        problemset_id: this.problemsetId,
+        token: this.scoreboardToken,
+      })
+        .then((response) => onRankingEvents(response.events))
+        .catch(ui.ignoreError);
+    }
+  }
+
+  onclose() {
+    this.socket = null;
+    if (this.socketKeepalive) {
+      clearInterval(this.socketKeepalive);
+      this.socketKeepalive = null;
+    }
+    if (this.shouldRetry && this.retries > 0) {
+      this.retries--;
+      this.socketStatus = SocketStatus.Waiting;
+      setTimeout(() => this.connect(), Math.random() * 15000);
+      return;
+    }
+    this.socketStatus = SocketStatus.Failed;
+  }
+
+  private connectSocket(): Promise<void> {
     this.shouldRetry = false;
     return new Promise((accept, reject) => {
       try {
@@ -87,64 +155,16 @@ export class EventsSocket {
     });
   }
 
-  onmessage(message: MessageEvent) {
-    const data = JSON.parse(message.data);
-
-    if (data.message == '/run/update/') {
-      data.run.time = time.remoteTime(data.run.time * 1000);
-      updateRun(data.run);
-    } else if (data.message == '/clarification/update/') {
-      data.clarification.time = time.remoteTime(data.clarification.time * 1000);
-      clarificationStore.commit('addClarification', data.clarification);
-    } else if (data.message == '/scoreboard/update/') {
-      data.time = time.remoteTime(data.time * 1000);
-      // TODO: Uncomment next block when virtual contest is migrated
-      /*if (problemsetAdmin && data.scoreboard_type != 'admin') {
-        if (options.originalContestAlias == null) return;
-        virtualRankingChange(data.scoreboard);
-        return;
-      }*/
-      onRankingChanged({ scoreboard: data.scoreboard });
-
-      api.Problemset.scoreboardEvents({
-        problemset_id: this.problemsetId,
-        token: this.scoreboardToken,
-      })
-        .then((response) => onRankingEvents(response.events))
-        .catch(ui.ignoreError);
-    }
-  }
-
-  onclose() {
-    this.socket = null;
-    if (this.socketKeepalive) {
-      clearInterval(this.socketKeepalive);
-      this.socketKeepalive = null;
-    }
-    if (this.shouldRetry && this.retries > 0) {
-      this.retries--;
-      this.socketStatus = SocketStatus.Waiting;
-      setTimeout(() => this.connect(), Math.random() * 15000);
-      return;
-    }
-    this.socketStatus = SocketStatus.Failed;
-  }
-
-  connectSocket(): void {
+  connect(): void {
     if (this.disableSockets || this.problemsetAlias == 'admin') {
       this.socketStatus = SocketStatus.Failed;
       return;
     }
 
-    this.uri =
-      `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${
-        window.location.host
-      }/events/?filter=/problemset/${this.problemsetId}` +
-      (this.scoreboardToken ? `/${this.scoreboardToken}` : '');
     this.socketStatus = SocketStatus.Waiting;
     ui.reportEvent('events-socket', 'attempt');
 
-    this.connect()
+    this.connectSocket()
       .then(() => {
         ui.reportEvent('events-socket', 'connected');
       })
@@ -163,7 +183,11 @@ export class EventsSocket {
       token: this.scoreboardToken,
     })
       .then((scoreboard) => {
-        onRankingChanged({ scoreboard });
+        onRankingChanged({
+          scoreboard,
+          currentUsername: this.currentUsername,
+          navbarProblems: this.navbarProblems,
+        });
 
         api.Problemset.scoreboardEvents({
           problemset_id: this.problemsetId,
@@ -202,7 +226,11 @@ export class EventsSocket {
           token: this.scoreboardToken,
         })
           .then((scoreboard) => {
-            onRankingChanged({ scoreboard });
+            onRankingChanged({
+              scoreboard,
+              currentUsername: this.currentUsername,
+              navbarProblems: this.navbarProblems,
+            });
 
             api.Problemset.scoreboardEvents({
               problemset_id: this.problemsetId,
