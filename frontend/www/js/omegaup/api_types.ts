@@ -1446,6 +1446,11 @@ export namespace types {
     username: string;
   }
 
+  export interface AuthIdentityExt {
+    currentIdentity: types.IdentityExt;
+    loginIdentity: types.IdentityExt;
+  }
+
   export interface AuthorRankTablePayload {
     length: number;
     page: number;
@@ -2066,8 +2071,10 @@ export namespace types {
   }
 
   export interface CurrentSession {
+    apiTokenId?: number;
     associated_identities: types.AssociatedIdentity[];
     auth_token?: string;
+    cacheKey?: string;
     classname: string;
     email?: string;
     identity?: dao.Identities;
@@ -2175,6 +2182,20 @@ export namespace types {
     school_name?: string;
     state?: string;
     state_id?: string;
+    username: string;
+  }
+
+  export interface IdentityExt {
+    classname: string;
+    country_id?: string;
+    current_identity_school_id?: number;
+    gender?: string;
+    identity_id: number;
+    language_id?: number;
+    name?: string;
+    password?: string;
+    state_id?: string;
+    user_id?: number;
     username: string;
   }
 
