@@ -4057,6 +4057,8 @@ export namespace messages {
   };
   export type UserCreateRequest = { [key: string]: any };
   export type UserCreateResponse = { username: string };
+  export type UserCreateAPITokenRequest = { [key: string]: any };
+  export type UserCreateAPITokenResponse = { token: string };
   export type UserExtraInformationRequest = { [key: string]: any };
   export type _UserExtraInformationServerResponse = any;
   export type UserExtraInformationResponse = {
@@ -4107,6 +4109,8 @@ export namespace messages {
   export type UserRemoveGroupResponse = {};
   export type UserRemoveRoleRequest = { [key: string]: any };
   export type UserRemoveRoleResponse = {};
+  export type UserRevokeAPITokenRequest = { [key: string]: any };
+  export type UserRevokeAPITokenResponse = {};
   export type UserSelectCoderOfTheMonthRequest = { [key: string]: any };
   export type UserSelectCoderOfTheMonthResponse = {};
   export type UserStatsRequest = { [key: string]: any };
@@ -4773,6 +4777,9 @@ export namespace controllers {
     create: (
       params?: messages.UserCreateRequest,
     ) => Promise<messages.UserCreateResponse>;
+    createAPIToken: (
+      params?: messages.UserCreateAPITokenRequest,
+    ) => Promise<messages.UserCreateAPITokenResponse>;
     extraInformation: (
       params?: messages.UserExtraInformationRequest,
     ) => Promise<messages.UserExtraInformationResponse>;
@@ -4821,6 +4828,9 @@ export namespace controllers {
     removeRole: (
       params?: messages.UserRemoveRoleRequest,
     ) => Promise<messages.UserRemoveRoleResponse>;
+    revokeAPIToken: (
+      params?: messages.UserRevokeAPITokenRequest,
+    ) => Promise<messages.UserRevokeAPITokenResponse>;
     selectCoderOfTheMonth: (
       params?: messages.UserSelectCoderOfTheMonthRequest,
     ) => Promise<messages.UserSelectCoderOfTheMonthResponse>;

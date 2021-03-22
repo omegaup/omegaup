@@ -211,6 +211,7 @@
   - [`/api/user/coderOfTheMonthList/`](#apiusercoderofthemonthlist)
   - [`/api/user/contestStats/`](#apiuserconteststats)
   - [`/api/user/create/`](#apiusercreate)
+  - [`/api/user/createAPIToken/`](#apiusercreateapitoken)
   - [`/api/user/extraInformation/`](#apiuserextrainformation)
   - [`/api/user/generateGitToken/`](#apiusergenerategittoken)
   - [`/api/user/generateOmiUsers/`](#apiusergenerateomiusers)
@@ -227,6 +228,7 @@
   - [`/api/user/removeExperiment/`](#apiuserremoveexperiment)
   - [`/api/user/removeGroup/`](#apiuserremovegroup)
   - [`/api/user/removeRole/`](#apiuserremoverole)
+  - [`/api/user/revokeAPIToken/`](#apiuserrevokeapitoken)
   - [`/api/user/selectCoderOfTheMonth/`](#apiuserselectcoderofthemonth)
   - [`/api/user/stats/`](#apiuserstats)
   - [`/api/user/statusVerified/`](#apiuserstatusverified)
@@ -4077,6 +4079,50 @@ Entry point for Create a User API
 | ---------- | -------- |
 | `username` | `string` |
 
+## `/api/user/createAPIToken/`
+
+### Description
+
+Creates a new API token associated with the user.
+
+This token can be used to authenticate against the API in other calls
+through the [HTTP `Authorization`
+header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization)
+in the request:
+
+```
+Authorization: token 92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6
+```
+
+The following alternative syntax allows to specify an associated
+identity:
+
+```
+Authorization: token Credential=92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6,Username=groupname:username
+```
+
+There is a limit of 1000 requests that can be done every hour, after
+which point all requests will fail with [HTTP 429 Too Many
+Requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429).
+The `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and
+`X-RateLimit-Reset` response headers will be set whenever an API token
+is used and will contain useful information about the limit to the
+caller.
+
+There is a limit of 5 API tokens that each user can have.
+
+### Parameters
+
+| Name   | Type     | Description                                                          |
+| ------ | -------- | -------------------------------------------------------------------- |
+| `name` | `string` | A non-empty alphanumeric string. May contain underscores and dashes. |
+
+### Returns
+
+| Name    | Type     |
+| ------- | -------- |
+| `token` | `string` |
+
 ## `/api/user/extraInformation/`
 
 ### Description
@@ -4365,6 +4411,22 @@ Removes the role from the user.
 | Name   | Type     | Description |
 | ------ | -------- | ----------- |
 | `role` | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/user/revokeAPIToken/`
+
+### Description
+
+Revokes an API token associated with the user.
+
+### Parameters
+
+| Name   | Type     | Description                                                          |
+| ------ | -------- | -------------------------------------------------------------------- |
+| `name` | `string` | A non-empty alphanumeric string. May contain underscores and dashes. |
 
 ### Returns
 

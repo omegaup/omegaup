@@ -82,7 +82,7 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Should not have been able to access the API');
         } catch (\OmegaUp\Exceptions\RateLimitExceededException $e) {
             $this->assertEquals(
-                'rateLimitExceeded',
+                'apiTokenRateLimitExceeded',
                 $e->getMessage(),
             );
         }
@@ -280,6 +280,150 @@ class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals(
                 'loginRequired',
                 $e->getMessage(),
+            );
+        }
+    }
+
+    public function testAPITokenNameUniqueness() {
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        \OmegaUp\Controllers\User::apiCreateAPIToken(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => 'my-token',
+            ]),
+        );
+        try {
+            \OmegaUp\Controllers\User::apiCreateAPIToken(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => 'my-token',
+                ]),
+            );
+            $this->fail(
+                'Should not have been able to create a duplicate token name'
+            );
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals(
+                'apiTokenNameAlreadyInUse',
+                $e->getMessage(),
+            );
+        }
+    }
+
+    public function testAPITokenLimit() {
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        for ($i = 0; $i < 5; $i++) {
+            \OmegaUp\Controllers\User::apiCreateAPIToken(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => "my-token-{$i}",
+                ]),
+            );
+        }
+        try {
+            \OmegaUp\Controllers\User::apiCreateAPIToken(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => 'my-token-5',
+                ]),
+            );
+            $this->fail('Should not have been able to create a sixth token');
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals(
+                'apiTokenLimitExceeded',
+                $e->getMessage(),
+            );
+        }
+    }
+
+    public function testAPITokensCanBeRevoked() {
+        $mockSessionManager = $this->getMockBuilder(
+            \OmegaUp\SessionManager::class
+        )
+            ->setMethods(['setHeader'])
+            ->getMock();
+        $mockSessionManager
+            ->expects($this->any())
+            ->method('setHeader');
+        \OmegaUp\Controllers\Session::setSessionManagerForTesting(
+            $mockSessionManager
+        );
+
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $token = \OmegaUp\Controllers\User::apiCreateAPIToken(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => 'my-token',
+            ]),
+        )['token'];
+        unset($login);
+        \OmegaUp\Controllers\Session::invalidateCache();
+        \OmegaUp\Controllers\Session::invalidateLocalCache();
+
+        $_SERVER['HTTP_AUTHORIZATION'] = "token {$token}";
+        $session = \OmegaUp\Controllers\Session::apiCurrentSession();
+        $this->assertTrue($session['session']['valid']);
+        $this->assertEquals(
+            $identity->username,
+            $session['session']['identity']->username,
+        );
+        unset($_SERVER['HTTP_AUTHORIZATION']);
+        \OmegaUp\Controllers\Session::invalidateCache();
+        \OmegaUp\Controllers\Session::invalidateLocalCache();
+
+        $login = self::login($identity);
+        \OmegaUp\Controllers\User::apiRevokeAPIToken(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => 'my-token',
+            ]),
+        );
+        unset($login);
+        \OmegaUp\Controllers\Session::invalidateCache();
+        \OmegaUp\Controllers\Session::invalidateLocalCache();
+
+        $_SERVER['HTTP_AUTHORIZATION'] = "token {$token}";
+        try {
+            \OmegaUp\Controllers\Session::apiCurrentSession();
+            $this->fail('Should not have been able to access the API');
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            $this->assertEquals(
+                'loginRequired',
+                $e->getMessage()
+            );
+        }
+    }
+
+    public function testAPITokensWithUnknownNamesCannotBeRevoked() {
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        try {
+            \OmegaUp\Controllers\User::apiRevokeAPIToken(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => 'my-token',
+                ]),
+            );
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            $this->assertEquals(
+                'recordNotFound',
+                $e->getMessage()
             );
         }
     }

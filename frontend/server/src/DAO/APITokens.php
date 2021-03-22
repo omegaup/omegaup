@@ -215,4 +215,34 @@ class APITokens extends \OmegaUp\DAO\Base\APITokens {
             throw $e;
         }
     }
+
+    public static function getCountByUser(int $userId): int {
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            '
+                SELECT
+                    COUNT(*)
+                FROM
+                    `API_Tokens` at
+                WHERE
+                    at.user_id = ?;
+            ',
+            [$userId],
+        );
+    }
+
+    public static function deleteByName(int $userId, string $name): void {
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            '
+                DELETE FROM
+                    `API_Tokens`
+                WHERE
+                    user_id = ? AND name = ?;
+            ',
+            [$userId, $name],
+        );
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
+        }
+    }
 }
