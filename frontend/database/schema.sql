@@ -26,6 +26,7 @@ CREATE TABLE `API_Tokens` (
   `use_count` int NOT NULL DEFAULT '0' COMMENT 'Número de usos desde la última hora',
   PRIMARY KEY (`apitoken_id`),
   UNIQUE KEY `token` (`token`),
+  UNIQUE KEY `user_name` (`user_id`,`name`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_atu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tokens para el API';

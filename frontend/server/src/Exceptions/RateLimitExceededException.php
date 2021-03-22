@@ -4,7 +4,7 @@ namespace OmegaUp\Exceptions;
 
 class RateLimitExceededException extends \OmegaUp\Exceptions\ApiException {
     public function __construct(
-        string $message = 'rateLimitExceeded',
+        string $message = 'apiTokenRateLimitExceeded',
         ?\Exception $previous = null
     ) {
         parent::__construct(

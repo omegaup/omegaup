@@ -4102,6 +4102,100 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         return $response;
     }
+
+    /**
+     * Creates a new API token associated with the user.
+     *
+     * This token can be used to authenticate against the API in other calls
+     * through the [HTTP `Authorization`
+     * header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization)
+     * in the request:
+     *
+     * ```
+     * Authorization: token 92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6
+     * ```
+     *
+     * The following alternative syntax allows to specify an associated
+     * identity:
+     *
+     * ```
+     * Authorization: token Credential=92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6,Username=groupname:username
+     * ```
+     *
+     * There is a limit of 1000 requests that can be done every hour, after
+     * which point all requests will fail with [HTTP 429 Too Many
+     * Requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429).
+     * The `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and
+     * `X-RateLimit-Reset` response headers will be set whenever an API token
+     * is used and will contain useful information about the limit to the
+     * caller.
+     *
+     * There is a limit of 5 API tokens that each user can have.
+     *
+     * @return array{token: string}
+     *
+     * @omegaup-request-param string $name A non-empty alphanumeric string. May contain underscores and dashes.
+     */
+    public static function apiCreateAPIToken(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        $r->ensureMainUserIdentity();
+
+        $name = $r->ensureString(
+            'name',
+            fn (string $name) => preg_match('/^[a-zA-Z0-9_-]+$/', $name) === 1,
+        );
+        $token = \OmegaUp\SecurityTools::randomHexString(40);
+        $apiToken = new \OmegaUp\DAO\VO\APITokens([
+            'user_id' => $r->user->user_id,
+            'token' => $token,
+            'name' => $name,
+        ]);
+
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+
+            \OmegaUp\DAO\APITokens::create($apiToken);
+            if (\OmegaUp\DAO\APITokens::getCountByUser($r->user->user_id) > 5) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'apiTokenLimitExceeded'
+                );
+            }
+
+            \OmegaUp\DAO\DAO::transEnd();
+            return [
+                'token' => $token,
+            ];
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'apiTokenNameAlreadyInUse',
+                    $e
+                );
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Revokes an API token associated with the user.
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $name A non-empty alphanumeric string. May contain underscores and dashes.
+     */
+    public static function apiRevokeAPIToken(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        $r->ensureMainUserIdentity();
+
+        $name = $r->ensureString(
+            'name',
+            fn (string $name) => preg_match('/^[a-zA-Z0-9_-]+$/', $name) === 1,
+        );
+
+        \OmegaUp\DAO\APITokens::deleteByName($r->user->user_id, $name);
+        return ['status' => 'ok'];
+    }
 }
 
 \OmegaUp\Controllers\User::$urlHelper = new \OmegaUp\UrlHelper();
