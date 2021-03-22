@@ -1718,6 +1718,10 @@ export const User = {
   create: apiCall<messages.UserCreateRequest, messages.UserCreateResponse>(
     '/api/user/create/',
   ),
+  createAPIToken: apiCall<
+    messages.UserCreateAPITokenRequest,
+    messages.UserCreateAPITokenResponse
+  >('/api/user/createAPIToken/'),
   extraInformation: apiCall<
     messages.UserExtraInformationRequest,
     messages._UserExtraInformationServerResponse,
@@ -1796,6 +1800,10 @@ export const User = {
     messages.UserRemoveRoleRequest,
     messages.UserRemoveRoleResponse
   >('/api/user/removeRole/'),
+  revokeAPIToken: apiCall<
+    messages.UserRevokeAPITokenRequest,
+    messages.UserRevokeAPITokenResponse
+  >('/api/user/revokeAPIToken/'),
   selectCoderOfTheMonth: apiCall<
     messages.UserSelectCoderOfTheMonthRequest,
     messages.UserSelectCoderOfTheMonthResponse

@@ -11,13 +11,13 @@ class TranslationStringChecker implements
      * A list of messages that are present in the base exception classes.
      */
     const EXCEPTION_MESSAGES = [
+        'apiTokenRateLimitExceeded',
         'csrfException',
         'emailNotVerified',
         'errorWhileSendingMail',
         'generalError',
         'loginRequired',
         'problemDeployerFailed',
-        'rateLimitExceeded',
         'resourceNotFound',
         'unableToVerifyCaptcha',
         'userNotAllowed',
