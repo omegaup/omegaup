@@ -23,7 +23,9 @@ class ScopedFacebook {
 /**
  * Session controller handles sessions.
  * @psalm-type AssociatedIdentity=array{default: bool, username: string}
- * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, auth_token: null|string, classname: string, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool}
+ * @psalm-type IdentityExt=array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}
+ * @psalm-type AuthIdentityExt=array{currentIdentity: IdentityExt, loginIdentity: IdentityExt}
+ * @psalm-type CurrentSession=array{apiTokenId: int|null, associated_identities: list<AssociatedIdentity>, auth_token: null|string, cacheKey: null|string, classname: string, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool}
  */
 class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
@@ -75,6 +77,44 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{token:string, username:string|null, cacheKey: string}|null
+     */
+    private static function getAPIToken() {
+        $token = self::getSessionManagerInstance()->getTokenAuthorization();
+        if (is_null($token)) {
+            return null;
+        }
+        if (strpos($token, ',') === false) {
+            return [
+                'token' => $token,
+                'username' => null,
+                'cacheKey' => "api-token:${token}",
+            ];
+        }
+        $tokens = explode(',', $token);
+        /** @var array<string, string> */
+        $authorization = [];
+        foreach ($tokens as $token) {
+            $kvp = explode('=', $token, 2);
+            if (count($kvp) != 2) {
+                throw new \OmegaUp\Exceptions\UnauthorizedException();
+            }
+            $authorization[trim($kvp[0])] = trim($kvp[1]);
+        }
+        if (
+            !isset($authorization['Credential']) ||
+            !isset($authorization['Username'])
+        ) {
+            throw new \OmegaUp\Exceptions\UnauthorizedException();
+        }
+        return [
+            'token' => $authorization['Credential'],
+            'username' => $authorization['Username'],
+            'cacheKey' => "api-token:${authorization['Credential']}:${authorization['Username']}",
+        ];
+    }
+
+    /**
      * @omegaup-request-param null|string $auth_token
      */
     private static function getAuthToken(\OmegaUp\Request $r): ?string {
@@ -114,61 +154,162 @@ class Session extends \OmegaUp\Controllers\Controller {
         if (is_null($r)) {
             $r = new \OmegaUp\Request();
         }
-        $authToken = $r->ensureOptionalString('auth_token');
-        if (is_null($authToken)) {
-            $authToken = self::getAuthToken($r);
-            $r['auth_token'] = $authToken;
-        }
-        if (
-            defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
-            OMEGAUP_SESSION_CACHE_ENABLED === true &&
-            !is_null($authToken)
-        ) {
-            self::$_currentSession = \OmegaUp\Cache::getFromCacheOrSet(
-                \OmegaUp\Cache::SESSION_PREFIX,
-                $authToken,
-                fn () => self::getCurrentSessionImpl($r),
-                APC_USER_CACHE_SESSION_TIMEOUT
+        $apiToken = self::getAPIToken();
+        if (!is_null($apiToken)) {
+            if (
+                defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
+                OMEGAUP_SESSION_CACHE_ENABLED === true
+            ) {
+                self::$_currentSession = \OmegaUp\Cache::getFromCacheOrSet(
+                    \OmegaUp\Cache::SESSION_PREFIX,
+                    $apiToken['cacheKey'],
+                    fn () => self::getCurrentSessionImplForAPIToken(
+                        $apiToken['token'],
+                        $apiToken['username'],
+                        $apiToken['cacheKey'],
+                    ),
+                    APC_USER_CACHE_SESSION_TIMEOUT
+                );
+            } else {
+                self::$_currentSession = self::getCurrentSessionImplForAPIToken(
+                    $apiToken['token'],
+                    $apiToken['username'],
+                    $apiToken['cacheKey'],
+                );
+            }
+            if (is_null(self::$_currentSession['apiTokenId'])) {
+                throw new \OmegaUp\Exceptions\UnauthorizedException();
+            }
+            $now = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
+            $usageData = \OmegaUp\DAO\APITokens::updateUsage(
+                self::$_currentSession['apiTokenId'],
+                $now,
             );
-            return self::$_currentSession;
+            if (is_null($usageData)) {
+                throw new \OmegaUp\Exceptions\UnauthorizedException();
+            }
+            $sessionManagerInstance = self::getSessionManagerInstance();
+            $sessionManagerInstance->setHeader(
+                "X-RateLimit-Limit: {$usageData['limit']}"
+            );
+            $sessionManagerInstance->setHeader(
+                "X-RateLimit-Remaining: ${usageData['remaining']}"
+            );
+            $sessionManagerInstance->setHeader(
+                "X-RateLimit-Reset: {$usageData['reset']->time}"
+            );
+            if ($usageData['remaining'] === 0) {
+                $retryAfter = $usageData['reset']->time - $now->time;
+                $sessionManagerInstance->setHeader(
+                    "Retry-After: {$retryAfter}"
+                );
+                throw new \OmegaUp\Exceptions\RateLimitExceededException();
+            }
+        } else {
+            $authToken = $r->ensureOptionalString('auth_token');
+            if (is_null($authToken)) {
+                $authToken = self::getAuthToken($r);
+                $r['auth_token'] = $authToken;
+            }
+            if (
+                defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
+                OMEGAUP_SESSION_CACHE_ENABLED === true &&
+                !is_null($authToken)
+            ) {
+                self::$_currentSession = \OmegaUp\Cache::getFromCacheOrSet(
+                    \OmegaUp\Cache::SESSION_PREFIX,
+                    $authToken,
+                    fn () => self::getCurrentSessionImplForAuthToken(
+                        $authToken
+                    ),
+                    APC_USER_CACHE_SESSION_TIMEOUT
+                );
+            } else {
+                self::$_currentSession = self::getCurrentSessionImplForAuthToken(
+                    $authToken
+                );
+            }
         }
-        self::$_currentSession = self::getCurrentSessionImpl($r);
         return self::$_currentSession;
     }
 
     /**
-     * @omegaup-request-param null|string $auth_token
+     * @return CurrentSession
+     */
+    private static function getCurrentSessionImplForAuthToken(?string $authToken): array {
+        if (!empty($authToken)) {
+            $identityExt = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
+                $authToken
+            );
+        } else {
+            $identityExt = null;
+        }
+        if (is_null($identityExt) || is_null($authToken)) {
+            // Means user has auth token, but does not exist in DB
+            return [
+                'valid' => false,
+                'email' => null,
+                'user' => null,
+                'identity' => null,
+                'loginIdentity' => null,
+                'classname' => 'user-rank-unranked',
+                'apiTokenId' => null,
+                'auth_token' => null,
+                'cacheKey' => null,
+                'is_admin' => false,
+                'associated_identities' => [],
+            ];
+        }
+        return self::getCurrentSessionImpl(
+            $identityExt,
+            $authToken,
+            $authToken,
+            /*$apiTokenId=*/null,
+        );
+    }
+
+    /**
+     * @return CurrentSession
+     */
+    private static function getCurrentSessionImplForAPIToken(
+        string $apiToken,
+        ?string $username,
+        string $cacheKey
+    ): array {
+        $identityExt = \OmegaUp\DAO\APITokens::getIdentityByToken(
+            $apiToken,
+            $username
+        );
+        if (is_null($identityExt)) {
+            throw new \OmegaUp\Exceptions\UnauthorizedException();
+        }
+        $apiTokenId = $identityExt['apiTokenId'];
+        unset($identityExt['apiTokenId']);
+        return self::getCurrentSessionImpl(
+            $identityExt,
+            $cacheKey,
+            null,
+            $apiTokenId,
+        );
+    }
+
+    /**
+     * @param AuthIdentityExt $identityExt
      *
      * @return CurrentSession
      */
-    private static function getCurrentSessionImpl(\OmegaUp\Request $r): array {
-        $authToken = $r->ensureOptionalString('auth_token');
-        $emptySession = [
-            'valid' => false,
-            'email' => null,
-            'user' => null,
-            'identity' => null,
-            'loginIdentity' => null,
-            'classname' => 'user-rank-unranked',
-            'auth_token' => null,
-            'is_admin' => false,
-            'associated_identities' => [],
-        ];
-        if (empty($authToken)) {
-            return $emptySession;
-        }
-        $identityExt = \OmegaUp\DAO\AuthTokens::getIdentityByToken($authToken);
-        if (is_null($identityExt)) {
-            // Means user has auth token, but does not exist in DB
-            return $emptySession;
-        }
+    private static function getCurrentSessionImpl(
+        $identityExt,
+        string $cacheKey,
+        ?string $authToken,
+        ?int $apiTokenId
+    ): array {
         [
             'currentIdentity' => $currentIdentityExt,
             'loginIdentity' => $loginIdentityExt,
         ] = $identityExt;
         $identityClassname = $currentIdentityExt['classname'];
-        unset($currentIdentityExt['classname']);
-        unset($loginIdentityExt['classname']);
+        unset($currentIdentityExt['classname'], $loginIdentityExt['classname']);
         $currentIdentity = new \OmegaUp\DAO\VO\Identities($currentIdentityExt);
         $loginIdentity = new \OmegaUp\DAO\VO\Identities($loginIdentityExt);
 
@@ -200,6 +341,8 @@ class Session extends \OmegaUp\Controllers\Controller {
             'identity' => $currentIdentity,
             'loginIdentity' => $loginIdentity,
             'classname' => $identityClassname,
+            'cacheKey' => $cacheKey,
+            'apiTokenId' => $apiTokenId,
             'auth_token' => $authToken,
             'is_admin' => \OmegaUp\Authorization::isSystemAdmin(
                 $currentIdentity
@@ -214,13 +357,13 @@ class Session extends \OmegaUp\Controllers\Controller {
     public static function invalidateCache(): void {
         $currentSession = self::getCurrentSession();
         if (
-            is_null($currentSession['auth_token'])
+            is_null($currentSession['cacheKey'])
         ) {
             return;
         }
         \OmegaUp\Cache::deleteFromCache(
             \OmegaUp\Cache::SESSION_PREFIX,
-            $currentSession['auth_token']
+            $currentSession['cacheKey']
         );
     }
 
