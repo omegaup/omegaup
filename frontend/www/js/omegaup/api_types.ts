@@ -4100,6 +4100,16 @@ export namespace messages {
   export type UserLastPrivacyPolicyAcceptedResponse = { hasAccepted: boolean };
   export type UserListRequest = { [key: string]: any };
   export type UserListResponse = types.UserListItem[];
+  export type UserListAPITokensRequest = { [key: string]: any };
+  export type _UserListAPITokensServerResponse = any;
+  export type UserListAPITokensResponse = {
+    tokens: {
+      last_used: Date;
+      name: string;
+      rate_limit: { limit: number; remaining: number; reset: Date };
+      timestamp: Date;
+    }[];
+  };
   export type UserListAssociatedIdentitiesRequest = { [key: string]: any };
   export type UserListAssociatedIdentitiesResponse = {
     identities: types.AssociatedIdentity[];
@@ -4817,6 +4827,9 @@ export namespace controllers {
     list: (
       params?: messages.UserListRequest,
     ) => Promise<messages.UserListResponse>;
+    listAPITokens: (
+      params?: messages.UserListAPITokensRequest,
+    ) => Promise<messages.UserListAPITokensResponse>;
     listAssociatedIdentities: (
       params?: messages.UserListAssociatedIdentitiesRequest,
     ) => Promise<messages.UserListAssociatedIdentitiesResponse>;
