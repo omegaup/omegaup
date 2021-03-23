@@ -74,7 +74,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             $params[] = $rowcount;
         }
 
-        /** @var list<array{answer: null|string, assignment_alias?: string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
+        /** @var list<array{answer: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
@@ -144,7 +144,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             $params[] = $rowcount;
         }
 
-        /** @var list<array{answer: null|string, assignment_alias?: string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
+        /** @var list<array{answer: null|string, assignment_alias: string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
@@ -213,7 +213,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             $params[] = $rowcount;
         }
 
-        /** @var list<array{answer: null|string, assignment_alias?: string, author: string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
+        /** @var list<array{answer: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
@@ -288,7 +288,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         }
 
         $result = [];
-        /** @var array{answer: null|string, assignment_alias?: string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp} $row */
+        /** @var array{answer: null|string, author: string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,

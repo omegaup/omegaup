@@ -6,7 +6,7 @@ import T from '../../lang';
 import arena_ClarificationList from './ClarificationList.vue';
 
 describe('ClarificationList.vue', () => {
-  const clarifications: types.ContestClarification[] = [
+  const clarifications: types.Clarification[] = [
     {
       answer: undefined,
       author: 'omegaUp',
