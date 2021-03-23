@@ -553,7 +553,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Problemsets $problemset,
         bool $contestAdmin,
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity,
+        bool $isPracticeMode = false
     ): array {
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -563,7 +564,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contestDetails = self::getContestDetails(
             $contest,
             $contestAdmin,
-            $identity
+            $identity,
+            /*$token=*/ null,
+            $isPracticeMode
         );
         /** @var list<NavbarProblemsetProblem> */
         $problems = [];
@@ -588,10 +591,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'users' => \OmegaUp\DAO\ProblemsetIdentities::getWithExtraInformation(
                 intval($contest->problemset_id)
             ),
-            'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
-                intval($contest->problemset_id),
+            'clarifications' => \OmegaUp\DAO\Clarifications::getContestClarifications(
+                $contest,
                 $contestAdmin,
-                $identity->identity_id,
+                $identity,
                 /*$offset=*/ null,
                 /*$rowcount=*/ 100
             ),
@@ -793,7 +796,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $contest,
             $problemset,
             $contestAdmin,
-            $r->identity
+            $r->identity,
+            /*$isPracticeMode=*/ true
         );
         if (!$contestAdmin) {
             $commonDetails['users'] = [];
@@ -1567,7 +1571,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Contests $contest,
         bool $contestAdmin,
         ?\OmegaUp\DAO\VO\Identities $identity,
-        ?string $token = null
+        ?string $token = null,
+        bool $isPracticeMode = false
     ) {
         $result = self::getCachedDetails($contest);
         $result['opened'] = true;
@@ -1580,6 +1585,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
+        }
+
+        $result['admin'] = \OmegaUp\Authorization::isContestAdmin(
+            $identity,
+            $contest
+        );
+
+        // Log the operation.
+        \OmegaUp\DAO\ProblemsetAccessLog::create(new \OmegaUp\DAO\VO\ProblemsetAccessLog([
+            'identity_id' => $identity->identity_id,
+            'problemset_id' => $contest->problemset_id,
+            'ip' => ip2long(
+                \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+            ),
+        ]));
+
+        // When the user joins a contest in practice mode, saving first access
+        // time is not necessary
+        if ($isPracticeMode) {
+            return $result;
         }
 
         // Adding timer info separately as it depends on the current user and we
@@ -1604,19 +1629,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         } else {
             $result['submission_deadline'] = $contest->finish_time;
         }
-        $result['admin'] = \OmegaUp\Authorization::isContestAdmin(
-            $identity,
-            $contest
-        );
-
-        // Log the operation.
-        \OmegaUp\DAO\ProblemsetAccessLog::create(new \OmegaUp\DAO\VO\ProblemsetAccessLog([
-            'identity_id' => $identity->identity_id,
-            'problemset_id' => $contest->problemset_id,
-            'ip' => ip2long(
-                \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
-            ),
-        ]));
 
         return $result;
     }
