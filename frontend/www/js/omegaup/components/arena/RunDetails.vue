@@ -47,7 +47,7 @@
             </tr>
             <template v-if="groupVisible[element.group]">
               <template v-for="problem_case in element.cases">
-                <tr :key="problem_case.name">
+                <tr :key="`${problem_case.name}-details`">
                   <td></td>
                   <td class="text-center">{{ problem_case.name }}</td>
                   <td class="text-center">{{ problem_case.verdict }}</td>
@@ -66,20 +66,20 @@
                   </td>
                 </tr>
                 <template v-if="shouldShowDiffs(problem_case.name)">
-                  <tr :key="problem_case.name">
+                  <tr :key="`${problem_case.name}-input`">
                     <td colspan="6">{{ T.wordsInput }}</td>
                   </tr>
-                  <tr :key="problem_case.name">
+                  <tr :key="`${problem_case.name}-in`">
                     <td colspan="6">
                       <pre>{{
                         showDataCase(data.cases, problem_case.name, 'in')
                       }}</pre>
                     </td>
                   </tr>
-                  <tr :key="problem_case.name">
+                  <tr :key="`${problem_case.name}-difference`">
                     <td colspan="6">{{ T.wordsDifference }}</td>
                   </tr>
-                  <tr :key="problem_case.name">
+                  <tr :key="p`${problem_case.name}-output`">
                     <td v-if="data.cases" colspan="6">
                       <omegaup-arena-diff-view
                         :left="data.cases[problem_case.name].out"
