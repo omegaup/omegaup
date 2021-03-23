@@ -125,8 +125,6 @@ OmegaUp.on('ready', () => {
             runs: types.Run[];
             nominationStatus: types.NominationStatus;
           }) => {
-            problemDetailsView.nextSubmissionTimestamp = null;
-
             api.Run.create({
               problem_alias: payload.problem.alias,
               language: language,

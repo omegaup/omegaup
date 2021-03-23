@@ -934,8 +934,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
      * Returns the time of the next submission to the current problem
      */
     final public static function nextSubmissionTimestamp(
-        \OmegaUp\DAO\VO\Contests $contest = null,
-        \OmegaUp\Timestamp $lastSubmissionTime = null
+        ?\OmegaUp\DAO\VO\Contests $contest = null,
+        ?\OmegaUp\Timestamp $lastSubmissionTime = null
     ): \OmegaUp\Timestamp {
         $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
         if (!is_null($contest)) {
@@ -962,7 +962,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     final public static function nextSubmissionTimestampByProblem(
         int $problemId,
         int $identityId,
-        \OmegaUp\DAO\VO\Contests $contest = null
+        ?\OmegaUp\DAO\VO\Contests $contest = null
     ): \OmegaUp\Timestamp {
         $lastSubmissionTime = \OmegaUp\DAO\Submissions::getLastSubmissionTimestampByProblem(
             $problemId,

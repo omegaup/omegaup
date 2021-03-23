@@ -4544,10 +4544,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $lastRunTime
         );
 
-        $response['smartyProperties']['payload']['problem'] = array_merge(
-            $response['smartyProperties']['payload']['problem'],
-            ['nextSubmissionTimestamp' => $nextSubmissionTimestamp]
-        );
+        $response['smartyProperties']['payload']['problem']['nextSubmissionTimestamp'] = $nextSubmissionTimestamp;
 
         if ($isAdmin) {
             $allRuns = [];
