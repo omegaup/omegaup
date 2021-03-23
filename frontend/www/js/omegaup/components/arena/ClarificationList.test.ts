@@ -6,12 +6,11 @@ import T from '../../lang';
 import arena_ClarificationList from './ClarificationList.vue';
 
 describe('ClarificationList.vue', () => {
-  const clarifications: types.Clarification[] = [
+  const clarifications: types.ContestClarification[] = [
     {
       answer: undefined,
       author: 'omegaUp',
       clarification_id: 1,
-      contest_alias: 'Concurso de prueba',
       message: 'Clarificación de prueba 1',
       problem_alias: 'Problema de prueba',
       public: true,
@@ -22,7 +21,6 @@ describe('ClarificationList.vue', () => {
       answer: 'Ok',
       author: 'omegaUp',
       clarification_id: 2,
-      contest_alias: undefined,
       message: 'Clarificación de prueba 2',
       problem_alias: 'Problema de prueba',
       public: false,

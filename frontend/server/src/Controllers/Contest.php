@@ -3357,49 +3357,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Get clarifications of a contest
      *
-     * @return array{clarifications: list<Clarification>}
-     *
-     * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param int $offset
-     * @omegaup-request-param int $rowcount
-     */
-    public static function apiClarifications(\OmegaUp\Request $r): array {
-        $r->ensureIdentity();
-        $offset = $r->ensureOptionalInt('offset');
-        $rowcount = $r->ensureOptionalInt('rowcount') ?? 1000;
-
-        $contestAlias = $r->ensureString(
-            'contest_alias',
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
-        $contest = self::validateContest($contestAlias);
-
-        $isContestDirector = \OmegaUp\Authorization::isContestAdmin(
-            $r->identity,
-            $contest
-        );
-
-        return [
-            'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
-                intval($contest->problemset_id),
-                $isContestDirector,
-                $r->identity->identity_id,
-                $offset,
-                $rowcount
-            ),
-        ];
-    }
-
-    /**
-     * Get clarifications of a contest
-     *
      * @return array{clarifications: list<ContestClarification>}
      *
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param int $offset
      * @omegaup-request-param int $rowcount
      */
-    public static function apiClarificationsv2(\OmegaUp\Request $r): array {
+    public static function apiClarifications(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
         $offset = $r->ensureOptionalInt('offset');

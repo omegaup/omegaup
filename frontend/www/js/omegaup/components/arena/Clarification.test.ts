@@ -9,7 +9,6 @@ describe('Clarification.vue', () => {
     answer: null,
     author: 'omegaUp',
     clarification_id: 1,
-    contest_alias: 'Concurso de prueba',
     message: 'Clarificación de prueba 1',
     problem_alias: 'Problema de prueba',
     public: false,

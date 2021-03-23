@@ -330,7 +330,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($contestant);
         // Call API
-        $response = \OmegaUp\Controllers\Contest::apiClarificationsv2(new \OmegaUp\Request([
+        $response = \OmegaUp\Controllers\Contest::apiClarifications(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $login->auth_token,
         ]));
@@ -341,7 +341,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
         for ($i = 0; $i < $n; $i++) {
             $logins[$i] = self::login($identities[$i]);
 
-            $response = \OmegaUp\Controllers\Contest::apiClarificationsv2(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\Contest::apiClarifications(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $logins[$i]->auth_token,
             ]));
@@ -360,7 +360,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         for ($i = 0; $i < $n; $i++) {
-            $response = \OmegaUp\Controllers\Contest::apiClarificationsv2(new \OmegaUp\Request([
+            $response = \OmegaUp\Controllers\Contest::apiClarifications(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $logins[$i]->auth_token,
             ]));

@@ -67,7 +67,7 @@ class ContestListClarificationsTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
 
         // Call API
-        $response = \OmegaUp\Controllers\Contest::apiClarificationsv2($r);
+        $response = \OmegaUp\Controllers\Contest::apiClarifications($r);
 
         // Check that we got all clarifications
         $this->assertEquals(
