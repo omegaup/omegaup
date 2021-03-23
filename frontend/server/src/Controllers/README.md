@@ -664,9 +664,9 @@ Get clarifications of a contest
 
 ### Returns
 
-| Name             | Type                           |
-| ---------------- | ------------------------------ |
-| `clarifications` | `types.ContestClarification[]` |
+| Name             | Type                    |
+| ---------------- | ----------------------- |
+| `clarifications` | `types.Clarification[]` |
 
 ## `/api/contest/clone/`
 
@@ -888,9 +888,9 @@ Get clarifications of problem in a contest
 
 ### Returns
 
-| Name             | Type                           |
-| ---------------- | ------------------------------ |
-| `clarifications` | `types.ProblemClarification[]` |
+| Name             | Type                    |
+| ---------------- | ----------------------- |
+| `clarifications` | `types.Clarification[]` |
 
 ## `/api/contest/problems/`
 
@@ -1587,9 +1587,9 @@ Gets the clarifications of all assignments in a course
 
 ### Returns
 
-| Name             | Type                          |
-| ---------------- | ----------------------------- |
-| `clarifications` | `types.CourseClarification[]` |
+| Name             | Type                    |
+| ---------------- | ----------------------- |
+| `clarifications` | `types.Clarification[]` |
 
 ## `/api/course/clone/`
 

@@ -15,9 +15,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestAdmin=array{role: string, username: string}
  * @psalm-type ContestGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type ConsentStatement=array{contest_alias: string, privacy_git_object_id?: string, share_user_information: bool|null, statement_type?: string}
- * @psalm-type Clarification=array{answer: null|string, author: null|string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
- * @psalm-type ProblemClarification=array{answer: null|string, author: string, clarification_id: int, message: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
- * @psalm-type ContestClarification=array{answer: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
+ * @psalm-type Clarification=array{answer: null|string, assignment_alias?: string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type ContestListMinePayload=array{contests: list<Contest>, privateContestsAlert: bool}
@@ -3369,7 +3367,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Get clarifications of a contest
      *
-     * @return array{clarifications: list<ContestClarification>}
+     * @return array{clarifications: list<Clarification>}
      *
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param int $offset
@@ -3405,7 +3403,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Get clarifications of problem in a contest
      *
-     * @return array{clarifications: list<ProblemClarification>}
+     * @return array{clarifications: list<Clarification>}
      *
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param string $problem_alias
