@@ -32,6 +32,10 @@ export function navigateToProblem({
     )
   ) {
     target.problemInfo = problemsStore.state.problems[problem.alias];
+    if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
+      window.location.hash = `#problems/${problem.alias}/new-run`;
+      return;
+    }
     window.location.hash = `#problems/${problem.alias}`;
     return;
   }
