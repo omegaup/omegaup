@@ -156,7 +156,7 @@ export class EventsSocket {
   }
 
   connect(): void {
-    if (this.disableSockets || this.problemsetAlias == 'admin') {
+    if (this.disableSockets || this.problemsetAlias === 'admin') {
       this.socketStatus = SocketStatus.Failed;
       return;
     }
