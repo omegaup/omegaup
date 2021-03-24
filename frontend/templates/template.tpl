@@ -92,7 +92,7 @@
     </main>
     {include file='common.analytics.tpl' inline}
     <div id="common-footer"></div>
-    {/if}
+    {js_include entrypoint="common_footer_v2"}
 
   </body>
   <script type="text/javascript" src="{version_hash src="/js/status.dismiss.js"}" defer></script>

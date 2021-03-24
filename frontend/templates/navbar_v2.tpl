@@ -3,4 +3,3 @@
 <div id="common-navbar"></div>
 {js_include entrypoint="common_navbar_v2"}
 {/if}
-
