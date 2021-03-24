@@ -79,7 +79,7 @@ export class EventsSocket {
     }
   }
 
-  onmessage(message: MessageEvent) {
+  private onmessage(message: MessageEvent) {
     const data = JSON.parse(message.data);
 
     if (data.message == '/run/update/') {
@@ -111,7 +111,7 @@ export class EventsSocket {
     }
   }
 
-  onclose() {
+  private onclose() {
     this.socket = null;
     if (this.socketKeepalive) {
       clearInterval(this.socketKeepalive);
@@ -120,7 +120,7 @@ export class EventsSocket {
     if (this.shouldRetry && this.retries > 0) {
       this.retries--;
       this.socketStatus = SocketStatus.Waiting;
-      setTimeout(() => this.connect(), Math.random() * 15000);
+      setTimeout(() => this.connectSocket(), Math.random() * 15000);
       return;
     }
     this.socketStatus = SocketStatus.Failed;
@@ -177,7 +177,7 @@ export class EventsSocket {
       });
   }
 
-  setupPolls(): void {
+  private setupPolls(): void {
     api.Problemset.scoreboard({
       problemset_id: this.problemsetId,
       token: this.scoreboardToken,
