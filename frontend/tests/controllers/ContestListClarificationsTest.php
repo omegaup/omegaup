@@ -100,4 +100,95 @@ class ContestListClarificationsTest extends \OmegaUp\Test\ControllerTestCase {
             $response['clarifications'][3]['message']
         );
     }
+
+    /**
+     * Create 4 clarifications in a contest with one user, then another 3 clarifications
+     * with another user.
+     * Get the list for the first user, will see only his 4
+     */
+    public function testListProblemClarifications() {
+        // Create two problems for a contest:
+        // - Create two clarifications for first problem
+        // - Create one clarifications for second problem
+        $problemsData = [
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+        ];
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemsData[0],
+            $contestData
+        );
+
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemsData[1],
+            $contestData
+        );
+
+        // Create our contestant who will submit the clarification
+        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create 4 clarifications with this contestant
+        $firstProblemClarifications = [];
+        for ($i = 0; $i < 2; $i++) {
+            $firstProblemClarifications[$i] =
+                \OmegaUp\Test\Factories\Clarification::createClarification(
+                    $problemsData[0],
+                    $contestData,
+                    $identity
+                );
+        }
+
+        $secondProblemClarification = \OmegaUp\Test\Factories\Clarification::createClarification(
+            $problemsData[1],
+            $contestData,
+            $identity
+        );
+
+        \OmegaUp\Test\Factories\Clarification::answer(
+            $firstProblemClarifications[1],
+            $contestData
+        );
+
+        \OmegaUp\Test\Factories\Clarification::answer(
+            $secondProblemClarification,
+            $contestData
+        );
+
+        $login = self::login($identity);
+
+        // First problem clarifications
+        $response = \OmegaUp\Controllers\Contest::apiProblemClarifications(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'problem_alias' => $problemsData[0]['problem']->alias
+            ])
+        );
+        $this->assertCount(2, $response['clarifications']);
+        $this->assertEquals(
+            $firstProblemClarifications[0]['request']['message'],
+            $response['clarifications'][0]['message']
+        );
+        $this->assertEquals(
+            $firstProblemClarifications[1]['request']['message'],
+            $response['clarifications'][1]['message']
+        );
+
+        // Second problem clarification
+        $response = \OmegaUp\Controllers\Contest::apiProblemClarifications(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'problem_alias' => $problemsData[1]['problem']->alias
+            ])
+        );
+        $this->assertCount(1, $response['clarifications']);
+        $this->assertEquals(
+            $secondProblemClarification['request']['message'],
+            $response['clarifications'][0]['message']
+        );
+    }
 }

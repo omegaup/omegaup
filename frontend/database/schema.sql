@@ -16,6 +16,23 @@ CREATE TABLE `ACLs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `API_Tokens` (
+  `apitoken_id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Momento de creación del token',
+  `name` varchar(100) NOT NULL COMMENT 'Nombre que el usuario le asigna al token',
+  `token` char(40) NOT NULL COMMENT 'Contenido del token',
+  `last_used` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Momento de último uso del token, redondeado a la última hora',
+  `use_count` int NOT NULL DEFAULT '0' COMMENT 'Número de usos desde la última hora',
+  PRIMARY KEY (`apitoken_id`),
+  UNIQUE KEY `token` (`token`),
+  UNIQUE KEY `user_name` (`user_id`,`name`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `fk_atu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tokens para el API';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Announcement` (
   `announcement_id` int NOT NULL AUTO_INCREMENT COMMENT 'Identificador del aviso',
   `user_id` int NOT NULL COMMENT 'UserID del autor de este aviso',
