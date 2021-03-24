@@ -57,9 +57,7 @@
   </head>
 
   <body class="d-flex flex-column h-100">
-    <script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
-    <div id="common-navbar"></div>
-    {js_include entrypoint="common_navbar_v2"}
+    {include file='navbar_v2.tpl' headerPayload=$headerPayload inline}
 	  <main role="main" {if (!isset($fullWidth) || !$fullWidth)}class="container-lg p-5"{/if}>
       {if (!isset($inArena) || !$inArena) && isset($ERROR_MESSAGE)}
         <div class="alert alert-danger">
@@ -93,9 +91,7 @@
       <div id="main-container"></div>
     </main>
     {include file='common.analytics.tpl' inline}
-    {if $headerPayload.inContest eq false}
     <div id="common-footer"></div>
-    {js_include entrypoint="common_footer_v2"}
     {/if}
 
   </body>

@@ -140,51 +140,6 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    public function testContestDataForTypescript() {
-        // Get a contest
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
-            new \OmegaUp\Test\Factories\ContestParams([
-                'requestsUserInformation' => 'optional',
-            ])
-        );
-        // Create user
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-
-        // Add user to our contest
-        \OmegaUp\Test\Factories\Contest::addUser(
-            $contestData,
-            $identity
-        );
-
-        $userLogin = self::login($identity);
-        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
-            new \OmegaUp\Request([
-                'auth_token' => $userLogin->auth_token,
-                'contest_alias' => $contestData['request']['alias'],
-            ])
-        )['smartyProperties']['payload'];
-
-        \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
-            'contest_alias' => $contestData['request']['alias'],
-            'auth_token' => $userLogin->auth_token,
-            'privacy_git_object_id' =>
-                $contestDetails['privacyStatement']['gitObjectId'],
-            'statement_type' =>
-                $contestDetails['privacyStatement']['statementType'],
-            'share_user_information' => 1,
-        ]));
-
-        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
-            new \OmegaUp\Request([
-                'auth_token' => $userLogin->auth_token,
-                'contest_alias' => $contestData['request']['alias'],
-            ])
-        )['smartyProperties']['payload'];
-
-        // Users list should be empty
-        $this->assertEmpty($contestDetails['users']);
-    }
-
     public function testContestParticipantsReport() {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
