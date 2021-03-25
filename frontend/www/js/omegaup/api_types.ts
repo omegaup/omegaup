@@ -227,6 +227,10 @@ export namespace types {
             x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           })(x.scoreboard);
+        if (x.submissionDeadline)
+          x.submissionDeadline = ((x: number) => new Date(x * 1000))(
+            x.submissionDeadline,
+          );
         x.users = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -1755,6 +1759,7 @@ export namespace types {
     problems: types.NavbarProblemsetProblem[];
     scoreboard?: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    submissionDeadline?: Date;
     users: types.ContestUser[];
   }
 
