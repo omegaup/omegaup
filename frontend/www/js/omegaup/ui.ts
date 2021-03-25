@@ -283,7 +283,7 @@ export function updateTheme(): void {
   if (!darkThemeStyleElement) {
     return;
   }
-  if (themePreferences?.theme === Theme.LIGHT) {
+  if (!themePreferences.theme || themePreferences.theme === Theme.LIGHT) {
     darkThemeStyleElement.setAttribute('href', '');
     return;
   }
