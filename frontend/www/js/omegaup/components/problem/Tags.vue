@@ -141,15 +141,11 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="switch-container font-weight-bold">
-          <div class="switch">
-            <input v-model="allowTags" type="checkbox" />
-            <span class="slider round"></span>
-          </div>
-          <span class="switch-text">
-            {{ T.problemEditFormAllowUserAddTags }}
-          </span>
-        </label>
+        <omegaup-toggle-switch
+          :value.sync="allowTags"
+          :checked-value="allowTags"
+          :text-description="T.problemEditFormAllowUserAddTags"
+        ></omegaup-toggle-switch>
       </div>
     </div>
     <input
@@ -165,6 +161,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+import omegaup_ToggleSwitch from '../ToggleSwitch.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -175,6 +172,7 @@ library.add(faTrash);
   components: {
     FontAwesomeIcon,
     VueTypeaheadBootstrap,
+    'omegaup-toggle-switch': omegaup_ToggleSwitch,
   },
 })
 export default class ProblemTags extends Vue {
@@ -256,82 +254,3 @@ export default class ProblemTags extends Vue {
   }
 }
 </script>
-
-<style scoped lang="scss">
-/* The switch - the box around the slider */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-/* Hide default HTML checkbox */
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-/* The slider */
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: '';
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-}
-
-input:checked + .slider {
-  background-color: #2196f3;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196f3;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-
-.switch-container {
-  width: 100%;
-  position: relative;
-}
-
-.switch-container span.switch-text {
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  margin-left: 5px;
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%);
-}
-</style>
