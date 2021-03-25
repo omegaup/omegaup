@@ -227,15 +227,28 @@
               v-if="inContest"
             ></omegaup-notifications-clarifications>
             -->
-            <li class="nav-item d-flex align-items-center">
-              <div class="nav-link custom-control custom-switch">
-                <label class="switch-container font-weight-bold">
-                  <div class="switch">
-                    <input v-model="toggleSwitch" type="checkbox" />
-                    <span class="slider round"></span>
-                  </div>
-                  {{ T.navbarDarkMode }}
-                </label>
+            <li class="nav-item dropdown nav-themes">
+              <a
+                class="nav-link px-2 dropdown-toggle"
+                href="#"
+                role="button"
+                data-nav-themes
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                {{ T.navbarChooseTheme }}
+              </a>
+              <div class="dropdown-menu">
+                <a
+                  v-for="theme in availableThemes"
+                  :key="theme"
+                  class="dropdown-item"
+                  href="#"
+                  @click="currentTheme = theme"
+                >
+                  {{ theme }}
+                </a>
               </div>
             </li>
             <omegaup-notification-list
@@ -380,6 +393,15 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 library.add(faSignOutAlt, faUser);
 
+export enum Theme {
+  LIGHT = 'light',
+  COSMO = 'cosmo',
+  CYBORG = 'cyborg',
+  DARKLY = 'darkly',
+  SALTE = 'slate',
+  SUPERHERO = 'superhero',
+}
+
 @Component({
   components: {
     FontAwesomeIcon,
@@ -410,11 +432,11 @@ export default class Navbar extends Vue {
   @Prop() errorMessage!: string | null;
   @Prop({ default: 0 }) profileProgress!: number;
   @Prop() initialClarifications!: types.Clarification[];
-  @Prop({ default: false }) isDark!: boolean;
+  @Prop({ default: Theme.LIGHT }) theme!: Theme;
 
   clarifications: types.Clarification[] = this.initialClarifications;
   T = T;
-  toggleSwitch = this.isDark;
+  currentTheme = this.theme;
 
   get formattedLoginURL(): string {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
@@ -426,99 +448,32 @@ export default class Navbar extends Vue {
     );
   }
 
+  get availableThemes(): string[] {
+    return Object.values(Theme);
+  }
+
   readNotifications(notifications: types.Notification[], url?: string): void {
     this.$emit('read-notifications', notifications, url);
   }
 
-  @Watch('toggleSwitch')
-  onSwitchChanged(newValue: boolean) {
-    const isDark = !newValue;
-    localStorage.setItem('theme-preferences', JSON.stringify({ isDark }));
+  @Watch('currentTheme')
+  onCurrentThemeChanged(newValue: Theme) {
+    localStorage.setItem(
+      'theme-preferences',
+      JSON.stringify({ theme: newValue }),
+    );
     ui.updateTheme();
   }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 nav.navbar {
   background-color: $header-primary-color;
 
   .navbar-brand {
-    background-color: #f2f2f2;
-  }
-}
-
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 22px;
-  input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-}
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-  &:before {
-    position: absolute;
-    content: '';
-    height: 14px;
-    width: 14px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: 0.4s;
-    transition: 0.4s;
-  }
-}
-input {
-  &:checked {
-    + {
-      .slider {
-        background-color: #2196f3;
-        &:before {
-          -webkit-transform: translateX(26px);
-          -ms-transform: translateX(26px);
-          transform: translateX(26px);
-        }
-      }
-    }
-  }
-  &:focus {
-    + {
-      .slider {
-        box-shadow: 0 0 1px #2196f3;
-      }
-    }
-  }
-}
-.slider.round {
-  border-radius: 34px;
-  &:before {
-    border-radius: 50%;
-  }
-}
-.switch-container {
-  width: 100%;
-  position: relative;
-  span.switch-text {
-    margin: 0;
-    position: absolute;
-    top: 50%;
-    margin-left: 5px;
-    -ms-transform: translateY(-50%);
-    transform: translateY(-50%);
+    background-color: $white;
   }
 }
 </style>

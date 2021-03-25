@@ -7,7 +7,7 @@ import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload('header-payload');
-  const isDark = ui.updateTheme();
+  ui.updateTheme();
   const commonNavbar = new Vue({
     el: '#common-navbar',
     components: {
@@ -42,7 +42,6 @@ OmegaUp.on('ready', () => {
           graderQueueLength: this.graderQueueLength,
           errorMessage: this.errorMessage,
           initialClarifications: [],
-          isDark,
         },
         on: {
           'read-notifications': (

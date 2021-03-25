@@ -581,7 +581,7 @@ const translations: { [key: string]: string; } = {
   navUserRanking: "Ranking de usuarios",
   navViewBadges: "Ver insignias",
   navViewProfile: "Mi perfil",
-  navbarDarkMode: "Modo oscuro",
+  navbarChooseTheme: "Tema",
   newPublicTagsNotAllowed: "No est\u00e1 permitido agregar nuevas etiquetas p\u00fablicas",
   noCoders: "No hay coders",
   nominationsRangeHeader: "Reportes de problemas (del %(lowCount) al %(highCount))",
