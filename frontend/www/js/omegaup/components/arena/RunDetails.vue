@@ -226,11 +226,11 @@ export default class ArenaRunDetails extends Vue {
   background: rgba(0, 0, 0, 0.5);
   z-index: 9999998 !important;
   form {
-    background: #eee;
+    background: $whisper;
     width: 80%;
     height: 90%;
     margin: auto;
-    border: 2px solid #ccc;
+    border: 2px solid $very-light-grey;
     padding: 1em;
     position: absolute;
     overflow-y: auto;
@@ -248,13 +248,13 @@ export default class ArenaRunDetails extends Vue {
         top: 0;
         right: 0;
         background-color: $omegaup-white;
-        border: 1px solid #ccc;
+        border: 1px solid $very-light-grey;
         border-width: 0 0 1px 1px;
         font-size: 110%;
         width: 25px;
         height: 25px;
         &:hover {
-          background-color: #eee;
+          background-color: $whisper;
         }
       }
     }
@@ -314,7 +314,7 @@ export default class ArenaRunDetails extends Vue {
     width: 100%;
 
     tr.group {
-      border-top: 1px solid #ccc;
+      border-top: 1px solid $very-light-grey;
 
       td,
       th {
@@ -340,7 +340,7 @@ export default class ArenaRunDetails extends Vue {
     }
 
     pre.stderr {
-      color: #400;
+      color: $seal-brown;
     }
   }
 }

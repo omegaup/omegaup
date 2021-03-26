@@ -129,7 +129,8 @@ export default class Clarifications extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .notification-button {
   padding-top: 6px !important;
   padding-bottom: 20px !important;
@@ -148,18 +149,18 @@ export default class Clarifications extends Vue {
 
 .notification-drawer::-webkit-scrollbar-track {
   border-radius: 10px;
-  background-color: #f5f5f5;
+  background-color: $header-dropdown-active-item;
 }
 
 .notification-drawer::-webkit-scrollbar {
   width: 8px;
   height: 8px;
-  background-color: #f5f5f5;
+  background-color: $header-dropdown-active-item;
 }
 
 .notification-drawer::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: #7f7f7f;
+  background-color: $grey;
 }
 
 .notification-drawer {
@@ -171,11 +172,11 @@ export default class Clarifications extends Vue {
 
 .notification-drawer li {
   padding: 3px 20px;
-  border-top: 1px solid #f1f1f1;
+  border-top: 1px solid $white-smoke;
 }
 
 .notification-drawer li a {
-  color: #333;
+  color: $night-rider;
   text-decoration: none;
 }
 
@@ -190,14 +191,14 @@ export default class Clarifications extends Vue {
 .notification-drawer li:focus,
 .notification-drawer li:active {
   cursor: pointer;
-  background-color: #678dd7;
+  background-color: $cornflower-blue;
   text-decoration: none;
 }
 
 .notification-drawer li:hover > a,
 .notification-drawer li:focus > a,
 .notification-drawer li:active > a {
-  color: #fff;
+  color: $white;
 }
 
 .notification-drawer li a > h4,

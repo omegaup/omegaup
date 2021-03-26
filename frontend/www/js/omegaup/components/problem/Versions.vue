@@ -262,13 +262,14 @@ export default class ProblemVersions extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .scrollable {
   max-height: 600px;
   overflow-y: auto;
 }
 .controls {
-  border-bottom: 1px solid #ddd;
-  background-color: #f5f5f5;
+  border-bottom: 1px solid $btn-cancel-color;
+  background-color: $white-smoke-2;
 }
 </style>

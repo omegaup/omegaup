@@ -34,9 +34,10 @@ export default class GraderCountBadge extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .grader-error {
-  color: #b94a48;
+  color: $chestnut;
   background-image: linear-gradient(
     rgb(242, 222, 222) 0px,
     rgb(231, 195, 195) 100%
@@ -45,7 +46,7 @@ export default class GraderCountBadge extends Vue {
 }
 
 .grader-ok {
-  color: #468847;
+  color: $killarney;
   background-image: linear-gradient(
     rgb(223, 240, 216) 0px,
     rgb(200, 229, 188) 100%
@@ -54,8 +55,8 @@ export default class GraderCountBadge extends Vue {
 }
 
 .grader-warning {
-  color: #c09853;
-  background-image: linear-gradient(to bottom, #fcf8e3 0, #f8efc0 100%);
-  border-color: #f5e79e;
+  color: $twine;
+  background-image: linear-gradient(to bottom, $corn-silk 0, $corn-field 100%);
+  border-color: $drover;
 }
 </style>

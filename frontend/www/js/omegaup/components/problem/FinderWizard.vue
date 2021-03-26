@@ -166,7 +166,8 @@ export default class ProblemFinderWizard extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .modal-mask {
   position: fixed;
   z-index: 99999;
@@ -179,10 +180,10 @@ export default class ProblemFinderWizard extends Vue {
 }
 
 .modal-container {
-  background: #eee;
+  background: $whisper;
   width: 800px;
   margin: 2.5em auto 0;
-  border: 2px solid #ccc;
+  border: 2px solid $very-light-grey;
   padding: 1em;
   position: relative;
   overflow: auto;
@@ -223,7 +224,7 @@ export default class ProblemFinderWizard extends Vue {
 .tags-input-remove:after,
 .tags-input-typeahead-item-highlighted-default,
 .vue-slider-process {
-  background-color: #678dd7;
+  background-color: $cornflower-blue;
 }
 
 .vue-slider {
@@ -244,16 +245,16 @@ export default class ProblemFinderWizard extends Vue {
   display: block;
   cursor: pointer;
   padding: 0.25em 1em;
-  border: 1px solid #678dd7;
+  border: 1px solid $cornflower-blue;
   flex: 1;
   text-align: center;
-  color: #678dd7;
+  color: $cornflower-blue;
 }
 
 .tab-select-el:hover,
 .tab-select-el-active {
-  color: #fff;
-  background: #678dd7;
+  color: $white;
+  background: $cornflower-blue;
 }
 
 .hidden-radio {

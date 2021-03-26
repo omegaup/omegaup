@@ -638,12 +638,12 @@ table td {
 }
 
 .karel-js-link {
-  border: 1px solid #eee;
+  border: 1px solid $whisper;
   border-left: 0;
   border-radius: 3px;
 
   a {
-    border-left: 5px solid #1b809e;
+    border-left: 5px solid $scooter;
     display: block;
   }
 }

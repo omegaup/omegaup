@@ -170,21 +170,22 @@ export default class SubmissionsList extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 table.submissions-table > tbody > tr > td {
   vertical-align: middle;
 }
 .verdict-AC {
-  background: #cf6;
+  background: $mindaro;
 }
 
 .verdict-CE {
-  background: #f90;
+  background: $orange-peel;
 }
 
 .verdict-JE,
 .verdict-VE {
-  background: #f00;
+  background: $red;
 }
 
 .school-text {

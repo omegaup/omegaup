@@ -229,20 +229,20 @@ export default class ArenaContest extends Vue {
   }
   .main {
     margin-left: 20em;
-    border: 1px solid #ccc;
+    border: 1px solid $very-light-grey;
     border-width: 0 0 1px 1px;
   }
 }
 
 .nav-tabs {
   .nav-link {
-    background-color: #ddd;
-    border-top-color: #ddd;
+    background-color: $gainsboro;
+    border-top-color: $gainsboro;
   }
 }
 
 .problem {
-  background: #fff;
+  background: $white;
   padding: 1em;
   margin-top: -1.5em;
   margin-right: -1em;

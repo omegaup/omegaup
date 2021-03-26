@@ -156,7 +156,7 @@ export default class Markdown extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../../../node_modules/prismjs/themes/prism.css';
 @import '../../../sass/main.scss';
 
@@ -207,7 +207,7 @@ export default class Markdown extends Vue {
 
   pre {
     padding: 16px;
-    background: #eee;
+    background: $whisper;
     margin: 1em 0;
     border-radius: 6px;
     display: block;
@@ -236,7 +236,7 @@ export default class Markdown extends Vue {
 
   details {
     padding: 16px;
-    border: 1px solid #eee;
+    border: 1px solid $whisper;
     summary {
       color: $omegaup-blue;
     }
@@ -246,7 +246,7 @@ export default class Markdown extends Vue {
   }
 
   table td {
-    border: 1px solid #000;
+    border: 1px solid $black;
     padding: 10px;
   }
   table th {
@@ -257,11 +257,11 @@ export default class Markdown extends Vue {
     padding: 5px;
 
     tbody {
-      background: #eee;
-      border: 1px solid #000;
+      background: $whisper;
+      border: 1px solid $black;
 
       tr:nth-child(even) {
-        background: #f5f5f5;
+        background: $white-smoke-2;
       }
     }
     th {
@@ -271,7 +271,7 @@ export default class Markdown extends Vue {
     td {
       vertical-align: top;
       padding: 10px;
-      border: 1px solid #000;
+      border: 1px solid $black;
     }
     pre {
       white-space: pre;
@@ -305,10 +305,10 @@ export default class Markdown extends Vue {
   }
   code.libinteractive-download,
   code.output-only-download {
-    background: #eee;
-    color: #ccc;
+    background: $whisper;
+    color: $very-light-grey;
     margin: 1em 0;
-    border: 1px dotted #ccc;
+    border: 1px dotted $very-light-grey;
     display: block;
     text-align: center;
     font-size: 2em;

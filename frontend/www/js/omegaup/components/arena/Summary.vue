@@ -107,8 +107,9 @@ export default class Summary extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .summary {
-  background: #fff;
+  background: $white;
   padding: 1em;
   margin-top: -1.5em;
   margin-right: -1em;

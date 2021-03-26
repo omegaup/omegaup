@@ -373,7 +373,7 @@ export default class Navbar extends Vue {
     }
 
     .navbar-brand {
-      background-color: #f2f2f2;
+      background-color: $white-smoke;
     }
   }
 
@@ -480,8 +480,12 @@ export default class Navbar extends Vue {
 
       & .grader-warning {
         color: $status-warning;
-        background-image: linear-gradient(to bottom, #fcf8e3 0, #f8efc0 100%);
-        border-color: #f5e79e;
+        background-image: linear-gradient(
+          to bottom,
+          $corn-silk 0,
+          $corn-field 100%
+        );
+        border-color: $drover;
       }
     }
   }

@@ -670,6 +670,7 @@ export default class Runs extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 caption {
   caption-side: top;
 }
@@ -680,7 +681,7 @@ caption {
 
 .runs {
   width: 100%;
-  border: 1px solid #ccc;
+  border: 1px solid $very-light-grey;
   margin-top: 2em;
 }
 
@@ -692,7 +693,7 @@ caption {
 
 .runs td,
 .runs th {
-  border: 1px solid #ccc;
+  border: 1px solid $very-light-grey;
   border-width: 1px 0;
   text-align: center;
 }
@@ -701,12 +702,12 @@ caption {
   display: block;
   padding: 0.5em;
   text-decoration: none;
-  color: #000;
-  background: #ccc;
+  color: $black;
+  background: $very-light-grey;
   text-align: center;
 }
 
 .runs tfoot td a:hover {
-  background: #fff;
+  background: $white;
 }
 </style>

@@ -267,11 +267,12 @@ export default class ArenaContestList extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .empty-category {
   text-align: center;
   font-size: 200%;
   margin: 1em;
-  color: #aaa;
+  color: $dark-gray;
 }
 </style>

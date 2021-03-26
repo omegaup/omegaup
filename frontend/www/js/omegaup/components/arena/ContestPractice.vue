@@ -211,14 +211,15 @@ export default class ArenaContestPractice extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .navleft {
   overflow: hidden;
 }
 
 .nav-tabs .nav-link {
-  background-color: #ddd;
-  border-top-color: #ddd;
+  background-color: $gainsboro;
+  border-top-color: $gainsboro;
 }
 
 .navleft .navbar {
@@ -229,12 +230,12 @@ export default class ArenaContestPractice extends Vue {
 
 .navleft .main {
   margin-left: 20em;
-  border: 1px solid #ccc;
+  border: 1px solid $very-light-grey;
   border-width: 0 0 1px 1px;
 }
 
 .problem {
-  background: #fff;
+  background: $white;
   padding: 1em;
   margin-top: -1.5em;
   margin-right: -1em;

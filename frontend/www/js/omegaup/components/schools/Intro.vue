@@ -51,7 +51,8 @@ export default class Intro extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .header-bg {
   background-image: url(/media/teacher3.jpg);
   background-position-x: -200px;
@@ -65,9 +66,9 @@ export default class Intro extends Vue {
 .header-bg h1 {
   font-size: 40px;
   margin-top: 80px;
-  text-shadow: 1px 1px #678dd7;
+  text-shadow: 1px 1px $cornflower-blue;
 }
 body {
-  background: #fff;
+  background: $black;
 }
 </style>

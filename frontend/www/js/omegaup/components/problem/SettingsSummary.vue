@@ -106,6 +106,7 @@ export default class ProblemSettingsSummary extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .panel {
   .title {
     text-align: center;
@@ -123,7 +124,7 @@ export default class ProblemSettingsSummary extends Vue {
     }
     td,
     th[scope='row'] {
-      border: 1px solid #000;
+      border: 1px solid $black;
       padding: 2px;
     }
   }

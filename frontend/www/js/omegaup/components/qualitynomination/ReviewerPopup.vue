@@ -205,11 +205,12 @@ export default class ReviewerPopup extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 ul.tag-select {
   height: 225px;
   overflow: auto;
-  border: 1px solid #ccc;
-  background: #fff;
+  border: 1px solid $very-light-grey;
+  background: $white;
   list-style-type: none;
 }
 .tag-label {

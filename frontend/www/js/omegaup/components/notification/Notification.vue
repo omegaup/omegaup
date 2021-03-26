@@ -129,13 +129,14 @@ export default class Notification extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .close {
   font-size: inherit;
 }
 
 .notification-date {
   font-size: 0.8rem;
-  color: #666;
+  color: $dim-gray;
 }
 
 .notification-link {
