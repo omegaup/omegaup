@@ -25,18 +25,13 @@ export function navigateToProblem({
   problem,
   problems,
 }: Navigation): void {
-  if (
-    Object.prototype.hasOwnProperty.call(
-      problemsStore.state.problems,
-      problem.alias,
-    )
-  ) {
+  if (isProblemAliasPresentInStore(problem.alias)) {
     target.problemInfo = problemsStore.state.problems[problem.alias];
     if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
-      window.location.hash = `#problems/${problem.alias}/new-run`;
+      setLocationHash(`#problems/${problem.alias}/new-run`);
       return;
     }
-    window.location.hash = `#problems/${problem.alias}`;
+    setLocationHash(`#problems/${problem.alias}`);
     return;
   }
   api.Problem.details({
@@ -58,15 +53,15 @@ export function navigateToProblem({
       problemsStore.commit('addProblem', problemInfo);
       target.problem = { problem, runs };
       if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
-        window.location.hash = `#problems/${problem.alias}/new-run`;
+        setLocationHash(`#problems/${problem.alias}/new-run`);
         return;
       }
-      window.location.hash = `#problems/${problem.alias}`;
+      setLocationHash(`#problems/${problem.alias}`);
     })
     .catch(() => {
       ui.dismissNotifications();
       target.problem = null;
-      window.location.hash = '#problems';
+      setLocationHash('#problems');
     });
 }
 
@@ -83,4 +78,19 @@ export function getMaxScore(
     maxScore = Math.max(maxScore, run.contest_score || 0);
   }
   return maxScore;
+}
+
+export function setLocationHash(hash: string): void {
+  window.location.hash = hash;
+}
+
+export function getLocationHash(): string {
+  return window.location.hash;
+}
+
+export function isProblemAliasPresentInStore(problemAlias: string): boolean {
+  return Object.prototype.hasOwnProperty.call(
+    problemsStore.state.problems,
+    problemAlias,
+  );
 }

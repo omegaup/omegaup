@@ -50,10 +50,6 @@ declare global {
 global.jQuery = require('jquery');
 global.$ = global.jQuery;
 window.jQuery = global.jQuery;
-global.window = Object.create(window);
-const oldLocation = global.window.location;
-delete global.window.location;
-global.window.location = { ...oldLocation };
 
 // This is needed for CodeMirror to work.
 global.document.createRange = () => {

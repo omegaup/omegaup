@@ -3,10 +3,11 @@ jest.mock('../../../third_party/js/diff_match_patch.js');
 import Vue from 'vue';
 import arena_ContestPractice from '../components/arena/ContestPractice.vue';
 import { types } from '../api_types';
-import { navigateToProblem } from './navigation';
+import { navigateToProblem, setLocationHash } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import { mutations } from './problemStore';
+import { getLocationHash } from './__mocks__/navigation';
 
 const vueInstance: Vue & {
   problemInfo: types.ProblemInfo | null;
@@ -85,14 +86,7 @@ const navbarProblems: types.NavbarProblemsetProblem[] = [
     text: 'B. Problem 2',
   },
 ];
-Object.defineProperty(window.location, 'href', {
-  writable: true,
-  value: 'https://omegaup.com/arena/contest/',
-});
-Object.defineProperty(window.location, 'hash', {
-  writable: true,
-  value: '#problems',
-});
+setLocationHash('#problems');
 
 const { addProblem } = mutations;
 
@@ -110,7 +104,8 @@ describe('navigation.ts', () => {
         addProblem(state, vueInstance.problemInfo);
       }
       navigateToProblem(params);
-      expect(window.location.hash).toEqual(
+
+      expect(getLocationHash()).toEqual(
         `#problems/${navbarProblems[0].alias}/new-run`,
       );
     });
