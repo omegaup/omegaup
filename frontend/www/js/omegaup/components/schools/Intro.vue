@@ -67,6 +67,7 @@ export default class Intro extends Vue {
   margin-top: 80px;
   text-shadow: 1px 1px #678dd7;
 }
+
 body {
   background: #fff;
 }

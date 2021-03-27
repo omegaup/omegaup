@@ -255,6 +255,7 @@ export default class ArenaRunDetails extends Vue {
   right: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 9999998 !important;
+
   form {
     background: #eee;
     width: 80%;
@@ -271,8 +272,10 @@ export default class ArenaRunDetails extends Vue {
     right: 0;
     display: flex;
     flex-direction: column;
+
     .close-container {
       width: 100%;
+
       .close {
         position: absolute;
         top: 0;
@@ -283,37 +286,46 @@ export default class ArenaRunDetails extends Vue {
         font-size: 110%;
         width: 25px;
         height: 25px;
+
         &:hover {
           background-color: #eee;
         }
       }
     }
+
     .languages {
       width: 100%;
     }
+
     .filename-extension {
       width: 100%;
     }
+
     .run-submit-paste-text {
       width: 100%;
     }
+
     .code-view {
       width: 100%;
       flex-grow: 1;
       overflow: auto;
     }
+
     .upload-file {
       width: 100%;
     }
+
     .submit-run {
       width: 100%;
     }
   }
+
   input[type='submit'] {
     font-size: 110%;
     padding: 0.3em 0.5em;
   }
 }
+
 .dropdown-cases {
   height: 100%;
   width: 100%;
@@ -351,13 +363,7 @@ export default class ArenaRunDetails extends Vue {
         padding: 0.2em inherit 0.2em inherit;
       }
     }
-  }
 
-  span.collapse {
-    padding: 0.2em;
-  }
-
-  table {
     thead th,
     td.center,
     th.center {
@@ -372,6 +378,10 @@ export default class ArenaRunDetails extends Vue {
     pre.stderr {
       color: #400;
     }
+  }
+
+  span.collapse {
+    padding: 0.2em;
   }
 }
 

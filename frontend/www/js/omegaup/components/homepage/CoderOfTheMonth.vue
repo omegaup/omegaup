@@ -93,10 +93,10 @@ export default class CoderOfTheMonth extends Vue {
 
 .card-header {
   color: white;
-  background-color: #5588dd;
+  background-color: #58d;
 
   &.card-header-female {
-    background-color: #8855dd;
+    background-color: #85d;
   }
 }
 </style>

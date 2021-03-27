@@ -170,11 +170,13 @@ export default class Markdown extends Vue {
     margin: 1em 0 0.5em 0;
     font-weight: bold;
   }
+
   h2 {
     font-size: 1.1em;
     margin: 1em 0 0.5em 0;
     font-weight: bold;
   }
+
   h3 {
     font-size: 1em;
     margin: 1em 0 0.5em 0;
@@ -190,6 +192,7 @@ export default class Markdown extends Vue {
     widows: 2;
     page-break-inside: avoid;
   }
+
   p {
     margin-bottom: 1em;
   }
@@ -197,9 +200,11 @@ export default class Markdown extends Vue {
   ul {
     list-style: disc;
   }
+
   ol {
     list-style: decimal;
   }
+
   ul li,
   ol li {
     margin-left: 0.25em;
@@ -213,12 +218,14 @@ export default class Markdown extends Vue {
     display: block;
     line-height: 125%;
   }
+
   & > pre > button {
     margin-right: -16px;
     margin-top: -16px;
     padding: 6px;
     font-size: 90%;
   }
+
   td > button.clipboard {
     float: right;
     border-color: rgb(218, 224, 229);
@@ -237,9 +244,11 @@ export default class Markdown extends Vue {
   details {
     padding: 16px;
     border: 1px solid #eee;
+
     summary {
       color: $omegaup-blue;
     }
+
     &[open] > summary {
       margin-bottom: 24px;
     }
@@ -249,9 +258,11 @@ export default class Markdown extends Vue {
     border: 1px solid #000;
     padding: 10px;
   }
+
   table th {
     text-align: center;
   }
+
   table.sample_io {
     margin: 5px;
     padding: 5px;
@@ -264,23 +275,27 @@ export default class Markdown extends Vue {
         background: #f5f5f5;
       }
     }
+
     th {
       padding: 10px;
       border-top: 0;
     }
+
     td {
       vertical-align: top;
       padding: 10px;
       border: 1px solid #000;
     }
+
     pre {
       white-space: pre;
       word-break: keep-all;
       word-wrap: normal;
       background: transparent;
-      border: 0px;
-      padding: 0px;
+      border: 0;
+      padding: 0;
       margin: inherit;
+
       & > button {
         margin-left: 2em;
         padding: 3px;
@@ -303,6 +318,7 @@ export default class Markdown extends Vue {
     display: inline-block;
     float: right;
   }
+
   code.libinteractive-download,
   code.output-only-download {
     background: #eee;
