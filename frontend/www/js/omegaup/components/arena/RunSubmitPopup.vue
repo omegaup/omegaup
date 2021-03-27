@@ -241,5 +241,11 @@ export default class ArenaRunSubmitPopup extends Vue {
 
     this.$emit('submit-run', this.code, this.selectedLanguage);
   }
+
+  clearForm(): void {
+    this.code = '';
+    this.inputFile.type = 'text';
+    this.inputFile.type = 'file';
+  }
 }
 </script>
