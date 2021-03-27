@@ -249,11 +249,11 @@ export default class ArenaRunSubmit extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 form[data-run-submit] {
-  background: $whisper;
+  background: var(--arena-run-submit-form-background-color);
   width: 80%;
   height: 90%;
   margin: auto;
-  border: 2px solid $very-light-grey;
+  border: 2px solid var(--arena-run-submit-form-border-color);
   padding: 1em;
   position: absolute;
   overflow-y: auto;
@@ -271,14 +271,14 @@ form[data-run-submit] {
       position: absolute;
       top: 0;
       right: 0;
-      background-color: $omegaup-white;
-      border: 1px solid $very-light-grey;
+      background-color: var(--arena-form-close-background-color);
+      border: 1px solid var(--arena-form-close-border-color);
       border-width: 0 0 1px 1px;
       font-size: 110%;
       width: 25px;
       height: 25px;
       &:hover {
-        background-color: $whisper;
+        background-color: var(--arena-form-close-background-color--hover);
       }
     }
   }

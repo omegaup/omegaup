@@ -471,6 +471,6 @@ export default class NewForm extends Vue {
 @import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
 
 .multiselect__tag {
-  background: $cornflower-blue;
+  background: var(--multiselect-tag-background-color);
 }
 </style>

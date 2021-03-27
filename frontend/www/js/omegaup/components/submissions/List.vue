@@ -176,16 +176,16 @@ table.submissions-table > tbody > tr > td {
   vertical-align: middle;
 }
 .verdict-AC {
-  background: $mindaro;
+  background: var(--arena-submissions-list-verdict-ac-background-color);
 }
 
 .verdict-CE {
-  background: $orange-peel;
+  background: --arena-submissions-list-verdict-ce-background-color;
 }
 
 .verdict-JE,
 .verdict-VE {
-  background: $red;
+  background: var(--arena-submissions-list-verdict-je-ve-background-color);
 }
 
 .school-text {

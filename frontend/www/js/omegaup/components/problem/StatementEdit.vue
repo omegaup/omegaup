@@ -210,6 +210,6 @@ export default class ProblemStatementEdit extends Vue {
 
 .wmd-preview,
 .wmd-button-bar {
-  background-color: $white;
+  background-color: var(--wmd-button-bar-background-color);
 }
 </style>

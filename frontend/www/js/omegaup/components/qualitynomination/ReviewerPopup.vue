@@ -209,8 +209,8 @@ export default class ReviewerPopup extends Vue {
 ul.tag-select {
   height: 225px;
   overflow: auto;
-  border: 1px solid $very-light-grey;
-  background: $white;
+  border: 1px solid var(--quality-nomination-tag-select-border-color);
+  background: var(--quality-nomination-tag-select-background-color);
   list-style-type: none;
 }
 .tag-label {

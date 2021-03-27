@@ -64,22 +64,22 @@ export default class Username extends Vue {
 }
 
 .user-rank-beginner {
-  color: $beginner;
+  color: var(--user-rank-beginner-font-color);
 }
 
 .user-rank-specialist {
-  color: $specialist;
+  color: var(--user-rank-specialist-font-color);
 }
 
 .user-rank-expert {
-  color: $expert;
+  color: var(--user-rank-expert-font-color);
 }
 
 .user-rank-master {
-  color: $master;
+  color: var(--user-rank-master-font-color);
 }
 
 .user-rank-international-master {
-  color: $international-master;
+  color: var(--user-rank-international-master-font-color);
 }
 </style>

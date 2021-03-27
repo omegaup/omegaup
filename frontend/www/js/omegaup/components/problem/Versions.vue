@@ -269,7 +269,7 @@ export default class ProblemVersions extends Vue {
   overflow-y: auto;
 }
 .controls {
-  border-bottom: 1px solid $btn-cancel-color;
-  background-color: $white-smoke-2;
+  border-bottom: 1px solid var(--problem-versions-controls-border-bottom-color);
+  background-color: var(--problem-versions-controls-background-color);
 }
 </style>

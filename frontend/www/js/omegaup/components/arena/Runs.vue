@@ -681,7 +681,7 @@ caption {
 
 .runs {
   width: 100%;
-  border: 1px solid $very-light-grey;
+  border: 1px solid var(--arena-runs-table-border-color);
   margin-top: 2em;
 }
 
@@ -693,7 +693,7 @@ caption {
 
 .runs td,
 .runs th {
-  border: 1px solid $very-light-grey;
+  border: 1px solid var(--arena-runs-table-td-border-color);
   border-width: 1px 0;
   text-align: center;
 }
@@ -702,12 +702,12 @@ caption {
   display: block;
   padding: 0.5em;
   text-decoration: none;
-  color: $black;
-  background: $very-light-grey;
+  color: var(--arena-runs-table-tfoot-font-color);
+  background: var(--arena-runs-table-tfoot-background-color);
   text-align: center;
 }
 
 .runs tfoot td a:hover {
-  background: $white;
+  background: var(--arena-runs-table-tfoot-background-color--hoover);
 }
 </style>

@@ -62,12 +62,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../../../../sass/main.scss';
+@import '../../../sass/main.scss';
 textarea {
-  background: $nero;
+  background: var(--text-editor-textarea-background-color);
   border: 0px;
   font-family: 'Droid Sans Mono', 'Courier New', monospace,
     'Droid Sans Fallback';
-  color: $light-gray;
+  color: var(--text-editor-textarea-font-color);
 }
 </style>

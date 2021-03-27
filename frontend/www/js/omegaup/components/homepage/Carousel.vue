@@ -69,6 +69,6 @@ export default class Carousel extends Vue {
 
 .carousel {
   background: $omegaup-primary--darker;
-  color: $white;
+  color: var(--homepage-carousel-font-color);
 }
 </style>

@@ -275,10 +275,10 @@ export default class QualityNominationPopup extends Vue {
   right: 4%;
   z-index: 9999999 !important;
   margin: 2em auto 0 auto;
-  border: 2px solid $very-light-grey;
+  border: 2px solid var(--quality-nomination-popup-border-color);
   padding: 1em;
   overflow: auto;
-  background: $black;
+  background: var(--quality-nomination-popup-background-color);
 }
 
 .qualitynomination-popup .control-label {

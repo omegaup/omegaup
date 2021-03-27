@@ -110,14 +110,14 @@ label[class*='small'] {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: $btn-cancel-color;
+  background-color: var(--toggle-switch-slider-background-color);
   -webkit-transition: 0.4s;
   transition: 0.4s;
   &:before {
     position: absolute;
     content: '';
     bottom: 4px;
-    background-color: $white;
+    background-color: var(--toggle-switch-slider-background-color--before);
     -webkit-transition: 0.4s;
     transition: 0.4s;
   }
@@ -126,14 +126,17 @@ input {
   &:checked {
     + {
       .slider {
-        background-color: $header-primary-color;
+        background-color: var(
+          --toggle-switch-input-checked-slider-background-color
+        );
       }
     }
   }
   &:focus {
     + {
       .slider {
-        box-shadow: 0 0 1px $header-primary-color;
+        box-shadow: 0 0 1px
+          var(--toggle-switch-input-focus-slider-background-color);
       }
     }
   }

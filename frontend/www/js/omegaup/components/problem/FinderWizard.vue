@@ -180,10 +180,10 @@ export default class ProblemFinderWizard extends Vue {
 }
 
 .modal-container {
-  background: $whisper;
+  background: var(--finder-wizard-modal-container-background-color);
   width: 800px;
   margin: 2.5em auto 0;
-  border: 2px solid $very-light-grey;
+  border: 2px solid var(--finder-wizard-modal-container-border-color);
   padding: 1em;
   position: relative;
   overflow: auto;
@@ -224,7 +224,7 @@ export default class ProblemFinderWizard extends Vue {
 .tags-input-remove:after,
 .tags-input-typeahead-item-highlighted-default,
 .vue-slider-process {
-  background-color: $cornflower-blue;
+  background-color: var(--finder-wizard-slider-process-background-color);
 }
 
 .vue-slider {
@@ -245,16 +245,16 @@ export default class ProblemFinderWizard extends Vue {
   display: block;
   cursor: pointer;
   padding: 0.25em 1em;
-  border: 1px solid $cornflower-blue;
+  border: 1px solid var(--finder-wizard-tab-select-el-border-color);
   flex: 1;
   text-align: center;
-  color: $cornflower-blue;
+  color: var(--finder-wizard-tab-select-el-font-color);
 }
 
 .tab-select-el:hover,
 .tab-select-el-active {
-  color: $white;
-  background: $cornflower-blue;
+  color: var(--finder-wizard-tab-select-el-font-color--active);
+  background: var(--finder-wizard-tab-select-el-background-color--active);
 }
 
 .hidden-radio {

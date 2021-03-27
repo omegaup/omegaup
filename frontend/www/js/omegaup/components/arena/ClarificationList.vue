@@ -139,9 +139,9 @@ export default class ArenaClarificationList extends Vue {
   padding: 0.5rem;
   font-size: 0.8rem;
   line-height: 1.42857143;
-  color: $night-rider;
+  color: var(--clarifications-list-pre-font-color);
   word-break: break-all;
-  background-color: $white-smoke-2;
+  background-color: var(--clarifications-list-pre-background-color);
   border-radius: 4px;
 }
 </style>

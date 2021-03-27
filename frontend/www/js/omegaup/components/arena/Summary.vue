@@ -109,7 +109,7 @@ export default class Summary extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 .summary {
-  background: $white;
+  background: var(--arena-summary-background-color);
   padding: 1em;
   margin-top: -1.5em;
   margin-right: -1em;

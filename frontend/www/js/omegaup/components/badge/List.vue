@@ -74,7 +74,7 @@ export default class BadgeList extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 a.badges-link {
-  color: $curious-blue;
+  color: var(--badges-link-font-color);
   font-size: 1rem;
 }
 </style>

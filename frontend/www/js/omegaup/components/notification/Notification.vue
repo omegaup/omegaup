@@ -136,7 +136,7 @@ export default class Notification extends Vue {
 
 .notification-date {
   font-size: 0.8rem;
-  color: $dim-gray;
+  color: var(--notifications-notification-date-font-color);
 }
 
 .notification-link {

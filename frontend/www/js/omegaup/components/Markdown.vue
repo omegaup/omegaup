@@ -207,7 +207,7 @@ export default class Markdown extends Vue {
 
   pre {
     padding: 16px;
-    background: $whisper;
+    background: var(--markdown-pre-background-color);
     margin: 1em 0;
     border-radius: 6px;
     display: block;
@@ -236,9 +236,9 @@ export default class Markdown extends Vue {
 
   details {
     padding: 16px;
-    border: 1px solid $whisper;
+    border: 1px solid var(--markdown-details-border-color);
     summary {
-      color: $omegaup-blue;
+      color: var(--markdown-details-summary-font-color);
     }
     &[open] > summary {
       margin-bottom: 24px;
@@ -246,7 +246,7 @@ export default class Markdown extends Vue {
   }
 
   table td {
-    border: 1px solid $black;
+    border: 1px solid var(--markdown-td-border-color);
     padding: 10px;
   }
   table th {
@@ -257,11 +257,11 @@ export default class Markdown extends Vue {
     padding: 5px;
 
     tbody {
-      background: $whisper;
-      border: 1px solid $black;
+      background: var(--markdown-sample-io-tbody-background-color);
+      border: 1px solid var(--markdown-sample-io-tbody-border-color);
 
       tr:nth-child(even) {
-        background: $white-smoke-2;
+        background: var(--markdown-sample-io-tr-even-element-background-color);
       }
     }
     th {
@@ -271,7 +271,7 @@ export default class Markdown extends Vue {
     td {
       vertical-align: top;
       padding: 10px;
-      border: 1px solid $black;
+      border: 1px solid var(--markdown-sample-io-td-border-color);
     }
     pre {
       white-space: pre;
@@ -305,10 +305,10 @@ export default class Markdown extends Vue {
   }
   code.libinteractive-download,
   code.output-only-download {
-    background: $whisper;
-    color: $very-light-grey;
+    background: var(--markdown-libinteractive-download-background-color);
+    color: var(--markdown-libinteractive-download-font-color);
     margin: 1em 0;
-    border: 1px dotted $very-light-grey;
+    border: 1px dotted var(--markdown-libinteractive-download-border-color);
     display: block;
     text-align: center;
     font-size: 2em;

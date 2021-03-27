@@ -52,7 +52,7 @@ export default class ArenaNavbarMiniranking extends Vue {
   margin-top: 2em;
 }
 .navbar .mini-ranking td {
-  border: 1px solid $black;
+  border: 1px solid var(--arena-navbar-miniranking-td-border-color);
   padding: 0.2em;
 }
 .navbar .mini-ranking th {

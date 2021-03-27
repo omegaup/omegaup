@@ -273,6 +273,6 @@ export default class ArenaContestList extends Vue {
   text-align: center;
   font-size: 200%;
   margin: 1em;
-  color: $dark-gray;
+  color: var(--arena-contest-list-empty-category-font-color);
 }
 </style>

@@ -124,7 +124,7 @@ export default class ProblemSettingsSummary extends Vue {
     }
     td,
     th[scope='row'] {
-      border: 1px solid $black;
+      border: 1px solid var(--arena-settings-summary-panel-th-border-color);
       padding: 2px;
     }
   }

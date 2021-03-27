@@ -62,14 +62,16 @@ export default class GraderStatus extends Vue {
 @import '../../../../sass/main.scss';
 .grader-submissions,
 a.grader-submissions-link {
-  background-color: $white;
-  color: $black !important;
+  background-color: var(--grader-status-submissions-link-background-color);
+  color: var(--grader-status-submissions-link-font-color) !important;
   text-decoration: none;
 }
 
 .grader-submissions:hover,
 a.grader-submissions-link:hover {
-  background-color: $white !important;
+  background-color: var(
+    --grader-status-submissions-link-background-color--hover
+  ) !important;
 }
 
 .grader {

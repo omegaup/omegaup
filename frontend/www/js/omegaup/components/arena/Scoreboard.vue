@@ -169,13 +169,13 @@ export default class ArenaScoreboard extends Vue {
   max-width: 900px;
   margin: 0 auto;
   a {
-    color: $cyan-blue-shade;
+    color: var(--arena-scoreboard-a-font-color);
   }
   .footer {
     padding: 1em;
     text-align: right;
     font-size: 70%;
-    color: $grey;
+    color: var(--arena-scoreboard-footer-font-color);
   }
   table {
     border-collapse: collapse;
@@ -188,7 +188,7 @@ export default class ArenaScoreboard extends Vue {
   td {
     text-align: center;
     vertical-align: middle;
-    border: 1px solid $black;
+    border: 1px solid var(--arena-scoreboard-td-border-color);
     padding: 0.2em;
     .points {
       font-weight: bold;
@@ -198,20 +198,20 @@ export default class ArenaScoreboard extends Vue {
     }
   }
   .accepted {
-    background: $tara;
+    background: var(--arena-scoreboard-accepted-background-color);
   }
   .pending {
-    background: $quartz;
+    background: var(--arena-scoreboard-pending-background-color);
   }
   .wrong {
-    background: $misty-rose;
+    background: var(--arena-scoreboard-wrong-background-color);
   }
   .position.recent-event {
     font-weight: bold;
-    background: $tara;
+    background: var(--arena-scoreboard-position-recent-event-background-color);
   }
   .accepted.recent-event {
-    background: $screamin-green;
+    background: var(--arena-scoreboard-accepted-recent-event-background-color);
   }
   .position {
     width: 3.5em;

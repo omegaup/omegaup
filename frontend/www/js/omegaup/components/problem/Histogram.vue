@@ -204,24 +204,40 @@ export default class ProblemHistogram extends Vue {
 .omegaup-histogram-bar-1 {
   background-image: linear-gradient(
     to right,
-    $cornflower-blue-2 50%,
+    var(--arena-histogram-bar-1-background-gradient) 50%,
     transparent 50%
   );
 }
 
 .omegaup-histogram-bar-2 {
-  background-image: linear-gradient(to right, $onahau 50%, transparent 50%);
+  background-image: linear-gradient(
+    to right,
+    var(--arena-histogram-bar-2-background-gradient) 50%,
+    transparent 50%
+  );
 }
 
 .omegaup-histogram-bar-3 {
-  background-image: linear-gradient(to right, $porcelain 50%, transparent 50%);
+  background-image: linear-gradient(
+    to right,
+    var(--arena-histogram-bar-3-background-gradient) 50%,
+    transparent 50%
+  );
 }
 
 .omegaup-histogram-bar-4 {
-  background-image: linear-gradient(to right, $apricot 50%, transparent 50%);
+  background-image: linear-gradient(
+    to right,
+    var(--arena-histogram-bar-4-background-gradient) 50%,
+    transparent 50%
+  );
 }
 
 .omegaup-histogram-bar-5 {
-  background-image: linear-gradient(to right, $amaranth 50%, transparent 50%);
+  background-image: linear-gradient(
+    to right,
+    var(--arena-histogram-bar-5-background-gradient) 50%,
+    transparent 50%
+  );
 }
 </style>
