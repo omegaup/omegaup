@@ -9,13 +9,15 @@
           <thead>
             <tr>
               <th>{{ T.wordsGroup }}</th>
-              <th v-if="data.feedback !== 'summary'">{{ T.wordsCase }}</th>
+              <th v-if="data.submissionFeedback !== 'summary'">
+                {{ T.wordsCase }}
+              </th>
               <th>{{ T.wordsVerdict }}</th>
               <th colspan="3">{{ T.rankScore }}</th>
               <th width="1"></th>
             </tr>
           </thead>
-          <tbody v-for="element in data.groups">
+          <tbody v-for="element in data.groups" :key="element.group">
             <tr class="group">
               <th class="center">{{ element.group }}</th>
               <th v-if="element.verdict" class="text-center">
@@ -95,6 +97,31 @@
             </template>
           </tbody>
         </table>
+        <div v-if="inCourse && data.feedback === null" class="feedback-section">
+          <a role="button" @click="showFeedbackForm = !showFeedbackForm">{{
+            T.submissionFeedbackButton
+          }}</a>
+          <div v-show="showFeedbackForm" class="form-group">
+            <textarea
+              v-model="feedback"
+              class="form-control"
+              rows="3"
+              maxlength="200"
+            ></textarea>
+            <button
+              class="btn btn-sm btn-primary"
+              :disabled="feedback.length === 0"
+              @click.prevent="
+                $emit('send-feedback', {
+                  guid: data.guid,
+                  feedback,
+                })
+              "
+            >
+              {{ T.wordsSend }}
+            </button>
+          </div>
+        </div>
       </div>
       <h3>{{ T.wordsSource }}</h3>
       <a v-if="data.source_link" download="data.zip" :href="data.source">{{
@@ -182,10 +209,13 @@ const EMPTY_FIELD = '∅';
 })
 export default class ArenaRunDetails extends Vue {
   @Prop() data!: types.RunDetails;
+  @Prop({ default: false }) inCourse!: boolean;
 
   EMPTY_FIELD = EMPTY_FIELD;
   T = T;
   groupVisible: GroupVisibility = {};
+  showFeedbackForm = false;
+  feedback = '';
 
   toggle(group: string): void {
     const visible = this.groupVisible[group];
@@ -341,6 +371,18 @@ export default class ArenaRunDetails extends Vue {
 
     pre.stderr {
       color: #400;
+    }
+  }
+}
+
+.feedback-section {
+  margin-top: 1.5em;
+
+  .form-group {
+    margin-top: 0.5em;
+
+    button {
+      margin-top: 1em;
     }
   }
 }

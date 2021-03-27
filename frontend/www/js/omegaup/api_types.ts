@@ -227,6 +227,10 @@ export namespace types {
             x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           })(x.scoreboard);
+        if (x.submissionDeadline)
+          x.submissionDeadline = ((x: number) => new Date(x * 1000))(
+            x.submissionDeadline,
+          );
         x.users = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -1758,6 +1762,7 @@ export namespace types {
     problems: types.NavbarProblemsetProblem[];
     scoreboard?: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    submissionDeadline?: Date;
     users: types.ContestUser[];
   }
 
@@ -3550,6 +3555,11 @@ export namespace messages {
   export type CourseMyProgressResponse = {
     assignments: types.AssignmentProgress;
   };
+  export type CourseProblemClarificationsRequest = { [key: string]: any };
+  export type _CourseProblemClarificationsServerResponse = any;
+  export type CourseProblemClarificationsResponse = {
+    clarifications: types.ProblemClarification[];
+  };
   export type CourseRegisterForCourseRequest = { [key: string]: any };
   export type CourseRegisterForCourseResponse = {};
   export type CourseRemoveAdminRequest = { [key: string]: any };
@@ -4411,6 +4421,9 @@ export namespace controllers {
     myProgress: (
       params?: messages.CourseMyProgressRequest,
     ) => Promise<messages.CourseMyProgressResponse>;
+    problemClarifications: (
+      params?: messages.CourseProblemClarificationsRequest,
+    ) => Promise<messages.CourseProblemClarificationsResponse>;
     registerForCourse: (
       params?: messages.CourseRegisterForCourseRequest,
     ) => Promise<messages.CourseRegisterForCourseResponse>;
