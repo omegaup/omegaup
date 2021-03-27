@@ -571,10 +571,10 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         // Happy ending
-        $response['nextSubmissionTimestamp'] = \OmegaUp\DAO\Runs::nextSubmissionTimestampByProblem(
-            intval($problem->problem_id),
-            intval($r->identity->identity_id),
-            $contest
+        $response['nextSubmissionTimestamp'] = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
+            $contest,
+            /*lastSubmissionTime=*/
+                new \OmegaUp\Timestamp(\OmegaUp\Time::get())
         );
 
         if (is_null($submission->guid)) {
