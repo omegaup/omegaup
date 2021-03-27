@@ -106,6 +106,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
      * submission gap.
      */
     final public static function isInsideSubmissionGap(
+        \OmegaUp\DAO\VO\Submissions $submission,
         ?int $problemsetId,
         ?\OmegaUp\DAO\VO\Contests $contest,
         int $problemId,
@@ -161,7 +162,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             );
         }
 
-        return \OmegaUp\Time::get() >= ($lastRunTime->time + $submissionGap);
+        return $submission->time->time >= ($lastRunTime->time + $submissionGap);
     }
 
     public static function countAcceptedSubmissions(
