@@ -56,12 +56,15 @@ img {
   display: block;
   width: 100%;
 }
+
 .badge-icon img {
   max-height: 100%;
 }
+
 .badge-name {
   padding-top: 0.5rem;
 }
+
 .badge-gray {
   filter: grayscale(100%);
 }

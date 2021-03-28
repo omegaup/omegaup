@@ -267,6 +267,7 @@ export default class ProblemVersions extends Vue {
   max-height: 600px;
   overflow-y: auto;
 }
+
 .controls {
   border-bottom: 1px solid #ddd;
   background-color: #f5f5f5;

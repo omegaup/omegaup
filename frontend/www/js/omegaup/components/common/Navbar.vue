@@ -351,7 +351,6 @@ export default class Navbar extends Vue {
   border-color: transparent;
   margin: 0;
   border-bottom-width: 0;
-
   background-color: $header-primary-color;
 
   & .caret {
@@ -407,6 +406,7 @@ export default class Navbar extends Vue {
 
   & .navbar-nav {
     margin: 0;
+
     li {
       a {
         color: $header-font-primary-color;
@@ -464,7 +464,7 @@ export default class Navbar extends Vue {
       & .grader-error {
         color: $status-error;
         background-image: linear-gradient(
-          rgb(242, 222, 222) 0px,
+          rgb(242, 222, 222) 0,
           rgb(231, 195, 195) 100%
         );
       }
@@ -472,7 +472,7 @@ export default class Navbar extends Vue {
       & .grader-ok {
         color: $status-success;
         background-image: linear-gradient(
-          rgb(223, 240, 216) 0px,
+          rgb(223, 240, 216) 0,
           rgb(200, 229, 188) 100%
         );
         background-color: rgb(223, 240, 216);

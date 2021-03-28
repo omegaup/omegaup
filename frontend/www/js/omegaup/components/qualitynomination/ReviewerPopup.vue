@@ -212,6 +212,7 @@ ul.tag-select {
   background: #fff;
   list-style-type: none;
 }
+
 .tag-label {
   width: -webkit-fill-available;
   margin-bottom: 0;
