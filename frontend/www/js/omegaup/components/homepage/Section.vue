@@ -40,6 +40,7 @@ export default class Homepage extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
+
 h3.display-4 {
   color: $omegaup-primary--darker;
   font-weight: normal;

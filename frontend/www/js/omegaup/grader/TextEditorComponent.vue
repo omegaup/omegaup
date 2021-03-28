@@ -63,8 +63,8 @@ export default {
 
 <style scoped>
 textarea {
-  background: #222222;
-  border: 0px;
+  background: #222;
+  border: 0;
   font-family: 'Droid Sans Mono', 'Courier New', monospace,
     'Droid Sans Fallback';
   color: #d4d4d4;

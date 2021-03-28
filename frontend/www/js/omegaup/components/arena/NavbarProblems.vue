@@ -131,7 +131,7 @@ export default class ArenaNavbarProblems extends Vue {
 }
 
 .problem-list > div a {
-  color: #5588dd;
+  color: #58d;
   display: block;
   padding: 0.5em;
   width: 100%;

@@ -167,54 +167,68 @@ export default class ArenaScoreboard extends Vue {
 .omegaup-scoreboard {
   max-width: 900px;
   margin: 0 auto;
+
   a {
-    color: #5588dd;
+    color: #58d;
   }
+
   .footer {
     padding: 1em;
     text-align: right;
     font-size: 70%;
     color: grey;
   }
+
   table {
     border-collapse: collapse;
     width: 100%;
   }
+
   th {
     padding: 0.2em;
     text-align: center;
   }
+
   td {
     text-align: center;
     vertical-align: middle;
     border: 1px solid #000;
     padding: 0.2em;
+
     .points {
       font-weight: bold;
     }
+
     .penalty {
       font-size: 70%;
     }
   }
+
   .accepted {
     background: #dfd;
   }
+
   .pending {
     background: #ddf;
   }
+
   .wrong {
     background: #fdd;
   }
+
   .position.recent-event {
     font-weight: bold;
     background: #dfd;
   }
+
   .accepted.recent-event {
     background: #8f8;
   }
+
   .position {
     width: 3.5em;
   }
+
   .legend {
     width: 0.5em;
   }
