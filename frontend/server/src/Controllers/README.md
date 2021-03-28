@@ -84,6 +84,7 @@
   - [`/api/course/listStudents/`](#apicourseliststudents)
   - [`/api/course/listUnsolvedProblems/`](#apicourselistunsolvedproblems)
   - [`/api/course/myProgress/`](#apicoursemyprogress)
+  - [`/api/course/problemClarifications/`](#apicourseproblemclarifications)
   - [`/api/course/registerForCourse/`](#apicourseregisterforcourse)
   - [`/api/course/removeAdmin/`](#apicourseremoveadmin)
   - [`/api/course/removeAssignment/`](#apicourseremoveassignment)
@@ -1847,6 +1848,28 @@ Returns details of a given course
 | Name          | Type                       |
 | ------------- | -------------------------- |
 | `assignments` | `types.AssignmentProgress` |
+
+## `/api/course/problemClarifications/`
+
+### Description
+
+Get clarifications of problem in a contest
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `offset`           | `int`    |             |
+| `problem_alias`    | `string` |             |
+| `rowcount`         | `int`    |             |
+
+### Returns
+
+| Name             | Type                           |
+| ---------------- | ------------------------------ |
+| `clarifications` | `types.ProblemClarification[]` |
 
 ## `/api/course/registerForCourse/`
 

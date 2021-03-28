@@ -146,6 +146,10 @@ class RequestParam {
                 $splitTypes = ['str'];
                 break;
             }
+            if ($splitType == 'boolean') {
+                $splitTypes[] = 'bool';
+                continue;
+            }
             if ($splitType == 'string') {
                 $splitTypes[] = 'str';
                 continue;
@@ -1010,7 +1014,11 @@ EOD;
                     echo "\n";
                     echo "        Args:\n";
                     foreach ($method->requestParams as $requestParam) {
-                        echo "            {$requestParam->name}: {$requestParam->description}\n";
+                        if (empty($requestParam->description)) {
+                            echo "            {$requestParam->name}:\n";
+                        } else {
+                            echo "            {$requestParam->name}: {$requestParam->description}\n";
+                        }
                     }
                 }
 
@@ -1023,7 +1031,7 @@ EOD;
                     if ($requestParam->isOptional) {
                         continue;
                     }
-                    echo "              '{$requestParam->name}': {$requestParam->pythonStringifiedValue()},\n";
+                    echo "            '{$requestParam->name}': {$requestParam->pythonStringifiedValue()},\n";
                 }
                 echo "        }\n";
                 foreach ($method->requestParams as $requestParam) {
@@ -1031,13 +1039,13 @@ EOD;
                         continue;
                     }
                     echo "        if {$requestParam->name} is not None:\n";
-                    echo "              parameters['{$requestParam->name}'] = {$requestParam->pythonStringifiedValue()}\n";
+                    echo "            parameters['{$requestParam->name}'] = {$requestParam->pythonStringifiedValue()}\n";
                 }
                 echo "        return self._client.query('/api/{$controller->apiName}/{$apiMethodName}/',\n";
-                echo "                               payload=parameters,\n";
-                echo "                               files_=files_,\n";
-                echo "                               timeout_=timeout_,\n";
-                echo "                               check_=check_)\n";
+                echo "                                  payload=parameters,\n";
+                echo "                                  files_=files_,\n";
+                echo "                                  timeout_=timeout_,\n";
+                echo "                                  check_=check_)\n";
                 echo "\n";
             }
         }
@@ -1046,22 +1054,29 @@ EOD;
         echo "class Client:\n";
         echo "    \"\"\".\"\"\",\n";
         echo "    def __init__(self,\n";
-        echo "                 username: str,\n";
         echo "                 *,\n";
+        echo "                 username: Optional[str] = None,\n";
         echo "                 password: Optional[str] = None,\n";
+        echo "                 api_token: Optional[str] = None,\n";
         echo "                 auth_token: Optional[str] = None,\n";
         echo "                 url: str = 'https://omegaup.com') -> None:\n";
         echo "        self._url = url\n";
+        echo "        self.username: Optional[str] = username\n";
+        echo "        self.api_token: Optional[str] = api_token\n";
         echo "        self.auth_token: Optional[str] = None\n";
-        echo "        self.username = username\n";
-        echo "        if auth_token is not None:\n";
-        echo "            self.auth_token = auth_token\n";
-        echo "        elif password is not None:\n";
-        echo "            self.auth_token = self.query('/api/user/login/',\n";
-        echo "                                         payload={\n";
-        echo "                                             'usernameOrEmail': username,\n";
-        echo "                                             'password': password,\n";
-        echo "                                         })['auth_token']\n";
+        echo "        if api_token is None:\n";
+        echo "            if username is None:\n";
+        echo "                raise ValueError(\n";
+        echo "                    'username cannot be None if api_token is not provided',\n";
+        echo "                )\n";
+        echo "            if auth_token is not None:\n";
+        echo "                self.auth_token = auth_token\n";
+        echo "            elif password is not None:\n";
+        echo "                self.auth_token = self.query('/api/user/login/',\n";
+        echo "                                             payload={\n";
+        echo "                                                 'usernameOrEmail': username,\n";
+        echo "                                                 'password': password,\n";
+        echo "                                             })['auth_token']\n";
         foreach ($this->controllers as $controller) {
             echo "        self._{$controller->apiName}: Optional[{$controller->classBasename}] = None\n";
         }
@@ -1083,11 +1098,21 @@ EOD;
         echo "            logger.debug('Calling endpoint: %s', endpoint)\n";
         echo "            logger.debug('Payload: %s', _filterKeys(payload, {'password'}))\n";
         echo "\n";
-        echo "        if self.auth_token is not None:\n";
+        echo "        headers = {}\n";
+        echo "        if self.api_token is not None:\n";
+        echo "            if self.username is not None:\n";
+        echo "                headers['Authorization'] = ','.join((\n";
+        echo "                    f'Credential={self.api_token}',\n";
+        echo "                    f'Username={self.username}',\n";
+        echo "                ))\n";
+        echo "            else:\n";
+        echo "                headers['Authorization'] = self.api_token\n";
+        echo "        elif self.auth_token is not None:\n";
         echo "            payload['ouat'] = self.auth_token\n";
         echo "\n";
         echo "        r = requests.post(urllib.parse.urljoin(self._url, endpoint),\n";
         echo "                          data=payload,\n";
+        echo "                          headers=headers,\n";
         echo "                          files=files_,\n";
         echo "                          timeout=timeout_.total_seconds())\n";
         echo "\n";

@@ -421,6 +421,7 @@ export default class CourseViewProgress extends Vue {
   overflow: auto;
   white-space: nowrap;
 }
+
 .sticky-offset {
   top: 4rem;
 }

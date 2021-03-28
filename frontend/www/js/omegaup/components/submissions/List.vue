@@ -174,6 +174,7 @@ export default class SubmissionsList extends Vue {
 table.submissions-table > tbody > tr > td {
   vertical-align: middle;
 }
+
 .verdict-AC {
   background: #cf6;
 }
