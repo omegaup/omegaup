@@ -220,6 +220,8 @@ export default class ArenaContest extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .navleft {
   overflow: hidden;
 

@@ -64,11 +64,11 @@ export default class Carousel extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
 .carousel {
-  background: $omegaup-primary--darker;
+  background: var(--homepage-carousel-background-color) !important;
   color: var(--homepage-carousel-font-color);
 }
 </style>
