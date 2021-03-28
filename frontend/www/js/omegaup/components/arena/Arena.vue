@@ -135,6 +135,11 @@ export default class Arena extends Vue {
   line-height: 0.4em;
 }
 
+.nav-tabs .nav-link {
+  background-color: var(--arena-contest-navtabs-link-background-color);
+  border-top-color: var(--arena-contest-navtabs-link-border-top-color);
+}
+
 .navleft {
   overflow: hidden;
 }

@@ -217,11 +217,6 @@ export default class ArenaContestPractice extends Vue {
   overflow: hidden;
 }
 
-.nav-tabs .nav-link {
-  background-color: var(--arena-contest-navtabs-link-background-color);
-  border-top-color: var(--arena-contest-navtabs-link-border-top-color);
-}
-
 .navleft .navbar {
   width: 21em;
   float: left;

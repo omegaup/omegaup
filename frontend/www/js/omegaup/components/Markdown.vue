@@ -156,7 +156,7 @@ export default class Markdown extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../../../../node_modules/prismjs/themes/prism.css';
 @import '../../../sass/main.scss';
 

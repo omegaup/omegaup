@@ -144,4 +144,15 @@ export default class ArenaClarificationList extends Vue {
   background-color: var(--clarifications-list-pre-background-color);
   border-radius: 4px;
 }
+
+a {
+  background-color: var(--btn-ok-background-color) !important;
+  color: var(--btn-ok-font-color) !important;
+  
+  /* stylelint-disable-next-line no-descending-specificity */
+  &:hover {
+    color: var(--btn-ok-font-color) !important;
+    text-decoration: none !important;
+  }
+}
 </style>

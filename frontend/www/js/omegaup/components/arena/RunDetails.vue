@@ -243,7 +243,7 @@ export default class ArenaRunDetails extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../../../sass/main.scss';
 
 #overlay {
