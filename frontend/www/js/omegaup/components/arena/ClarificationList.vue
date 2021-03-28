@@ -148,7 +148,7 @@ export default class ArenaClarificationList extends Vue {
 a {
   background-color: var(--btn-ok-background-color) !important;
   color: var(--btn-ok-font-color) !important;
-  
+
   /* stylelint-disable-next-line no-descending-specificity */
   &:hover {
     color: var(--btn-ok-font-color) !important;
