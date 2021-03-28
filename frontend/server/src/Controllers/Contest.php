@@ -589,8 +589,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'users' => \OmegaUp\DAO\ProblemsetIdentities::getWithExtraInformation(
                 intval($contest->problemset_id)
             ),
-            'clarifications' => \OmegaUp\DAO\Clarifications::getContestClarifications(
+            'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
                 $contest,
+                /* course */ null,
                 $contestAdmin,
                 $identity,
                 /*$offset=*/ null,
@@ -3391,8 +3392,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'clarifications' => \OmegaUp\DAO\Clarifications::getContestClarifications(
+            'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
                 $contest,
+                /* course */ null,
                 \OmegaUp\Authorization::isContestAdmin(
                     $r->identity,
                     $contest

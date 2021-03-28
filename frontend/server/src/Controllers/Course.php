@@ -4878,7 +4878,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'clarifications' => \OmegaUp\DAO\Clarifications::getCourseClarifications(
+            'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
+                /* contest */                null,
                 $course,
                 \OmegaUp\Authorization::isCourseAdmin($r->identity, $course),
                 $r->identity,
