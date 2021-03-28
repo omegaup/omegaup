@@ -299,7 +299,7 @@ export default class QualityNominationPopup extends Vue {
   opacity: 0;
 }
 
-.qualitynomination-popup .required .control-label:before {
+.qualitynomination-popup .required .control-label::before {
   content: '*';
   color: red;
   position: absolute;
@@ -328,10 +328,7 @@ export default class QualityNominationPopup extends Vue {
 ul.tag-select {
   height: 185px;
   overflow: auto;
-  border: 1px solid $very-light-grey;
-}
-
-ul.tag-select {
+  border: 1px solid var(--quality-nomination-popup-border-color);
   list-style-type: none;
   margin: 0;
   padding: 0;

@@ -420,6 +420,7 @@ export default class Navbar extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
+
 nav.navbar {
   background-color: var(--header-primary-color);
 

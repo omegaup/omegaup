@@ -279,9 +279,11 @@ export default class UserProfile extends Vue {
 a:hover {
   cursor: pointer;
 }
+
 th.numericColumn {
   text-align: right;
 }
+
 [data-user-profile-root] {
   font-size: 1rem;
 }

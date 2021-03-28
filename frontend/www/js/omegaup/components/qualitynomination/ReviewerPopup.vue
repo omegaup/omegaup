@@ -213,6 +213,7 @@ ul.tag-select {
   background: var(--quality-nomination-tag-select-background-color);
   list-style-type: none;
 }
+
 .tag-label {
   width: -webkit-fill-available;
   margin-bottom: 0;

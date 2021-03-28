@@ -113,15 +113,19 @@ export default class ProblemSettingsSummary extends Vue {
     font-size: 1.5em;
     margin: 1em;
   }
+
   table {
     width: 30em;
     margin: 10px auto;
+
     td {
       text-align: center;
     }
+
     th[scope='row'] {
       font-weight: bold;
     }
+
     td,
     th[scope='row'] {
       border: 1px solid var(--arena-settings-summary-panel-th-border-color);

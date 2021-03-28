@@ -222,11 +222,13 @@ export default class ArenaContest extends Vue {
 <style lang="scss" scoped>
 .navleft {
   overflow: hidden;
+
   .navbar {
     width: 21em;
     float: left;
     background: transparent;
   }
+
   .main {
     margin-left: 20em;
     border: 1px solid var(--arena-contest-navleft-main-border-color);

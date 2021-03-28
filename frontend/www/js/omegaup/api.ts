@@ -892,6 +892,22 @@ export const Course = {
     messages.CourseMyProgressRequest,
     messages.CourseMyProgressResponse
   >('/api/course/myProgress/'),
+  problemClarifications: apiCall<
+    messages.CourseProblemClarificationsRequest,
+    messages._CourseProblemClarificationsServerResponse,
+    messages.CourseProblemClarificationsResponse
+  >('/api/course/problemClarifications/', (x) => {
+    x.clarifications = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.clarifications);
+    return x;
+  }),
   registerForCourse: apiCall<
     messages.CourseRegisterForCourseRequest,
     messages.CourseRegisterForCourseResponse

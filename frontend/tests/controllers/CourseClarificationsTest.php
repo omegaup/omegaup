@@ -197,4 +197,85 @@ class CourseClarificationsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
     }
+
+    public function testListClarificationsForProblemInCourse() {
+        // First student will submit clarification for problem0, problem1
+        \OmegaUp\Controllers\Clarification::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => self::login(
+                    $this->students[0]['identity']
+                )->auth_token,
+                'course_alias' => $this->course->alias,
+                'assignment_alias' => $this->assignmentsAliases[0],
+                'problem_alias' => $this->problems[0]['problem']->alias,
+                'message' => 'Test message',
+            ])
+        );
+
+        \OmegaUp\Controllers\Clarification::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => self::login(
+                    $this->students[0]['identity']
+                )->auth_token,
+                'course_alias' => $this->course->alias,
+                'assignment_alias' => $this->assignmentsAliases[1],
+                'problem_alias' => $this->problems[1]['problem']->alias,
+                'message' => 'Test message',
+            ])
+        );
+
+        // Second student will submit clarification for problem1
+        \OmegaUp\Controllers\Clarification::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => self::login(
+                    $this->students[1]['identity']
+                )->auth_token,
+                'course_alias' => $this->course->alias,
+                'assignment_alias' => $this->assignmentsAliases[1],
+                'problem_alias' => $this->problems[1]['problem']->alias,
+                'message' => 'Test message',
+            ])
+        );
+
+        // Now list clarifications for problem0 (1) and problem1 (2)
+        $response = \OmegaUp\Controllers\Course::apiProblemClarifications(
+            new \OmegaUp\Request([
+                'auth_token' => self::login(
+                    $this->courseAdmin
+                )->auth_token,
+                'course_alias' => $this->course->alias,
+                'assignment_alias' => $this->assignmentsAliases[0],
+                'problem_alias' => $this->problems[0]['problem']->alias
+            ])
+        );
+        $this->assertCount(1, $response['clarifications']);
+
+        $response = \OmegaUp\Controllers\Course::apiProblemClarifications(
+            new \OmegaUp\Request([
+                'auth_token' => self::login(
+                    $this->courseAdmin
+                )->auth_token,
+                'course_alias' => $this->course->alias,
+                'assignment_alias' => $this->assignmentsAliases[1],
+                'problem_alias' => $this->problems[1]['problem']->alias
+            ])
+        );
+        $this->assertCount(2, $response['clarifications']);
+
+        // Random user should receive an exception
+        $randomUser = \OmegaUp\Test\Factories\User::createUser();
+        try {
+            \OmegaUp\Controllers\Course::apiClarifications(
+                new \OmegaUp\Request([
+                    'auth_token' => self::login(
+                        $randomUser['identity']
+                    )->auth_token,
+                    'course_alias' => $this->course->alias,
+                ])
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+    }
 }

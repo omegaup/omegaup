@@ -68,6 +68,7 @@ export default class Intro extends Vue {
   margin-top: 80px;
   text-shadow: 1px 1px var(--schools-intro-header-title-text-shadow-color);
 }
+
 body {
   background: var(--schools-intro-body-background-color);
 }

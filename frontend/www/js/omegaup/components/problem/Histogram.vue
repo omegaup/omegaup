@@ -162,9 +162,6 @@ export default class ProblemHistogram extends Vue {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.omegaup-histogram-score {
   font-size: 70px;
 }
 

@@ -220,8 +220,8 @@ export default class ProblemFinderWizard extends Vue {
   margin-top: 0.35em;
 }
 
-.tags-input-remove:before,
-.tags-input-remove:after,
+.tags-input-remove::before,
+.tags-input-remove::after,
 .tags-input-typeahead-item-highlighted-default,
 .vue-slider-process {
   background-color: var(--finder-wizard-slider-process-background-color);
