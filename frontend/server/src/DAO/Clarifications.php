@@ -9,7 +9,7 @@ namespace OmegaUp\DAO;
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Clarifications}.
  *
- * @psalm-type Clarification=array{answer: null|string, assignment_alias?: string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
+ * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  */
 class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
     /**

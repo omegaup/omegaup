@@ -1867,9 +1867,9 @@ Get clarifications of problem in a contest
 
 ### Returns
 
-| Name             | Type                           |
-| ---------------- | ------------------------------ |
-| `clarifications` | `types.ProblemClarification[]` |
+| Name             | Type                    |
+| ---------------- | ----------------------- |
+| `clarifications` | `types.Clarification[]` |
 
 ## `/api/course/registerForCourse/`
 

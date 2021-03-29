@@ -2390,16 +2390,6 @@ export namespace types {
     [key: string]: { contestantOutput?: string; in: string; out: string };
   }
 
-  export interface ProblemClarification {
-    answer?: string;
-    author: string;
-    clarification_id: number;
-    message: string;
-    public: boolean;
-    receiver?: string;
-    time: Date;
-  }
-
   export interface ProblemDetails {
     accepted: number;
     accepts_submissions: boolean;
@@ -3542,7 +3532,7 @@ export namespace messages {
   export type CourseProblemClarificationsRequest = { [key: string]: any };
   export type _CourseProblemClarificationsServerResponse = any;
   export type CourseProblemClarificationsResponse = {
-    clarifications: types.ProblemClarification[];
+    clarifications: types.Clarification[];
   };
   export type CourseRegisterForCourseRequest = { [key: string]: any };
   export type CourseRegisterForCourseResponse = {};
