@@ -423,6 +423,7 @@ const translations: { [key: string]: string; } = {
   emailNotVerified: "Your email is not verified yet. Please look for the verification email in your inbox and spam folder. If you still have problems, please contact omegaup-soporte@googlegroups.com for support.",
   enterContest: "Enter Contest",
   errorWhileSendingMail: "There was an error sending the verification email. Please try again later or contact omegaup-soporte@googlegroups.com for support. Your email is not verified yet.",
+  feedbackLeftBy: "Feedback left by: <strong><a href=\"https://omegaup.com/profile/%(username)\">%(username)</a></strong>",
   feedbackNotSentYet: "The feedback for this submission has not been sent yet.",
   feedbackSuccesfullyAdded: "The feedback has been succesfully added.",
   firstSumbissionWithIdentity: "Note that you are trying to send a submission with an identity account",

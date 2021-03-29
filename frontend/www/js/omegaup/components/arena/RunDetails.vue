@@ -7,6 +7,15 @@
         <pre>{{
           data.feedback ? data.feedback.feedback : T.feedbackNotSentYet
         }}</pre>
+        <omegaup-markdown
+          v-if="data.feedback"
+          :markdown="
+            ui.formatString(T.feedbackLeftBy, {
+              username: data.feedback.author,
+            })
+          "
+        >
+        </omegaup-markdown>
         <div
           v-if="data.admin && data.feedback === null"
           class="feedback-section"
@@ -191,8 +200,10 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 import arena_CodeView from './CodeView.vue';
 import arena_DiffView from './DiffView.vue';
+import omegaup_Markdown from '../Markdown.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -214,6 +225,7 @@ const EMPTY_FIELD = '∅';
     FontAwesomeIcon,
     'omegaup-arena-code-view': arena_CodeView,
     'omegaup-arena-diff-view': arena_DiffView,
+    'omegaup-markdown': omegaup_Markdown,
   },
 })
 export default class ArenaRunDetails extends Vue {
@@ -222,6 +234,7 @@ export default class ArenaRunDetails extends Vue {
 
   EMPTY_FIELD = EMPTY_FIELD;
   T = T;
+  ui = ui;
   groupVisible: GroupVisibility = {};
   showFeedbackForm = false;
   feedback = this.data?.feedback ? this.data.feedback.feedback : '';
