@@ -2,6 +2,40 @@
   <form data-run-details-view>
     <div v-if="data">
       <button class="close">❌</button>
+      <div v-if="inCourse">
+        <h3>Retroalimentación del profesor</h3>
+        <pre>{{
+          data.feedback ? data.feedback.feedback : T.feedbackNotSentYet
+        }}</pre>
+        <div
+          v-if="data.admin && data.feedback === null"
+          class="feedback-section"
+        >
+          <a role="button" @click="showFeedbackForm = !showFeedbackForm">{{
+            T.submissionFeedbackSendButton
+          }}</a>
+          <div v-show="showFeedbackForm" class="form-group">
+            <textarea
+              v-model="feedback"
+              class="form-control"
+              rows="3"
+              maxlength="200"
+            ></textarea>
+            <button
+              class="btn btn-sm btn-primary"
+              :disabled="feedback.length === 0"
+              @click.prevent="
+                $emit('send-feedback', {
+                  guid: data.guid,
+                  feedback,
+                })
+              "
+            >
+              {{ T.wordsSend }}
+            </button>
+          </div>
+        </div>
+      </div>
       <div v-if="data.groups" class="cases">
         <h3>{{ T.wordsCases }}</h3>
         <div></div>
@@ -97,31 +131,6 @@
             </template>
           </tbody>
         </table>
-        <div v-if="inCourse && data.feedback === null" class="feedback-section">
-          <a role="button" @click="showFeedbackForm = !showFeedbackForm">{{
-            T.submissionFeedbackButton
-          }}</a>
-          <div v-show="showFeedbackForm" class="form-group">
-            <textarea
-              v-model="feedback"
-              class="form-control"
-              rows="3"
-              maxlength="200"
-            ></textarea>
-            <button
-              class="btn btn-sm btn-primary"
-              :disabled="feedback.length === 0"
-              @click.prevent="
-                $emit('send-feedback', {
-                  guid: data.guid,
-                  feedback,
-                })
-              "
-            >
-              {{ T.wordsSend }}
-            </button>
-          </div>
-        </div>
       </div>
       <h3>{{ T.wordsSource }}</h3>
       <a v-if="data.source_link" download="data.zip" :href="data.source">{{
@@ -215,7 +224,7 @@ export default class ArenaRunDetails extends Vue {
   T = T;
   groupVisible: GroupVisibility = {};
   showFeedbackForm = false;
-  feedback = '';
+  feedback = this.data?.feedback ? this.data.feedback.feedback : '';
 
   toggle(group: string): void {
     const visible = this.groupVisible[group];
