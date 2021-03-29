@@ -257,11 +257,11 @@ export default class ArenaRunDetails extends Vue {
   z-index: 9999998 !important;
 
   form {
-    background: #eee;
+    background: var(--arena-run-details-form-background-color);
     width: 80%;
     height: 90%;
     margin: auto;
-    border: 2px solid #ccc;
+    border: 2px solid var(--arena-run-details-form-border-color);
     padding: 1em;
     position: absolute;
     overflow-y: auto;
@@ -280,15 +280,15 @@ export default class ArenaRunDetails extends Vue {
         position: absolute;
         top: 0;
         right: 0;
-        background-color: $omegaup-white;
-        border: 1px solid #ccc;
+        background-color: var(--arena-form-close-background-color);
+        border: 1px solid var(--arena-form-close-border-color);
         border-width: 0 0 1px 1px;
         font-size: 110%;
         width: 25px;
         height: 25px;
 
         &:hover {
-          background-color: #eee;
+          background-color: var(--arena-form-close-background-color--hover);
         }
       }
     }
@@ -356,7 +356,7 @@ export default class ArenaRunDetails extends Vue {
     width: 100%;
 
     tr.group {
-      border-top: 1px solid #ccc;
+      border-top: 1px solid var(--arena-cases-tr-border-top-color);
 
       td,
       th {
@@ -376,7 +376,7 @@ export default class ArenaRunDetails extends Vue {
     }
 
     pre.stderr {
-      color: #400;
+      color: var(--arena-cases-table-stderr-font-color);
     }
   }
 

@@ -220,6 +220,8 @@ export default class ArenaContest extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .navleft {
   overflow: hidden;
 
@@ -231,20 +233,20 @@ export default class ArenaContest extends Vue {
 
   .main {
     margin-left: 20em;
-    border: 1px solid #ccc;
+    border: 1px solid var(--arena-contest-navleft-main-border-color);
     border-width: 0 0 1px 1px;
   }
 }
 
 .nav-tabs {
   .nav-link {
-    background-color: #ddd;
-    border-top-color: #ddd;
+    background-color: var(--arena-contest-navtabs-link-background-color);
+    border-top-color: var(--arena-contest-navtabs-link-border-top-color);
   }
 }
 
 .problem {
-  background: #fff;
+  background: var(--arena-problem-background-color);
   padding: 1em;
   margin-top: -1.5em;
   margin-right: -1em;

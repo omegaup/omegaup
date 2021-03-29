@@ -170,22 +170,23 @@ export default class SubmissionsList extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 table.submissions-table > tbody > tr > td {
   vertical-align: middle;
 }
 
 .verdict-AC {
-  background: #cf6;
+  background: var(--arena-submissions-list-verdict-ac-background-color);
 }
 
 .verdict-CE {
-  background: #f90;
+  background: --arena-submissions-list-verdict-ce-background-color;
 }
 
 .verdict-JE,
 .verdict-VE {
-  background: #f00;
+  background: var(--arena-submissions-list-verdict-je-ve-background-color);
 }
 
 .school-text {

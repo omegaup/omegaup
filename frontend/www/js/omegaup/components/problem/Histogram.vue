@@ -128,7 +128,8 @@ export default class ProblemHistogram extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .omegaup-histogram-container {
   margin: 50px 0;
 }
@@ -198,22 +199,42 @@ export default class ProblemHistogram extends Vue {
 }
 
 .omegaup-histogram-bar-1 {
-  background-image: linear-gradient(to right, #4fa2eb 50%, transparent 50%);
+  background-image: linear-gradient(
+    to right,
+    var(--arena-histogram-bar-1-background-gradient) 50%,
+    transparent 50%
+  );
 }
 
 .omegaup-histogram-bar-2 {
-  background-image: linear-gradient(to right, #c2ddeb 50%, transparent 50%);
+  background-image: linear-gradient(
+    to right,
+    var(--arena-histogram-bar-2-background-gradient) 50%,
+    transparent 50%
+  );
 }
 
 .omegaup-histogram-bar-3 {
-  background-image: linear-gradient(to right, #dddcdb 50%, transparent 50%);
+  background-image: linear-gradient(
+    to right,
+    var(--arena-histogram-bar-3-background-gradient) 50%,
+    transparent 50%
+  );
 }
 
 .omegaup-histogram-bar-4 {
-  background-image: linear-gradient(to right, #faccb4 50%, transparent 50%);
+  background-image: linear-gradient(
+    to right,
+    var(--arena-histogram-bar-4-background-gradient) 50%,
+    transparent 50%
+  );
 }
 
 .omegaup-histogram-bar-5 {
-  background-image: linear-gradient(to right, #df3e4b 50%, transparent 50%);
+  background-image: linear-gradient(
+    to right,
+    var(--arena-histogram-bar-5-background-gradient) 50%,
+    transparent 50%
+  );
 }
 </style>

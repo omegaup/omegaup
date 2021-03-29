@@ -132,15 +132,27 @@ export default class ArenaClarificationList extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 // Deep allows child components to inherit the styles (see: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors)
 /deep/ pre {
   display: block;
   padding: 0.5rem;
   font-size: 0.8rem;
   line-height: 1.42857143;
-  color: #333;
+  color: var(--clarifications-list-pre-font-color);
   word-break: break-all;
-  background-color: #f5f5f5;
+  background-color: var(--clarifications-list-pre-background-color);
   border-radius: 4px;
+}
+
+a {
+  background-color: var(--btn-ok-background-color) !important;
+  color: var(--btn-ok-font-color) !important;
+
+  /* stylelint-disable-next-line no-descending-specificity */
+  &:hover {
+    color: var(--btn-ok-font-color) !important;
+    text-decoration: none !important;
+  }
 }
 </style>
