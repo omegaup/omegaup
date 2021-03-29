@@ -216,6 +216,54 @@ class APITokens extends \OmegaUp\DAO\Base\APITokens {
         }
     }
 
+    /**
+     * @return list<array{name: string, timestamp: \OmegaUp\Timestamp, last_used: \OmegaUp\Timestamp, rate_limit: array{reset: \OmegaUp\Timestamp, limit: int, remaining: int}}>
+     */
+    public static function getAllByUser(int $userId) {
+        /** @var list<array{last_used: \OmegaUp\Timestamp, name: string, timestamp: \OmegaUp\Timestamp, use_count: int}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            '
+                SELECT
+                    at.name,
+                    at.timestamp,
+                    at.last_used,
+                    at.use_count
+                FROM
+                    `API_Tokens` at
+                WHERE
+                    at.user_id = ?
+                ORDER BY
+                    at.apitoken_id;
+            ',
+            [$userId],
+        );
+
+        $lastUsed = (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))
+            ->setTimestamp(\OmegaUp\Time::get());
+        $lastUsed = $lastUsed->setTime(intval($lastUsed->format('G')), 0);
+        $resetTimestamp = new \OmegaUp\Timestamp(
+            $lastUsed->add(new \DateInterval('PT1H'))->getTimestamp(),
+        );
+
+        $apiTokens = [];
+        foreach ($rs as &$apiToken) {
+            $useCount = $apiToken['use_count'];
+            unset($apiToken['use_count']);
+            $remaining = OMEGAUP_SESSION_API_HOURLY_LIMIT;
+            if ($lastUsed->getTimestamp() == $apiToken['last_used']->time) {
+                $remaining = max(0, $remaining - $useCount);
+            }
+            $apiToken['rate_limit'] = [
+                'reset' => $resetTimestamp,
+                'limit' => OMEGAUP_SESSION_API_HOURLY_LIMIT,
+                'remaining' => $remaining,
+            ];
+            $apiTokens[] = $apiToken;
+        }
+
+        return $apiTokens;
+    }
+
     public static function getCountByUser(int $userId): int {
         /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne(

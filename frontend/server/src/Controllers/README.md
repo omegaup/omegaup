@@ -84,6 +84,7 @@
   - [`/api/course/listStudents/`](#apicourseliststudents)
   - [`/api/course/listUnsolvedProblems/`](#apicourselistunsolvedproblems)
   - [`/api/course/myProgress/`](#apicoursemyprogress)
+  - [`/api/course/problemClarifications/`](#apicourseproblemclarifications)
   - [`/api/course/registerForCourse/`](#apicourseregisterforcourse)
   - [`/api/course/removeAdmin/`](#apicourseremoveadmin)
   - [`/api/course/removeAssignment/`](#apicourseremoveassignment)
@@ -218,6 +219,7 @@
   - [`/api/user/interviewStats/`](#apiuserinterviewstats)
   - [`/api/user/lastPrivacyPolicyAccepted/`](#apiuserlastprivacypolicyaccepted)
   - [`/api/user/list/`](#apiuserlist)
+  - [`/api/user/listAPITokens/`](#apiuserlistapitokens)
   - [`/api/user/listAssociatedIdentities/`](#apiuserlistassociatedidentities)
   - [`/api/user/listUnsolvedProblems/`](#apiuserlistunsolvedproblems)
   - [`/api/user/login/`](#apiuserlogin)
@@ -1846,6 +1848,28 @@ Returns details of a given course
 | Name          | Type                       |
 | ------------- | -------------------------- |
 | `assignments` | `types.AssignmentProgress` |
+
+## `/api/course/problemClarifications/`
+
+### Description
+
+Get clarifications of problem in a contest
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `offset`           | `int`    |             |
+| `problem_alias`    | `string` |             |
+| `rowcount`         | `int`    |             |
+
+### Returns
+
+| Name             | Type                           |
+| ---------------- | ------------------------------ |
+| `clarifications` | `types.ProblemClarification[]` |
 
 ## `/api/course/registerForCourse/`
 
@@ -4247,6 +4271,18 @@ it is used by typeahead.
 ```typescript
 types.UserListItem[]
 ```
+
+## `/api/user/listAPITokens/`
+
+### Description
+
+Returns a list of all the API tokens associated with the user.
+
+### Returns
+
+| Name     | Type                                                                                                                    |
+| -------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `tokens` | `{ last_used: Date; name: string; rate_limit: { limit: number; remaining: number; reset: Date; }; timestamp: Date; }[]` |
 
 ## `/api/user/listAssociatedIdentities/`
 

@@ -892,6 +892,22 @@ export const Course = {
     messages.CourseMyProgressRequest,
     messages.CourseMyProgressResponse
   >('/api/course/myProgress/'),
+  problemClarifications: apiCall<
+    messages.CourseProblemClarificationsRequest,
+    messages._CourseProblemClarificationsServerResponse,
+    messages.CourseProblemClarificationsResponse
+  >('/api/course/problemClarifications/', (x) => {
+    x.clarifications = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.clarifications);
+    return x;
+  }),
   registerForCourse: apiCall<
     messages.CourseRegisterForCourseRequest,
     messages.CourseRegisterForCourseResponse
@@ -1752,6 +1768,27 @@ export const User = {
   list: apiCall<messages.UserListRequest, messages.UserListResponse>(
     '/api/user/list/',
   ),
+  listAPITokens: apiCall<
+    messages.UserListAPITokensRequest,
+    messages._UserListAPITokensServerResponse,
+    messages.UserListAPITokensResponse
+  >('/api/user/listAPITokens/', (x) => {
+    x.tokens = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.last_used = ((x: number) => new Date(x * 1000))(x.last_used);
+        x.rate_limit = ((x) => {
+          x.reset = ((x: number) => new Date(x * 1000))(x.reset);
+          return x;
+        })(x.rate_limit);
+        x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+        return x;
+      });
+    })(x.tokens);
+    return x;
+  }),
   listAssociatedIdentities: apiCall<
     messages.UserListAssociatedIdentitiesRequest,
     messages.UserListAssociatedIdentitiesResponse

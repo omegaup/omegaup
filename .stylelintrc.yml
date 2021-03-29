@@ -1,0 +1,16 @@
+extends: stylelint-config-standard
+rules:
+  # TODO: remove.
+  no-descending-specificity: null
+  # conflicts with prettier.
+  declaration-colon-newline-after: null
+  value-list-comma-newline-after: null
+ignoreFiles:
+  - frontend/www/css/dist/**/*
+  - frontend/www/css/markdown-editor-widgets.css
+  - frontend/www/docs/**/*
+  - frontend/www/grader/**/*
+  - frontend/www/karel.js/**/*
+  - frontend/www/libinteractive/**/*
+  - frontend/www/preguntas/**/*
+  - frontend/www/third_party/**/*

@@ -9,13 +9,15 @@
           <thead>
             <tr>
               <th>{{ T.wordsGroup }}</th>
-              <th v-if="data.feedback !== 'summary'">{{ T.wordsCase }}</th>
+              <th v-if="data.submissionFeedback !== 'summary'">
+                {{ T.wordsCase }}
+              </th>
               <th>{{ T.wordsVerdict }}</th>
               <th colspan="3">{{ T.rankScore }}</th>
               <th width="1"></th>
             </tr>
           </thead>
-          <tbody v-for="element in data.groups">
+          <tbody v-for="element in data.groups" :key="element.group">
             <tr class="group">
               <th class="center">{{ element.group }}</th>
               <th v-if="element.verdict" class="text-center">
@@ -95,6 +97,31 @@
             </template>
           </tbody>
         </table>
+        <div v-if="inCourse && data.feedback === null" class="feedback-section">
+          <a role="button" @click="showFeedbackForm = !showFeedbackForm">{{
+            T.submissionFeedbackButton
+          }}</a>
+          <div v-show="showFeedbackForm" class="form-group">
+            <textarea
+              v-model="feedback"
+              class="form-control"
+              rows="3"
+              maxlength="200"
+            ></textarea>
+            <button
+              class="btn btn-sm btn-primary"
+              :disabled="feedback.length === 0"
+              @click.prevent="
+                $emit('send-feedback', {
+                  guid: data.guid,
+                  feedback,
+                })
+              "
+            >
+              {{ T.wordsSend }}
+            </button>
+          </div>
+        </div>
       </div>
       <h3>{{ T.wordsSource }}</h3>
       <a v-if="data.source_link" download="data.zip" :href="data.source">{{
@@ -182,10 +209,13 @@ const EMPTY_FIELD = '∅';
 })
 export default class ArenaRunDetails extends Vue {
   @Prop() data!: types.RunDetails;
+  @Prop({ default: false }) inCourse!: boolean;
 
   EMPTY_FIELD = EMPTY_FIELD;
   T = T;
   groupVisible: GroupVisibility = {};
+  showFeedbackForm = false;
+  feedback = '';
 
   toggle(group: string): void {
     const visible = this.groupVisible[group];
@@ -225,6 +255,7 @@ export default class ArenaRunDetails extends Vue {
   right: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 9999998 !important;
+
   form {
     background: #eee;
     width: 80%;
@@ -241,8 +272,10 @@ export default class ArenaRunDetails extends Vue {
     right: 0;
     display: flex;
     flex-direction: column;
+
     .close-container {
       width: 100%;
+
       .close {
         position: absolute;
         top: 0;
@@ -253,37 +286,46 @@ export default class ArenaRunDetails extends Vue {
         font-size: 110%;
         width: 25px;
         height: 25px;
+
         &:hover {
           background-color: #eee;
         }
       }
     }
+
     .languages {
       width: 100%;
     }
+
     .filename-extension {
       width: 100%;
     }
+
     .run-submit-paste-text {
       width: 100%;
     }
+
     .code-view {
       width: 100%;
       flex-grow: 1;
       overflow: auto;
     }
+
     .upload-file {
       width: 100%;
     }
+
     .submit-run {
       width: 100%;
     }
   }
+
   input[type='submit'] {
     font-size: 110%;
     padding: 0.3em 0.5em;
   }
 }
+
 .dropdown-cases {
   height: 100%;
   width: 100%;
@@ -321,13 +363,7 @@ export default class ArenaRunDetails extends Vue {
         padding: 0.2em inherit 0.2em inherit;
       }
     }
-  }
 
-  span.collapse {
-    padding: 0.2em;
-  }
-
-  table {
     thead th,
     td.center,
     th.center {
@@ -341,6 +377,22 @@ export default class ArenaRunDetails extends Vue {
 
     pre.stderr {
       color: #400;
+    }
+  }
+
+  span.collapse {
+    padding: 0.2em;
+  }
+}
+
+.feedback-section {
+  margin-top: 1.5em;
+
+  .form-group {
+    margin-top: 0.5em;
+
+    button {
+      margin-top: 1em;
     }
   }
 }

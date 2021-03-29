@@ -143,7 +143,7 @@ export default class Clarifications extends Vue {
   font-size: 16px;
   padding: 2px 4px;
   bottom: 4px;
-  right: 0px;
+  right: 0;
 }
 
 .notification-drawer::-webkit-scrollbar-track {

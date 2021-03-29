@@ -87,6 +87,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * runs be created.
      */
     private static function validateWithinSubmissionGap(
+        \OmegaUp\DAO\VO\Submissions $submission,
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Contests $contest
@@ -94,6 +95,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         if (is_null($contest)) {
             if (
                 !\OmegaUp\DAO\Submissions::isInsideSubmissionGap(
+                    $submission,
                     null,
                     null,
                     intval($problem->problem_id),
@@ -108,6 +110,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         } else {
             if (
                 !\OmegaUp\DAO\Submissions::isInsideSubmissionGap(
+                    $submission,
                     intval($contest->problemset_id),
                     $contest,
                     intval($problem->problem_id),
@@ -482,7 +485,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             'status' => 'uploading',
             'runtime' => 0,
             'penalty' => $submitDelay,
-            'time' => \OmegaUp\Time::get(),
+            'time' => $submission->time,
             'memory' => 0,
             'score' => 0,
             'contest_score' => !is_null($problemsetId) ? 0 : null,
@@ -495,6 +498,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             // _Now_ that we are in a transaction, we can check whether the run
             // is within the submission gap.
             self::validateWithinSubmissionGap(
+                $submission,
                 $r->identity,
                 $problem,
                 $contest
