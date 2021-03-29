@@ -164,19 +164,20 @@ export default class ArenaScoreboard extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .omegaup-scoreboard {
   max-width: 900px;
   margin: 0 auto;
 
   a {
-    color: #58d;
+    color: var(--arena-scoreboard-a-font-color);
   }
 
   .footer {
     padding: 1em;
     text-align: right;
     font-size: 70%;
-    color: grey;
+    color: var(--arena-scoreboard-footer-font-color);
   }
 
   table {
@@ -192,7 +193,7 @@ export default class ArenaScoreboard extends Vue {
   td {
     text-align: center;
     vertical-align: middle;
-    border: 1px solid #000;
+    border: 1px solid var(--arena-scoreboard-td-border-color);
     padding: 0.2em;
 
     .points {
@@ -205,24 +206,24 @@ export default class ArenaScoreboard extends Vue {
   }
 
   .accepted {
-    background: #dfd;
+    background: var(--arena-scoreboard-accepted-background-color);
   }
 
   .pending {
-    background: #ddf;
+    background: var(--arena-scoreboard-pending-background-color);
   }
 
   .wrong {
-    background: #fdd;
+    background: var(--arena-scoreboard-wrong-background-color);
   }
 
   .position.recent-event {
     font-weight: bold;
-    background: #dfd;
+    background: var(--arena-scoreboard-position-recent-event-background-color);
   }
 
   .accepted.recent-event {
-    background: #8f8;
+    background: var(--arena-scoreboard-accepted-recent-event-background-color);
   }
 
   .position {

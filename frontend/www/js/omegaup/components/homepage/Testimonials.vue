@@ -72,6 +72,13 @@ export default class Testimonials extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.carousel {
+  background: var(--homepage-carousel-background-color) !important;
+  color: var(--homepage-carousel-font-color);
+}
+
 .carousel-inner {
   min-height: 12rem;
 

@@ -2,22 +2,183 @@
 // used incorrectly. Creating a site-wide naming convention is essential when working with Variables.
 // Without one, they become harder to understand and re-use.
 
-$white: white;
-$black: black;
+:root {
+  // STATUS
+  --status-success-color: #468847;
+  --status-error-color: #b94a48;
+  --status-warning-color: #c09853;
 
-// STATUS
-$status-success: #468847;
-$status-error: #b94a48;
-$status-warning: #c09853;
+  // HEADER
+  --header-primary-color: #678dd7;
+  --header-caret-border-color: #ffffff;
+  --header-navbar-right-caret-border-color: #000000;
+  --header-navbar-right-a-font-color: #000000;
+  --header-navbar-brand-background-color: #f2f2f2;
+  --header-navbar-dropdown-item-font-color: #000000;
+  --header-active-color: #5f87d4;
+  --header-accent-color: #577dc7;
 
-// HEADER
-$header-primary-color: #678dd7;
-$header-active-color: #5f87d4;
-$header-accent-color: #577dc7;
+  --header-font-primary-color: #ffffff;
+  --header-font-secondary-color: #333333;
+  --header-dropdown-active-item: #f5f5f5;
 
-$header-font-primary-color: #fff;
-$header-font-secondary-color: #333;
-$header-dropdown-active-item: #f5f5f5;
+  // BUTTONS
+  --btn-cancel-background-color: #dddddd;
+  --btn-cancel-font-color: #000000;
+  --btn-ok-background-color: #007bff;
+  --btn-ok-font-color: #fff;
+  --btn-ok-font-color--hover: #fff;
 
-// BUTTONS
-$btn-cancel-color: #ddd;
+  // MARKDOWN
+  --markdown-pre-background-color: #eeeeee;
+  --markdown-details-border-color: #eeeeee;
+  --markdown-details-summary-font-color: #5588dd;
+  --markdown-td-border-color: #000000;
+  --markdown-sample-io-tbody-background-color: #eeeeee;
+  --markdown-sample-io-tbody-border-color: #000000;
+  --markdown-sample-io-tr-even-element-background-color: #f5f5f5;
+  --markdown-sample-io-td-border-color: #000000;
+  --markdown-libinteractive-download-background-color: #eeeeee;
+  --markdown-libinteractive-download-font-color: #cccccc;
+  --markdown-libinteractive-download-border-color: #cccccc;
+  --wmd-button-bar-background-color: #ffffff;
+
+  // OVERLAY POPUP
+  --overlay-popup-background-color: #eeeeee;
+  --overlay-popup-border-color: #cccccc;
+  --overlay-popup-close-background-color--hover: #eeeeee;
+
+  // ARENA
+  --arena-practice-background-color: #666688;
+  --arena-background-color: #ebeff2;
+  --arena-socket-status-error-color: #880000;
+  --arena-socket-status-ok-color: #008800;
+  --arena-navbar-left-border-color: #cccccc;
+  --arena-problem-background-color: #ffffff;
+  --arena-run-details-form-background-color: #eeeeee;
+  --arena-run-details-form-border-color: #cccccc;
+  --arena-form-close-background-color: #ffffff;
+  --arena-form-close-border-color: #cccccc;
+  --arena-form-close-background-color--hover: #eeeeee;
+  --arena-cases-tr-border-top-color: #cccccc;
+  --arena-cases-table-stderr-font-color: #440000;
+  --arena-run-submit-form-background-color: #eeeeee;
+  --arena-run-submit-form-border-color: #cccccc;
+  --arena-problem-details-karel-link-border-color: #eeeeee;
+  --arena-problem-details-karel-link-border-left-color: #1b809e;
+  --arena-contest-navleft-main-border-color: #cccccc;
+  --arena-contest-navtabs-link-background-color: #dddddd;
+  --arena-contest-navtabs-link-border-top-color: #dddddd;
+  --arena-contest-navbar-problem-list-background-color: #dddddd;
+  --arena-contest-navbar-problem-list-border-color: #cccccc;
+  --arena-contest-navbar-problem-list-a-font-color: #5588dd;
+  --arena-contest-navbar-problem-type-font-color: #9a9a9a;
+  --arena-runs-table-border-color: #cccccc;
+  --arena-runs-table-td-border-color: #cccccc;
+  --arena-runs-table-tfoot-font-color: #000000;
+  --arena-runs-table-tfoot-background-color: #cccccc;
+  --arena-runs-table-tfoot-background-color--hoover: #ffffff;
+  --arena-solvers-table-border-color: #cccccc;
+  --arena-solvers-td-border-color: #cccccc;
+  --arena-contest-list-empty-category-font-color: #aaaaaa;
+  --arena-scoreboard-a-font-color: #5588dd;
+  --arena-scoreboard-footer-font-color: #808080;
+  --arena-scoreboard-td-border-color: #000000;
+  --arena-scoreboard-accepted-bacground-color: #ddffdd;
+  --arena-scoreboard-pending-background-color: #ddddff;
+  --arena-scoreboard-wrong-background-color: #ffdddd;
+  --arena-scoreboard-position-recent-event-background-color: #ddffdd;
+  --arena-scoreboard-accepted-recent-event-background-color: #88ff88;
+  --arena-submissions-list-verdict-ac-background-color: #ccff66;
+  --arena-submissions-list-verdict-ce-background-color: #ff9900;
+  --arena-submissions-list-verdict-je-ve-background-color: #ff0000;
+  --arena-histogram-bar-1-background-gradient: #678dd7-2;
+  --arena-histogram-bar-2-background-gradient: #c2ddeb;
+  --arena-histogram-bar-3-background-gradient: #dddcdb;
+  --arena-histogram-bar-4-background-gradient: #faccb4;
+  --arena-histogram-bar-5-background-gradient: #df3e4b;
+  --arena-settings-summary-panel-th-border-color: #000000;
+  --arena-summary-background-color: #ffffff;
+  --arena-navbar-miniranking-td-border-color: #000000;
+
+  // FINDER WIZARD
+  --finder-wizard-modal-container-background-color: #eeeeee;
+  --finder-wizard-modal-container-border-color: #cccccc;
+  --finder-wizard-slider-process-background-color: #678dd7;
+  --finder-wizard-tab-select-el-border-color: #678dd7;
+  --finder-wizard-tab-select-el-font-color: #678dd7;
+  --finder-wizard-tab-select-el-font-color--active: #ffffff;
+  --finder-wizard-tab-select-el-background-color--active: #678dd7;
+
+  // CLARIFICATIONS
+  --clarifications-list-pre-font-color: #333333;
+  --clarifications-list-pre-background-color: #f5f5f5;
+
+  // PROBLEM
+  --problem-versions-controls-background-color: #f5f5f5;
+  --problem-versions-controls-border-bottom-color: #dddddd;
+
+  // NOTIFICATIONS
+  --notifications-clarifications-scrollbar-track-background-color: #f5f5f5;
+  --notifications-clarifications-scrollbar-background-color: #f5f5f5;
+  --notifications-clarifications-scrollbar-thumb-background-color: #808080;
+  --notifications-clarifications-drawer-li-border-top-color: #f2f2f2;
+  --notifications-clarifications-drawer-li-a-font-color: #333333;
+  --notifications-clarifications-drawer-li-background-color--active: #678dd7;
+  --notifications-clarifications-drawer-li-font-color--active: #ffffff;
+  --notifications-notification-date-font-color: #666666;
+
+  // QUALITY NOMINATIONS
+  --quality-nomination-popup-border-color: #cccccc;
+  --quality-nomination-popup-background-color: #000000;
+  --quality-nomination-tag-select-border-color: #cccccc;
+  --quality-nomination-tag-select-background-color: #ffffff;
+
+  // CODER OF THE MONTH
+  --coder-of-the-month-card-header-font-color: #ffffff;
+  --coder-of-the-month-card-header-background-color: #5588dd;
+  --coder-of-the-month-card-header-female-background-color: #8855dd;
+
+  // BADGES
+  --badges-link-font-color: #337ab7;
+  --badges-grader-error-font-color: #b94a48;
+  --badges-grader-ok-font-color: #468847;
+  --badges-grader-warning-from-font-color: #fcf8e3;
+  --badges-grader-warning-to-font-color: #f8efc0;
+  --badges-grader-warning-border-color: #f5e79e;
+  --badges-grader-warning-font-color: #c09853;
+
+  // MULTISELECT
+  --multiselect-tag-background-color: #678dd7;
+
+  // SCHOOLS
+  --schools-intro-header-title-text-shadow-color: #678dd7;
+  --schools-intro-header-text-color: #ffffff;
+  --schools-intro-body-background-color: #000000;
+
+  // TEXTEDITOR
+  --text-editor-textarea-background-color: #222222;
+  --text-editor-textarea-font-color: #d4d4d4;
+
+  // USER RANK
+  --user-rank-beginner-font-color: #919191;
+  --user-rank-specialist-font-color: #598c4c;
+  --user-rank-expert-font-color: #1c52c7;
+  --user-rank-master-font-color: #f0c245;
+  --user-rank-international-master-font-color: #cb000a;
+
+  // HOMEPAGE
+  --homepage-carousel-font-color: #ffffff;
+  --homepage-carousel-background-color: #466aaf;
+
+  // GRADER
+  --grader-status-submissions-link-background-color: #ffffff;
+  --grader-status-submissions-link-font-color: #000000;
+  --grader-status-submissions-link-background-color--hover: #ffffff;
+
+  // TOGGLE SWITCH
+  --toggle-switch-slider-background-color: #dddddd;
+  --toggle-switch-slider-background-color--before: #ffffff;
+  --toggle-switch-input-checked-slider-background-color: #678dd7;
+  --toggle-switch-input-focus-slider-background-color: #678dd7;
+}
