@@ -56,7 +56,9 @@ export default class Paginator extends Vue {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(
+    --quality-nomination-details-confirmation-bacground-color
+  );
   transition: opacity 0.3s ease;
   display: flex;
   justify-content: center;

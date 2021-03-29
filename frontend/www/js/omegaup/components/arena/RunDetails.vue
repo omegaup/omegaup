@@ -253,7 +253,7 @@ export default class ArenaRunDetails extends Vue {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay-background-color);
   z-index: 9999998 !important;
 
   form {
@@ -331,7 +331,7 @@ export default class ArenaRunDetails extends Vue {
   width: 100%;
   margin: 0 auto;
   text-align: center;
-  background: rgb(245, 245, 245);
+  background: var(--arena-run-details-dropdown-cases-background-color);
   border-radius: 5px;
 }
 

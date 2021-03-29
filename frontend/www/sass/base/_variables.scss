@@ -42,11 +42,13 @@
   --markdown-libinteractive-download-font-color: #cccccc;
   --markdown-libinteractive-download-border-color: #cccccc;
   --wmd-button-bar-background-color: #ffffff;
+  --markdown-button-clipboard-border-color: #dae0e5;
 
   // OVERLAY POPUP
   --overlay-popup-background-color: #eeeeee;
   --overlay-popup-border-color: #cccccc;
   --overlay-popup-close-background-color--hover: #eeeeee;
+  --overlay-background-color: rgba(0, 0, 0, 0.5);
 
   // ARENA
   --arena-practice-background-color: #666688;
@@ -57,6 +59,7 @@
   --arena-problem-background-color: #ffffff;
   --arena-run-details-form-background-color: #eeeeee;
   --arena-run-details-form-border-color: #cccccc;
+  --arena-run-details-dropdown-cases-background-color: #f5f5f5;
   --arena-form-close-background-color: #ffffff;
   --arena-form-close-border-color: #cccccc;
   --arena-form-close-background-color--hover: #eeeeee;
@@ -102,6 +105,7 @@
   --arena-navbar-miniranking-td-border-color: #000000;
 
   // FINDER WIZARD
+  --finder-wizard-modal-mask-background-color: rgba(0, 0, 0, 0.5);
   --finder-wizard-modal-container-background-color: #eeeeee;
   --finder-wizard-modal-container-border-color: #cccccc;
   --finder-wizard-slider-process-background-color: #678dd7;
@@ -113,6 +117,25 @@
   // CLARIFICATIONS
   --clarifications-list-pre-font-color: #333333;
   --clarifications-list-pre-background-color: #f5f5f5;
+  --clarification-resolved-font-color: #468847;
+  --clarification-resolved-background-color: #dff0d8;
+  --clarification-resolved-gradient-from-background-color: rgb(223, 240, 216) 0;
+  --clarification-resolved-gradient-to-background-color: rgb(200, 229, 188) 100%;
+  --clarification-direct-message-font-color: #7d7512;
+  --clarification-direct-message-background-color: #dff0d8;
+  --clarification-direct-message-gradient-from-background-color: rgb(
+      253,
+      245,
+      154
+    )
+    0;
+  --clarification-direct-message-gradient-to-background-color: rgba(
+      255,
+      249,
+      181,
+      0.5
+    )
+    100%;
 
   // PROBLEM
   --problem-versions-controls-background-color: #f5f5f5;
@@ -127,12 +150,19 @@
   --notifications-clarifications-drawer-li-background-color--active: #678dd7;
   --notifications-clarifications-drawer-li-font-color--active: #ffffff;
   --notifications-notification-date-font-color: #666666;
+  --notifications-notification-link-background-color--hover: rgba(
+    0,
+    0,
+    0,
+    0.05
+  );
 
   // QUALITY NOMINATIONS
   --quality-nomination-popup-border-color: #cccccc;
   --quality-nomination-popup-background-color: #000000;
   --quality-nomination-tag-select-border-color: #cccccc;
   --quality-nomination-tag-select-background-color: #ffffff;
+  --quality-nomination-details-confirmation-bacground-color: rgba(0, 0, 0, 0.5);
 
   // CODER OF THE MONTH
   --coder-of-the-month-card-header-font-color: #ffffff;
@@ -142,7 +172,13 @@
   // BADGES
   --badges-link-font-color: #337ab7;
   --badges-grader-error-font-color: #b94a48;
+  --badges-grader-error-background-color: #f2dede;
+  --badges-grader-error-gradient-from-background-color: rgb(242, 222, 222) 0;
+  --badges-grader-error-gradient-to-background-color: rgb(231, 195, 195) 100%;
   --badges-grader-ok-font-color: #468847;
+  --badges-grader-ok-background-color: #dff0d8;
+  --badges-grader-ok-gradient-from-background-color: rgb(223, 240, 216) 0;
+  --badges-grader-ok-gradient-to-background-color: rgb(200, 229, 188) 100%;
   --badges-grader-warning-from-font-color: #fcf8e3;
   --badges-grader-warning-to-font-color: #f8efc0;
   --badges-grader-warning-border-color: #f5e79e;
