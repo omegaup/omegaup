@@ -157,6 +157,12 @@ export default class Markdown extends Vue {
 </script>
 
 <style lang="scss">
+// This file cannot use `scoped` because it injects elements into the DOM at
+// runtime, and is incompatible with how webpacked Vue creates scoped rules: by
+// adding a compile-time random prefix to all classes.
+//
+// Instead, all the rules in this file are added as children of the root
+// element, which has the `data-markdown-statement` data attribute.
 @import '../../../../../node_modules/prismjs/themes/prism.css';
 @import '../../../sass/main.scss';
 
