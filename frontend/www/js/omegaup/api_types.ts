@@ -2390,6 +2390,16 @@ export namespace types {
     [key: string]: { contestantOutput?: string; in: string; out: string };
   }
 
+  export interface ProblemClarification {
+    answer?: string;
+    author: string;
+    clarification_id: number;
+    message: string;
+    public: boolean;
+    receiver?: string;
+    time: Date;
+  }
+
   export interface ProblemDetails {
     accepted: number;
     accepts_submissions: boolean;
