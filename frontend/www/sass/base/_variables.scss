@@ -81,6 +81,14 @@
   --arena-runs-table-tfoot-font-color: #000000;
   --arena-runs-table-tfoot-background-color: #cccccc;
   --arena-runs-table-tfoot-background-color--hoover: #ffffff;
+  --arena-runs-table-status-disqualified-background-color: #f00;
+  --arena-runs-table-status-disqualified-font-color: #fff;
+  --arena-runs-table-status-je-ve-background-color: #f00;
+  --arena-runs-table-status-je-ve-font-color: #fff;
+  --arena-runs-table-status-ac-background-color: #cf6;
+  --arena-runs-table-status-ac-font-color: #333;
+  --arena-runs-table-status-ce-background-color: #f90;
+  --arena-runs-table-status-ce-font-color: #fff;
   --arena-solvers-table-border-color: #cccccc;
   --arena-solvers-td-border-color: #cccccc;
   --arena-contest-list-empty-category-font-color: #aaaaaa;
@@ -92,6 +100,16 @@
   --arena-scoreboard-wrong-background-color: #ffdddd;
   --arena-scoreboard-position-recent-event-background-color: #ddffdd;
   --arena-scoreboard-accepted-recent-event-background-color: #88ff88;
+  --arena-scoreboard-legend-1-background-color: #fb3f51;
+  --arena-scoreboard-legend-2-background-color: #ff5d40;
+  --arena-scoreboard-legend-3-background-color: #ffa240;
+  --arena-scoreboard-legend-4-background-color: #ffc740;
+  --arena-scoreboard-legend-5-background-color: #59ea3a;
+  --arena-scoreboard-legend-6-background-color: #37dd6f;
+  --arena-scoreboard-legend-7-background-color: #34d0ba;
+  --arena-scoreboard-legend-8-background-color: #3aaacf;
+  --arena-scoreboard-legend-9-background-color: #8144d6;
+  --arena-scoreboard-legend-10-background-color: #cd35d3;
   --arena-submissions-list-verdict-ac-background-color: #ccff66;
   --arena-submissions-list-verdict-ce-background-color: #ff9900;
   --arena-submissions-list-verdict-je-ve-background-color: #ff0000;
@@ -202,6 +220,8 @@
   --user-rank-expert-font-color: #1c52c7;
   --user-rank-master-font-color: #f0c245;
   --user-rank-international-master-font-color: #cb000a;
+  --user-basic-info-form-group-border-color: #e9e9e9;
+  --user-basic-info-field-data-font-color: #808080;
 
   // HOMEPAGE
   --homepage-carousel-font-color: #ffffff;
