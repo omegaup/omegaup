@@ -7,7 +7,6 @@ import { navigateToProblem, setLocationHash } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import { mutations } from './problemStore';
-import { getLocationHash } from './__mocks__/navigation';
 
 const vueInstance: Vue & {
   problemInfo: types.ProblemInfo | null;
@@ -104,6 +103,9 @@ describe('navigation.ts', () => {
         addProblem(state, vueInstance.problemInfo);
       }
       navigateToProblem(params);
+      const getLocationHash = jest
+        .fn()
+        .mockReturnValue('#problems/problem_alias/new-run');
 
       expect(getLocationHash()).toEqual(
         `#problems/${navbarProblems[0].alias}/new-run`,

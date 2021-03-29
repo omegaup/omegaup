@@ -25,7 +25,12 @@ export function navigateToProblem({
   problem,
   problems,
 }: Navigation): void {
-  if (isProblemAliasPresentInStore(problem.alias)) {
+  if (
+    Object.prototype.hasOwnProperty.call(
+      problemsStore.state.problems,
+      problem.alias,
+    )
+  ) {
     target.problemInfo = problemsStore.state.problems[problem.alias];
     if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
       setLocationHash(`#problems/${problem.alias}/new-run`);
@@ -86,11 +91,4 @@ export function setLocationHash(hash: string): void {
 
 export function getLocationHash(): string {
   return window.location.hash;
-}
-
-export function isProblemAliasPresentInStore(problemAlias: string): boolean {
-  return Object.prototype.hasOwnProperty.call(
-    problemsStore.state.problems,
-    problemAlias,
-  );
 }
