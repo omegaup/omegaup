@@ -234,7 +234,7 @@ export default class Markdown extends Vue {
 
   td > button.clipboard {
     float: right;
-    border-color: rgb(218, 224, 229);
+    border-color: var(--markdown-button-clipboard-border-color);
     margin-left: 0.5em;
     margin-right: -6px;
     margin-top: -6px;

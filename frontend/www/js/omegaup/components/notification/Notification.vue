@@ -143,7 +143,10 @@ export default class Notification extends Vue {
   cursor: pointer;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(
+      var(--notifications-notification-link-background-color--hover),
+      0.05
+    );
   }
 }
 </style>

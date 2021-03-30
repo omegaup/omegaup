@@ -121,7 +121,7 @@
                 <span
                   v-for="filter in filters"
                   :key="filter.name"
-                  class="btn btn-secondary mr-3"
+                  class="btn-secondary mr-3"
                 >
                   <span class="mr-2"
                     >{{ filter.name }}: {{ filter.value }}</span
@@ -218,11 +218,11 @@
               </a>
             </td>
             <td
-              :style="{ backgroundColor: statusColor(run) }"
+              :class="statusClass(run)"
               data-run-status
-              class="text-center"
+              class="text-center opacity-4 font-weight-bold"
             >
-              <span>{{ status(run) }}</span>
+              <span class="mr-1">{{ status(run) }}</span>
 
               <button
                 v-if="!!statusHelp(run)"
@@ -230,7 +230,7 @@
                 :data-content="statusHelp(run)"
                 data-toggle="popover"
                 data-trigger="focus"
-                class="btn btn-outline-dark btn-sm"
+                class="btn-outline-dark btn-sm"
                 @click="showVerdictHelp"
               >
                 <font-awesome-icon :icon="['fas', 'question-circle']" />
@@ -244,7 +244,7 @@
             <td class="numeric">{{ runtime(run) }}</td>
             <td v-if="showDetails && !showDisqualify && !showRejudge">
               <button
-                class="details btn btn-outline-dark btn-sm"
+                class="details btn-outline-dark btn-sm"
                 data-run-details
                 @click="$emit('details', run)"
               >
@@ -254,7 +254,7 @@
             <td v-else-if="showDetails || showDisqualify || showRejudge">
               <div class="dropdown">
                 <button
-                  class="btn btn-secondary dropdown-toggle"
+                  class="btn-secondary dropdown-toggle"
                   type="button"
                   data-toggle="dropdown"
                   aria-haspopup="true"
@@ -265,14 +265,14 @@
                 <div class="dropdown-menu">
                   <button
                     v-if="showDetails"
-                    class="btn btn-link dropdown-item"
+                    class="btn-link dropdown-item"
                     @click="$emit('details', run)"
                   >
                     {{ T.wordsDetails }}
                   </button>
                   <button
                     v-if="showRejudge"
-                    class="btn btn-link dropdown-item"
+                    class="btn-link dropdown-item"
                     @click="$emit('rejudge', run)"
                   >
                     {{ T.wordsRejudge }}
@@ -280,7 +280,7 @@
                   <div class="dropdown-divider"></div>
                   <button
                     v-if="showDisqualify"
-                    class="btn btn-link dropdown-item"
+                    class="btn-link dropdown-item"
                     @click="$emit('disqualify', run)"
                   >
                     {{ T.wordsDisqualify }}
@@ -527,20 +527,19 @@ export default class Runsv2 extends Vue {
     $(ev.target as HTMLElement).popover('show');
   }
 
-  statusColor(run: types.Run): string {
+  statusClass(run: types.Run): string {
     if (run.status != 'ready') return '';
-
-    if (run.type == 'disqualified') return '#F00';
-
+    if (run.type == 'disqualified') return 'status-disqualified';
     if (run.verdict == 'AC') {
-      return '#CF6';
-    } else if (run.verdict == 'CE') {
-      return '#F90';
-    } else if (run.verdict == 'JE' || run.verdict == 'VE') {
-      return '#F00';
-    } else {
-      return '';
+      return 'status-ac';
     }
+    if (run.verdict == 'CE') {
+      return 'status-ce';
+    }
+    if (run.verdict == 'JE' || run.verdict == 'VE') {
+      return 'status-je-ve';
+    }
+    return '';
   }
 
   status(run: types.Run): string {
@@ -712,5 +711,22 @@ caption {
 
 .runs tfoot td a:hover {
   background: var(--arena-runs-table-tfoot-background-color--hoover);
+}
+
+.status-disqualified {
+  background: var(--arena-runs-table-status-disqualified-background-color);
+  color: var(--arena-runs-table-status-disqualified-font-color);
+}
+.status-je-ve {
+  background: var(--arena-runs-table-status-je-ve-background-color);
+  color: var(--arena-runs-table-status-je-ve-font-color);
+}
+.status-ac {
+  background: var(--arena-runs-table-status-ac-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+.status-ce {
+  background: var(--arena-runs-table-status-ce-background-color);
+  color: var(--arena-runs-table-status-ce-font-color);
 }
 </style>
