@@ -279,7 +279,7 @@ export function updateTheme(): void {
     localStorage.getItem('theme-preferences') ?? '{}',
   );
   const htmlElement = document.getElementsByTagName('html')[0];
-  htmlElement.dataset.colorMode = themePreferences;
+  htmlElement.dataset.colorMode = themePreferences.theme;
   if (!darkThemeStyleElement) {
     return;
   }
