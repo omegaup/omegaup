@@ -2781,7 +2781,12 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback?: { author: string; date: Date; feedback: string };
+    feedback?: {
+      author: string;
+      author_classname: string;
+      date: Date;
+      feedback: string;
+    };
     guid: string;
     judged_by?: string;
     language: string;
