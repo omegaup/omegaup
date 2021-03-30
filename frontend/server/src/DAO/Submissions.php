@@ -106,6 +106,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
      * submission gap.
      */
     final public static function isInsideSubmissionGap(
+        \OmegaUp\DAO\VO\Submissions $submission,
         ?int $problemsetId,
         ?\OmegaUp\DAO\VO\Contests $contest,
         int $problemId,
@@ -161,7 +162,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             );
         }
 
-        return \OmegaUp\Time::get() >= ($lastRunTime->time + $submissionGap);
+        return $submission->time->time >= ($lastRunTime->time + $submissionGap);
     }
 
     public static function countAcceptedSubmissions(
@@ -367,7 +368,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     /**
      * Gets the feedback of a certain submission
      *
-     * @return array{author: string, date: \OmegaUp\Timestamp, feedback: string}|null
+     * @return array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string}|null
      */
     public static function getSubmissionFeedback(
         \OmegaUp\DAO\VO\Submissions $submission
@@ -375,6 +376,25 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         $sql = '
             SELECT
                 i.username as author,
+                IFNULL(
+                    (
+                        SELECT urc.classname
+                        FROM User_Rank_Cutoffs urc
+                        WHERE
+                            urc.score <= (
+                                SELECT
+                                    ur.score
+                                FROM
+                                    User_Rank ur
+                                WHERE
+                                    ur.user_id = i.user_id
+                            )
+                        ORDER BY
+                            urc.percentile ASC
+                        LIMIT 1
+                    ),
+                    "user-rank-unranked"
+                ) AS author_classname,
                 sf.feedback,
                 sf.date
             FROM
@@ -387,7 +407,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 s.submission_id = ?
         ';
 
-        /** @var array{author: string, date: \OmegaUp\Timestamp, feedback: string}|null */
+        /** @var array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string}|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [

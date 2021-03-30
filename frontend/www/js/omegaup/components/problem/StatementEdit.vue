@@ -204,11 +204,12 @@ export default class ProblemStatementEdit extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 @import '../../../../third_party/js/pagedown/demo/browser/demo.css';
 
 .wmd-preview,
 .wmd-button-bar {
-  background-color: #fff;
+  background-color: var(--wmd-button-bar-background-color);
 }
 </style>

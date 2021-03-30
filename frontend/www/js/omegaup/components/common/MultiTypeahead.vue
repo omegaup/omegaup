@@ -48,8 +48,8 @@ export default class Typeahead extends Vue {
 <style lang="scss">
 @import '../../../../sass/main.scss';
 
-.tags-input-remove:before,
-.tags-input-remove:after,
+.tags-input-remove::before,
+.tags-input-remove::after,
 .tags-input-typeahead-item-highlighted-default {
   background-color: $omegaup-primary--darker;
 }

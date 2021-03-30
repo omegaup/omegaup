@@ -487,7 +487,6 @@ export class Arena {
         render: function (createElement) {
           return createElement('omegaup-arena-scoreboard', {
             props: {
-              scoreboardColors: scoreboardColors,
               problems: this.problems,
               ranking: this.ranking,
               lastUpdated: this.lastUpdated,
@@ -502,6 +501,8 @@ export class Arena {
 
     // Setup run details view, if available.
     if (document.getElementById('run-details') != null) {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      const self = this;
       this.runDetailsView = new Vue({
         el: '#run-details',
         components: {
@@ -514,6 +515,28 @@ export class Arena {
           return createElement('omegaup-arena-rundetails', {
             props: {
               data: this.data,
+              inCourse: self.options.courseAlias !== null,
+            },
+            on: {
+              'send-feedback': ({
+                guid,
+                feedback,
+              }: {
+                guid: string;
+                feedback: string;
+              }) => {
+                api.Submission.createFeedback({
+                  guid,
+                  course_alias: self.options.courseAlias,
+                  assignment_alias: self.options.assignmentAlias,
+                  feedback,
+                })
+                  .then(() => {
+                    ui.success(T.feedbackSuccesfullyAdded);
+                    self.hideOverlay();
+                  })
+                  .catch(ui.error);
+              },
             },
           });
         },
@@ -2111,7 +2134,7 @@ export class Arena {
           !this.options.contestAlias || this.options.contestAlias === 'admin'
             ? data.show_diff
             : 'none',
-        feedback: ((this.options.contestAlias &&
+        submissionFeedback: ((this.options.contestAlias &&
           this.currentProblemset?.feedback) ||
           'detailed') as omegaup.SubmissionFeedback,
       });

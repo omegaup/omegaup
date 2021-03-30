@@ -257,18 +257,22 @@ button.in-group {
   border-left-width: 6px;
   padding-left: 15px;
 }
+
 button[type='submit'] {
   width: 2em;
 }
+
 div.summary {
   text-align: center;
   padding: 0.25em;
 }
+
 div.case-item {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 span.verdict {
   display: inline-block;
   float: left;
@@ -276,19 +280,23 @@ span.verdict {
   text-align: center;
   margin: -7px 5px -6px -10px;
 }
+
 span.verdict span.score {
   font-size: xx-small;
   display: block;
 }
+
 div.filenames {
   overflow-y: auto;
   flex: 1;
 }
+
 a.list-group-item {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 input.case-weight {
   flex: 0.3;
 }

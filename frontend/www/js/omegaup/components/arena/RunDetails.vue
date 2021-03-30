@@ -2,6 +2,48 @@
   <form data-run-details-view>
     <div v-if="data">
       <button class="close">❌</button>
+      <div v-if="inCourse">
+        <h3>{{ T.feedbackTitle }}</h3>
+        <pre>{{
+          data.feedback ? data.feedback.feedback : T.feedbackNotSentYet
+        }}</pre>
+        <div v-if="data.feedback">
+          {{ T.feedbackLeftBy }}
+          <omegaup-user-username
+            :username="data.feedback.author"
+            :classname="data.feedback.author_classname"
+            :linkify="true"
+          ></omegaup-user-username>
+        </div>
+        <div
+          v-if="data.admin && data.feedback === null"
+          class="feedback-section"
+        >
+          <a role="button" @click="showFeedbackForm = !showFeedbackForm">{{
+            T.submissionFeedbackSendButton
+          }}</a>
+          <div v-show="showFeedbackForm" class="form-group">
+            <textarea
+              v-model="feedback"
+              class="form-control"
+              rows="3"
+              maxlength="200"
+            ></textarea>
+            <button
+              class="btn btn-sm btn-primary"
+              :disabled="feedback.length === 0"
+              @click.prevent="
+                $emit('send-feedback', {
+                  guid: data.guid,
+                  feedback,
+                })
+              "
+            >
+              {{ T.wordsSend }}
+            </button>
+          </div>
+        </div>
+      </div>
       <div v-if="data.groups" class="cases">
         <h3>{{ T.wordsCases }}</h3>
         <div></div>
@@ -9,13 +51,15 @@
           <thead>
             <tr>
               <th>{{ T.wordsGroup }}</th>
-              <th v-if="data.feedback !== 'summary'">{{ T.wordsCase }}</th>
+              <th v-if="data.submissionFeedback !== 'summary'">
+                {{ T.wordsCase }}
+              </th>
               <th>{{ T.wordsVerdict }}</th>
               <th colspan="3">{{ T.rankScore }}</th>
               <th width="1"></th>
             </tr>
           </thead>
-          <tbody v-for="element in data.groups">
+          <tbody v-for="element in data.groups" :key="element.group">
             <tr class="group">
               <th class="center">{{ element.group }}</th>
               <th v-if="element.verdict" class="text-center">
@@ -155,8 +199,10 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 import arena_CodeView from './CodeView.vue';
 import arena_DiffView from './DiffView.vue';
+import user_Username from '../user/Username.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -178,14 +224,19 @@ const EMPTY_FIELD = '∅';
     FontAwesomeIcon,
     'omegaup-arena-code-view': arena_CodeView,
     'omegaup-arena-diff-view': arena_DiffView,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class ArenaRunDetails extends Vue {
   @Prop() data!: types.RunDetails;
+  @Prop({ default: false }) inCourse!: boolean;
 
   EMPTY_FIELD = EMPTY_FIELD;
   T = T;
+  ui = ui;
   groupVisible: GroupVisibility = {};
+  showFeedbackForm = false;
+  feedback = this.data?.feedback?.feedback ?? null;
 
   toggle(group: string): void {
     const visible = this.groupVisible[group];
@@ -223,14 +274,15 @@ export default class ArenaRunDetails extends Vue {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(var(--overlay-background-color), 0.5);
   z-index: 9999998 !important;
+
   form {
-    background: #eee;
+    background: var(--arena-run-details-form-background-color);
     width: 80%;
     height: 90%;
     margin: auto;
-    border: 2px solid #ccc;
+    border: 2px solid var(--arena-run-details-form-border-color);
     padding: 1em;
     position: absolute;
     overflow-y: auto;
@@ -241,55 +293,66 @@ export default class ArenaRunDetails extends Vue {
     right: 0;
     display: flex;
     flex-direction: column;
+
     .close-container {
       width: 100%;
+
       .close {
         position: absolute;
         top: 0;
         right: 0;
-        background-color: $omegaup-white;
-        border: 1px solid #ccc;
+        background-color: var(--arena-form-close-background-color);
+        border: 1px solid var(--arena-form-close-border-color);
         border-width: 0 0 1px 1px;
         font-size: 110%;
         width: 25px;
         height: 25px;
+
         &:hover {
-          background-color: #eee;
+          background-color: var(--arena-form-close-background-color--hover);
         }
       }
     }
+
     .languages {
       width: 100%;
     }
+
     .filename-extension {
       width: 100%;
     }
+
     .run-submit-paste-text {
       width: 100%;
     }
+
     .code-view {
       width: 100%;
       flex-grow: 1;
       overflow: auto;
     }
+
     .upload-file {
       width: 100%;
     }
+
     .submit-run {
       width: 100%;
     }
   }
+
   input[type='submit'] {
     font-size: 110%;
     padding: 0.3em 0.5em;
   }
 }
+
 .dropdown-cases {
   height: 100%;
   width: 100%;
   margin: 0 auto;
   text-align: center;
-  background: rgb(245, 245, 245);
+  background: var(--arena-run-details-dropdown-cases-background-color);
   border-radius: 5px;
 }
 
@@ -314,20 +377,14 @@ export default class ArenaRunDetails extends Vue {
     width: 100%;
 
     tr.group {
-      border-top: 1px solid #ccc;
+      border-top: 1px solid var(--arena-cases-tr-border-top-color);
 
       td,
       th {
         padding: 0.2em inherit 0.2em inherit;
       }
     }
-  }
 
-  span.collapse {
-    padding: 0.2em;
-  }
-
-  table {
     thead th,
     td.center,
     th.center {
@@ -340,7 +397,23 @@ export default class ArenaRunDetails extends Vue {
     }
 
     pre.stderr {
-      color: #400;
+      color: var(--arena-cases-table-stderr-font-color);
+    }
+  }
+
+  span.collapse {
+    padding: 0.2em;
+  }
+}
+
+.feedback-section {
+  margin-top: 1.5em;
+
+  .form-group {
+    margin-top: 0.5em;
+
+    button {
+      margin-top: 1em;
     }
   }
 }

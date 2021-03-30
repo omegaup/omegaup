@@ -53,12 +53,14 @@ export default {
 div.filenames {
   overflow-y: auto;
 }
+
 button.list-group-item {
   width: 10em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 textarea {
   flex: 1;
 }
