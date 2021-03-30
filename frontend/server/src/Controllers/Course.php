@@ -10,10 +10,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type AssignmentProgress=array<string, Progress>
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
- * @psalm-type ProblemClarification=array{answer: null|string, author: string, clarification_id: int, message: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, classname: string, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, name: null|string, request_time: \OmegaUp\Timestamp, username: string}
  * @psalm-type CourseAdmin=array{role: string, username: string}
- * @psalm-type CourseClarification=array{answer: null|string, assignment_alias: string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
+ * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, languages: list<string>|null, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
@@ -4849,7 +4848,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the clarifications of all assignments in a course
      *
-     * @return array{clarifications: list<CourseClarification>}
+     * @return array{clarifications: list<Clarification>}
      *
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param int $offset
@@ -4879,7 +4878,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'clarifications' => \OmegaUp\DAO\Clarifications::getCourseClarifications(
+            'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
+                /* contest */                null,
                 $course,
                 \OmegaUp\Authorization::isCourseAdmin($r->identity, $course),
                 $r->identity,
@@ -4892,7 +4892,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Get clarifications of problem in a contest
      *
-     * @return array{clarifications: list<ProblemClarification>}
+     * @return array{clarifications: list<Clarification>}
      *
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param string $assignment_alias
