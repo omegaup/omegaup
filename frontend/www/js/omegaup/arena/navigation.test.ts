@@ -3,7 +3,7 @@ jest.mock('../../../third_party/js/diff_match_patch.js');
 import Vue from 'vue';
 import arena_ContestPractice from '../components/arena/ContestPractice.vue';
 import { types } from '../api_types';
-import { navigateToProblem, setLocationHash } from './navigation';
+import { navigateToProblem, Navigation, setLocationHash } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import { mutations } from './problemStore';
@@ -92,15 +92,17 @@ const { addProblem } = mutations;
 describe('navigation.ts', () => {
   describe('navigateToProblem', () => {
     it('Should change window location hash', async () => {
-      const params = {
+      const params: Navigation = {
         target: vueInstance,
         runs: [],
         problems: navbarProblems,
         problem: navbarProblems[0],
+        storedProblems: {},
       };
       const state = { problems: {} };
       if (vueInstance.problemInfo) {
         addProblem(state, vueInstance.problemInfo);
+        params.storedProblems = state.problems;
       }
       navigateToProblem(params);
       const getLocationHash = jest

@@ -8,7 +8,7 @@ import { PopupDisplayed } from '../components/problem/Details.vue';
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import { trackRun } from './submissions';
 
-interface Navigation {
+export interface Navigation {
   target: Vue & {
     problemInfo: types.ProblemInfo | null;
     popupDisplayed?: PopupDisplayed;
@@ -17,6 +17,7 @@ interface Navigation {
   runs: types.Run[];
   problem: types.NavbarProblemsetProblem;
   problems: types.NavbarProblemsetProblem[];
+  storedProblems: Record<string, types.ProblemInfo>;
 }
 
 export function navigateToProblem({
@@ -24,14 +25,10 @@ export function navigateToProblem({
   runs,
   problem,
   problems,
+  storedProblems,
 }: Navigation): void {
-  if (
-    Object.prototype.hasOwnProperty.call(
-      problemsStore.state.problems,
-      problem.alias,
-    )
-  ) {
-    target.problemInfo = problemsStore.state.problems[problem.alias];
+  if (Object.prototype.hasOwnProperty.call(storedProblems, problem.alias)) {
+    target.problemInfo = storedProblems[problem.alias];
     if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
       setLocationHash(`#problems/${problem.alias}/new-run`);
       return;
