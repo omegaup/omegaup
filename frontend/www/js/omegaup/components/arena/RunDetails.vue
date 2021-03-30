@@ -2,6 +2,48 @@
   <form data-run-details-view>
     <div v-if="data">
       <button class="close">❌</button>
+      <div v-if="inCourse">
+        <h3>{{ T.feedbackTitle }}</h3>
+        <pre>{{
+          data.feedback ? data.feedback.feedback : T.feedbackNotSentYet
+        }}</pre>
+        <div v-if="data.feedback">
+          {{ T.feedbackLeftBy }}
+          <omegaup-user-username
+            :username="data.feedback.author"
+            :classname="data.feedback.author_classname"
+            :linkify="true"
+          ></omegaup-user-username>
+        </div>
+        <div
+          v-if="data.admin && data.feedback === null"
+          class="feedback-section"
+        >
+          <a role="button" @click="showFeedbackForm = !showFeedbackForm">{{
+            T.submissionFeedbackSendButton
+          }}</a>
+          <div v-show="showFeedbackForm" class="form-group">
+            <textarea
+              v-model="feedback"
+              class="form-control"
+              rows="3"
+              maxlength="200"
+            ></textarea>
+            <button
+              class="btn btn-sm btn-primary"
+              :disabled="feedback.length === 0"
+              @click.prevent="
+                $emit('send-feedback', {
+                  guid: data.guid,
+                  feedback,
+                })
+              "
+            >
+              {{ T.wordsSend }}
+            </button>
+          </div>
+        </div>
+      </div>
       <div v-if="data.groups" class="cases">
         <h3>{{ T.wordsCases }}</h3>
         <div></div>
@@ -97,31 +139,6 @@
             </template>
           </tbody>
         </table>
-        <div v-if="inCourse && data.feedback === null" class="feedback-section">
-          <a role="button" @click="showFeedbackForm = !showFeedbackForm">{{
-            T.submissionFeedbackButton
-          }}</a>
-          <div v-show="showFeedbackForm" class="form-group">
-            <textarea
-              v-model="feedback"
-              class="form-control"
-              rows="3"
-              maxlength="200"
-            ></textarea>
-            <button
-              class="btn btn-sm btn-primary"
-              :disabled="feedback.length === 0"
-              @click.prevent="
-                $emit('send-feedback', {
-                  guid: data.guid,
-                  feedback,
-                })
-              "
-            >
-              {{ T.wordsSend }}
-            </button>
-          </div>
-        </div>
       </div>
       <h3>{{ T.wordsSource }}</h3>
       <a v-if="data.source_link" download="data.zip" :href="data.source">{{
@@ -182,8 +199,10 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 import arena_CodeView from './CodeView.vue';
 import arena_DiffView from './DiffView.vue';
+import user_Username from '../user/Username.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -205,6 +224,7 @@ const EMPTY_FIELD = '∅';
     FontAwesomeIcon,
     'omegaup-arena-code-view': arena_CodeView,
     'omegaup-arena-diff-view': arena_DiffView,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class ArenaRunDetails extends Vue {
@@ -213,9 +233,10 @@ export default class ArenaRunDetails extends Vue {
 
   EMPTY_FIELD = EMPTY_FIELD;
   T = T;
+  ui = ui;
   groupVisible: GroupVisibility = {};
   showFeedbackForm = false;
-  feedback = '';
+  feedback = this.data?.feedback?.feedback ?? null;
 
   toggle(group: string): void {
     const visible = this.groupVisible[group];
