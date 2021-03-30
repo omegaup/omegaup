@@ -27,8 +27,8 @@ interface CourseClarificationAllProblems {
 }
 
 export type CourseClarificationRequest =
-| CourseClarificationWithProblem
-| CourseClarificationAllProblems;
+  | CourseClarificationWithProblem
+  | CourseClarificationAllProblems;
 
 export interface ContestClarification {
   contestAlias: string;

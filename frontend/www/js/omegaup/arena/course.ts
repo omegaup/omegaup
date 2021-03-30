@@ -116,7 +116,7 @@ OmegaUp.on('ready', () => {
           },
           'new-clarification': ({
             clarification,
-            clearForm
+            clearForm,
           }: {
             clarification: types.Clarification;
             clearForm: () => void;
@@ -134,7 +134,17 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 clearForm();
                 refreshCourseClarifications({
-                  courseAlias: payload.courseDetails.alias
+                  courseAlias: payload.courseDetails.alias,
+                } as CourseClarificationRequest);
+              })
+              .catch(ui.apiError);
+          },
+          'clarification-response': (clarification: types.Clarification) => {
+            console.log(clarification);
+            api.Clarification.update(clarification)
+              .then(() => {
+                refreshCourseClarifications({
+                  courseAlias: payload.courseDetails.alias,
                 } as CourseClarificationRequest);
               })
               .catch(ui.apiError);

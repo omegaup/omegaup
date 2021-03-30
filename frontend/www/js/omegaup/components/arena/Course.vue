@@ -61,15 +61,18 @@
           :problems="problems"
           :users="users"
           :problem-alias="problems.length != 0 ? problems[0].alias : null"
-          :username="(course.is_admin || course.is_curator) && users.length != 0 ? users[0].username : null"
+          :username="
+            (course.is_admin || course.is_curator) && users.length != 0
+              ? users[0].username
+              : null
+          "
           :clarifications="currentClarifications"
-          :is-admin="(course.is_admin || course.is_curator)"
+          :is-admin="course.is_admin || course.is_curator"
           :in-course="true"
           :show-new-clarification-popup="showNewClarificationPopup"
           @new-clarification="(request) => $emit('new-clarification', request)"
           @clarification-response="
-            (id, responseText, isPublic) =>
-              $emit('clarification-response', id, responseText, isPublic)
+            (request) => $emit('clarification-response', request)
           "
           @update:activeTab="
             (selectedTab) => $emit('update:activeTab', selectedTab)

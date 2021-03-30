@@ -5,9 +5,14 @@
       'direct-message': isDirectMessage,
     }"
   >
+    <td v-if="inCourse" class="text-center">
+      {{ clarification.assignment_alias }}
+    </td>
     <td class="text-center align-middle">
       {{
-        !inContest ? clarification.contest_alias : clarification.problem_alias
+        !inContest && !inCourse
+          ? clarification.contest_alias
+          : clarification.problem_alias
       }}
     </td>
     <td class="text-center align-middle">{{ clarification.author }}</td>
@@ -86,7 +91,8 @@ import * as time from '../../time';
 @Component
 export default class ArenaClarificationForm extends Vue {
   @Prop() clarification!: types.Clarification;
-  @Prop() inContest!: boolean;
+  @Prop({ default: false }) inContest!: boolean;
+  @Prop({ default: false }) inCourse!: boolean;
   @Prop({ default: false }) isAdmin!: boolean;
 
   T = T;
