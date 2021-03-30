@@ -15,7 +15,6 @@ import {
   submitRunFailed,
 } from './submissions';
 import {
-  CourseClarification,
   CourseClarificationType,
   CourseClarificationRequest,
   refreshCourseClarifications,
@@ -31,6 +30,8 @@ OmegaUp.on('ready', () => {
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
+
+  trackClarifications(payload.courseDetails.clarifications);
 
   const arenaCourse = new Vue({
     el: '#main-container',
