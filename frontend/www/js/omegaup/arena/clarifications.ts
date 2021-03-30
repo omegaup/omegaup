@@ -3,6 +3,33 @@ import * as time from '../time';
 import { types } from '../api_types';
 import clarificationStore from './clarificationsStore';
 
+export interface CourseClarification {
+  courseAlias: string;
+  clarification: types.Clarification;
+  courseClarificationRequest: CourseClarificationRequest;
+}
+
+export enum CourseClarificationType {
+  WithProblem,
+  AllProblems,
+}
+
+interface CourseClarificationWithProblem {
+  type: CourseClarificationType.WithProblem;
+  courseAlias: string;
+  assignmentAlias: string;
+  problemAlias: string;
+}
+
+interface CourseClarificationAllProblems {
+  type: CourseClarificationType.AllProblems;
+  courseAlias: string;
+}
+
+export type CourseClarificationRequest =
+| CourseClarificationWithProblem
+| CourseClarificationAllProblems;
+
 export interface ContestClarification {
   contestAlias: string;
   clarification: types.Clarification;
@@ -39,6 +66,21 @@ export function refreshContestClarifications(
   api.Contest.clarifications({
     contest_alias: request.contestAlias,
     problem_alias: problemAlias,
+    rowcount: 100,
+    offset: null,
+  })
+    .then(time.remoteTimeAdapter)
+    .then((data) => {
+      trackClarifications(data.clarifications);
+    });
+}
+
+export function refreshCourseClarifications(
+  request: CourseClarificationRequest,
+) {
+  console.log(request);
+  api.Course.clarifications({
+    course_alias: request.courseAlias,
     rowcount: 100,
     offset: null,
   })

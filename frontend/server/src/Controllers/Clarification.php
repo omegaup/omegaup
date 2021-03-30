@@ -93,6 +93,10 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             }
 
             if (
+                !\OmegaUp\Authorization::isCourseAdmin(
+                    $r->identity,
+                    $course
+                ) &&
                 is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
                     $course->group_id,
                     $r->identity->identity_id

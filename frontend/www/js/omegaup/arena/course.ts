@@ -14,6 +14,14 @@ import {
   submitRun,
   submitRunFailed,
 } from './submissions';
+import {
+  CourseClarification,
+  CourseClarificationType,
+  CourseClarificationRequest,
+  refreshCourseClarifications,
+  trackClarifications,
+} from './clarifications';
+import clarificationStore from './clarificationsStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -41,6 +49,7 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-arena-course', {
         props: {
+          clarifications: clarificationStore.state.clarifications,
           course: payload.courseDetails,
           currentAssignment: payload.currentAssignment,
           problemInfo: this.problemInfo,
@@ -105,6 +114,31 @@ OmegaUp.on('ready', () => {
                 });
               });
           },
+          'new-clarification': ({
+            clarification,
+            clearForm
+          }: {
+            clarification: types.Clarification;
+            clearForm: () => void;
+          }) => {
+            if (!clarification) {
+              return;
+            }
+            api.Clarification.create({
+              course_alias: payload.courseDetails.alias,
+              assignment_alias: payload.currentAssignment.alias,
+              problem_alias: clarification.problem_alias,
+              username: clarification.author,
+              message: clarification.message,
+            })
+              .then(() => {
+                clearForm();
+                refreshCourseClarifications({
+                  courseAlias: payload.courseDetails.alias
+                } as CourseClarificationRequest);
+              })
+              .catch(ui.apiError);
+          },
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
           },
@@ -117,4 +151,11 @@ OmegaUp.on('ready', () => {
   // on the `navigate-to-problem` callback being invoked, and that is
   // not the case if this is set a priori.
   Object.assign(arenaCourse, getOptionsFromLocation(window.location.hash));
+
+  setInterval(() => {
+    refreshCourseClarifications({
+      type: CourseClarificationType.AllProblems,
+      courseAlias: payload.courseDetails.alias,
+    });
+  }, 5 * 60 * 1000);
 });

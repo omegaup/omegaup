@@ -87,7 +87,8 @@ export enum PopupDisplayed {
   },
 })
 export default class ArenaClarificationList extends Vue {
-  @Prop() inContest!: boolean;
+  @Prop({ default: false }) inContest!: boolean;
+  @Prop({ default: false }) inCourse!: boolean;
   @Prop({ default: false }) isAdmin!: boolean;
   @Prop() clarifications!: types.Clarification[];
   @Prop({ default: () => [] }) problems!: types.NavbarProblemsetProblem[];
