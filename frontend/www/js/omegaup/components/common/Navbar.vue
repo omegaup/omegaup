@@ -464,18 +464,18 @@ export default class Navbar extends Vue {
       & .grader-error {
         color: var(--status-error-color);
         background-image: linear-gradient(
-          rgb(242, 222, 222) 0,
-          rgb(231, 195, 195) 100%
+          var(--badges-grader-error-gradient-from-background-color),
+          var(--badges-grader-error-gradient-to-background-color)
         );
       }
 
       & .grader-ok {
         color: var(--status-success-color);
         background-image: linear-gradient(
-          rgb(223, 240, 216) 0,
-          rgb(200, 229, 188) 100%
+          var(--badges-grader-ok-gradient-from-background-color),
+          var(--badges-grader-ok-gradient-to-background-color)
         );
-        background-color: rgb(223, 240, 216);
+        background-color: var(--badges-grader-ok-background-color);
       }
 
       & .grader-warning {
