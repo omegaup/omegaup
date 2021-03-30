@@ -169,7 +169,7 @@ export default class Markdown extends Vue {
 [data-markdown-statement] {
   display: block;
   max-width: 50em;
-  margin: 0;
+  margin: 0 auto;
 
   h1 {
     font-size: 1.3em;

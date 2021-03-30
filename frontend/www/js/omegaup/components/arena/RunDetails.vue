@@ -3,19 +3,18 @@
     <div v-if="data">
       <button class="close">❌</button>
       <div v-if="inCourse">
-        <h3>Retroalimentación del profesor</h3>
+        <h3>{{ T.feedbackTitle }}</h3>
         <pre>{{
           data.feedback ? data.feedback.feedback : T.feedbackNotSentYet
         }}</pre>
-        <omegaup-markdown
-          v-if="data.feedback"
-          :markdown="
-            ui.formatString(T.feedbackLeftBy, {
-              username: data.feedback.author,
-            })
-          "
-        >
-        </omegaup-markdown>
+        <div v-if="data.feedback">
+          {{ T.feedbackLeftBy }}
+          <omegaup-user-username
+            :username="data.feedback.author"
+            :classname="data.feedback.author_classname"
+            :linkify="true"
+          ></omegaup-user-username>
+        </div>
         <div
           v-if="data.admin && data.feedback === null"
           class="feedback-section"
@@ -203,7 +202,7 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import arena_CodeView from './CodeView.vue';
 import arena_DiffView from './DiffView.vue';
-import omegaup_Markdown from '../Markdown.vue';
+import user_Username from '../user/Username.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -225,7 +224,7 @@ const EMPTY_FIELD = '∅';
     FontAwesomeIcon,
     'omegaup-arena-code-view': arena_CodeView,
     'omegaup-arena-diff-view': arena_DiffView,
-    'omegaup-markdown': omegaup_Markdown,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class ArenaRunDetails extends Vue {
@@ -237,7 +236,7 @@ export default class ArenaRunDetails extends Vue {
   ui = ui;
   groupVisible: GroupVisibility = {};
   showFeedbackForm = false;
-  feedback = this.data?.feedback ? this.data.feedback.feedback : '';
+  feedback = this.data?.feedback?.feedback ?? null;
 
   toggle(group: string): void {
     const visible = this.groupVisible[group];
