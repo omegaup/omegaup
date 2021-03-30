@@ -38,7 +38,6 @@ declare global {
       $: JQuery;
       jQuery: JQuery;
       document: Document;
-      window: Window;
     }
   }
 
