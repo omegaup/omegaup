@@ -175,7 +175,7 @@ export default class ProblemFinderWizard extends Vue {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: var(--finder-wizard-modal-mask-background-color);
+  background-color: rgba(var(--finder-wizard-modal-mask-background-color), 0.5);
   transition: opacity 0.3s ease;
 }
 

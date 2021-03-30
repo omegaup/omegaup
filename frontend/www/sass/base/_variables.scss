@@ -48,7 +48,7 @@
   --overlay-popup-background-color: #eeeeee;
   --overlay-popup-border-color: #cccccc;
   --overlay-popup-close-background-color--hover: #eeeeee;
-  --overlay-background-color: rgba(0, 0, 0, 0.5);
+  --overlay-background-color: #000000;
 
   // ARENA
   --arena-practice-background-color: #666688;
@@ -95,7 +95,7 @@
   --arena-scoreboard-a-font-color: #5588dd;
   --arena-scoreboard-footer-font-color: #808080;
   --arena-scoreboard-td-border-color: #000000;
-  --arena-scoreboard-accepted-bacground-color: #ddffdd;
+  --arena-scoreboard-accepted-background-color: #ddffdd;
   --arena-scoreboard-pending-background-color: #ddddff;
   --arena-scoreboard-wrong-background-color: #ffdddd;
   --arena-scoreboard-position-recent-event-background-color: #ddffdd;
@@ -113,7 +113,7 @@
   --arena-submissions-list-verdict-ac-background-color: #ccff66;
   --arena-submissions-list-verdict-ce-background-color: #ff9900;
   --arena-submissions-list-verdict-je-ve-background-color: #ff0000;
-  --arena-histogram-bar-1-background-gradient: #678dd7-2;
+  --arena-histogram-bar-1-background-gradient: #4fa2eb;
   --arena-histogram-bar-2-background-gradient: #c2ddeb;
   --arena-histogram-bar-3-background-gradient: #dddcdb;
   --arena-histogram-bar-4-background-gradient: #faccb4;
@@ -123,7 +123,7 @@
   --arena-navbar-miniranking-td-border-color: #000000;
 
   // FINDER WIZARD
-  --finder-wizard-modal-mask-background-color: rgba(0, 0, 0, 0.5);
+  --finder-wizard-modal-mask-background-color: #000000;
   --finder-wizard-modal-container-background-color: #eeeeee;
   --finder-wizard-modal-container-border-color: #cccccc;
   --finder-wizard-slider-process-background-color: #678dd7;
@@ -137,23 +137,12 @@
   --clarifications-list-pre-background-color: #f5f5f5;
   --clarification-resolved-font-color: #468847;
   --clarification-resolved-background-color: #dff0d8;
-  --clarification-resolved-gradient-from-background-color: rgb(223, 240, 216) 0;
-  --clarification-resolved-gradient-to-background-color: rgb(200, 229, 188) 100%;
+  --clarification-resolved-gradient-from-background-color: #dff0d8;
+  --clarification-resolved-gradient-to-background-color: #c8e5bc;
   --clarification-direct-message-font-color: #7d7512;
   --clarification-direct-message-background-color: #dff0d8;
-  --clarification-direct-message-gradient-from-background-color: rgb(
-      253,
-      245,
-      154
-    )
-    0;
-  --clarification-direct-message-gradient-to-background-color: rgba(
-      255,
-      249,
-      181,
-      0.5
-    )
-    100%;
+  --clarification-direct-message-gradient-from-background-color: #fdf59a;
+  --clarification-direct-message-gradient-to-background-color: #fff9b5;
 
   // PROBLEM
   --problem-versions-controls-background-color: #f5f5f5;
@@ -168,19 +157,14 @@
   --notifications-clarifications-drawer-li-background-color--active: #678dd7;
   --notifications-clarifications-drawer-li-font-color--active: #ffffff;
   --notifications-notification-date-font-color: #666666;
-  --notifications-notification-link-background-color--hover: rgba(
-    0,
-    0,
-    0,
-    0.05
-  );
+  --notifications-notification-link-background-color--hover: #000000;
 
   // QUALITY NOMINATIONS
   --quality-nomination-popup-border-color: #cccccc;
   --quality-nomination-popup-background-color: #000000;
   --quality-nomination-tag-select-border-color: #cccccc;
   --quality-nomination-tag-select-background-color: #ffffff;
-  --quality-nomination-details-confirmation-bacground-color: rgba(0, 0, 0, 0.5);
+  --quality-nomination-details-confirmation-background-color: #000000;
 
   // CODER OF THE MONTH
   --coder-of-the-month-card-header-font-color: #ffffff;
@@ -191,12 +175,12 @@
   --badges-link-font-color: #337ab7;
   --badges-grader-error-font-color: #b94a48;
   --badges-grader-error-background-color: #f2dede;
-  --badges-grader-error-gradient-from-background-color: rgb(242, 222, 222) 0;
-  --badges-grader-error-gradient-to-background-color: rgb(231, 195, 195) 100%;
+  --badges-grader-error-gradient-from-background-color: #f2dede;
+  --badges-grader-error-gradient-to-background-color: #e7c3c3;
   --badges-grader-ok-font-color: #468847;
   --badges-grader-ok-background-color: #dff0d8;
-  --badges-grader-ok-gradient-from-background-color: rgb(223, 240, 216) 0;
-  --badges-grader-ok-gradient-to-background-color: rgb(200, 229, 188) 100%;
+  --badges-grader-ok-gradient-from-background-color: #dff0d8;
+  --badges-grader-ok-gradient-to-background-color: #c8e5bc;
   --badges-grader-warning-from-font-color: #fcf8e3;
   --badges-grader-warning-to-font-color: #f8efc0;
   --badges-grader-warning-border-color: #f5e79e;

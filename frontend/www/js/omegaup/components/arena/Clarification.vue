@@ -166,7 +166,7 @@ export default class ArenaClarificationForm extends Vue {
   color: var(--clarification-direct-message-font-color);
   background-image: linear-gradient(
     var(--clarification-direct-message-gradient-from-background-color),
-    var(--clarification-direct-message-gradient-to-background-color)
+    rgba(var(--clarification-direct-message-gradient-to-background-color), 0.5)
   );
   background-color: var(--clarification-direct-message-background-color);
 }

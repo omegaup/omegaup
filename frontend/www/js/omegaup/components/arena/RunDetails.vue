@@ -253,7 +253,7 @@ export default class ArenaRunDetails extends Vue {
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--overlay-background-color);
+  background: rgba(var(--overlay-background-color), 0.5);
   z-index: 9999998 !important;
 
   form {
