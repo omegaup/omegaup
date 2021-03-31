@@ -9,6 +9,7 @@ describe('ClarificationList.vue', () => {
   const clarifications: types.Clarification[] = [
     {
       answer: undefined,
+      assignment_alias: 'Tarea de prueba',
       author: 'omegaUp',
       clarification_id: 1,
       message: 'Clarificación de prueba 1',
@@ -19,6 +20,7 @@ describe('ClarificationList.vue', () => {
     },
     {
       answer: 'Ok',
+      assignment_alias: 'Tarea de prueba',
       author: 'omegaUp',
       clarification_id: 2,
       message: 'Clarificación de prueba 2',
@@ -37,5 +39,15 @@ describe('ClarificationList.vue', () => {
       },
     });
     expect(wrapper.find('th').text()).toBe(T.wordsProblem);
+  });
+
+  it('Should handle course clarifications', async () => {
+    const wrapper = shallowMount(arena_ClarificationList, {
+      propsData: {
+        inCourse: true,
+        clarifications,
+      },
+    });
+    expect(wrapper.find('th').text()).toBe(T.wordsHomework);
   });
 });

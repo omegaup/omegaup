@@ -16,7 +16,6 @@ import {
 } from './submissions';
 import {
   CourseClarificationType,
-  CourseClarificationRequest,
   refreshCourseClarifications,
   trackClarifications,
 } from './clarifications';
@@ -136,17 +135,18 @@ OmegaUp.on('ready', () => {
                 clearForm();
                 refreshCourseClarifications({
                   courseAlias: payload.courseDetails.alias,
-                } as CourseClarificationRequest);
+                  type: CourseClarificationType.AllProblems,
+                });
               })
               .catch(ui.apiError);
           },
           'clarification-response': (clarification: types.Clarification) => {
-            console.log(clarification);
             api.Clarification.update(clarification)
               .then(() => {
                 refreshCourseClarifications({
                   courseAlias: payload.courseDetails.alias,
-                } as CourseClarificationRequest);
+                  type: CourseClarificationType.AllProblems,
+                });
               })
               .catch(ui.apiError);
           },

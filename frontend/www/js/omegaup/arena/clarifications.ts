@@ -78,7 +78,6 @@ export function refreshContestClarifications(
 export function refreshCourseClarifications(
   request: CourseClarificationRequest,
 ) {
-  console.log(request);
   api.Course.clarifications({
     course_alias: request.courseAlias,
     rowcount: 100,
