@@ -6,7 +6,7 @@ import { types } from '../api_types';
 import { navigateToProblem, Navigation, setLocationHash } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
-import problemStore from './problemStore';
+import { storeConfig } from './problemStore';
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import { cloneDeep } from 'lodash';
@@ -102,10 +102,12 @@ describe('navigation.ts', () => {
       if (vueInstance.problemInfo) {
         const localVue = createLocalVue();
         localVue.use(Vuex);
-        const store = new Vuex.Store(cloneDeep(problemStore));
+        const store = new Vuex.Store(cloneDeep(storeConfig));
         expect(store.state.problems).toStrictEqual({});
         store.commit('addProblem', vueInstance.problemInfo);
-        expect(store.state.problems).toStrictEqual(vueInstance.problemInfo);
+        expect(vueInstance.problemInfo.alias).toBe(
+          store.state.problems[navbarProblems[0].alias].alias,
+        );
       }
       navigateToProblem(params);
       const getLocationHash = jest
