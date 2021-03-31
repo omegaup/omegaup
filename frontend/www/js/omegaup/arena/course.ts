@@ -14,7 +14,6 @@ import {
   submitRun,
   submitRunFailed,
 } from './submissions';
-import problemsStore from './problemStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -62,7 +61,6 @@ OmegaUp.on('ready', () => {
               runs,
               target: arenaCourse,
               problems: this.problems,
-              storedProblems: problemsStore.state.problems,
             });
           },
           'show-run': (request: SubmissionRequest) => {

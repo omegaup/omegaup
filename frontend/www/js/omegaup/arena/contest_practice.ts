@@ -24,7 +24,6 @@ import {
   trackClarifications,
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
-import problemsStore from './problemStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -73,7 +72,6 @@ OmegaUp.on('ready', () => {
               runs,
               target: contestPractice,
               problems: this.problems,
-              storedProblems: problemsStore.state.problems,
             });
           },
           'show-run': (request: SubmissionRequest) => {

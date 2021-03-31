@@ -97,12 +97,10 @@ describe('navigation.ts', () => {
         runs: [],
         problems: navbarProblems,
         problem: navbarProblems[0],
-        storedProblems: {},
       };
       const state = { problems: {} };
       if (vueInstance.problemInfo) {
         addProblem(state, vueInstance.problemInfo);
-        params.storedProblems = state.problems;
       }
       navigateToProblem(params);
       const getLocationHash = jest
