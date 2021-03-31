@@ -20,7 +20,7 @@ describe('Course.vue', () => {
     admission_mode: 'registration',
     alias: 'test-course',
     archived: false,
-    assignments: [ currentAssignment ],
+    assignments: [currentAssignment],
     clarifications: [],
     needs_basic_information: false,
     description: '# Test',
