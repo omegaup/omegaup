@@ -6,7 +6,10 @@ import { types } from '../api_types';
 import { navigateToProblem, Navigation, setLocationHash } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
-import { mutations } from './problemStore';
+import problemStore from './problemStore';
+import { createLocalVue } from '@vue/test-utils';
+import Vuex from 'vuex';
+import { cloneDeep } from 'lodash';
 
 const vueInstance: Vue & {
   problemInfo: types.ProblemInfo | null;
@@ -87,8 +90,6 @@ const navbarProblems: types.NavbarProblemsetProblem[] = [
 ];
 setLocationHash('#problems');
 
-const { addProblem } = mutations;
-
 describe('navigation.ts', () => {
   describe('navigateToProblem', () => {
     it('Should change window location hash', async () => {
@@ -98,9 +99,13 @@ describe('navigation.ts', () => {
         problems: navbarProblems,
         problem: navbarProblems[0],
       };
-      const state = { problems: {} };
       if (vueInstance.problemInfo) {
-        addProblem(state, vueInstance.problemInfo);
+        const localVue = createLocalVue();
+        localVue.use(Vuex);
+        const store = new Vuex.Store(cloneDeep(problemStore));
+        expect(store.state.problems).toStrictEqual({});
+        store.commit('addProblem', vueInstance.problemInfo);
+        expect(store.state.problems).toStrictEqual(vueInstance.problemInfo);
       }
       navigateToProblem(params);
       const getLocationHash = jest
