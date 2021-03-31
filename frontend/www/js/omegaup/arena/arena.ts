@@ -537,6 +537,25 @@ export class Arena {
                   })
                   .catch(ui.error);
               },
+              'update-feedback': ({
+                guid,
+                feedback,
+              }: {
+                guid: string;
+                feedback: string;
+              }) => {
+                api.Submission.updateFeedback({
+                  guid,
+                  course_alias: self.options.courseAlias,
+                  assignment_alias: self.options.assignmentAlias,
+                  feedback,
+                })
+                  .then(() => {
+                    ui.success(T.feedbackSuccesfullyUpdated);
+                    self.hideOverlay();
+                  })
+                  .catch(ui.error);
+              },
             },
           });
         },

@@ -196,6 +196,7 @@
   - [`/api/session/googleLogin/`](#apisessiongooglelogin)
 - [Submission](#submission)
   - [`/api/submission/createFeedback/`](#apisubmissioncreatefeedback)
+  - [`/api/submission/updateFeedback/`](#apisubmissionupdatefeedback)
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
@@ -3850,6 +3851,25 @@ SubmissionController
 ### Description
 
 Adds admin feedback to a submission
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `feedback`         | `string` |             |
+| `guid`             | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/submission/updateFeedback/`
+
+### Description
+
+Updates the admin feedback for a submission
 
 ### Parameters
 

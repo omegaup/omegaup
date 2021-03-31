@@ -1638,6 +1638,10 @@ export const Submission = {
     messages.SubmissionCreateFeedbackRequest,
     messages.SubmissionCreateFeedbackResponse
   >('/api/submission/createFeedback/'),
+  updateFeedback: apiCall<
+    messages.SubmissionUpdateFeedbackRequest,
+    messages.SubmissionUpdateFeedbackResponse
+  >('/api/submission/updateFeedback/'),
 };
 
 export const Tag = {
