@@ -10,6 +10,31 @@ import {
 } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
+import fetchMock from 'jest-fetch-mock';
+fetchMock.enableMocks();
+fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
+  if (req.url != '/api/problem/details/') {
+    return Promise.resolve({
+      ok: false,
+      status: 404,
+      body: JSON.stringify({
+        status: 'error',
+        error: `Invalid call to "${req.url}" in test`,
+        errorcode: 403,
+      }),
+    });
+  }
+  return Promise.resolve({
+    status: 200,
+    body: JSON.stringify({
+      status: 'ok',
+      session: {
+        valid: false,
+      },
+      time: Date.now() / 1000,
+    }),
+  });
+});
 
 const vueInstance: Vue & {
   problemInfo: types.ProblemInfo | null;
@@ -92,17 +117,19 @@ const navbarProblems: types.NavbarProblemsetProblem[] = [
 describe('navigation.ts', () => {
   describe('navigateToProblem', () => {
     it('Should change hash when contest alias is declared in practice mode', async () => {
-      const params: NavigationRequest = {
+      navigateToProblem({
         type: NavigationType.ForContest,
         target: vueInstance,
         runs: [],
         problems: navbarProblems,
         problem: navbarProblems[0],
-        contestAlias: 'problem_alias',
-      };
-      if (vueInstance.problemInfo) {
-        navigateToProblem(params);
-      }
+        contestAlias: 'contest_alias',
+      } as NavigationRequest);
+
+      const getLocationHash = jest
+        .fn()
+        .mockReturnValue('#problems/problem_alias');
+      expect(getLocationHash()).toEqual(`#problems/${navbarProblems[0].alias}`);
     });
   });
 });

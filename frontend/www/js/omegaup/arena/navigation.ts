@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import * as api from '../api';
 import * as ui from '../ui';
-import T from '../lang';
 import { types } from '../api_types';
 import { myRunsStore } from './runsStore';
 import problemsStore from './problemStore';
@@ -14,8 +13,7 @@ export enum NavigationType {
   ForSingleProblemOrCourse,
 }
 
-interface NavigationForContest {
-  type: NavigationType.ForContest;
+interface BaseNavigation {
   target: Vue & {
     problemInfo: types.ProblemInfo | null;
     popupDisplayed?: PopupDisplayed;
@@ -24,20 +22,16 @@ interface NavigationForContest {
   runs: types.Run[];
   problem: types.NavbarProblemsetProblem;
   problems: types.NavbarProblemsetProblem[];
-  contestAlias: string;
 }
 
-interface NavigationForSingleProblemOrCourse {
+type NavigationForContest = BaseNavigation & {
+  type: NavigationType.ForContest;
+  contestAlias: string;
+};
+
+type NavigationForSingleProblemOrCourse = BaseNavigation & {
   type: NavigationType.ForSingleProblemOrCourse;
-  target: Vue & {
-    problemInfo: types.ProblemInfo | null;
-    popupDisplayed?: PopupDisplayed;
-    problem: ActiveProblem | null;
-  };
-  runs: types.Run[];
-  problem: types.NavbarProblemsetProblem;
-  problems: types.NavbarProblemsetProblem[];
-}
+};
 
 export type NavigationRequest =
   | NavigationForContest
@@ -46,9 +40,6 @@ export type NavigationRequest =
 export function navigateToProblem(request: NavigationRequest): void {
   let contestAlias;
   if (request.type === NavigationType.ForContest) {
-    if (!request.contestAlias) {
-      ui.error(T.problemNavigationContestAliasRequired);
-    }
     contestAlias = request.contestAlias;
   }
   const { target, problem, problems } = request;

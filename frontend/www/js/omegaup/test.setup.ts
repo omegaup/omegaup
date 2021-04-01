@@ -4,15 +4,12 @@ import 'process';
 import '@testing-library/jest-dom';
 import '@testing-library/jest-dom/extend-expect';
 
-// Intercept all API calls. Only let `API.Session.currentSession()` and
-// `API.Problem.details()` work and fail everything else.
+// Intercept all API calls. Only let `API.Session.currentSession()` work and
+// fail everything else.
 import fetchMock from 'jest-fetch-mock';
 fetchMock.enableMocks();
 fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
-  if (
-    req.url != '/api/session/currentSession/' &&
-    req.url != '/api/problem/details/'
-  ) {
+  if (req.url != '/api/session/currentSession/') {
     return Promise.resolve({
       ok: false,
       status: 404,

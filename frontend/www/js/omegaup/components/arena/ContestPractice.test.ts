@@ -9,7 +9,7 @@ import arena_ContestPractice from './ContestPractice.vue';
 describe('ContestPractice.vue', () => {
   const date = new Date();
 
-  const contest = {
+  const contest: types.ContestPublicDetails = {
     admission_mode: 'public',
     alias: 'omegaUp',
     description: 'hello omegaUp',
@@ -29,7 +29,7 @@ describe('ContestPractice.vue', () => {
     start_time: date,
     submissions_gap: 1200,
     title: 'hello omegaUp',
-  } as types.ContestPublicDetails;
+  };
 
   const problemInfo: types.ProblemInfo = {
     alias: 'triangulos',
