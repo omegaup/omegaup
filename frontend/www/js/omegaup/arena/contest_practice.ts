@@ -72,6 +72,7 @@ OmegaUp.on('ready', () => {
               runs,
               target: contestPractice,
               problems: this.problems,
+              contestAlias: payload.contest.alias,
             });
           },
           'show-run': (request: SubmissionRequest) => {

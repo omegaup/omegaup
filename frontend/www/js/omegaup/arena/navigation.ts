@@ -17,6 +17,7 @@ interface Navigation {
   runs: types.Run[];
   problem: types.NavbarProblemsetProblem;
   problems: types.NavbarProblemsetProblem[];
+  contestAlias?: string;
 }
 
 export function navigateToProblem({
@@ -24,6 +25,7 @@ export function navigateToProblem({
   runs,
   problem,
   problems,
+  contestAlias,
 }: Navigation): void {
   if (
     Object.prototype.hasOwnProperty.call(
@@ -38,6 +40,7 @@ export function navigateToProblem({
   api.Problem.details({
     problem_alias: problem.alias,
     prevent_problemset_open: false,
+    contest_alias: contestAlias,
   })
     .then((problemInfo) => {
       for (const run of problemInfo.runs ?? []) {
