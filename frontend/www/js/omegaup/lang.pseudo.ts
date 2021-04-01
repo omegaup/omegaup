@@ -781,6 +781,7 @@ const translations: { [key: string]: string; } = {
   problemLevelUpdated: "(Pr0b13m 13v31 add3d.)",
   problemListShowAdminProblems: "(A150 5h0w pr0b13m5 I manag3)",
   problemListShowAdminProblemsAndDeleted: "(A150 5h0w pr0b13m5 I manag3 and d31373d pr0b13m5)",
+  problemNavigationContestAliasRequired: "(C0n7357 a1ia5 i5 r3quir3d)",
   problemNew: "(Cr3a73 pr0b13m)",
   problemNotFound: "(Pr0b13m n07 f0und.)",
   problemNotFoundInContest: "(Pr0b13m n07 f0und in c0n7357.)",

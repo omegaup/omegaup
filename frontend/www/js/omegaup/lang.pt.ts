@@ -781,6 +781,7 @@ const translations: { [key: string]: string; } = {
   problemLevelUpdated: "O n\u00edvel do problema foi atualizado.",
   problemListShowAdminProblems: "Tamb\u00e9m mostrar problemas que eu gerencio",
   problemListShowAdminProblemsAndDeleted: "Tamb\u00e9m mostrar problemas que eu gerencio e problemas eliminados",
+  problemNavigationContestAliasRequired: "O alias do concurso \u00e9 obrigat\u00f3rio",
   problemNew: "Criar problema",
   problemNotFound: "Problema n\u00e3o encontrado",
   problemNotFoundInContest: "Problema n\u00e3o encontrado neste concurso",

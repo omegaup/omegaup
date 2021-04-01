@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import * as api from '../api';
 import * as ui from '../ui';
+import T from '../lang';
 import { types } from '../api_types';
 import { myRunsStore } from './runsStore';
 import problemsStore from './problemStore';
@@ -8,7 +9,13 @@ import { PopupDisplayed } from '../components/problem/Details.vue';
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import { trackRun } from './submissions';
 
-interface Navigation {
+export enum NavigationType {
+  ForContest,
+  ForSingleProblemOrCourse,
+}
+
+interface NavigationForContest {
+  type: NavigationType.ForContest;
   target: Vue & {
     problemInfo: types.ProblemInfo | null;
     popupDisplayed?: PopupDisplayed;
@@ -17,16 +24,35 @@ interface Navigation {
   runs: types.Run[];
   problem: types.NavbarProblemsetProblem;
   problems: types.NavbarProblemsetProblem[];
-  contestAlias?: string;
+  contestAlias: string;
 }
 
-export function navigateToProblem({
-  target,
-  runs,
-  problem,
-  problems,
-  contestAlias,
-}: Navigation): void {
+interface NavigationForSingleProblemOrCourse {
+  type: NavigationType.ForSingleProblemOrCourse;
+  target: Vue & {
+    problemInfo: types.ProblemInfo | null;
+    popupDisplayed?: PopupDisplayed;
+    problem: ActiveProblem | null;
+  };
+  runs: types.Run[];
+  problem: types.NavbarProblemsetProblem;
+  problems: types.NavbarProblemsetProblem[];
+}
+
+export type NavigationRequest =
+  | NavigationForContest
+  | NavigationForSingleProblemOrCourse;
+
+export function navigateToProblem(request: NavigationRequest): void {
+  let contestAlias;
+  if (request.type === NavigationType.ForContest) {
+    if (!request.contestAlias) {
+      ui.error(T.problemNavigationContestAliasRequired);
+    }
+    contestAlias = request.contestAlias;
+  }
+  const { target, problem, problems } = request;
+  let { runs } = request;
   if (
     Object.prototype.hasOwnProperty.call(
       problemsStore.state.problems,

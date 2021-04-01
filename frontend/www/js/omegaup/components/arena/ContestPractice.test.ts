@@ -9,7 +9,7 @@ import arena_ContestPractice from './ContestPractice.vue';
 describe('ContestPractice.vue', () => {
   const date = new Date();
 
-  const contestDetails = {
+  const contest = {
     admission_mode: 'public',
     alias: 'omegaUp',
     description: 'hello omegaUp',
@@ -31,7 +31,7 @@ describe('ContestPractice.vue', () => {
     title: 'hello omegaUp',
   } as types.ContestPublicDetails;
 
-  const sampleProblem = {
+  const problemInfo: types.ProblemInfo = {
     alias: 'triangulos',
     accepts_submissions: true,
     karel_problem: false,
@@ -83,67 +83,33 @@ describe('ContestPractice.vue', () => {
     title: 'Triangulos',
     visibility: 2,
     input_limit: 1000,
-    guid: '80bbe93bc01c1d47ff9fb396dfaff741',
-    runDetailsData: {
-      admin: false,
-      alias: 'sumas',
-      cases: {},
-      details: {
-        compile_meta: {
-          Main: {
-            memory: 12091392,
-            sys_time: 0.029124,
-            time: 0.174746,
-            verdict: 'OK',
-            wall_time: 0.51659,
-          },
-        },
-        contest_score: 5,
-        groups: [],
-        judged_by: 'localhost',
-        max_score: 100,
-        memory: 10407936,
-        score: 0.05,
-        time: 0.31891,
-        verdict: 'PA',
-        wall_time: 0.699709,
-      },
-      groups: [],
-      guid: '80bbe93bc01c1d47ff9fb396dfaff741',
-      judged_by: '',
-      language: 'py3',
-      logs: '',
-      show_diff: 'none',
-      source: 'print(3)',
-      source_link: false,
-      source_name: 'Main.py3',
-      source_url: 'blob:http://localhost:8001/url',
-    } as types.RunDetails,
-  } as types.ProblemInfo;
+  };
+
+  const problems: types.NavbarProblemsetProblem[] = [
+    {
+      acceptsSubmissions: true,
+      alias: 'problemOmegaUp',
+      bestScore: 100,
+      hasRuns: true,
+      maxScore: 100,
+      text: 'A. hello problem omegaUp',
+    },
+    {
+      acceptsSubmissions: true,
+      alias: 'otherProblemOmegaUp',
+      bestScore: 100,
+      hasRuns: true,
+      maxScore: 100,
+      text: 'B. hello other problem omegaUp',
+    },
+  ];
 
   it('Should handle details for a problem in a contest, practice mode', async () => {
     const wrapper = mount(arena_ContestPractice, {
       propsData: {
-        contest: contestDetails,
-        problems: [
-          {
-            acceptsSubmissions: true,
-            alias: 'problemOmegaUp',
-            bestScore: 100,
-            hasRuns: true,
-            maxScore: 100,
-            text: 'A. hello problem omegaUp',
-          },
-          {
-            acceptsSubmissions: true,
-            alias: 'otherProblemOmegaUp',
-            bestScore: 100,
-            hasRuns: true,
-            maxScore: 100,
-            text: 'B. hello other problem omegaUp',
-          },
-        ] as types.NavbarProblemsetProblem[],
-        problemInfo: sampleProblem,
+        contest,
+        problems,
+        problemInfo,
       },
     });
 
@@ -155,7 +121,7 @@ describe('ContestPractice.vue', () => {
     expect(wrapper.find('a[data-problem=otherProblemOmegaUp]').text()).toBe(
       'B. hello other problem omegaUp',
     );
-    expect(wrapper.text()).toContain(sampleProblem.points);
+    expect(wrapper.text()).toContain(problemInfo.points);
     expect(wrapper.text()).toContain(time.formatDateLocal(date));
 
     await wrapper.find('a[data-problem=problemOmegaUp]').trigger('click');
