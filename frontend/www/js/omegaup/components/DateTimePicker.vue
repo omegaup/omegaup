@@ -1,16 +1,22 @@
 <template>
-  <input
+  <datetime
     v-model="stringValue"
-    class="form-control"
-    :class="{ 'is-invalid': isInvalid }"
-    required="required"
-    size="16"
-    type="datetime-local"
-    :disabled="!enabled"
-    :max="finish ? time.formatDateTimeLocal(finish) : null"
-    :min="start ? time.formatDateTimeLocal(start) : null"
-    :readonly="readonly || usedFallback"
-  />
+    type="datetime"
+    :format="LuxonDateTime.DATETIME_SHORT"
+    input-class="form-control"
+    minute-step="10"
+    :max-datetime="finish ? time.formatDateTimeLocal(finish) : null"
+    :min-datetime="start ? time.formatDateTimeLocal(start) : null"
+  >
+    <template #button-cancel>
+      <font-awesome-icon :icon="['fas', 'times']" />
+      {{ T.wordsCancel }}
+    </template>
+    <template #button-confirm>
+      <font-awesome-icon :icon="['fas', 'check-circle']" />
+      {{ T.wordsConfirm }}
+    </template>
+  </datetime>
 </template>
 
 <script lang="ts">
@@ -20,11 +26,25 @@ import * as time from '../time';
 import '../../../third_party/js/bootstrap-datetimepicker.min.js';
 import '../../../third_party/js/locales/bootstrap-datetimepicker.es.js';
 import '../../../third_party/js/locales/bootstrap-datetimepicker.pt-BR.js';
+import { Datetime } from 'vue-datetime';
+import { DateTime as LuxonDateTime } from 'luxon';
+import 'vue-datetime/dist/vue-datetime.css';
 
-@Component
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faTimes, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+library.add(faTimes, faCheckCircle);
+
+@Component({
+  components: {
+    datetime: Datetime,
+    FontAwesomeIcon,
+  },
+})
 export default class DateTimePicker extends Vue {
   T = T;
   time = time;
+  LuxonDateTime = LuxonDateTime;
 
   @Prop() value!: Date;
   @Prop({ default: true }) enabled!: boolean;
@@ -34,58 +54,11 @@ export default class DateTimePicker extends Vue {
   @Prop({ default: false }) readonly!: boolean;
   @Prop({ default: false }) isInvalid!: boolean;
 
-  private usedFallback: boolean = false;
-  private stringValue: string = time.formatDateTimeLocal(this.value);
-
-  public mounted() {
-    if ((this.$el as HTMLInputElement).type === 'text') {
-      // Even though we declared the input as having datetime-local type,
-      // browsers that don't support it will silently change the type to text.
-      // In that case, use the bootstrap datetimepicker.
-      this.mountedFallback();
-    }
-  }
-
-  private mountedFallback() {
-    this.usedFallback = true;
-    $(this.$el)
-      .datetimepicker({
-        format: this.format,
-        defaultDate: this.value,
-        locale: T.locale,
-      })
-      .on('change', () => {
-        this.$emit('input', $(this.$el).data('datetimepicker').getDate());
-      });
-
-    $(this.$el).data('datetimepicker').setDate(this.value);
-    if (this.start !== null) {
-      $(this.$el).data('datetimepicker').setStartDate(this.start);
-    }
-    if (this.finish !== null) {
-      $(this.$el).data('datetimepicker').setEndDate(this.finish);
-    }
-  }
+  stringValue: string = time.formatDateTimeLocal(this.value);
 
   @Watch('stringValue')
   onStringValueChanged(newStringValue: string) {
-    if (this.usedFallback) {
-      // If the fallback was used, we don't need to update anything.
-      return;
-    }
     this.$emit('input', time.parseDateTimeLocal(newStringValue));
-  }
-
-  @Watch('value')
-  onPropertyChanged(newValue: Date) {
-    this.stringValue = time.formatDateTimeLocal(newValue);
-    if (this.usedFallback) {
-      $(this.$el).data('datetimepicker').setDate(newValue);
-    }
   }
 }
 </script>
-
-<style>
-@import '../../../third_party/css/bootstrap-datetimepicker.css';
-</style>

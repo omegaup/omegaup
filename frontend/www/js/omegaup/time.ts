@@ -107,7 +107,11 @@ export function parseDateTimeLocal(dateString: string): Date {
   // Date.parse() will use UTC if given a timestamp with that format, instead
   // of the local timezone.
   const result = new Date();
-  const matches = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(dateString);
+  console.log(dateString);
+  const matches = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}).(\d{3})Z$/.exec(
+    dateString,
+  );
+  console.log(matches);
   if (matches !== null) {
     result.setFullYear(Number.parseInt(matches[1], 10));
     // Months in JavaScript start at 0.

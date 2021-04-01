@@ -18,7 +18,7 @@ describe('time', () => {
   });
 
   describe('formatDateTimeLocal', () => {
-    const expectedValue = '2010-01-01T11:22';
+    const expectedValue = '2010-01-01T11:22:33.0000Z';
 
     it('Should format dates correctly', () => {
       expect(time.formatDateTimeLocal(new Date('2010-01-01 11:22:33'))).toEqual(
