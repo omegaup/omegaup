@@ -11,49 +11,8 @@ import {
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import fetchMock from 'jest-fetch-mock';
-fetchMock.enableMocks();
-fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
-  if (req.url != '/api/problem/details/') {
-    return Promise.resolve({
-      ok: false,
-      status: 404,
-      body: JSON.stringify({
-        status: 'error',
-        error: `Invalid call to "${req.url}" in test`,
-        errorcode: 403,
-      }),
-    });
-  }
-  return Promise.resolve({
-    status: 200,
-    body: JSON.stringify({
-      status: 'ok',
-      session: {
-        valid: false,
-      },
-      time: Date.now() / 1000,
-    }),
-  });
-});
 
-const vueInstance: Vue & {
-  problemInfo: types.ProblemInfo | null;
-  popupDisplayed?: PopupDisplayed;
-  problem: ActiveProblem | null;
-} = new Vue({
-  components: {
-    'omegaup-arena-contest-practice': arena_ContestPractice,
-  },
-  render: function (createElement) {
-    return createElement('omegaup-badge-details', {
-      props: {
-        problemInfo: null,
-        problem: null,
-      },
-    });
-  },
-});
-vueInstance.problemInfo = {
+const problemDetails: types.ProblemInfo = {
   accepts_submissions: true,
   commit: 'abcdef',
   alias: 'problem_alias',
@@ -94,6 +53,46 @@ vueInstance.problemInfo = {
   title: 'A. Problem',
   visibility: 2,
 };
+fetchMock.enableMocks();
+fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
+  if (req.url != '/api/problem/details/') {
+    return Promise.resolve({
+      ok: false,
+      status: 404,
+      body: JSON.stringify({
+        status: 'error',
+        error: `Invalid call to "${req.url}" in test`,
+        errorcode: 403,
+      }),
+    });
+  }
+  return Promise.resolve({
+    status: 200,
+    body: JSON.stringify({
+      ...problemDetails,
+      status: 'ok',
+    }),
+  });
+});
+
+const vueInstance: Vue & {
+  problemInfo: types.ProblemInfo | null;
+  popupDisplayed?: PopupDisplayed;
+  problem: ActiveProblem | null;
+} = new Vue({
+  components: {
+    'omegaup-arena-contest-practice': arena_ContestPractice,
+  },
+  render: function (createElement) {
+    return createElement('omegaup-badge-details', {
+      props: {
+        problemInfo: null,
+        problem: null,
+      },
+    });
+  },
+});
+vueInstance.problemInfo = problemDetails;
 vueInstance.popupDisplayed = PopupDisplayed.RunSubmit;
 const navbarProblems: types.NavbarProblemsetProblem[] = [
   {
@@ -117,19 +116,21 @@ const navbarProblems: types.NavbarProblemsetProblem[] = [
 describe('navigation.ts', () => {
   describe('navigateToProblem', () => {
     it('Should change hash when contest alias is declared in practice mode', async () => {
-      navigateToProblem({
+      const mockSetLocationHash = jest.fn((x) => x);
+      const params: NavigationRequest = {
         type: NavigationType.ForContest,
         target: vueInstance,
         runs: [],
         problems: navbarProblems,
         problem: navbarProblems[0],
         contestAlias: 'contest_alias',
-      } as NavigationRequest);
-
-      const getLocationHash = jest
-        .fn()
-        .mockReturnValue('#problems/problem_alias');
-      expect(getLocationHash()).toEqual(`#problems/${navbarProblems[0].alias}`);
+      };
+      navigateToProblem(params);
+      mockSetLocationHash(`#problems/${navbarProblems[0].alias}`);
+      expect(mockSetLocationHash.mock.calls.length).toBe(1);
+      expect(mockSetLocationHash.mock.calls[0][0]).toBe(
+        `#problems/${navbarProblems[0].alias}`,
+      );
     });
   });
 });

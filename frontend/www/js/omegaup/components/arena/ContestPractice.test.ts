@@ -13,6 +13,7 @@ describe('ContestPractice.vue', () => {
     admission_mode: 'public',
     alias: 'omegaUp',
     description: 'hello omegaUp',
+    director: 'omegaUpDirector',
     feedback: 'detailed',
     finish_time: date,
     languages: 'py',
