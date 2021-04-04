@@ -68,7 +68,6 @@
           "
           :clarifications="currentClarifications"
           :is-admin="course.is_admin || course.is_curator"
-          :in-course="true"
           :show-new-clarification-popup="showNewClarificationPopup"
           @new-clarification="(request) => $emit('new-clarification', request)"
           @clarification-response="
@@ -77,7 +76,12 @@
           @update:activeTab="
             (selectedTab) => $emit('update:activeTab', selectedTab)
           "
-        ></omegaup-arena-clarification-list>
+        >
+          <template #table-title>
+            <th class="text-center" scope="col">{{ T.wordsHomework }}</th>
+            <th class="text-center" scope="col">{{ T.wordsProblem }}</th>
+          </template>
+        </omegaup-arena-clarification-list>
       </div>
     </template>
   </omegaup-arena>

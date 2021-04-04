@@ -21,7 +21,6 @@ describe('Clarification.vue', () => {
     const wrapper = shallowMount(arena_Clarification, {
       propsData: {
         clarification,
-        inContest: true,
         isAdmin: true,
       },
     });
@@ -34,8 +33,6 @@ describe('Clarification.vue', () => {
     const wrapper = shallowMount(arena_Clarification, {
       propsData: {
         clarification,
-        inContest: false,
-        inCourse: true,
         isAdmin: true,
       },
     });

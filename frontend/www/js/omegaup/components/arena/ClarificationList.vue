@@ -35,9 +35,6 @@
       <table class="table mb-0">
         <thead>
           <tr>
-            <th v-if="inCourse" class="text-center" scope="col">
-              {{ T.wordsHomework }}
-            </th>
             <slot name="table-title">
               <th class="text-center" scope="col">{{ T.wordsProblem }}</th>
             </slot>
@@ -51,8 +48,6 @@
           <omegaup-clarification
             v-for="clarification in clarifications"
             :key="clarification.clarification_id"
-            :in-contest="inContest"
-            :in-course="inCourse"
             :is-admin="isAdmin"
             :clarification="clarification"
             @clarification-response="
@@ -91,8 +86,6 @@ export enum PopupDisplayed {
   },
 })
 export default class ArenaClarificationList extends Vue {
-  @Prop({ default: false }) inContest!: boolean;
-  @Prop({ default: false }) inCourse!: boolean;
   @Prop({ default: false }) isAdmin!: boolean;
   @Prop() clarifications!: types.Clarification[];
   @Prop({ default: () => [] }) problems!: types.NavbarProblemsetProblem[];

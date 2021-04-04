@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, mount } from '@vue/test-utils';
 import { types } from '../../api_types';
 
 import T from '../../lang';
@@ -34,7 +34,6 @@ describe('ClarificationList.vue', () => {
   it('Should handle contest clarifications', async () => {
     const wrapper = shallowMount(arena_ClarificationList, {
       propsData: {
-        inContest: true,
         clarifications,
       },
     });
@@ -42,12 +41,11 @@ describe('ClarificationList.vue', () => {
   });
 
   it('Should handle course clarifications', async () => {
-    const wrapper = shallowMount(arena_ClarificationList, {
+    const wrapper = mount(arena_ClarificationList, {
       propsData: {
-        inCourse: true,
         clarifications,
       },
     });
-    expect(wrapper.find('th').text()).toBe(T.wordsHomework);
+    expect(wrapper.text()).toContain(clarifications[0].assignment_alias);
   });
 });
