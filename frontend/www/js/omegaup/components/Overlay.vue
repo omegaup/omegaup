@@ -27,7 +27,7 @@ export default class Overlay extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../sass/main.scss';
 
 [data-overlay] {
@@ -37,7 +37,7 @@ export default class Overlay extends Vue {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(var(--overlay-background-color), 0.5);
   z-index: 9999998 !important;
 }
 </style>

@@ -32,10 +32,7 @@
             :key="user.username"
             :class="user.username"
           >
-            <td
-              class="legend"
-              :style="{ backgroundColor: legendColor(userIndex) }"
-            ></td>
+            <td class="legend" :class="legendClass(userIndex)"></td>
             <td class="position">{{ user.place || '—' }}</td>
             <td class="user">
               {{ ui.rankingUsername(user) }}
@@ -92,22 +89,9 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 
-export const defaultScoreboardColors = [
-  '#FB3F51',
-  '#FF5D40',
-  '#FFA240',
-  '#FFC740',
-  '#59EA3A',
-  '#37DD6F',
-  '#34D0BA',
-  '#3AAACF',
-  '#8144D6',
-  '#CD35D3',
-];
-
 @Component
 export default class ArenaScoreboard extends Vue {
-  @Prop({ default: () => defaultScoreboardColors }) scoreboardColors!: string[];
+  @Prop({ default: 10 }) numberOfPositions!: number;
   @Prop() problems!: omegaup.Problem[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
   @Prop() lastUpdated!: Date;
@@ -123,10 +107,8 @@ export default class ArenaScoreboard extends Vue {
     return !this.lastUpdated ? '' : this.lastUpdated.toString();
   }
 
-  legendColor(idx: number): string {
-    return this.scoreboardColors && idx < this.scoreboardColors.length
-      ? this.scoreboardColors[idx]
-      : '';
+  legendClass(idx: number): string {
+    return idx < this.numberOfPositions ? `legend-${idx + 1}` : '';
   }
 
   renderPoints(p: types.ScoreboardRankingProblem): string {
@@ -164,19 +146,20 @@ export default class ArenaScoreboard extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .omegaup-scoreboard {
   max-width: 900px;
   margin: 0 auto;
 
   a {
-    color: #58d;
+    color: var(--arena-scoreboard-a-font-color);
   }
 
   .footer {
     padding: 1em;
     text-align: right;
     font-size: 70%;
-    color: grey;
+    color: var(--arena-scoreboard-footer-font-color);
   }
 
   table {
@@ -192,7 +175,7 @@ export default class ArenaScoreboard extends Vue {
   td {
     text-align: center;
     vertical-align: middle;
-    border: 1px solid #000;
+    border: 1px solid var(--arena-scoreboard-td-border-color);
     padding: 0.2em;
 
     .points {
@@ -205,32 +188,73 @@ export default class ArenaScoreboard extends Vue {
   }
 
   .accepted {
-    background: #dfd;
+    background: var(--arena-scoreboard-accepted-background-color);
   }
 
   .pending {
-    background: #ddf;
+    background: var(--arena-scoreboard-pending-background-color);
   }
 
   .wrong {
-    background: #fdd;
+    background: var(--arena-scoreboard-wrong-background-color);
   }
 
   .position.recent-event {
     font-weight: bold;
-    background: #dfd;
+    background: var(--arena-scoreboard-position-recent-event-background-color);
   }
 
   .accepted.recent-event {
-    background: #8f8;
+    background: var(--arena-scoreboard-accepted-recent-event-background-color);
   }
 
   .position {
     width: 3.5em;
   }
 
+  .legend-1 {
+    background-color: var(--arena-scoreboard-legend-1-background-color);
+  }
+
+  .legend-2 {
+    background-color: var(--arena-scoreboard-legend-2-background-color);
+  }
+
+  .legend-3 {
+    background-color: var(--arena-scoreboard-legend-3-background-color);
+  }
+
+  .legend-4 {
+    background-color: var(--arena-scoreboard-legend-4-background-color);
+  }
+
+  .legend-5 {
+    background-color: var(--arena-scoreboard-legend-5-background-color);
+  }
+
+  .legend-6 {
+    background-color: var(--arena-scoreboard-legend-6-background-color);
+  }
+
+  .legend-7 {
+    background-color: var(--arena-scoreboard-legend-7-background-color);
+  }
+
+  .legend-8 {
+    background-color: var(--arena-scoreboard-legend-8-background-color);
+  }
+
+  .legend-9 {
+    background-color: var(--arena-scoreboard-legend-9-background-color);
+  }
+
+  .legend-10 {
+    background-color: var(--arena-scoreboard-legend-10-background-color);
+  }
+
   .legend {
     width: 0.5em;
+    opacity: 0.8;
   }
 }
 </style>

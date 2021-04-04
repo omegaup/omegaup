@@ -157,6 +157,12 @@ export default class Markdown extends Vue {
 </script>
 
 <style lang="scss">
+// This file cannot use `scoped` because it injects elements into the DOM at
+// runtime, and is incompatible with how webpacked Vue creates scoped rules: by
+// adding a compile-time random prefix to all classes.
+//
+// Instead, all the rules in this file are added as children of the root
+// element, which has the `data-markdown-statement` data attribute.
 @import '../../../../../node_modules/prismjs/themes/prism.css';
 @import '../../../sass/main.scss';
 
@@ -212,7 +218,7 @@ export default class Markdown extends Vue {
 
   pre {
     padding: 16px;
-    background: #eee;
+    background: var(--markdown-pre-background-color);
     margin: 1em 0;
     border-radius: 6px;
     display: block;
@@ -228,7 +234,7 @@ export default class Markdown extends Vue {
 
   td > button.clipboard {
     float: right;
-    border-color: rgb(218, 224, 229);
+    border-color: var(--markdown-button-clipboard-border-color);
     margin-left: 0.5em;
     margin-right: -6px;
     margin-top: -6px;
@@ -243,10 +249,10 @@ export default class Markdown extends Vue {
 
   details {
     padding: 16px;
-    border: 1px solid #eee;
+    border: 1px solid var(--markdown-details-border-color);
 
     summary {
-      color: $omegaup-blue;
+      color: var(--markdown-details-summary-font-color);
     }
 
     &[open] > summary {
@@ -255,7 +261,7 @@ export default class Markdown extends Vue {
   }
 
   table td {
-    border: 1px solid #000;
+    border: 1px solid var(--markdown-td-border-color);
     padding: 10px;
   }
 
@@ -268,11 +274,11 @@ export default class Markdown extends Vue {
     padding: 5px;
 
     tbody {
-      background: #eee;
-      border: 1px solid #000;
+      background: var(--markdown-sample-io-tbody-background-color);
+      border: 1px solid var(--markdown-sample-io-tbody-border-color);
 
       tr:nth-child(even) {
-        background: #f5f5f5;
+        background: var(--markdown-sample-io-tr-even-element-background-color);
       }
     }
 
@@ -284,7 +290,7 @@ export default class Markdown extends Vue {
     td {
       vertical-align: top;
       padding: 10px;
-      border: 1px solid #000;
+      border: 1px solid var(--markdown-sample-io-td-border-color);
     }
 
     pre {
@@ -321,10 +327,10 @@ export default class Markdown extends Vue {
 
   code.libinteractive-download,
   code.output-only-download {
-    background: #eee;
-    color: #ccc;
+    background: var(--markdown-libinteractive-download-background-color);
+    color: var(--markdown-libinteractive-download-font-color);
     margin: 1em 0;
-    border: 1px dotted #ccc;
+    border: 1px dotted var(--markdown-libinteractive-download-border-color);
     display: block;
     text-align: center;
     font-size: 2em;
