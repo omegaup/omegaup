@@ -1634,14 +1634,10 @@ export const Session = {
 };
 
 export const Submission = {
-  createFeedback: apiCall<
-    messages.SubmissionCreateFeedbackRequest,
-    messages.SubmissionCreateFeedbackResponse
-  >('/api/submission/createFeedback/'),
-  updateFeedback: apiCall<
-    messages.SubmissionUpdateFeedbackRequest,
-    messages.SubmissionUpdateFeedbackResponse
-  >('/api/submission/updateFeedback/'),
+  setFeedback: apiCall<
+    messages.SubmissionSetFeedbackRequest,
+    messages.SubmissionSetFeedbackResponse
+  >('/api/submission/setFeedback/'),
 };
 
 export const Tag = {
