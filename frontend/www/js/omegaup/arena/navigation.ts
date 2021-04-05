@@ -8,103 +8,105 @@ import { PopupDisplayed } from '../components/problem/Details.vue';
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import { trackRun } from './submissions';
 
-export enum NavigationType {
-  ForContest,
-  ForSingleProblemOrCourse,
-}
+export namespace navigation {
+  export enum NavigationType {
+    ForContest,
+    ForSingleProblemOrCourse,
+  }
 
-interface BaseNavigation {
-  target: Vue & {
-    problemInfo: types.ProblemInfo | null;
-    popupDisplayed?: PopupDisplayed;
-    problem: ActiveProblem | null;
+  interface BaseNavigation {
+    target: Vue & {
+      problemInfo: types.ProblemInfo | null;
+      popupDisplayed?: PopupDisplayed;
+      problem: ActiveProblem | null;
+    };
+    runs: types.Run[];
+    problem: types.NavbarProblemsetProblem;
+    problems: types.NavbarProblemsetProblem[];
+  }
+
+  type NavigationForContest = BaseNavigation & {
+    type: NavigationType.ForContest;
+    contestAlias: string;
   };
-  runs: types.Run[];
-  problem: types.NavbarProblemsetProblem;
-  problems: types.NavbarProblemsetProblem[];
-}
 
-type NavigationForContest = BaseNavigation & {
-  type: NavigationType.ForContest;
-  contestAlias: string;
-};
+  type NavigationForSingleProblemOrCourse = BaseNavigation & {
+    type: NavigationType.ForSingleProblemOrCourse;
+  };
 
-type NavigationForSingleProblemOrCourse = BaseNavigation & {
-  type: NavigationType.ForSingleProblemOrCourse;
-};
+  export type NavigationRequest =
+    | NavigationForContest
+    | NavigationForSingleProblemOrCourse;
 
-export type NavigationRequest =
-  | NavigationForContest
-  | NavigationForSingleProblemOrCourse;
-
-export function navigateToProblem(request: NavigationRequest): void {
-  let contestAlias;
-  if (request.type === NavigationType.ForContest) {
-    contestAlias = request.contestAlias;
-  }
-  const { target, problem, problems } = request;
-  let { runs } = request;
-  if (
-    Object.prototype.hasOwnProperty.call(
-      problemsStore.state.problems,
-      problem.alias,
-    )
-  ) {
-    target.problemInfo = problemsStore.state.problems[problem.alias];
-    setLocationHash(`#problems/${problem.alias}`);
-    return;
-  }
-  api.Problem.details({
-    problem_alias: problem.alias,
-    prevent_problemset_open: false,
-    contest_alias: contestAlias,
-  })
-    .then((problemInfo) => {
-      for (const run of problemInfo.runs ?? []) {
-        trackRun({ run });
-      }
-      const currentProblem = problems?.find(
-        ({ alias }: { alias: string }) => alias === problemInfo.alias,
-      );
-      problemInfo.title = currentProblem?.text ?? '';
-      target.problemInfo = problemInfo;
-      problem.alias = problemInfo.alias;
-      runs = myRunsStore.state.runs;
-      problem.bestScore = getMaxScore(runs, problemInfo.alias, 0);
-      problemsStore.commit('addProblem', problemInfo);
-      target.problem = { problem, runs };
-      if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
-        setLocationHash(`#problems/${problem.alias}/new-run`);
-        return;
-      }
-      setLocationHash(`#problems/${problem.alias}`);
-    })
-    .catch(() => {
-      ui.dismissNotifications();
-      target.problem = null;
-      setLocationHash('#problems');
-    });
-}
-
-export function getMaxScore(
-  runs: types.Run[],
-  alias: string,
-  previousScore: number,
-): number {
-  let maxScore = previousScore;
-  for (const run of runs) {
-    if (alias != run.alias) {
-      continue;
+  export function navigateToProblem(request: NavigationRequest): void {
+    let contestAlias;
+    if (request.type === NavigationType.ForContest) {
+      contestAlias = request.contestAlias;
     }
-    maxScore = Math.max(maxScore, run.contest_score || 0);
+    const { target, problem, problems } = request;
+    let { runs } = request;
+    if (
+      Object.prototype.hasOwnProperty.call(
+        problemsStore.state.problems,
+        problem.alias,
+      )
+    ) {
+      target.problemInfo = problemsStore.state.problems[problem.alias];
+      setLocationHash(`#problems/${problem.alias}`);
+      return;
+    }
+    api.Problem.details({
+      problem_alias: problem.alias,
+      prevent_problemset_open: false,
+      contest_alias: contestAlias,
+    })
+      .then((problemInfo) => {
+        for (const run of problemInfo.runs ?? []) {
+          trackRun({ run });
+        }
+        const currentProblem = problems?.find(
+          ({ alias }: { alias: string }) => alias === problemInfo.alias,
+        );
+        problemInfo.title = currentProblem?.text ?? '';
+        target.problemInfo = problemInfo;
+        problem.alias = problemInfo.alias;
+        runs = myRunsStore.state.runs;
+        problem.bestScore = getMaxScore(runs, problemInfo.alias, 0);
+        problemsStore.commit('addProblem', problemInfo);
+        target.problem = { problem, runs };
+        if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
+          setLocationHash(`#problems/${problem.alias}/new-run`);
+          return;
+        }
+        setLocationHash(`#problems/${problem.alias}`);
+      })
+      .catch(() => {
+        ui.dismissNotifications();
+        target.problem = null;
+        setLocationHash('#problems');
+      });
   }
-  return maxScore;
-}
 
-export function setLocationHash(hash: string): void {
-  window.location.hash = hash;
-}
+  export function getMaxScore(
+    runs: types.Run[],
+    alias: string,
+    previousScore: number,
+  ): number {
+    let maxScore = previousScore;
+    for (const run of runs) {
+      if (alias != run.alias) {
+        continue;
+      }
+      maxScore = Math.max(maxScore, run.contest_score || 0);
+    }
+    return maxScore;
+  }
 
-export function getLocationHash(): string {
-  return window.location.hash;
+  export function setLocationHash(hash: string): void {
+    window.location.hash = hash;
+  }
+
+  export function getLocationHash(): string {
+    return window.location.hash;
+  }
 }

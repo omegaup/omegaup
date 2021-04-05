@@ -3,11 +3,7 @@ jest.mock('../../../third_party/js/diff_match_patch.js');
 import Vue from 'vue';
 import arena_ContestPractice from '../components/arena/ContestPractice.vue';
 import { types } from '../api_types';
-import {
-  navigateToProblem,
-  NavigationRequest,
-  NavigationType,
-} from './navigation';
+import { navigation } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import fetchMock from 'jest-fetch-mock';
@@ -116,21 +112,21 @@ const navbarProblems: types.NavbarProblemsetProblem[] = [
 describe('navigation.ts', () => {
   describe('navigateToProblem', () => {
     it('Should change hash when contest alias is declared in practice mode', async () => {
-      const mockSetLocationHash = jest.fn((x) => x);
-      const params: NavigationRequest = {
-        type: NavigationType.ForContest,
+      const spy = jest.spyOn(navigation, 'setLocationHash');
+      const params: navigation.NavigationRequest = {
+        type: navigation.NavigationType.ForContest,
         target: vueInstance,
         runs: [],
         problems: navbarProblems,
         problem: navbarProblems[0],
         contestAlias: 'contest_alias',
       };
-      navigateToProblem(params);
-      mockSetLocationHash(`#problems/${navbarProblems[0].alias}`);
-      expect(mockSetLocationHash.mock.calls.length).toBe(1);
-      expect(mockSetLocationHash.mock.calls[0][0]).toBe(
-        `#problems/${navbarProblems[0].alias}`,
-      );
+      navigation.setLocationHash(`#problems/${navbarProblems[0].alias}`);
+      const locationHash = navigation.getLocationHash();
+      expect(spy).toHaveBeenCalled();
+      expect(locationHash).toBe('#problems/problem_alias');
+      navigation.navigateToProblem(params);
+      spy.mockRestore();
     });
   });
 });

@@ -15,7 +15,7 @@ import {
   submitRunFailed,
 } from './submissions';
 import { getOptionsFromLocation } from './location';
-import { navigateToProblem, NavigationType } from './navigation';
+import { navigation } from './navigation';
 import {
   ContestClarification,
   ContestClarificationType,
@@ -67,8 +67,8 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
-            navigateToProblem({
-              type: NavigationType.ForContest,
+            navigation.navigateToProblem({
+              type: navigation.NavigationType.ForContest,
               problem,
               runs,
               target: contestPractice,

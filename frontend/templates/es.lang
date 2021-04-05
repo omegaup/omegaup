@@ -779,7 +779,6 @@ problemLevelIntermediateMathsInProgramming = "Nivel Intermedio: Matemáticas en 
 problemLevelUpdated = "El nivel del problema fue actualizado."
 problemListShowAdminProblems = "También muestra problemas que administro"
 problemListShowAdminProblemsAndDeleted = "También muestra problemas que administro y problemas eliminados"
-problemNavigationContestAliasRequired = "El alias del concurso es requerido"
 problemNew = "Crear problema"
 problemNotFound = "Problema no encontrado"
 problemNotFoundInContest = "Problema no encontrado en concurso"
