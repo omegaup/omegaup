@@ -15,7 +15,6 @@ import {
   submitRunFailed,
 } from './submissions';
 import { getOptionsFromLocation } from './location';
-import { navigation } from './navigation';
 import {
   ContestClarification,
   ContestClarificationType,
@@ -24,6 +23,7 @@ import {
   trackClarifications,
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
+import { navigateToProblem, NavigationType } from './navigation';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -67,8 +67,8 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
-            navigation.navigateToProblem({
-              type: navigation.NavigationType.ForContest,
+            navigateToProblem({
+              type: NavigationType.ForContest,
               problem,
               runs,
               target: contestPractice,

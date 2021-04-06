@@ -7,13 +7,13 @@ import * as ui from '../ui';
 import Vue from 'vue';
 import arena_Course, { ActiveProblem } from '../components/arena/Course.vue';
 import { getOptionsFromLocation } from './location';
-import { navigation } from './navigation';
 import {
   showSubmission,
   SubmissionRequest,
   submitRun,
   submitRunFailed,
 } from './submissions';
+import { navigateToProblem, NavigationType } from './navigation';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -56,8 +56,8 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
-            navigation.navigateToProblem({
-              type: navigation.NavigationType.ForSingleProblemOrCourse,
+            navigateToProblem({
+              type: NavigationType.ForSingleProblemOrCourse,
               problem,
               runs,
               target: arenaCourse,

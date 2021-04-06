@@ -1,8 +1,8 @@
 import * as ui from '../ui';
 import { types } from '../api_types';
-import { navigation } from './navigation';
 import { myRunsStore } from './runsStore';
 import { omegaup } from '../omegaup';
+import { getMaxScore } from './navigation';
 
 interface Problem {
   accepts_submissions: boolean;
@@ -58,7 +58,7 @@ export function updateProblemScore({
       ranking.problems = rank.problems.map((problem) => {
         const problemRanking = problem;
         if (problemRanking.alias == alias) {
-          const maxScore = navigation.getMaxScore(
+          const maxScore = getMaxScore(
             myRunsStore.state.runs,
             problemRanking.alias,
             previousScore,
@@ -121,7 +121,7 @@ export function onRankingChanged({
 
         if (currentProblem) {
           currentProblem.hasRuns = problem.runs > 0;
-          currentProblem.bestScore = navigation.getMaxScore(
+          currentProblem.bestScore = getMaxScore(
             myRunsStore.state.runs,
             alias,
             problem.points,
