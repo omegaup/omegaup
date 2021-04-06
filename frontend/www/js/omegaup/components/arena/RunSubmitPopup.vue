@@ -89,7 +89,7 @@ import omegaup_OverlayPopup from '../OverlayPopup.vue';
 export default class ArenaRunSubmitPopup extends Vue {
   @Ref() inputFile!: HTMLInputElement;
   @Prop() languages!: string[];
-  @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: null | Date;
+  @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
   @Prop({ default: null }) preferredLanguage!: null | string;
 
