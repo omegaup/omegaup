@@ -63,6 +63,7 @@ OmegaUp.on('ready', () => {
               alias: problem.alias,
               acceptsSubmissions: true,
               text: problemName,
+              clarifications: [],
               bestScore: 0,
               maxScore: 0,
               hasRuns: false,
