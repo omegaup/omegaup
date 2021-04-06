@@ -7,13 +7,13 @@ import * as ui from '../ui';
 import Vue from 'vue';
 import arena_Course, { ActiveProblem } from '../components/arena/Course.vue';
 import { getOptionsFromLocation } from './location';
-import { navigateToProblem } from './navigation';
 import {
   showSubmission,
   SubmissionRequest,
   submitRun,
   submitRunFailed,
 } from './submissions';
+import { navigateToProblem, NavigationType } from './navigation';
 import {
   CourseClarificationType,
   refreshCourseClarifications,
@@ -66,6 +66,7 @@ OmegaUp.on('ready', () => {
         on: {
           'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
             navigateToProblem({
+              type: NavigationType.ForSingleProblemOrCourse,
               problem,
               runs,
               target: arenaCourse,
