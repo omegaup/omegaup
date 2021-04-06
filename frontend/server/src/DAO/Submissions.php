@@ -315,28 +315,6 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         ];
     }
 
-    /** @return \OmegaUp\Timestamp|null */
-    public static function getLastSubmissionTimestampByProblem(
-        int $problemId,
-        ?int $identityId
-    ) {
-        $params = [$problemId, $identityId];
-        $sql = '
-            SELECT
-                s.time
-            FROM
-                Submissions s
-            WHERE
-                s.problem_id = ? AND s.identity_id = ?
-            ORDER BY
-                s.submission_id DESC
-            LIMIT 1
-        ';
-
-        /** @var \OmegaUp\Timestamp|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
-    }
-
     /**
      * Gets the alias of the problem, assignment
      * and course, along with the author's user_id

@@ -352,7 +352,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop() isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
-  @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
+  @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: null | Date;
   @Prop({ default: false }) shouldShowTabs!: boolean;
   @Prop({ default: false }) shouldShowRunDetails!: boolean;
 
