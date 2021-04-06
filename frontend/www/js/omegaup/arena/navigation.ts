@@ -81,7 +81,6 @@ export async function navigateToProblem(
         return;
       }
       setLocationHash(`#problems/${problem.alias}`);
-      return;
     })
     .catch(() => {
       ui.dismissNotifications();
