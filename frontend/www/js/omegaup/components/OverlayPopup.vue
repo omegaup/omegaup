@@ -16,14 +16,15 @@ export default class OverlayPopup extends Vue {}
 
 <style lang="scss" scoped>
 @import '../../../sass/main.scss';
+
 div[data-overlay-popup] {
-  background: #eee;
+  background: var(--overlay-popup-background-color);
   width: 80%;
   height: -moz-max-content;
   height: fit-content;
   max-height: 90%;
   margin: auto;
-  border: 2px solid #ccc;
+  border: 2px solid var(--overlay-popup-border-color);
   padding: 1em;
   position: absolute;
   overflow-y: auto;
@@ -33,13 +34,15 @@ div[data-overlay-popup] {
   left: 0;
   right: 0;
   z-index: -1;
+
   .close-container {
     .close {
       background-color: transparent;
       border: none;
       font-size: 110%;
+
       &:hover {
-        background-color: #eee;
+        background-color: var(--overlay-popup-close-background-color--hover);
       }
     }
   }

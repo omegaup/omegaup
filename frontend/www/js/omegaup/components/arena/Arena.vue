@@ -110,27 +110,34 @@ export default class Arena extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .practice {
-  background: #668 url(/media/gradient.png) repeat-x 0 0 !important;
+  background: var(--arena-practice-background-color) url(/media/gradient.png)
+    repeat-x 0 0 !important;
 }
 
 [data-arena-wrapper] {
-  background: #ebeff2;
+  background: var(--arena-background-color);
   font-family: sans-serif;
   overflow-y: auto;
 }
 
 .socket-status-error {
-  color: #800;
+  color: var(--arena-socket-status-error-color);
 }
 
 .socket-status-ok {
-  color: #080;
+  color: var(--arena-socket-status-ok-color);
 }
 
 .clock {
   font-size: 3em;
   line-height: 0.4em;
+}
+
+.nav-tabs .nav-link {
+  background-color: var(--arena-contest-navtabs-link-background-color);
+  border-top-color: var(--arena-contest-navtabs-link-border-top-color);
 }
 
 .navleft {
@@ -145,12 +152,12 @@ export default class Arena extends Vue {
 
 .navleft .main {
   margin-left: 20em;
-  border: 1px solid #ccc;
+  border: 1px solid var(--arena-navbar-left-border-color);
   border-width: 0 0 1px 1px;
 }
 
 .problem {
-  background: #fff;
+  background: var(--arena-problem-background-color);
   padding: 1em;
   margin-top: -1.5em;
   margin-right: -1em;

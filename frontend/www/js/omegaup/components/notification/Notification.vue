@@ -129,19 +129,24 @@ export default class Notification extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .close {
   font-size: inherit;
 }
 
 .notification-date {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--notifications-notification-date-font-color);
 }
 
 .notification-link {
   cursor: pointer;
+
   &:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(
+      var(--notifications-notification-link-background-color--hover),
+      0.05
+    );
   }
 }
 </style>

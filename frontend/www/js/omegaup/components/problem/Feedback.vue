@@ -52,6 +52,7 @@ export default class ProblemFeedback extends Vue {
 .omegaup-feedback-row {
   margin: 30px auto 0;
 }
+
 .omegaup-feedback-title {
   font-weight: bold;
   color: gray;

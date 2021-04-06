@@ -42,32 +42,37 @@ export default class ToggleSwitch extends Vue {
 
 <style scoped lang="scss">
 @import '../../../sass/main.scss';
+
 .switch {
   position: relative;
   display: inline-block;
+
   input {
     opacity: 0;
     width: 0;
     height: 0;
   }
 }
+
 label[class*='large'] {
   .switch {
     width: 60px;
     height: 34px;
   }
+
   .slider {
-    &:before {
+    &::before {
       height: 26px;
       width: 26px;
       left: 4px;
     }
   }
+
   input {
     &:checked {
       + {
         .slider {
-          &:before {
+          &::before {
             -webkit-transform: translateX(26px);
             -ms-transform: translateX(26px);
             transform: translateX(26px);
@@ -77,23 +82,26 @@ label[class*='large'] {
     }
   }
 }
+
 label[class*='small'] {
   .switch {
     width: 40px;
     height: 26px;
   }
+
   .slider {
-    &:before {
+    &::before {
       height: 18px;
       width: 18px;
       left: 3px;
     }
   }
+
   input {
     &:checked {
       + {
         .slider {
-          &:before {
+          &::before {
             -webkit-transform: translateX(15px);
             -ms-transform: translateX(15px);
             transform: translateX(15px);
@@ -103,6 +111,7 @@ label[class*='small'] {
     }
   }
 }
+
 .slider {
   position: absolute;
   cursor: pointer;
@@ -110,43 +119,53 @@ label[class*='small'] {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: $btn-cancel-color;
+  background-color: var(--toggle-switch-slider-background-color);
   -webkit-transition: 0.4s;
   transition: 0.4s;
-  &:before {
+
+  &::before {
     position: absolute;
     content: '';
     bottom: 4px;
-    background-color: $white;
+    background-color: var(--toggle-switch-slider-background-color--before);
     -webkit-transition: 0.4s;
     transition: 0.4s;
   }
 }
+
 input {
   &:checked {
     + {
       .slider {
-        background-color: $header-primary-color;
+        background-color: var(
+          --toggle-switch-input-checked-slider-background-color
+        );
       }
     }
   }
+
   &:focus {
     + {
       .slider {
-        box-shadow: 0 0 1px $header-primary-color;
+        box-shadow: 0 0 1px
+          var(--toggle-switch-input-focus-slider-background-color);
       }
     }
   }
 }
+
 .slider.round {
   border-radius: 34px;
-  &:before {
+
+  &::before {
     border-radius: 50%;
   }
 }
+
 .switch-container {
   width: 100%;
   position: relative;
+
   span.switch-text {
     margin: 0;
     position: absolute;

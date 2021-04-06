@@ -487,7 +487,6 @@ export class Arena {
         render: function (createElement) {
           return createElement('omegaup-arena-scoreboard', {
             props: {
-              scoreboardColors: scoreboardColors,
               problems: this.problems,
               ranking: this.ranking,
               lastUpdated: this.lastUpdated,

@@ -266,12 +266,3 @@ export default class ArenaContestList extends Vue {
   }
 }
 </script>
-
-<style>
-.empty-category {
-  text-align: center;
-  font-size: 200%;
-  margin: 1em;
-  color: #aaa;
-}
-</style>

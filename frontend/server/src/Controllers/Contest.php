@@ -15,8 +15,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestAdmin=array{role: string, username: string}
  * @psalm-type ContestGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type ConsentStatement=array{contest_alias: string, privacy_git_object_id?: string, share_user_information: bool|null, statement_type?: string}
- * @psalm-type Clarification=array{answer: null|string, author: null|string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
- * @psalm-type ProblemClarification=array{answer: null|string, author: string, clarification_id: int, message: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
+ * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type ContestListMinePayload=array{contests: list<Contest>, privateContestsAlert: bool}
@@ -591,9 +590,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 intval($contest->problemset_id)
             ),
             'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
-                intval($contest->problemset_id),
+                $contest,
+                /* course */ null,
                 $contestAdmin,
-                $identity->identity_id,
+                $identity,
                 /*$offset=*/ null,
                 /*$rowcount=*/ 100
             ),
@@ -3380,25 +3380,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiClarifications(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
+
         $offset = $r->ensureOptionalInt('offset');
         $rowcount = $r->ensureOptionalInt('rowcount') ?? 1000;
 
-        $contestAlias = $r->ensureString(
-            'contest_alias',
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
-        $contest = self::validateContest($contestAlias);
-
-        $isContestDirector = \OmegaUp\Authorization::isContestAdmin(
-            $r->identity,
-            $contest
+        $contest = self::validateContest(
+            $r->ensureString(
+                'contest_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            )
         );
 
         return [
             'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
-                intval($contest->problemset_id),
-                $isContestDirector,
-                $r->identity->identity_id,
+                $contest,
+                /* course */ null,
+                \OmegaUp\Authorization::isContestAdmin(
+                    $r->identity,
+                    $contest
+                ),
+                $r->identity,
                 $offset,
                 $rowcount
             ),
@@ -3408,7 +3409,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Get clarifications of problem in a contest
      *
-     * @return array{clarifications: list<ProblemClarification>}
+     * @return array{clarifications: list<Clarification>}
      *
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param string $problem_alias

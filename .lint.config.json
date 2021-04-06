@@ -63,6 +63,21 @@
 				"frontend/www/js/omegaup/api_types.ts"
 			]
 		},
+		"style": {
+			"allowlist": [
+				"frontend/www/.*\\.(css|scss)$"
+			],
+			"denylist": [
+				"frontend/www/css/dist/.*",
+				"frontend/www/css/markdown-editor-widgets\\.css",
+				"frontend/www/docs/.*",
+				"frontend/www/grader/.*",
+				"frontend/www/karel.js/.*",
+				"frontend/www/libinteractive/.*",
+				"frontend/www/preguntas/.*",
+				"frontend/www/third_party/.*"
+			]
+		},
 		"typescript": {
 			"extra_js_linters": [
 				"yarn run refactor"
@@ -79,6 +94,7 @@
 			"extra_js_linters": [
 				"yarn run refactor"
 			],
+			"stylelint": true,
 			"allowlist": [
 				"frontend/www/.*\\.vue$"
 			]
