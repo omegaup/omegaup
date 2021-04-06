@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import * as api from '../api';
 import * as ui from '../ui';
+import { setLocationHash } from '../location';
 import { types } from '../api_types';
 import { myRunsStore } from './runsStore';
 import problemsStore from './problemStore';
@@ -37,7 +38,7 @@ export type NavigationRequest =
   | NavigationForContest
   | NavigationForSingleProblemOrCourse;
 
-export function navigateToProblem(request: NavigationRequest): void {
+export function navigateToProblem(request: NavigationRequest): Promise<void> {
   let contestAlias;
   if (request.type === NavigationType.ForContest) {
     contestAlias = request.contestAlias;
@@ -52,9 +53,9 @@ export function navigateToProblem(request: NavigationRequest): void {
   ) {
     target.problemInfo = problemsStore.state.problems[problem.alias];
     setLocationHash(`#problems/${problem.alias}`);
-    return;
+    return Promise.resolve();
   }
-  api.Problem.details({
+  return api.Problem.details({
     problem_alias: problem.alias,
     prevent_problemset_open: false,
     contest_alias: contestAlias,
@@ -83,6 +84,9 @@ export function navigateToProblem(request: NavigationRequest): void {
       ui.dismissNotifications();
       target.problem = null;
       setLocationHash('#problems');
+    })
+    .finally(() => {
+      return Promise.resolve();
     });
 }
 
@@ -99,12 +103,4 @@ export function getMaxScore(
     maxScore = Math.max(maxScore, run.contest_score || 0);
   }
   return maxScore;
-}
-
-export function setLocationHash(hash: string): void {
-  window.location.hash = hash;
-}
-
-export function getLocationHash(): string {
-  return window.location.hash;
 }
