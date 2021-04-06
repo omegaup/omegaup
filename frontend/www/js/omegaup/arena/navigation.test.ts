@@ -59,30 +59,9 @@ const problemDetails: types.ProblemInfo = {
   title: 'A. Problem',
   visibility: 2,
 };
-fetchMock.enableMocks();
-fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
-  if (req.url != '/api/problem/details/') {
-    return Promise.resolve({
-      ok: false,
-      status: 404,
-      body: JSON.stringify({
-        status: 'error',
-        error: `Invalid call to "${req.url}" in test`,
-        errorcode: 403,
-      }),
-    });
-  }
-  return Promise.resolve({
-    status: 200,
-    body: JSON.stringify({
-      ...problemDetails,
-      status: 'ok',
-    }),
-  });
-});
 
 const vueInstance: Vue & {
-  problemInfo: types.ProblemInfo | null;
+  problemInfo: types.ProblemInfo;
   popupDisplayed?: PopupDisplayed;
   problem: ActiveProblem | null;
 } = new Vue({
@@ -92,14 +71,13 @@ const vueInstance: Vue & {
   render: function (createElement) {
     return createElement('omegaup-badge-details', {
       props: {
-        problemInfo: null,
+        problemInfo: problemDetails,
         problem: null,
       },
     });
   },
 });
 vueInstance.problemInfo = problemDetails;
-vueInstance.popupDisplayed = PopupDisplayed.RunSubmit;
 const navbarProblems: types.NavbarProblemsetProblem[] = [
   {
     acceptsSubmissions: true,
@@ -121,7 +99,30 @@ const navbarProblems: types.NavbarProblemsetProblem[] = [
 
 describe('navigation.ts', () => {
   describe('navigateToProblem', () => {
+    fetchMock.enableMocks();
+    fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
+      if (req.url != '/api/problem/details/') {
+        return Promise.resolve({
+          ok: false,
+          status: 404,
+          body: JSON.stringify({
+            status: 'error',
+            error: `Invalid call to "${req.url}" in test`,
+            errorcode: 403,
+          }),
+        });
+      }
+      return Promise.resolve({
+        status: 200,
+        body: JSON.stringify({
+          ...problemDetails,
+          status: 'ok',
+        }),
+      });
+    });
+
     it('Should change hash when contest alias is declared in practice mode', async () => {
+      vueInstance.popupDisplayed = PopupDisplayed.RunSubmit;
       const params: NavigationRequest = {
         type: NavigationType.ForContest,
         target: vueInstance,
@@ -137,6 +138,7 @@ describe('navigation.ts', () => {
     });
 
     it('Should change window location hash', async () => {
+      vueInstance.popupDisplayed = PopupDisplayed.None;
       const params: NavigationRequest = {
         type: NavigationType.ForContest,
         target: vueInstance,
@@ -145,23 +147,12 @@ describe('navigation.ts', () => {
         problem: navbarProblems[0],
         contestAlias: 'contest_alias',
       };
-      if (vueInstance.problemInfo) {
-        const localVue = createLocalVue();
-        localVue.use(Vuex);
-        const store = new Vuex.Store(cloneDeep(storeConfig));
-        expect(store.state.problems).toStrictEqual({});
-        store.commit('addProblem', vueInstance.problemInfo);
-        expect(vueInstance.problemInfo.alias).toBe(
-          store.state.problems[navbarProblems[0].alias].alias,
-        );
-      }
-      navigateToProblem(params);
-      const getLocationHash = jest
-        .fn()
-        .mockReturnValue('#problems/problem_alias/new-run');
-
-      expect(getLocationHash()).toEqual(
-        `#problems/${navbarProblems[0].alias}/new-run`,
+      const localVue = createLocalVue();
+      localVue.use(Vuex);
+      new Vuex.Store(cloneDeep(storeConfig));
+      await navigateToProblem(params);
+      expect(setLocationHash).toHaveBeenCalledWith(
+        `#problems/${params.problem.alias}`,
       );
     });
   });
