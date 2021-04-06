@@ -48,7 +48,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type IntroDetailsPayload=array{alias: string, archived: boolean, description: string, details?: CourseDetails, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
- * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
+ * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, clarifications: list<Clarification>, hasRuns: bool, maxScore: float|int, text: string}
  * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, start_time: \OmegaUp\Timestamp}
  * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, courseDetails: CourseDetails, currentAssignment: ArenaAssignment}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
@@ -3703,6 +3703,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'bestScore' => 0,
                 'maxScore' => floatval($problem['points']),
                 'hasRuns' => false,
+                'clarifications' => [], //FIXME: This should be adapted later
             ];
         }
 

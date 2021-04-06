@@ -89,6 +89,23 @@ export namespace types {
         x.currentAssignment = ((x) => {
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.problems = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.clarifications = ((x) => {
+                if (!Array.isArray(x)) {
+                  return x;
+                }
+                return x.map((x) => {
+                  x.time = ((x: number) => new Date(x * 1000))(x.time);
+                  return x;
+                });
+              })(x.clarifications);
+              return x;
+            });
+          })(x.problems);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.currentAssignment);
@@ -217,6 +234,23 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
+        x.problems = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.clarifications = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.clarifications);
+            return x;
+          });
+        })(x.problems);
         if (x.scoreboard)
           x.scoreboard = ((x) => {
             if (x.finish_time)
@@ -2299,6 +2333,7 @@ export namespace types {
     acceptsSubmissions: boolean;
     alias: string;
     bestScore: number;
+    clarifications: types.Clarification[];
     hasRuns: boolean;
     maxScore: number | number;
     text: string;

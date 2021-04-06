@@ -8,14 +8,14 @@ namespace OmegaUp\Controllers;
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type Contest=array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}
- * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
+ * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
+ * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, clarifications: list<Clarification>, hasRuns: bool, maxScore: float|int, text: string}
  * @psalm-type ContestUser=array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, is_owner: int|null, username: string}
  * @psalm-type ContestGroup=array{alias: string, name: string}
  * @psalm-type ContestRequest=array{accepted: bool|null, admin?: array{username?: null|string}, country: null|string, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ContestAdmin=array{role: string, username: string}
  * @psalm-type ContestGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type ConsentStatement=array{contest_alias: string, privacy_git_object_id?: string, share_user_information: bool|null, statement_type?: string}
- * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type ContestListMinePayload=array{contests: list<Contest>, privateContestsAlert: bool}
@@ -572,6 +572,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $problemText = isset(
                 $problem['letter']
             ) ? "{$problem['letter']}. {$problem['title']}" : $problem['title'];
+            $problemObject = null;
+            if (array_key_exists('problem_id', $problem)) {
+                $problemObject = \OmegaUp\DAO\Problems::getByPK(
+                    $problem['problem_id']
+                );
+            }
             array_push(
                 $problems,
                 [
@@ -581,6 +587,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'bestScore' => 0,
                     'maxScore' => floatval($problem['points']),
                     'hasRuns' => false,
+                    'clarifications' => (
+                        is_null($problemObject)
+                        ? []
+                        : \OmegaUp\DAO\Clarifications::getProblemInProblemsetClarifications(
+                            $problemObject,
+                            intval($contest->problemset_id),
+                            $contestAdmin,
+                            $identity,
+                            /*offset=*/0,
+                            /*rowcount=*/100
+                        )
+                    ),
                 ]
             );
         }
