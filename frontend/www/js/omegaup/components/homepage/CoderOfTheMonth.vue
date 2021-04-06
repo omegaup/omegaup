@@ -92,11 +92,13 @@ export default class CoderOfTheMonth extends Vue {
 @import '../../../../sass/main.scss';
 
 .card-header {
-  color: white;
-  background-color: #58d;
+  color: var(--coder-of-the-month-card-header-font-color);
+  background-color: var(--coder-of-the-month-card-header-background-color);
 
   &.card-header-female {
-    background-color: #85d;
+    background-color: var(
+      --coder-of-the-month-card-header-female-background-color
+    );
   }
 }
 </style>

@@ -61,10 +61,10 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 textarea {
   background: #222;
-  border: 0;
+  border: 0px;
   font-family: 'Droid Sans Mono', 'Courier New', monospace,
     'Droid Sans Fallback';
   color: #d4d4d4;

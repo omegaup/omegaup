@@ -487,7 +487,6 @@ export class Arena {
         render: function (createElement) {
           return createElement('omegaup-arena-scoreboard', {
             props: {
-              scoreboardColors: scoreboardColors,
               problems: this.problems,
               ranking: this.ranking,
               lastUpdated: this.lastUpdated,
@@ -526,7 +525,7 @@ export class Arena {
                 guid: string;
                 feedback: string;
               }) => {
-                api.Submission.createFeedback({
+                api.Submission.setFeedback({
                   guid,
                   course_alias: self.options.courseAlias,
                   assignment_alias: self.options.assignmentAlias,

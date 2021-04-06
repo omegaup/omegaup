@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import * as api from '../api';
 import * as ui from '../ui';
+import { setLocationHash } from '../location';
 import { types } from '../api_types';
 import { myRunsStore } from './runsStore';
 import problemsStore from './problemStore';
@@ -8,7 +9,12 @@ import { PopupDisplayed } from '../components/problem/Details.vue';
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import { trackRun } from './submissions';
 
-export interface Navigation {
+export enum NavigationType {
+  ForContest,
+  ForSingleProblemOrCourse,
+}
+
+interface BaseNavigation {
   target: Vue & {
     problemInfo: types.ProblemInfo | null;
     popupDisplayed?: PopupDisplayed;
@@ -19,12 +25,28 @@ export interface Navigation {
   problems: types.NavbarProblemsetProblem[];
 }
 
-export function navigateToProblem({
-  target,
-  runs,
-  problem,
-  problems,
-}: Navigation): void {
+type NavigationForContest = BaseNavigation & {
+  type: NavigationType.ForContest;
+  contestAlias: string;
+};
+
+type NavigationForSingleProblemOrCourse = BaseNavigation & {
+  type: NavigationType.ForSingleProblemOrCourse;
+};
+
+export type NavigationRequest =
+  | NavigationForContest
+  | NavigationForSingleProblemOrCourse;
+
+export async function navigateToProblem(
+  request: NavigationRequest,
+): Promise<void> {
+  let contestAlias;
+  if (request.type === NavigationType.ForContest) {
+    contestAlias = request.contestAlias;
+  }
+  const { target, problem, problems } = request;
+  let { runs } = request;
   if (
     Object.prototype.hasOwnProperty.call(
       problemsStore.state.problems,
@@ -39,9 +61,10 @@ export function navigateToProblem({
     setLocationHash(`#problems/${problem.alias}`);
     return;
   }
-  api.Problem.details({
+  return api.Problem.details({
     problem_alias: problem.alias,
     prevent_problemset_open: false,
+    contest_alias: contestAlias,
   })
     .then((problemInfo) => {
       for (const run of problemInfo.runs ?? []) {
@@ -83,12 +106,4 @@ export function getMaxScore(
     maxScore = Math.max(maxScore, run.contest_score || 0);
   }
   return maxScore;
-}
-
-export function setLocationHash(hash: string): void {
-  window.location.hash = hash;
-}
-
-export function getLocationHash(): string {
-  return window.location.hash;
 }

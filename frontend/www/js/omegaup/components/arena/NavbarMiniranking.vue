@@ -45,14 +45,15 @@ export default class ArenaNavbarMiniranking extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .navbar .mini-ranking {
   width: 18em;
   margin-top: 2em;
 }
 
 .navbar .mini-ranking td {
-  border: 1px solid #000;
+  border: 1px solid var(--arena-navbar-miniranking-td-border-color);
   padding: 0.2em;
 }
 

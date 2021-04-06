@@ -12,6 +12,7 @@ const baseCourseFormProps = {
     alias: 'Newx',
     archived: false,
     assignments: [],
+    clarifications: [],
     needs_basic_information: false,
     description: 'New',
     finish_time: new Date(),

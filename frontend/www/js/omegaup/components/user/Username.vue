@@ -52,7 +52,8 @@ export default class Username extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scope>
+@import '../../../../sass/main.scss';
 .user-rank-unranked,
 .user-rank-beginner,
 .user-rank-specialist,
@@ -63,22 +64,22 @@ export default class Username extends Vue {
 }
 
 .user-rank-beginner {
-  color: #919191;
+  color: var(--user-rank-beginner-font-color);
 }
 
 .user-rank-specialist {
-  color: #598c4c;
+  color: var(--user-rank-specialist-font-color);
 }
 
 .user-rank-expert {
-  color: #1c52c7;
+  color: var(--user-rank-expert-font-color);
 }
 
 .user-rank-master {
-  color: #f0c245;
+  color: var(--user-rank-master-font-color);
 }
 
 .user-rank-international-master {
-  color: #cb000a;
+  color: var(--user-rank-international-master-font-color);
 }
 </style>

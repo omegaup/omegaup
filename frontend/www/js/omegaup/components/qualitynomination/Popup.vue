@@ -267,17 +267,18 @@ export default class QualityNominationPopup extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .qualitynomination-popup .popup {
   position: fixed;
   bottom: 10px;
   right: 4%;
   z-index: 9999999 !important;
   margin: 2em auto 0 auto;
-  border: 2px solid #ccc;
+  border: 2px solid var(--quality-nomination-popup-border-color);
   padding: 1em;
   overflow: auto;
-  background: #fff;
+  background: var(--quality-nomination-popup-background-color);
 }
 
 .qualitynomination-popup .control-label {
@@ -327,7 +328,7 @@ export default class QualityNominationPopup extends Vue {
 ul.tag-select {
   height: 185px;
   overflow: auto;
-  border: 1px solid #ccc;
+  border: 1px solid var(--quality-nomination-popup-border-color);
   list-style-type: none;
   margin: 0;
   padding: 0;

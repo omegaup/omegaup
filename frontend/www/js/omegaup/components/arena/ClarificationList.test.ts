@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, mount } from '@vue/test-utils';
 import { types } from '../../api_types';
 
 import T from '../../lang';
@@ -9,9 +9,9 @@ describe('ClarificationList.vue', () => {
   const clarifications: types.Clarification[] = [
     {
       answer: undefined,
+      assignment_alias: 'Tarea de prueba',
       author: 'omegaUp',
       clarification_id: 1,
-      contest_alias: 'Concurso de prueba',
       message: 'Clarificación de prueba 1',
       problem_alias: 'Problema de prueba',
       public: true,
@@ -20,9 +20,9 @@ describe('ClarificationList.vue', () => {
     },
     {
       answer: 'Ok',
+      assignment_alias: 'Tarea de prueba',
       author: 'omegaUp',
       clarification_id: 2,
-      contest_alias: undefined,
       message: 'Clarificación de prueba 2',
       problem_alias: 'Problema de prueba',
       public: false,
@@ -34,10 +34,18 @@ describe('ClarificationList.vue', () => {
   it('Should handle contest clarifications', async () => {
     const wrapper = shallowMount(arena_ClarificationList, {
       propsData: {
-        inContest: true,
         clarifications,
       },
     });
     expect(wrapper.find('th').text()).toBe(T.wordsProblem);
+  });
+
+  it('Should handle course clarifications', async () => {
+    const wrapper = mount(arena_ClarificationList, {
+      propsData: {
+        clarifications,
+      },
+    });
+    expect(wrapper.text()).toContain(clarifications[0].assignment_alias);
   });
 });

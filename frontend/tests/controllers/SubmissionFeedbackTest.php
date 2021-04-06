@@ -45,7 +45,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         $feedback = 'Test feedback';
-        \OmegaUp\Controllers\Submission::apiCreateFeedback(
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
                 'auth_token' => self::login($admin['identity'])->auth_token,
                 'guid' => $runData['response']['guid'],
@@ -124,7 +124,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNull($response['feedback']);
 
         $feedback = 'Test feedback';
-        \OmegaUp\Controllers\Submission::apiCreateFeedback(
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
                 'auth_token' => self::login($admin['identity'])->auth_token,
                 'guid' => $runData['response']['guid'],
@@ -148,6 +148,82 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             $admin['identity']->username,
             $response['feedback']['author']
+        );
+    }
+
+    public function testEditSubmissionFeedbackForCourse() {
+        $admin = \OmegaUp\Test\Factories\User::createUser();
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $admin['identity'],
+            self::login($admin['identity']),
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+
+        $login = self::login($admin['identity']);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+
+        $student = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student['identity']
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $student['identity']
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $run = \OmegaUp\DAO\Runs::getByGUID($runData['response']['guid']);
+        if (is_null($run)) {
+            return;
+        }
+
+        $submission = \OmegaUp\DAO\Submissions::getByGuid(
+            $runData['response']['guid']
+        );
+        if (is_null($submission)) {
+            return;
+        }
+
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($admin['identity'])->auth_token,
+                'guid' => $runData['response']['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback' => 'Initial test feedback',
+            ])
+        );
+        $initialFeedback = \OmegaUp\DAO\Submissions::getFeedbackBySubmission(
+            $submission
+        );
+
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($admin['identity'])->auth_token,
+                'guid' => $runData['response']['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback' => 'New feedback',
+            ])
+        );
+        $newFeedback = \OmegaUp\DAO\Submissions::getFeedbackBySubmission(
+            $submission
+        );
+
+        $this->assertNotEquals(
+            $initialFeedback->feedback,
+            $newFeedback->feedback
         );
     }
 }

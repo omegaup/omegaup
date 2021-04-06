@@ -33,6 +33,7 @@ describe('Edit.vue', () => {
                 assignment_type: 'test',
               },
             ],
+            clarifications: [],
             needs_basic_information: false,
             description: '# Test',
             finish_time: undefined,
