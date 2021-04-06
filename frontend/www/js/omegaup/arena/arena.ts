@@ -312,7 +312,7 @@ export class Arena {
         isProblemsetOpened: true,
         problemAlias: null,
       }),
-      render: function (createElement) {
+      render: function(createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
             contestAlias: options.contestAlias,
@@ -350,7 +350,7 @@ export class Arena {
           initialClarifications: [],
           notifications: [],
         }),
-        render: function (createElement) {
+        render: function(createElement) {
           return createElement('omegaup-common-navbar', {
             props: {
               omegaUpLockDown: options.payload.omegaUpLockDown,
@@ -375,14 +375,14 @@ export class Arena {
 
       if (this.options.payload.isAdmin) {
         api.Notification.myList({})
-          .then((data) => {
+          .then(data => {
             commonNavbar.notifications = data.notifications;
           })
           .catch(ui.apiError);
 
         const updateGraderStatus = () => {
           api.Grader.status()
-            .then((stats) => {
+            .then(stats => {
               commonNavbar.graderInfo = stats.grader;
               if (stats.grader.queue) {
                 commonNavbar.graderQueueLength =
@@ -391,7 +391,7 @@ export class Arena {
               }
               commonNavbar.errorMessage = null;
             })
-            .catch((stats) => {
+            .catch(stats => {
               commonNavbar.errorMessage = stats.error;
             });
         };
@@ -421,7 +421,7 @@ export class Arena {
           problems: [],
           activeProblem: '',
         }),
-        render: function (createElement) {
+        render: function(createElement) {
           return createElement('omegaup-arena-navbar-problems', {
             props: {
               problems: this.problems,
@@ -461,7 +461,7 @@ export class Arena {
           showRanking: navbarPayload,
           users: [],
         }),
-        render: function (createElement) {
+        render: function(createElement) {
           return createElement('omegaup-arena-navbar-miniranking', {
             props: {
               showRanking: this.showRanking,
@@ -484,7 +484,7 @@ export class Arena {
           lastUpdated: new Date(0),
           showPenalty: true,
         }),
-        render: function (createElement) {
+        render: function(createElement) {
           return createElement('omegaup-arena-scoreboard', {
             props: {
               problems: this.problems,
@@ -511,7 +511,7 @@ export class Arena {
         data: () => ({
           data: null,
         }),
-        render: function (createElement) {
+        render: function(createElement) {
           return createElement('omegaup-arena-rundetails', {
             props: {
               data: this.data,
@@ -555,7 +555,7 @@ export class Arena {
           preferredLanguage: '',
           nextSubmissionTimestamp: new Date(0),
         }),
-        render: function (createElement) {
+        render: function(createElement) {
           return createElement('omegaup-arena-runsubmit', {
             props: {
               languages: this.languages,
@@ -591,7 +591,7 @@ export class Arena {
           director: '',
         },
       }),
-      render: function (createElement) {
+      render: function(createElement) {
         return createElement('omegaup-arena-contestsummary', {
           props: {
             contest: this.contest,
@@ -615,7 +615,7 @@ export class Arena {
         sourceMapping: {} as markdown.SourceMapping,
         problemSettings: undefined as types.ProblemSettingsDistrib | undefined,
       }),
-      render: function (createElement) {
+      render: function(createElement) {
         return createElement('omegaup-markdown', {
           props: {
             markdown: this.markdown,
@@ -698,7 +698,7 @@ export class Arena {
       .then(() => {
         ui.reportEvent('events-socket', 'connected');
       })
-      .catch((e) => {
+      .catch(e => {
         ui.reportEvent('events-socket', 'fallback');
         console.log(e);
         this.socket = null;
@@ -782,8 +782,8 @@ export class Arena {
           setTimeout(problemsetCallback, 1000);
         } else {
           api.Problemset.details({ problemset_id: problemsetId })
-            .then((result) => this.problemsetLoaded(result))
-            .catch((e) => this.problemsetLoadedError(e));
+            .then(result => this.problemsetLoaded(result))
+            .catch(e => this.problemsetLoadedError(e));
         }
       };
       setTimeout(problemsetCallback, 1000);
@@ -873,7 +873,7 @@ export class Arena {
         components: {
           'omegaup-arena-navbar-assignments': arena_Navbar_Assignments,
         },
-        render: function (createElement) {
+        render: function(createElement) {
           return createElement('omegaup-arena-navbar-assignments', {
             props: {
               assignments: problemset.courseAssignments,
@@ -905,7 +905,7 @@ export class Arena {
         ...problemsetProblem,
         languages: problemsetProblem.languages
           .split(',')
-          .filter((language) => language !== ''),
+          .filter(language => language !== ''),
       };
     }
     if (this.scoreboard) {
@@ -952,7 +952,7 @@ export class Arena {
     setTimeout(() => {
       api.Run.status({ run_alias: guid })
         .then(time.remoteTimeAdapter)
-        .then((response) => this.updateRun(response))
+        .then(response => this.updateRun(response))
         .catch(ui.ignoreError);
     }, 5000);
   }
@@ -980,7 +980,7 @@ export class Arena {
 
     if (this.options.contestAlias != null) {
       api.Problemset.scoreboard(scoreboardParams)
-        .then((response) => {
+        .then(response => {
           // Differentiate ranking change between virtual and normal contest
           if (this.options.originalContestAlias != null)
             this.virtualRankingChange(response);
@@ -994,7 +994,7 @@ export class Arena {
       (this.options.courseAlias && this.options.assignmentAlias)
     ) {
       api.Problemset.scoreboard(scoreboardParams)
-        .then((response) => this.rankingChange(response))
+        .then(response => this.rankingChange(response))
         .catch(ui.ignoreError);
     }
   }
@@ -1039,7 +1039,7 @@ export class Arena {
     // Refresh after time T
     let refreshTime = 30 * 1000; // 30 seconds
 
-    events.forEach((evt) => {
+    events.forEach(evt => {
       const key = evt.username;
       if (!Object.prototype.hasOwnProperty.call(originalContestRanking, key)) {
         originalContestRanking[key] = {
@@ -1095,7 +1095,7 @@ export class Arena {
       problemset_id: this.options.problemsetId,
       token: this.options.scoreboardToken,
     })
-      .then((response) => {
+      .then(response => {
         // Change username to username-virtual
         for (const evt of response.events) {
           evt.username = ui.formatString(T.virtualSuffix, {
@@ -1126,7 +1126,7 @@ export class Arena {
       api.Problemset.scoreboardEvents({
         problemset_id: this.options.originalProblemsetId,
       })
-        .then((response) => {
+        .then(response => {
           this.originalContestScoreboardEvents = response.events;
           this.onVirtualRankingChange(scoreboard);
         })
@@ -1148,7 +1148,7 @@ export class Arena {
           this.options.problemsetId || this.currentProblemset?.problemset_id,
         token: this.options.scoreboardToken,
       })
-        .then((response) => this.onRankingEvents(response.events))
+        .then(response => this.onRankingEvents(response.events))
         .catch(ui.ignoreError);
     }
   }
@@ -1191,7 +1191,7 @@ export class Arena {
           const currentPoints = this.problems[alias].points;
           if (this.navbarProblems) {
             const currentProblem = this.navbarProblems.problems.find(
-              (problem) => problem.alias === alias,
+              problem => problem.alias === alias,
             );
             if (currentProblem) {
               currentProblem.hasRuns = problem.runs > 0;
@@ -1323,7 +1323,7 @@ export class Arena {
           showLastLabel: true,
           showFirstLabel: false,
           min: 0,
-          max: ((problems) => {
+          max: (problems => {
             let total = 0;
             for (const problem of Object.values(problems)) {
               total += problem.points;
@@ -1365,7 +1365,7 @@ export class Arena {
       rowcount: this.clarificationsRowcount,
     })
       .then(time.remoteTimeAdapter)
-      .then((response) => this.clarificationsChange(response.clarifications))
+      .then(response => this.clarificationsChange(response.clarifications))
       .catch(ui.ignoreError);
   }
 
@@ -1378,7 +1378,7 @@ export class Arena {
       r = this.clarifications[clarification.clarification_id];
       if (this.problemsetAdmin) {
         this.initialClarifications = clarifications.filter(
-          (notification) =>
+          notification =>
             notification.clarification_id !== clarification.clarification_id,
         );
         if (this.commonNavbar !== null) {
@@ -1414,9 +1414,13 @@ export class Arena {
           ).first();
           cannedResponse.on('change', () => {
             if (cannedResponse.val() === 'other') {
-              $('.create-response-text', answerNode).first().show();
+              $('.create-response-text', answerNode)
+                .first()
+                .show();
             } else {
-              $('.create-response-text', answerNode).first().hide();
+              $('.create-response-text', answerNode)
+                .first()
+                .hide();
             }
           });
           if (clarification.public) {
@@ -1430,10 +1434,14 @@ export class Arena {
           responseFormNode.on('submit', () => {
             let responseText: string = '';
             if (
-              $('.create-response-canned', answerNode).first().val() === 'other'
+              $('.create-response-canned', answerNode)
+                .first()
+                .val() === 'other'
             ) {
               responseText = String(
-                $('.create-response-text', responseFormNode).first().val(),
+                $('.create-response-text', responseFormNode)
+                  .first()
+                  .val(),
               );
             } else {
               responseText = String(
@@ -1453,11 +1461,15 @@ export class Arena {
             })
               .then(() => {
                 $('pre', answerNode).html(responseText);
-                $('.create-response-text', answerNode).first().val('');
+                $('.create-response-text', answerNode)
+                  .first()
+                  .val('');
               })
               .catch(() => {
                 $('pre', answerNode).html(responseText);
-                $('.create-response-text', answerNode).first().val('');
+                $('.create-response-text', answerNode)
+                  .first()
+                  .val('');
               });
             return false;
           });
@@ -1489,7 +1501,9 @@ export class Arena {
         $(r).addClass('resolved');
       }
       if (clarification.public) {
-        $('.create-response-is-public', r).first().prop('checked', true);
+        $('.create-response-is-public', r)
+          .first()
+          .prop('checked', true);
       }
     }
   }
@@ -1514,7 +1528,7 @@ export class Arena {
 
     if (this.commonNavbar !== null) {
       this.commonNavbar.initialClarifications = clarifications
-        .filter((clarification) =>
+        .filter(clarification =>
           // Removing all unsolved clarifications.
           this.problemsetAdmin
             ? clarification.answer === null
@@ -1527,7 +1541,7 @@ export class Arena {
         .reverse();
     } else {
       this.initialClarifications = clarifications
-        .filter((clarification) =>
+        .filter(clarification =>
           // Removing all unsolved clarifications.
           this.problemsetAdmin
             ? clarification.answer === null
@@ -1623,7 +1637,7 @@ export class Arena {
             data: () => ({
               problem: problem,
             }),
-            render: function (createElement) {
+            render: function(createElement) {
               return createElement('omegaup-problem-settings-summary', {
                 props: { problem: this.problem },
               });
@@ -1632,7 +1646,7 @@ export class Arena {
         }
         this.renderProblem(problem);
         const karelLangs = ['kp', 'kj'];
-        if (karelLangs.every((x) => problem.languages.indexOf(x) != -1)) {
+        if (karelLangs.every(x => problem.languages.indexOf(x) != -1)) {
           let originalHref = $('#problem .karel-js-link a').attr('href');
           if (originalHref) {
             const hashIndex = originalHref.indexOf('#');
@@ -1706,7 +1720,7 @@ export class Arena {
                 this.problemsetAdmin && !this.myRunsList.isProblemsetOpened,
             }),
           )
-            .then((problem_ext) => {
+            .then(problem_ext => {
               problem.source = problem_ext.source;
               problem.problemsetter = problem_ext.problemsetter;
               if (problem_ext.statement) {
@@ -1785,7 +1799,7 @@ export class Arena {
       mounted: () => {
         ui.reportEvent('quality-nomination', 'shown');
       },
-      render: function (createElement) {
+      render: function(createElement) {
         return createElement('qualitynomination-popup', {
           props: {
             nominated: this.qualityPayload.nominated,
@@ -1889,7 +1903,7 @@ export class Arena {
     const guid = showRunMatch[1];
     api.Run.details({ run_alias: guid })
       .then(time.remoteTimeAdapter)
-      .then((data) => {
+      .then(data => {
         if (
           data.show_diff === 'none' ||
           (this.options.contestAlias && this.options.contestAlias !== 'admin')
@@ -1898,7 +1912,7 @@ export class Arena {
           return;
         }
         fetch(`/api/run/download/run_alias/${guid}/show_diff/true/`)
-          .then((response) => {
+          .then(response => {
             if (!response.ok) {
               return Promise.reject(new Error(response.statusText));
             }
@@ -1928,8 +1942,8 @@ export class Arena {
             });
             return result;
           })
-          .then((response) => {
-            Promise.allSettled(response.promises).then((results) => {
+          .then(response => {
+            Promise.allSettled(response.promises).then(results => {
               results.forEach((result: any, index: number) => {
                 if (data.cases[response.cases[index]]) {
                   data.cases[response.cases[index]].contestantOutput =
@@ -1941,7 +1955,7 @@ export class Arena {
           })
           .catch(ui.apiError);
       })
-      .catch((error) => {
+      .catch(error => {
         ui.apiError(error);
         this.hideOverlay();
       });
@@ -2013,7 +2027,7 @@ export class Arena {
         source: code,
       }),
     )
-      .then((response) => {
+      .then(response => {
         ui.reportEvent('submission', 'submit');
         if (this.options.isLockdownMode && sessionStorage) {
           sessionStorage.setItem(`run:${response.guid}`, code);
@@ -2055,7 +2069,7 @@ export class Arena {
           this.initSubmissionCountdown();
         }
       })
-      .catch((run) => {
+      .catch(run => {
         alert(run.error ?? run);
         if (run.errorname) {
           ui.reportEvent('submission', 'submit-fail', run.errorname);
@@ -2181,10 +2195,10 @@ export class Arena {
   ): void {
     // It only works for contests
     if (this.options.contestAlias != null && this.scoreboard !== null) {
-      this.scoreboard.ranking = this.scoreboard.ranking.map((rank) => {
+      this.scoreboard.ranking = this.scoreboard.ranking.map(rank => {
         const ranking = rank;
         if (ranking.username == OmegaUp.username) {
-          ranking.problems = rank.problems.map((problem) => {
+          ranking.problems = rank.problems.map(problem => {
             const problemRanking = problem;
             if (problemRanking.alias == alias) {
               const maxScore = getMaxScore(
@@ -2206,7 +2220,7 @@ export class Arena {
     }
     if (this.navbarProblems) {
       const currentProblem = this.navbarProblems.problems.find(
-        (problem) => problem.alias === alias,
+        problem => problem.alias === alias,
       );
       if (currentProblem) {
         currentProblem.bestScore = getMaxScore(
@@ -2322,7 +2336,7 @@ export class EventsSocket {
       try {
         const socket = new WebSocket(this.uri, 'com.omegaup.events');
 
-        socket.onmessage = (message) => this.onmessage(message);
+        socket.onmessage = message => this.onmessage(message);
         socket.onopen = () => {
           this.shouldRetry = true;
           this.arena.updateSocketStatus('•', '#080');
@@ -2403,7 +2417,7 @@ export class EphemeralGrader {
 
     this.ephemeralEmbeddedGraderElement.onload = () => {
       this.loaded = true;
-      this.messageQueue.slice(0).forEach((message) => {
+      this.messageQueue.slice(0).forEach(message => {
         this._sendInternal(message);
       });
     };
