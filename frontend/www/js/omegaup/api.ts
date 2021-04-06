@@ -1661,10 +1661,10 @@ export const Session = {
 };
 
 export const Submission = {
-  createFeedback: apiCall<
-    messages.SubmissionCreateFeedbackRequest,
-    messages.SubmissionCreateFeedbackResponse
-  >('/api/submission/createFeedback/'),
+  setFeedback: apiCall<
+    messages.SubmissionSetFeedbackRequest,
+    messages.SubmissionSetFeedbackResponse
+  >('/api/submission/setFeedback/'),
 };
 
 export const Tag = {
