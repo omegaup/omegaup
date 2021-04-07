@@ -121,7 +121,7 @@ describe('navigation.ts', () => {
           }),
         });
       });
-      vueInstance.popupDisplayed = PopupDisplayed.RunSubmit;
+      vueInstance.popupDisplayed = PopupDisplayed.None;
       const params: NavigationRequest = {
         type: NavigationType.ForContest,
         target: vueInstance,
@@ -132,12 +132,12 @@ describe('navigation.ts', () => {
       };
       await navigateToProblem(params);
       expect(setLocationHash).toHaveBeenCalledWith(
-        `#problems/${params.problem.alias}/new-run`,
+        `#problems/${params.problem.alias}`,
       );
     });
 
     it('Should change window location hash when problem was stored in vuex', async () => {
-      vueInstance.popupDisplayed = PopupDisplayed.None;
+      vueInstance.popupDisplayed = PopupDisplayed.RunSubmit;
       const params: NavigationRequest = {
         type: NavigationType.ForContest,
         target: vueInstance,
@@ -151,7 +151,7 @@ describe('navigation.ts', () => {
       new Vuex.Store(cloneDeep(storeConfig));
       await navigateToProblem(params);
       expect(setLocationHash).toHaveBeenCalledWith(
-        `#problems/${params.problem.alias}`,
+        `#problems/${params.problem.alias}/new-run`,
       );
     });
   });
