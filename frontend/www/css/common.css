@@ -6,10 +6,12 @@ body {
 .no-padding {
   padding: 0;
 }
+
 /* Clase para quitar el margin de algn contenedor o div tag */
 .no-margin {
   margin: 0;
 }
+
 /* Estilos de uso general */
 .center {
   display: block;

@@ -642,12 +642,13 @@ table td {
 }
 
 .karel-js-link {
-  border: 1px solid #eee;
+  border: 1px solid var(--arena-problem-details-karel-link-border-color);
   border-left: 0;
   border-radius: 3px;
 
   a {
-    border-left: 5px solid #1b809e;
+    border-left: 5px solid
+      var(--arena-problem-details-karel-link-border-left-color);
     display: block;
   }
 }

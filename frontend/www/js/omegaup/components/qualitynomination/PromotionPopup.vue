@@ -250,13 +250,15 @@ export default class QualityPromotionPopup extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 ul.tag-select {
   height: 185px;
   overflow: auto;
-  border: 1px solid #ccc;
-  background: #fff;
+  border: 1px solid var(--quality-nomination-tag-select-border-color);
+  background: var(--quality-nomination-tag-select-background-color);
   list-style-type: none;
 }
+
 .tag-label {
   width: -webkit-fill-available;
   margin-bottom: 0;

@@ -81,6 +81,15 @@ export namespace types {
               return x;
             });
           })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -227,6 +236,10 @@ export namespace types {
             x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           })(x.scoreboard);
+        if (x.submissionDeadline)
+          x.submissionDeadline = ((x: number) => new Date(x * 1000))(
+            x.submissionDeadline,
+          );
         x.users = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -515,6 +528,15 @@ export namespace types {
               return x;
             });
           })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -546,6 +568,15 @@ export namespace types {
               return x;
             });
           })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -577,6 +608,15 @@ export namespace types {
               return x;
             });
           })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -848,6 +888,15 @@ export namespace types {
               return x;
             });
           })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -996,6 +1045,15 @@ export namespace types {
                 return x;
               });
             })(x.assignments);
+            x.clarifications = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.clarifications);
             if (x.finish_time)
               x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
@@ -1227,6 +1285,15 @@ export namespace types {
               return x;
             });
           })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -1258,6 +1325,15 @@ export namespace types {
               return x;
             });
           })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -1512,6 +1588,7 @@ export namespace types {
 
   export interface Clarification {
     answer?: string;
+    assignment_alias?: string;
     author?: string;
     clarification_id: number;
     contest_alias?: string;
@@ -1754,6 +1831,7 @@ export namespace types {
     problems: types.NavbarProblemsetProblem[];
     scoreboard?: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    submissionDeadline?: Date;
     users: types.ContestUser[];
   }
 
@@ -1898,18 +1976,6 @@ export namespace types {
     start_time: Date;
   }
 
-  export interface CourseClarification {
-    answer?: string;
-    assignment_alias: string;
-    author: string;
-    clarification_id: number;
-    message: string;
-    problem_alias: string;
-    public: boolean;
-    receiver?: string;
-    time: Date;
-  }
-
   export interface CourseCloneDetailsPayload {
     creator: { classname: string; username: string };
     details: types.CourseDetails;
@@ -1921,6 +1987,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     assignments: types.CourseAssignment[];
+    clarifications: types.Clarification[];
     description: string;
     finish_time?: Date;
     is_admin: boolean;
@@ -2396,16 +2463,6 @@ export namespace types {
     [key: string]: { contestantOutput?: string; in: string; out: string };
   }
 
-  export interface ProblemClarification {
-    answer?: string;
-    author: string;
-    clarification_id: number;
-    message: string;
-    public: boolean;
-    receiver?: string;
-    time: Date;
-  }
-
   export interface ProblemDetails {
     accepted: number;
     accepts_submissions: boolean;
@@ -2797,7 +2854,12 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback?: { author: string; date: Date; feedback: string };
+    feedback?: {
+      author: string;
+      author_classname: string;
+      date: Date;
+      feedback: string;
+    };
     guid: string;
     judged_by?: string;
     language: string;
@@ -3326,7 +3388,7 @@ export namespace messages {
   export type ContestProblemClarificationsRequest = { [key: string]: any };
   export type _ContestProblemClarificationsServerResponse = any;
   export type ContestProblemClarificationsResponse = {
-    clarifications: types.ProblemClarification[];
+    clarifications: types.Clarification[];
   };
   export type ContestProblemsRequest = { [key: string]: any };
   export type ContestProblemsResponse = { problems: types.ProblemsetProblem[] };
@@ -3501,7 +3563,7 @@ export namespace messages {
   export type CourseClarificationsRequest = { [key: string]: any };
   export type _CourseClarificationsServerResponse = any;
   export type CourseClarificationsResponse = {
-    clarifications: types.CourseClarification[];
+    clarifications: types.Clarification[];
   };
   export type CourseCloneRequest = { [key: string]: any };
   export type CourseCloneResponse = { alias: string };
@@ -3544,6 +3606,11 @@ export namespace messages {
   export type CourseMyProgressRequest = { [key: string]: any };
   export type CourseMyProgressResponse = {
     assignments: types.AssignmentProgress;
+  };
+  export type CourseProblemClarificationsRequest = { [key: string]: any };
+  export type _CourseProblemClarificationsServerResponse = any;
+  export type CourseProblemClarificationsResponse = {
+    clarifications: types.Clarification[];
   };
   export type CourseRegisterForCourseRequest = { [key: string]: any };
   export type CourseRegisterForCourseResponse = {};
@@ -4015,8 +4082,8 @@ export namespace messages {
   export type SessionGoogleLoginResponse = { isAccountCreation: boolean };
 
   // Submission
-  export type SubmissionCreateFeedbackRequest = { [key: string]: any };
-  export type SubmissionCreateFeedbackResponse = {};
+  export type SubmissionSetFeedbackRequest = { [key: string]: any };
+  export type SubmissionSetFeedbackResponse = {};
 
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
@@ -4406,6 +4473,9 @@ export namespace controllers {
     myProgress: (
       params?: messages.CourseMyProgressRequest,
     ) => Promise<messages.CourseMyProgressResponse>;
+    problemClarifications: (
+      params?: messages.CourseProblemClarificationsRequest,
+    ) => Promise<messages.CourseProblemClarificationsResponse>;
     registerForCourse: (
       params?: messages.CourseRegisterForCourseRequest,
     ) => Promise<messages.CourseRegisterForCourseResponse>;
@@ -4736,9 +4806,9 @@ export namespace controllers {
   }
 
   export interface Submission {
-    createFeedback: (
-      params?: messages.SubmissionCreateFeedbackRequest,
-    ) => Promise<messages.SubmissionCreateFeedbackResponse>;
+    setFeedback: (
+      params?: messages.SubmissionSetFeedbackRequest,
+    ) => Promise<messages.SubmissionSetFeedbackResponse>;
   }
 
   export interface Tag {

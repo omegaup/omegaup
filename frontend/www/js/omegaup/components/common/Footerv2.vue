@@ -157,6 +157,7 @@ export default class Footer extends Vue {
   .footer-navigation {
     .footer-brand {
       max-width: 200px;
+
       @media only screen and (max-width: 767px) {
         max-width: 100%;
       }
@@ -182,12 +183,15 @@ export default class Footer extends Vue {
         padding: 0;
         margin: 0 auto;
         text-align: center;
+
         li {
           margin-top: 8px;
           padding: 0;
+
           a {
             text-decoration: none;
             color: white;
+
             &:hover {
               color: gray;
             }
