@@ -162,7 +162,8 @@ def show_run_details_course(driver, course_alias, assignment_alias):
 
     util.show_run_details(driver,
                           table_classname='local',
-                          dropdown_classname='open')
+                          dropdown_classname='open',
+                          code='#include <iostream>')
 
     driver.browser.find_element_by_css_selector('#overlay').click()
 

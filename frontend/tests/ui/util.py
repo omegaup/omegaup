@@ -534,7 +534,7 @@ def add_identities_group(driver, group_alias):
     return identities
 
 
-def show_run_details(driver, *, table_classname, dropdown_classname):
+def show_run_details(driver, *, table_classname, dropdown_classname, code):
     '''It shows details popup for a certain submission.'''
 
     driver.wait.until(EC.element_to_be_clickable(
@@ -559,3 +559,11 @@ def show_run_details(driver, *, table_classname, dropdown_classname):
 
     assert (('show-run:') in
             driver.browser.current_url), driver.browser.current_url
+
+    code_element = driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR,
+             'form[data-run-details-view] .CodeMirror-code')))
+    code_text = code_element.get_attribute('innerText')
+
+    assert ((code) in code_text), code_text

@@ -123,7 +123,8 @@ def test_create_problem(driver):
         prepare_run(driver, problem_alias)
         util.show_run_details(driver,
                               table_classname='global',
-                              dropdown_classname='show')
+                              dropdown_classname='show',
+                              code='java.util.Scanner')
 
         driver.wait.until(
             EC.element_to_be_clickable(
