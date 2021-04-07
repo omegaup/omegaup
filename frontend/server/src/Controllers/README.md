@@ -195,7 +195,7 @@
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
   - [`/api/session/googleLogin/`](#apisessiongooglelogin)
 - [Submission](#submission)
-  - [`/api/submission/createFeedback/`](#apisubmissioncreatefeedback)
+  - [`/api/submission/setFeedback/`](#apisubmissionsetfeedback)
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
@@ -3845,11 +3845,11 @@ contestant's machine and the server.
 
 SubmissionController
 
-## `/api/submission/createFeedback/`
+## `/api/submission/setFeedback/`
 
 ### Description
 
-Adds admin feedback to a submission
+Updates the admin feedback for a submission
 
 ### Parameters
 

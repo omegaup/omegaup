@@ -609,7 +609,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ),
             'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
                 $contest,
-                /* course */ null,
+                /*course=*/ null,
                 $contestAdmin,
                 $identity,
                 /*$offset=*/ null,

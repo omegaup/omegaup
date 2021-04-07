@@ -83,7 +83,6 @@
         :username="contestAdmin && users.length != 0 ? users[0].username : null"
         :clarifications="currentClarifications"
         :is-admin="contestAdmin"
-        :in-contest="true"
         :show-new-clarification-popup="showNewClarificationPopup"
         @new-clarification="(request) => $emit('new-clarification', request)"
         @clarification-response="

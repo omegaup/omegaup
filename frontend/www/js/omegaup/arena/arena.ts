@@ -525,7 +525,7 @@ export class Arena {
                 guid: string;
                 feedback: string;
               }) => {
-                api.Submission.createFeedback({
+                api.Submission.setFeedback({
                   guid,
                   course_alias: self.options.courseAlias,
                   assignment_alias: self.options.assignmentAlias,

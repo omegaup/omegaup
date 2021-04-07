@@ -31,7 +31,7 @@
             ></textarea>
             <button
               class="btn btn-sm btn-primary"
-              :disabled="feedback.length === 0"
+              :disabled="!feedback"
               @click.prevent="
                 $emit('send-feedback', {
                   guid: data.guid,
