@@ -124,7 +124,8 @@ def test_create_problem(driver):
         util.show_run_details(driver,
                               table_classname='global',
                               dropdown_classname='show',
-                              code='java.util.Scanner')
+                              code='java.util.Scanner',
+                              has_been_migrated=True)
 
         driver.wait.until(
             EC.element_to_be_clickable(
