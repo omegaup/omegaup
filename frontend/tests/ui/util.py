@@ -532,3 +532,30 @@ def add_identities_group(driver, group_alias):
                 identity.username, uploaded_identities[i]))
 
     return identities
+
+
+def show_run_details(driver, *, table_classname, dropdown_classname):
+    '''It shows details popup for a certain submission.'''
+
+    driver.wait.until(EC.element_to_be_clickable(
+        (By.XPATH, ('//a[contains(@href, "#runs")]')))).click()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             '//table[contains(concat(" ", normalize-space(@class), " "), "'
+             ' %s ")]/tbody/tr/td/div[contains(concat(" ", '
+             'normalize-space(@class), " "), " dropdown ")]/button'
+             % table_classname))).click()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             '//table[contains(concat(" ", normalize-space(@class), " "), '
+             '" %s ")]/tbody/tr/td/div[contains(concat(" ", '
+             'normalize-space(@class), " "), " %s ")]/ul/li['
+             '@data-actions-details]/button'
+             % (table_classname, dropdown_classname)))).click()
+
+    assert (('show-run:') in
+            driver.browser.current_url), driver.browser.current_url
