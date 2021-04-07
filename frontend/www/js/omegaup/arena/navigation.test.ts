@@ -4,12 +4,12 @@ jest.mock('../location');
 import Vue from 'vue';
 import arena_ContestPractice from '../components/arena/ContestPractice.vue';
 import { types } from '../api_types';
+import { setLocationHash } from '../location';
 import {
   NavigationRequest,
   NavigationType,
   navigateToProblem,
 } from './navigation';
-import { setLocationHash } from '../location';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import { storeConfig } from './problemStore';
@@ -99,29 +99,28 @@ const navbarProblems: types.NavbarProblemsetProblem[] = [
 
 describe('navigation.ts', () => {
   describe('navigateToProblem', () => {
-    fetchMock.enableMocks();
-    fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
-      if (req.url != '/api/problem/details/') {
+    it('Should change hash when contest alias is declared in practice mode', async () => {
+      fetchMock.enableMocks();
+      fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
+        if (req.url != '/api/problem/details/') {
+          return Promise.resolve({
+            ok: false,
+            status: 404,
+            body: JSON.stringify({
+              status: 'error',
+              error: `Invalid call to "${req.url}" in test`,
+              errorcode: 403,
+            }),
+          });
+        }
         return Promise.resolve({
-          ok: false,
-          status: 404,
+          status: 200,
           body: JSON.stringify({
-            status: 'error',
-            error: `Invalid call to "${req.url}" in test`,
-            errorcode: 403,
+            ...problemDetails,
+            status: 'ok',
           }),
         });
-      }
-      return Promise.resolve({
-        status: 200,
-        body: JSON.stringify({
-          ...problemDetails,
-          status: 'ok',
-        }),
       });
-    });
-
-    it('Should change hash when contest alias is declared in practice mode', async () => {
       vueInstance.popupDisplayed = PopupDisplayed.RunSubmit;
       const params: NavigationRequest = {
         type: NavigationType.ForContest,
@@ -137,7 +136,7 @@ describe('navigation.ts', () => {
       );
     });
 
-    it('Should change window location hash', async () => {
+    it('Should change window location hash when problem was stored in vuex', async () => {
       vueInstance.popupDisplayed = PopupDisplayed.None;
       const params: NavigationRequest = {
         type: NavigationType.ForContest,
