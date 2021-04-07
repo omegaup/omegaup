@@ -15,7 +15,6 @@ import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import { storeConfig } from './problemStore';
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
-import { cloneDeep } from 'lodash';
 import fetchMock from 'jest-fetch-mock';
 
 const problemDetails: types.ProblemInfo = {
@@ -148,7 +147,7 @@ describe('navigation.ts', () => {
       };
       const localVue = createLocalVue();
       localVue.use(Vuex);
-      new Vuex.Store(cloneDeep(storeConfig));
+      new Vuex.Store(storeConfig);
       await navigateToProblem(params);
       expect(setLocationHash).toHaveBeenCalledWith(
         `#problems/${params.problem.alias}/new-run`,
