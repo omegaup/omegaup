@@ -561,7 +561,7 @@ def show_run_details(driver, *, table_classname, dropdown_classname, code,
     assert (('show-run:') in
             driver.browser.current_url), driver.browser.current_url
 
-    # It shoul be removed when everything is migrated
+    # It should be removed when everything is migrated
     if has_been_migrated:
         selector = '.show form[data-run-details-view] .CodeMirror-code'
     else:
