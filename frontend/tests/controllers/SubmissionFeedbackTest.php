@@ -45,7 +45,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         $feedback = 'Test feedback';
-        \OmegaUp\Controllers\Submission::apiCreateFeedback(
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
                 'auth_token' => self::login($admin['identity'])->auth_token,
                 'guid' => $runData['response']['guid'],
@@ -124,7 +124,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNull($response['feedback']);
 
         $feedback = 'Test feedback';
-        \OmegaUp\Controllers\Submission::apiCreateFeedback(
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
                 'auth_token' => self::login($admin['identity'])->auth_token,
                 'guid' => $runData['response']['guid'],
@@ -195,7 +195,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             return;
         }
 
-        \OmegaUp\Controllers\Submission::apiCreateFeedback(
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
                 'auth_token' => self::login($admin['identity'])->auth_token,
                 'guid' => $runData['response']['guid'],
@@ -208,7 +208,7 @@ class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {
             $submission
         );
 
-        \OmegaUp\Controllers\Submission::apiUpdateFeedback(
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
             new \OmegaUp\Request([
                 'auth_token' => self::login($admin['identity'])->auth_token,
                 'guid' => $runData['response']['guid'],

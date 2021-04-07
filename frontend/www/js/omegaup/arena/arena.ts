@@ -503,7 +503,7 @@ export class Arena {
     if (document.getElementById('run-details') != null) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       const self = this;
-      this.runDetailsView = new Vue({
+      self.runDetailsView = new Vue({
         el: '#run-details',
         components: {
           'omegaup-arena-rundetails': arena_RunDetails,
@@ -518,40 +518,25 @@ export class Arena {
               inCourse: self.options.courseAlias !== null,
             },
             on: {
-              'send-feedback': ({
+              'set-feedback': ({
                 guid,
                 feedback,
               }: {
                 guid: string;
                 feedback: string;
               }) => {
-                api.Submission.createFeedback({
+                api.Submission.setFeedback({
                   guid,
                   course_alias: self.options.courseAlias,
                   assignment_alias: self.options.assignmentAlias,
                   feedback,
                 })
                   .then(() => {
-                    ui.success(T.feedbackSuccesfullyAdded);
-                    self.hideOverlay();
-                  })
-                  .catch(ui.error);
-              },
-              'update-feedback': ({
-                guid,
-                feedback,
-              }: {
-                guid: string;
-                feedback: string;
-              }) => {
-                api.Submission.updateFeedback({
-                  guid,
-                  course_alias: self.options.courseAlias,
-                  assignment_alias: self.options.assignmentAlias,
-                  feedback,
-                })
-                  .then(() => {
-                    ui.success(T.feedbackSuccesfullyUpdated);
+                    ui.success(
+                      self.runDetailsView?.$data.feedback
+                        ? T.feedbackSuccesfullyAdded
+                        : T.feedbackSuccesfullyUpdated,
+                    );
                     self.hideOverlay();
                   })
                   .catch(ui.error);

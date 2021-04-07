@@ -433,6 +433,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 Submissions s ON s.submission_id = sf.submission_id
             WHERE
                 s.submission_id = ?
+            FOR UPDATE;
         ';
 
         /** @var array{date: \OmegaUp\Timestamp, feedback: string, identity_id: int, submission_feedback_id: int, submission_id: int}|null */

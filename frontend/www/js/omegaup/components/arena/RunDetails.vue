@@ -30,15 +30,12 @@
             ></textarea>
             <button
               class="btn btn-sm btn-primary"
-              :disabled="feedback === null || feedback.length === 0"
+              :disabled="!feedback"
               @click.prevent="
-                $emit(
-                  data.feedback === null ? 'send-feedback' : 'update-feedback',
-                  {
-                    guid: data.guid,
-                    feedback,
-                  },
-                )
+                $emit('set-feedback', {
+                  guid: data.guid,
+                  feedback,
+                })
               "
             >
               {{
