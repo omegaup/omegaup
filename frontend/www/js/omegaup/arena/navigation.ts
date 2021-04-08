@@ -54,6 +54,10 @@ export async function navigateToProblem(
     )
   ) {
     target.problemInfo = problemsStore.state.problems[problem.alias];
+    if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
+      setLocationHash(`#problems/${problem.alias}/new-run`);
+      return;
+    }
     setLocationHash(`#problems/${problem.alias}`);
     return;
   }
