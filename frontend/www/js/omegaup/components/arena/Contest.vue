@@ -225,7 +225,7 @@ export default class ArenaContest extends Vue {
   }
 
   onRunSubmitted(run: { code: string; language: string }): void {
-    this.$emit('submit-run', Object.assign({}, run, this.activeProblem));
+    this.$emit('submit-run', { ...run, ...this.activeProblem });
   }
 
   @Watch('problem')

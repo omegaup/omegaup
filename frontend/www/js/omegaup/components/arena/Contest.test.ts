@@ -25,7 +25,6 @@ describe('Contest.vue', () => {
   const currentDate = new Date();
   const futureDate = new Date();
   futureDate.setMinutes(futureDate.getMinutes() + 2);
-  const finishTime = new Date(futureDate);
 
   const contest: types.ContestPublicDetails = {
     admission_mode: 'public',
@@ -33,7 +32,7 @@ describe('Contest.vue', () => {
     description: 'hello omegaUp',
     director: 'omegaUpDirector',
     feedback: 'detailed',
-    finish_time: finishTime,
+    finish_time: futureDate,
     languages: 'py',
     partial_score: true,
     penalty: 1,
@@ -178,8 +177,9 @@ describe('Contest.vue', () => {
       .trigger('click');
     expect(wrapper.find('form[data-run-submit')).toBeTruthy();
 
-    const options = wrapper.find('select[name="language"]').findAll('option');
-    await options.at(1).setSelected();
+    await wrapper
+      .find('select[name="language"] option[value="py3"]')
+      .setSelected();
 
     const runSubmitWrapper = wrapper.findComponent(arena_RunSubmit);
 
