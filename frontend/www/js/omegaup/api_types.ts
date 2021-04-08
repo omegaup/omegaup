@@ -1807,7 +1807,7 @@ export namespace types {
     penalty_calc_policy: string;
     penalty_type: string;
     points_decay_factor: number;
-    problems: types.ProblemsetProblem[];
+    problems: types.ProblemsetProblemWithId[];
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
@@ -1842,7 +1842,7 @@ export namespace types {
     penalty_calc_policy: string;
     penalty_type: string;
     points_decay_factor: number;
-    problems: types.ProblemsetProblem[];
+    problems: types.ProblemsetProblemWithId[];
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
@@ -1874,7 +1874,7 @@ export namespace types {
     details: types.ContestAdminDetails;
     group_admins: types.ContestGroupAdmin[];
     groups: types.ContestGroup[];
-    problems: types.ProblemsetProblem[];
+    problems: types.ProblemsetProblemWithId[];
     requests: types.ContestRequest[];
     users: types.ContestUser[];
   }
@@ -2824,6 +2824,27 @@ export namespace types {
     order: number;
     points: number;
     problem_id?: number;
+    quality_payload?: types.ProblemQualityPayload;
+    quality_seal: boolean;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
+  }
+
+  export interface ProblemsetProblemWithId {
+    accepted: number;
+    accepts_submissions: boolean;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    input_limit: number;
+    languages: string;
+    letter?: string;
+    order: number;
+    points: number;
+    problem_id: number;
     quality_payload?: types.ProblemQualityPayload;
     quality_seal: boolean;
     submissions: number;
