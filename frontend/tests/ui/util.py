@@ -534,8 +534,8 @@ def add_identities_group(driver, group_alias):
     return identities
 
 
-def show_run_details(driver, *, table_classname, dropdown_classname, code,
-                     has_been_migrated):
+def show_run_details(driver, *, table_classname: str, dropdown_classname: str,
+                     code: str, has_been_migrated: bool) -> None:
     '''It shows details popup for a certain submission.'''
 
     driver.wait.until(EC.element_to_be_clickable(

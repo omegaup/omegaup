@@ -152,7 +152,8 @@ def test_user_ranking_course(driver):
         show_run_details_course(driver, course_alias, assignment_alias)
 
 
-def show_run_details_course(driver, course_alias, assignment_alias):
+def show_run_details_course(driver: conftest.Driver, course_alias: str,
+                            assignment_alias: str) -> None:
     '''It shows details popup for a certain submission in a course.'''
     enter_course_assignments_page(driver, course_alias)
     with driver.page_transition():
