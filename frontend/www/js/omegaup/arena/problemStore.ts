@@ -9,18 +9,18 @@ export interface ProblemState {
   problems: Record<string, types.ProblemInfo>;
 }
 
-const problemsStore = new Vuex.Store<ProblemState>({
+export const storeConfig = {
   state: {
     problems: {},
   },
   mutations: {
-    addProblem(state, problem: types.ProblemInfo) {
+    addProblem(state: ProblemState, problem: types.ProblemInfo) {
       if (Object.prototype.hasOwnProperty.call(state.problems, problem.alias)) {
         return;
       }
       Vue.set(state.problems, problem.alias, problem);
     },
   },
-});
+};
 
-export default problemsStore;
+export default new Vuex.Store<ProblemState>(storeConfig);
