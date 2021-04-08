@@ -56,6 +56,7 @@
           <omegaup-markdown
             ref="statement-markdown"
             :markdown="problem.statement.markdown"
+            :source-mapping="problem.statement.sources"
             :image-mapping="problem.statement.images"
             :problem-settings="problem.settings"
             @rendered="onProblemRendered"
