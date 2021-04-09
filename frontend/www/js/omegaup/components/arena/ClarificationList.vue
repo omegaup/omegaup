@@ -1,36 +1,72 @@
 <template>
   <div class="card">
     <h5 class="card-header">{{ T.wordsClarifications }}</h5>
-    <slot name="new-clarification">
-      <div class="card-body">
-        <a
-          href="#clarifications/all/new"
-          class="btn btn-primary"
-          @click="currentPopupDisplayed = PopupDisplayed.NewClarification"
-        >
-          {{ T.wordsNewClarification }}
-        </a>
-        <omegaup-overlay
-          :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
-          @hide-overlay="onPopupDismissed"
-        >
-          <template #popup>
-            <omegaup-arena-new-clarification-popup
-              v-show="currentPopupDisplayed === PopupDisplayed.NewClarification"
-              :problems="problems"
-              :users="users"
-              :problem-alias="problemAlias"
-              :username="username"
-              @new-clarification="
-                (contestClarification) =>
-                  $emit('new-clarification', contestClarification)
-              "
-              @dismiss="onPopupDismissed"
-            ></omegaup-arena-new-clarification-popup>
-          </template>
-        </omegaup-overlay>
+    <div class="card-body">
+      <slot name="new-clarification">
+        <div class="mb-3">
+          <a
+            href="#clarifications/all/new"
+            class="btn btn-primary"
+            @click="currentPopupDisplayed = PopupDisplayed.NewClarification"
+          >
+            {{ T.wordsNewClarification }}
+          </a>
+          <omegaup-overlay
+            :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
+            @hide-overlay="onPopupDismissed"
+          >
+            <template #popup>
+              <omegaup-arena-new-clarification-popup
+                v-show="
+                  currentPopupDisplayed === PopupDisplayed.NewClarification
+                "
+                :problems="problems"
+                :users="users"
+                :problem-alias="problemAlias"
+                :username="username"
+                @new-clarification="
+                  (contestClarification) =>
+                    $emit('new-clarification', contestClarification)
+                "
+                @dismiss="onPopupDismissed"
+              ></omegaup-arena-new-clarification-popup>
+            </template>
+          </omegaup-overlay>
+        </div>
+      </slot>
+      <div class="form-inline">
+        <label v-if="filterAssignments">
+          {{ T.wordsFilterByHomework }}
+          <select
+            v-model="selectedAssignment"
+            class="form-control custom-select ml-1"
+          >
+            <option
+              v-for="assignmentName in assignmentsNames"
+              :key="assignmentName"
+              :value="assignmentName"
+            >
+              {{ assignmentName }}
+            </option>
+          </select>
+        </label>
+        <label :class="{ 'ml-4': filterAssignments }">
+          {{ T.wordsFilterByProblem }}
+          <select
+            v-model="selectedProblem"
+            class="form-control custom-select ml-1"
+          >
+            <option
+              v-for="problemName in problemsNames"
+              :key="problemName"
+              :value="problemName"
+            >
+              {{ problemName }}
+            </option>
+          </select>
+        </label>
       </div>
-    </slot>
+    </div>
     <div class="table-responsive">
       <table class="table mb-0">
         <thead>
@@ -46,7 +82,7 @@
         </thead>
         <tbody>
           <omegaup-clarification
-            v-for="clarification in clarifications"
+            v-for="clarification in filteredClarifications"
             :key="clarification.clarification_id"
             :is-admin="isAdmin"
             :clarification="clarification"
@@ -94,10 +130,13 @@ export default class ArenaClarificationList extends Vue {
   @Prop() problemAlias!: null | string;
   @Prop() username!: null | string;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
+  @Prop({ default: false }) filterAssignments!: boolean;
 
   T = T;
   PopupDisplayed = PopupDisplayed;
   currentPopupDisplayed = this.popupDisplayed;
+  selectedAssignment = null;
+  selectedProblem = null;
 
   onNewClarification(): void {
     this.currentPopupDisplayed = PopupDisplayed.NewClarification;
@@ -106,6 +145,46 @@ export default class ArenaClarificationList extends Vue {
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
     this.$emit('update:activeTab', 'clarifications');
+  }
+
+  get assignmentsNames(): string[] {
+    return this.filterAssignments
+      ? [
+          ...new Set(
+            this.clarifications.map((clarification) => {
+              if (
+                'assignment_alias' in clarification &&
+                clarification.assignment_alias
+              ) {
+                return clarification.assignment_alias;
+              }
+              return '';
+            }),
+          ),
+        ]
+      : [];
+  }
+
+  get problemsNames(): string[] {
+    return [
+      ...new Set(
+        this.clarifications.map((clarification) => clarification.problem_alias),
+      ),
+    ];
+  }
+
+  get filteredClarifications(): types.Clarification[] {
+    return this.clarifications.filter((clarification) => {
+      if (
+        (this.selectedAssignment === null ||
+          clarification.assignment_alias === this.selectedAssignment) &&
+        (this.selectedProblem === null ||
+          clarification.problem_alias === this.selectedProblem)
+      ) {
+        return true;
+      }
+      return false;
+    });
   }
 
   @Watch('showNewClarificationPopup')
