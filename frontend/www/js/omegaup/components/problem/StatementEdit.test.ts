@@ -1,58 +1,15 @@
 import { mount } from '@vue/test-utils';
 
 import type { types } from '../../api_types';
-import T from '../../lang';
 
-import problem_Solution from './Solution.vue';
+import problem_StatementEdit from './StatementEdit.vue';
 
-describe('Solution.vue', () => {
-  it('Should handle an empty/locked solution', () => {
-    const wrapper = mount(problem_Solution, {
-      propsData: {
-        solution: null as types.ProblemStatement | null,
-        status: 'locked',
-        availableTokens: 0,
-        allTokens: 0,
-      },
-    });
-
-    expect(wrapper.text()).toContain(T.solutionLocked.split('\n')[0]);
-  });
-
-  it('Should handle an empty/unlocked solution', () => {
-    const wrapper = mount(problem_Solution, {
-      propsData: {
-        solution: null as types.ProblemStatement | null,
-        status: 'unlocked',
-        availableTokens: 0,
-        allTokens: 0,
-      },
-    });
-
-    expect(wrapper.text()).toContain(T.solutionConfirm);
-  });
-
-  it('Should handle a non-empty, unlocked solution', () => {
-    const wrapper = mount(problem_Solution, {
-      propsData: {
-        solution: {
-          markdown: 'Hello, World!',
-          images: {},
-        } as types.ProblemStatement | null,
-        status: 'unlocked',
-        availableTokens: 0,
-        allTokens: 0,
-      },
-    });
-
-    expect(wrapper.text()).toContain('Hello, World!');
-  });
-
+describe('StatementEdit.vue', () => {
   it('Should handle unrecognized source filename error', () => {
-    const wrapper = mount(problem_Solution, {
+    const wrapper = mount(problem_StatementEdit, {
       propsData: {
-        solution: {
-          markdown: `# test with embed code in solution
+        statement: {
+          markdown: `# test with embed code in statement
 Here we can add code.
 <details>
   <summary>
@@ -76,10 +33,10 @@ Here we can add code.
   });
 
   it('Should handle a valid source filename with content', async () => {
-    const wrapper = mount(problem_Solution, {
+    const wrapper = mount(problem_StatementEdit, {
       propsData: {
-        solution: {
-          markdown: `# test with embed code in solution
+        statement: {
+          markdown: `# test with embed code in statement
 Here we can add code.
 <details>
   <summary>
@@ -91,7 +48,7 @@ Here we can add code.
   </details>`,
           sources: {
             'sample.cpp': `#include <iostream>
-
+      
       int main() {
         std::cout << "This is only an example";
         return 0;
