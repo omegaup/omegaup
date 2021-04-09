@@ -35,6 +35,7 @@
                 $emit('set-feedback', {
                   guid: data.guid,
                   feedback,
+                  isUpdate: data.feedback !== null,
                 })
               "
             >

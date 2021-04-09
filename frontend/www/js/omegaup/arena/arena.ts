@@ -521,9 +521,11 @@ export class Arena {
               'set-feedback': ({
                 guid,
                 feedback,
+                isUpdate,
               }: {
                 guid: string;
                 feedback: string;
+                isUpdate: boolean;
               }) => {
                 api.Submission.setFeedback({
                   guid,
@@ -533,9 +535,9 @@ export class Arena {
                 })
                   .then(() => {
                     ui.success(
-                      self.runDetailsView?.$data.feedback
-                        ? T.feedbackSuccesfullyAdded
-                        : T.feedbackSuccesfullyUpdated,
+                      isUpdate
+                        ? T.feedbackSuccesfullyUpdated
+                        : T.feedbackSuccesfullyAdded,
                     );
                     self.hideOverlay();
                   })
