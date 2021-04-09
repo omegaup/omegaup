@@ -15,12 +15,11 @@
             :linkify="true"
           ></omegaup-user-username>
         </div>
-        <div
-          v-if="data.admin && data.feedback === null"
-          class="feedback-section"
-        >
+        <div v-if="data.admin" class="feedback-section">
           <a role="button" @click="showFeedbackForm = !showFeedbackForm">{{
-            T.submissionFeedbackSendButton
+            data.feedback === null
+              ? T.submissionFeedbackSendButton
+              : T.submissionFeedbackUpdateButton
           }}</a>
           <div v-show="showFeedbackForm" class="form-group">
             <textarea
@@ -33,13 +32,18 @@
               class="btn btn-sm btn-primary"
               :disabled="!feedback"
               @click.prevent="
-                $emit('send-feedback', {
+                $emit('set-feedback', {
                   guid: data.guid,
                   feedback,
+                  isUpdate: data.feedback !== null,
                 })
               "
             >
-              {{ T.wordsSend }}
+              {{
+                data.feedback === null
+                  ? T.submissionSendFeedback
+                  : T.submissionUpdateFeedback
+              }}
             </button>
           </div>
         </div>
