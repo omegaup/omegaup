@@ -620,6 +620,15 @@ export const Course = {
         return x;
       });
     })(x.assignments);
+    x.clarifications = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.clarifications);
     if (x.finish_time)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -714,6 +723,15 @@ export const Course = {
         return x;
       });
     })(x.assignments);
+    x.clarifications = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.clarifications);
     if (x.finish_time)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -747,6 +765,15 @@ export const Course = {
             return x;
           });
         })(x.assignments);
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
         if (x.finish_time)
           x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
         x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -892,6 +919,22 @@ export const Course = {
     messages.CourseMyProgressRequest,
     messages.CourseMyProgressResponse
   >('/api/course/myProgress/'),
+  problemClarifications: apiCall<
+    messages.CourseProblemClarificationsRequest,
+    messages._CourseProblemClarificationsServerResponse,
+    messages.CourseProblemClarificationsResponse
+  >('/api/course/problemClarifications/', (x) => {
+    x.clarifications = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        return x;
+      });
+    })(x.clarifications);
+    return x;
+  }),
   registerForCourse: apiCall<
     messages.CourseRegisterForCourseRequest,
     messages.CourseRegisterForCourseResponse
@@ -1618,10 +1661,10 @@ export const Session = {
 };
 
 export const Submission = {
-  createFeedback: apiCall<
-    messages.SubmissionCreateFeedbackRequest,
-    messages.SubmissionCreateFeedbackResponse
-  >('/api/submission/createFeedback/'),
+  setFeedback: apiCall<
+    messages.SubmissionSetFeedbackRequest,
+    messages.SubmissionSetFeedbackResponse
+  >('/api/submission/setFeedback/'),
 };
 
 export const Tag = {

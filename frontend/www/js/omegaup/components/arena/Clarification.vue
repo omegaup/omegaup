@@ -5,9 +5,14 @@
       'direct-message': isDirectMessage,
     }"
   >
+    <td v-if="'assignment_alias' in clarification" class="text-center">
+      {{ clarification.assignment_alias }}
+    </td>
     <td class="text-center align-middle">
       {{
-        !inContest ? clarification.contest_alias : clarification.problem_alias
+        'contest_alias' in clarification
+          ? clarification.contest_alias
+          : clarification.problem_alias
       }}
     </td>
     <td class="text-center align-middle">{{ clarification.author }}</td>
@@ -84,9 +89,8 @@ import { types } from '../../api_types';
 import * as time from '../../time';
 
 @Component
-export default class ArenaClarificationForm extends Vue {
+export default class ArenaClarification extends Vue {
   @Prop() clarification!: types.Clarification;
-  @Prop() inContest!: boolean;
   @Prop({ default: false }) isAdmin!: boolean;
 
   T = T;
@@ -151,21 +155,23 @@ export default class ArenaClarificationForm extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .resolved {
-  color: rgb(70, 136, 71);
+  color: var(--clarification-resolved-font-color);
   background-image: linear-gradient(
-    rgb(223, 240, 216) 0px,
-    rgb(200, 229, 188) 100%
+    var(--clarification-resolved-gradient-from-background-color),
+    var(--clarification-resolved-gradient-to-background-color)
   );
-  background-color: rgb(223, 240, 216);
+  background-color: var(--clarification-resolved-background-color);
 }
 
 .direct-message {
-  color: rgb(125, 117, 18);
+  color: var(--clarification-direct-message-font-color);
   background-image: linear-gradient(
-    rgb(253, 245, 154) 0px,
-    rgba(255, 249, 181, 0.5) 100%
+    var(--clarification-direct-message-gradient-from-background-color),
+    rgba(var(--clarification-direct-message-gradient-to-background-color), 0.5)
   );
-  background-color: rgb(223, 240, 216);
+  background-color: var(--clarification-direct-message-background-color);
 }
 </style>

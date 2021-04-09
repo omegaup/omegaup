@@ -36,6 +36,7 @@
           <h1 class="title text-center">{{ title }}</h1>
           <omegaup-markdown
             :markdown="currentMarkdown"
+            :source-mapping="statement.sources"
             :image-mapping="statement.images"
             preview="true"
           ></omegaup-markdown>
@@ -204,11 +205,12 @@ export default class ProblemStatementEdit extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 @import '../../../../third_party/js/pagedown/demo/browser/demo.css';
 
 .wmd-preview,
 .wmd-button-bar {
-  background-color: #fff;
+  background-color: var(--wmd-button-bar-background-color);
 }
 </style>

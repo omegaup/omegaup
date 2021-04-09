@@ -1,8 +1,8 @@
 import * as ui from '../ui';
 import { types } from '../api_types';
-import { getMaxScore } from './navigation';
 import { myRunsStore } from './runsStore';
 import { omegaup } from '../omegaup';
+import { getMaxScore } from './navigation';
 
 interface Problem {
   accepts_submissions: boolean;
