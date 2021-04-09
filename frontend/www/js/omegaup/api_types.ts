@@ -98,23 +98,6 @@ export namespace types {
         x.currentAssignment = ((x) => {
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.problems = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              x.clarifications = ((x) => {
-                if (!Array.isArray(x)) {
-                  return x;
-                }
-                return x.map((x) => {
-                  x.time = ((x: number) => new Date(x * 1000))(x.time);
-                  return x;
-                });
-              })(x.clarifications);
-              return x;
-            });
-          })(x.problems);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.currentAssignment);
@@ -243,23 +226,6 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
-        x.problems = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            x.clarifications = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                x.time = ((x: number) => new Date(x * 1000))(x.time);
-                return x;
-              });
-            })(x.clarifications);
-            return x;
-          });
-        })(x.problems);
         if (x.scoreboard)
           x.scoreboard = ((x) => {
             if (x.finish_time)
@@ -1807,7 +1773,7 @@ export namespace types {
     penalty_calc_policy: string;
     penalty_type: string;
     points_decay_factor: number;
-    problems: types.ProblemsetProblemWithId[];
+    problems: types.ProblemsetProblem[];
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
@@ -1842,7 +1808,7 @@ export namespace types {
     penalty_calc_policy: string;
     penalty_type: string;
     points_decay_factor: number;
-    problems: types.ProblemsetProblemWithId[];
+    problems: types.ProblemsetProblem[];
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
@@ -1874,7 +1840,7 @@ export namespace types {
     details: types.ContestAdminDetails;
     group_admins: types.ContestGroupAdmin[];
     groups: types.ContestGroup[];
-    problems: types.ProblemsetProblemWithId[];
+    problems: types.ProblemsetProblem[];
     requests: types.ContestRequest[];
     users: types.ContestUser[];
   }
@@ -2406,7 +2372,6 @@ export namespace types {
     acceptsSubmissions: boolean;
     alias: string;
     bestScore: number;
-    clarifications: types.Clarification[];
     hasRuns: boolean;
     maxScore: number | number;
     text: string;
@@ -2824,27 +2789,6 @@ export namespace types {
     order: number;
     points: number;
     problem_id?: number;
-    quality_payload?: types.ProblemQualityPayload;
-    quality_seal: boolean;
-    submissions: number;
-    title: string;
-    version: string;
-    visibility: number;
-    visits: number;
-  }
-
-  export interface ProblemsetProblemWithId {
-    accepted: number;
-    accepts_submissions: boolean;
-    alias: string;
-    commit: string;
-    difficulty: number;
-    input_limit: number;
-    languages: string;
-    letter?: string;
-    order: number;
-    points: number;
-    problem_id: number;
     quality_payload?: types.ProblemQualityPayload;
     quality_seal: boolean;
     submissions: number;

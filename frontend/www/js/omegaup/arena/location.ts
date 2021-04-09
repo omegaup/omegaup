@@ -33,7 +33,6 @@ export function getOptionsFromLocation(location: string): LocationOptions {
         problem: {
           alias: match?.groups?.alias,
           text: '',
-          clarifications: [],
           acceptsSubmissions: true,
           bestScore: 0,
           maxScore: 0,

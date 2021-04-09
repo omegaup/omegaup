@@ -836,7 +836,6 @@ export class Arena {
           this.navbarProblems.problems.push({
             alias: problem.alias,
             text: problemName,
-            clarifications: [],
             acceptsSubmissions: problem.languages !== '',
             bestScore: 0,
             maxScore: problem.points,

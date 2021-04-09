@@ -51,7 +51,6 @@ describe('ranking', () => {
     {
       acceptsSubmissions: true,
       alias: 'problem_alias',
-      clarifications: [],
       bestScore: 100,
       hasRuns: true,
       maxScore: 100,
@@ -61,7 +60,6 @@ describe('ranking', () => {
       acceptsSubmissions: true,
       alias: 'problem_alias_2',
       bestScore: 80,
-      clarifications: [],
       hasRuns: true,
       maxScore: 100,
       text: 'B. Problem 2',
