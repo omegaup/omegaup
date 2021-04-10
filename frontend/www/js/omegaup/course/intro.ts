@@ -2,6 +2,7 @@ import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
+import T from '../lang';
 import Vue from 'vue';
 import course_Intro from '../components/course/Intro.vue';
 
@@ -30,6 +31,7 @@ OmegaUp.on('ready', () => {
           userRegistrationAnswered: payload.userRegistrationAnswered,
           userRegistrationAccepted: payload.userRegistrationAccepted,
           loggedIn: headerPayload.isLoggedIn,
+          username: headerPayload.currentUsername,
         },
         on: {
           submit: (source: course_Intro) => {
@@ -54,6 +56,23 @@ OmegaUp.on('ready', () => {
                 courseIntro.userRegistrationRequested = true;
               })
               .catch(ui.error);
+          },
+          clone: (alias: string, name: string, startTime: Date) => {
+            api.Course.clone({
+              course_alias: payload.details?.alias,
+              name: name,
+              alias: alias,
+              start_time: startTime.getTime() / 1000,
+            })
+              .then(() => {
+                ui.success(
+                  ui.formatString(T.courseEditCourseClonedSuccessfully, {
+                    course_alias: alias,
+                  }),
+                  /*autoHide=*/ false,
+                );
+              })
+              .catch(ui.apiError);
           },
         },
       });

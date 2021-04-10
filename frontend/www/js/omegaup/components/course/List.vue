@@ -69,6 +69,7 @@
                 <omegaup-course
                   v-for="course in filteredCourses.courses"
                   :key="course.alias"
+                  :username="username"
                   :is-public="accessMode === 'public'"
                   :course-name="course.name"
                   :course-alias="course.alias"
@@ -83,6 +84,10 @@
                   :show-topics="
                     course.admission_mode === 'public' &&
                     accessMode !== 'student'
+                  "
+                  @clone="
+                    (alias, name, startTime) =>
+                      $emit('clone', course.alias, alias, name, startTime)
                   "
                 ></omegaup-course>
               </template>
@@ -122,6 +127,7 @@ library.add(fas);
 export default class CourseList extends Vue {
   @Prop() courses!: types.StudentCourses;
   @Prop() loggedIn!: boolean;
+  @Prop() username!: string;
 
   T = T;
 
