@@ -39,6 +39,7 @@
               :popup-displayed="popupDisplayed"
               :guid="guid"
               :problem-alias="problemAlias"
+              :contest-alias="contest.alias"
               :should-show-run-details="shouldShowRunDetails"
               @update:activeTab="
                 (selectedTab) =>
@@ -91,7 +92,6 @@
         :username="contestAdmin && users.length != 0 ? users[0].username : null"
         :clarifications="currentClarifications"
         :is-admin="contestAdmin"
-        :in-contest="true"
         :show-new-clarification-popup="showNewClarificationPopup"
         @new-clarification="
           (contestClarification) =>

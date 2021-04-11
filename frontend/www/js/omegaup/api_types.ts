@@ -81,6 +81,15 @@ export namespace types {
               return x;
             });
           })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -519,6 +528,15 @@ export namespace types {
               return x;
             });
           })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -550,6 +568,15 @@ export namespace types {
               return x;
             });
           })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -581,6 +608,15 @@ export namespace types {
               return x;
             });
           })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -852,6 +888,15 @@ export namespace types {
               return x;
             });
           })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -1000,6 +1045,15 @@ export namespace types {
                 return x;
               });
             })(x.assignments);
+            x.clarifications = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.clarifications);
             if (x.finish_time)
               x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
@@ -1235,6 +1289,15 @@ export namespace types {
               return x;
             });
           })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -1266,6 +1329,15 @@ export namespace types {
               return x;
             });
           })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -1730,6 +1802,7 @@ export namespace types {
     director: string;
     feedback: string;
     finish_time: Date;
+    has_submissions: boolean;
     languages: string[];
     needs_basic_information: boolean;
     opened: boolean;
@@ -1919,6 +1992,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     assignments: types.CourseAssignment[];
+    clarifications: types.Clarification[];
     description: string;
     finish_time?: Date;
     is_admin: boolean;
@@ -2715,6 +2789,7 @@ export namespace types {
     alias: string;
     commit: string;
     difficulty: number;
+    has_submissions: boolean;
     input_limit: number;
     languages: string;
     letter?: string;
@@ -4014,8 +4089,8 @@ export namespace messages {
   export type SessionGoogleLoginResponse = { isAccountCreation: boolean };
 
   // Submission
-  export type SubmissionCreateFeedbackRequest = { [key: string]: any };
-  export type SubmissionCreateFeedbackResponse = {};
+  export type SubmissionSetFeedbackRequest = { [key: string]: any };
+  export type SubmissionSetFeedbackResponse = {};
 
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
@@ -4738,9 +4813,9 @@ export namespace controllers {
   }
 
   export interface Submission {
-    createFeedback: (
-      params?: messages.SubmissionCreateFeedbackRequest,
-    ) => Promise<messages.SubmissionCreateFeedbackResponse>;
+    setFeedback: (
+      params?: messages.SubmissionSetFeedbackRequest,
+    ) => Promise<messages.SubmissionSetFeedbackResponse>;
   }
 
   export interface Tag {

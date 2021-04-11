@@ -503,7 +503,7 @@ export class Arena {
     if (document.getElementById('run-details') != null) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       const self = this;
-      this.runDetailsView = new Vue({
+      self.runDetailsView = new Vue({
         el: '#run-details',
         components: {
           'omegaup-arena-rundetails': arena_RunDetails,
@@ -518,21 +518,27 @@ export class Arena {
               inCourse: self.options.courseAlias !== null,
             },
             on: {
-              'send-feedback': ({
+              'set-feedback': ({
                 guid,
                 feedback,
+                isUpdate,
               }: {
                 guid: string;
                 feedback: string;
+                isUpdate: boolean;
               }) => {
-                api.Submission.createFeedback({
+                api.Submission.setFeedback({
                   guid,
                   course_alias: self.options.courseAlias,
                   assignment_alias: self.options.assignmentAlias,
                   feedback,
                 })
                   .then(() => {
-                    ui.success(T.feedbackSuccesfullyAdded);
+                    ui.success(
+                      isUpdate
+                        ? T.feedbackSuccesfullyUpdated
+                        : T.feedbackSuccesfullyAdded,
+                    );
                     self.hideOverlay();
                   })
                   .catch(ui.error);
