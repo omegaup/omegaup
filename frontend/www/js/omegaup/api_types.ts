@@ -1798,6 +1798,7 @@ export namespace types {
     director: string;
     feedback: string;
     finish_time: Date;
+    has_submissions: boolean;
     languages: string[];
     needs_basic_information: boolean;
     opened: boolean;
@@ -2783,6 +2784,7 @@ export namespace types {
     alias: string;
     commit: string;
     difficulty: number;
+    has_submissions: boolean;
     input_limit: number;
     languages: string;
     letter?: string;

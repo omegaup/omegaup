@@ -72,15 +72,21 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData,
             $contestData
         );
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
+        $details = \OmegaUp\Controllers\Contest::apiAdminDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ]),
+        );
+        $this->assertEquals(false, $details['problems'][0]['has_submissions']);
 
-        $response = \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
+        \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
             $problemData,
             $contestData
         );
-
-        // Validate
-        $this->assertEquals('ok', $response['status']);
-
         $this->assertProblemRemovedFromContest($problemData, $contestData);
     }
 
@@ -480,6 +486,17 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData,
             $identity
         );
+
+        $login = \OmegaUp\Test\ControllerTestCase::login(
+            $contestData['director']
+        );
+        $details = \OmegaUp\Controllers\Contest::apiAdminDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ]),
+        );
+        $this->assertEquals(true, $details['problems'][0]['has_submissions']);
 
         try {
             \OmegaUp\Test\Factories\Contest::removeProblemFromContest(
