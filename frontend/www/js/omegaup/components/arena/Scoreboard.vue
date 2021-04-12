@@ -32,10 +32,7 @@
             :key="user.username"
             :class="user.username"
           >
-            <td
-              class="legend"
-              :style="{ backgroundColor: legendColor(userIndex) }"
-            ></td>
+            <td class="legend" :class="legendClass(userIndex)"></td>
             <td class="position">{{ user.place || '—' }}</td>
             <td class="user">
               {{ ui.rankingUsername(user) }}
@@ -92,22 +89,9 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 
-export const defaultScoreboardColors = [
-  '#FB3F51',
-  '#FF5D40',
-  '#FFA240',
-  '#FFC740',
-  '#59EA3A',
-  '#37DD6F',
-  '#34D0BA',
-  '#3AAACF',
-  '#8144D6',
-  '#CD35D3',
-];
-
 @Component
 export default class ArenaScoreboard extends Vue {
-  @Prop({ default: () => defaultScoreboardColors }) scoreboardColors!: string[];
+  @Prop({ default: 10 }) numberOfPositions!: number;
   @Prop() problems!: omegaup.Problem[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
   @Prop() lastUpdated!: Date;
@@ -123,10 +107,8 @@ export default class ArenaScoreboard extends Vue {
     return !this.lastUpdated ? '' : this.lastUpdated.toString();
   }
 
-  legendColor(idx: number): string {
-    return this.scoreboardColors && idx < this.scoreboardColors.length
-      ? this.scoreboardColors[idx]
-      : '';
+  legendClass(idx: number): string {
+    return idx < this.numberOfPositions ? `legend-${idx + 1}` : '';
   }
 
   renderPoints(p: types.ScoreboardRankingProblem): string {
@@ -230,8 +212,49 @@ export default class ArenaScoreboard extends Vue {
     width: 3.5em;
   }
 
+  .legend-1 {
+    background-color: var(--arena-scoreboard-legend-1-background-color);
+  }
+
+  .legend-2 {
+    background-color: var(--arena-scoreboard-legend-2-background-color);
+  }
+
+  .legend-3 {
+    background-color: var(--arena-scoreboard-legend-3-background-color);
+  }
+
+  .legend-4 {
+    background-color: var(--arena-scoreboard-legend-4-background-color);
+  }
+
+  .legend-5 {
+    background-color: var(--arena-scoreboard-legend-5-background-color);
+  }
+
+  .legend-6 {
+    background-color: var(--arena-scoreboard-legend-6-background-color);
+  }
+
+  .legend-7 {
+    background-color: var(--arena-scoreboard-legend-7-background-color);
+  }
+
+  .legend-8 {
+    background-color: var(--arena-scoreboard-legend-8-background-color);
+  }
+
+  .legend-9 {
+    background-color: var(--arena-scoreboard-legend-9-background-color);
+  }
+
+  .legend-10 {
+    background-color: var(--arena-scoreboard-legend-10-background-color);
+  }
+
   .legend {
     width: 0.5em;
+    opacity: 0.8;
   }
 }
 </style>

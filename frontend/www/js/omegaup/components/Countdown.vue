@@ -45,7 +45,7 @@ export default class Countdown extends Vue {
     if (!this.timerInterval) return;
     clearInterval(this.timerInterval);
     this.timerInterval = 0;
-    this.$emit('emit-finish');
+    this.$emit('finish');
   }
 
   mounted() {

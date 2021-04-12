@@ -195,7 +195,7 @@
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
   - [`/api/session/googleLogin/`](#apisessiongooglelogin)
 - [Submission](#submission)
-  - [`/api/submission/createFeedback/`](#apisubmissioncreatefeedback)
+  - [`/api/submission/setFeedback/`](#apisubmissionsetfeedback)
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
@@ -889,9 +889,9 @@ Get clarifications of problem in a contest
 
 ### Returns
 
-| Name             | Type                           |
-| ---------------- | ------------------------------ |
-| `clarifications` | `types.ProblemClarification[]` |
+| Name             | Type                    |
+| ---------------- | ----------------------- |
+| `clarifications` | `types.Clarification[]` |
 
 ## `/api/contest/problems/`
 
@@ -1588,9 +1588,9 @@ Gets the clarifications of all assignments in a course
 
 ### Returns
 
-| Name             | Type                          |
-| ---------------- | ----------------------------- |
-| `clarifications` | `types.CourseClarification[]` |
+| Name             | Type                    |
+| ---------------- | ----------------------- |
+| `clarifications` | `types.Clarification[]` |
 
 ## `/api/course/clone/`
 
@@ -1867,9 +1867,9 @@ Get clarifications of problem in a contest
 
 ### Returns
 
-| Name             | Type                           |
-| ---------------- | ------------------------------ |
-| `clarifications` | `types.ProblemClarification[]` |
+| Name             | Type                    |
+| ---------------- | ----------------------- |
+| `clarifications` | `types.Clarification[]` |
 
 ## `/api/course/registerForCourse/`
 
@@ -3845,11 +3845,11 @@ contestant's machine and the server.
 
 SubmissionController
 
-## `/api/submission/createFeedback/`
+## `/api/submission/setFeedback/`
 
 ### Description
 
-Adds admin feedback to a submission
+Updates the admin feedback for a submission
 
 ### Parameters
 
