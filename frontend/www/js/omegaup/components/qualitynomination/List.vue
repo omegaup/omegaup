@@ -71,17 +71,39 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th>{{ T.wordsAlias }}</th>
+            <th>
+              <span>
+                {{ T.wordsAlias }}
+                <omegaup-common-sort-controls
+                  ref="sortControlByTitle"
+                  column="title"
+                  :sort-order="sortOrder"
+                  :column-name="columnName"
+                  @apply-filter="onApplyFilter"
+                ></omegaup-common-sort-controls>
+              </span>
+            </th>
             <th v-if="!myView">{{ T.wordsNominator }}</th>
             <th>{{ T.wordsAuthor }}</th>
-            <th>{{ T.wordsSubmissionDate }}</th>
+            <th>
+              <span>
+                {{ T.wordsSubmissionDate }}
+                <omegaup-common-sort-controls
+                  ref="sortControlByTime"
+                  column="time"
+                  :sort-order="sortOrder"
+                  :column-name="columnName"
+                  @apply-filter="onApplyFilter"
+                ></omegaup-common-sort-controls>
+              </span>
+            </th>
             <th v-if="!myView" data-name="reason">{{ T.wordsReason }}</th>
             <th class="text-center">{{ T.wordsStatus }}</th>
             <th><!-- view button --></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="nomination in nominations">
+          <tr v-for="nomination in orderedNominations">
             <td>
               <a :href="problemUrl(nomination.problem.alias)">{{
                 nomination.problem.title
@@ -122,17 +144,20 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 import common_Paginator from '../common/Paginatorv2.vue';
 import { types } from '../../api_types';
 import Autocomplete from '../Autocomplete.vue';
 import * as typeahead from '../../typeahead';
+import common_SortControls from '../common/SortControls.vue';
 
 @Component({
   components: {
     'omegaup-common-paginator': common_Paginator,
     'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-sort-controls': common_SortControls,
   },
 })
 export default class QualityNominationList extends Vue {
@@ -148,6 +173,9 @@ export default class QualityNominationList extends Vue {
   ui = ui;
   typeahead = typeahead;
 
+  sortOrder: omegaup.SortOrder = omegaup.SortOrder.Ascending;
+  columnName = 'title';
+
   queryProblem = '';
   queryUsername = '';
   selectColumn = '';
@@ -156,6 +184,31 @@ export default class QualityNominationList extends Vue {
     nominator_username: T.wordsNominator,
     author_username: T.wordsAuthor,
   };
+
+  get orderedNominations() : types.NominationListItem[] {
+    let order = this.sortOrder === omegaup.SortOrder.Ascending ? -1 : 1;
+    
+    switch (this.columnName) {
+      case 'title':
+        return this.nominations.sort((a, b) => 
+          a.problem.title < b.problem.title ? order : (
+            b.problem.title < a.problem.title ? (-1 * order) : 0
+          )
+        );
+      case 'time':
+        return this.nominations.sort((a, b) => 
+          a.time.getTime() < b.time.getTime() ? order : (
+            b.time.getTime() < a.time.getTime() ? (-1 * order) : 0
+          )
+        );
+      default:
+        return this.nominations.sort((a, b) => 
+          a.problem.title < b.problem.title ? -1 : (
+            b.problem.title < a.problem.title ? 1 : 0
+          )
+        );
+    }
+  }
 
   @Watch('selectColumn')
   onPropertyChanged() {
@@ -192,6 +245,15 @@ export default class QualityNominationList extends Vue {
 
   nominationDetailsUrl(nominationId: number): string {
     return `/nomination/${nominationId}/`;
+  }
+
+  onApplyFilter(columnName: string, sortOrder: string): void {
+    this.columnName = columnName;
+
+    this.sortOrder =
+      sortOrder === omegaup.SortOrder.Ascending
+        ? omegaup.SortOrder.Ascending
+        : omegaup.SortOrder.Descending;
   }
 }
 </script>
