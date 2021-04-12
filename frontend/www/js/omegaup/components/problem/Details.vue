@@ -114,7 +114,7 @@
               v-show="currentPopupDisplayed === PopupDisplayed.RunSubmit"
               :preferred-language="problem.preferred_language"
               :languages="problem.languages"
-              :next-submission-timestamp="nextSubmissionTimestamp"
+              :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
               @dismiss="onPopupDismissed"
               @submit-run="onRunSubmitted"
             ></omegaup-arena-runsubmit-popup>
@@ -355,7 +355,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop() isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
-  @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: null | Date;
+  @Prop() nextSubmissionTimestamp!: null | Date;
   @Prop({ default: false }) shouldShowTabs!: boolean;
   @Prop({ default: false }) shouldShowRunDetails!: boolean;
   @Prop({ default: false }) isContestFinished!: boolean;
