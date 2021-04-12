@@ -13,7 +13,7 @@ import { types } from '../api_types';
 export enum SocketStatus {
   Waiting = '↻',
   Failed = '✗',
-  Ok = '•',
+  Connected = '•',
 }
 
 export interface SocketOptions {
@@ -141,7 +141,7 @@ export class EventsSocket {
         socket.onmessage = (message) => this.onmessage(message);
         socket.onopen = () => {
           this.shouldRetry = true;
-          this.socketStatus = SocketStatus.Ok;
+          this.socketStatus = SocketStatus.Connected;
           this.socketKeepalive = setInterval(
             () => socket.send('"ping"'),
             30000,
