@@ -2,8 +2,7 @@ jest.mock('../../../third_party/js/diff_match_patch.js');
 
 import { types } from '../api_types';
 import { OmegaUp } from '../omegaup';
-import * as socket from './events_socket';
-import { SocketStatus } from './events_socket';
+import { SocketOptions, SocketStatus, EventsSocket } from './events_socket';
 import WS from 'jest-websocket-mock';
 
 describe('socket', () => {
@@ -26,7 +25,7 @@ describe('socket', () => {
     },
   ];
 
-  const options = {
+  const options: SocketOptions = {
     disableSockets: false,
     problemsetAlias: 'hello',
     locationProtocol: 'https',
@@ -47,28 +46,26 @@ describe('socket', () => {
     });
 
     it('can be instantiated', () => {
-      const mySocket = new socket.EventsSocket(options);
-      expect(mySocket.shouldRetry).toEqual(false);
-      expect(mySocket.retries).toEqual(10);
-      expect(mySocket.socketStatus).toEqual(SocketStatus.Waiting);
+      const socket = new EventsSocket(options);
+      expect(socket.shouldRetry).toEqual(false);
+      expect(socket.retries).toEqual(10);
+      expect(socket.socketStatus).toEqual(SocketStatus.Waiting);
 
-      mySocket.connect();
-      expect(mySocket.socketStatus).toEqual(SocketStatus.Waiting);
+      socket.connect();
+      expect(socket.socketStatus).toEqual(SocketStatus.Waiting);
     });
 
-    it('should handle socket when is disabled', () => {
-      const mySocket = new socket.EventsSocket(
-        Object.assign({}, options, { disableSockets: true }),
-      );
-      expect(mySocket.shouldRetry).toEqual(false);
-      expect(mySocket.retries).toEqual(10);
-      expect(mySocket.socketStatus).toEqual(SocketStatus.Waiting);
+    it('should handle socket when it is disabled', () => {
+      const socket = new EventsSocket({ ...options, disableSockets: true });
+      expect(socket.shouldRetry).toEqual(false);
+      expect(socket.retries).toEqual(10);
+      expect(socket.socketStatus).toEqual(SocketStatus.Waiting);
 
-      mySocket.connect();
-      expect(mySocket.socketStatus).toEqual(SocketStatus.Failed);
+      socket.connect();
+      expect(socket.socketStatus).toEqual(SocketStatus.Failed);
     });
 
-    it('should handle socket when is closed', async () => {
+    it('should handle socket when it is closed', async () => {
       const server = new WS('ws://localhost:1234');
       server.on('connection', (socket) => {
         socket.close({ wasClean: false, code: 1003, reason: 'any' });
@@ -88,50 +85,31 @@ describe('socket', () => {
       await server.closed;
       expect(client.readyState).toBe(WebSocket.CLOSED);
 
-      const mySocket = new socket.EventsSocket(
+      const socket = new EventsSocket(
         Object.assign({}, options, { disableSockets: false }),
       );
 
-      expect(mySocket.shouldRetry).toEqual(false);
-      expect(mySocket.retries).toEqual(10);
-      expect(mySocket.socketStatus).toEqual(SocketStatus.Waiting);
+      expect(socket.shouldRetry).toEqual(false);
+      expect(socket.retries).toEqual(10);
+      expect(socket.socketStatus).toEqual(SocketStatus.Waiting);
 
-      mySocket.connect();
-      expect(mySocket.socketStatus).toEqual(SocketStatus.Waiting);
+      socket.connect();
+      expect(socket.socketStatus).toEqual(SocketStatus.Waiting);
 
       WS.clean();
     });
 
-    it('should handle socket when send mesages', async () => {
-      const server = new WS('ws://localhost:1234');
-      const client = new WebSocket('ws://localhost:1234');
-
-      await server.connected;
-      client.send('hello');
-      server.send('hello everyone');
-      await expect(server).toReceiveMessage('hello');
-      expect(server).toHaveReceivedMessages(['hello']);
-
-      const messages: { client: string[] } = { client: [] };
-      client.onmessage = (e: MessageEvent) => {
-        messages.client.push(e.data);
-      };
-
-      server.send('hello everyone');
-      expect(messages).toEqual({
-        client: ['hello everyone'],
-      });
-
-      const mySocket = new socket.EventsSocket(
+    it('should handle socket when it sends messages', async () => {
+      const socket = new EventsSocket(
         Object.assign({}, options, { disableSockets: false }),
       );
 
-      expect(mySocket.shouldRetry).toEqual(false);
-      expect(mySocket.retries).toEqual(10);
-      expect(mySocket.socketStatus).toEqual(SocketStatus.Waiting);
+      expect(socket.shouldRetry).toEqual(false);
+      expect(socket.retries).toEqual(10);
+      expect(socket.socketStatus).toEqual(SocketStatus.Waiting);
 
-      mySocket.connect();
-      expect(mySocket.socketStatus).toEqual(SocketStatus.Waiting);
+      socket.connect();
+      expect(socket.socketStatus).toEqual(SocketStatus.Waiting);
 
       WS.clean();
     });

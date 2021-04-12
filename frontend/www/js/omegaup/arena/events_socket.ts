@@ -23,6 +23,9 @@ export interface SocketOptions {
   locationHost: string;
   problemsetId: number;
   scoreboardToken: null | string;
+  socketStatus: SocketStatus;
+  clarificationInterval: ReturnType<typeof setTimeout> | null;
+  rankingInterval: ReturnType<typeof setTimeout> | null;
   clarificationsOffset: number;
   clarificationsRowcount: number;
   currentUsername: string;
@@ -70,6 +73,9 @@ export class EventsSocket {
     this.clarificationsRowcount = clarificationsRowcount;
     this.currentUsername = currentUsername;
     this.navbarProblems = navbarProblems;
+    this.socketStatus = SocketStatus.Waiting;
+    this.clarificationInterval = null;
+    this.rankingInterval = null;
 
     const protocol = locationProtocol === 'https:' ? 'wss:' : 'ws:';
     const host = locationHost;
