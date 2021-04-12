@@ -185,27 +185,33 @@ export default class QualityNominationList extends Vue {
     author_username: T.wordsAuthor,
   };
 
-  get orderedNominations() : types.NominationListItem[] {
+  get orderedNominations(): types.NominationListItem[] {
     let order = this.sortOrder === omegaup.SortOrder.Ascending ? -1 : 1;
-    
+
     switch (this.columnName) {
       case 'title':
-        return this.nominations.sort((a, b) => 
-          a.problem.title < b.problem.title ? order : (
-            b.problem.title < a.problem.title ? (-1 * order) : 0
-          )
+        return this.nominations.sort((a, b) =>
+          a.problem.title < b.problem.title
+            ? order
+            : b.problem.title < a.problem.title
+            ? -1 * order
+            : 0,
         );
       case 'time':
-        return this.nominations.sort((a, b) => 
-          a.time.getTime() < b.time.getTime() ? order : (
-            b.time.getTime() < a.time.getTime() ? (-1 * order) : 0
-          )
+        return this.nominations.sort((a, b) =>
+          a.time.getTime() < b.time.getTime()
+            ? order
+            : b.time.getTime() < a.time.getTime()
+            ? -1 * order
+            : 0,
         );
       default:
-        return this.nominations.sort((a, b) => 
-          a.problem.title < b.problem.title ? -1 : (
-            b.problem.title < a.problem.title ? 1 : 0
-          )
+        return this.nominations.sort((a, b) =>
+          a.problem.title < b.problem.title
+            ? -1
+            : b.problem.title < a.problem.title
+            ? 1
+            : 0,
         );
     }
   }
