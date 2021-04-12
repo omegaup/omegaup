@@ -16,7 +16,7 @@
               {{ T.contestWillBeginIn }}
               <omegaup-countdown
                 :target-time="contest.start_time"
-                @emit-finish="now = Date.now()"
+                @finish="now = Date.now()"
               ></omegaup-countdown>
             </p>
           </div>
