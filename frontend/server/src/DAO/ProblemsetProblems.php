@@ -105,7 +105,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
      * Get problemset problems including problemset alias, points, and order
      *
-     * @return list<array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
+     * @return list<array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
      */
     final public static function getProblemsByProblemset(
         int $problemsetId
@@ -124,6 +124,10 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     IFNULL(p.difficulty, 0.0) AS difficulty,
                     pp.order,
                     p.languages,
+                    IFNULL(
+                        COUNT(s.submission_id),
+                        0
+                    ) > 0 AS has_submissions,
                     pp.points,
                     pp.commit,
                     pp.version
@@ -133,12 +137,21 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     Problemset_Problems pp
                 ON
                     pp.problem_id = p.problem_id
+                LEFT JOIN
+                    Submissions s
+                ON
+                    s.problem_id = p.problem_id AND
+                    s.problemset_id = pp.problemset_id AND
+                    s.`type` = "normal"
                 WHERE
                     pp.problemset_id = ?
+                GROUP BY
+                    p.problem_id,
+                    pp.problemset_id
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, has_submissions: int, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
@@ -146,13 +159,14 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         $problems = [];
         foreach ($rs as $problem) {
             $problem['accepts_submissions'] = !empty($problem['languages']);
+            $problem['has_submissions'] = boolval($problem['has_submissions']);
             $problems[] = $problem;
         }
         return $problems;
     }
 
     /**
-     * @return list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
+     * @return list<array{accepted: int, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
      */
     final public static function getProblemsByAssignmentAlias(
         string $assignmentAlias,
@@ -173,6 +187,10 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     pp.order,
                     ps.languages AS problemset_languages,
                     p.languages,
+                    IFNULL(
+                        COUNT(s.submission_id),
+                        0
+                    ) > 0 AS has_submissions,
                     pp.points,
                     pp.commit,
                     pp.version
@@ -194,18 +212,30 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     Courses c
                 ON
                     c.course_id = a.course_id
+                LEFT JOIN
+                    Submissions s
+                ON
+                    s.problem_id = p.problem_id AND
+                    s.problemset_id = pp.problemset_id AND
+                    s.`type` = "normal"
                 WHERE
                     a.alias = ?
                     AND c.alias = ?
+                GROUP BY
+                    a.assignment_id,
+                    c.course_id,
+                    p.problem_id,
+                    pp.problemset_id
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, problemset_languages: null|string, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
-        $problems = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, has_submissions: int, input_limit: int, languages: string, order: int, points: float, problem_id: int, problemset_languages: null|string, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$assignmentAlias, $courseAlias]
         );
-        foreach ($problems as &$problem) {
+        $problems = [];
+        foreach ($rs as &$problem) {
             // There are languages in problemset table, so we can get the list
             // directly from that table
             if (!is_null($problem['problemset_languages'])) {
@@ -214,7 +244,9 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     explode(',', $problem['languages'])
                 ));
             }
+            $problem['has_submissions'] = boolval($problem['has_submissions']);
             unset($problem['problemset_languages']);
+            $problems[] = $problem;
         }
         return $problems;
     }
