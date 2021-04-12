@@ -68,7 +68,7 @@
           "
           :clarifications="currentClarifications"
           :is-admin="course.is_admin || course.is_curator"
-          :filter-assignments="true"
+          :allow-filter-by-assignment="true"
           :show-new-clarification-popup="showNewClarificationPopup"
           @new-clarification="(request) => $emit('new-clarification', request)"
           @clarification-response="

@@ -35,7 +35,7 @@
         </div>
       </slot>
       <div class="form-inline">
-        <label v-if="filterAssignments">
+        <label v-if="allowFilterByAssignment">
           {{ T.wordsFilterByHomework }}
           <select
             v-model="selectedAssignment"
@@ -46,11 +46,11 @@
               :key="assignmentName"
               :value="assignmentName"
             >
-              {{ assignmentName }}
+              {{ assignmentName ? assignmentName : '' }}
             </option>
           </select>
         </label>
-        <label :class="{ 'ml-4': filterAssignments }">
+        <label :class="{ 'ml-4': allowFilterByAssignment }">
           {{ T.wordsFilterByProblem }}
           <select
             v-model="selectedProblem"
@@ -130,13 +130,13 @@ export default class ArenaClarificationList extends Vue {
   @Prop() problemAlias!: null | string;
   @Prop() username!: null | string;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
-  @Prop({ default: false }) filterAssignments!: boolean;
+  @Prop({ default: false }) allowFilterByAssignment!: boolean;
 
   T = T;
   PopupDisplayed = PopupDisplayed;
   currentPopupDisplayed = this.popupDisplayed;
-  selectedAssignment = null;
-  selectedProblem = null;
+  selectedAssignment: string | null = null;
+  selectedProblem: string | null = null;
 
   onNewClarification(): void {
     this.currentPopupDisplayed = PopupDisplayed.NewClarification;
@@ -147,19 +147,13 @@ export default class ArenaClarificationList extends Vue {
     this.$emit('update:activeTab', 'clarifications');
   }
 
-  get assignmentsNames(): string[] {
-    return this.filterAssignments
+  get assignmentsNames(): Array<string | null> {
+    return this.allowFilterByAssignment
       ? [
           ...new Set(
-            this.clarifications.map((clarification) => {
-              if (
-                'assignment_alias' in clarification &&
-                clarification.assignment_alias
-              ) {
-                return clarification.assignment_alias;
-              }
-              return '';
-            }),
+            this.clarifications.map(
+              (clarification) => clarification.assignment_alias ?? null,
+            ),
           ),
         ]
       : [];
@@ -174,17 +168,13 @@ export default class ArenaClarificationList extends Vue {
   }
 
   get filteredClarifications(): types.Clarification[] {
-    return this.clarifications.filter((clarification) => {
-      if (
+    return this.clarifications.filter(
+      (clarification) =>
         (this.selectedAssignment === null ||
           clarification.assignment_alias === this.selectedAssignment) &&
         (this.selectedProblem === null ||
-          clarification.problem_alias === this.selectedProblem)
-      ) {
-        return true;
-      }
-      return false;
-    });
+          clarification.problem_alias === this.selectedProblem),
+    );
   }
 
   @Watch('showNewClarificationPopup')
