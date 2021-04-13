@@ -175,8 +175,8 @@
         <omegaup-common-requests
           :data="requests"
           :text-add-participant="T.contestAdduserAddContestant"
-          @emit-accept-request="(username) => $emit('accept-request', username)"
-          @emit-deny-request="(username) => $emit('deny-request', username)"
+          @accept-request="(username) => $emit('accept-request', username)"
+          @deny-request="(username) => $emit('deny-request', username)"
         ></omegaup-common-requests>
         <omegaup-contest-groups
           :groups="groups"
