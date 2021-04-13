@@ -127,13 +127,13 @@ describe('socket', () => {
       const server = new WS('ws://localhost:1234');
       const socket = new EventsSocket({ ...options, disableSockets: false });
 
-      await server.connected;
-
       expect(socket.shouldRetry).toEqual(false);
       expect(socket.retries).toEqual(10);
       expect(socket.socketStatus).toEqual(SocketStatus.Waiting);
 
       socket.connect();
+      await server.connected;
+
       expect(socket.socketStatus).toEqual(SocketStatus.Waiting);
 
       WS.clean();
