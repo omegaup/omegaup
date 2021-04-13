@@ -28,17 +28,15 @@ describe('socket', () => {
   const options: SocketOptions = {
     disableSockets: false,
     problemsetAlias: 'hello',
-    locationProtocol: 'https',
-    locationHost: 'localhost',
+    locationProtocol: 'http',
+    locationHost: 'localhost:1234',
     problemsetId: 1,
     scoreboardToken: 'token',
-    socketStatus: SocketStatus.Waiting,
-    clarificationInterval: null,
-    rankingInterval: null,
     clarificationsOffset: 1,
     clarificationsRowcount: 30,
     navbarProblems: navbarProblems,
     currentUsername: 'omegaUp',
+    intervalInMiliSeconds: 500,
   };
   describe('EventsSocket', () => {
     beforeEach(() => {
@@ -70,39 +68,66 @@ describe('socket', () => {
       server.on('connection', (socket) => {
         socket.close({ wasClean: false, code: 1003, reason: 'any' });
       });
-      const client = new WebSocket('ws://localhost:1234');
-      client.onclose = (event: CloseEvent) => {
-        expect(event.code).toBe(1003);
-        expect(event.wasClean).toBe(false);
-        expect(event.reason).toBe('any');
-      };
+      const client = new EventsSocket({ ...options, disableSockets: true });
 
-      expect(client.readyState).toBe(WebSocket.CONNECTING);
+      expect(client.shouldRetry).toEqual(false);
+      expect(client.retries).toEqual(10);
+      expect(client.socketStatus).toEqual(SocketStatus.Waiting);
 
-      await server.connected;
-      expect(client.readyState).toBe(WebSocket.CLOSING);
-
-      await server.closed;
-      expect(client.readyState).toBe(WebSocket.CLOSED);
-
-      const socket = new EventsSocket(
-        Object.assign({}, options, { disableSockets: false }),
-      );
-
-      expect(socket.shouldRetry).toEqual(false);
-      expect(socket.retries).toEqual(10);
-      expect(socket.socketStatus).toEqual(SocketStatus.Waiting);
-
-      socket.connect();
-      expect(socket.socketStatus).toEqual(SocketStatus.Waiting);
+      client.connect();
+      expect(client.socketStatus).toEqual(SocketStatus.Failed);
 
       WS.clean();
     });
 
     it('should handle socket when it sends messages', async () => {
-      const socket = new EventsSocket(
-        Object.assign({}, options, { disableSockets: false }),
-      );
+      fetchMock.enableMocks();
+      fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
+        if (req.url == '/api/contest/clarifications/') {
+          return Promise.resolve({
+            status: 200,
+            body: JSON.stringify({
+              clarifications: [],
+              status: 'ok',
+            }),
+          });
+        } else if (req.url == '/api/problemset/scoreboard/') {
+          return Promise.resolve({
+            status: 200,
+            body: JSON.stringify({
+              finish_time: null,
+              problems: [],
+              ranking: [],
+              start_time: new Date(),
+              time: new Date(),
+              title: 'someTitle',
+              status: 'ok',
+            }),
+          });
+        } else if (req.url == '/api/problemset/scoreboardEvents/') {
+          return Promise.resolve({
+            status: 200,
+            body: JSON.stringify({
+              events: [],
+              status: 'ok',
+            }),
+          });
+        }
+        return Promise.resolve({
+          ok: false,
+          status: 404,
+          body: JSON.stringify({
+            status: 'error',
+            error: `Invalid call to "${req.url}" in test`,
+            errorcode: 403,
+          }),
+        });
+      });
+
+      const server = new WS('ws://localhost:1234');
+      const socket = new EventsSocket({ ...options, disableSockets: false });
+
+      await server.connected;
 
       expect(socket.shouldRetry).toEqual(false);
       expect(socket.retries).toEqual(10);
