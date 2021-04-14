@@ -146,9 +146,10 @@
             }}</a>
           </td>
           <td class="text-right">{{ problem.points }}</td>
-          <td class="text-center" data-remove-problem>
+          <td class="text-center">
             <button
               v-tooltip="T.problemEditFormUpdateProblem"
+              data-update-problem
               class="btn btn-link"
               @click="onEdit(problem)"
             >
@@ -157,6 +158,7 @@
             <button
               v-if="problem.has_submissions"
               v-tooltip="T.cannotRemoveProblemWithSubmissions"
+              data-remove-problem-disabled
               class="btn btn-link"
               data-toggle="tooltip"
               data-placement="bottom"
@@ -166,6 +168,7 @@
             <button
               v-else
               v-tooltip="T.contestAddproblemProblemRemove"
+              data-remove-problem
               class="btn btn-link"
               @click="onRemove(problem)"
             >
@@ -253,7 +256,6 @@ export default class AddProblem extends Vue {
           ? this.selectedRevision.commit
           : undefined,
     });
-    //this.useLatestVersion = true;
     this.alias = null;
   }
 
