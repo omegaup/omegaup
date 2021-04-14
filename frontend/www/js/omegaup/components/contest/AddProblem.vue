@@ -248,13 +248,16 @@ export default class AddProblem extends Vue {
 
   onAddProblem(): void {
     this.$emit('add-problem', {
-      order: this.order,
-      alias: this.alias,
-      points: this.points,
-      commit:
-        !this.useLatestVersion && this.selectedRevision
-          ? this.selectedRevision.commit
-          : undefined,
+      problem: {
+        order: this.order,
+        alias: this.alias,
+        points: this.points,
+        commit:
+          !this.useLatestVersion && this.selectedRevision
+            ? this.selectedRevision.commit
+            : undefined,
+      },
+      isUpdate: this.problemToUpdate,
     });
     this.alias = null;
   }

@@ -795,6 +795,7 @@ const translations: { [key: string]: string; } = {
   problemSolutionNotVisible: "Voc\u00ea n\u00e3o tem permiss\u00e3o para visualizar a solu\u00e7\u00e3o do problema. Tente resolver o problema primeiro.",
   problemSuccessfullyAdded: "Problema adicionado com sucesso",
   problemSuccessfullyRemoved: "Problema removido com sucesso",
+  problemSuccessfullyUpdated: "Problema atualizado com sucesso",
   problemTagAnalysisOfRecurrences: "An\u00e1lise de recorr\u00eancias",
   problemTagAnalyticGeometry: "Geometria anal\u00edtica",
   problemTagArithmetic: "Aritm\u00e9tica",

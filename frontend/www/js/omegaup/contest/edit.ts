@@ -173,7 +173,13 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'add-problem': (problem: types.ProblemsetProblem) => {
+          'add-problem': ({
+            problem,
+            isUpdate,
+          }: {
+            problem: types.ProblemsetProblem;
+            isUpdate: boolean;
+          }) => {
             api.Contest.addProblem({
               contest_alias: payload.details.alias,
               order_in_contest: problem.order,
@@ -182,8 +188,12 @@ OmegaUp.on('ready', () => {
               commit: problem.commit,
             })
               .then(() => {
-                ui.success(T.problemSuccessfullyAdded);
                 this.refreshProblems();
+                if (isUpdate) {
+                  ui.success(T.problemSuccessfullyUpdated);
+                  return;
+                }
+                ui.success(T.problemSuccessfullyAdded);
               })
               .catch(ui.apiError);
           },
