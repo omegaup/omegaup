@@ -110,9 +110,12 @@ describe('AddProblem.vue', () => {
     expect(wrapper.emitted('add-problem')).toEqual([
       [
         {
-          ...updatedProblem,
-          alias: 'problem',
-          commit: undefined,
+          isUpdate: true,
+          problem: {
+            ...updatedProblem,
+            alias: 'problem',
+            commit: undefined,
+          },
         },
       ],
     ]);
