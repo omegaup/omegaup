@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import { types } from '../../api_types';
 
 import T from '../../lang';
 
@@ -11,10 +12,10 @@ describe('Requests.vue', () => {
       admin: {
         username: 'test_user',
       },
-      country: null,
       last_update: new Date(),
       request_time: new Date(),
       username: 'test_user',
+      classname: 'user-rank-unranked',
     },
   ];
 
