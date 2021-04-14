@@ -3,9 +3,16 @@
     <div class="card-body">
       <form class="form" @submit.prevent="onSubmit">
         <div class="row">
-          <div class="form-group col-md-6">
-            <label>{{ T.wordsProblem }}</label>
+          <div class="form-group col-md-12">
+            <label class="font-weight-bold">{{ T.wordsProblem }}</label>
+            <input
+              v-if="problemToUpdate"
+              :value="alias"
+              class="form-control"
+              disabled="disabled"
+            />
             <omegaup-common-typeahead
+              v-else
               :existing-options="searchResultProblems"
               :value.sync="alias"
               @update-existing-options="
@@ -14,8 +21,10 @@
             >
             </omegaup-common-typeahead>
           </div>
+        </div>
+        <div v-if="alias" class="row">
           <div class="form-group col-md-6">
-            <label for="use-latest-version">{{
+            <label for="use-latest-version" class="font-weight-bold">{{
               T.contestAddproblemChooseVersion
             }}</label>
             <div class="form-control">
@@ -45,18 +54,29 @@
               </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label>{{ T.contestAddproblemProblemPoints }}</label>
+          <div class="form-group col-md-3">
+            <label class="font-weight-bold"
+              >{{ T.wordsPoints }}
+              <font-awesome-icon
+                :title="T.contestAddproblemProblemPoints"
+                icon="info-circle"
+              />
+            </label>
             <input
               v-model="points"
               class="form-control problem-points"
               size="3"
+              type="number"
             />
           </div>
-          <div class="form-group col-md-6">
-            <label>{{ T.contestAddproblemContestOrder }}</label>
+          <div class="form-group col-md-3">
+            <label class="font-weight-bold"
+              >{{ T.contestAddproblemProblemOrder }}
+              <font-awesome-icon
+                :title="T.contestAddproblemContestOrder"
+                icon="info-circle"
+              />
+            </label>
             <input
               v-model="order"
               class="form-control"
@@ -66,27 +86,28 @@
             />
           </div>
         </div>
-        <div v-show="!useLatestVersion" class="form-group">
-          <button
-            class="btn btn-primary get-versions"
-            type="submit"
-            :disabled="alias == ''"
-            @click.prevent="onSubmit"
-          >
-            {{ T.wordsGetVersions }}
-          </button>
-          <small class="form-text text-muted">
-            {{ T.selectProblemToGetVersions }}
-          </small>
-        </div>
-        <omegaup-problem-versions
-          v-show="!useLatestVersion"
-          v-model="selectedRevision"
-          :log="versionLog"
-          :published-revision="publishedRevision"
-          :show-footer="false"
-          @runs-diff="onRunsDiff"
-        ></omegaup-problem-versions>
+        <template v-if="!useLatestVersion && alias !== null">
+          <div class="form-group">
+            <button
+              class="btn btn-primary get-versions"
+              type="submit"
+              :disabled="alias == ''"
+              @click.prevent="onSubmit"
+            >
+              {{ T.wordsGetVersions }}
+            </button>
+            <small class="form-text text-muted">
+              {{ T.selectProblemToGetVersions }}
+            </small>
+          </div>
+          <omegaup-problem-versions
+            v-model="selectedRevision"
+            :log="versionLog"
+            :published-revision="publishedRevision"
+            :show-footer="false"
+            @runs-diff="onRunsDiff"
+          ></omegaup-problem-versions>
+        </template>
         <div class="form-group">
           <button
             class="btn btn-primary add-problem"
@@ -96,34 +117,28 @@
           >
             {{ addProblemButtonLabel }}
           </button>
+          <button
+            class="btn btn-secondary mx-3"
+            type="reset"
+            :disabled="addProblemButtonDisabled"
+            @click.prevent="alias = null"
+          >
+            {{ T.wordsCancel }}
+          </button>
         </div>
       </form>
     </div>
     <table class="table table-striped mb-0">
       <thead>
         <tr>
-          <th></th>
           <th class="text-center">{{ T.contestAddproblemContestOrder }}</th>
           <th class="text-center">{{ T.contestAddproblemProblemName }}</th>
           <th class="text-center">{{ T.contestAddproblemProblemPoints }}</th>
-          <th class="text-center">{{ T.contestAddproblemProblemRemove }}</th>
+          <th class="text-center">{{ T.wordsActions }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="problem in problems" :key="problem.alias">
-          <td>
-            <button
-              class="btn btn-default"
-              type="button"
-              :aria-label="T.wordsEdit"
-              @click.prevent="onEdit(problem)"
-            >
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-pencil"
-              ></span>
-            </button>
-          </td>
           <td class="text-center">{{ problem.order }}</td>
           <td>
             <a :href="`/arena/problem/${problem.alias}/`">{{
@@ -133,19 +148,28 @@
           <td class="text-right">{{ problem.points }}</td>
           <td class="text-center" data-remove-problem>
             <button
-              v-if="!problem.has_submissions"
-              class="close float-none"
-              @click="onRemove(problem)"
+              v-tooltip="T.problemEditFormUpdateProblem"
+              class="btn btn-link"
+              @click="onEdit(problem)"
             >
-              ×
+              <font-awesome-icon icon="edit" />
+            </button>
+            <button
+              v-if="problem.has_submissions"
+              v-tooltip="T.cannotRemoveProblemWithSubmissions"
+              class="btn btn-link"
+              data-toggle="tooltip"
+              data-placement="bottom"
+            >
+              <font-awesome-icon icon="trash" class="disabled text-secondary" />
             </button>
             <button
               v-else
-              class="close float-none"
-              disabled="disabled"
-              :title="T.cannotRemoveProblemWithSubmissions"
+              v-tooltip="T.contestAddproblemProblemRemove"
+              class="btn btn-link"
+              @click="onRemove(problem)"
             >
-              🚫
+              <font-awesome-icon icon="trash" />
             </button>
           </td>
         </tr>
@@ -161,6 +185,17 @@ import T from '../../lang';
 
 import problem_Versions from '../problem/Versions.vue';
 import common_Typeahead from '../common/Typeahead.vue';
+import 'v-tooltip/dist/v-tooltip.css';
+import { VTooltip } from 'v-tooltip';
+
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
 
 const emptyCommit: types.ProblemVersion = {
   author: {},
@@ -176,6 +211,12 @@ const emptyCommit: types.ProblemVersion = {
   components: {
     'omegaup-problem-versions': problem_Versions,
     'omegaup-common-typeahead': common_Typeahead,
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
+  },
+  directives: {
+    tooltip: VTooltip,
   },
 })
 export default class AddProblem extends Vue {
@@ -185,7 +226,7 @@ export default class AddProblem extends Vue {
   @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
-  alias = '';
+  alias: null | string = null;
   points = this.initialPoints;
   order = this.initialProblems.length + 1;
   problems = this.initialProblems;
@@ -212,6 +253,8 @@ export default class AddProblem extends Vue {
           ? this.selectedRevision.commit
           : undefined,
     });
+    //this.useLatestVersion = true;
+    this.alias = null;
   }
 
   onEdit(problem: types.ProblemsetProblem): void {
@@ -241,11 +284,18 @@ export default class AddProblem extends Vue {
     this.$emit('runs-diff', this.alias, versions, selectedCommit);
   }
 
-  get addProblemButtonLabel(): string {
+  get problemToUpdate(): boolean {
     for (const problem of this.problems) {
       if (this.alias === problem.alias) {
-        return T.wordsUpdateProblem;
+        return true;
       }
+    }
+    return false;
+  }
+
+  get addProblemButtonLabel(): string {
+    if (this.problemToUpdate) {
+      return T.wordsUpdateProblem;
     }
     return T.wordsAddProblem;
   }
