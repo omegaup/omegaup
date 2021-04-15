@@ -35,7 +35,9 @@ describe('Requests.vue', () => {
 
     await wrapper.find('button.text-danger').trigger('click');
     expect(wrapper.emitted('deny-request')).toBeDefined();
-    expect(wrapper.emitted('deny-request')).toEqual([['test_user']]);
+    expect(wrapper.emitted('deny-request')).toEqual([
+      [{ username: 'test_user' }],
+    ]);
   });
 
   it('Should handle accept request event', async () => {
@@ -43,6 +45,8 @@ describe('Requests.vue', () => {
 
     await wrapper.find('button.text-success').trigger('click');
     expect(wrapper.emitted('accept-request')).toBeDefined();
-    expect(wrapper.emitted('accept-request')).toEqual([['test_user']]);
+    expect(wrapper.emitted('accept-request')).toEqual([
+      [{ username: 'test_user' }],
+    ]);
   });
 });

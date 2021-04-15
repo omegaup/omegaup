@@ -44,13 +44,13 @@
           <td v-if="!request.accepted" class="text-center">
             <button
               class="close float-none text-danger mx-2"
-              @click="$emit('deny-request', request.username)"
+              @click="$emit('deny-request', { username: request.username })"
             >
               ×
             </button>
             <button
               class="close float-none text-success mx-2"
-              @click="$emit('accept-request', request.username)"
+              @click="$emit('accept-request', { username: request.username })"
             >
               ✓
             </button>

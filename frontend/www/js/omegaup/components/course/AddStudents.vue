@@ -78,8 +78,8 @@
     <omegaup-common-requests
       :data="identityRequests"
       :text-add-participant="T.wordsAddStudent"
-      @accept-request="(username) => $emit('accept-request', username)"
-      @deny-request="(username) => $emit('deny-request', username)"
+      @accept-request="(request) => $emit('accept-request', request)"
+      @deny-request="(request) => $emit('deny-request', request)"
     ></omegaup-common-requests>
   </div>
 </template>
