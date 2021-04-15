@@ -2439,13 +2439,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $lang
      * @omegaup-request-param bool|null $prevent_problemset_open
      * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param int|null $problemset_id
      * @omegaup-request-param bool|null $show_solvers
      * @omegaup-request-param null|string $statement_type
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $showSolvers = $r->ensureOptionalBool('show_solvers') ?? false;
-        $preventProblemsetOptin = $r->ensureOptionalBool(
+        $preventProblemsetOpen = $r->ensureOptionalBool(
             'prevent_problemset_open'
         ) ?? false;
         $contestAlias = $r->ensureOptionalString(
@@ -2474,7 +2474,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $contestAlias,
             $problemAlias,
             $r->ensureOptionalString('statement_type') ?? '',
-            !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
+            $r->ensureOptionalInt('problemset_id')
         );
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -2487,7 +2487,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problemset,
             $lang,
             $showSolvers,
-            boolval($r['prevent_problemset_open']),
+            $preventProblemsetOpen,
             $contestAlias
         );
         if (is_null($details)) {

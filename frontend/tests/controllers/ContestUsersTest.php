@@ -403,6 +403,56 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testProblemsInContestPracticeForNonRegisteredUsers() {
+        // Get a contest in the past
+        $startTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 120 * 60);
+        $finishTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 60 * 60);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'startTime' => $startTime,
+                'finishTime' => $finishTime,
+                'admissionMode' => 'public',
+            ])
+        );
+        $problems = \OmegaUp\Test\Factories\Contest::insertProblemsInContest(
+            $contestData
+        );
+        // One more problem, but in this case, it is private
+        $login = self::login($contestData['director']);
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'private',
+            ]),
+            $login
+        );
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contestData
+        );
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $userLogin = self::login($identity);
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestPracticeDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        // Users should be able to see all the problems
+        foreach ($contestDetails['problems'] as $problem) {
+            $problemDetails = \OmegaUp\Controllers\Problem::apiDetails(
+                new \OmegaUp\Request([
+                    'auth_token' => $userLogin->auth_token,
+                    'problem_alias' => $problem['alias'],
+                    'prevent_problemset_open' => false,
+                    'contest_alias' => $contestData['request']['alias'],
+                ])
+            );
+            $this->assertEquals($problemDetails['alias'], $problem['alias']);
+        }
+    }
+
     public function testPrivateContestPracticeForNonRegisteredUsers() {
         // Get a contest in the past
         $startTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 120 * 60);

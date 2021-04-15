@@ -1605,9 +1605,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ),
         ]));
 
-        // When the user joins a contest in practice mode, saving first access
-        // time is not necessary
+        // Check and save first access time in practice mode is necessary to
+        // make user explicitly joins the contest
         if ($isPracticeMode) {
+            \OmegaUp\DAO\ProblemsetIdentities::checkAndSaveFirstTimeAccess(
+                $identity,
+                $contest,
+                /*$grantAccess=*/true
+            );
             return $result;
         }
 
