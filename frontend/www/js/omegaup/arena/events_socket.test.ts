@@ -123,8 +123,11 @@ describe('socket', () => {
           }),
         });
       });
+      const selectProtocol = () => 'com.omegaup.events';
 
-      const server = new WS('ws://localhost:1234');
+      const server = new WS(`ws://${options.locationHost}/events/`, {
+        selectProtocol,
+      });
       const socket = new EventsSocket({ ...options, disableSockets: false });
 
       expect(socket.shouldRetry).toEqual(false);
@@ -134,7 +137,7 @@ describe('socket', () => {
       socket.connect();
       await server.connected;
 
-      expect(socket.socketStatus).toEqual(SocketStatus.Waiting);
+      expect(socket.socketStatus).toEqual(SocketStatus.Connected);
 
       WS.clean();
     });
