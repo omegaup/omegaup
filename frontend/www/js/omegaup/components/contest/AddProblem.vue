@@ -6,8 +6,8 @@
           <div class="form-group col-md-12">
             <label class="font-weight-bold">{{ T.wordsProblem }}</label>
             <input
-              v-if="problemToUpdate"
-              :value="alias"
+              v-if="isUpdate"
+              :value="title"
               class="form-control"
               disabled="disabled"
             />
@@ -24,43 +24,23 @@
         </div>
         <div v-if="alias" class="row">
           <div class="form-group col-md-6">
-            <label for="use-latest-version" class="font-weight-bold">{{
-              T.contestAddproblemChooseVersion
-            }}</label>
-            <div class="form-control">
-              <div class="form-check form-check-inline">
-                <label class="form-check-label">
-                  <input
-                    v-model="useLatestVersion"
-                    class="form-check-input"
-                    type="radio"
-                    name="use-latest-version"
-                    :value="true"
-                  />
-                  {{ T.contestAddproblemLatestVersion }}
-                </label>
-              </div>
-              <div class="form-check form-check-inline">
-                <label class="form-check-label">
-                  <input
-                    v-model="useLatestVersion"
-                    class="form-check-input"
-                    type="radio"
-                    name="use-latest-version"
-                    :value="false"
-                  />
-                  {{ T.contestAddproblemOtherVersion }}
-                </label>
-              </div>
-            </div>
+            <label for="use-latest-version" class="font-weight-bold"
+              >{{ T.contestAddproblemChooseVersion }}
+            </label>
+            <omegaup-radio-switch
+              :value.sync="useLatestVersion"
+              :selected-value="useLatestVersion"
+              :name="'use-latest-version'"
+              :text-for-true="T.contestAddproblemLatestVersion"
+              :text-for-false="T.contestAddproblemOtherVersion"
+            ></omegaup-radio-switch>
           </div>
           <div class="form-group col-md-3">
-            <label class="font-weight-bold"
+            <label
+              v-tooltip="T.contestAddproblemProblemPoints"
+              class="font-weight-bold"
               >{{ T.wordsPoints }}
-              <font-awesome-icon
-                :title="T.contestAddproblemProblemPoints"
-                icon="info-circle"
-              />
+              <font-awesome-icon icon="info-circle" />
             </label>
             <input
               v-model="points"
@@ -70,12 +50,11 @@
             />
           </div>
           <div class="form-group col-md-3">
-            <label class="font-weight-bold"
+            <label
+              v-tooltip="T.contestAddproblemContestOrder"
+              class="font-weight-bold"
               >{{ T.contestAddproblemProblemOrder }}
-              <font-awesome-icon
-                :title="T.contestAddproblemContestOrder"
-                icon="info-circle"
-              />
+              <font-awesome-icon icon="info-circle" />
             </label>
             <input
               v-model="order"
@@ -91,7 +70,7 @@
             <button
               class="btn btn-primary get-versions"
               type="submit"
-              :disabled="alias == ''"
+              :disabled="alias === null"
               @click.prevent="onSubmit"
             >
               {{ T.wordsGetVersions }}
@@ -142,14 +121,14 @@
           <td class="text-center">{{ problem.order }}</td>
           <td>
             <a :href="`/arena/problem/${problem.alias}/`">{{
-              problem.alias
+              problem.title
             }}</a>
           </td>
           <td class="text-right">{{ problem.points }}</td>
           <td class="text-center">
             <button
               v-tooltip="T.problemEditFormUpdateProblem"
-              data-update-problem
+              :data-update-problem="problem.alias"
               class="btn btn-link"
               @click="onEdit(problem)"
             >
@@ -158,7 +137,7 @@
             <button
               v-if="problem.has_submissions"
               v-tooltip="T.cannotRemoveProblemWithSubmissions"
-              data-remove-problem-disabled
+              :data-remove-problem-disabled="problem.alias"
               class="btn btn-link"
               data-toggle="tooltip"
               data-placement="bottom"
@@ -168,7 +147,7 @@
             <button
               v-else
               v-tooltip="T.contestAddproblemProblemRemove"
-              data-remove-problem
+              :data-remove-problem="problem.alias"
               class="btn btn-link"
               @click="onRemove(problem)"
             >
@@ -188,6 +167,7 @@ import T from '../../lang';
 
 import problem_Versions from '../problem/Versions.vue';
 import common_Typeahead from '../common/Typeahead.vue';
+import omegaup_RadioSwitch from '../RadioSwitch.vue';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
 
@@ -200,20 +180,11 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
-const emptyCommit: types.ProblemVersion = {
-  author: {},
-  commit: '',
-  committer: {},
-  message: '',
-  parents: [],
-  tree: {},
-  version: '',
-};
-
 @Component({
   components: {
     'omegaup-problem-versions': problem_Versions,
     'omegaup-common-typeahead': common_Typeahead,
+    'omegaup-radio-switch': omegaup_RadioSwitch,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
@@ -230,13 +201,14 @@ export default class AddProblem extends Vue {
 
   T = T;
   alias: null | string = null;
+  title: null | string = null;
   points = this.initialPoints;
   order = this.initialProblems.length + 1;
   problems = this.initialProblems;
   versionLog: types.ProblemVersion[] = [];
-  useLatestVersion = true;
-  publishedRevision = emptyCommit;
-  selectedRevision = emptyCommit;
+  useLatestVersion = this.latestVersionOptionSelected;
+  publishedRevision: null | types.ProblemVersion = null;
+  selectedRevision: null | types.ProblemVersion = null;
 
   onSubmit(): void {
     if (this.useLatestVersion) {
@@ -252,17 +224,16 @@ export default class AddProblem extends Vue {
         order: this.order,
         alias: this.alias,
         points: this.points,
-        commit:
-          !this.useLatestVersion && this.selectedRevision
-            ? this.selectedRevision.commit
-            : undefined,
+        commit: this.selectedRevision?.commit,
       },
-      isUpdate: this.problemToUpdate,
+      isUpdate: this.isUpdate,
     });
     this.alias = null;
+    this.title = null;
   }
 
   onEdit(problem: types.ProblemsetProblem): void {
+    this.title = problem.title;
     this.alias = problem.alias;
     this.points = problem.points;
     this.order = problem.order;
@@ -289,27 +260,26 @@ export default class AddProblem extends Vue {
     this.$emit('runs-diff', this.alias, versions, selectedCommit);
   }
 
-  get problemToUpdate(): boolean {
-    for (const problem of this.problems) {
-      if (this.alias === problem.alias) {
-        return true;
-      }
-    }
+  get latestVersionOptionSelected(): boolean {
+    if (this.versionLog.length === 1 || !this.selectedRevision) return true;
+    if (this.versionLog[0].commit === this.selectedRevision.commit) return true;
     return false;
   }
 
+  get isUpdate(): boolean {
+    return this.problems.some((problem) => problem.alias === this.alias);
+  }
+
   get addProblemButtonLabel(): string {
-    if (this.problemToUpdate) {
+    if (this.isUpdate) {
       return T.wordsUpdateProblem;
     }
     return T.wordsAddProblem;
   }
 
   get addProblemButtonDisabled(): boolean {
-    if (this.useLatestVersion) {
-      return this.alias === '' || this.alias === null;
-    }
-    return this.selectedRevision.commit === '';
+    if (this.useLatestVersion) return this.alias === null;
+    return !this.selectedRevision;
   }
 
   @Watch('initialProblems')
@@ -322,10 +292,15 @@ export default class AddProblem extends Vue {
   onAliasChange(newProblemAlias: string) {
     if (!newProblemAlias) {
       this.versionLog = [];
-      this.selectedRevision = this.publishedRevision = emptyCommit;
+      this.selectedRevision = this.publishedRevision = null;
       return;
     }
     this.$emit('get-versions', newProblemAlias, this);
+  }
+
+  @Watch('latestVersionOptionSelected')
+  onLatestVersionOptionChanged(newValue: boolean): void {
+    this.useLatestVersion = newValue;
   }
 }
 </script>

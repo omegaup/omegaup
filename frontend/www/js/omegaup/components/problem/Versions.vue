@@ -1,5 +1,5 @@
 <template>
-  <div class="card w-100 mb-4">
+  <div class="card w-100 mb-4" data-versions>
     <div class="card-body controls">
       <label
         >{{ T.problemVersionDiffMode }}
@@ -35,6 +35,8 @@
               <tbody>
                 <tr
                   v-for="revision in log"
+                  :key="revision.commit"
+                  :data-revision="revision.commit"
                   @click="selectedRevision = revision"
                 >
                   <td>
