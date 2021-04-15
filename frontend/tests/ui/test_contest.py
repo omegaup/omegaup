@@ -555,7 +555,7 @@ def add_problem_to_contest(driver, problem):
         EC.visibility_of_element_located(
             (By.XPATH,
              '//*[contains(concat(" ", normalize-space(@class), " "), " table'
-             ' ")]//a[text()="%s"]' % problem)))
+             ' ")]//a[@href="/arena/problem/%s/"]' % problem)))
 
 
 @util.annotate
