@@ -275,6 +275,32 @@ export namespace types {
             );
           return x;
         })(x.details);
+        x.problems = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.log = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.author = ((x) => {
+                  if (x.time)
+                    x.time = ((x: number) => new Date(x * 1000))(x.time);
+                  return x;
+                })(x.author);
+                x.committer = ((x) => {
+                  if (x.time)
+                    x.time = ((x: number) => new Date(x * 1000))(x.time);
+                  return x;
+                })(x.committer);
+                return x;
+              });
+            })(x.log);
+            return x;
+          });
+        })(x.problems);
         x.requests = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -1845,7 +1871,7 @@ export namespace types {
     details: types.ContestAdminDetails;
     group_admins: types.ContestGroupAdmin[];
     groups: types.ContestGroup[];
-    problems: types.ProblemsetProblem[];
+    problems: types.ProblemsetProblemWithVersions[];
     requests: types.ContestRequest[];
     users: types.ContestUser[];
   }
@@ -2805,6 +2831,30 @@ export namespace types {
     visits: number;
   }
 
+  export interface ProblemsetProblemWithVersions {
+    accepted: number;
+    accepts_submissions: boolean;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    has_submissions: boolean;
+    input_limit: number;
+    languages: string;
+    letter?: string;
+    log: types.ProblemVersion[];
+    order: number;
+    points: number;
+    problem_id?: number;
+    published?: string;
+    quality_payload?: types.ProblemQualityPayload;
+    quality_seal: boolean;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
+  }
+
   export interface ProblemsetterInfo {
     classname: string;
     creation_date?: Date;
@@ -3398,7 +3448,10 @@ export namespace messages {
     clarifications: types.Clarification[];
   };
   export type ContestProblemsRequest = { [key: string]: any };
-  export type ContestProblemsResponse = { problems: types.ProblemsetProblem[] };
+  export type _ContestProblemsServerResponse = any;
+  export type ContestProblemsResponse = {
+    problems: types.ProblemsetProblemWithVersions[];
+  };
   export type ContestPublicDetailsRequest = { [key: string]: any };
   export type _ContestPublicDetailsServerResponse = any;
   export type ContestPublicDetailsResponse = types.ContestPublicDetails;

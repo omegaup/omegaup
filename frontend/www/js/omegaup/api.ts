@@ -419,8 +419,35 @@ export const Contest = {
   }),
   problems: apiCall<
     messages.ContestProblemsRequest,
+    messages._ContestProblemsServerResponse,
     messages.ContestProblemsResponse
-  >('/api/contest/problems/'),
+  >('/api/contest/problems/', (x) => {
+    x.problems = ((x) => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map((x) => {
+        x.log = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.author = ((x) => {
+              if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            })(x.author);
+            x.committer = ((x) => {
+              if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            })(x.committer);
+            return x;
+          });
+        })(x.log);
+        return x;
+      });
+    })(x.problems);
+    return x;
+  }),
   publicDetails: apiCall<
     messages.ContestPublicDetailsRequest,
     messages._ContestPublicDetailsServerResponse,

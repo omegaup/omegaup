@@ -907,9 +907,9 @@ Gets the problems from a contest
 
 ### Returns
 
-| Name       | Type                        |
-| ---------- | --------------------------- |
-| `problems` | `types.ProblemsetProblem[]` |
+| Name       | Type                                    |
+| ---------- | --------------------------------------- |
+| `problems` | `types.ProblemsetProblemWithVersions[]` |
 
 ## `/api/contest/publicDetails/`
 

@@ -2919,7 +2919,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{published: null|string, log: list<ProblemVersion>}
      */
-    private static function getVersions(
+    public static function getVersions(
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\Identities $identity
     ) {
