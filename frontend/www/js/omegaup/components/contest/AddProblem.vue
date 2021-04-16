@@ -206,7 +206,7 @@ export default class AddProblem extends Vue {
   order = this.initialProblems.length + 1;
   problems = this.initialProblems;
   versionLog: types.ProblemVersion[] = [];
-  useLatestVersion = this.latestVersionOptionSelected;
+  useLatestVersion = true;
   publishedRevision: null | types.ProblemVersion = null;
   selectedRevision: null | types.ProblemVersion = null;
 
@@ -224,7 +224,9 @@ export default class AddProblem extends Vue {
         order: this.order,
         alias: this.alias,
         points: this.points,
-        commit: this.selectedRevision?.commit,
+        commit: !this.useLatestVersion
+          ? this.selectedRevision?.commit
+          : undefined,
       },
       isUpdate: this.isUpdate,
     });
@@ -237,6 +239,7 @@ export default class AddProblem extends Vue {
     this.alias = problem.alias;
     this.points = problem.points;
     this.order = problem.order;
+    this.useLatestVersion = false;
   }
 
   onRemove(problem: types.ProblemsetProblem): void {
@@ -258,12 +261,6 @@ export default class AddProblem extends Vue {
       return;
     }
     this.$emit('runs-diff', this.alias, versions, selectedCommit);
-  }
-
-  get latestVersionOptionSelected(): boolean {
-    if (this.versionLog.length === 1 || !this.selectedRevision) return true;
-    if (this.versionLog[0].commit === this.selectedRevision.commit) return true;
-    return false;
   }
 
   get isUpdate(): boolean {
@@ -296,11 +293,6 @@ export default class AddProblem extends Vue {
       return;
     }
     this.$emit('get-versions', newProblemAlias, this);
-  }
-
-  @Watch('latestVersionOptionSelected')
-  onLatestVersionOptionChanged(newValue: boolean): void {
-    this.useLatestVersion = newValue;
   }
 }
 </script>
