@@ -35,7 +35,11 @@ OmegaUp.on('ready', () => {
           note: resolutionText,
         })
           .then(() => {
-            ui.success(T.successfulOperation);
+            if (resolution) {
+              ui.success(T.arbitrateRequestAcceptSuccessfully);
+            } else {
+              ui.success(T.arbitrateRequestDenySuccessfully);
+            }
             contestEdit.refreshRequests();
           })
           .catch(ui.apiError);
@@ -326,10 +330,10 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'accept-request': (username: string) => {
+          'accept-request': ({ username }: { username: string }) => {
             this.arbitrateRequest(username, true);
           },
-          'deny-request': (username: string) => {
+          'deny-request': ({ username }: { username: string }) => {
             this.arbitrateRequest(username, false);
           },
           'add-admin': (username: string) => {
