@@ -39,19 +39,13 @@ export default class RadioSwitch extends Vue {
   @Prop({ default: false }) valueForFalse!: any;
   @Prop({ default: T.wordsYes }) textForTrue!: string;
   @Prop({ default: T.wordsNo }) textForFalse!: string;
-  @Prop({ default: false }) value!: any;
 
-  radioValue = this.selectedValue ?? false;
+  radioValue = this.selectedValue ?? this.valueForFalse;
 
   @Watch('radioValue')
   @Emit('update:value')
   onUpdateInput(newValue: any): any {
     return newValue;
-  }
-
-  @Watch('value')
-  onValueChanged(newValue: boolean): void {
-    this.radioValue = newValue;
   }
 }
 </script>

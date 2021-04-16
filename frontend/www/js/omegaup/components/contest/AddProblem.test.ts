@@ -77,7 +77,7 @@ describe('AddProblem.vue', () => {
     });
 
     expect(
-      wrapper.find('button[data-remove-problem-disabaled="problem"]'),
+      wrapper.find('button[data-remove-problem-disabled="problem"]'),
     ).toBeTruthy();
   });
 
@@ -122,7 +122,6 @@ describe('AddProblem.vue', () => {
       points: '98',
     };
     wrapper.setData(updatedProblem);
-    wrapper.setData({ selectedRevision: revision });
 
     await wrapper.find('button.add-problem').trigger('click');
     expect(wrapper.emitted('add-problem')).toBeDefined();
@@ -140,7 +139,7 @@ describe('AddProblem.vue', () => {
     ]);
   });
 
-  it('Should update the version for a problem in the list', async () => {
+  it('Should update non-latest version for a problem in the list', async () => {
     const alternativeCommit = 'b6918b04024976471c4cac1d2efeb81021d93345';
     const versionLog: types.ProblemVersion[] = [
       { ...revision },
@@ -189,6 +188,50 @@ describe('AddProblem.vue', () => {
             points: 100,
             alias: 'problem',
             commit: alternativeCommit,
+          },
+        },
+      ],
+    ]);
+  });
+
+  it('Should update latest version for a problem in the list', async () => {
+    const alternativeCommit = 'b6918b04024976471c4cac1d2efeb81021d93345';
+    const versionLog: types.ProblemVersion[] = [
+      { ...revision },
+      { ...revision, commit: alternativeCommit },
+    ];
+
+    const wrapper = mount(contest_AddProblem, {
+      propsData: {
+        contestAlias: 'testContestAlias',
+        initialPoints: 100,
+        initialProblems: [
+          { ...problem, has_submissions: false },
+          { ...problem, alias: 'problem_2', letter: 'B', title: 'Problem 2' },
+        ],
+      },
+    });
+
+    await wrapper
+      .find('button[data-update-problem="problem"]')
+      .trigger('click');
+
+    wrapper.setData({ versionLog });
+
+    await wrapper
+      .find('input[name="use-latest-version"][value="true"]')
+      .trigger('click');
+
+    await wrapper.find('button.add-problem').trigger('click');
+    expect(wrapper.emitted('add-problem')).toEqual([
+      [
+        {
+          isUpdate: true,
+          problem: {
+            order: 1,
+            points: 100,
+            alias: 'problem',
+            commit: undefined,
           },
         },
       ],
