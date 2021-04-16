@@ -56,6 +56,7 @@ OmegaUp.on('ready', () => {
         (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
       guid: null as null | string,
+      nextSubmissionTimestamp: payload.problem.nextSubmissionTimestamp,
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
@@ -85,6 +86,7 @@ OmegaUp.on('ready', () => {
           guid: this.guid,
           isAdmin: commonPayload.isAdmin,
           showVisibilityIndicators: true,
+          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           shouldShowTabs: true,
         },
         on: {
@@ -129,6 +131,9 @@ OmegaUp.on('ready', () => {
               source: code,
             })
               .then((response) => {
+                problemDetailsView.nextSubmissionTimestamp =
+                  response.nextSubmissionTimestamp;
+
                 submitRun({
                   runs,
                   guid: response.guid,
@@ -297,6 +302,8 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 refreshProblemClarifications({
                   problemAlias: payload.problem.alias,
+                  rowcount: 20,
+                  offset: 0,
                 });
               })
               .catch(ui.apiError);
@@ -387,6 +394,8 @@ OmegaUp.on('ready', () => {
       refreshRuns();
       refreshProblemClarifications({
         problemAlias: payload.problem.alias,
+        rowcount: 20,
+        offset: 0,
       });
     }, 5 * 60 * 1000);
   }

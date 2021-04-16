@@ -14,7 +14,7 @@ else
 	if [ -d "${OMEGAUP_ROOT}/.git/refs/remotes/upstream" ]; then
 		REMOTE="upstream"
 	fi
-	REMOTE_HASH="$(git rev-parse "${REMOTE}/master")"
+	REMOTE_HASH="$(git rev-parse "${REMOTE}/main")"
 	MERGE_BASE="$(git merge-base "${REMOTE_HASH}" HEAD)"
 	ARGS="fix ${MERGE_BASE}"
 fi
