@@ -174,6 +174,8 @@ OmegaUp.on('ready', () => {
     refreshContestClarifications({
       type: ContestClarificationType.AllProblems,
       contestAlias: payload.contest.alias,
+      rowcount: 20,
+      offset: 0,
     });
   }, 5 * 60 * 1000);
 });
