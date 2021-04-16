@@ -213,8 +213,6 @@ export class EventsSocket {
     refreshContestClarifications({
       type: ContestClarificationType.AllProblems,
       contestAlias: this.problemsetAlias,
-      rowcount: this.clarificationsRowcount,
-      offset: this.clarificationsOffset,
     });
 
     if (!this.socket) {
@@ -224,8 +222,6 @@ export class EventsSocket {
           refreshContestClarifications({
             type: ContestClarificationType.AllProblems,
             contestAlias: this.problemsetAlias,
-            rowcount: this.clarificationsRowcount,
-            offset: this.clarificationsOffset,
           });
         }
       }, this.intervalInMiliSeconds);
