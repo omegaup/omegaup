@@ -19,7 +19,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
   * @psalm-type ProblemVersion=array{author: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, commit: string, committer: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, message?: string, parents?: list<string>, tree: array<string, string>|null, version: null|string}
- * @psalm-type ProblemsetProblemWithVersions=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, letter?: string, log: list<ProblemVersion>, order: int, points: float, problem_id?: int, published: null|string, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemsetProblemWithVersions=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, letter?: string, order: int, points: float, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, versions: array{log: list<ProblemVersion>, published: null|string}, visibility: int, visits: int}
  * @psalm-type ContestListMinePayload=array{contests: list<Contest>, privateContestsAlert: bool}
  * @psalm-type ContestDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
  * @psalm-type ContestAdminDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, available_languages: array<string, string>, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
@@ -1061,24 +1061,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'problemsetNotFound'
             );
         }
-        [
-            'problems' => $problems,
-            'problemsAsObject' => $problemsAsObject,
-        ] = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+        $problems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             $problemset->problemset_id
         );
-
-        // Adding the version log to every problem
-        $problemsWithVersion = [];
-        foreach ($problems as $index => $problem) {
-            $problemsWithVersion[] = array_merge(
-                \OmegaUp\Controllers\Problem::getVersions(
-                    $problemsAsObject[$index],
-                    $r->identity
-                ),
-                $problem
-            );
-        }
 
         // Requests
         $resultAdmins = \OmegaUp\DAO\ProblemsetIdentityRequest::getFirstAdminForProblemsetRequest(
@@ -1110,7 +1095,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
                         $contest,
                         $r->identity
                     ),
-                    'problems' => $problemsWithVersion,
+                    'problems' => self::addVersionsToProblems(
+                        $problems,
+                        $r->identity
+                    ),
                     'users' => \OmegaUp\DAO\ProblemsetIdentities::getWithExtraInformation(
                         intval($contest->problemset_id)
                     ),
@@ -1131,6 +1119,36 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ],
             'entrypoint' => 'contest_edit',
         ];
+    }
+
+    /**
+     * Adding the version log to every problem in a contest
+     * @param list<ProblemsetProblem> $problems
+     * @return list<ProblemsetProblemWithVersions> $problems
+     */
+    private static function addVersionsToProblems(
+        array $problems,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): array {
+        $problemsWithVersion = [];
+        foreach ($problems as $problem) {
+            unset($problem['problem_id']);
+            $problemsWithVersion[] = array_merge(
+                [
+                    'versions' => \OmegaUp\Controllers\Problem::getVersions(
+                        new \OmegaUp\DAO\VO\Problems(
+                            array_intersect_key(
+                                $problem,
+                                \OmegaUp\DAO\VO\Problems::FIELD_NAMES
+                            )
+                        ),
+                        $identity
+                    )
+                ],
+                $problem
+            );
+        }
+        return $problemsWithVersion;
     }
 
     /**
@@ -1503,9 +1521,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 }
                 $result['director'] = $director->username;
 
-                [
-                    'problems' => $problemsInContest,
-                ] = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+                $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
                     $contest->problemset_id
                 );
 
@@ -1934,9 +1950,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            [
-                'problems' => $problemsetProblems,
-            ] = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+            $problemsetProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
                 $originalContest->problemset_id
             );
             foreach ($problemsetProblems as $problemsetProblem) {
@@ -2607,29 +2621,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'problemsetNotFound'
             );
         }
-        [
-            'problems' => $problems,
-            'problemsAsObject' => $problemsAsObject,
-        ] = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+        $problems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             $problemset->problemset_id
         );
 
-        // Adding the version log to every problem
-        $problemsWithVersion = [];
-        foreach ($problems as $index => $problem) {
-            $problemWithVersion = array_merge(
-                \OmegaUp\Controllers\Problem::getVersions(
-                    $problemsAsObject[$index],
-                    $r->identity
-                ),
-                $problem
-            );
-            unset($problemWithVersion['problem_id']);
-            $problemsWithVersion[] = $problemWithVersion;
-        }
-
         return [
-            'problems' => $problemsWithVersion,
+            'problems' => self::addVersionsToProblems(
+                $problems,
+                $r->identity
+            ),
         ];
     }
 

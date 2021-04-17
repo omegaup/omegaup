@@ -427,22 +427,27 @@ export const Contest = {
         return x;
       }
       return x.map((x) => {
-        x.log = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            x.author = ((x) => {
-              if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.versions = ((x) => {
+          x.log = ((x) => {
+            if (!Array.isArray(x)) {
               return x;
-            })(x.author);
-            x.committer = ((x) => {
-              if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+            }
+            return x.map((x) => {
+              x.author = ((x) => {
+                if (x.time)
+                  x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              })(x.author);
+              x.committer = ((x) => {
+                if (x.time)
+                  x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              })(x.committer);
               return x;
-            })(x.committer);
-            return x;
-          });
-        })(x.log);
+            });
+          })(x.log);
+          return x;
+        })(x.versions);
         return x;
       });
     })(x.problems);

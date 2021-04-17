@@ -2056,9 +2056,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        [
-            'problems' => $rawProblems,
-        ] = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+        $rawProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             $assignment->problemset_id
         );
         $letter = 0;
@@ -3685,9 +3683,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $assignmentAlias
         );
 
-        [
-            'problems' => $problemsInAssignment,
-        ] = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+        $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             intval($assignment->problemset_id)
         );
 

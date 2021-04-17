@@ -105,38 +105,25 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
      * Get problemset problems including problemset alias, points, and order
      *
-     * @return array{problems: list<array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>, problemsAsObject: list<\OmegaUp\DAO\VO\Problems>}
+     * @return list<array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
      */
     final public static function getProblemsByProblemset(
         int $problemsetId
     ): array {
         // Build SQL statement
         $sql = 'SELECT
-                    p.problem_id,
-                    p.acl_id,
-                    p.visibility,
                     p.title,
+                    p.problem_id,
                     p.alias,
-                    p.commit AS problem_commit,
-                    p.current_version,
-                    p.languages,
-                    p.input_limit,
+                    p.visibility,
                     p.visits,
                     p.submissions,
                     p.accepted,
-                    IFNULL(p.difficulty, 0.0) AS difficulty,
-                    p.creation_date,
-                    p.source,
-                    p.order AS problem_order,
-                    p.deprecated,
-                    p.email_clarifications,
-                    p.quality,
-                    p.quality_histogram,
-                    p.difficulty_histogram,
                     p.quality_seal,
-                    p.show_diff,
-                    p.allow_user_add_tags,
+                    p.input_limit,
+                    IFNULL(p.difficulty, 0.0) AS difficulty,
                     pp.order,
+                    p.languages,
                     IFNULL(
                         COUNT(s.submission_id),
                         0
@@ -164,64 +151,18 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float, difficulty_histogram: null|string, email_clarifications: bool, has_submissions: int, input_limit: int, languages: string, order: int, points: float, problem_commit: string, problem_id: int, problem_order: string, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, version: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, has_submissions: int, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
         );
         $problems = [];
-        $problemsAsObject = [];
         foreach ($rs as $problem) {
-            $problems[] = [
-                'title' => $problem['title'],
-                'problem_id' => $problem['problem_id'],
-                'alias' => $problem['alias'],
-                'visibility' => $problem['visibility'],
-                'visits' => $problem['visits'],
-                'submissions' => $problem['submissions'],
-                'accepted' => $problem['accepted'],
-                'quality_seal' => $problem['quality_seal'],
-                'input_limit' => $problem['input_limit'],
-                'difficulty' => $problem['difficulty'],
-                'order' => $problem['order'],
-                'languages' => $problem['languages'],
-                'accepts_submissions' => !empty($problem['languages']),
-                'has_submissions' => boolval($problem['has_submissions']),
-                'points' => $problem['points'],
-                'commit' => $problem['commit'],
-                'version' => $problem['version'],
-            ];
-            $problemsAsObject[] = new \OmegaUp\DAO\VO\Problems([
-                'problem_id' => $problem['problem_id'],
-                'acl_id' => $problem['acl_id'],
-                'visibility' => $problem['visibility'],
-                'title' => $problem['title'],
-                'alias' => $problem['alias'],
-                'commit' => $problem['problem_commit'],
-                'current_version' => $problem['current_version'],
-                'languages' => $problem['languages'],
-                'input_limit' => $problem['input_limit'],
-                'visits' => $problem['visits'],
-                'submissions' => $problem['submissions'],
-                'accepted' => $problem['accepted'],
-                'difficulty' => $problem['difficulty'],
-                'creation_date' => $problem['creation_date'],
-                'source' => $problem['source'],
-                'order' => $problem['problem_order'],
-                'deprecated' => $problem['deprecated'],
-                'email_clarifications' => $problem['email_clarifications'],
-                'quality' => $problem['quality'],
-                'quality_histogram' => $problem['quality_histogram'],
-                'difficulty_histogram' => $problem['difficulty_histogram'],
-                'quality_seal' => $problem['quality_seal'],
-                'show_diff' => $problem['show_diff'],
-                'allow_user_add_tags' => $problem['allow_user_add_tags'],
-            ]);
+            $problem['accepts_submissions'] = !empty($problem['languages']);
+            $problem['has_submissions'] = boolval($problem['has_submissions']);
+            $problems[] = $problem;
         }
-        return [
-            'problems' => $problems,
-            'problemsAsObject' => $problemsAsObject,
-        ];
+        return $problems;
     }
 
     /**

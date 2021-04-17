@@ -280,24 +280,27 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            x.log = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                x.author = ((x) => {
-                  if (x.time)
-                    x.time = ((x: number) => new Date(x * 1000))(x.time);
+            x.versions = ((x) => {
+              x.log = ((x) => {
+                if (!Array.isArray(x)) {
                   return x;
-                })(x.author);
-                x.committer = ((x) => {
-                  if (x.time)
-                    x.time = ((x: number) => new Date(x * 1000))(x.time);
+                }
+                return x.map((x) => {
+                  x.author = ((x) => {
+                    if (x.time)
+                      x.time = ((x: number) => new Date(x * 1000))(x.time);
+                    return x;
+                  })(x.author);
+                  x.committer = ((x) => {
+                    if (x.time)
+                      x.time = ((x: number) => new Date(x * 1000))(x.time);
+                    return x;
+                  })(x.committer);
                   return x;
-                })(x.committer);
-                return x;
-              });
-            })(x.log);
+                });
+              })(x.log);
+              return x;
+            })(x.versions);
             return x;
           });
         })(x.problems);
@@ -2841,16 +2844,14 @@ export namespace types {
     input_limit: number;
     languages: string;
     letter?: string;
-    log: types.ProblemVersion[];
     order: number;
     points: number;
-    problem_id?: number;
-    published?: string;
     quality_payload?: types.ProblemQualityPayload;
     quality_seal: boolean;
     submissions: number;
     title: string;
     version: string;
+    versions: { log: types.ProblemVersion[]; published?: string };
     visibility: number;
     visits: number;
   }
