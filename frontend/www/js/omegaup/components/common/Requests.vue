@@ -43,16 +43,14 @@
           <td v-else></td>
           <td v-if="!request.accepted" class="text-center">
             <button
-              class="close float-none"
-              style="color: red"
-              @click="$emit('emit-deny-request', request.username)"
+              class="close float-none text-danger mx-2"
+              @click="$emit('deny-request', { username: request.username })"
             >
               ×
             </button>
             <button
-              class="close float-none"
-              style="color: green"
-              @click="$emit('emit-accept-request', request.username)"
+              class="close float-none text-success mx-2"
+              @click="$emit('accept-request', { username: request.username })"
             >
               ✓
             </button>

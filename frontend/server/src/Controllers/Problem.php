@@ -16,7 +16,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemSettingsDistrib=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettingsDistrib, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, name: string, tolerance?: float}}
  * @psalm-type ProblemsetterInfo=array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}
  * @psalm-type SettingLimits=array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}
- * @psalm-type ProblemInfo=array{accepts_submissions: boolean, commit: string, alias: string, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, points: float, preferred_language: null|string, problem_id: int, problemsetter: ProblemsetterInfo|null, quality_seal: bool, sample_input: null|string, settings: ProblemSettingsDistrib, source: null|string, statement: ProblemStatement, title: string, visibility: int}
+ * @psalm-type ProblemInfo=array{accepts_submissions: boolean, commit: string, alias: string, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, points: float, preferred_language: null|string, problem_id: int, problemsetter: ProblemsetterInfo|null, quality_seal: bool, sample_input: null|string, settings: ProblemSettingsDistrib, source: null|string, statement: ProblemStatement, title: string, visibility: int}
  * @psalm-type UserInfoForProblem=array{loggedIn: bool, admin: bool, reviewer: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -4507,15 +4507,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
+        $runsPayload = \OmegaUp\DAO\Runs::getForProblemDetails(
+            intval($problem->problem_id),
+            /*$problemsetId=*/null,
+            intval($r->identity->identity_id)
+        );
+
         $response['smartyProperties']['payload'] = array_merge(
             $response['smartyProperties']['payload'],
             [
                 'nominationStatus' => $nominationPayload,
-                'runs' => \OmegaUp\DAO\Runs::getForProblemDetails(
-                    intval($problem->problem_id),
-                    /*$problemsetId=*/null,
-                    intval($r->identity->identity_id)
-                ),
+                'runs' => $runsPayload,
                 'solutionStatus' => self::getProblemSolutionStatus(
                     $problem,
                     $r->identity
@@ -4529,6 +4531,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ),
             ]
         );
+
+        $lastRunTime = null;
+
+        if (($n = count($runsPayload)) > 0) {
+            $lastRun = $runsPayload[$n - 1];
+            $lastRunTime = $lastRun['time'];
+        }
+
+        $nextSubmissionTimestamp = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
+            null,
+            $lastRunTime
+        );
+
+        $response['smartyProperties']['payload']['problem']['nextSubmissionTimestamp'] = $nextSubmissionTimestamp;
+
         if ($isAdmin) {
             $allRuns = [];
             foreach (
