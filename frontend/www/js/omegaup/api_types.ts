@@ -2714,9 +2714,9 @@ export namespace types {
     author: types.Signature;
     commit: string;
     committer: types.Signature;
-    message?: string;
-    parents?: string[];
-    tree?: { [key: string]: string };
+    message: string;
+    parents: string[];
+    tree: { [key: string]: string };
     version: string;
   }
 
@@ -3057,8 +3057,8 @@ export namespace types {
   }
 
   export interface Signature {
-    email?: string;
-    name?: string;
+    email: string;
+    name: string;
     time?: Date;
   }
 
