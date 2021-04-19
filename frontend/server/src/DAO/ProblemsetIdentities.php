@@ -27,7 +27,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         $container,
         bool $grantAccess = false,
         bool $shareUserInformation = false
-    ): \OmegaUp\DAO\VO\ProblemsetIdentities {
+    ): ?\OmegaUp\DAO\VO\ProblemsetIdentities {
         $currentTime = \OmegaUp\Time::get();
         $problemsetIdentity  = self::getByPK(
             $identity->identity_id,
@@ -47,7 +47,14 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
                 )
             );
             if (!$grantAccess && !$isInvited) {
-                // User was not authorized to do this.
+                // User was not authorized to do this, unless the problemset has
+                // already ended.
+                if (
+                    !isset($container->finish_time) ||
+                    $container->finish_time->time < \OmegaUp\Time::get()
+                ) {
+                    return null;
+                }
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
             $problemsetIdentity = new \OmegaUp\DAO\VO\ProblemsetIdentities([

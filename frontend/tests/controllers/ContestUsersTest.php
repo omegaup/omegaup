@@ -414,6 +414,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'admissionMode' => 'public',
             ])
         );
+
         $problems = \OmegaUp\Test\Factories\Contest::insertProblemsInContest(
             $contestData
         );
@@ -451,6 +452,15 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->assertEquals($problemDetails['alias'], $problem['alias']);
         }
+
+        // But they are not included in the original contest scoreboard
+        $response = \OmegaUp\Controllers\Problemset::apiScoreboard(
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'problemset_id' => $contestData['contest']->problemset_id,
+            ])
+        );
+        $this->assertEmpty($response['ranking']);
     }
 
     public function testPrivateContestPracticeForNonRegisteredUsers() {
