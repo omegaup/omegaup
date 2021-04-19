@@ -1,7 +1,35 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import T from '../../lang';
 import qualitynomination_List from './List.vue';
 import type { types } from '../../api_types';
+
+const nominations: types.NominationListItem[] = [1, 2, 3].map(
+  (x) =>
+    ({
+      author: {
+        name: 'nombre',
+        username: 'user',
+      },
+      contents: {
+        original: '',
+        rationale: 'N/A',
+        reason: 'wrong-test-cases',
+      },
+      nomination: 'demotion',
+      nominator: {
+        name: 'nominador',
+        username: 'user_nominator',
+      },
+      problem: {
+        alias: `Problem-${x}`,
+        title: `Problem ${x}`,
+      },
+      qualitynomination_id: 1,
+      status: 'open',
+      time: new Date(`2021-02-0${x} 00:00:00`),
+      votes: [],
+    } as types.NominationListItem),
+);
 
 describe('List.vue', () => {
   it('Should handle list of nominations', async () => {
@@ -100,35 +128,6 @@ describe('List.vue', () => {
 
   describe('Sort controls', () => {
     it('Should sort by problem title by default', async () => {
-      const nominations: types.NominationListItem[] = [];
-
-      for (let i = 6; i >= 1; --i) {
-        nominations.push({
-          author: {
-            name: 'nombre',
-            username: 'user',
-          },
-          contents: {
-            original: '',
-            rationale: 'N/A',
-            reason: 'wrong-test-cases',
-          },
-          nomination: 'demotion',
-          nominator: {
-            name: 'nominador',
-            username: 'user_nominator',
-          },
-          problem: {
-            alias: `Problem-${i}`,
-            title: `Problem ${i}`,
-          },
-          qualitynomination_id: 1,
-          status: 'open',
-          time: new Date('2021-02-03 00:00:00'),
-          votes: [],
-        } as types.NominationListItem);
-      }
-
       const wrapper = shallowMount(qualitynomination_List, {
         propsData: {
           nominations,
@@ -150,36 +149,7 @@ describe('List.vue', () => {
     });
 
     it('Should sort by problem title in descending order', async () => {
-      const nominations: types.NominationListItem[] = [];
-
-      for (let i = 6; i >= 1; --i) {
-        nominations.push({
-          author: {
-            name: 'nombre',
-            username: 'user',
-          },
-          contents: {
-            original: '',
-            rationale: 'N/A',
-            reason: 'wrong-test-cases',
-          },
-          nomination: 'demotion',
-          nominator: {
-            name: 'nominador',
-            username: 'user_nominator',
-          },
-          problem: {
-            alias: `Problem-${i}`,
-            title: `Problem ${i}`,
-          },
-          qualitynomination_id: 1,
-          status: 'open',
-          time: new Date('2021-02-03 00:00:00'),
-          votes: [],
-        } as types.NominationListItem);
-      }
-
-      const wrapper = shallowMount(qualitynomination_List, {
+      const wrapper = mount(qualitynomination_List, {
         propsData: {
           nominations,
           pagerItems: [
@@ -198,46 +168,21 @@ describe('List.vue', () => {
 
       expect(wrapper.vm.orderedNominations[0].problem.title).toBe('Problem 1');
 
-      const sortControlByTime = wrapper.findComponent({
+      const sortControlByTitle = wrapper.findComponent({
         ref: 'sortControlByTitle',
       });
-      expect(sortControlByTime.exists()).toBe(true);
+      expect(sortControlByTitle.exists()).toBe(true);
 
-      sortControlByTime.vm.$emit('apply-filter', 'title', 'desc');
-      expect(wrapper.vm.orderedNominations[0].problem.title).toBe('Problem 6');
+      const button = sortControlByTitle.find('a');
+      expect(button.exists()).toBe(true);
+
+      button.trigger('click');
+
+      expect(wrapper.vm.orderedNominations[0].problem.title).toBe('Problem 3');
     });
 
     it('Should sort by time', async () => {
-      const nominations: types.NominationListItem[] = [];
-
-      for (let i = 6; i >= 1; --i) {
-        nominations.push({
-          author: {
-            name: 'nombre',
-            username: 'user',
-          },
-          contents: {
-            original: '',
-            rationale: 'N/A',
-            reason: 'wrong-test-cases',
-          },
-          nomination: 'demotion',
-          nominator: {
-            name: 'nominador',
-            username: 'user_nominator',
-          },
-          problem: {
-            alias: `Problem-${7 - i}`,
-            title: `Problem ${7 - i}`,
-          },
-          qualitynomination_id: 1,
-          status: 'open',
-          time: new Date(`2021-02-0${i} 00:00:00`),
-          votes: [],
-        } as types.NominationListItem);
-      }
-
-      const wrapper = shallowMount(qualitynomination_List, {
+      const wrapper = mount(qualitynomination_List, {
         propsData: {
           nominations,
           pagerItems: [
@@ -256,7 +201,7 @@ describe('List.vue', () => {
 
       expect(wrapper.vm.orderedNominations[0].problem.title).toBe('Problem 1');
       expect(wrapper.vm.orderedNominations[0].time.getTime()).toBe(
-        new Date('2021-02-06 00:00:00').getTime(),
+        new Date('2021-02-01 00:00:00').getTime(),
       );
 
       const sortControlByTime = wrapper.findComponent({
@@ -264,10 +209,14 @@ describe('List.vue', () => {
       });
       expect(sortControlByTime.exists()).toBe(true);
 
-      sortControlByTime.vm.$emit('apply-filter', 'time', 'asc');
-      expect(wrapper.vm.orderedNominations[0].problem.title).toBe('Problem 6');
+      const button = sortControlByTime.find('a');
+      expect(button.exists()).toBe(true);
+
+      button.trigger('click');
+
+      expect(wrapper.vm.orderedNominations[0].problem.title).toBe('Problem 3');
       expect(wrapper.vm.orderedNominations[0].time.getTime()).toBe(
-        new Date('2021-02-01 00:00:00').getTime(),
+        new Date('2021-02-03 00:00:00').getTime(),
       );
     });
   });
