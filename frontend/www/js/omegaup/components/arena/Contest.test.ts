@@ -2,20 +2,37 @@ jest.mock('../../../../third_party/js/diff_match_patch.js');
 
 import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
+import T from '../../lang';
 import * as time from '../../time';
 
 import arena_Contest from './Contest.vue';
+import arena_RunSubmit from './RunSubmitPopup.vue';
 
 describe('Contest.vue', () => {
-  const date = new Date();
+  beforeAll(() => {
+    const div = document.createElement('div');
+    div.id = 'root';
+    document.body.appendChild(div);
+  });
 
-  const contestDetails: types.ContestPublicDetails = {
+  afterAll(() => {
+    const rootDiv = document.getElementById('root');
+    if (rootDiv) {
+      document.removeChild(rootDiv);
+    }
+  });
+
+  const currentDate = new Date();
+  const futureDate = new Date();
+  futureDate.setMinutes(futureDate.getMinutes() + 2);
+
+  const contest: types.ContestPublicDetails = {
     admission_mode: 'public',
     alias: 'omegaUp',
     description: 'hello omegaUp',
     director: 'omegaUpDirector',
     feedback: 'detailed',
-    finish_time: date,
+    finish_time: futureDate,
     languages: 'py',
     partial_score: true,
     penalty: 1,
@@ -27,13 +44,13 @@ describe('Contest.vue', () => {
     scoreboard: 100,
     show_penalty: true,
     show_scoreboard_after: true,
-    start_time: date,
+    start_time: currentDate,
     submissions_gap: 1200,
     title: 'hello omegaUp',
   };
 
-  const sampleProblem: types.ProblemInfo = {
-    alias: 'triangulos',
+  const problemInfo: types.ProblemInfo = {
+    alias: 'problemOmegaUp',
     accepts_submissions: true,
     karel_problem: false,
     commit: 'abc',
@@ -48,7 +65,7 @@ describe('Contest.vue', () => {
     problem_id: 1,
     problemsetter: {
       classname: 'user-rank-unranked',
-      creation_date: date,
+      creation_date: currentDate,
       name: 'omegaUp admin',
       username: 'omegaup',
     },
@@ -86,33 +103,48 @@ describe('Contest.vue', () => {
     input_limit: 1000,
   };
 
-  it('Should handle details for a problem in a contest', async () => {
+  const problems: types.NavbarProblemsetProblem[] = [
+    {
+      acceptsSubmissions: true,
+      alias: 'problemOmegaUp',
+      bestScore: 100,
+      hasRuns: true,
+      maxScore: 100,
+      text: 'A. hello problem omegaUp',
+    },
+    {
+      acceptsSubmissions: true,
+      alias: 'otherProblemOmegaUp',
+      bestScore: 100,
+      hasRuns: true,
+      maxScore: 100,
+      text: 'B. hello other problem omegaUp',
+    },
+  ];
+
+  it('Should handle a finished contest', async () => {
     const wrapper = mount(arena_Contest, {
       propsData: {
-        contest: contestDetails,
-        problems: [
-          {
-            acceptsSubmissions: true,
-            alias: 'problemOmegaUp',
-            bestScore: 100,
-            hasRuns: true,
-            maxScore: 100,
-            text: 'A. hello problem omegaUp',
-          },
-          {
-            acceptsSubmissions: true,
-            alias: 'otherProblemOmegaUp',
-            bestScore: 100,
-            hasRuns: true,
-            maxScore: 100,
-            text: 'B. hello other problem omegaUp',
-          },
-        ] as types.NavbarProblemsetProblem[],
-        problemInfo: sampleProblem,
+        contest: Object.assign({}, contest, { finish_time: currentDate }),
+        problems,
+        problemInfo,
       },
     });
 
-    expect(wrapper.find('.clock').text()).toBe('00:00:00');
+    expect(wrapper.find('.alert-warning').text()).toBe(
+      T.arenaContestEndedUsePractice,
+    );
+  });
+
+  it('Should handle details for a problem in a contest', async () => {
+    const wrapper = mount(arena_Contest, {
+      propsData: {
+        contest,
+        problems,
+        problemInfo,
+      },
+    });
+
     expect(wrapper.find('.socket-status-ok').text()).toBe('•');
     expect(wrapper.find('a[data-problem=problemOmegaUp]').text()).toBe(
       'A. hello problem omegaUp',
@@ -120,10 +152,44 @@ describe('Contest.vue', () => {
     expect(wrapper.find('a[data-problem=otherProblemOmegaUp]').text()).toBe(
       'B. hello other problem omegaUp',
     );
-    expect(wrapper.text()).toContain(sampleProblem.points);
-    expect(wrapper.text()).toContain(time.formatDateLocal(date));
+    expect(wrapper.text()).toContain(problemInfo.points);
+    expect(wrapper.text()).toContain(time.formatDateLocal(currentDate));
 
     await wrapper.find('a[data-problem=problemOmegaUp]').trigger('click');
     expect(wrapper.emitted('navigate-to-problem')).toBeDefined();
+  });
+
+  it('Should handle a submission', async () => {
+    const wrapper = mount(arena_Contest, {
+      attachTo: '#root',
+      propsData: {
+        contest,
+        problems,
+        problemInfo,
+      },
+    });
+
+    await wrapper.find('a[data-problem=problemOmegaUp]').trigger('click');
+    expect(wrapper.emitted('navigate-to-problem')).toBeDefined();
+
+    await wrapper
+      .find('a[href="#problems/problemOmegaUp/new-run"')
+      .trigger('click');
+    expect(wrapper.find('form[data-run-submit')).toBeTruthy();
+
+    await wrapper
+      .find('select[name="language"] option[value="py3"]')
+      .setSelected();
+
+    const runSubmitWrapper = wrapper.findComponent(arena_RunSubmit);
+
+    runSubmitWrapper.setData({
+      code: 'print(3)',
+    });
+
+    await wrapper.find('form button[type="submit"]').trigger('click');
+    expect(wrapper.emitted('submit-run')).toBeDefined();
+
+    wrapper.destroy();
   });
 });

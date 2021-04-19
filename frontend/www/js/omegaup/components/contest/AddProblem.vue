@@ -131,9 +131,21 @@
             }}</a>
           </td>
           <td class="text-right">{{ problem.points }}</td>
-          <td class="text-center">
-            <button class="close float-none" @click="onRemove(problem)">
+          <td class="text-center" data-remove-problem>
+            <button
+              v-if="!problem.has_submissions"
+              class="close float-none"
+              @click="onRemove(problem)"
+            >
               ×
+            </button>
+            <button
+              v-else
+              class="close float-none"
+              disabled="disabled"
+              :title="T.cannotRemoveProblemWithSubmissions"
+            >
+              🚫
             </button>
           </td>
         </tr>

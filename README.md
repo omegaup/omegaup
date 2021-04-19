@@ -12,11 +12,11 @@ Directorios que se utilizan activamente en el desarrollo.
 
 | Directorio | Descripción |
 |------------|-------------|
-| [frontend/server/controllers](https://github.com/omegaup/omegaup/tree/master/frontend/server/controllers) | Lógica de negocio que implementa la API de omegaUp. |
-| [frontend/server/libs](https://github.com/omegaup/omegaup/tree/master/frontend/server/libs) | Bibliotecas y utilerías. |
-| [frontend/server/libs/dao](https://github.com/omegaup/omegaup/tree/master/frontend/server/libs/dao) | Los Data Access Objects [DAO] y Value Objects [VO]. Clases utilizadas para representar los esquemas de la base de datos y facilitar su consumo por los controladores. |
-| [frontend/templates](https://github.com/omegaup/omegaup/tree/master/frontend/templates) | Plantillas de Smarty utilizadas para generar el HTML que se despliega a los usuarios. También aquí están los archivos de internacionalización para inglés, español y portugués. |
-| [frontend/www](https://github.com/omegaup/omegaup/tree/master/frontend/www) |  Los contenidos completos de la página de internet. |
+| [frontend/server/controllers](https://github.com/omegaup/omegaup/tree/main/frontend/server/controllers) | Lógica de negocio que implementa la API de omegaUp. |
+| [frontend/server/libs](https://github.com/omegaup/omegaup/tree/main/frontend/server/libs) | Bibliotecas y utilerías. |
+| [frontend/server/libs/dao](https://github.com/omegaup/omegaup/tree/main/frontend/server/libs/dao) | Los Data Access Objects [DAO] y Value Objects [VO]. Clases utilizadas para representar los esquemas de la base de datos y facilitar su consumo por los controladores. |
+| [frontend/templates](https://github.com/omegaup/omegaup/tree/main/frontend/templates) | Plantillas de Smarty utilizadas para generar el HTML que se despliega a los usuarios. También aquí están los archivos de internacionalización para inglés, español y portugués. |
+| [frontend/www](https://github.com/omegaup/omegaup/tree/main/frontend/www) |  Los contenidos completos de la página de internet. |
 
 El resto del código está en otros repositorios
 

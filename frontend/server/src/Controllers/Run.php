@@ -575,8 +575,11 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         // Happy ending
-        $response['nextSubmissionTimestamp'] =
-            \OmegaUp\DAO\Runs::nextSubmissionTimestamp($contest);
+        $response['nextSubmissionTimestamp'] = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
+            $contest,
+            /*lastSubmissionTime=*/$submission->time
+        );
+
         if (is_null($submission->guid)) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
