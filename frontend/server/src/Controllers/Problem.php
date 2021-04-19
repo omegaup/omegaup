@@ -2919,8 +2919,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * @return array{published: null|string, log: list<ProblemVersion>}
-     *         array{log: list<array{author: array{email: string, name: string, time: OmegaUp\Timestamp}, commit: string, committer: array{email: string, name: string, time: OmegaUp\Timestamp}, message: string, parents: list<string>, tree: array<string, string>, version: string}>, published: null|string}
-     *         array{log: list<array{author: array{email: string, name: string, time: OmegaUp\Timestamp}, commit: string, committer: array{email: string, name: string, time: OmegaUp\Timestamp}, message: string, parents: list<string>, tree: array<string, string>, version: string}>, published: null|string}
      */
     private static function getVersions(
         \OmegaUp\DAO\VO\Problems $problem,
