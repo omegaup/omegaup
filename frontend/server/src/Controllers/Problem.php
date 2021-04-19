@@ -30,7 +30,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
  * @psalm-type ProblemAdmin=array{role: string, username: string}
  * @psalm-type ProblemGroupAdmin=array{alias: string, name: string, role: string}
- * @psalm-type Signature=array{email: string, name: string, time: \OmegaUp\Timestamp|null}
+ * @psalm-type Signature=array{email: string, name: string, time: \OmegaUp\Timestamp}
  * @psalm-type ProblemVersion=array{author: Signature, commit: string, committer: Signature, message: string, parents: list<string>, tree: array<string, string>, version: string}
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
@@ -2919,6 +2919,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * @return array{published: null|string, log: list<ProblemVersion>}
+     *         array{log: list<array{author: array{email: string, name: string, time: OmegaUp\Timestamp}, commit: string, committer: array{email: string, name: string, time: OmegaUp\Timestamp}, message: string, parents: list<string>, tree: array<string, string>, version: string}>, published: null|string}
+     *         array{log: list<array{author: array{email: string, name: string, time: OmegaUp\Timestamp}, commit: string, committer: array{email: string, name: string, time: OmegaUp\Timestamp}, message: string, parents: list<string>, tree: array<string, string>, version: string}>, published: null|string}
      */
     private static function getVersions(
         \OmegaUp\DAO\VO\Problems $problem,
@@ -2928,9 +2930,26 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         if (!\OmegaUp\Authorization::canEditProblem($identity, $problem)) {
+            $emptyAuthorCommitter = [
+                'time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                    $problem->creation_date
+                ),
+                'email' => '',
+                'name' => '',
+            ];
             return [
                 'published' => $problem->commit,
-                'log' => [],
+                'log' => [
+                    [
+                        'commit' => $problem->commit,
+                        'tree' => [],
+                        'parents' => [],
+                        'message' => '',
+                        'author' => $emptyAuthorCommitter,
+                        'committer' => $emptyAuthorCommitter,
+                        'version' => strval($problem->current_version),
+                    ],
+                ],
             ];
         }
 
