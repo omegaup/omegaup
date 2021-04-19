@@ -50,7 +50,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
                 // User was not authorized to do this, unless the problemset has
                 // already ended.
                 if (
-                    !isset($container->finish_time) ||
+                    $container instanceof \OmegaUp\DAO\VO\Contests &&
                     $container->finish_time->time < \OmegaUp\Time::get()
                 ) {
                     return null;
