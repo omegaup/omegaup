@@ -5,12 +5,17 @@
       'direct-message': isDirectMessage,
     }"
   >
-    <td v-if="'assignment_alias' in clarification" class="text-center">
+    <td
+      v-if="
+        'assignment_alias' in clarification && clarification.assignment_alias
+      "
+      class="text-center align-middle"
+    >
       {{ clarification.assignment_alias }}
     </td>
     <td class="text-center align-middle">
       {{
-        'contest_alias' in clarification
+        'contest_alias' in clarification && clarification.contest_alias
           ? clarification.contest_alias
           : clarification.problem_alias
       }}
