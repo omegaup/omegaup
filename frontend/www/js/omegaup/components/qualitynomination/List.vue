@@ -186,13 +186,13 @@ export default class QualityNominationList extends Vue {
 
     switch (this.columnName) {
       case 'time':
-        return this.nominations.sort((a, b) =>
-          order * (a.time.getTime() - b.time.getTime())
+        return this.nominations.sort(
+          (a, b) => order * (a.time.getTime() - b.time.getTime()),
         );
       case 'title':
       default:
-        return this.nominations.sort((a, b) =>
-          order * a.problem.title.localeCompare(b.problem.title),
+        return this.nominations.sort(
+          (a, b) => order * a.problem.title.localeCompare(b.problem.title),
         );
     }
   }
