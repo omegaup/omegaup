@@ -147,10 +147,7 @@ describe('EventsSocket', () => {
 
     const localVue = createLocalVue();
     localVue.use(Vuex);
-    const mutations = {
-      addRun: jest.fn(),
-    };
-    new Vuex.Store(storeConfig);
+    const store = new Vuex.Store(storeConfig);
 
     server?.send({
       message: '/run/update/',
@@ -173,6 +170,8 @@ describe('EventsSocket', () => {
     });
 
     expect(socket.socketStatus).toEqual(SocketStatus.Connected);
-    expect(mutations.addRun.mock.calls).toHaveLength(1);
+    expect(store.state.runs).toHaveLength(1);
+    expect(store.state.runs[0].alias).toBe('hello');
+    expect(store.state.runs[0].classname).toBe('user-rank-unranked');
   });
 });
