@@ -1,4 +1,5 @@
 jest.mock('../../../third_party/js/diff_match_patch.js');
+jest.mock('./ranking');
 
 import { types } from '../api_types';
 import { OmegaUp } from '../omegaup';
@@ -9,6 +10,7 @@ import { clarificationStoreConfig } from './clarificationsStore';
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import fetchMock from 'jest-fetch-mock';
+import { onRankingChanged } from './ranking';
 
 const navbarProblems: types.NavbarProblemsetProblem[] = [
   {
@@ -164,7 +166,7 @@ describe('EventsSocket', () => {
         time: new Date(0),
         username: 'omegaUp',
         verdict: 'AC',
-      },
+      } as types.Run,
     });
 
     expect(socket.socketStatus).toEqual(SocketStatus.Connected);
@@ -195,7 +197,7 @@ describe('EventsSocket', () => {
         problem_alias: 'problem_alias',
         public: true,
         time: new Date(0),
-      },
+      } as types.Clarification,
     });
 
     expect(socket.socketStatus).toEqual(SocketStatus.Connected);
@@ -206,5 +208,139 @@ describe('EventsSocket', () => {
     expect(clarificationStore.state.clarifications[0]['message']).toBe(
       'some message',
     );
+  });
+
+  it('should handle socket when server sends /scoreboard/update/ message', async () => {
+    const socket = new EventsSocket({ ...options, disableSockets: false });
+
+    socket.connect();
+    await server?.connected;
+
+    server?.send({
+      message: '/scoreboard/update/',
+      scoreboard: {
+        problems: [
+          { alias: 'problem_1', order: 1 },
+          { alias: 'problem_2', order: 2 },
+          { alias: 'problem_3', order: 3 },
+        ],
+        ranking: [
+          {
+            classname: 'user-rank-unranked',
+            country: 'MX',
+            is_invited: true,
+            problems: [
+              {
+                alias: 'problem_1',
+                penalty: 20,
+                percent: 1,
+                points: 100,
+                runs: 1,
+              },
+              {
+                alias: 'problem_2',
+                penalty: 10,
+                percent: 1,
+                points: 100,
+                runs: 4,
+              },
+              {
+                alias: 'problem_3',
+                penalty: 30,
+                percent: 1,
+                points: 100,
+                runs: 5,
+              },
+            ],
+            total: { penalty: 20, points: 100 },
+            username: 'omegaUp',
+          },
+        ],
+        title: 'omegaUp',
+        time: new Date(0),
+        start_time: new Date(0),
+        finish_time: new Date(0),
+      } as types.Scoreboard,
+    });
+
+    expect(socket.socketStatus).toEqual(SocketStatus.Connected);
+
+    expect(onRankingChanged).toHaveBeenCalledWith({
+      currentUsername: 'omegaUp',
+      navbarProblems: [
+        {
+          acceptsSubmissions: true,
+          alias: 'problem_alias',
+          bestScore: 100,
+          hasRuns: true,
+          maxScore: 100,
+          text: 'A. Problem',
+        },
+        {
+          acceptsSubmissions: true,
+          alias: 'problem_alias_2',
+          bestScore: 80,
+          hasRuns: true,
+          maxScore: 100,
+          text: 'B. Problem 2',
+        },
+      ],
+      scoreboard: {
+        finish_time: '1970-01-01T00:00:00.000Z',
+        problems: [
+          {
+            alias: 'problem_1',
+            order: 1,
+          },
+          {
+            alias: 'problem_2',
+            order: 2,
+          },
+          {
+            alias: 'problem_3',
+            order: 3,
+          },
+        ],
+        ranking: [
+          {
+            classname: 'user-rank-unranked',
+            country: 'MX',
+            is_invited: true,
+            problems: [
+              {
+                alias: 'problem_1',
+                penalty: 20,
+                percent: 1,
+                points: 100,
+                runs: 1,
+              },
+              {
+                alias: 'problem_2',
+                penalty: 10,
+                percent: 1,
+                points: 100,
+                runs: 4,
+              },
+              {
+                alias: 'problem_3',
+                penalty: 30,
+                percent: 1,
+                points: 100,
+                runs: 5,
+              },
+            ],
+            total: {
+              penalty: 20,
+              points: 100,
+            },
+            username: 'omegaUp',
+          },
+        ],
+        start_time: '1970-01-01T00:00:00.000Z',
+        time: '1970-01-01T00:00:00.000Z',
+        title: 'omegaUp',
+      },
+    });
+    expect(onRankingChanged).toHaveBeenCalledTimes(1);
   });
 });
