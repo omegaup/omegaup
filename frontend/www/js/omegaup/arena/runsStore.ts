@@ -23,7 +23,7 @@ export interface RunsState {
   filters?: RunFilters;
 }
 
-export const storeConfig = {
+export const runsStoreConfig = {
   state: {
     runs: [],
     index: {},
@@ -86,4 +86,4 @@ export const myRunsStore = new Vuex.Store<RunsState>({
   },
 });
 
-export const runsStore = new Vuex.Store<RunsState>(storeConfig);
+export const runsStore = new Vuex.Store<RunsState>(runsStoreConfig);

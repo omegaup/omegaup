@@ -4,7 +4,8 @@ import { types } from '../api_types';
 import { OmegaUp } from '../omegaup';
 import { SocketOptions, SocketStatus, EventsSocket } from './events_socket';
 import WS from 'jest-websocket-mock';
-import { storeConfig } from './runsStore';
+import { runsStoreConfig } from './runsStore';
+import { clarificationStoreConfig } from './clarificationsStore';
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import fetchMock from 'jest-fetch-mock';
@@ -48,6 +49,49 @@ describe('EventsSocket', () => {
     server = new WS(`ws://${options.locationHost}/events/`, {
       selectProtocol: () => 'com.omegaup.events',
       jsonProtocol: true,
+    });
+
+    fetchMock.enableMocks();
+    fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
+      if (req.url == '/api/contest/clarifications/') {
+        return Promise.resolve({
+          status: 200,
+          body: JSON.stringify({
+            clarifications: [],
+            status: 'ok',
+          }),
+        });
+      } else if (req.url == '/api/problemset/scoreboard/') {
+        return Promise.resolve({
+          status: 200,
+          body: JSON.stringify({
+            finish_time: null,
+            problems: [],
+            ranking: [],
+            start_time: new Date(),
+            time: new Date(),
+            title: 'someTitle',
+            status: 'ok',
+          }),
+        });
+      } else if (req.url == '/api/problemset/scoreboardEvents/') {
+        return Promise.resolve({
+          status: 200,
+          body: JSON.stringify({
+            events: [],
+            status: 'ok',
+          }),
+        });
+      }
+      return Promise.resolve({
+        ok: false,
+        status: 404,
+        body: JSON.stringify({
+          status: 'error',
+          error: `Invalid call to "${req.url}" in test`,
+          errorcode: 403,
+        }),
+      });
     });
   });
 
@@ -93,61 +137,15 @@ describe('EventsSocket', () => {
     expect(client.socketStatus).toEqual(SocketStatus.Failed);
   });
 
-  it('should handle socket when it sends messages', async () => {
-    fetchMock.enableMocks();
-    fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
-      if (req.url == '/api/contest/clarifications/') {
-        return Promise.resolve({
-          status: 200,
-          body: JSON.stringify({
-            clarifications: [],
-            status: 'ok',
-          }),
-        });
-      } else if (req.url == '/api/problemset/scoreboard/') {
-        return Promise.resolve({
-          status: 200,
-          body: JSON.stringify({
-            finish_time: null,
-            problems: [],
-            ranking: [],
-            start_time: new Date(),
-            time: new Date(),
-            title: 'someTitle',
-            status: 'ok',
-          }),
-        });
-      } else if (req.url == '/api/problemset/scoreboardEvents/') {
-        return Promise.resolve({
-          status: 200,
-          body: JSON.stringify({
-            events: [],
-            status: 'ok',
-          }),
-        });
-      }
-      return Promise.resolve({
-        ok: false,
-        status: 404,
-        body: JSON.stringify({
-          status: 'error',
-          error: `Invalid call to "${req.url}" in test`,
-          errorcode: 403,
-        }),
-      });
-    });
+  it('should handle socket when server sends /run/update/ message', async () => {
     const socket = new EventsSocket({ ...options, disableSockets: false });
-
-    expect(socket.shouldRetry).toEqual(false);
-    expect(socket.retries).toEqual(10);
-    expect(socket.socketStatus).toEqual(SocketStatus.Waiting);
 
     socket.connect();
     await server?.connected;
 
     const localVue = createLocalVue();
     localVue.use(Vuex);
-    const store = new Vuex.Store(storeConfig);
+    const store = new Vuex.Store(runsStoreConfig);
 
     server?.send({
       message: '/run/update/',
@@ -171,7 +169,42 @@ describe('EventsSocket', () => {
 
     expect(socket.socketStatus).toEqual(SocketStatus.Connected);
     expect(store.state.runs).toHaveLength(1);
-    expect(store.state.runs[0].alias).toBe('hello');
-    expect(store.state.runs[0].classname).toBe('user-rank-unranked');
+    expect(store.state.runs[0]['alias']).toBe('hello');
+    expect(store.state.runs[0]['classname']).toBe('user-rank-unranked');
+  });
+
+  it('should handle socket when server sends /clarification/update/ message', async () => {
+    const socket = new EventsSocket({ ...options, disableSockets: false });
+
+    socket.connect();
+    await server?.connected;
+
+    const localVue = createLocalVue();
+    localVue.use(Vuex);
+    const clarificationStore = new Vuex.Store(clarificationStoreConfig);
+
+    server?.send({
+      message: '/clarification/update/',
+      clarification: {
+        answer: 'some answer',
+        assignment_alias: 'assignment_01',
+        author: 'user_1',
+        clarification_id: 1,
+        contest_alias: 'contest_alias',
+        message: 'some message',
+        problem_alias: 'problem_alias',
+        public: true,
+        time: new Date(0),
+      },
+    });
+
+    expect(socket.socketStatus).toEqual(SocketStatus.Connected);
+    expect(clarificationStore.state.clarifications).toHaveLength(1);
+    expect(clarificationStore.state.clarifications[0]['answer']).toBe(
+      'some answer',
+    );
+    expect(clarificationStore.state.clarifications[0]['message']).toBe(
+      'some message',
+    );
   });
 });
