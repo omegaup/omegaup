@@ -91,7 +91,7 @@ export class EventsSocket {
 
     if (data.message == '/run/update/') {
       data.run.time = time.remoteTime(data.run.time * 1000);
-      updateRun(data.run);
+      updateRun({ run: data.run });
     } else if (data.message == '/clarification/update/') {
       data.clarification.time = time.remoteTime(data.clarification.time * 1000);
       clarificationStore.commit('addClarification', data.clarification);
@@ -213,6 +213,8 @@ export class EventsSocket {
     refreshContestClarifications({
       type: ContestClarificationType.AllProblems,
       contestAlias: this.problemsetAlias,
+      offset: this.clarificationsOffset,
+      rowcount: this.clarificationsRowcount,
     });
 
     if (!this.socket) {
@@ -222,6 +224,8 @@ export class EventsSocket {
           refreshContestClarifications({
             type: ContestClarificationType.AllProblems,
             contestAlias: this.problemsetAlias,
+            offset: this.clarificationsOffset,
+            rowcount: this.clarificationsRowcount,
           });
         }
       }, this.intervalInMiliSeconds);

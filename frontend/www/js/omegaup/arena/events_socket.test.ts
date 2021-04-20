@@ -4,6 +4,10 @@ import { types } from '../api_types';
 import { OmegaUp } from '../omegaup';
 import { SocketOptions, SocketStatus, EventsSocket } from './events_socket';
 import WS from 'jest-websocket-mock';
+import { storeConfig } from './runsStore';
+import { createLocalVue } from '@vue/test-utils';
+import Vuex from 'vuex';
+import fetchMock from 'jest-fetch-mock';
 
 const navbarProblems: types.NavbarProblemsetProblem[] = [
   {
@@ -43,6 +47,7 @@ describe('EventsSocket', () => {
     OmegaUp.ready = true;
     server = new WS(`ws://${options.locationHost}/events/`, {
       selectProtocol: () => 'com.omegaup.events',
+      jsonProtocol: true,
     });
   });
 
@@ -72,8 +77,10 @@ describe('EventsSocket', () => {
   });
 
   it('should handle socket when it is closed', async () => {
-    const server = new WS('ws://localhost:1234');
-    server.on('connection', (socket) => {
+    const socket = new EventsSocket({ ...options, disableSockets: false });
+    socket.connect();
+    await server?.connected;
+    server?.on('connection', (socket) => {
       socket.close({ wasClean: false, code: 1003, reason: 'any' });
     });
     const client = new EventsSocket({ ...options, disableSockets: true });
@@ -138,6 +145,34 @@ describe('EventsSocket', () => {
     socket.connect();
     await server?.connected;
 
+    const localVue = createLocalVue();
+    localVue.use(Vuex);
+    const mutations = {
+      addRun: jest.fn(),
+    };
+    new Vuex.Store(storeConfig);
+
+    server?.send({
+      message: '/run/update/',
+      run: {
+        alias: 'hello',
+        classname: 'user-rank-unranked',
+        country: 'MX',
+        guid: 'abcdef',
+        language: 'py2',
+        memory: 10240,
+        penalty: 20,
+        runtime: 1,
+        score: 100,
+        status: 'ready',
+        submit_delay: 1,
+        time: new Date(0),
+        username: 'omegaUp',
+        verdict: 'AC',
+      },
+    });
+
     expect(socket.socketStatus).toEqual(SocketStatus.Connected);
+    expect(mutations.addRun.mock.calls).toHaveLength(1);
   });
 });

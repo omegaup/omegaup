@@ -23,14 +23,14 @@ export interface RunsState {
   filters?: RunFilters;
 }
 
-export const runsStore = new Vuex.Store<RunsState>({
+export const storeConfig = {
   state: {
     runs: [],
     index: {},
     filters: {},
   },
   mutations: {
-    addRun(state, run: types.Run) {
+    addRun(state: RunsState, run: types.Run) {
       if (Object.prototype.hasOwnProperty.call(state.index, run.guid)) {
         Vue.set(
           state.runs,
@@ -42,15 +42,15 @@ export const runsStore = new Vuex.Store<RunsState>({
       Vue.set(state.index, run.guid, state.runs.length);
       state.runs.push(run);
     },
-    clear(state) {
+    clear(state: RunsState) {
       state.runs.splice(0);
       state.index = {};
     },
-    applyFilter(state, filter: RunFilters) {
+    applyFilter(state: RunsState, filter: RunFilters) {
       state.filters = Object.assign(state.filters, filter);
     },
     removeFilter(
-      state,
+      state: RunsState,
       filter: 'verdict' | 'language' | 'username' | 'status',
     ) {
       if (!state.filters) {
@@ -59,7 +59,7 @@ export const runsStore = new Vuex.Store<RunsState>({
       delete state.filters[filter];
     },
   },
-});
+};
 
 export const myRunsStore = new Vuex.Store<RunsState>({
   state: {
@@ -85,3 +85,5 @@ export const myRunsStore = new Vuex.Store<RunsState>({
     },
   },
 });
+
+export const runsStore = new Vuex.Store<RunsState>(storeConfig);
