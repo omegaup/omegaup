@@ -1119,6 +1119,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         ];
     }
 
+    /**
+     * @return list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
+     */
     final public static function getCurrentContests(
         int $page = 1,
         int $rowsPerPage = 1000,
