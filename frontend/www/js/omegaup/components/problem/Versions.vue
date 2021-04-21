@@ -1,5 +1,5 @@
 <template>
-  <div class="card w-100 mb-4">
+  <div class="card w-100 mb-4" data-versions>
     <div class="card-body controls">
       <label
         >{{ T.problemVersionDiffMode }}
@@ -35,6 +35,8 @@
               <tbody>
                 <tr
                   v-for="revision in log"
+                  :key="revision.commit"
+                  :data-revision="revision.commit"
                   @click="selectedRevision = revision"
                 >
                   <td>
@@ -75,6 +77,7 @@
             <ul v-if="diffMode == 'files'" class="list-group no-margin">
               <li
                 v-for="diffEntry in diffFiles"
+                :key="diffEntry[0]"
                 class="list-group-item"
                 :class="diffEntry[1]"
               >
@@ -106,7 +109,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="diffEntry in diffSubmissions" :class="diffEntry[1]">
+                <tr
+                  v-for="diffEntry in diffSubmissions"
+                  :key="diffEntry[0].guid"
+                  :class="diffEntry[1]"
+                >
                   <td class="text-center">
                     <acronym :title="diffEntry[0].guid"
                       ><tt>{{ diffEntry[0].guid.substr(0, 8) }}</tt></acronym
@@ -163,14 +170,14 @@ import * as time from '../../time';
 @Component
 export default class ProblemVersions extends Vue {
   @Prop() log!: omegaup.Commit[];
-  @Prop() publishedRevision!: omegaup.Commit;
+  @Prop({ default: null }) publishedRevision!: null | omegaup.Commit;
   @Prop() showFooter!: boolean;
-  @Prop() value!: omegaup.Commit;
+  @Prop({ default: null }) value!: null | omegaup.Commit;
 
   T = T;
   time = time;
   diffMode = 'files';
-  selectedRevision: omegaup.Commit = this.value;
+  selectedRevision: null | omegaup.Commit = this.value;
   runsDiff: types.CommitRunsDiff = {};
   showOnlyChanges = false;
   updatePublished = 'owned-problemsets';
