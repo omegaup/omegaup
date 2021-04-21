@@ -60,9 +60,6 @@ final class DAO {
      * @return (T is null ? null : \OmegaUp\Timestamp) the POSIX timestamp.
      */
     final public static function fromMySQLTimestamp($timestamp): ?\OmegaUp\Timestamp {
-        if (is_null($timestamp)) {
-            return null;
-        }
         // Temporary migration code to allow the timestamps to be in either
         // format.
         if ($timestamp instanceof \OmegaUp\Timestamp) {
