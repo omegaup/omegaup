@@ -237,6 +237,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return $addedContests;
     }
 
+    /**
+     * @return list<ContestListItem>
+     */
     public static function getContestList2() {
         $contests = \OmegaUp\DAO\Contests::getCurrentContests();
         return $contests;
@@ -947,6 +950,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ];
     }
 
+    /**
+     * @return array{smartyProperties: array{payload: ContestListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     */
     public static function getContestListDetailsForTypeScript2(
         \OmegaUp\Request $r
     ) {
