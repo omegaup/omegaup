@@ -1118,4 +1118,53 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             'totalRows' => $totalRows,
         ];
     }
+
+    final public static function getCurrentContests(
+        int $page = 1,
+        int $rowsPerPage = 1000,
+        int $actives = \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+        int $recommended = \OmegaUp\DAO\Enum\RecommendedStatus::ALL,
+        ?string $query = null
+    ): array {
+        $offset = ($page - 1) * $rowsPerPage;
+        $end_check = \OmegaUp\DAO\Enum\ActiveStatus::sql($actives);
+        $recommended_check = \OmegaUp\DAO\Enum\RecommendedStatus::sql(
+            $recommended
+        );
+        $filter = self::formatSearch($query);
+        $query_check = \OmegaUp\DAO\Enum\FilteredStatus::sql($filter['type']);
+
+        $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
+
+        $sql = "
+               SELECT
+                    $columns
+                FROM
+                    `Contests`
+                WHERE
+                    `admission_mode` <> 'private'
+                    AND $recommended_check
+                    AND $end_check
+                    AND $query_check
+                    AND archived = 0
+                ORDER BY
+                    CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
+                    `recommended` DESC,
+                    `original_finish_time` DESC
+                LIMIT ?, ?
+                ";
+
+        $params = [];
+        if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
+            $params[] = $filter['query'];
+        } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {
+            $params[] = $filter['query'];
+            $params[] = $filter['query'];
+        }
+
+        $params[] = intval($offset);
+        $params[] = intval($rowsPerPage);
+
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+    }
 }

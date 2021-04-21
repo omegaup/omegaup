@@ -237,6 +237,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return $addedContests;
     }
 
+    public static function getContestList2() {
+        $contests = \OmegaUp\DAO\Contests::getCurrentContests();
+        return $contests;
+    }
+
     /**
      * Returns a list of contests where current user has admin rights (or is
      * the director).
@@ -939,6 +944,32 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'arena_contest_list',
+        ];
+    }
+
+    public static function getContestListDetailsForTypeScript2(
+        \OmegaUp\Request $r
+    ) {
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing.
+            $r->identity = null;
+        }
+
+        $contests = self::getContestList2();
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'isLogged' => !is_null($r->identity),
+                    'contests' => $contests,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleContestList'
+                ),
+            ],
+            'entrypoint' => 'arena_contest_list2',
         ];
     }
 

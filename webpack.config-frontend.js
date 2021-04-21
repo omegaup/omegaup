@@ -28,6 +28,7 @@ module.exports = {
       './frontend/www/js/omegaup/arena/assignment_admin.ts',
     arena_contest: './frontend/www/js/omegaup/arena/contest.ts',
     arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
+    arena_contest_list2: './frontend/www/js/omegaup/arena/contest_list2.ts',
     arena_contest_practice:
       './frontend/www/js/omegaup/arena/contest_practice.ts',
     arena_course: './frontend/www/js/omegaup/arena/course.ts',
