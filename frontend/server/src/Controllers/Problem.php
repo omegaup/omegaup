@@ -2698,8 +2698,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     );
                 }
                 $isPracticeMode = (
-                    $problemset->type === 'Contest' &&
-                    $problemset->access_mode !== 'private' &&
+                    $container instanceof \OmegaUp\DAO\VO\Contests &&
+                    $container->admission_mode !== 'private' &&
                     $container->finish_time->time < \OmegaUp\Time::get()
                 );
                 if (!$isPracticeMode) {
