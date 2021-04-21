@@ -22,7 +22,7 @@ const nominations: types.NominationListItem[] = [1, 2, 3].map((x) => ({
     alias: `Problem-${x}`,
     title: `Problem ${x}`,
   },
-  qualitynomination_id: 1,
+  qualitynomination_id: x,
   status: 'open',
   time: new Date(`2021-02-0${x} 00:00:00`),
   votes: [],
