@@ -33,7 +33,10 @@ export interface RankingRequest {
 }
 
 // Implement this function in a new PR
-export function onRankingEvents(): void {
+export function onRankingEvents(events: types.ScoreboardEvent[]): void {
+  // Don't trust input data (data might not be sorted)
+  // TODO: use events
+  events.sort((a, b) => a.delta - b.delta);
   createChart();
 }
 
