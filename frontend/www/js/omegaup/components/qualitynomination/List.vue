@@ -99,7 +99,10 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="nomination in orderedNominations">
+          <tr
+            v-for="nomination in orderedNominations"
+            :key="`nomination-${nomination.qualitynomination_id}`"
+          >
             <td>
               <a :href="problemUrl(nomination.problem.alias)">{{
                 nomination.problem.title

@@ -3,33 +3,30 @@ import T from '../../lang';
 import qualitynomination_List from './List.vue';
 import type { types } from '../../api_types';
 
-const nominations: types.NominationListItem[] = [1, 2, 3].map(
-  (x) =>
-    ({
-      author: {
-        name: 'nombre',
-        username: 'user',
-      },
-      contents: {
-        original: '',
-        rationale: 'N/A',
-        reason: 'wrong-test-cases',
-      },
-      nomination: 'demotion',
-      nominator: {
-        name: 'nominador',
-        username: 'user_nominator',
-      },
-      problem: {
-        alias: `Problem-${x}`,
-        title: `Problem ${x}`,
-      },
-      qualitynomination_id: 1,
-      status: 'open',
-      time: new Date(`2021-02-0${x} 00:00:00`),
-      votes: [],
-    } as types.NominationListItem),
-);
+const nominations: types.NominationListItem[] = [1, 2, 3].map((x) => ({
+  author: {
+    name: 'nombre',
+    username: 'user',
+  },
+  contents: {
+    original: '',
+    rationale: 'N/A',
+    reason: 'wrong-test-cases',
+  },
+  nomination: 'demotion',
+  nominator: {
+    name: 'nominador',
+    username: 'user_nominator',
+  },
+  problem: {
+    alias: `Problem-${x}`,
+    title: `Problem ${x}`,
+  },
+  qualitynomination_id: 1,
+  status: 'open',
+  time: new Date(`2021-02-0${x} 00:00:00`),
+  votes: [],
+}));
 
 describe('List.vue', () => {
   it('Should handle list of nominations', async () => {
