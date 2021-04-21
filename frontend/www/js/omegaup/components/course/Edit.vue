@@ -199,8 +199,8 @@
             (participants) => $emit('add-student', participants)
           "
           @emit-remove-student="(student) => $emit('remove-student', student)"
-          @emit-accept-request="(username) => $emit('accept-request', username)"
-          @emit-deny-request="(username) => $emit('deny-request', username)"
+          @accept-request="(request) => $emit('accept-request', request)"
+          @deny-request="(request) => $emit('deny-request', request)"
         ></omegaup-course-add-students>
       </div>
 

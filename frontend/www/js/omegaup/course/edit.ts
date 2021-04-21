@@ -85,7 +85,11 @@ OmegaUp.on('ready', () => {
           note: '',
         })
           .then(() => {
-            ui.success(T.successfulOperation);
+            if (resolution) {
+              ui.success(T.arbitrateRequestAcceptSuccessfully);
+            } else {
+              ui.success(T.arbitrateRequestDenySuccessfully);
+            }
             courseEdit.refreshStudentList();
           })
           .catch(ui.apiError);
@@ -398,9 +402,9 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'accept-request': (username: string) =>
+          'accept-request': ({ username }: { username: string }) =>
             this.arbitrateRequest(username, true),
-          'deny-request': (username: string) =>
+          'deny-request': ({ username }: { username: string }) =>
             this.arbitrateRequest(username, false),
           'add-admin': (useradmin: string) => {
             api.Course.addAdmin({
