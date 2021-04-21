@@ -152,10 +152,7 @@
             (assignmentFormComponent, problems) =>
               $emit('submit-new-assignment', assignmentFormComponent, problems)
           "
-          @get-versions="
-            (newProblemAlias, addProblemComponent) =>
-              $emit('get-versions', newProblemAlias, addProblemComponent)
-          "
+          @get-versions="(request) => $emit('get-versions', request)"
         >
           <template #page-header><span></span></template>
           <template #cancel-button>

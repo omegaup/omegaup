@@ -529,6 +529,17 @@ class Authorization {
             );
     }
 
+    public static function canEditProblemset(
+        \OmegaUp\DAO\VO\Identities $identity,
+        int $problemsetId
+    ): bool {
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK($problemsetId);
+        if (is_null($problemset) || is_null($problemset->acl_id)) {
+            return false;
+        }
+        return self::isAdmin($identity, $problemset);
+    }
+
     public static function canCreatePublicCourse(\OmegaUp\DAO\VO\Identities $identity): bool {
         return self::isCourseCurator($identity);
     }
