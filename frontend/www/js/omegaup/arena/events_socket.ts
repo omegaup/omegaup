@@ -27,7 +27,7 @@ export interface SocketOptions {
   clarificationsRowcount: number;
   currentUsername: string;
   navbarProblems: types.NavbarProblemsetProblem[];
-  intervalInMiliSeconds: number;
+  intervalInMilliseconds: number;
 }
 
 export class EventsSocket {
@@ -48,7 +48,7 @@ export class EventsSocket {
   private readonly clarificationsRowcount: number;
   private readonly currentUsername: string;
   private readonly navbarProblems: types.NavbarProblemsetProblem[];
-  private readonly intervalInMiliSeconds: number;
+  private readonly intervalInMilliseconds: number;
 
   constructor({
     disableSockets = false,
@@ -61,7 +61,7 @@ export class EventsSocket {
     clarificationsRowcount = 20,
     currentUsername,
     navbarProblems,
-    intervalInMiliSeconds = 5 * 60 * 1000,
+    intervalInMilliseconds = 5 * 60 * 1000,
   }: SocketOptions) {
     this.socket = null;
 
@@ -76,7 +76,7 @@ export class EventsSocket {
     this.socketStatus = SocketStatus.Waiting;
     this.clarificationInterval = null;
     this.rankingInterval = null;
-    this.intervalInMiliSeconds = intervalInMiliSeconds;
+    this.intervalInMilliseconds = intervalInMilliseconds;
 
     const protocol = locationProtocol === 'https:' ? 'wss:' : 'ws:';
     const host = locationHost;
@@ -129,7 +129,7 @@ export class EventsSocket {
       this.socketStatus = SocketStatus.Waiting;
       setTimeout(
         () => this.connectSocket(),
-        Math.random() * (this.intervalInMiliSeconds / 2),
+        Math.random() * (this.intervalInMilliseconds / 2),
       );
       return;
     }
@@ -148,7 +148,7 @@ export class EventsSocket {
           this.socketStatus = SocketStatus.Connected;
           this.socketKeepalive = setInterval(
             () => socket.send('"ping"'),
-            this.intervalInMiliSeconds,
+            this.intervalInMilliseconds,
           );
           accept();
         };
@@ -183,7 +183,7 @@ export class EventsSocket {
         console.log(e);
         setTimeout(() => {
           this.setupPolls();
-        }, Math.random() * (this.intervalInMiliSeconds / 2));
+        }, Math.random() * (this.intervalInMilliseconds / 2));
       });
   }
 
@@ -228,7 +228,7 @@ export class EventsSocket {
             rowcount: this.clarificationsRowcount,
           });
         }
-      }, this.intervalInMiliSeconds);
+      }, this.intervalInMilliseconds);
 
       this.rankingInterval = setInterval(() => {
         api.Problemset.scoreboard({
@@ -250,7 +250,7 @@ export class EventsSocket {
               .catch(ui.ignoreError);
           })
           .catch(ui.ignoreError);
-      }, this.intervalInMiliSeconds);
+      }, this.intervalInMilliseconds);
     }
   }
 }

@@ -42,7 +42,7 @@ const options: SocketOptions = {
   clarificationsRowcount: 30,
   navbarProblems: navbarProblems,
   currentUsername: 'omegaUp',
-  intervalInMiliSeconds: 500,
+  intervalInMilliseconds: 500,
 };
 describe('EventsSocket', () => {
   let server: WS | null = null;
@@ -112,7 +112,7 @@ describe('EventsSocket', () => {
     expect(socket.socketStatus).toEqual(SocketStatus.Waiting);
   });
 
-  it('should handle socket when it is disabled', () => {
+  it('should handle a socket when it is disabled', () => {
     const socket = new EventsSocket({ ...options, disableSockets: true });
     expect(socket.shouldRetry).toEqual(false);
     expect(socket.retries).toEqual(10);
@@ -122,9 +122,14 @@ describe('EventsSocket', () => {
     expect(socket.socketStatus).toEqual(SocketStatus.Failed);
   });
 
-  it('should handle socket when it is closed', async () => {
+  it('should handle a socket successfully connected', async () => {
     const socket = new EventsSocket({ ...options, disableSockets: false });
     socket.connect();
+    await server?.connected;
+    expect(socket.socketStatus).toEqual(SocketStatus.Connected);
+  });
+
+  it('should handle a socket when it is closed', async () => {
     await server?.connected;
     server?.on('connection', (socket) => {
       socket.close({ wasClean: false, code: 1003, reason: 'any' });
@@ -139,7 +144,7 @@ describe('EventsSocket', () => {
     expect(client.socketStatus).toEqual(SocketStatus.Failed);
   });
 
-  it('should handle socket when server sends /run/update/ message', async () => {
+  it('should handle a socket when server sends /run/update/ message', async () => {
     const socket = new EventsSocket({ ...options, disableSockets: false });
 
     socket.connect();
@@ -175,7 +180,7 @@ describe('EventsSocket', () => {
     expect(store.state.runs[0]['classname']).toBe('user-rank-unranked');
   });
 
-  it('should handle socket when server sends /clarification/update/ message', async () => {
+  it('should handle a socket when server sends /clarification/update/ message', async () => {
     const socket = new EventsSocket({ ...options, disableSockets: false });
 
     socket.connect();
@@ -210,7 +215,7 @@ describe('EventsSocket', () => {
     );
   });
 
-  it('should handle socket when server sends /scoreboard/update/ message', async () => {
+  it('should handle a socket when server sends /scoreboard/update/ message', async () => {
     const socket = new EventsSocket({ ...options, disableSockets: false });
 
     socket.connect();
@@ -341,6 +346,6 @@ describe('EventsSocket', () => {
         title: 'omegaUp',
       },
     });
-    expect(onRankingChanged).toHaveBeenCalledTimes(1);
+    expect(onRankingChanged).toHaveBeenCalled();
   });
 });
