@@ -1618,9 +1618,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $identity,
             $contest
         );
-        if (is_null($problemsetIdentity)) {
-            return $result;
-        }
         $problemsetIdentity->access_time = $problemsetIdentity->access_time;
 
         // Add time left to response

@@ -2697,14 +2697,23 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'problemsetNotFound'
                     );
                 }
-                \OmegaUp\DAO\ProblemsetIdentities::checkAndSaveFirstTimeAccess(
-                    $loggedIdentity,
-                    $container,
-                    \OmegaUp\Authorization::canSubmitToProblemset(
-                        $loggedIdentity,
-                        $problemset
-                    )
+                $isPracticeMode = (
+                    $problemset->type === 'Contest' &&
+                    $problemset->access_mode !== 'private' &&
+                    $container->finish_time->time < \OmegaUp\Time::get()
                 );
+                if (!$isPracticeMode) {
+                    // Check and save first time access is not needed for
+                    // contests in practice mode
+                    \OmegaUp\DAO\ProblemsetIdentities::checkAndSaveFirstTimeAccess(
+                        $loggedIdentity,
+                        $container,
+                        \OmegaUp\Authorization::canSubmitToProblemset(
+                            $loggedIdentity,
+                            $problemset
+                        )
+                    );
+                }
             }
 
             // As last step, register the problem as opened
