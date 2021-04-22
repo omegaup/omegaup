@@ -15,7 +15,7 @@ import {
   refreshContestClarifications,
   trackClarifications,
 } from './clarifications';
-import { navigateToProblem } from './navigation';
+import { navigateToProblem, NavigationType } from './navigation';
 import clarificationStore from './clarificationsStore';
 import {
   showSubmission,
@@ -39,7 +39,7 @@ OmegaUp.on('ready', () => {
   if (payload.scoreboard) {
     const rankingInfo = onRankingChanged({
       scoreboard: payload.scoreboard,
-      username: commonPayload.currentUsername,
+      currentUsername: commonPayload.currentUsername,
       navbarProblems: payload.problems,
     });
     ranking = rankingInfo.ranking;
@@ -87,10 +87,12 @@ OmegaUp.on('ready', () => {
         on: {
           'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
             navigateToProblem({
+              type: NavigationType.ForContest,
               problem,
               runs,
               target: contestContestant,
               problems: this.problems,
+              contestAlias: payload.contest.alias,
             });
           },
           'show-run': (request: SubmissionRequest) => {
@@ -148,9 +150,8 @@ OmegaUp.on('ready', () => {
             if (!clarification) {
               return;
             }
-            const contestAlias = payload.contest.alias;
             api.Clarification.create({
-              contest_alias: contestAlias,
+              contest_alias: payload.contest.alias,
               problem_alias: clarification.problem_alias,
               username: clarification.author,
               message: clarification.message,
@@ -194,6 +195,8 @@ OmegaUp.on('ready', () => {
     refreshContestClarifications({
       type: ContestClarificationType.AllProblems,
       contestAlias: payload.contest.alias,
+      offset: 0,
+      rowcount: 100,
     });
   }, 5 * 60 * 1000);
 });
