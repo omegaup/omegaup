@@ -2849,7 +2849,7 @@ export namespace types {
     submissions: number;
     title: string;
     version: string;
-    versions: { log: types.ProblemVersion[]; published?: string };
+    versions: { log: types.ProblemVersion[]; published: string };
     visibility: number;
     visits: number;
   }
@@ -3956,7 +3956,7 @@ export namespace messages {
   export type _ProblemVersionsServerResponse = any;
   export type ProblemVersionsResponse = {
     log: types.ProblemVersion[];
-    published?: string;
+    published: string;
   };
 
   // ProblemForfeited
