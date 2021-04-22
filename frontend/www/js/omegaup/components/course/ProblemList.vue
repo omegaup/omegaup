@@ -279,7 +279,10 @@ export default class CourseProblemList extends Vue {
       this.selectedRevision = this.publishedRevision;
       return;
     }
-    this.$emit('change-alias', this, newProblemAlias);
+    this.$emit('change-alias', {
+      target: this,
+      request: { problemAlias: newProblemAlias },
+    });
   }
 
   @Watch('assignmentProblems')
