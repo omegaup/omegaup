@@ -242,7 +242,17 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function getContestList2() {
         $contests = \OmegaUp\DAO\Contests::getCurrentContests();
-        return $contests;
+
+        $addedContests = [];
+        foreach ($contests as $contestInfo) {
+            $contestInfo['duration'] = (is_null($contestInfo['window_length']) ?
+                $contestInfo['finish_time']->time - $contestInfo['start_time']->time :
+                ($contestInfo['window_length'] * 60)
+            );
+
+            $addedContests[] = $contestInfo;
+        }
+        return $addedContests;
     }
 
     /**
