@@ -1904,6 +1904,15 @@ export namespace types {
     query: string;
   }
 
+  export interface ContestListPayload2 {
+    contests: {
+      current: types.ContestListItem[];
+      future: types.ContestListItem[];
+      past: types.ContestListItem[];
+    };
+    isLogged: boolean;
+  }
+
   export interface ContestNewPayload {
     languages: { [key: string]: string };
   }
