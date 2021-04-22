@@ -227,6 +227,30 @@
               v-if="inContest"
             ></omegaup-notifications-clarifications>
             -->
+            <li class="nav-item dropdown nav-themes">
+              <a
+                class="nav-link px-2 dropdown-toggle"
+                href="#"
+                role="button"
+                data-nav-themes
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                {{ T.navbarChooseTheme }}
+              </a>
+              <div class="dropdown-menu">
+                <a
+                  v-for="theme in availableThemes"
+                  :key="theme"
+                  class="dropdown-item"
+                  href="#"
+                  @click="currentTheme = theme"
+                >
+                  {{ theme }}
+                </a>
+              </div>
+            </li>
             <omegaup-notification-list
               :notifications="notifications"
               @read="readNotifications"
@@ -355,9 +379,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 import notifications_List from '../notification/List.vue';
 import notifications_Clarifications from '../notification/Clarifications.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
@@ -367,6 +392,15 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 library.add(faSignOutAlt, faUser);
+
+export enum Theme {
+  LIGHT = 'light',
+  COSMO = 'cosmo',
+  CYBORG = 'cyborg',
+  DARKLY = 'darkly',
+  SALTE = 'slate',
+  SUPERHERO = 'superhero',
+}
 
 @Component({
   components: {
@@ -398,9 +432,11 @@ export default class Navbar extends Vue {
   @Prop() errorMessage!: string | null;
   @Prop({ default: 0 }) profileProgress!: number;
   @Prop() initialClarifications!: types.Clarification[];
+  @Prop({ default: Theme.LIGHT }) theme!: Theme;
 
   clarifications: types.Clarification[] = this.initialClarifications;
   T = T;
+  currentTheme = this.theme;
 
   get formattedLoginURL(): string {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
@@ -412,8 +448,21 @@ export default class Navbar extends Vue {
     );
   }
 
+  get availableThemes(): string[] {
+    return Object.values(Theme);
+  }
+
   readNotifications(notifications: types.Notification[], url?: string): void {
     this.$emit('read-notifications', notifications, url);
+  }
+
+  @Watch('currentTheme')
+  onCurrentThemeChanged(newValue: Theme) {
+    localStorage.setItem(
+      'theme-preferences',
+      JSON.stringify({ theme: newValue }),
+    );
+    ui.updateTheme();
   }
 }
 </script>

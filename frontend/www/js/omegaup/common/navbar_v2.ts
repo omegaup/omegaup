@@ -7,6 +7,7 @@ import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload('header-payload');
+  ui.updateTheme();
   const commonNavbar = new Vue({
     el: '#common-navbar',
     components: {

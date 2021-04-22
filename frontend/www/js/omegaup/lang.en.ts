@@ -591,6 +591,7 @@ const translations: { [key: string]: string; } = {
   navUserRanking: "User ranking",
   navViewBadges: "View badges",
   navViewProfile: "My profile",
+  navbarChooseTheme: "Theme",
   newPublicTagsNotAllowed: "It is not allowed to add new public tags",
   noCoders: "No coders.",
   nominationsRangeHeader: "Problem reports (from %(lowCount) to %(highCount))",

@@ -1,6 +1,7 @@
 import T from './lang';
 import { formatDate, formatDateTime } from './time';
 import { omegaup } from './omegaup';
+import { Theme } from './components/common/Navbarv2.vue';
 
 export enum MessageType {
   Danger = 'alert-danger',
@@ -270,4 +271,24 @@ export function rankingUsername(
   if (rank.virtual)
     username = formatString(T.virtualSuffix, { username: username });
   return username;
+}
+
+export function updateTheme(): void {
+  const darkThemeStyleElement = document.getElementById('dark-theme-style');
+  const themePreferences = JSON.parse(
+    localStorage.getItem('theme-preferences') ?? '{}',
+  );
+  const htmlElement = document.getElementsByTagName('html')[0];
+  htmlElement.dataset.colorMode = themePreferences.theme;
+  if (!darkThemeStyleElement) {
+    return;
+  }
+  if (!themePreferences.theme || themePreferences.theme === Theme.LIGHT) {
+    darkThemeStyleElement.setAttribute('href', '');
+    return;
+  }
+  darkThemeStyleElement.setAttribute(
+    'href',
+    `/third_party/bootswatch-4.6.0/${themePreferences.theme}/bootstrap.min.css`,
+  );
 }
