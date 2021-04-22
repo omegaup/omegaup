@@ -2677,6 +2677,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $response['runs'] = $results;
         }
 
+        $isPracticeMode = false;
         if (!is_null($problemset) && !is_null($loggedIdentity)) {
             $response['admin'] = \OmegaUp\Authorization::isAdmin(
                 $loggedIdentity,
@@ -2722,7 +2723,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $problemsetId,
                     $problem->problem_id,
                     $loggedIdentity->identity_id
-                )
+                ) &&
+                !$isPracticeMode
             ) {
                 \OmegaUp\DAO\ProblemsetProblemOpened::create(new \OmegaUp\DAO\VO\ProblemsetProblemOpened([
                     'problemset_id' => $problemset->problemset_id,
