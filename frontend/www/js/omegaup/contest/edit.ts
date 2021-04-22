@@ -22,7 +22,8 @@ OmegaUp.on('ready', () => {
       problems: payload.problems,
       requests: payload.requests,
       users: payload.users,
-      existingProblems: [] as { key: string; value: string }[],
+      searchResultProblems: [] as types.ListItem[],
+      searchResultUsers: [] as types.ListItem[],
     }),
     methods: {
       arbitrateRequest: (username: string, resolution: boolean): void => {
@@ -34,7 +35,11 @@ OmegaUp.on('ready', () => {
           note: resolutionText,
         })
           .then(() => {
-            ui.success(T.successfulOperation);
+            if (resolution) {
+              ui.success(T.arbitrateRequestAcceptSuccessfully);
+            } else {
+              ui.success(T.arbitrateRequestDenySuccessfully);
+            }
             contestEdit.refreshRequests();
           })
           .catch(ui.apiError);
@@ -113,23 +118,50 @@ OmegaUp.on('ready', () => {
           problems: this.problems,
           requests: this.requests,
           users: this.users,
-          existingProblems: this.existingProblems,
+          searchResultProblems: this.searchResultProblems,
+          searchResultUsers: this.searchResultUsers,
         },
         on: {
-          'update-existing-problems': (query: string) => {
+          'update-search-result-problems': (query: string) => {
             api.Problem.list({
               query,
             })
               .then((data) => {
-                this.existingProblems = [];
-                data.results.forEach((problem: types.ProblemListItem) => {
-                  this.existingProblems.push({
+                // Problems previously added into the contest should not be
+                // shown in the dropdown
+                const addedProblems = new Set(
+                  this.problems.map((problem) => problem.alias),
+                );
+                this.searchResultProblems = data.results
+                  .filter((problem) => !addedProblems.has(problem.alias))
+                  .map((problem) => ({
                     key: problem.alias,
-                    value: problem.title,
-                  });
-                });
+                    value: `${ui.escape(problem.title)} (<strong>${ui.escape(
+                      problem.alias,
+                    )}</strong>)`,
+                  }));
               })
-              .catch();
+              .catch(ui.apiError);
+          },
+          'update-search-result-users': (query: string) => {
+            api.User.list({ query })
+              .then((data) => {
+                // Users previously invited to the contest should not be shown
+                // in the dropdown
+                const addedUsers = new Set(
+                  this.users.map((user) => user.username),
+                );
+
+                this.searchResultUsers = data
+                  .filter((user) => !addedUsers.has(user.label))
+                  .map((user) => ({
+                    key: user.label,
+                    value: `${ui.escape(user.label)} (<strong>${ui.escape(
+                      user.value,
+                    )}</strong>)`,
+                  }));
+              })
+              .catch(ui.apiError);
           },
           'update-contest': function (contest: omegaup.Contest) {
             api.Contest.update(
@@ -159,23 +191,27 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'get-versions': (
-            problemAlias: string,
-            addProblemComponent: {
+          'get-versions': ({
+            request,
+            target,
+          }: {
+            request: { problemAlias: string };
+            target: {
               versionLog: types.ProblemVersion[];
               problems: types.ProblemsetProblem[];
               selectedRevision: types.ProblemVersion;
               publishedRevision: types.ProblemVersion;
-            },
-          ) => {
+            };
+          }) => {
             api.Problem.versions({
-              problem_alias: problemAlias,
+              problem_alias: request.problemAlias,
+              problemset_id: payload.details.problemset_id,
             })
               .then((result) => {
-                addProblemComponent.versionLog = result.log;
+                target.versionLog = result.log;
                 let currentProblem = null;
-                for (const problem of addProblemComponent.problems) {
-                  if (problem.alias === problemAlias) {
+                for (const problem of target.problems) {
+                  if (problem.alias === request.problemAlias) {
                     currentProblem = problem;
                     break;
                   }
@@ -186,7 +222,7 @@ OmegaUp.on('ready', () => {
                 }
                 for (const revision of result.log) {
                   if (publishedCommitHash === revision.commit) {
-                    addProblemComponent.selectedRevision = addProblemComponent.publishedRevision = revision;
+                    target.selectedRevision = target.publishedRevision = revision;
                     break;
                   }
                 }
@@ -258,7 +294,11 @@ OmegaUp.on('ready', () => {
                 this.refreshUsers();
                 this.refreshRequests();
                 if (!contestantsWithError.length) {
-                  ui.success(T.bulkUserAddSuccess);
+                  ui.success(
+                    contestants.length === 1
+                      ? T.singleUserAddSuccess
+                      : T.bulkUserAddSuccess,
+                  );
                 } else {
                   ui.error(
                     ui.formatString(T.bulkUserAddError, {
@@ -294,10 +334,10 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'accept-request': (username: string) => {
+          'accept-request': ({ username }: { username: string }) => {
             this.arbitrateRequest(username, true);
           },
-          'deny-request': (username: string) => {
+          'deny-request': ({ username }: { username: string }) => {
             this.arbitrateRequest(username, false);
           },
           'add-admin': (username: string) => {

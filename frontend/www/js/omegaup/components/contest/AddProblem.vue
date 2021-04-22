@@ -6,11 +6,10 @@
           <div class="form-group col-md-6">
             <label>{{ T.wordsProblem }}</label>
             <omegaup-common-typeahead
-              :existing-options="existingProblems"
-              :type="'problem'"
+              :existing-options="searchResultProblems"
               :value.sync="alias"
               @update-existing-options="
-                (query) => $emit('update-existing-problems', query)
+                (query) => $emit('update-search-result-problems', query)
               "
             >
             </omegaup-common-typeahead>
@@ -132,9 +131,21 @@
             }}</a>
           </td>
           <td class="text-right">{{ problem.points }}</td>
-          <td class="text-center">
-            <button class="close float-none" @click="onRemove(problem)">
+          <td class="text-center" data-remove-problem>
+            <button
+              v-if="!problem.has_submissions"
+              class="close float-none"
+              @click="onRemove(problem)"
+            >
               ×
+            </button>
+            <button
+              v-else
+              class="close float-none"
+              disabled="disabled"
+              :title="T.cannotRemoveProblemWithSubmissions"
+            >
+              🚫
             </button>
           </td>
         </tr>
@@ -171,7 +182,7 @@ export default class AddProblem extends Vue {
   @Prop() contestAlias!: string;
   @Prop() initialPoints!: number;
   @Prop() initialProblems!: types.ProblemsetProblem[];
-  @Prop() existingProblems!: { key: string; value: string }[];
+  @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
   alias = '';
@@ -185,7 +196,10 @@ export default class AddProblem extends Vue {
 
   onSubmit(): void {
     if (this.useLatestVersion) {
-      this.$emit('get-versions', this.alias, this);
+      this.$emit('get-versions', {
+        target: this,
+        request: { problemAlias: this.alias },
+      });
     } else {
       this.onAddProblem();
     }
@@ -259,7 +273,10 @@ export default class AddProblem extends Vue {
       this.selectedRevision = this.publishedRevision = emptyCommit;
       return;
     }
-    this.$emit('get-versions', newProblemAlias, this);
+    this.$emit('get-versions', {
+      target: this,
+      request: { problemAlias: this.alias },
+    });
   }
 }
 </script>

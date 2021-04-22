@@ -9,12 +9,13 @@ namespace OmegaUp\Controllers;
  * @psalm-type Progress=array{score: float, max_score: float}
  * @psalm-type AssignmentProgress=array<string, Progress>
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
- * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, classname: string, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, name: null|string, request_time: \OmegaUp\Timestamp, username: string}
  * @psalm-type CourseAdmin=array{role: string, username: string}
+ * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, languages: list<string>|null, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
+ * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, languages: list<string>|null, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -4062,6 +4063,18 @@ class Course extends \OmegaUp\Controllers\Controller {
                 strval($course->alias),
                 $isAdmin
             ),
+            'clarifications' => (
+                is_null($identity)
+                ? []
+                : \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
+                    /*$contest=*/                    null,
+                    $course,
+                    ($isAdmin || $isCurator),
+                    $identity,
+                    /*$offset=*/ null,
+                    /*$rowcount=*/ 100,
+                )
+            ),
             'name' => strval($course->name),
             'description' => strval($course->description),
             'alias' => strval($course->alias),
@@ -4841,6 +4854,120 @@ class Course extends \OmegaUp\Controllers\Controller {
         self::$log->info("Course updated (alias): {$courseAlias}");
         return [
             'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Gets the clarifications of all assignments in a course
+     *
+     * @return array{clarifications: list<Clarification>}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param int $offset
+     * @omegaup-request-param int $rowcount
+     */
+    public static function apiClarifications(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        $offset = $r->ensureOptionalInt('offset');
+        $rowcount = $r->ensureOptionalInt('rowcount') ?? 1000;
+
+        $course = self::validateCourseExists(
+            $r->ensureString(
+                'course_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            )
+        );
+
+        if (
+            !\OmegaUp\Authorization::canViewCourse(
+                $r->identity,
+                $course,
+                self::resolveGroup($course)
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return [
+            'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
+                /* contest */                null,
+                $course,
+                \OmegaUp\Authorization::isCourseAdmin($r->identity, $course),
+                $r->identity,
+                $offset,
+                $rowcount
+            ),
+        ];
+    }
+
+    /**
+     * Get clarifications of problem in a contest
+     *
+     * @return array{clarifications: list<Clarification>}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param int $offset
+     * @omegaup-request-param int $rowcount
+     */
+    public static function apiProblemClarifications(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        $offset = $r->ensureOptionalInt('offset');
+        $rowcount = $r->ensureOptionalInt('rowcount') ?? 1000;
+
+        $course = self::validateCourseExists(
+            $r->ensureString(
+                'course_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            )
+        );
+
+        $assignment = self::validateCourseAssignmentAlias(
+            $course,
+            $r->ensureString(
+                'assignment_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            )
+        );
+
+        $problem = \OmegaUp\DAO\Problems::getByAliasAndProblemset(
+            $r->ensureString(
+                'problem_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            ),
+            intval($assignment->problemset_id)
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+
+        if (
+            !\OmegaUp\Authorization::canViewCourse(
+                $r->identity,
+                $course,
+                self::resolveGroup($course)
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return [
+            'clarifications' => \OmegaUp\DAO\Clarifications::getProblemInProblemsetClarifications(
+                $problem,
+                intval($assignment->problemset_id),
+                \OmegaUp\Authorization::isCourseAdmin(
+                    $r->identity,
+                    $course
+                ),
+                /* currentIdentity */ $r->identity,
+                $offset,
+                $rowcount
+            ),
         ];
     }
 

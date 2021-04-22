@@ -1,36 +1,72 @@
 <template>
   <div class="card">
     <h5 class="card-header">{{ T.wordsClarifications }}</h5>
-    <slot name="new-clarification">
-      <div class="card-body">
-        <a
-          href="#clarifications/all/new"
-          class="btn btn-primary"
-          @click="currentPopupDisplayed = PopupDisplayed.NewClarification"
-        >
-          {{ T.wordsNewClarification }}
-        </a>
-        <omegaup-overlay
-          :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
-          @hide-overlay="onPopupDismissed"
-        >
-          <template #popup>
-            <omegaup-arena-new-clarification-popup
-              v-show="currentPopupDisplayed === PopupDisplayed.NewClarification"
-              :problems="problems"
-              :users="users"
-              :problem-alias="problemAlias"
-              :username="username"
-              @new-clarification="
-                (contestClarification) =>
-                  $emit('new-clarification', contestClarification)
-              "
-              @dismiss="onPopupDismissed"
-            ></omegaup-arena-new-clarification-popup>
-          </template>
-        </omegaup-overlay>
+    <div class="card-body">
+      <slot name="new-clarification">
+        <div class="mb-3">
+          <a
+            href="#clarifications/all/new"
+            class="btn btn-primary"
+            @click="currentPopupDisplayed = PopupDisplayed.NewClarification"
+          >
+            {{ T.wordsNewClarification }}
+          </a>
+          <omegaup-overlay
+            :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
+            @hide-overlay="onPopupDismissed"
+          >
+            <template #popup>
+              <omegaup-arena-new-clarification-popup
+                v-show="
+                  currentPopupDisplayed === PopupDisplayed.NewClarification
+                "
+                :problems="problems"
+                :users="users"
+                :problem-alias="problemAlias"
+                :username="username"
+                @new-clarification="
+                  (contestClarification) =>
+                    $emit('new-clarification', contestClarification)
+                "
+                @dismiss="onPopupDismissed"
+              ></omegaup-arena-new-clarification-popup>
+            </template>
+          </omegaup-overlay>
+        </div>
+      </slot>
+      <div class="form-inline">
+        <label v-if="allowFilterByAssignment">
+          {{ T.wordsFilterByHomework }}
+          <select
+            v-model="selectedAssignment"
+            class="form-control custom-select ml-1"
+          >
+            <option
+              v-for="assignmentName in assignmentsNames"
+              :key="assignmentName"
+              :value="assignmentName"
+            >
+              {{ assignmentName ? assignmentName : '' }}
+            </option>
+          </select>
+        </label>
+        <label :class="{ 'ml-4': allowFilterByAssignment }">
+          {{ T.wordsFilterByProblem }}
+          <select
+            v-model="selectedProblem"
+            class="form-control custom-select ml-1"
+          >
+            <option
+              v-for="problemName in problemsNames"
+              :key="problemName"
+              :value="problemName"
+            >
+              {{ problemName }}
+            </option>
+          </select>
+        </label>
       </div>
-    </slot>
+    </div>
     <div class="table-responsive">
       <table class="table mb-0">
         <thead>
@@ -46,9 +82,8 @@
         </thead>
         <tbody>
           <omegaup-clarification
-            v-for="clarification in clarifications"
+            v-for="clarification in filteredClarifications"
             :key="clarification.clarification_id"
-            :in-contest="inContest"
             :is-admin="isAdmin"
             :clarification="clarification"
             @clarification-response="
@@ -87,7 +122,6 @@ export enum PopupDisplayed {
   },
 })
 export default class ArenaClarificationList extends Vue {
-  @Prop() inContest!: boolean;
   @Prop({ default: false }) isAdmin!: boolean;
   @Prop() clarifications!: types.Clarification[];
   @Prop({ default: () => [] }) problems!: types.NavbarProblemsetProblem[];
@@ -96,10 +130,13 @@ export default class ArenaClarificationList extends Vue {
   @Prop() problemAlias!: null | string;
   @Prop() username!: null | string;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
+  @Prop({ default: false }) allowFilterByAssignment!: boolean;
 
   T = T;
   PopupDisplayed = PopupDisplayed;
   currentPopupDisplayed = this.popupDisplayed;
+  selectedAssignment: string | null = null;
+  selectedProblem: string | null = null;
 
   onNewClarification(): void {
     this.currentPopupDisplayed = PopupDisplayed.NewClarification;
@@ -108,6 +145,36 @@ export default class ArenaClarificationList extends Vue {
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
     this.$emit('update:activeTab', 'clarifications');
+  }
+
+  get assignmentsNames(): Array<string | null> {
+    return this.allowFilterByAssignment
+      ? [
+          ...new Set(
+            this.clarifications.map(
+              (clarification) => clarification.assignment_alias ?? null,
+            ),
+          ),
+        ]
+      : [];
+  }
+
+  get problemsNames(): string[] {
+    return [
+      ...new Set(
+        this.clarifications.map((clarification) => clarification.problem_alias),
+      ),
+    ];
+  }
+
+  get filteredClarifications(): types.Clarification[] {
+    return this.clarifications.filter(
+      (clarification) =>
+        (this.selectedAssignment === null ||
+          clarification.assignment_alias === this.selectedAssignment) &&
+        (this.selectedProblem === null ||
+          clarification.problem_alias === this.selectedProblem),
+    );
   }
 
   @Watch('showNewClarificationPopup')
@@ -132,15 +199,27 @@ export default class ArenaClarificationList extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 // Deep allows child components to inherit the styles (see: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors)
 /deep/ pre {
   display: block;
   padding: 0.5rem;
   font-size: 0.8rem;
   line-height: 1.42857143;
-  color: #333;
+  color: var(--clarifications-list-pre-font-color);
   word-break: break-all;
-  background-color: #f5f5f5;
+  background-color: var(--clarifications-list-pre-background-color);
   border-radius: 4px;
+}
+
+a {
+  background-color: var(--btn-ok-background-color) !important;
+  color: var(--btn-ok-font-color) !important;
+
+  /* stylelint-disable-next-line no-descending-specificity */
+  &:hover {
+    color: var(--btn-ok-font-color) !important;
+    text-decoration: none !important;
+  }
 }
 </style>

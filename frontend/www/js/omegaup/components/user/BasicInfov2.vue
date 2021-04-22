@@ -116,16 +116,18 @@ export default class UserBasicInfo extends Vue {
 }
 </script>
 
-<style type="scss" scoped>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .fields-border > .form-group,
 .fields-border div > .form-group {
-  border-color: #e9e9e9 !important;
+  border-color: var(--user-basic-info-form-group-border-color) !important;
   border-style: solid !important;
   border-width: 0 0 0.05rem 0 !important;
 }
 
 .field-data {
-  color: gray;
+  color: var(--user-basic-info-field-data-font-color);
 }
 
 .padding-field {

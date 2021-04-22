@@ -56,6 +56,7 @@
           <omegaup-markdown
             ref="statement-markdown"
             :markdown="problem.statement.markdown"
+            :source-mapping="problem.statement.sources"
             :image-mapping="problem.statement.images"
             :problem-settings="problem.settings"
             @rendered="onProblemRendered"
@@ -113,6 +114,7 @@
               v-show="currentPopupDisplayed === PopupDisplayed.RunSubmit"
               :preferred-language="problem.preferred_language"
               :languages="problem.languages"
+              :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
               @dismiss="onPopupDismissed"
               @submit-run="onRunSubmitted"
             ></omegaup-arena-runsubmit-popup>
@@ -164,9 +166,11 @@
         </omegaup-overlay>
         <omegaup-arena-runs
           :problem-alias="problem.alias"
+          :contest-alias="contestAlias"
           :runs="runs"
           :show-details="true"
           :problemset-problems="[]"
+          :is-contest-finished="isContestFinished"
           @details="(run) => onRunDetails(run.guid)"
           @new-submission="onNewSubmission"
         ></omegaup-arena-runs>
@@ -351,8 +355,11 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop() isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
+  @Prop() nextSubmissionTimestamp!: null | Date;
   @Prop({ default: false }) shouldShowTabs!: boolean;
   @Prop({ default: false }) shouldShowRunDetails!: boolean;
+  @Prop({ default: false }) isContestFinished!: boolean;
+  @Prop({ default: null }) contestAlias!: string | null;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
@@ -638,12 +645,13 @@ table td {
 }
 
 .karel-js-link {
-  border: 1px solid #eee;
+  border: 1px solid var(--arena-problem-details-karel-link-border-color);
   border-left: 0;
   border-radius: 3px;
 
   a {
-    border-left: 5px solid #1b809e;
+    border-left: 5px solid
+      var(--arena-problem-details-karel-link-border-left-color);
     display: block;
   }
 }

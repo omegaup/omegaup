@@ -140,6 +140,51 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testContestDataForTypescript() {
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'requestsUserInformation' => 'optional',
+            ])
+        );
+        // Create user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Add user to our contest
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contestData,
+            $identity
+        );
+
+        $userLogin = self::login($identity);
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $userLogin->auth_token,
+            'privacy_git_object_id' =>
+                $contestDetails['privacyStatement']['gitObjectId'],
+            'statement_type' =>
+                $contestDetails['privacyStatement']['statementType'],
+            'share_user_information' => 1,
+        ]));
+
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        // Users list should be empty
+        $this->assertEmpty($contestDetails['users']);
+    }
+
     public function testContestParticipantsReport() {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
@@ -299,6 +344,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Test\Factories\ContestParams([
                 'startTime' => $startTime,
                 'finishTime' => $finishTime,
+                'admissionMode' => 'private',
             ])
         );
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -325,6 +371,69 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['director']->username,
             $contestDetails['contest']['director']
         );
+    }
+
+    public function testContestPracticeForNonRegisteredUsers() {
+        // Get a contest in the past
+        $startTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 120 * 60);
+        $finishTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 60 * 60);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'startTime' => $startTime,
+                'finishTime' => $finishTime,
+                'admissionMode' => 'public',
+            ])
+        );
+
+        // Non-registered users can access public contests in practice mode
+        [
+            'identity' => $nonRegisteredIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $userLogin = self::login($nonRegisteredIdentity);
+        $contestDetails = \OmegaUp\Controllers\Contest::getContestPracticeDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertEquals(
+            $contestData['director']->username,
+            $contestDetails['contest']['director']
+        );
+    }
+
+    public function testPrivateContestPracticeForNonRegisteredUsers() {
+        // Get a contest in the past
+        $startTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 120 * 60);
+        $finishTime =  new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 60 * 60);
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'startTime' => $startTime,
+                'finishTime' => $finishTime,
+                'admissionMode' => 'private',
+            ])
+        );
+
+        // Non-registered users can't access private contests, even in practice
+        // mode
+        [
+            'identity' => $nonRegisteredIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $userLogin = self::login($nonRegisteredIdentity);
+        try {
+            \OmegaUp\Controllers\Contest::getContestPracticeDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $userLogin->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                ])
+            );
+            $this->fail(
+                'User should not have access to contest in practice mode when it is private'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 
     public function testContestPracticeWhenOriginalContestHasNotEnded() {

@@ -418,17 +418,18 @@ export default class Navbar extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../../sass/main.scss';
+
 nav.navbar {
-  background-color: $header-primary-color;
+  background-color: var(--header-primary-color);
 
   .navbar-brand {
-    background-color: #f2f2f2;
+    background-color: var(--header-navbar-brand-background-color);
   }
 
   a.dropdown-item {
-    color: black;
+    color: var(--header-navbar-dropdown-item-font-color);
   }
 }
 </style>

@@ -9,7 +9,7 @@ import problem_Details from './Details.vue';
 
 describe('Details.vue', () => {
   const date = new Date();
-  const sampleProblem: types.ProblemInfo = {
+  const problem: types.ProblemInfo = {
     alias: 'triangulos',
     accepts_submissions: true,
     karel_problem: false,
@@ -55,8 +55,18 @@ describe('Details.vue', () => {
     statement: {
       images: {},
       sources: {},
-      language: 'es',
-      markdown: '# test',
+      language: 'en',
+      markdown: `# test with embed code
+Here we can add code.
+<details>
+  <summary>
+    Example:
+  </summary>
+
+  {{sample.cpp}}
+
+  </details>
+      `,
     },
     title: 'Triangulos',
     visibility: 2,
@@ -87,7 +97,6 @@ describe('Details.vue', () => {
       verdict: 'PA',
       wall_time: 0.699709,
     },
-    feedback: 'none',
     guid: '80bbe93bc01c1d47ff9fb396dfaff741',
     judged_by: '',
     language: 'py3',
@@ -147,23 +156,23 @@ describe('Details.vue', () => {
     const wrapper = mount(problem_Details, {
       propsData: {
         initialTab: 'problems',
-        problem: sampleProblem,
+        problem,
         runDetailsData,
-        user: user,
-        nominationStatus: nominationStatus,
+        user,
+        nominationStatus,
         initialClarifications: [],
         activeTab: 'problems',
         runs: [] as types.Run[],
         allRuns: [] as types.Run[],
         clarifications: [] as types.Clarification[],
         solutionStatus: 'not_found',
-        histogram: histogram,
+        histogram,
         showNewRunWindow: false,
         publicTags: [],
       },
     });
 
-    expect(wrapper.text()).toContain(sampleProblem.points);
+    expect(wrapper.text()).toContain(problem.points);
     expect(wrapper.text()).toContain(time.formatDate(date));
   });
 
@@ -171,17 +180,17 @@ describe('Details.vue', () => {
     const wrapper = mount(problem_Details, {
       propsData: {
         initialTab: 'problems',
-        problem: sampleProblem,
+        problem,
         runDetailsData,
-        user: user,
-        nominationStatus: nominationStatus,
+        user,
+        nominationStatus,
         initialClarifications: [],
         activeTab: 'problems',
-        runs: runs,
+        runs,
         allRuns: runs,
         clarifications: [] as types.Clarification[],
         solutionStatus: 'not_found',
-        histogram: histogram,
+        histogram,
         showNewRunWindow: false,
         publicTags: [],
         shouldShowTabs: true,
@@ -204,17 +213,17 @@ describe('Details.vue', () => {
     const wrapper = mount(problem_Details, {
       propsData: {
         initialTab: 'problems',
-        problem: sampleProblem,
+        problem,
         runDetailsData,
-        user: user,
-        nominationStatus: nominationStatus,
+        user,
+        nominationStatus,
         initialClarifications: [],
         activeTab: 'problems',
-        runs: runs,
+        runs,
         allRuns: runs,
         clarifications: [] as types.Clarification[],
         solutionStatus: 'not_found',
-        histogram: histogram,
+        histogram,
         showNewRunWindow: false,
         publicTags: [],
         shouldShowTabs: true,
@@ -267,17 +276,17 @@ describe('Details.vue', () => {
     const wrapper = mount(problem_Details, {
       propsData: {
         initialTab: 'problems',
-        problem: sampleProblem,
+        problem,
         runDetailsData,
-        user: user,
-        nominationStatus: nominationStatus,
+        user,
+        nominationStatus,
         initialClarifications: [],
         activeTab: 'problems',
-        runs: runs,
+        runs,
         allRuns: runs,
         clarifications: clarifications as types.Clarification[],
         solutionStatus: 'not_found',
-        histogram: histogram,
+        histogram,
         showNewRunWindow: false,
         publicTags: [],
         shouldShowTabs: true,
@@ -286,6 +295,72 @@ describe('Details.vue', () => {
     await wrapper.find('a[href="#clarifications"]').trigger('click');
     expect(wrapper.find('.tab-content .show table thead tr th').text()).toBe(
       T.wordsContest,
+    );
+  });
+
+  it('Should handle unrecognized source filename error', () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        initialTab: 'problems',
+        problem,
+        runDetailsData,
+        user,
+        nominationStatus,
+        initialClarifications: [],
+        activeTab: 'problems',
+        runs,
+        allRuns: runs,
+        clarifications: [] as types.Clarification[],
+        solutionStatus: 'not_found',
+        histogram,
+        showNewRunWindow: false,
+        publicTags: [],
+        shouldShowTabs: true,
+      },
+    });
+
+    expect(wrapper.find('div[data-markdown-statement]').text()).toContain(
+      'Unrecognized source filename: sample.cpp',
+    );
+  });
+
+  it('Should handle a valid source filename with content', async () => {
+    problem.statement.sources = {
+      'sample.cpp': `#include <iostream>
+
+int main() {
+  std::cout << "This is only an example";
+  return 0;
+}`,
+    };
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        initialTab: 'problems',
+        problem,
+        runDetailsData,
+        user,
+        nominationStatus,
+        initialClarifications: [],
+        activeTab: 'problems',
+        runs,
+        allRuns: runs,
+        clarifications: [] as types.Clarification[],
+        solutionStatus: 'not_found',
+        histogram,
+        showNewRunWindow: false,
+        publicTags: [],
+        shouldShowTabs: true,
+      },
+    });
+
+    expect(wrapper.find('details').attributes()).toMatchObject({});
+    await wrapper.find('details > summary').trigger('click');
+    expect(wrapper.find('details').attributes()).toMatchObject({ open: '' });
+    expect(wrapper.find('div[data-markdown-statement]').text()).toContain(
+      '#include <iostream>',
+    );
+    expect(wrapper.find('div[data-markdown-statement]').text()).toContain(
+      'This is only an example',
     );
   });
 });

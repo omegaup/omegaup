@@ -56,7 +56,7 @@
             :countdown-format="
               omegaup.CountdownFormat.WaitBetweenUploadsSeconds
             "
-            @emit-finish="now = Date.now()"
+            @finish="now = Date.now()"
           ></omegaup-countdown>
           <span v-else>{{ T.wordsSend }}</span>
         </button>
@@ -248,12 +248,13 @@ export default class ArenaRunSubmit extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
+
 form[data-run-submit] {
-  background: #eee;
+  background: var(--arena-run-submit-form-background-color);
   width: 80%;
   height: 90%;
   margin: auto;
-  border: 2px solid #ccc;
+  border: 2px solid var(--arena-run-submit-form-border-color);
   padding: 1em;
   position: absolute;
   overflow-y: auto;
@@ -265,40 +266,49 @@ form[data-run-submit] {
   display: flex;
   flex-direction: column;
   z-index: -1;
+
   .close-container {
     width: 100%;
+
     .close {
       position: absolute;
       top: 0;
       right: 0;
-      background-color: $omegaup-white;
-      border: 1px solid #ccc;
+      background-color: var(--arena-form-close-background-color);
+      border: 1px solid var(--arena-form-close-border-color);
       border-width: 0 0 1px 1px;
       font-size: 110%;
       width: 25px;
       height: 25px;
+
       &:hover {
-        background-color: #eee;
+        background-color: var(--arena-form-close-background-color--hover);
       }
     }
   }
+
   .languages {
     width: 100%;
   }
+
   .filename-extension {
     width: 100%;
   }
+
   .run-submit-paste-text {
     width: 100%;
   }
+
   .code-view {
     width: 100%;
     flex-grow: 1;
     overflow: auto;
   }
+
   .upload-file {
     width: 100%;
   }
+
   .submit-run {
     width: 100%;
   }

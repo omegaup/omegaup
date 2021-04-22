@@ -136,6 +136,7 @@ export default class Footer extends Vue {
     @media only screen and (max-width: 767px) {
       display: table;
     }
+
     .footer-brand {
       max-width: 200px;
 
@@ -212,6 +213,7 @@ export default class Footer extends Vue {
       .menu {
         ul {
           margin: 0;
+
           li {
             list-style-type: none;
 

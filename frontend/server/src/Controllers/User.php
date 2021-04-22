@@ -2069,18 +2069,30 @@ class User extends \OmegaUp\Controllers\Controller {
      * Gets a list of users. This returns an array instead of an object since
      * it is used by typeahead.
      *
-     * @omegaup-request-param mixed $query
-     * @omegaup-request-param mixed $term
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param null|string $term
      *
      * @return list<UserListItem>
      */
     public static function apiList(\OmegaUp\Request $r): array {
-        $param = '';
-        if (is_string($r['term'])) {
-            $param = $r['term'];
-        } elseif (is_string($r['query'])) {
-            $param = $r['query'];
-        } else {
+        $term = $r->ensureOptionalString(
+            'term',
+            /*$required=*/false,
+            fn (string $term) => \OmegaUp\Validators::stringNonEmpty($term)
+        );
+        $query = $r->ensureOptionalString(
+            'query',
+            /*$required=*/false,
+            fn (string $query) => \OmegaUp\Validators::stringNonEmpty($query)
+        );
+        if (is_null($term) && is_null($query)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'query'
+            );
+        }
+        $param = $term ?? $query;
+        if (is_null($param)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 'query'
@@ -2090,9 +2102,10 @@ class User extends \OmegaUp\Controllers\Controller {
         $identities = \OmegaUp\DAO\Identities::findByUsernameOrName($param);
         $response = [];
         foreach ($identities as $identity) {
+            $username = strval($identity->username);
             $response[] = [
-                'label' => strval($identity->username),
-                'value' => strval($identity->username)
+                'label' => $username,
+                'value' => $identity->name ?: $username,
             ];
         }
         return $response;
@@ -4088,6 +4101,114 @@ class User extends \OmegaUp\Controllers\Controller {
             return $response;
         }
         return $response;
+    }
+
+    /**
+     * Creates a new API token associated with the user.
+     *
+     * This token can be used to authenticate against the API in other calls
+     * through the [HTTP `Authorization`
+     * header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization)
+     * in the request:
+     *
+     * ```
+     * Authorization: token 92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6
+     * ```
+     *
+     * The following alternative syntax allows to specify an associated
+     * identity:
+     *
+     * ```
+     * Authorization: token Credential=92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6,Username=groupname:username
+     * ```
+     *
+     * There is a limit of 1000 requests that can be done every hour, after
+     * which point all requests will fail with [HTTP 429 Too Many
+     * Requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429).
+     * The `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and
+     * `X-RateLimit-Reset` response headers will be set whenever an API token
+     * is used and will contain useful information about the limit to the
+     * caller.
+     *
+     * There is a limit of 5 API tokens that each user can have.
+     *
+     * @return array{token: string}
+     *
+     * @omegaup-request-param string $name A non-empty alphanumeric string. May contain underscores and dashes.
+     */
+    public static function apiCreateAPIToken(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        $r->ensureMainUserIdentity();
+
+        $name = $r->ensureString(
+            'name',
+            fn (string $name) => preg_match('/^[a-zA-Z0-9_-]+$/', $name) === 1,
+        );
+        $token = \OmegaUp\SecurityTools::randomHexString(40);
+        $apiToken = new \OmegaUp\DAO\VO\APITokens([
+            'user_id' => $r->user->user_id,
+            'token' => $token,
+            'name' => $name,
+        ]);
+
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+
+            \OmegaUp\DAO\APITokens::create($apiToken);
+            if (\OmegaUp\DAO\APITokens::getCountByUser($r->user->user_id) > 5) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'apiTokenLimitExceeded'
+                );
+            }
+
+            \OmegaUp\DAO\DAO::transEnd();
+            return [
+                'token' => $token,
+            ];
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'apiTokenNameAlreadyInUse',
+                    $e
+                );
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Returns a list of all the API tokens associated with the user.
+     *
+     * @return array{tokens: list<array{name: string, timestamp: \OmegaUp\Timestamp, last_used: \OmegaUp\Timestamp, rate_limit: array{reset: \OmegaUp\Timestamp, limit: int, remaining: int}}>}
+     */
+    public static function apiListAPITokens(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        $r->ensureMainUserIdentity();
+
+        return [
+            'tokens' => \OmegaUp\DAO\APITokens::getAllByUser($r->user->user_id),
+        ];
+    }
+
+    /**
+     * Revokes an API token associated with the user.
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $name A non-empty alphanumeric string. May contain underscores and dashes.
+     */
+    public static function apiRevokeAPIToken(\OmegaUp\Request $r) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        $r->ensureMainUserIdentity();
+
+        $name = $r->ensureString(
+            'name',
+            fn (string $name) => preg_match('/^[a-zA-Z0-9_-]+$/', $name) === 1,
+        );
+
+        \OmegaUp\DAO\APITokens::deleteByName($r->user->user_id, $name);
+        return ['status' => 'ok'];
     }
 }
 

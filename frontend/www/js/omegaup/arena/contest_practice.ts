@@ -15,7 +15,6 @@ import {
   submitRunFailed,
 } from './submissions';
 import { getOptionsFromLocation } from './location';
-import { navigateToProblem } from './navigation';
 import {
   ContestClarification,
   ContestClarificationType,
@@ -24,6 +23,7 @@ import {
   trackClarifications,
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
+import { navigateToProblem, NavigationType } from './navigation';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -68,10 +68,12 @@ OmegaUp.on('ready', () => {
         on: {
           'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
             navigateToProblem({
+              type: NavigationType.ForContest,
               problem,
               runs,
               target: contestPractice,
               problems: this.problems,
+              contestAlias: payload.contest.alias,
             });
           },
           'show-run': (request: SubmissionRequest) => {
@@ -172,6 +174,8 @@ OmegaUp.on('ready', () => {
     refreshContestClarifications({
       type: ContestClarificationType.AllProblems,
       contestAlias: payload.contest.alias,
+      rowcount: 20,
+      offset: 0,
     });
   }, 5 * 60 * 1000);
 });

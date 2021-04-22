@@ -106,6 +106,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
      * submission gap.
      */
     final public static function isInsideSubmissionGap(
+        \OmegaUp\DAO\VO\Submissions $submission,
         ?int $problemsetId,
         ?\OmegaUp\DAO\VO\Contests $contest,
         int $problemId,
@@ -161,7 +162,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             );
         }
 
-        return \OmegaUp\Time::get() >= ($lastRunTime->time + $submissionGap);
+        return $submission->time->time >= ($lastRunTime->time + $submissionGap);
     }
 
     public static function countAcceptedSubmissions(
@@ -362,5 +363,89 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 $courseAlias
             ]
         );
+    }
+
+    /**
+     * Gets the feedback of a certain submission
+     *
+     * @return array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string}|null
+     */
+    public static function getSubmissionFeedback(
+        \OmegaUp\DAO\VO\Submissions $submission
+    ): ?array {
+        $sql = '
+            SELECT
+                i.username as author,
+                IFNULL(
+                    (
+                        SELECT urc.classname
+                        FROM User_Rank_Cutoffs urc
+                        WHERE
+                            urc.score <= (
+                                SELECT
+                                    ur.score
+                                FROM
+                                    User_Rank ur
+                                WHERE
+                                    ur.user_id = i.user_id
+                            )
+                        ORDER BY
+                            urc.percentile ASC
+                        LIMIT 1
+                    ),
+                    "user-rank-unranked"
+                ) AS author_classname,
+                sf.feedback,
+                sf.date
+            FROM
+                Submissions s
+            INNER JOIN
+                Submission_Feedback sf ON sf.submission_id = s.submission_id
+            INNER JOIN
+                Identities i ON i.identity_id = sf.identity_id
+            WHERE
+                s.submission_id = ?
+        ';
+
+        /** @var array{author: string, author_classname: string, date: \OmegaUp\Timestamp, feedback: string}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [
+               $submission->submission_id
+            ]
+        );
+    }
+
+    /**
+     * Gets the SubmissionFeedback object of a certain submission
+     *
+     * @return \OmegaUp\DAO\VO\SubmissionFeedback|null
+     */
+    public static function getFeedbackBySubmission(
+        \OmegaUp\DAO\VO\Submissions $submission
+    ): ?\OmegaUp\DAO\VO\SubmissionFeedback {
+        $sql = '
+            SELECT
+                sf.*
+            FROM
+                Submission_Feedback sf
+            INNER JOIN
+                Submissions s ON s.submission_id = sf.submission_id
+            WHERE
+                s.submission_id = ?
+            FOR UPDATE;
+        ';
+
+        /** @var array{date: \OmegaUp\Timestamp, feedback: string, identity_id: int, submission_feedback_id: int, submission_id: int}|null */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [
+               $submission->submission_id
+            ]
+        );
+        if (is_null($rs)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\SubmissionFeedback($rs);
     }
 }

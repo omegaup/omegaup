@@ -487,7 +487,6 @@ export class Arena {
         render: function (createElement) {
           return createElement('omegaup-arena-scoreboard', {
             props: {
-              scoreboardColors: scoreboardColors,
               problems: this.problems,
               ranking: this.ranking,
               lastUpdated: this.lastUpdated,
@@ -502,7 +501,9 @@ export class Arena {
 
     // Setup run details view, if available.
     if (document.getElementById('run-details') != null) {
-      this.runDetailsView = new Vue({
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      const self = this;
+      self.runDetailsView = new Vue({
         el: '#run-details',
         components: {
           'omegaup-arena-rundetails': arena_RunDetails,
@@ -514,6 +515,34 @@ export class Arena {
           return createElement('omegaup-arena-rundetails', {
             props: {
               data: this.data,
+              inCourse: self.options.courseAlias !== null,
+            },
+            on: {
+              'set-feedback': ({
+                guid,
+                feedback,
+                isUpdate,
+              }: {
+                guid: string;
+                feedback: string;
+                isUpdate: boolean;
+              }) => {
+                api.Submission.setFeedback({
+                  guid,
+                  course_alias: self.options.courseAlias,
+                  assignment_alias: self.options.assignmentAlias,
+                  feedback,
+                })
+                  .then(() => {
+                    ui.success(
+                      isUpdate
+                        ? T.feedbackSuccesfullyUpdated
+                        : T.feedbackSuccesfullyAdded,
+                    );
+                    self.hideOverlay();
+                  })
+                  .catch(ui.error);
+              },
             },
           });
         },
@@ -655,43 +684,34 @@ export class Arena {
     );
   }
 
-  connectSocket(): boolean {
+  connectSocket() {
     if (this.options.disableSockets || this.options.contestAlias == 'admin') {
       this.updateSocketStatus('✗', '#800');
-      return false;
+      return;
     }
 
-    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    const uris = [];
-    // Backendv2 uri
-    uris.push(
-      `${protocol}${window.location.host}/events/?filter=/problemset/${this.options.problemsetId}` +
-        (this.options.scoreboardToken
-          ? `/${this.options.scoreboardToken}`
-          : ''),
-    );
-
-    const connect = (uris: string[], index: number) => {
-      this.socket = new EventsSocket(uris[index], this);
-      this.socket.connect().catch((e) => {
-        console.log(e);
-        // Try the next uri.
-        index++;
-        if (index < uris.length) {
-          connect(uris, index);
-        } else {
-          // Out of options. Falling back to polls.
-          this.socket = null;
-          setTimeout(() => {
-            this.setupPolls();
-          }, Math.random() * 15000);
-        }
-      });
-    };
+    const uri =
+      `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${
+        window.location.host
+      }/events/?filter=/problemset/${this.options.problemsetId}` +
+      (this.options.scoreboardToken ? `/${this.options.scoreboardToken}` : '');
 
     this.updateSocketStatus('↻', '#888');
-    connect(uris, 0);
-    return false;
+    ui.reportEvent('events-socket', 'attempt');
+    this.socket = new EventsSocket(uri, this);
+    this.socket
+      .connect()
+      .then(() => {
+        ui.reportEvent('events-socket', 'connected');
+      })
+      .catch((e) => {
+        ui.reportEvent('events-socket', 'fallback');
+        console.log(e);
+        this.socket = null;
+        setTimeout(() => {
+          this.setupPolls();
+        }, Math.random() * 15000);
+      });
   }
 
   updateSocketStatus(status: string, color: string): void {
@@ -2120,7 +2140,7 @@ export class Arena {
           !this.options.contestAlias || this.options.contestAlias === 'admin'
             ? data.show_diff
             : 'none',
-        feedback: ((this.options.contestAlias &&
+        submissionFeedback: ((this.options.contestAlias &&
           this.currentProblemset?.feedback) ||
           'detailed') as omegaup.SubmissionFeedback,
       });

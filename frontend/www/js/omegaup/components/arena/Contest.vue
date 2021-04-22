@@ -9,7 +9,15 @@
       <sup :class="socketClass" title="WebSocket">{{ socketIcon }}</sup>
     </template>
     <template #clock>
-      <div class="clock">{{ clock }}</div>
+      <div v-if="isContestFinished" class="alert alert-warning" role="alert">
+        <a :href="urlPractice">{{ T.arenaContestEndedUsePractice }}</a>
+      </div>
+      <omegaup-countdown
+        v-else
+        class="clock"
+        :target-time="deadline"
+        @finish="now = Date.now()"
+      ></omegaup-countdown>
     </template>
     <template #arena-problems>
       <div data-contest>
@@ -48,6 +56,8 @@
               :popup-displayed="popupDisplayed"
               :guid="guid"
               :should-show-run-details="shouldShowRunDetails"
+              :contest-alias="contest.alias"
+              :is-contest-finished="isContestFinished"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', {
@@ -83,7 +93,6 @@
         :username="contestAdmin && users.length != 0 ? users[0].username : null"
         :clarifications="currentClarifications"
         :is-admin="contestAdmin"
-        :in-contest="true"
         :show-new-clarification-popup="showNewClarificationPopup"
         @new-clarification="
           (contestClarification) =>
@@ -125,6 +134,7 @@ import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_NavbarMiniranking from './NavbarMiniranking.vue';
 import arena_Summary from './Summary.vue';
 import arena_Scoreboard from './Scoreboard.vue';
+import omegaup_Countdown from '../Countdown.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { omegaup } from '../../omegaup';
@@ -143,6 +153,7 @@ export interface ActiveProblem {
     'omegaup-arena-navbar-miniranking': arena_NavbarMiniranking,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
     'omegaup-arena-scoreboard': arena_Scoreboard,
+    'omegaup-countdown': omegaup_Countdown,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-problem-details': problem_Details,
   },
@@ -169,6 +180,7 @@ export default class ArenaContest extends Vue {
   @Prop() minirankingUsers!: omegaup.UserRank[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
   @Prop() lastUpdated!: Date;
+  @Prop() submissionDeadline!: Date;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   @Prop({ default: true }) showPenalty!: boolean;
   @Prop({ default: true }) socketConnected!: boolean;
@@ -179,7 +191,7 @@ export default class ArenaContest extends Vue {
   currentClarifications = this.clarifications;
   activeProblem: ActiveProblem | null = this.problem;
   shouldShowRunDetails = false;
-  clock = '00:00:00';
+  now = new Date();
 
   get socketIcon(): string {
     if (this.socketConnected) return '•';
@@ -195,13 +207,25 @@ export default class ArenaContest extends Vue {
     return this.activeProblem?.problem.alias ?? null;
   }
 
+  get deadline(): Date {
+    return this.submissionDeadline || this.contest.finish_time;
+  }
+
+  get isContestFinished(): boolean {
+    return this.deadline < this.now;
+  }
+
+  get urlPractice(): string {
+    return `/arena/${this.contest.alias}/practice/`;
+  }
+
   onNavigateToProblem(request: ActiveProblem) {
     this.activeProblem = request;
     this.$emit('navigate-to-problem', request);
   }
 
   onRunSubmitted(run: { code: string; language: string }): void {
-    this.$emit('submit-run', Object.assign({}, run, this.activeProblem));
+    this.$emit('submit-run', { ...run, ...this.activeProblem });
   }
 
   @Watch('problem')
@@ -230,29 +254,33 @@ export default class ArenaContest extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .navleft {
   overflow: hidden;
+
   .navbar {
     width: 21em;
     float: left;
     background: transparent;
   }
+
   .main {
     margin-left: 20em;
-    border: 1px solid #ccc;
+    border: 1px solid var(--arena-contest-navleft-main-border-color);
     border-width: 0 0 1px 1px;
   }
 }
 
 .nav-tabs {
   .nav-link {
-    background-color: #ddd;
-    border-top-color: #ddd;
+    background-color: var(--arena-contest-navtabs-link-background-color);
+    border-top-color: var(--arena-contest-navtabs-link-border-top-color);
   }
 }
 
 .problem {
-  background: #fff;
+  background: var(--arena-problem-background-color);
   padding: 1em;
   margin-top: -1.5em;
   margin-right: -1em;
