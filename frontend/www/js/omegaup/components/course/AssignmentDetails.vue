@@ -179,8 +179,14 @@
             "
             @emit-tags="(tags) => $emit('tags-problems', tags)"
             @change-alias="
-              (addProblemComponent, newProblemAlias) =>
-                $emit('get-versions', newProblemAlias, addProblemComponent)
+              ({ request, target }) =>
+                $emit('get-versions', {
+                  target,
+                  request: {
+                    ...request,
+                    problemsetId: assignment.problemset_id,
+                  },
+                })
             "
           ></omegaup-course-problem-list>
         </template>
