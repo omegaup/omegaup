@@ -1371,11 +1371,11 @@ export const Problem = {
       }
       return x.map((x) => {
         x.author = ((x) => {
-          if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
           return x;
         })(x.author);
         x.committer = ((x) => {
-          if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
           return x;
         })(x.committer);
         return x;

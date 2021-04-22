@@ -55,13 +55,11 @@ final class DAO {
      * Helper function to convert from MySQL timestamps to the internal POSIX
      * timestamp format.
      *
-     * @param string|int|float|\OmegaUp\Timestamp|null $timestamp the MySQL timestamp.
-     * @return \OmegaUp\Timestamp|null the POSIX timestamp.
+     * @template T as string|int|float|\OmegaUp\Timestamp|null
+     * @param T $timestamp the MySQL timestamp.
+     * @return (T is null ? null : \OmegaUp\Timestamp) the POSIX timestamp.
      */
     final public static function fromMySQLTimestamp($timestamp): ?\OmegaUp\Timestamp {
-        if (is_null($timestamp)) {
-            return null;
-        }
         // Temporary migration code to allow the timestamps to be in either
         // format.
         if ($timestamp instanceof \OmegaUp\Timestamp) {
@@ -73,6 +71,9 @@ final class DAO {
         if (is_float($timestamp)) {
             return new \OmegaUp\Timestamp(intval($timestamp));
         }
-        return new \OmegaUp\Timestamp(strtotime($timestamp));
+        if (is_string($timestamp)) {
+            return new \OmegaUp\Timestamp(strtotime($timestamp));
+        }
+        return null;
     }
 }

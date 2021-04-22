@@ -132,7 +132,7 @@
           :initial-points="details.partial_score ? 100 : 1"
           :initial-problems="problems"
           :search-result-problems="searchResultProblems"
-          @add-problem="(problem) => $emit('add-problem', problem)"
+          @add-problem="(request) => $emit('add-problem', request)"
           @update-search-result-problems="
             (query) => $emit('update-search-result-problems', query)
           "
