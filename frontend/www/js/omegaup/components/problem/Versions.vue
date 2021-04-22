@@ -162,22 +162,21 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 
 @Component
 export default class ProblemVersions extends Vue {
-  @Prop() log!: omegaup.Commit[];
-  @Prop({ default: null }) publishedRevision!: null | omegaup.Commit;
+  @Prop() log!: types.ProblemVersion[];
+  @Prop({ default: null }) publishedRevision!: null | types.ProblemVersion;
   @Prop() showFooter!: boolean;
-  @Prop({ default: null }) value!: null | omegaup.Commit;
+  @Prop({ default: null }) value!: null | types.ProblemVersion;
 
   T = T;
   time = time;
   diffMode = 'files';
-  selectedRevision: null | omegaup.Commit = this.value;
+  selectedRevision: null | types.ProblemVersion = this.value;
   runsDiff: types.CommitRunsDiff = {};
   showOnlyChanges = false;
   updatePublished = 'owned-problemsets';
@@ -247,12 +246,12 @@ export default class ProblemVersions extends Vue {
   }
 
   @Watch('value')
-  onValueChange(newValue: omegaup.Commit) {
+  onValueChange(newValue: types.ProblemVersion) {
     this.selectedRevision = newValue;
   }
 
   @Watch('selectedRevision')
-  onSelectedRevisionChange(newValue: omegaup.Commit) {
+  onSelectedRevisionChange(newValue: types.ProblemVersion) {
     this.$emit('input', this.selectedRevision);
     if (
       !newValue ||

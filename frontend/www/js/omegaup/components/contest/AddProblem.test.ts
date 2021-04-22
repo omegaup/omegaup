@@ -67,7 +67,6 @@ describe('AddProblem.vue', () => {
         initialProblems: [{ ...problem, has_submissions: true }],
       },
     });
-
     const removeIcon =
       'button[data-remove-problem-disabled="problem"] font-awesome-icon-stub';
     expect(wrapper.find(removeIcon).attributes().class).toContain('disabled');
