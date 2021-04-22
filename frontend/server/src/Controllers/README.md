@@ -3204,6 +3204,7 @@ Entry point for Problem Versions API
 | Name            | Type           | Description |
 | --------------- | -------------- | ----------- |
 | `problem_alias` | `null\|string` |             |
+| `problemset_id` | `int\|null`    |             |
 
 ### Returns
 
