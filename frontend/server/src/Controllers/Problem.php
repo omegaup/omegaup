@@ -30,7 +30,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
  * @psalm-type ProblemAdmin=array{role: string, username: string}
  * @psalm-type ProblemGroupAdmin=array{alias: string, name: string, role: string}
- * @psalm-type ProblemVersion=array{author: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, commit: string, committer: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, message?: string, parents?: list<string>, tree: array<string, string>|null, version: null|string}
+ * @psalm-type ProblemVersion=array{author: array{email: string, name: string, time: \OmegaUp\Timestamp}, commit: string, committer: array{email: string, name: string, time: \OmegaUp\Timestamp}, message: string, parents: list<string>, tree: array<string, string>, version: string}
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
  * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, allRuns?: list<Run>, clarifications?: list<Clarification>, histogram: Histogram, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus?: string, solvers: list<BestSolvers>, user: UserInfoForProblem}
@@ -2918,6 +2918,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * @return array{published: null|string, log: list<ProblemVersion>}
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function getVersions(
         \OmegaUp\DAO\VO\Problems $problem,
@@ -2927,26 +2929,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         if (!\OmegaUp\Authorization::canEditProblem($identity, $problem)) {
-            return [
-                'published' => $problem->commit,
-                'log' => [
-                    [
-                        'commit' => $problem->commit,
-                        'tree' => null,
-                        'author' => [
-                            'time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-                                $problem->creation_date
-                            ),
-                        ],
-                        'committer' => [
-                            'time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-                                $problem->creation_date
-                            ),
-                        ],
-                        'version' => $problem->current_version,
-                    ],
-                ],
-            ];
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $privateTreeMapping = [];

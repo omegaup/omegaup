@@ -18,7 +18,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
- * @psalm-type ProblemVersion=array{author: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, commit: string, committer: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, message?: string, parents?: list<string>, tree: array<string, string>|null, version: null|string}
+ * @psalm-type ProblemVersion=array{author: array{email: string, name: string, time: \OmegaUp\Timestamp}, commit: string, committer: array{email: string, name: string, time: \OmegaUp\Timestamp}, message: string, parents: list<string>, tree: array<string, string>, version: string}
  * @psalm-type ProblemsetProblemWithVersions=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, letter?: string, order: int, points: float, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, versions: array{log: list<ProblemVersion>, published: null|string}, visibility: int, visits: int}
  * @psalm-type ContestListMinePayload=array{contests: list<Contest>, privateContestsAlert: bool}
  * @psalm-type ContestDetails=array{admin: bool, admission_mode: string, alias: string, archived: bool, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: list<string>, needs_basic_information: bool, opened: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<ProblemsetProblem>, problemset_id: int, requests_user_information: string, rerun_id?: int, scoreboard: int, scoreboard_url?: string, scoreboard_url_admin?: string, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap: int, title: string, window_length: int|null}
@@ -1130,25 +1130,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
         array $problems,
         \OmegaUp\DAO\VO\Identities $identity
     ): array {
-        $problemsWithVersion = [];
+        $problemsWithVersions = [];
         foreach ($problems as $problem) {
             unset($problem['problem_id']);
-            $problemsWithVersion[] = array_merge(
-                [
-                    'versions' => \OmegaUp\Controllers\Problem::getVersions(
-                        new \OmegaUp\DAO\VO\Problems(
-                            array_intersect_key(
-                                $problem,
-                                \OmegaUp\DAO\VO\Problems::FIELD_NAMES
-                            )
-                        ),
-                        $identity
+            $problem['versions'] = \OmegaUp\Controllers\Problem::getVersions(
+                new \OmegaUp\DAO\VO\Problems(
+                    array_intersect_key(
+                        $problem,
+                        \OmegaUp\DAO\VO\Problems::FIELD_NAMES
                     )
-                ],
-                $problem
+                ),
+                $identity
             );
+            $problemsWithVersions[] = $problem;
         }
-        return $problemsWithVersion;
+        return $problemsWithVersions;
     }
 
     /**
