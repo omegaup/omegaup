@@ -136,10 +136,7 @@
           @update-search-result-problems="
             (query) => $emit('update-search-result-problems', query)
           "
-          @get-versions="
-            (problemAlias, addProblemComponent) =>
-              $emit('get-versions', problemAlias, addProblemComponent)
-          "
+          @get-versions="(request) => $emit('get-versions', request)"
           @remove-problem="
             (problemAlias) => $emit('remove-problem', problemAlias)
           "

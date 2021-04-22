@@ -172,16 +172,6 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
-const emptyCommit: types.ProblemVersion = {
-  author: {},
-  commit: '',
-  committer: {},
-  message: '',
-  parents: [],
-  tree: {},
-  version: '',
-};
-
 @Component({
   components: {
     'omegaup-autocomplete': Autocomplete,
@@ -210,8 +200,8 @@ export default class CourseProblemList extends Vue {
   problemsOrderChanged = false;
   useLatestVersion = true;
   versionLog: types.ProblemVersion[] = [];
-  publishedRevision = emptyCommit;
-  selectedRevision = emptyCommit;
+  publishedRevision: null | types.ProblemVersion = null;
+  selectedRevision: null | types.ProblemVersion = null;
 
   get tags(): string[] {
     let t = this.topics.slice();
@@ -220,11 +210,8 @@ export default class CourseProblemList extends Vue {
   }
 
   get addProblemButtonDisabled(): boolean {
-    if (this.useLatestVersion) {
-      return this.problemAlias === '';
-    } else {
-      return this.selectedRevision.commit === '';
-    }
+    if (this.useLatestVersion) return this.problemAlias === '';
+    return !this.selectedRevision;
   }
 
   get addProblemButtonLabel(): string {
@@ -289,10 +276,13 @@ export default class CourseProblemList extends Vue {
   onAliasChange(newProblemAlias: string) {
     if (!newProblemAlias) {
       this.versionLog = [];
-      this.selectedRevision = this.publishedRevision = emptyCommit;
+      this.selectedRevision = this.publishedRevision;
       return;
     }
-    this.$emit('change-alias', this, newProblemAlias);
+    this.$emit('change-alias', {
+      target: this,
+      request: { problemAlias: newProblemAlias },
+    });
   }
 
   @Watch('assignmentProblems')

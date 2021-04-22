@@ -162,16 +162,6 @@ import T from '../../lang';
 import problem_Versions from '../problem/Versions.vue';
 import common_Typeahead from '../common/Typeahead.vue';
 
-const emptyCommit: types.ProblemVersion = {
-  author: {},
-  commit: '',
-  committer: {},
-  message: '',
-  parents: [],
-  tree: {},
-  version: '',
-};
-
 @Component({
   components: {
     'omegaup-problem-versions': problem_Versions,
@@ -191,12 +181,15 @@ export default class AddProblem extends Vue {
   problems = this.initialProblems;
   versionLog: types.ProblemVersion[] = [];
   useLatestVersion = true;
-  publishedRevision = emptyCommit;
-  selectedRevision = emptyCommit;
+  publishedRevision: null | types.ProblemVersion = null;
+  selectedRevision: null | types.ProblemVersion = null;
 
   onSubmit(): void {
     if (this.useLatestVersion) {
-      this.$emit('get-versions', this.alias, this);
+      this.$emit('get-versions', {
+        target: this,
+        request: { problemAlias: this.alias },
+      });
     } else {
       this.onAddProblem();
     }
@@ -251,10 +244,8 @@ export default class AddProblem extends Vue {
   }
 
   get addProblemButtonDisabled(): boolean {
-    if (this.useLatestVersion) {
-      return this.alias === '' || this.alias === null;
-    }
-    return this.selectedRevision.commit === '';
+    if (this.useLatestVersion) return this.alias === null;
+    return !this.selectedRevision;
   }
 
   @Watch('initialProblems')
@@ -267,10 +258,13 @@ export default class AddProblem extends Vue {
   onAliasChange(newProblemAlias: string) {
     if (!newProblemAlias) {
       this.versionLog = [];
-      this.selectedRevision = this.publishedRevision = emptyCommit;
+      this.selectedRevision = this.publishedRevision;
       return;
     }
-    this.$emit('get-versions', newProblemAlias, this);
+    this.$emit('get-versions', {
+      target: this,
+      request: { problemAlias: this.alias },
+    });
   }
 }
 </script>

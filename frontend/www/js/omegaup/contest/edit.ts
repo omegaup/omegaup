@@ -191,23 +191,27 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'get-versions': (
-            problemAlias: string,
-            addProblemComponent: {
+          'get-versions': ({
+            request,
+            target,
+          }: {
+            request: { problemAlias: string };
+            target: {
               versionLog: types.ProblemVersion[];
               problems: types.ProblemsetProblem[];
               selectedRevision: types.ProblemVersion;
               publishedRevision: types.ProblemVersion;
-            },
-          ) => {
+            };
+          }) => {
             api.Problem.versions({
-              problem_alias: problemAlias,
+              problem_alias: request.problemAlias,
+              problemset_id: payload.details.problemset_id,
             })
               .then((result) => {
-                addProblemComponent.versionLog = result.log;
+                target.versionLog = result.log;
                 let currentProblem = null;
-                for (const problem of addProblemComponent.problems) {
-                  if (problem.alias === problemAlias) {
+                for (const problem of target.problems) {
+                  if (problem.alias === request.problemAlias) {
                     currentProblem = problem;
                     break;
                   }
@@ -218,7 +222,7 @@ OmegaUp.on('ready', () => {
                 }
                 for (const revision of result.log) {
                   if (publishedCommitHash === revision.commit) {
-                    addProblemComponent.selectedRevision = addProblemComponent.publishedRevision = revision;
+                    target.selectedRevision = target.publishedRevision = revision;
                     break;
                   }
                 }

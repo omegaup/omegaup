@@ -1097,7 +1097,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     ),
                     'problems' => self::addVersionsToProblems(
                         $problems,
-                        $r->identity
+                        $r->identity,
+                        $problemset->problemset_id
                     ),
                     'users' => \OmegaUp\DAO\ProblemsetIdentities::getWithExtraInformation(
                         intval($contest->problemset_id)
@@ -1128,7 +1129,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     private static function addVersionsToProblems(
         array $problems,
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity,
+        int $problemsetId
     ): array {
         $problemsWithVersions = [];
         foreach ($problems as $problem) {
@@ -1140,7 +1142,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                         \OmegaUp\DAO\VO\Problems::FIELD_NAMES
                     )
                 ),
-                $identity
+                $identity,
+                $problemsetId
             );
             $problemsWithVersions[] = $problem;
         }
@@ -2624,7 +2627,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return [
             'problems' => self::addVersionsToProblems(
                 $problems,
-                $r->identity
+                $r->identity,
+                $problemset->problemset_id
             ),
         ];
     }
