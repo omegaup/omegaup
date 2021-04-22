@@ -2900,6 +2900,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{published: null|string, log: list<ProblemVersion>}
      *
      * @omegaup-request-param null|string $problem_alias
+     * @omegaup-request-param int|null $problemset_id
      */
     public static function apiVersions(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -2909,46 +2910,40 @@ class Problem extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
+        $problemsetId = $r->ensureOptionalInt('problemset_id');
+
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        return self::getVersions($problem, $r->identity);
+        return self::getVersions($problem, $r->identity, $problemsetId);
     }
 
     /**
      * @return array{published: null|string, log: list<ProblemVersion>}
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     private static function getVersions(
         \OmegaUp\DAO\VO\Problems $problem,
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity,
+        ?int $problemsetId = null
     ) {
         if (is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
-        if (!\OmegaUp\Authorization::canEditProblem($identity, $problem)) {
-            $emptyAuthorCommitter = [
-                'time' => \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-                    $problem->creation_date
-                ),
-                'email' => '',
-                'name' => '',
-            ];
-            return [
-                'published' => $problem->commit,
-                'log' => [
-                    [
-                        'commit' => $problem->commit,
-                        'tree' => [],
-                        'parents' => [],
-                        'message' => '',
-                        'author' => $emptyAuthorCommitter,
-                        'committer' => $emptyAuthorCommitter,
-                        'version' => strval($problem->current_version),
-                    ],
-                ],
-            ];
+        if (
+            !\OmegaUp\Authorization::canEditProblem($identity, $problem) &&
+            (
+                is_null($problemsetId) ||
+                !\OmegaUp\Authorization::canEditProblemset(
+                    $identity,
+                    $problemsetId
+                )
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
         $privateTreeMapping = [];

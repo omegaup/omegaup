@@ -16,7 +16,7 @@ ALTER TABLE `User_Roles` DROP KEY `contest_id`;
 --
 -- Corrige la codificación de estas tablas.
 --
-ALTER TABLE `Problemset_User_Request` CONVERT TO CHARACTER SET utf8;
-ALTER TABLE `Problemset_User_Request` DEFAULT CHARACTER SET utf8;
-ALTER TABLE `Problemset_User_Request_History` CONVERT TO CHARACTER SET utf8;
-ALTER TABLE `Problemset_User_Request_History` DEFAULT CHARACTER SET utf8;
+ALTER TABLE `Problemset_User_Request` CONVERT TO CHARACTER SET utf8mb4;
+ALTER TABLE `Problemset_User_Request` DEFAULT CHARACTER SET utf8mb4;
+ALTER TABLE `Problemset_User_Request_History` CONVERT TO CHARACTER SET utf8mb4;
+ALTER TABLE `Problemset_User_Request_History` DEFAULT CHARACTER SET utf8mb4;

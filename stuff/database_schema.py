@@ -6,6 +6,7 @@
 
 from __future__ import print_function
 
+import difflib
 import os.path
 import re
 import subprocess
@@ -16,6 +17,8 @@ import database_utils
 from hook_tools import git_tools
 
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
+
+_SCHEMA_FILENAME = 'frontend/database/schema.sql'
 
 
 def _expected_database_schema(*,
@@ -42,7 +45,7 @@ def _expected_database_schema(*,
     return re.sub(br'AUTO_INCREMENT=\d+\s+', b'', schema)
 
 
-def strip_mysql_extensions(sql):
+def strip_mysql_extensions(sql: bytes) -> bytes:
     '''Strips MySQL extension comments.'''
     return re.sub(br'/\*!([^*]|\*[^/])*\*/', b'', sql,
                   flags=re.MULTILINE | re.DOTALL)
@@ -81,20 +84,27 @@ def main():
                                          password=args.password,
                                          hostname=args.hostname,
                                          verbose=args.verbose)
-    actual = git_tools.file_contents(
-        args, root, 'frontend/database/schema.sql')
+    actual = git_tools.file_contents(args, root, _SCHEMA_FILENAME)
 
-    if (strip_mysql_extensions(expected.strip()) != strip_mysql_extensions(
-            actual.strip())):
+    expected_contents = strip_mysql_extensions(expected.strip())
+    actual_contents = strip_mysql_extensions(actual.strip())
+
+    if expected_contents != actual_contents:
         if validate_only:
             if git_tools.attempt_automatic_fixes(sys.argv[0], args,
                                                  filtered_files):
                 sys.exit(1)
+            sys.stderr.writelines(
+                difflib.unified_diff(
+                    actual_contents.decode('utf-8').splitlines(keepends=True),
+                    expected_contents.decode('utf-8').splitlines(
+                        keepends=True),
+                    fromfile=_SCHEMA_FILENAME,
+                    tofile=_SCHEMA_FILENAME))
             print('%sschema.sql validation errors.%s '
-                  'Please run `%s` to fix them.' % (
-                      git_tools.COLORS.FAIL, git_tools.COLORS.NORMAL,
-                      git_tools.get_fix_commandline(sys.argv[0], args,
-                                                    filtered_files)),
+                  'Please run `%s` to fix them.' %
+                  (git_tools.COLORS.FAIL, git_tools.COLORS.NORMAL,
+                   git_tools.get_fix_commandline(args, filtered_files)),
                   file=sys.stderr)
         else:
             with open(os.path.join(root,

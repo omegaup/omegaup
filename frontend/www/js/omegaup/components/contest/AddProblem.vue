@@ -197,7 +197,10 @@ export default class AddProblem extends Vue {
 
   onSubmit(): void {
     if (this.useLatestVersion) {
-      this.$emit('get-versions', this.alias, this);
+      this.$emit('get-versions', {
+        target: this,
+        request: { problemAlias: this.alias },
+      });
     } else {
       this.onAddProblem();
     }
@@ -272,7 +275,10 @@ export default class AddProblem extends Vue {
       this.selectedRevision = this.publishedRevision = null;
       return;
     }
-    this.$emit('get-versions', newProblemAlias, this);
+    this.$emit('get-versions', {
+      target: this,
+      request: { problemAlias: this.alias },
+    });
   }
 }
 </script>
