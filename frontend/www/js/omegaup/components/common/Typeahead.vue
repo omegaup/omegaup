@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import VoerroTagsInput from '@voerro/vue-tagsinput';
 import '@voerro/vue-tagsinput/dist/style.css';
 import T from '../../lang';
@@ -34,6 +34,7 @@ export default class Typeahead extends Vue {
   @Prop() existingOptions!: types.ListItem[];
   @Prop({ default: 3 }) activationThreshold!: number;
   @Prop({ default: 5 }) maxResults!: number;
+  @Prop({ default: null }) value!: null | string;
 
   T = T;
   selectedOptions: types.ListItem[] = [];
@@ -50,6 +51,13 @@ export default class Typeahead extends Vue {
 
   onTagRemoved(): void {
     this.$emit('update:value', null);
+  }
+
+  @Watch('value')
+  onValueChanged(newValue: null | string): void {
+    this.selectedOptions = this.existingOptions.filter(
+      (option) => option.key === newValue,
+    );
   }
 }
 </script>

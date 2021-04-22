@@ -5,11 +5,12 @@ import T from '../../lang';
 
 import contest_AddProblem from './AddProblem.vue';
 
+const commit = '54318b04024976471c4cac1d2efeb81021d9396b';
 const problem: types.ProblemsetProblem = {
   accepted: 0,
   accepts_submissions: true,
   alias: 'problem',
-  commit: '54318b04024976471c4cac1d2efeb81021d9396b',
+  commit,
   difficulty: 1.0,
   has_submissions: false,
   input_limit: 1024,
@@ -20,13 +21,13 @@ const problem: types.ProblemsetProblem = {
   quality_seal: true,
   submissions: 0,
   title: 'Problem',
-  version: '54318b04024976471c4cac1d2efeb81021d9396b',
+  version: commit,
   visibility: 1,
   visits: 0,
 };
 
 describe('AddProblem.vue', () => {
-  it('Should handle empty props', async () => {
+  it('Should handle empty props', () => {
     const wrapper = shallowMount(contest_AddProblem, {
       propsData: {
         contestAlias: 'testContestAlias',
@@ -47,12 +48,18 @@ describe('AddProblem.vue', () => {
       },
     });
 
-    expect(wrapper.find('td[data-remove-problem] button').text()).toContain(
-      '×',
-    );
+    const removeIcon =
+      'button[data-remove-problem="problem"] font-awesome-icon-stub';
+    expect(wrapper.find(removeIcon).attributes().icon).toBe('trash');
+    expect(wrapper.find(removeIcon).attributes().class).toBeFalsy();
+    await wrapper
+      .find('button[data-remove-problem="problem"]')
+      .trigger('click');
+    expect(wrapper.emitted('remove-problem')).toBeDefined();
+    expect(wrapper.emitted('remove-problem')).toEqual([['problem']]);
   });
 
-  it('Should disable the delete button when a problem has submissions', async () => {
+  it('Should disable the delete button when a problem has submissions', () => {
     const wrapper = shallowMount(contest_AddProblem, {
       propsData: {
         contestAlias: 'testContestAlias',
@@ -60,9 +67,11 @@ describe('AddProblem.vue', () => {
         initialProblems: [{ ...problem, has_submissions: true }],
       },
     });
-
-    expect(wrapper.find('td[data-remove-problem] button').text()).toContain(
-      '🚫',
+    const removeIcon =
+      'button[data-remove-problem-disabled="problem"] font-awesome-icon-stub';
+    expect(wrapper.find(removeIcon).attributes().class).toContain('disabled');
+    expect(wrapper.find(removeIcon).attributes().class).toContain(
+      'text-secondary',
     );
   });
 });
