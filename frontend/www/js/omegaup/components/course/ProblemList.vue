@@ -67,7 +67,7 @@
           <div class="col-md-12">
             <div class="row">
               <div class="form-group col-md-5">
-                <label
+                <label class="w-100"
                   >{{ T.wordsProblem }}
                   <omegaup-autocomplete
                     v-model="problemAlias"
@@ -80,13 +80,13 @@
                 </p>
               </div>
               <div class="form-group col-md-2">
-                <label
+                <label class="w-100"
                   >{{ T.wordsPoints }}
                   <input v-model="points" type="number" class="form-control" />
                 </label>
               </div>
               <div class="form-group col-md-5">
-                <label for="use-latest-version"
+                <label for="use-latest-version" class="w-100"
                   >{{ T.contestAddproblemChooseVersion }}
                   <div class="form-control form-group">
                     <div class="form-check form-check-inline">
@@ -322,9 +322,3 @@ export default class CourseProblemList extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.form-group > label {
-  width: 100%;
-}
-</style>

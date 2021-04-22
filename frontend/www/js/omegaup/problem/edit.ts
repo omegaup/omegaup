@@ -1,4 +1,4 @@
-import { OmegaUp, omegaup } from '../omegaup';
+import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import T from '../lang';
 import Vue from 'vue';
@@ -262,7 +262,7 @@ OmegaUp.on('ready', () => {
           },
           'runs-diff': (
             versions: types.CommitRunsDiff,
-            selectedCommit: omegaup.Commit,
+            selectedCommit: types.ProblemVersion,
           ) => {
             api.Problem.runsDiff({
               problem_alias: payload.alias,

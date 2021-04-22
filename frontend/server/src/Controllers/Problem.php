@@ -30,7 +30,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
  * @psalm-type ProblemAdmin=array{role: string, username: string}
  * @psalm-type ProblemGroupAdmin=array{alias: string, name: string, role: string}
- * @psalm-type ProblemVersion=array{author: array{email: string, name: string, time: \OmegaUp\Timestamp}, commit: string, committer: array{email: string, name: string, time: \OmegaUp\Timestamp}, message: string, parents: list<string>, tree: array<string, string>, version: string}
+ * @psalm-type Signature=array{email: string, name: string, time: \OmegaUp\Timestamp}
+ * @psalm-type ProblemVersion=array{author: Signature, commit: string, committer: Signature, message: string, parents: list<string>, tree: array<string, string>, version: string}
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
  * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, allRuns?: list<Run>, clarifications?: list<Clarification>, histogram: Histogram, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus?: string, solvers: list<BestSolvers>, user: UserInfoForProblem}
@@ -2439,13 +2440,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $lang
      * @omegaup-request-param bool|null $prevent_problemset_open
      * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param int|null $problemset_id
      * @omegaup-request-param bool|null $show_solvers
      * @omegaup-request-param null|string $statement_type
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $showSolvers = $r->ensureOptionalBool('show_solvers') ?? false;
-        $preventProblemsetOptin = $r->ensureOptionalBool(
+        $preventProblemsetOpen = $r->ensureOptionalBool(
             'prevent_problemset_open'
         ) ?? false;
         $contestAlias = $r->ensureOptionalString(
@@ -2474,7 +2475,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $contestAlias,
             $problemAlias,
             $r->ensureOptionalString('statement_type') ?? '',
-            !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
+            $r->ensureOptionalInt('problemset_id')
         );
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -2487,7 +2488,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problemset,
             $lang,
             $showSolvers,
-            boolval($r['prevent_problemset_open']),
+            $preventProblemsetOpen,
             $contestAlias
         );
         if (is_null($details)) {
@@ -2677,6 +2678,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $response['runs'] = $results;
         }
 
+        $isPracticeMode = false;
         if (!is_null($problemset) && !is_null($loggedIdentity)) {
             $response['admin'] = \OmegaUp\Authorization::isAdmin(
                 $loggedIdentity,
@@ -2697,14 +2699,23 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'problemsetNotFound'
                     );
                 }
-                \OmegaUp\DAO\ProblemsetIdentities::checkAndSaveFirstTimeAccess(
-                    $loggedIdentity,
-                    $container,
-                    \OmegaUp\Authorization::canSubmitToProblemset(
-                        $loggedIdentity,
-                        $problemset
-                    )
+                $isPracticeMode = (
+                    $container instanceof \OmegaUp\DAO\VO\Contests &&
+                    $container->admission_mode !== 'private' &&
+                    $container->finish_time->time < \OmegaUp\Time::get()
                 );
+                if (!$isPracticeMode) {
+                    // Check and save first time access is not needed for
+                    // contests in practice mode
+                    \OmegaUp\DAO\ProblemsetIdentities::checkAndSaveFirstTimeAccess(
+                        $loggedIdentity,
+                        $container,
+                        \OmegaUp\Authorization::canSubmitToProblemset(
+                            $loggedIdentity,
+                            $problemset
+                        )
+                    );
+                }
             }
 
             // As last step, register the problem as opened
@@ -2713,7 +2724,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $problemsetId,
                     $problem->problem_id,
                     $loggedIdentity->identity_id
-                )
+                ) &&
+                !$isPracticeMode
             ) {
                 \OmegaUp\DAO\ProblemsetProblemOpened::create(new \OmegaUp\DAO\VO\ProblemsetProblemOpened([
                     'problemset_id' => $problemset->problemset_id,
