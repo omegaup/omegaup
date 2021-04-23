@@ -89,6 +89,27 @@ header('Content-Security-Policy: ' . implode('; ', array_map(
 )));
 header('X-Frame-Options: DENY');
 
+/**
+ * Creates a log4php appender configuration.
+ */
+function appenderConfig(string $filename): array {
+    if ($filename === 'php://stderr') {
+        return [
+            'class' => 'LoggerAppenderConsole',
+            'params' => [
+                'target' => 'stderr',
+            ],
+        ];
+    }
+    return [
+        'class' => 'LoggerAppenderFile',
+        'params' => [
+            'file' => $filename,
+            'append' => true,
+        ],
+    ];
+}
+
 require_once('libs/third_party/log4php/src/main/php/Logger.php');
 \Logger::configure([
     'rootLogger' => [
@@ -110,61 +131,53 @@ require_once('libs/third_party/log4php/src/main/php/Logger.php');
         ],
     ],
     'appenders' => [
-        'default' => [
-            'class' => 'LoggerAppenderFile',
-            'layout' => [
-                'class' => 'LoggerLayoutPattern',
-                'params' => [
-                    'conversionPattern' => (
-                        '%date [%level]: ' .
-                        \OmegaUp\Request::requestId() .
-                        ' %server{REQUEST_URI} %message (%F:%L) %newline'
-                    ),
+        'default' => array_merge(
+            appenderConfig(OMEGAUP_LOG_FILE),
+            [
+                'layout' => [
+                    'class' => 'LoggerLayoutPattern',
+                    'params' => [
+                        'conversionPattern' => (
+                            '%date [%level]: ' .
+                            \OmegaUp\Request::requestId() .
+                            ' %server{REQUEST_URI} %message (%F:%L) %newline'
+                        ),
+                    ],
                 ],
             ],
-            'params' => [
-                'file' => OMEGAUP_LOG_FILE,
-                'append' => true,
-            ],
-        ],
-        'csp' => [
-            'class' => 'LoggerAppenderFile',
-            'layout' => [
-                'class' => 'LoggerLayoutPattern',
-                'params' => [
-                    'conversionPattern' => '%date: %message %newline',
+        ),
+        'csp' => array_merge(
+            appenderConfig(OMEGAUP_CSP_LOG_FILE),
+            [
+                'layout' => [
+                    'class' => 'LoggerLayoutPattern',
+                    'params' => [
+                        'conversionPattern' => '%date: %message %newline',
+                    ],
                 ],
             ],
-            'params' => [
-                'file' => OMEGAUP_CSP_LOG_FILE,
-                'append' => true,
-            ],
-        ],
-        'jserror' => [
-            'class' => 'LoggerAppenderFile',
-            'layout' => [
-                'class' => 'LoggerLayoutPattern',
-                'params' => [
-                    'conversionPattern' => '%date: %message %newline',
+        ),
+        'jserror' => array_merge(
+            appenderConfig(OMEGAUP_JSERROR_LOG_FILE),
+            [
+                'layout' => [
+                    'class' => 'LoggerLayoutPattern',
+                    'params' => [
+                        'conversionPattern' => '%date: %message %newline',
+                    ],
                 ],
             ],
-            'params' => [
-                'file' => OMEGAUP_JSERROR_LOG_FILE,
-                'append' => true,
-            ],
-        ],
-        'mysqltypes' => [
-            'class' => 'LoggerAppenderFile',
-            'layout' => [
-                'class' => 'LoggerLayoutPattern',
-                'params' => [
-                    'conversionPattern' => '%message %newline',
+        ),
+        'mysqltypes' => array_merge(
+            appenderConfig(OMEGAUP_MYSQL_TYPES_LOG_FILE),
+            [
+                'layout' => [
+                    'class' => 'LoggerLayoutPattern',
+                    'params' => [
+                        'conversionPattern' => '%message %newline',
+                    ],
                 ],
             ],
-            'params' => [
-                'file' => OMEGAUP_MYSQL_TYPES_LOG_FILE,
-                'append' => true,
-            ],
-        ],
+        ),
     ],
 ]);
