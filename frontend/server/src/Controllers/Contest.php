@@ -2781,7 +2781,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             !\OmegaUp\Authorization::isProblemAdmin($identity, $problem) &&
             !\OmegaUp\Authorization::canEditProblemset(
                 $identity,
-                $contest->problemset_id
+                intval($contest->problemset_id)
             )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
