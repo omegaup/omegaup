@@ -1137,7 +1137,6 @@ const translations: { [key: string]: string; } = {
   scoreboardShowOnlyInvitedIdentities: "Mostre somente os concorrentes convidados",
   searchUser: "Pesquisar usu\u00e1rio",
   selectProblemLevelDesc: "Para adicionar o problema, voc\u00ea deve escolher o n\u00edvel correspondente",
-  selectProblemToGetVersions: "Selecione o problema e pressione Enter ou clique no bot\u00e3o Obter vers\u00f5es para mostrar todas as diferentes vers\u00f5es do problema.",
   sendInvitesToCandidates: "Enviar correos",
   showLinks: "V\u00ednculos",
   showTotalScoreboard: "Mostre o painel total",

@@ -46,7 +46,7 @@ const problem: types.ProblemsetProblemWithVersions = {
   version: commit,
   versions: {
     log: versionLog,
-    published: '',
+    published: commit,
   },
   visibility: 1,
   visits: 0,
@@ -102,14 +102,18 @@ describe('AddProblem.vue', () => {
   });
 
   it('Should update a problem in the list', async () => {
+    const initialProblems: types.ProblemsetProblemWithVersions[] = [
+      { ...problem, has_submissions: false },
+      { ...problem, alias: 'problem_2', letter: 'B', title: 'Problem 2' },
+    ];
+    initialProblems[0].commit = alternativeCommit;
+    initialProblems[0].version = alternativeCommit;
+    initialProblems[0].versions.published = alternativeCommit;
     const wrapper = shallowMount(contest_AddProblem, {
       propsData: {
         contestAlias: 'testContestAlias',
         initialPoints: 100,
-        initialProblems: [
-          { ...problem, has_submissions: false },
-          { ...problem, alias: 'problem_2', letter: 'B', title: 'Problem 2' },
-        ],
+        initialProblems,
       },
     });
 
@@ -152,7 +156,7 @@ describe('AddProblem.vue', () => {
           problem: {
             ...updatedProblem,
             alias: 'problem',
-            commit: undefined,
+            commit: alternativeCommit,
           },
         },
       ],
@@ -236,6 +240,51 @@ describe('AddProblem.vue', () => {
             points: 100,
             alias: 'problem',
             commit: undefined,
+          },
+        },
+      ],
+    ]);
+  });
+
+  it('Should update latest version for a problem in the list when it is explicitly selected', async () => {
+    const wrapper = mount(contest_AddProblem, {
+      propsData: {
+        contestAlias: 'testContestAlias',
+        initialPoints: 100,
+        initialProblems: [
+          { ...problem, has_submissions: false },
+          { ...problem, alias: 'problem_2', letter: 'B', title: 'Problem 2' },
+        ],
+      },
+    });
+
+    await wrapper
+      .find('button[data-update-problem="problem"]')
+      .trigger('click');
+
+    await wrapper
+      .find('input[name="use-latest-version"][value="false"]')
+      .trigger('click');
+
+    expect(wrapper.find('[data-versions]').text()).toContain(
+      commit.substr(0, 8),
+    );
+    expect(wrapper.find('[data-versions]').text()).toContain(
+      alternativeCommit.substr(0, 8),
+    );
+
+    await wrapper.find(`tr[data-revision="${commit}"]`).trigger('click');
+
+    await wrapper.find('button.add-problem').trigger('click');
+    expect(wrapper.emitted('add-problem')).toEqual([
+      [
+        {
+          isUpdate: true,
+          problem: {
+            order: 1,
+            points: 100,
+            alias: 'problem',
+            commit,
           },
         },
       ],

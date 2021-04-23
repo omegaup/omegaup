@@ -39,7 +39,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'problemIsPrivate'
+                'userNotAllowed'
             );
         }
     }

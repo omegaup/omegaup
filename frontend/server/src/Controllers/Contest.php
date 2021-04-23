@@ -2745,7 +2745,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         string $contestAlias,
         string $problemAlias
     ): array {
-        // Only director is allowed to create problems in contest
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -2774,18 +2773,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'problemIsBanned'
-            );
-        }
-        if (
-            !\OmegaUp\DAO\Problems::isVisible($problem) &&
-            !\OmegaUp\Authorization::isProblemAdmin($identity, $problem) &&
-            !\OmegaUp\Authorization::canEditProblemset(
-                $identity,
-                intval($contest->problemset_id)
-            )
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'problemIsPrivate'
             );
         }
 

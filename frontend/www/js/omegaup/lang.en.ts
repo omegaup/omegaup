@@ -1137,7 +1137,6 @@ const translations: { [key: string]: string; } = {
   scoreboardShowOnlyInvitedIdentities: "Show invited contestants only",
   searchUser: "Search user",
   selectProblemLevelDesc: "In order to add the problem, you must to choose its corresponding level",
-  selectProblemToGetVersions: "Select the problem and press Enter or click on Get versions button to show all the different versions of the problem.",
   sendInvitesToCandidates: "Send emails",
   showLinks: "Links",
   showTotalScoreboard: "Show total scoreboard",

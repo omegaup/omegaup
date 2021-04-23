@@ -196,30 +196,37 @@ export default class AddProblem extends Vue {
   publishedRevision: null | types.ProblemVersion = null;
   selectedRevision: null | types.ProblemVersion = null;
 
+  setInitialRevisionValues(): void {
+    this.versionLog = [];
+    this.selectedRevision = this.publishedRevision = null;
+    this.useLatestVersion = true;
+  }
+
   onGetVersions(problemAlias: string): void {
     const currentProblem = this.problems.find(
       (problem) => problem.alias === problemAlias,
     );
-    if (!currentProblem) return;
+    if (!currentProblem) {
+      this.setInitialRevisionValues();
+      return;
+    }
     this.versionLog = currentProblem.versions.log;
     const publishedCommitHash = currentProblem.commit;
     const revision = currentProblem.versions.log.find(
       (revision) => revision.commit === publishedCommitHash,
     );
-    if (revision) {
-      this.selectedRevision = this.publishedRevision = revision;
-      this.useLatestVersion =
-        currentProblem.versions.log[0].commit === revision.commit;
+    if (!revision) {
+      this.setInitialRevisionValues();
+      return;
     }
+    this.selectedRevision = this.publishedRevision = revision;
+    this.useLatestVersion =
+      currentProblem.versions.log[0].commit === revision.commit;
   }
 
   onSubmit(): void {
     if (!this.alias) return;
-    if (this.useLatestVersion) {
-      this.onGetVersions(this.alias);
-    } else {
-      this.onAddProblem();
-    }
+    this.onAddProblem();
   }
 
   onAddProblem(): void {

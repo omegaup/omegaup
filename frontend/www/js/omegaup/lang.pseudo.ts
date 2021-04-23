@@ -1137,7 +1137,6 @@ const translations: { [key: string]: string; } = {
   scoreboardShowOnlyInvitedIdentities: "(Sh0w invi73d c0n7357an75 0n1y)",
   searchUser: "(S3arch u53r)",
   selectProblemLevelDesc: "(In 0rd3r 70 add 7h3 pr0b13m, y0u mu57 70 ch0053 i75 c0rr35p0nding 13v31)",
-  selectProblemToGetVersions: "(S313c7 7h3 pr0b13m and pr355 En73r 0r c1ick 0n G37 v3r5i0n5 bu770n 70 5h0w a11 7h3 diff3r3n7 v3r5i0n5 0f 7h3 pr0b13m.)",
   sendInvitesToCandidates: "(S3nd 3mai15)",
   showLinks: "(Link5)",
   showTotalScoreboard: "(Sh0w 707a1 5c0r3b0ard)",
