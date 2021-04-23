@@ -1387,7 +1387,6 @@ const translations: { [key: string]: string; } = {
   wordsGenderMale: "(Ma13)",
   wordsGenderOther: "(O7h3r)",
   wordsGetToKnowOurCourses: "(G37 70 kn0w 0ur c0ur535!)",
-  wordsGetVersions: "(G37 v3r5i0n5)",
   wordsGlobalSubmissions: "(G10ba1 5ubmi55i0n5)",
   wordsGroup: "(Gr0up)",
   wordsGroupAdmin: "(Admin gr0up)",
