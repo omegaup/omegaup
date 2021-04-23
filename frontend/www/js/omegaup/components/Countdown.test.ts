@@ -1,10 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
 
 import omegaup_Countdown from './Countdown.vue';
-import delay from 'delay';
 
 describe('Countdown.vue', () => {
-  it('Should handle a countdown with 5 seconds left to finish', async () => {
+  jest.useFakeTimers();
+  it('Should handle a countdown with 10 seconds left to finish', async () => {
     const targetTime = new Date();
     const time = new Date();
     targetTime.setSeconds(targetTime.getSeconds() + 10);
@@ -21,10 +21,10 @@ describe('Countdown.vue', () => {
       .spyOn(wrapper.vm, 'getDateNow')
       .mockImplementation(() => mockedCurrentTime);
 
-    await delay(2000);
+    jest.advanceTimersByTime(5000);
 
     expect(mockGetDateNowMethod).toHaveBeenCalled();
-    expect(wrapper.find('span').text()).toBe('00:00:05');
+    expect(wrapper.find('span').text()).toBe('00:00:10');
 
     mockGetDateNowMethod.mockRestore();
   });
