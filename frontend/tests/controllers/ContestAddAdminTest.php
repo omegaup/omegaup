@@ -339,6 +339,9 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertContains($problem['alias'], $problemsAliasMapping);
             $this->assertStringContainsString('Updated', $problem['title']);
 
+            // Now, versions are sent from payload too.
+            $this->assertCount(2, $problem['versions']['log']);
+
             $versionsData = \OmegaUp\Controllers\Problem::apiVersions(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
@@ -348,6 +351,10 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
             );
 
             $this->assertCount(2, $versionsData['log']);
+            $this->assertEquals(
+                $problem['versions']['log'],
+                $versionsData['log']
+            );
         }
 
         // But private problem versions can not be shown when user tries to

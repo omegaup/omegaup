@@ -2908,7 +2908,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
-     * @return array{published: null|string, log: list<ProblemVersion>}
+     * @return array{published: string, log: list<ProblemVersion>}
      *
      * @omegaup-request-param null|string $problem_alias
      * @omegaup-request-param int|null $problemset_id
@@ -2932,11 +2932,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{published: null|string, log: list<ProblemVersion>}
+     * @return array{published: string, log: list<ProblemVersion>}
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
-    private static function getVersions(
+    public static function getVersions(
         \OmegaUp\DAO\VO\Problems $problem,
         \OmegaUp\DAO\VO\Identities $identity,
         ?int $problemsetId = null
@@ -3002,8 +3002,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $commit = (
             new \OmegaUp\ProblemArtifacts($problem->alias, 'published')
         )->commit();
+
+        if (is_null($commit)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
         return [
-            'published' => !is_null($commit) ? $commit['commit'] : null,
+            'published' => $commit['commit'],
             'log' => $masterLog,
         ];
     }
