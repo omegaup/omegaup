@@ -14,7 +14,7 @@ else
 	if [ -d "${OMEGAUP_ROOT}/.git/refs/remotes/upstream" ]; then
 		REMOTE="upstream"
 	fi
-	REMOTE_HASH="$(git rev-parse "${REMOTE}/master")"
+	REMOTE_HASH="$(git rev-parse "${REMOTE}/main")"
 	MERGE_BASE="$(git merge-base "${REMOTE_HASH}" HEAD)"
 	ARGS="fix ${MERGE_BASE}"
 fi
@@ -48,6 +48,6 @@ fi
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
 	--env 'PYTHONIOENCODING=utf-8' \
 	--env "MYPYPATH=${OMEGAUP_ROOT}/stuff" \
-	omegaup/hook_tools:20210327 --command-name="./stuff/lint.sh" $ARGS
+	omegaup/hook_tools:20210422 --command-name="./stuff/lint.sh" $ARGS
 
 echo OK

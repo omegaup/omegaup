@@ -5,7 +5,6 @@ import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import course_AssignmentDetails from '../components/course/AssignmentDetails.vue';
-import course_ProblemList from '../components/course/ProblemList.vue';
 import course_Edit from '../components/course/Edit.vue';
 import course_Form from '../components/course/Form.vue';
 import Sortable from 'sortablejs';
@@ -85,7 +84,11 @@ OmegaUp.on('ready', () => {
           note: '',
         })
           .then(() => {
-            ui.success(T.successfulOperation);
+            if (resolution) {
+              ui.success(T.arbitrateRequestAcceptSuccessfully);
+            } else {
+              ui.success(T.arbitrateRequestDenySuccessfully);
+            }
             courseEdit.refreshStudentList();
           })
           .catch(ui.apiError);
@@ -242,23 +245,34 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'get-versions': (
-            problemAlias: string,
-            source: course_ProblemList,
-          ) => {
-            api.Problem.versions({ problem_alias: problemAlias })
+          'get-versions': ({
+            request,
+            target,
+          }: {
+            request: { problemAlias: string; problemsetId: number };
+            target: {
+              versionLog: types.ProblemVersion[];
+              problems: types.ProblemsetProblem[];
+              selectedRevision: types.ProblemVersion;
+              publishedRevision: types.ProblemVersion;
+            };
+          }) => {
+            api.Problem.versions({
+              problem_alias: request.problemAlias,
+              problemset_id: request.problemsetId,
+            })
               .then((result) => {
-                source.versionLog = result.log;
+                target.versionLog = result.log;
                 let publishedCommitHash = result.published;
-                for (const problem of source.problems) {
-                  if (problem.alias === problemAlias) {
+                for (const problem of target.problems) {
+                  if (problem.alias === request.problemAlias) {
                     publishedCommitHash = problem.commit;
                     break;
                   }
                 }
                 for (const revision of result.log) {
                   if (publishedCommitHash === revision.commit) {
-                    source.selectedRevision = source.publishedRevision = revision;
+                    target.selectedRevision = target.publishedRevision = revision;
                     break;
                   }
                 }
@@ -398,9 +412,9 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'accept-request': (username: string) =>
+          'accept-request': ({ username }: { username: string }) =>
             this.arbitrateRequest(username, true),
-          'deny-request': (username: string) =>
+          'deny-request': ({ username }: { username: string }) =>
             this.arbitrateRequest(username, false),
           'add-admin': (useradmin: string) => {
             api.Course.addAdmin({

@@ -4,7 +4,7 @@ import { types } from '../api_types';
 
 Vue.use(Vuex);
 
-export interface ClarifiactionState {
+export interface ClarificationState {
   // The list of clarifications
   clarifications: types.Clarification[];
 
@@ -13,13 +13,16 @@ export interface ClarifiactionState {
   index: Record<number, number>;
 }
 
-const clarificationStore = new Vuex.Store<ClarifiactionState>({
+export const clarificationStoreConfig = {
   state: {
     clarifications: [],
     index: {},
   },
   mutations: {
-    addClarification(state, clarification: types.Clarification) {
+    addClarification(
+      state: ClarificationState,
+      clarification: types.Clarification,
+    ) {
       if (
         Object.prototype.hasOwnProperty.call(
           state.index,
@@ -44,11 +47,11 @@ const clarificationStore = new Vuex.Store<ClarifiactionState>({
       );
       state.clarifications.push(clarification);
     },
-    clear(state) {
+    clear(state: ClarificationState) {
       state.clarifications.splice(0);
       state.index = {};
     },
   },
-});
+};
 
-export default clarificationStore;
+export default new Vuex.Store<ClarificationState>(clarificationStoreConfig);

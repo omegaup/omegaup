@@ -65,28 +65,14 @@
             />
           </div>
         </div>
-        <template v-if="!useLatestVersion && alias !== null">
-          <div class="form-group">
-            <button
-              class="btn btn-primary get-versions"
-              type="submit"
-              :disabled="alias === null"
-              @click.prevent="onSubmit"
-            >
-              {{ T.wordsGetVersions }}
-            </button>
-            <small class="form-text text-muted">
-              {{ T.selectProblemToGetVersions }}
-            </small>
-          </div>
-          <omegaup-problem-versions
-            v-model="selectedRevision"
-            :log="versionLog"
-            :published-revision="publishedRevision"
-            :show-footer="false"
-            @runs-diff="onRunsDiff"
-          ></omegaup-problem-versions>
-        </template>
+        <omegaup-problem-versions
+          v-if="!useLatestVersion && alias !== null"
+          v-model="selectedRevision"
+          :log="versionLog"
+          :published-revision="publishedRevision"
+          :show-footer="false"
+          @runs-diff="onRunsDiff"
+        ></omegaup-problem-versions>
         <div class="form-group">
           <button
             class="btn btn-primary add-problem"
@@ -196,7 +182,7 @@ library.add(fas);
 export default class AddProblem extends Vue {
   @Prop() contestAlias!: string;
   @Prop() initialPoints!: number;
-  @Prop() initialProblems!: types.ProblemsetProblem[];
+  @Prop() initialProblems!: types.ProblemsetProblemWithVersions[];
   @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
@@ -210,9 +196,27 @@ export default class AddProblem extends Vue {
   publishedRevision: null | types.ProblemVersion = null;
   selectedRevision: null | types.ProblemVersion = null;
 
+  onGetVersions(problemAlias: string): void {
+    const currentProblem = this.problems.find(
+      (problem) => problem.alias === problemAlias,
+    );
+    if (!currentProblem) return;
+    this.versionLog = currentProblem.versions.log;
+    const publishedCommitHash = currentProblem.commit;
+    const revision = currentProblem.versions.log.find(
+      (revision) => revision.commit === publishedCommitHash,
+    );
+    if (revision) {
+      this.selectedRevision = this.publishedRevision = revision;
+      this.useLatestVersion =
+        currentProblem.versions.log[0].commit === revision.commit;
+    }
+  }
+
   onSubmit(): void {
+    if (!this.alias) return;
     if (this.useLatestVersion) {
-      this.$emit('get-versions', this.alias, this);
+      this.onGetVersions(this.alias);
     } else {
       this.onAddProblem();
     }
@@ -234,15 +238,14 @@ export default class AddProblem extends Vue {
     this.title = null;
   }
 
-  onEdit(problem: types.ProblemsetProblem): void {
+  onEdit(problem: types.ProblemsetProblemWithVersions): void {
     this.title = problem.title;
     this.alias = problem.alias;
     this.points = problem.points;
     this.order = problem.order;
-    this.useLatestVersion = false;
   }
 
-  onRemove(problem: types.ProblemsetProblem): void {
+  onRemove(problem: types.ProblemsetProblemWithVersions): void {
     this.$emit('remove-problem', problem.alias);
   }
 
@@ -280,7 +283,9 @@ export default class AddProblem extends Vue {
   }
 
   @Watch('initialProblems')
-  onInitialProblemsChange(newValue: types.ProblemsetProblem[]): void {
+  onInitialProblemsChange(
+    newValue: types.ProblemsetProblemWithVersions[],
+  ): void {
     this.problems = newValue;
     this.order = newValue.length + 1;
   }
@@ -292,7 +297,14 @@ export default class AddProblem extends Vue {
       this.selectedRevision = this.publishedRevision = null;
       return;
     }
-    this.$emit('get-versions', newProblemAlias, this);
+    if (this.isUpdate) {
+      this.onGetVersions(newProblemAlias);
+      return;
+    }
+    this.$emit('get-versions', {
+      target: this,
+      request: { problemAlias: this.alias },
+    });
   }
 }
 </script>

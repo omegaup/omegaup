@@ -152,10 +152,7 @@
             (assignmentFormComponent, problems) =>
               $emit('submit-new-assignment', assignmentFormComponent, problems)
           "
-          @get-versions="
-            (newProblemAlias, addProblemComponent) =>
-              $emit('get-versions', newProblemAlias, addProblemComponent)
-          "
+          @get-versions="(request) => $emit('get-versions', request)"
         >
           <template #page-header><span></span></template>
           <template #cancel-button>
@@ -199,8 +196,8 @@
             (participants) => $emit('add-student', participants)
           "
           @emit-remove-student="(student) => $emit('remove-student', student)"
-          @emit-accept-request="(username) => $emit('accept-request', username)"
-          @emit-deny-request="(username) => $emit('deny-request', username)"
+          @accept-request="(request) => $emit('accept-request', request)"
+          @deny-request="(request) => $emit('deny-request', request)"
         ></omegaup-course-add-students>
       </div>
 

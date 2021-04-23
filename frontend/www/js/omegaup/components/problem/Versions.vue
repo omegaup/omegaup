@@ -77,6 +77,7 @@
             <ul v-if="diffMode == 'files'" class="list-group no-margin">
               <li
                 v-for="diffEntry in diffFiles"
+                :key="diffEntry[0]"
                 class="list-group-item"
                 :class="diffEntry[1]"
               >
@@ -108,7 +109,11 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="diffEntry in diffSubmissions" :class="diffEntry[1]">
+                <tr
+                  v-for="diffEntry in diffSubmissions"
+                  :key="diffEntry[0].guid"
+                  :class="diffEntry[1]"
+                >
                   <td class="text-center">
                     <acronym :title="diffEntry[0].guid"
                       ><tt>{{ diffEntry[0].guid.substr(0, 8) }}</tt></acronym
@@ -157,22 +162,21 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 
 @Component
 export default class ProblemVersions extends Vue {
-  @Prop() log!: omegaup.Commit[];
-  @Prop() publishedRevision!: omegaup.Commit;
+  @Prop() log!: types.ProblemVersion[];
+  @Prop({ default: null }) publishedRevision!: null | types.ProblemVersion;
   @Prop() showFooter!: boolean;
-  @Prop() value!: omegaup.Commit;
+  @Prop({ default: null }) value!: null | types.ProblemVersion;
 
   T = T;
   time = time;
   diffMode = 'files';
-  selectedRevision: omegaup.Commit = this.value;
+  selectedRevision: null | types.ProblemVersion = this.value;
   runsDiff: types.CommitRunsDiff = {};
   showOnlyChanges = false;
   updatePublished = 'owned-problemsets';
@@ -242,12 +246,12 @@ export default class ProblemVersions extends Vue {
   }
 
   @Watch('value')
-  onValueChange(newValue: omegaup.Commit) {
+  onValueChange(newValue: types.ProblemVersion) {
     this.selectedRevision = newValue;
   }
 
   @Watch('selectedRevision')
-  onSelectedRevisionChange(newValue: omegaup.Commit) {
+  onSelectedRevisionChange(newValue: types.ProblemVersion) {
     this.$emit('input', this.selectedRevision);
     if (
       !newValue ||

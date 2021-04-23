@@ -16,7 +16,8 @@ namespace OmegaUp\Controllers;
 class Problemset extends \OmegaUp\Controllers\Controller {
     public static function validateAddProblemToProblemset(
         \OmegaUp\DAO\VO\Problems $problem,
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity,
+        ?int $problemsetId = null
     ): void {
         if (
             $problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED ||
@@ -27,8 +28,15 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             );
         }
         if (
-            !\OmegaUp\DAO\Problems::isVisible($problem)
-            && !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
+            !\OmegaUp\DAO\Problems::isVisible($problem) &&
+            !\OmegaUp\Authorization::isProblemAdmin($identity, $problem) &&
+            (
+                is_null($problemsetId) ||
+                !\OmegaUp\Authorization::canEditProblemset(
+                    $identity,
+                    $problemsetId
+                )
+            )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'problemIsPrivate'
@@ -49,7 +57,8 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         if ($validateVisibility) {
             \OmegaUp\Controllers\Problemset::validateAddProblemToProblemset(
                 $problem,
-                $identity
+                $identity,
+                $problemsetId
             );
         }
 

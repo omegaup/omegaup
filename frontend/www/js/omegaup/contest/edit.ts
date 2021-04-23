@@ -35,7 +35,11 @@ OmegaUp.on('ready', () => {
           note: resolutionText,
         })
           .then(() => {
-            ui.success(T.successfulOperation);
+            if (resolution) {
+              ui.success(T.arbitrateRequestAcceptSuccessfully);
+            } else {
+              ui.success(T.arbitrateRequestDenySuccessfully);
+            }
             contestEdit.refreshRequests();
           })
           .catch(ui.apiError);
@@ -175,7 +179,7 @@ OmegaUp.on('ready', () => {
           },
           'add-problem': ({
             problem,
-            isUpdate,
+            isUpdate = false,
           }: {
             problem: types.ProblemsetProblem;
             isUpdate: boolean;
@@ -197,23 +201,27 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'get-versions': (
-            problemAlias: string,
-            addProblemComponent: {
+          'get-versions': ({
+            request,
+            target,
+          }: {
+            request: { problemAlias: string };
+            target: {
               versionLog: types.ProblemVersion[];
               problems: types.ProblemsetProblem[];
               selectedRevision: types.ProblemVersion;
               publishedRevision: types.ProblemVersion;
-            },
-          ) => {
+            };
+          }) => {
             api.Problem.versions({
-              problem_alias: problemAlias,
+              problem_alias: request.problemAlias,
+              problemset_id: payload.details.problemset_id,
             })
               .then((result) => {
-                addProblemComponent.versionLog = result.log;
+                target.versionLog = result.log;
                 let currentProblem = null;
-                for (const problem of addProblemComponent.problems) {
-                  if (problem.alias === problemAlias) {
+                for (const problem of target.problems) {
+                  if (problem.alias === request.problemAlias) {
                     currentProblem = problem;
                     break;
                   }
@@ -224,7 +232,7 @@ OmegaUp.on('ready', () => {
                 }
                 for (const revision of result.log) {
                   if (publishedCommitHash === revision.commit) {
-                    addProblemComponent.selectedRevision = addProblemComponent.publishedRevision = revision;
+                    target.selectedRevision = target.publishedRevision = revision;
                     break;
                   }
                 }
@@ -245,7 +253,7 @@ OmegaUp.on('ready', () => {
           'runs-diff': (
             problemAlias: string,
             versionsComponent: types.CommitRunsDiff,
-            selectedCommit: omegaup.Commit,
+            selectedCommit: types.ProblemVersion,
           ) => {
             api.Contest.runsDiff({
               problem_alias: problemAlias,
@@ -336,10 +344,10 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'accept-request': (username: string) => {
+          'accept-request': ({ username }: { username: string }) => {
             this.arbitrateRequest(username, true);
           },
-          'deny-request': (username: string) => {
+          'deny-request': ({ username }: { username: string }) => {
             this.arbitrateRequest(username, false);
           },
           'add-admin': (username: string) => {

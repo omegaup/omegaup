@@ -136,10 +136,7 @@
           @update-search-result-problems="
             (query) => $emit('update-search-result-problems', query)
           "
-          @get-versions="
-            (problemAlias, addProblemComponent) =>
-              $emit('get-versions', problemAlias, addProblemComponent)
-          "
+          @get-versions="(request) => $emit('get-versions', request)"
           @remove-problem="
             (problemAlias) => $emit('remove-problem', problemAlias)
           "
@@ -175,8 +172,8 @@
         <omegaup-common-requests
           :data="requests"
           :text-add-participant="T.contestAdduserAddContestant"
-          @emit-accept-request="(username) => $emit('accept-request', username)"
-          @emit-deny-request="(username) => $emit('deny-request', username)"
+          @accept-request="(request) => $emit('accept-request', request)"
+          @deny-request="(request) => $emit('deny-request', request)"
         ></omegaup-common-requests>
         <omegaup-contest-groups
           :groups="groups"
@@ -266,7 +263,7 @@ export default class Edit extends Vue {
   @Prop() details!: types.ContestAdminDetails;
   @Prop() groups!: types.ContestGroup[];
   @Prop() groupAdmins!: types.ContestGroupAdmin[];
-  @Prop() problems!: types.ProblemsetProblem[];
+  @Prop() problems!: types.ProblemsetProblemWithVersions[];
   @Prop() requests!: types.ContestRequest[];
   @Prop() users!: types.ContestUser[];
   @Prop() searchResultProblems!: types.ListItem[];

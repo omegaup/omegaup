@@ -6,7 +6,29 @@ import T from '../../lang';
 import contest_AddProblem from './AddProblem.vue';
 
 const commit = '54318b04024976471c4cac1d2efeb81021d9396b';
-const problem: types.ProblemsetProblem = {
+const alternativeCommit = 'b6918b04024976471c4cac1d2efeb81021d93345';
+const revision: types.ProblemVersion = {
+  author: {
+    name: 'Problem Author',
+    email: 'author@omegaup.org',
+    time: new Date(0),
+  },
+  commit,
+  committer: {
+    name: 'Problem Author',
+    email: 'author@omegaup.org',
+    time: new Date(0),
+  },
+  message: 'Some message',
+  parents: [],
+  tree: {},
+  version: commit,
+};
+const versionLog: types.ProblemVersion[] = [
+  { ...revision },
+  { ...revision, commit: alternativeCommit },
+];
+const problem: types.ProblemsetProblemWithVersions = {
   accepted: 0,
   accepts_submissions: true,
   alias: 'problem',
@@ -22,19 +44,12 @@ const problem: types.ProblemsetProblem = {
   submissions: 0,
   title: 'Problem',
   version: commit,
+  versions: {
+    log: versionLog,
+    published: '',
+  },
   visibility: 1,
   visits: 0,
-};
-const revision: types.ProblemVersion = {
-  author: {
-    name: 'Problem Author',
-  },
-  commit,
-  committer: {},
-  message: 'Some message',
-  parents: [],
-  tree: {},
-  version: commit,
 };
 
 describe('AddProblem.vue', () => {
@@ -59,7 +74,10 @@ describe('AddProblem.vue', () => {
       },
     });
 
-    expect(wrapper.find('button[data-remove-problem="problem"]')).toBeTruthy();
+    const removeIcon =
+      'button[data-remove-problem="problem"] font-awesome-icon-stub';
+    expect(wrapper.find(removeIcon).attributes().icon).toBe('trash');
+    expect(wrapper.find(removeIcon).attributes().class).toBeFalsy();
     await wrapper
       .find('button[data-remove-problem="problem"]')
       .trigger('click');
@@ -75,10 +93,12 @@ describe('AddProblem.vue', () => {
         initialProblems: [{ ...problem, has_submissions: true }],
       },
     });
-
-    expect(
-      wrapper.find('button[data-remove-problem-disabled="problem"]'),
-    ).toBeTruthy();
+    const removeIcon =
+      'button[data-remove-problem-disabled="problem"] font-awesome-icon-stub';
+    expect(wrapper.find(removeIcon).attributes().class).toContain('disabled');
+    expect(wrapper.find(removeIcon).attributes().class).toContain(
+      'text-secondary',
+    );
   });
 
   it('Should update a problem in the list', async () => {
@@ -132,7 +152,7 @@ describe('AddProblem.vue', () => {
           problem: {
             ...updatedProblem,
             alias: 'problem',
-            commit,
+            commit: undefined,
           },
         },
       ],
@@ -140,12 +160,6 @@ describe('AddProblem.vue', () => {
   });
 
   it('Should update non-latest version for a problem in the list', async () => {
-    const alternativeCommit = 'b6918b04024976471c4cac1d2efeb81021d93345';
-    const versionLog: types.ProblemVersion[] = [
-      { ...revision },
-      { ...revision, commit: alternativeCommit },
-    ];
-
     const wrapper = mount(contest_AddProblem, {
       propsData: {
         contestAlias: 'testContestAlias',
@@ -160,8 +174,6 @@ describe('AddProblem.vue', () => {
     await wrapper
       .find('button[data-update-problem="problem"]')
       .trigger('click');
-
-    wrapper.setData({ selectedRevision: revision, versionLog });
 
     await wrapper
       .find('input[name="use-latest-version"][value="false"]')
@@ -195,12 +207,6 @@ describe('AddProblem.vue', () => {
   });
 
   it('Should update latest version for a problem in the list', async () => {
-    const alternativeCommit = 'b6918b04024976471c4cac1d2efeb81021d93345';
-    const versionLog: types.ProblemVersion[] = [
-      { ...revision },
-      { ...revision, commit: alternativeCommit },
-    ];
-
     const wrapper = mount(contest_AddProblem, {
       propsData: {
         contestAlias: 'testContestAlias',
@@ -215,8 +221,6 @@ describe('AddProblem.vue', () => {
     await wrapper
       .find('button[data-update-problem="problem"]')
       .trigger('click');
-
-    wrapper.setData({ versionLog });
 
     await wrapper
       .find('input[name="use-latest-version"][value="true"]')
