@@ -53,6 +53,19 @@ const problem: types.ProblemsetProblemWithVersions = {
 };
 
 describe('AddProblem.vue', () => {
+  beforeAll(() => {
+    const div = document.createElement('div');
+    div.id = 'root';
+    document.body.appendChild(div);
+  });
+
+  afterAll(() => {
+    const rootDiv = document.getElementById('root');
+    if (rootDiv) {
+      document.removeChild(rootDiv);
+    }
+  });
+
   it('Should handle empty props', () => {
     const wrapper = shallowMount(contest_AddProblem, {
       propsData: {
@@ -99,6 +112,32 @@ describe('AddProblem.vue', () => {
     expect(wrapper.find(removeIcon).attributes().class).toContain(
       'text-secondary',
     );
+  });
+
+  it('Should handle empty revision when commit was not found', async () => {
+    const initialProblems: types.ProblemsetProblemWithVersions[] = [
+      { ...problem, has_submissions: false },
+      { ...problem, alias: 'problem_2', letter: 'B', title: 'Problem 2' },
+    ];
+    initialProblems[0].commit = '123456';
+    initialProblems[0].version = '123456';
+    initialProblems[0].versions.published = '123456';
+    const wrapper = shallowMount(contest_AddProblem, {
+      propsData: {
+        contestAlias: 'testContestAlias',
+        initialPoints: 100,
+        initialProblems,
+      },
+    });
+
+    await wrapper
+      .find('button[data-update-problem="problem"]')
+      .trigger('click');
+
+    expect(wrapper.vm.versionLog).toEqual([]);
+    expect(wrapper.vm.selectedRevision).toBeFalsy();
+    expect(wrapper.vm.publishedRevision).toBeFalsy();
+    expect(wrapper.vm.useLatestVersion).toBeTruthy();
   });
 
   it('Should update a problem in the list', async () => {
@@ -249,6 +288,7 @@ describe('AddProblem.vue', () => {
   it('Should update latest version for a problem in the list when it is explicitly selected', async () => {
     const wrapper = mount(contest_AddProblem, {
       propsData: {
+        attachTo: '#root',
         contestAlias: 'testContestAlias',
         initialPoints: 100,
         initialProblems: [
@@ -275,7 +315,7 @@ describe('AddProblem.vue', () => {
 
     await wrapper.find(`tr[data-revision="${commit}"]`).trigger('click');
 
-    await wrapper.find('button.add-problem').trigger('click');
+    await wrapper.find('form button[type="submit"]').trigger('click');
     expect(wrapper.emitted('add-problem')).toEqual([
       [
         {
