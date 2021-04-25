@@ -2775,11 +2775,32 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'problemIsBanned'
             );
         }
-
-        return [
+        $problemsetProblem = \OmegaUp\DAO\Base\ProblemsetProblems::getByPK(
+            $contest->problemset_id,
+            $problem->problem_id
+        );
+        $result = [
             'contest' => $contest,
             'problem' => $problem,
         ];
+        if (!is_null($problemsetProblem)) {
+            // Any user with admin contest privileges should update a problem
+            // in a contest
+            return $result;
+        }
+        if (
+            !\OmegaUp\DAO\Problems::isVisible($problem) &&
+            !\OmegaUp\Authorization::isProblemAdmin(
+                $identity,
+                $problem
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'problemIsPrivate'
+            );
+        }
+
+        return $result;
     }
 
     /**

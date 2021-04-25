@@ -114,32 +114,6 @@ describe('AddProblem.vue', () => {
     );
   });
 
-  it('Should handle empty revision when commit was not found', async () => {
-    const initialProblems: types.ProblemsetProblemWithVersions[] = [
-      { ...problem, has_submissions: false },
-      { ...problem, alias: 'problem_2', letter: 'B', title: 'Problem 2' },
-    ];
-    initialProblems[0].commit = '123456';
-    initialProblems[0].version = '123456';
-    initialProblems[0].versions.published = '123456';
-    const wrapper = shallowMount(contest_AddProblem, {
-      propsData: {
-        contestAlias: 'testContestAlias',
-        initialPoints: 100,
-        initialProblems,
-      },
-    });
-
-    await wrapper
-      .find('button[data-update-problem="problem"]')
-      .trigger('click');
-
-    expect(wrapper.vm.versionLog).toEqual([]);
-    expect(wrapper.vm.selectedRevision).toBeFalsy();
-    expect(wrapper.vm.publishedRevision).toBeFalsy();
-    expect(wrapper.vm.useLatestVersion).toBeTruthy();
-  });
-
   it('Should update a problem in the list', async () => {
     const initialProblems: types.ProblemsetProblemWithVersions[] = [
       { ...problem, has_submissions: false },

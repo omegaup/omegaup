@@ -166,6 +166,15 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
+interface MappedProblems {
+  [key: string]: {
+    published: string;
+    useLastVersion: boolean;
+    versions: types.ProblemVersion[];
+    mappedVersions: { [key: string]: types.ProblemVersion };
+  };
+}
+
 @Component({
   components: {
     'omegaup-problem-versions': problem_Versions,
@@ -202,26 +211,34 @@ export default class AddProblem extends Vue {
     this.useLatestVersion = true;
   }
 
+  get problemsMapping(): MappedProblems {
+    let problemsMapping: MappedProblems = {};
+    for (const problem of this.problems) {
+      const publishedCommitHash = problem.commit;
+      problemsMapping[problem.alias] = {
+        versions: problem.versions.log,
+        mappedVersions: {},
+        published: problem.commit,
+        useLastVersion: false,
+      };
+      for (const [index, version] of problem.versions.log.entries()) {
+        problemsMapping[problem.alias].mappedVersions[version.commit] = version;
+        if (index === 0 && version.commit === publishedCommitHash) {
+          problemsMapping[problem.alias].useLastVersion = true;
+        }
+      }
+    }
+    return problemsMapping;
+  }
+
   onGetVersions(problemAlias: string): void {
-    const currentProblem = this.problems.find(
-      (problem) => problem.alias === problemAlias,
-    );
-    if (!currentProblem) {
-      this.setInitialRevisionValues();
-      return;
-    }
-    this.versionLog = currentProblem.versions.log;
-    const publishedCommitHash = currentProblem.commit;
-    const revision = currentProblem.versions.log.find(
-      (revision) => revision.commit === publishedCommitHash,
-    );
-    if (!revision) {
-      this.setInitialRevisionValues();
-      return;
-    }
+    this.versionLog = this.problemsMapping[problemAlias].versions;
+    const published = this.problemsMapping[problemAlias].published;
+    const revision = this.problemsMapping[problemAlias].mappedVersions[
+      published
+    ];
     this.selectedRevision = this.publishedRevision = revision;
-    this.useLatestVersion =
-      currentProblem.versions.log[0].commit === revision.commit;
+    this.useLatestVersion = this.problemsMapping[problemAlias].useLastVersion;
   }
 
   onSubmit(): void {
