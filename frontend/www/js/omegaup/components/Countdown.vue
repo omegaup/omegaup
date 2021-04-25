@@ -18,18 +18,12 @@ export default class Countdown extends Vue {
     default: omegaup.CountdownFormat.EventCountdown,
   })
   countdownFormat!: omegaup.CountdownFormat;
-  // For testing purposes, we can receive a mocked time
-  @Prop({ default: () => Date.now() }) time!: number;
 
   timerInterval = 0;
-  currentTime: number = this.time;
+  currentTime = Date.now();
 
   get timeLeft(): number {
-    return this.targetTimestamp - this.currentTime;
-  }
-
-  get targetTimestamp(): number {
-    return this.targetTime.getTime();
+    return this.targetTime.getTime() - this.currentTime;
   }
 
   get formattedTimeLeft(): string {
@@ -54,13 +48,9 @@ export default class Countdown extends Vue {
     this.$emit('finish');
   }
 
-  getDateNow(): number {
-    return Date.now();
-  }
-
   mounted() {
     this.timerInterval = window.setInterval(
-      () => (this.currentTime = this.getDateNow()),
+      () => (this.currentTime = Date.now()),
       1000,
     );
   }
