@@ -222,9 +222,7 @@ export default class AddProblem extends Vue {
     const problemMapping = this.problemMapping[problemAlias];
     this.versionLog = problemMapping.problem.versions.log;
     const published = problemMapping.problem.commit;
-    const revision = problemMapping.commitVersions[
-      published
-    ];
+    const revision = problemMapping.commitVersions[published];
     this.selectedRevision = this.publishedRevision = revision;
     this.useLatestVersion = false;
   }
