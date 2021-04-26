@@ -49,7 +49,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             return;
         }
 
-        // Only original admin is allowed to add problems in the problemset
+        // Only problem admins are allowed to add their own private problems in problemsets.
         if (
             !\OmegaUp\DAO\Problems::isVisible($problem) &&
             !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
