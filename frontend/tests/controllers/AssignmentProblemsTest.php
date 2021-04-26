@@ -48,6 +48,86 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testInvitedAdminAddPrivateProblem() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = self::login($identity);
+
+        // Create a course with an assignment
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $identity,
+            $adminLogin
+        );
+        $courseAlias = $courseData['course_alias'];
+        $assignmentAlias = $courseData['assignment_alias'];
+
+        // Add one problem to the assignment
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'private',
+                'author' => $identity
+            ]),
+            $adminLogin
+        );
+
+        [
+            'identity' => $invitedAdmin,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Controllers\Course::apiAddAdmin(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $invitedAdmin->username,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        // Invited admin tries to add a private problem into the course
+        $invitedAdminLogin = self::login($invitedAdmin);
+
+        try {
+            \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
+                'auth_token' => $invitedAdminLogin->auth_token,
+                'course_alias' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'problem_alias' => $problem['problem']->alias,
+                'points' => 100,
+            ]));
+            $this->fail('It should fail because of the privileges');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+
+        \OmegaUp\Controllers\Course::apiAddProblem(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'problem_alias' => $problem['problem']->alias,
+                'points' => 100,
+            ])
+        );
+
+        // But the invited admin can update the problem in the same course
+        \OmegaUp\Controllers\Course::apiAddProblem(
+            new \OmegaUp\Request([
+                'auth_token' => $invitedAdminLogin->auth_token,
+                'course_alias' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'problem_alias' => $problem['problem']->alias,
+                'points' => 50,
+            ])
+        );
+
+        $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(
+            new \OmegaUp\Request([
+                'course' => $courseAlias,
+                'assignment' => $assignmentAlias,
+                'auth_token' => $invitedAdminLogin->auth_token,
+            ])
+        );
+
+        self::assertEquals($response['problems'][0]['points'], 50);
+    }
+
     public function testDeleteProblemFromAssignment() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
