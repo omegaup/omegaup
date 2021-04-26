@@ -226,6 +226,7 @@ describe('AddProblem.vue', () => {
   it('Should update latest version for a problem in the list', async () => {
     const wrapper = mount(contest_AddProblem, {
       propsData: {
+        attachTo: '#root',
         contestAlias: 'testContestAlias',
         initialPoints: 100,
         initialProblems: [
@@ -243,7 +244,7 @@ describe('AddProblem.vue', () => {
       .find('input[name="use-latest-version"][value="true"]')
       .trigger('click');
 
-    await wrapper.find('button.add-problem').trigger('click');
+    await wrapper.find('button.add-problem').trigger('submit');
     expect(wrapper.emitted('add-problem')).toEqual([
       [
         {
@@ -289,7 +290,7 @@ describe('AddProblem.vue', () => {
 
     await wrapper.find(`tr[data-revision="${commit}"]`).trigger('click');
 
-    await wrapper.find('form button[type="submit"]').trigger('click');
+    await wrapper.find('form button[type="submit"]').trigger('submit');
     expect(wrapper.emitted('add-problem')).toEqual([
       [
         {
