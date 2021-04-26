@@ -132,14 +132,11 @@
           :initial-points="details.partial_score ? 100 : 1"
           :initial-problems="problems"
           :search-result-problems="searchResultProblems"
-          @add-problem="(problem) => $emit('add-problem', problem)"
+          @add-problem="(request) => $emit('add-problem', request)"
           @update-search-result-problems="
             (query) => $emit('update-search-result-problems', query)
           "
-          @get-versions="
-            (problemAlias, addProblemComponent) =>
-              $emit('get-versions', problemAlias, addProblemComponent)
-          "
+          @get-versions="(request) => $emit('get-versions', request)"
           @remove-problem="
             (problemAlias) => $emit('remove-problem', problemAlias)
           "
@@ -266,7 +263,7 @@ export default class Edit extends Vue {
   @Prop() details!: types.ContestAdminDetails;
   @Prop() groups!: types.ContestGroup[];
   @Prop() groupAdmins!: types.ContestGroupAdmin[];
-  @Prop() problems!: types.ProblemsetProblem[];
+  @Prop() problems!: types.ProblemsetProblemWithVersions[];
   @Prop() requests!: types.ContestRequest[];
   @Prop() users!: types.ContestUser[];
   @Prop() searchResultProblems!: types.ListItem[];

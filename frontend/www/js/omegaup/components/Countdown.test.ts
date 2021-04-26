@@ -1,21 +1,46 @@
 import { shallowMount } from '@vue/test-utils';
 
 import omegaup_Countdown from './Countdown.vue';
-
 describe('Countdown.vue', () => {
-  it('Should emit finish method', async () => {
-    const date = new Date();
-    const currentTime = new Date();
-    date.setSeconds(date.getSeconds() + 2);
+  let now = Date.now();
+  let dateNowSpy: jest.SpyInstance<number, []> | null = null;
+
+  beforeAll(() => {
+    dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
+  });
+
+  afterAll(() => {
+    if (dateNowSpy) {
+      dateNowSpy.mockRestore();
+    }
+  });
+
+  jest.useFakeTimers();
+  it('Should handle a countdown with 5 seconds left to finish', async () => {
     const wrapper = shallowMount(omegaup_Countdown, {
       propsData: {
-        targetTime: date,
+        targetTime: new Date(now + 10000),
+      },
+    });
+
+    const timeDelta = 5000;
+    now += timeDelta;
+    expect(wrapper.find('span').text()).toBe('00:00:10');
+    await jest.advanceTimersByTime(timeDelta);
+    expect(wrapper.find('span').text()).toBe('00:00:05');
+  });
+
+  it('Should emit finish method', async () => {
+    const wrapper = shallowMount(omegaup_Countdown, {
+      propsData: {
+        targetTime: new Date(now + 1000),
       },
     });
     expect(wrapper.emitted('finish')).not.toBeDefined();
 
-    currentTime.setSeconds(date.getSeconds() + 1);
-    await wrapper.setData({ currentTime });
+    const timeDelta = 3000;
+    now += timeDelta;
+    await jest.advanceTimersByTime(timeDelta);
     expect(wrapper.emitted('finish')).toBeDefined();
   });
 });

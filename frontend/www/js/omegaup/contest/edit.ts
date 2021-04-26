@@ -177,7 +177,13 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'add-problem': (problem: types.ProblemsetProblem) => {
+          'add-problem': ({
+            problem,
+            isUpdate = false,
+          }: {
+            problem: types.ProblemsetProblem;
+            isUpdate: boolean;
+          }) => {
             api.Contest.addProblem({
               contest_alias: payload.details.alias,
               order_in_contest: problem.order,
@@ -186,28 +192,36 @@ OmegaUp.on('ready', () => {
               commit: problem.commit,
             })
               .then(() => {
-                ui.success(T.problemSuccessfullyAdded);
                 this.refreshProblems();
+                if (isUpdate) {
+                  ui.success(T.problemSuccessfullyUpdated);
+                  return;
+                }
+                ui.success(T.problemSuccessfullyAdded);
               })
               .catch(ui.apiError);
           },
-          'get-versions': (
-            problemAlias: string,
-            addProblemComponent: {
+          'get-versions': ({
+            request,
+            target,
+          }: {
+            request: { problemAlias: string };
+            target: {
               versionLog: types.ProblemVersion[];
               problems: types.ProblemsetProblem[];
               selectedRevision: types.ProblemVersion;
               publishedRevision: types.ProblemVersion;
-            },
-          ) => {
+            };
+          }) => {
             api.Problem.versions({
-              problem_alias: problemAlias,
+              problem_alias: request.problemAlias,
+              problemset_id: payload.details.problemset_id,
             })
               .then((result) => {
-                addProblemComponent.versionLog = result.log;
+                target.versionLog = result.log;
                 let currentProblem = null;
-                for (const problem of addProblemComponent.problems) {
-                  if (problem.alias === problemAlias) {
+                for (const problem of target.problems) {
+                  if (problem.alias === request.problemAlias) {
                     currentProblem = problem;
                     break;
                   }
@@ -218,7 +232,7 @@ OmegaUp.on('ready', () => {
                 }
                 for (const revision of result.log) {
                   if (publishedCommitHash === revision.commit) {
-                    addProblemComponent.selectedRevision = addProblemComponent.publishedRevision = revision;
+                    target.selectedRevision = target.publishedRevision = revision;
                     break;
                   }
                 }
@@ -239,7 +253,7 @@ OmegaUp.on('ready', () => {
           'runs-diff': (
             problemAlias: string,
             versionsComponent: types.CommitRunsDiff,
-            selectedCommit: omegaup.Commit,
+            selectedCommit: types.ProblemVersion,
           ) => {
             api.Contest.runsDiff({
               problem_alias: problemAlias,
