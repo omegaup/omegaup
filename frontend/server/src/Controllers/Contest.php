@@ -2664,18 +2664,25 @@ class Contest extends \OmegaUp\Controllers\Controller {
             null
         ) ?? 1;
 
-        // Validate the request and get the problem and the contest in an array
-        $params = self::validateAddToContestRequest(
+        $contest = self::validateContestAdmin($contestAlias, $r->identity);
+
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+        // Validate the request
+        \OmegaUp\Controllers\Problemset::validateAddProblemToProblemset(
+            $problem,
             $r->identity,
-            $contestAlias,
-            $problemAlias
+            $contest->problemset_id
         );
 
-        self::forbiddenInVirtual($params['contest']);
+        self::forbiddenInVirtual($contest);
 
-        /** @var int $params['contest']->problemset_id */
         $problemset = \OmegaUp\DAO\Problemsets::getByPK(
-            $params['contest']->problemset_id
+            intval($contest->problemset_id)
         );
         if (is_null($problemset)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -2694,8 +2701,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        [$masterCommit, $currentVersion] = \OmegaUp\Controllers\Problem::resolveCommit(
-            $params['problem'],
+        [
+            $masterCommit,
+            $currentVersion,
+        ] = \OmegaUp\Controllers\Problem::resolveCommit(
+            $problem,
             $r->ensureOptionalString(
                 'commit',
                 false,
@@ -2708,8 +2718,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
 
         \OmegaUp\Controllers\Problemset::addProblem(
-            $params['contest']->problemset_id,
-            $params['problem'],
+            intval($contest->problemset_id),
+            $problem,
             $masterCommit,
             $currentVersion,
             $r->identity,
@@ -2724,83 +2734,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         \OmegaUp\Scoreboard::invalidateScoreboardCache(
             \OmegaUp\ScoreboardParams::fromContest(
-                $params['contest']
+                $contest
             )
         );
 
         return ['status' => 'ok'];
-    }
-
-    /**
-     * Validates the request for AddToContest and returns an array with
-     * the problem and contest DAOs
-     *
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
-     *
-     * @return array{contest: \OmegaUp\DAO\VO\Contests, problem: \OmegaUp\DAO\VO\Problems}
-     */
-    private static function validateAddToContestRequest(
-        \OmegaUp\DAO\VO\Identities $identity,
-        string $contestAlias,
-        string $problemAlias
-    ): array {
-        $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
-        if (is_null($contest)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterNotFound',
-                'contest_alias'
-            );
-        }
-        // Only contest admin is allowed to create problems in contest
-        if (!\OmegaUp\Authorization::isContestAdmin($identity, $contest)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'cannotAddProb'
-            );
-        }
-
-        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterNotFound',
-                'problem_alias'
-            );
-        }
-
-        if (
-            $problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
-            || $problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'problemIsBanned'
-            );
-        }
-        $problemsetProblem = \OmegaUp\DAO\Base\ProblemsetProblems::getByPK(
-            $contest->problemset_id,
-            $problem->problem_id
-        );
-        $result = [
-            'contest' => $contest,
-            'problem' => $problem,
-        ];
-        if (!is_null($problemsetProblem)) {
-            // Any user with admin contest privileges should update a problem
-            // in a contest
-            return $result;
-        }
-        if (
-            !\OmegaUp\DAO\Problems::isVisible($problem) &&
-            !\OmegaUp\Authorization::isProblemAdmin(
-                $identity,
-                $problem
-            )
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'problemIsPrivate'
-            );
-        }
-
-        return $result;
     }
 
     /**

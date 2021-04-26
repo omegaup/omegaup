@@ -87,9 +87,8 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 'order_in_contest' => 1,
             ]));
             $this->fail('Should have failed');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotFound', $e->getMessage());
-            $this->assertEquals('problem_alias', $e->parameter);
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            $this->assertEquals('problemNotFound', $e->getMessage());
         }
     }
 
@@ -116,9 +115,8 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 'order_in_contest' => 1,
             ]));
             $this->fail('Should have failed');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotFound', $e->getMessage());
-            $this->assertEquals('contest_alias', $e->parameter);
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            $this->assertEquals('contestNotFound', $e->getMessage());
         }
     }
 
@@ -147,7 +145,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('cannotAddProb', $e->getMessage());
+            $this->assertEquals('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -288,7 +286,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('It should fail because of the privileges');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('problemIsPrivate', $e->getMessage());
+            $this->assertEquals('userNotAllowed', $e->getMessage());
         }
 
         \OmegaUp\Controllers\Contest::apiAddProblem(

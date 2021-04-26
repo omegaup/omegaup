@@ -167,11 +167,9 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
 interface MappedProblems {
-  [key: string]: {
-    published: string;
-    useLastVersion: boolean;
-    versions: types.ProblemVersion[];
-    mappedVersions: { [key: string]: types.ProblemVersion };
+  [problemAlias: string]: {
+    problem: types.ProblemsetProblemWithVersions;
+    commitVersions: { [commit: string]: types.ProblemVersion };
   };
 }
 
@@ -205,40 +203,30 @@ export default class AddProblem extends Vue {
   publishedRevision: null | types.ProblemVersion = null;
   selectedRevision: null | types.ProblemVersion = null;
 
-  setInitialRevisionValues(): void {
-    this.versionLog = [];
-    this.selectedRevision = this.publishedRevision = null;
-    this.useLatestVersion = true;
-  }
-
-  get problemsMapping(): MappedProblems {
-    let problemsMapping: MappedProblems = {};
+  get problemMapping(): MappedProblems {
+    let problemMapping: MappedProblems = {};
     for (const problem of this.problems) {
-      const publishedCommitHash = problem.commit;
-      problemsMapping[problem.alias] = {
-        versions: problem.versions.log,
-        mappedVersions: {},
-        published: problem.commit,
-        useLastVersion: false,
-      };
-      for (const [index, version] of problem.versions.log.entries()) {
-        problemsMapping[problem.alias].mappedVersions[version.commit] = version;
-        if (index === 0 && version.commit === publishedCommitHash) {
-          problemsMapping[problem.alias].useLastVersion = true;
-        }
+      const commitVersions: { [commit: string]: types.ProblemVersion } = {};
+      for (const version of problem.versions.log) {
+        commitVersions[version.commit] = version;
       }
+      problemMapping[problem.alias] = {
+        problem,
+        commitVersions,
+      };
     }
-    return problemsMapping;
+    return problemMapping;
   }
 
   onGetVersions(problemAlias: string): void {
-    this.versionLog = this.problemsMapping[problemAlias].versions;
-    const published = this.problemsMapping[problemAlias].published;
-    const revision = this.problemsMapping[problemAlias].mappedVersions[
+    const problemMapping = this.problemMapping[problemAlias];
+    this.versionLog = problemMapping.problem.versions.log;
+    const published = problemMapping.problem.commit;
+    const revision = this.problemMapping[problemAlias].commitVersions[
       published
     ];
     this.selectedRevision = this.publishedRevision = revision;
-    this.useLatestVersion = this.problemsMapping[problemAlias].useLastVersion;
+    this.useLatestVersion = false;
   }
 
   onSubmit(): void {
@@ -291,7 +279,8 @@ export default class AddProblem extends Vue {
   }
 
   get isUpdate(): boolean {
-    return this.problems.some((problem) => problem.alias === this.alias);
+    if (!this.alias) return false;
+    return !!this.problemMapping[this.alias];
   }
 
   get addProblemButtonLabel(): string {

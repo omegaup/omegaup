@@ -27,16 +27,32 @@ class Problemset extends \OmegaUp\Controllers\Controller {
                 'problemIsBanned'
             );
         }
+        $canEditProblemset = !is_null(
+            $problemsetId
+        ) && \OmegaUp\Authorization::canEditProblemset(
+            $identity,
+            $problemsetId
+        );
+
+        if (!$canEditProblemset) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'cannotAddProb'
+            );
+        }
+
+        $problemsetProblem = \OmegaUp\DAO\Base\ProblemsetProblems::getByPK(
+            $problemsetId,
+            $problem->problem_id
+        );
+        if (!is_null($problemsetProblem)) {
+            // Invited admin should update a problem in problemset
+            return;
+        }
+
+        // Only original admin is allowed to add problems in the problemset
         if (
             !\OmegaUp\DAO\Problems::isVisible($problem) &&
-            !\OmegaUp\Authorization::isProblemAdmin($identity, $problem) &&
-            (
-                is_null($problemsetId) ||
-                !\OmegaUp\Authorization::canEditProblemset(
-                    $identity,
-                    $problemsetId
-                )
-            )
+            !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
