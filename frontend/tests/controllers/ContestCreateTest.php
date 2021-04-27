@@ -205,11 +205,8 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
-                'contestMustBeCreatedInPrivateMode',
-                $e->getMessage()
-            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('cannotAddProb', $e->getMessage());
         }
     }
 
@@ -241,7 +238,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('problemIsPrivate', $e->getMessage());
+            $this->assertEquals('cannotAddProb', $e->getMessage());
         }
     }
 

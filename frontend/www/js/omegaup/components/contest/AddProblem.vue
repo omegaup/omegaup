@@ -5,7 +5,14 @@
         <div class="row">
           <div class="form-group col-md-12">
             <label class="font-weight-bold">{{ T.wordsProblem }}</label>
+            <input
+              v-if="isUpdate"
+              :value="title"
+              class="form-control"
+              disabled="disabled"
+            />
             <omegaup-common-typeahead
+              v-else
               :existing-options="searchResultProblems"
               :value.sync="alias"
               @update-existing-options="
@@ -58,28 +65,14 @@
             />
           </div>
         </div>
-        <template v-if="!useLatestVersion && alias !== null">
-          <div class="form-group">
-            <button
-              class="btn btn-primary get-versions"
-              type="submit"
-              :disabled="alias === null"
-              @click.prevent="onSubmit"
-            >
-              {{ T.wordsGetVersions }}
-            </button>
-            <small class="form-text text-muted">
-              {{ T.selectProblemToGetVersions }}
-            </small>
-          </div>
-          <omegaup-problem-versions
-            v-model="selectedRevision"
-            :log="versionLog"
-            :published-revision="publishedRevision"
-            :show-footer="false"
-            @runs-diff="onRunsDiff"
-          ></omegaup-problem-versions>
-        </template>
+        <omegaup-problem-versions
+          v-if="!useLatestVersion && alias !== null"
+          v-model="selectedRevision"
+          :log="versionLog"
+          :published-revision="publishedRevision"
+          :show-footer="false"
+          @runs-diff="onRunsDiff"
+        ></omegaup-problem-versions>
         <div class="form-group">
           <button
             class="btn btn-primary add-problem"
@@ -119,6 +112,14 @@
           </td>
           <td class="text-right">{{ problem.points }}</td>
           <td class="text-center">
+            <button
+              v-tooltip="T.problemEditFormUpdateProblem"
+              :data-update-problem="problem.alias"
+              class="btn btn-link"
+              @click="onEdit(problem)"
+            >
+              <font-awesome-icon icon="edit" />
+            </button>
             <button
               v-if="problem.has_submissions"
               v-tooltip="T.cannotRemoveProblemWithSubmissions"
@@ -165,6 +166,13 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
+interface MappedProblems {
+  [problemAlias: string]: {
+    problem: types.ProblemsetProblemWithVersions;
+    commitVersions: { [commit: string]: types.ProblemVersion };
+  };
+}
+
 @Component({
   components: {
     'omegaup-problem-versions': problem_Versions,
@@ -181,7 +189,7 @@ library.add(fas);
 export default class AddProblem extends Vue {
   @Prop() contestAlias!: string;
   @Prop() initialPoints!: number;
-  @Prop() initialProblems!: types.ProblemsetProblem[];
+  @Prop() initialProblems!: types.ProblemsetProblemWithVersions[];
   @Prop() searchResultProblems!: types.ListItem[];
 
   T = T;
@@ -195,15 +203,33 @@ export default class AddProblem extends Vue {
   publishedRevision: null | types.ProblemVersion = null;
   selectedRevision: null | types.ProblemVersion = null;
 
-  onSubmit(): void {
-    if (this.useLatestVersion) {
-      this.$emit('get-versions', {
-        target: this,
-        request: { problemAlias: this.alias },
-      });
-    } else {
-      this.onAddProblem();
+  get problemMapping(): MappedProblems {
+    let problemMapping: MappedProblems = {};
+    for (const problem of this.problems) {
+      const commitVersions: { [commit: string]: types.ProblemVersion } = {};
+      for (const version of problem.versions.log) {
+        commitVersions[version.commit] = version;
+      }
+      problemMapping[problem.alias] = {
+        problem,
+        commitVersions,
+      };
     }
+    return problemMapping;
+  }
+
+  onGetVersions(problemAlias: string): void {
+    const problemMapping = this.problemMapping[problemAlias];
+    this.versionLog = problemMapping.problem.versions.log;
+    const published = problemMapping.problem.commit;
+    const revision = problemMapping.commitVersions[published];
+    this.selectedRevision = this.publishedRevision = revision;
+    this.useLatestVersion = false;
+  }
+
+  onSubmit(): void {
+    if (!this.alias) return;
+    this.onAddProblem();
   }
 
   onAddProblem(): void {
@@ -216,18 +242,20 @@ export default class AddProblem extends Vue {
           ? this.selectedRevision?.commit
           : undefined,
       },
+      isUpdate: this.isUpdate,
     });
     this.alias = null;
     this.title = null;
   }
 
-  onEdit(problem: types.ProblemsetProblem): void {
+  onEdit(problem: types.ProblemsetProblemWithVersions): void {
+    this.title = problem.title;
     this.alias = problem.alias;
     this.points = problem.points;
     this.order = problem.order;
   }
 
-  onRemove(problem: types.ProblemsetProblem): void {
+  onRemove(problem: types.ProblemsetProblemWithVersions): void {
     this.$emit('remove-problem', problem.alias);
   }
 
@@ -248,11 +276,14 @@ export default class AddProblem extends Vue {
     this.$emit('runs-diff', this.alias, versions, selectedCommit);
   }
 
+  get isUpdate(): boolean {
+    if (!this.alias) return false;
+    return !!this.problemMapping[this.alias];
+  }
+
   get addProblemButtonLabel(): string {
-    for (const problem of this.problems) {
-      if (this.alias === problem.alias) {
-        return T.wordsUpdateProblem;
-      }
+    if (this.isUpdate) {
+      return T.wordsUpdateProblem;
     }
     return T.wordsAddProblem;
   }
@@ -263,7 +294,9 @@ export default class AddProblem extends Vue {
   }
 
   @Watch('initialProblems')
-  onInitialProblemsChange(newValue: types.ProblemsetProblem[]): void {
+  onInitialProblemsChange(
+    newValue: types.ProblemsetProblemWithVersions[],
+  ): void {
     this.problems = newValue;
     this.order = newValue.length + 1;
   }
@@ -273,6 +306,10 @@ export default class AddProblem extends Vue {
     if (!newProblemAlias) {
       this.versionLog = [];
       this.selectedRevision = this.publishedRevision = null;
+      return;
+    }
+    if (this.isUpdate) {
+      this.onGetVersions(newProblemAlias);
       return;
     }
     this.$emit('get-versions', {
