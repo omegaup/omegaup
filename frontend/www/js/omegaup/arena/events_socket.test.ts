@@ -10,7 +10,6 @@ import { clarificationStoreConfig } from './clarificationsStore';
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import fetchMock from 'jest-fetch-mock';
-import { onRankingChanged } from './ranking';
 
 const navbarProblems: types.NavbarProblemsetProblem[] = [
   {
@@ -43,6 +42,8 @@ const options: SocketOptions = {
   navbarProblems: navbarProblems,
   currentUsername: 'omegaUp',
   intervalInMilliseconds: 500,
+  startTime: null,
+  finishTime: null,
 };
 describe('EventsSocket', () => {
   let server: WS | null = null;
@@ -270,7 +271,7 @@ describe('EventsSocket', () => {
 
     expect(socket.socketStatus).toEqual(SocketStatus.Connected);
 
-    expect(onRankingChanged).toHaveBeenCalledWith({
+    expect(socket.arenaRanking.onRankingChanged).toHaveBeenCalledWith({
       currentUsername: 'omegaUp',
       navbarProblems: [
         {
@@ -346,6 +347,6 @@ describe('EventsSocket', () => {
         title: 'omegaUp',
       },
     });
-    expect(onRankingChanged).toHaveBeenCalled();
+    expect(socket.arenaRanking.onRankingChanged).toHaveBeenCalled();
   });
 });

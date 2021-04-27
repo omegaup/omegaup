@@ -1,7 +1,7 @@
 jest.mock('../../../third_party/js/diff_match_patch.js');
 
 import { types } from '../api_types';
-import { onRankingChanged, updateProblemScore } from './ranking';
+import { Ranking } from './ranking';
 
 describe('ranking', () => {
   const scoreboard: types.Scoreboard = {
@@ -68,14 +68,19 @@ describe('ranking', () => {
 
   describe('updateProblemScore', () => {
     it('Should update problem score in a contest', () => {
+      const arenaRanking = new Ranking({
+        startTime: null,
+        finishTime: null,
+      });
       const params = {
         alias: 'problem_alias',
         previousScore: 100,
         username: 'omegaUp',
-        scoreboard: scoreboard,
+        scoreboard,
       };
-      const scoreboardRanking = updateProblemScore(params);
-      expect(scoreboardRanking).toEqual([
+
+      arenaRanking.updateProblemScore(params);
+      expect(arenaRanking.scoreboardRanking).toEqual([
         {
           classname: 'user-rank-unranked',
           country: 'MX',
@@ -106,14 +111,18 @@ describe('ranking', () => {
     });
 
     it('Should update problem when ranking change', () => {
+      const arenaRanking = new Ranking({
+        startTime: null,
+        finishTime: null,
+      });
       const params = {
         currentUsername: 'omegaUp',
         scoreboard: scoreboard,
         navbarProblems: navbarProblems,
       };
-      const { ranking, users } = onRankingChanged(params);
-      expect(ranking[0].total.points).toEqual(200);
-      expect(users[0].position).toEqual(0);
+      arenaRanking.onRankingChanged(params);
+      expect(arenaRanking.scoreboardRanking[0].total.points).toEqual(200);
+      expect(arenaRanking.miniRankingUsers[0].position).toEqual(0);
     });
   });
 });

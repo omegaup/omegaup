@@ -4,11 +4,11 @@ import * as ui from '../ui';
 import * as time from '../time';
 import { types } from '../api_types';
 import { myRunsStore, runsStore } from './runsStore';
-import { OmegaUp } from '../omegaup';
+import { omegaup, OmegaUp } from '../omegaup';
 import JSZip from 'jszip';
 import type problem_Details from '../components/problem/Details.vue';
-import { omegaup } from '../omegaup';
 import T from '../lang';
+import { Problem, Ranking } from './ranking';
 
 interface RunSubmit {
   classname: string;
@@ -211,8 +211,14 @@ function displayRunDetails({
   window.location.hash = hash;
 }
 
-export function updateRun({ run }: { run: types.Run }): void {
-  trackRun({ run });
+export function updateRun({
+  run,
+  problem,
+}: {
+  run: types.Run;
+  problem?: Problem;
+}): void {
+  trackRun({ run, problem });
 
   // TODO: Implement websocket support
 
@@ -231,12 +237,30 @@ export function updateRunFallback({ run }: { run: types.Run }): void {
   }, 5000);
 }
 
-export function trackRun({ run }: { run: types.Run }): void {
+export function trackRun({
+  run,
+  problem,
+}: {
+  run: types.Run;
+  problem?: Problem;
+}): void {
   runsStore.commit('addRun', run);
   if (run.username !== OmegaUp.username) {
     return;
   }
   myRunsStore.commit('addRun', run);
+
+  if (!problem) {
+    return;
+  }
+  const arenaRanking = new Ranking({
+    startTime: null,
+    finishTime: null,
+  });
+  arenaRanking.updateProblemScore({
+    alias: run.alias,
+    previousScore: 0,
+  });
 }
 
 export function onSetNominationStatus({
@@ -254,9 +278,15 @@ export function onSetNominationStatus({
   }
 }
 
-export function onRefreshRuns({ runs }: { runs: types.Run[] }): void {
+export function onRefreshRuns({
+  runs,
+  problem,
+}: {
+  runs: types.Run[];
+  problem: Problem;
+}): void {
   runsStore.commit('clear');
   for (const run of runs) {
-    trackRun({ run });
+    trackRun({ run, problem });
   }
 }

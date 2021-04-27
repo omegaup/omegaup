@@ -23,7 +23,7 @@ import {
   submitRun,
   submitRunFailed,
 } from './submissions';
-import { onRankingChanged } from './ranking';
+import { Ranking } from './ranking';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -37,13 +37,17 @@ OmegaUp.on('ready', () => {
 
   let ranking: types.ScoreboardRankingEntry[], users: omegaup.UserRank[];
   if (payload.scoreboard) {
-    const rankingInfo = onRankingChanged({
+    const arenaRanking = new Ranking({
+      startTime: payload.contest.start_time,
+      finishTime: payload.contest.finish_time,
+    });
+    arenaRanking.onRankingChanged({
       scoreboard: payload.scoreboard,
       currentUsername: commonPayload.currentUsername,
       navbarProblems: payload.problems,
     });
-    ranking = rankingInfo.ranking;
-    users = rankingInfo.users;
+    ranking = arenaRanking.scoreboardRanking;
+    users = arenaRanking.miniRankingUsers;
   }
 
   const contestContestant = new Vue({

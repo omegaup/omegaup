@@ -369,7 +369,7 @@ OmegaUp.on('ready', () => {
       .then(time.remoteTimeAdapter)
       .then((response) => {
         if (!problemDetailsView.nominationStatus) return;
-        onRefreshRuns({ runs: response.runs });
+        onRefreshRuns({ runs: response.runs, problem: payload.problem });
         setNominationStatus({
           runs: response.runs,
           nominationStatus: problemDetailsView.nominationStatus,
@@ -380,7 +380,7 @@ OmegaUp.on('ready', () => {
 
   if (runs) {
     for (const run of runs) {
-      trackRun({ run });
+      trackRun({ run, problem: payload.problem });
     }
     if (problemDetailsView.nominationStatus) {
       setNominationStatus({
