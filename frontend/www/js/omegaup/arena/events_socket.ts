@@ -6,7 +6,7 @@ import {
   refreshContestClarifications,
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
-import { Ranking } from './ranking';
+import { onRankingChanged, onRankingEvents } from './ranking';
 import { updateRun } from './submissions';
 import { types } from '../api_types';
 
@@ -28,8 +28,6 @@ export interface SocketOptions {
   currentUsername: string;
   navbarProblems: types.NavbarProblemsetProblem[];
   intervalInMilliseconds: number;
-  startTime: Date | null;
-  finishTime: Date | null;
 }
 
 export class EventsSocket {
@@ -52,8 +50,6 @@ export class EventsSocket {
   private readonly navbarProblems: types.NavbarProblemsetProblem[];
   private readonly intervalInMilliseconds: number;
 
-  readonly arenaRanking: Ranking;
-
   constructor({
     disableSockets = false,
     problemsetAlias,
@@ -66,8 +62,6 @@ export class EventsSocket {
     currentUsername,
     navbarProblems,
     intervalInMilliseconds = 5 * 60 * 1000,
-    startTime = null,
-    finishTime = null,
   }: SocketOptions) {
     this.socket = null;
 
@@ -83,10 +77,6 @@ export class EventsSocket {
     this.clarificationInterval = null;
     this.rankingInterval = null;
     this.intervalInMilliseconds = intervalInMilliseconds;
-    this.arenaRanking = new Ranking({
-      startTime,
-      finishTime,
-    });
 
     const protocol = locationProtocol === 'https:' ? 'wss:' : 'ws:';
     const host = locationHost;
@@ -113,7 +103,7 @@ export class EventsSocket {
         virtualRankingChange(data.scoreboard);
         return;
       }*/
-      this.arenaRanking.onRankingChanged({
+      onRankingChanged({
         scoreboard: data.scoreboard,
         currentUsername: this.currentUsername,
         navbarProblems: this.navbarProblems,
@@ -123,7 +113,7 @@ export class EventsSocket {
         problemset_id: this.problemsetId,
         token: this.scoreboardToken,
       })
-        .then((response) => this.arenaRanking.onRankingEvents(response.events))
+        .then((response) => onRankingEvents(response.events))
         .catch(ui.ignoreError);
     }
   }
@@ -203,7 +193,7 @@ export class EventsSocket {
       token: this.scoreboardToken,
     })
       .then((scoreboard) => {
-        this.arenaRanking.onRankingChanged({
+        onRankingChanged({
           scoreboard,
           currentUsername: this.currentUsername,
           navbarProblems: this.navbarProblems,
@@ -213,9 +203,7 @@ export class EventsSocket {
           problemset_id: this.problemsetId,
           token: this.scoreboardToken,
         })
-          .then((response) =>
-            this.arenaRanking.onRankingEvents(response.events),
-          )
+          .then((response) => onRankingEvents(response.events))
           .catch(ui.ignoreError);
       })
       .catch(ui.ignoreError);
@@ -248,7 +236,7 @@ export class EventsSocket {
           token: this.scoreboardToken,
         })
           .then((scoreboard) => {
-            this.arenaRanking.onRankingChanged({
+            onRankingChanged({
               scoreboard,
               currentUsername: this.currentUsername,
               navbarProblems: this.navbarProblems,
@@ -258,9 +246,7 @@ export class EventsSocket {
               problemset_id: this.problemsetId,
               token: this.scoreboardToken,
             })
-              .then((response) =>
-                this.arenaRanking.onRankingEvents(response.events),
-              )
+              .then((response) => onRankingEvents(response.events))
               .catch(ui.ignoreError);
           })
           .catch(ui.ignoreError);
