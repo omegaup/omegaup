@@ -30,6 +30,7 @@ module.exports = {
     arena_contest_contestant:
       './frontend/www/js/omegaup/arena/contest_contestant.ts',
     arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
+    arena_contest_list2: './frontend/www/js/omegaup/arena/contest_list2.ts',
     arena_contest_practice:
       './frontend/www/js/omegaup/arena/contest_practice.ts',
     arena_course: './frontend/www/js/omegaup/arena/course.ts',
