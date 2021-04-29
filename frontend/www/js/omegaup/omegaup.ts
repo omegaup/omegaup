@@ -147,18 +147,6 @@ export namespace omegaup {
     school_id?: number;
   }
 
-  export interface Commit {
-    author: Signature;
-    commit: string;
-    commiter: Signature;
-    message: string;
-    parents: string[];
-    tree: {
-      [file: string]: string;
-    };
-    version: string;
-  }
-
   export interface Contest {
     alias: string;
     title: string;
@@ -442,12 +430,6 @@ export namespace omegaup {
     showHeader: boolean;
     totalRows: number;
     rank: omegaup.SchoolsRank[];
-  }
-
-  export interface Signature {
-    email: string;
-    name: string;
-    time: string;
   }
 
   export interface Stats {

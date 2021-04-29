@@ -35,7 +35,7 @@
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :problem="problemInfo"
               :active-tab="'problems'"
-              :runs="activeProblem.runs"
+              :runs="problemRuns"
               :popup-displayed="popupDisplayed"
               :guid="guid"
               :problem-alias="problemAlias"
@@ -166,13 +166,17 @@ export default class ArenaContestPractice extends Vue {
     return this.activeProblem?.problem.alias ?? null;
   }
 
+  get problemRuns(): types.Run[] {
+    return this.problem?.runs ?? [];
+  }
+
   onNavigateToProblem(request: ActiveProblem) {
     this.activeProblem = request;
     this.$emit('navigate-to-problem', request);
   }
 
   onRunSubmitted(run: { code: string; language: string }): void {
-    this.$emit('submit-run', Object.assign({}, run, this.activeProblem));
+    this.$emit('submit-run', Object.assign({}, run, this.problem));
   }
 
   onClarificationResponse(response: types.Clarification): void {

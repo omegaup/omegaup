@@ -907,9 +907,9 @@ Gets the problems from a contest
 
 ### Returns
 
-| Name       | Type                        |
-| ---------- | --------------------------- |
-| `problems` | `types.ProblemsetProblem[]` |
+| Name       | Type                                    |
+| ---------- | --------------------------------------- |
+| `problems` | `types.ProblemsetProblemWithVersions[]` |
 
 ## `/api/contest/publicDetails/`
 
@@ -2784,7 +2784,7 @@ Entry point for Problem Details API
 | `contest_alias`           | `null\|string` |             |
 | `lang`                    | `null\|string` |             |
 | `prevent_problemset_open` | `bool\|null`   |             |
-| `problemset_id`           | `mixed`        |             |
+| `problemset_id`           | `int\|null`    |             |
 | `show_solvers`            | `bool\|null`   |             |
 | `statement_type`          | `null\|string` |             |
 
@@ -3204,6 +3204,7 @@ Entry point for Problem Versions API
 | Name            | Type           | Description |
 | --------------- | -------------- | ----------- |
 | `problem_alias` | `null\|string` |             |
+| `problemset_id` | `int\|null`    |             |
 
 ### Returns
 

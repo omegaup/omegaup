@@ -87,9 +87,8 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 'order_in_contest' => 1,
             ]));
             $this->fail('Should have failed');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotFound', $e->getMessage());
-            $this->assertEquals('problem_alias', $e->parameter);
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            $this->assertEquals('problemNotFound', $e->getMessage());
         }
     }
 
@@ -116,9 +115,8 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 'order_in_contest' => 1,
             ]));
             $this->fail('Should have failed');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterNotFound', $e->getMessage());
-            $this->assertEquals('contest_alias', $e->parameter);
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            $this->assertEquals('contestNotFound', $e->getMessage());
         }
     }
 
@@ -147,7 +145,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('cannotAddProb', $e->getMessage());
+            $this->assertEquals('userNotAllowed', $e->getMessage());
         }
     }
 
@@ -203,10 +201,12 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddBannedProblemToContest() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 'public',
-            'author' => $contestData['director']
-        ]));
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'public',
+                'author' => $contestData['director']
+            ])
+        );
         $problem = $problemData['problem'];
 
         // Ban the problem.
@@ -243,5 +243,81 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiAddProblem($r);
         $this->assertEquals('ok', $response['status']);
         self::assertProblemAddedToContest($problemData, $contestData, $r);
+    }
+
+    public function testInvitedAdminAddPrivateProblem() {
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'public']
+            )
+        );
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'private',
+                'author' => $contestData['director']
+            ])
+        );
+
+        $login = self::login($contestData['director']);
+        [
+            'identity' => $invitedAdmin,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        $response = \OmegaUp\Controllers\Contest::apiAddAdmin(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'usernameOrEmail' => $invitedAdmin->username,
+                'contest_alias' => $contestData['request']['alias'],
+                ])
+        );
+
+        // Invited admin tries to add a private problem into the contest
+        $invitedAdminLogin = self::login($invitedAdmin);
+
+        try {
+            \OmegaUp\Controllers\Contest::apiAddProblem(
+                new \OmegaUp\Request([
+                    'auth_token' => $invitedAdminLogin->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                    'problem_alias' => $problemData['request']['problem_alias'],
+                    'points' => 100,
+                    'order_in_contest' => 1,
+                ])
+            );
+            $this->fail('It should fail because of the privileges');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+
+        \OmegaUp\Controllers\Contest::apiAddProblem(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'points' => 100,
+                'order_in_contest' => 1,
+            ])
+        );
+
+        // But the invited admin can update the problem in the same contest
+        \OmegaUp\Controllers\Contest::apiAddProblem(
+            new \OmegaUp\Request([
+                'auth_token' => $invitedAdminLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'points' => 50,
+                'order_in_contest' => 2,
+            ])
+        );
+
+        $response = \OmegaUp\Controllers\Contest::apiProblems(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        self::assertEquals($response['problems'][0]['points'], 50);
+        self::assertEquals($response['problems'][0]['order'], 2);
     }
 }
