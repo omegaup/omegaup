@@ -23,11 +23,12 @@ import {
   submitRun,
   submitRunFailed,
 } from './submissions';
-import { onRankingChanged } from './ranking';
+import { createChart, onRankingChanged, onRankingEvents } from './ranking';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestDetailsPayload();
+  console.log(payload.scoreboardEvents);
   const commonPayload = types.payloadParsers.CommonPayload();
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
@@ -35,8 +36,10 @@ OmegaUp.on('ready', () => {
 
   trackClarifications(payload.clarifications);
 
-  let ranking: types.ScoreboardRankingEntry[], users: omegaup.UserRank[];
-  if (payload.scoreboard) {
+  let ranking: types.ScoreboardRankingEntry[],
+    users: omegaup.UserRank[],
+    currentRanking: { [username: string]: number };
+  if (payload.scoreboard && payload.scoreboardEvents) {
     const rankingInfo = onRankingChanged({
       scoreboard: payload.scoreboard,
       currentUsername: commonPayload.currentUsername,
@@ -44,6 +47,18 @@ OmegaUp.on('ready', () => {
     });
     ranking = rankingInfo.ranking;
     users = rankingInfo.users;
+    currentRanking = rankingInfo.currentRanking;
+
+    const { series, navigatorData } = onRankingEvents({
+      events: payload.scoreboardEvents,
+      currentRanking,
+      startTimestamp: payload.contest.start_time.getTime(),
+      finishTimestamp: Math.min(
+        payload.contest.finish_time.getTime(),
+        Date.now(),
+      ),
+    });
+    createChart({ series, navigatorData });
   }
 
   const contestContestant = new Vue({
