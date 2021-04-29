@@ -47,4 +47,17 @@ class ContestListTest2 extends \OmegaUp\Test\ControllerTestCase {
         $this->assertArrayHasKey('past', $contestListDetails['contests']);
         $this->assertIsArray($contestListDetails['contests']['past']);
     }
+
+    public function testGetContestList2() {
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'title' => 'test-contest-1'
+            ])
+        );
+
+        $contests = \OmegaUp\Controllers\Contest::getContestList2();
+
+        $this->assertArrayHasKey('title', $contests[0]);
+    }
 }
