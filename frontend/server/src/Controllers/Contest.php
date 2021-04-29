@@ -30,6 +30,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation: bool, privacyStatement: PrivacyStatement, requestsUserInformation: string, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestListPayload=array{contests: array{current: list<ContestListItem>, future: list<ContestListItem>, participating?: list<ContestListItem>, past: list<ContestListItem>, public: list<ContestListItem>, recommended_current: list<ContestListItem>, recommended_past: list<ContestListItem>}, isLogged: bool, query: string}
+ * @psalm-type ContestListPayload2=array{contests: array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}, isLogged: bool}
  * @psalm-type ContestNewPayload=array{languages: array<string, string>}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
@@ -228,6 +229,24 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $query
             );
         }
+        $addedContests = [];
+        foreach ($contests as $contestInfo) {
+            $contestInfo['duration'] = (is_null($contestInfo['window_length']) ?
+                $contestInfo['finish_time']->time - $contestInfo['start_time']->time :
+                ($contestInfo['window_length'] * 60)
+            );
+
+            $addedContests[] = $contestInfo;
+        }
+        return $addedContests;
+    }
+
+    /**
+     * @return list<ContestListItem>
+     */
+    public static function getContestList2() {
+        $contests = \OmegaUp\DAO\Contests::getCurrentContests();
+
         $addedContests = [];
         foreach ($contests as $contestInfo) {
             $contestInfo['duration'] = (is_null($contestInfo['window_length']) ?
@@ -942,6 +961,38 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'arena_contest_list',
+        ];
+    }
+
+    /**
+     * @return array{smartyProperties: array{payload: ContestListPayload2, title: \OmegaUp\TranslationString}, entrypoint: string}
+     */
+    public static function getContestListDetailsForTypeScript2(
+        \OmegaUp\Request $r
+    ) {
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing.
+            $r->identity = null;
+        }
+
+        $contests = [];
+        $contests['current'] = self::getContestList2();
+        $contests['future'] = self::getContestList2();
+        $contests['past'] = self::getContestList2();
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'isLogged' => !is_null($r->identity),
+                    'contests' => $contests,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleContestList'
+                ),
+            ],
+            'entrypoint' => 'arena_contest_list2',
         ];
     }
 
