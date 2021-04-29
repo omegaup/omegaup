@@ -28,7 +28,6 @@ import { createChart, onRankingChanged, onRankingEvents } from './ranking';
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestDetailsPayload();
-  console.log(payload.scoreboardEvents);
   const commonPayload = types.payloadParsers.CommonPayload();
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
