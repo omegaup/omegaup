@@ -2660,24 +2660,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problemset->problemset_id
         ) : null;
 
-        if (!is_null($loggedIdentity)) {
-            // Get all the available runs done by the current_user
-            $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
-                intval($problem->problem_id),
-                $problemsetId,
-                intval($loggedIdentity->identity_id)
-            );
-
-            // Add each filtered run to an array
-            $results = [];
-            foreach ($runsArray as $run) {
-                $run['alias'] = strval($problem->alias);
-                $run['username'] = strval($loggedIdentity->username);
-                $results[] = $run;
-            }
-            $response['runs'] = $results;
-        }
-
         $isPracticeMode = false;
         if (!is_null($problemset) && !is_null($loggedIdentity)) {
             $response['admin'] = \OmegaUp\Authorization::isAdmin(
@@ -2741,6 +2723,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         if (!is_null($loggedIdentity)) {
+            // Get all the available runs done by the current_user
+            $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
+                intval($problem->problem_id),
+                $isPracticeMode ? null : $problemsetId,
+                intval($loggedIdentity->identity_id)
+            );
+
+            // Add each filtered run to an array
+            $results = [];
+            foreach ($runsArray as $run) {
+                $run['alias'] = strval($problem->alias);
+                $run['username'] = strval($loggedIdentity->username);
+                $results[] = $run;
+            }
+            $response['runs'] = $results;
+
             \OmegaUp\DAO\ProblemViewed::MarkProblemViewed(
                 intval($loggedIdentity->identity_id),
                 intval($problem->problem_id)

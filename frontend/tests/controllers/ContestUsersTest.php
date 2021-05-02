@@ -420,14 +420,14 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
         // One more problem, but in this case, it is private
         $login = self::login($contestData['director']);
-        $problem = \OmegaUp\Test\Factories\Problem::createProblem(
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => 'private',
             ]),
             $login
         );
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
-            $problem,
+            $problemData,
             $contestData
         );
 
@@ -461,6 +461,29 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
         $this->assertEmpty($response['ranking']);
+
+        // Users can create runs
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity,
+            /*$inPracticeMode=*/ true
+        );
+
+        // Grade the run
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $userLogin = self::login($identity);
+        $problemDetails = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $userLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'prevent_problemset_open' => false,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        );
+
+        $this->assertCount(1, $problemDetails['runs']);
     }
 
     public function testPrivateContestPracticeForNonRegisteredUsers() {

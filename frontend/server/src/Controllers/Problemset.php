@@ -16,7 +16,8 @@ namespace OmegaUp\Controllers;
 class Problemset extends \OmegaUp\Controllers\Controller {
     public static function validateAddProblemToProblemset(
         \OmegaUp\DAO\VO\Problems $problem,
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity,
+        ?int $problemsetId = null
     ): void {
         if (
             $problem->visibility == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED ||
@@ -26,12 +27,35 @@ class Problemset extends \OmegaUp\Controllers\Controller {
                 'problemIsBanned'
             );
         }
+        $canEditProblemset = !is_null(
+            $problemsetId
+        ) && \OmegaUp\Authorization::canEditProblemset(
+            $identity,
+            $problemsetId
+        );
+
+        if (!$canEditProblemset) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'cannotAddProb'
+            );
+        }
+
+        $problemsetProblem = \OmegaUp\DAO\Base\ProblemsetProblems::getByPK(
+            $problemsetId,
+            $problem->problem_id
+        );
+        if (!is_null($problemsetProblem)) {
+            // Invited admin should update a problem in problemset
+            return;
+        }
+
+        // Only problem admins are allowed to add their own private problems in problemsets.
         if (
-            !\OmegaUp\DAO\Problems::isVisible($problem)
-            && !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
+            !\OmegaUp\DAO\Problems::isVisible($problem) &&
+            !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'problemIsPrivate'
+                'userNotAllowed'
             );
         }
     }
@@ -49,7 +73,8 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         if ($validateVisibility) {
             \OmegaUp\Controllers\Problemset::validateAddProblemToProblemset(
                 $problem,
-                $identity
+                $identity,
+                $problemsetId
             );
         }
 
