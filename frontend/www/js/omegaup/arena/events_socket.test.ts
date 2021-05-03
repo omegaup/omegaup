@@ -44,14 +44,12 @@ const options: SocketOptions = {
   currentUsername: 'omegaUp',
   intervalInMilliseconds: 500,
 };
-
 describe('EventsSocket', () => {
   let server: WS | null = null;
-  const now = Date.now();
-  let dateNowSpy: jest.SpyInstance<number, []> | null = null;
+
   beforeEach(() => {
     OmegaUp.ready = true;
-    dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
+    jest.useFakeTimers();
     server = new WS(`ws://${options.locationHost}/events/`, {
       selectProtocol: () => 'com.omegaup.events',
       jsonProtocol: true,
@@ -102,14 +100,12 @@ describe('EventsSocket', () => {
   });
 
   afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
     server = null;
     WS.clean();
-    if (dateNowSpy) {
-      dateNowSpy.mockRestore();
-    }
   });
 
-  jest.useFakeTimers();
   it('can be instantiated', () => {
     const socket = new EventsSocket(options);
     expect(socket.shouldRetry).toEqual(false);
@@ -134,7 +130,6 @@ describe('EventsSocket', () => {
     const socket = new EventsSocket({ ...options, disableSockets: false });
     socket.connect();
     await server?.connected;
-    jest.runAllTimers();
     expect(socket.socketStatus).toEqual(SocketStatus.Connected);
   });
 
