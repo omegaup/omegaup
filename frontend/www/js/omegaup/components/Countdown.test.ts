@@ -5,17 +5,19 @@ describe('Countdown.vue', () => {
   let now = Date.now();
   let dateNowSpy: jest.SpyInstance<number, []> | null = null;
 
-  beforeAll(() => {
+  beforeEach(() => {
     dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
+    jest.useFakeTimers();
   });
 
-  afterAll(() => {
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
     if (dateNowSpy) {
       dateNowSpy.mockRestore();
     }
   });
 
-  jest.useFakeTimers();
   it('Should handle a countdown with 5 seconds left to finish', async () => {
     const wrapper = shallowMount(omegaup_Countdown, {
       propsData: {

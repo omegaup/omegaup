@@ -154,10 +154,16 @@ class Run {
     public static function createRun(
         array $problemData,
         array $contestData,
-        \OmegaUp\DAO\VO\Identities $contestant
+        \OmegaUp\DAO\VO\Identities $contestant,
+        bool $inPracticeMode = false
     ): array {
         // Our contestant has to open the contest before sending a run
-        \OmegaUp\Test\Factories\Contest::openContest($contestData, $contestant);
+        if (!$inPracticeMode) {
+            \OmegaUp\Test\Factories\Contest::openContest(
+                $contestData,
+                $contestant
+            );
+        }
 
         // Then we need to open the problem
         $details = \OmegaUp\Test\Factories\Contest::openProblemInContest(
@@ -166,7 +172,11 @@ class Run {
             $contestant
         );
 
-        $r = self::createRequestCommon($problemData, $contestData, $contestant);
+        $r = self::createRequestCommon(
+            $problemData,
+            $inPracticeMode ? null : $contestData,
+            $contestant
+        );
 
         // Call API
         $response = \OmegaUp\Controllers\Run::apiCreate($r);
