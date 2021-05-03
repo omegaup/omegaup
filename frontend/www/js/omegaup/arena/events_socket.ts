@@ -6,7 +6,7 @@ import {
   refreshContestClarifications,
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
-import { onRankingChanged, onRankingEvents } from './ranking';
+import { onRankingWithEventsChanged } from './ranking';
 import { updateRun } from './submissions';
 import { types } from '../api_types';
 
@@ -103,23 +103,13 @@ export class EventsSocket {
         virtualRankingChange(data.scoreboard);
         return;
       }*/
-      const { currentRanking } = onRankingChanged({
+      onRankingWithEventsChanged({
         scoreboard: data.scoreboard,
         currentUsername: this.currentUsername,
         navbarProblems: this.navbarProblems,
+        problemsetId: this.problemsetId,
+        scoreboardToken: this.scoreboardToken,
       });
-
-      api.Problemset.scoreboardEvents({
-        problemset_id: this.problemsetId,
-        token: this.scoreboardToken,
-      })
-        .then((response) =>
-          onRankingEvents({
-            events: response.events,
-            currentRanking,
-          }),
-        )
-        .catch(ui.ignoreError);
     }
   }
 
@@ -198,23 +188,13 @@ export class EventsSocket {
       token: this.scoreboardToken,
     })
       .then((scoreboard) => {
-        const { currentRanking } = onRankingChanged({
+        onRankingWithEventsChanged({
           scoreboard,
           currentUsername: this.currentUsername,
           navbarProblems: this.navbarProblems,
+          problemsetId: this.problemsetId,
+          scoreboardToken: this.scoreboardToken,
         });
-
-        api.Problemset.scoreboardEvents({
-          problemset_id: this.problemsetId,
-          token: this.scoreboardToken,
-        })
-          .then((response) =>
-            onRankingEvents({
-              events: response.events,
-              currentRanking,
-            }),
-          )
-          .catch(ui.ignoreError);
       })
       .catch(ui.ignoreError);
     if (!this.problemsetAlias) {
@@ -246,23 +226,13 @@ export class EventsSocket {
           token: this.scoreboardToken,
         })
           .then((scoreboard) => {
-            const { currentRanking } = onRankingChanged({
+            onRankingWithEventsChanged({
               scoreboard,
               currentUsername: this.currentUsername,
               navbarProblems: this.navbarProblems,
+              problemsetId: this.problemsetId,
+              scoreboardToken: this.scoreboardToken,
             });
-
-            api.Problemset.scoreboardEvents({
-              problemset_id: this.problemsetId,
-              token: this.scoreboardToken,
-            })
-              .then((response) =>
-                onRankingEvents({
-                  events: response.events,
-                  currentRanking,
-                }),
-              )
-              .catch(ui.ignoreError);
           })
           .catch(ui.ignoreError);
       }, this.intervalInMilliseconds);
