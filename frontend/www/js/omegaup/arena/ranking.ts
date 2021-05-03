@@ -11,7 +11,6 @@ export interface RankingRequest {
   navbarProblems: types.NavbarProblemsetProblem[];
 }
 
-// TODO: Implement this function in a new PR
 export function onRankingEvents({
   events,
   currentRanking,
@@ -177,10 +176,6 @@ export function onRankingChanged({
         rank.username === currentUsername &&
         problems[alias].acceptsSubmissions
       ) {
-        const currentPoints = rank.problems.filter(
-          (problem) => problem.alias === alias,
-        )[0].points;
-
         const currentProblem = problems[alias];
 
         currentProblem.hasRuns = problem.runs > 0;
@@ -189,7 +184,7 @@ export function onRankingChanged({
           alias,
           problem.points,
         );
-        currentProblem.maxScore = currentPoints;
+        currentProblem.maxScore = problem.points;
       }
     }
 

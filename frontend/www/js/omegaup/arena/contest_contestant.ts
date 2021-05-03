@@ -35,9 +35,9 @@ OmegaUp.on('ready', () => {
 
   trackClarifications(payload.clarifications);
 
-  let ranking: types.ScoreboardRankingEntry[],
-    users: omegaup.UserRank[],
-    currentRanking: { [username: string]: number };
+  let ranking: types.ScoreboardRankingEntry[];
+  let users: omegaup.UserRank[];
+  let currentRanking: { [username: string]: number };
   if (payload.scoreboard && payload.scoreboardEvents) {
     const rankingInfo = onRankingChanged({
       scoreboard: payload.scoreboard,
