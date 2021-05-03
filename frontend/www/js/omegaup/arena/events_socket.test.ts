@@ -129,12 +129,12 @@ describe('EventsSocket', () => {
   it('should handle a socket successfully connected', async () => {
     const socket = new EventsSocket({ ...options, disableSockets: false });
     socket.connect();
+    jest.runOnlyPendingTimers();
     await server?.connected;
     expect(socket.socketStatus).toEqual(SocketStatus.Connected);
   });
 
   it('should handle a socket when it is closed', async () => {
-    await server?.connected;
     server?.on('connection', (socket) => {
       socket.close({ wasClean: false, code: 1003, reason: 'any' });
     });
@@ -152,6 +152,7 @@ describe('EventsSocket', () => {
     const socket = new EventsSocket({ ...options, disableSockets: false });
 
     socket.connect();
+    jest.runOnlyPendingTimers();
     await server?.connected;
 
     const localVue = createLocalVue();
@@ -188,6 +189,7 @@ describe('EventsSocket', () => {
     const socket = new EventsSocket({ ...options, disableSockets: false });
 
     socket.connect();
+    jest.runOnlyPendingTimers();
     await server?.connected;
 
     const localVue = createLocalVue();
@@ -223,6 +225,7 @@ describe('EventsSocket', () => {
     const socket = new EventsSocket({ ...options, disableSockets: false });
 
     socket.connect();
+    jest.runOnlyPendingTimers();
     await server?.connected;
 
     server?.send({
