@@ -223,13 +223,12 @@ describe('EventsSocket', () => {
 
   it('should handle a socket when server sends /scoreboard/update/ message', async () => {
     const socket = new EventsSocket({ ...options, disableSockets: false });
-    const onRankingChangedMock = jest.fn(onRankingChanged);
 
     socket.connect();
     jest.runOnlyPendingTimers();
     await server?.connected;
 
-    onRankingChangedMock.mockReturnValueOnce({
+    onRankingChanged.mockReturnValueOnce({
       users: [],
       ranking: [],
       currentRanking: { omegaUp: 0 },

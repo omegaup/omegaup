@@ -167,14 +167,19 @@ describe('ranking', () => {
         finishTimestamp: Date.now() + 10000,
       };
       const { series, navigatorData } = onRankingEvents(params);
-      expect(navigatorData.length).toEqual(3);
-      expect(navigatorData[0][1]).toEqual(0);
-      expect(navigatorData[1][1]).toEqual(100);
-      expect(navigatorData[2][1]).toEqual(100);
-      expect(series[0].name).toEqual('omegaUp');
-      expect(series[0].rank).toEqual(0);
-      expect(series[0].step).toEqual('right');
-      expect(series[0].type).toEqual('line');
+      expect(navigatorData).toEqual([
+        [expect.any(Number), 0],
+        [expect.any(Number), 100],
+        [expect.any(Number), 100],
+      ]);
+      expect(series).toEqual([
+        expect.objectContaining({
+          name: 'omegaUp',
+          rank: 0,
+          step: 'right',
+          type: 'line',
+        }),
+      ]);
     });
   });
 });
