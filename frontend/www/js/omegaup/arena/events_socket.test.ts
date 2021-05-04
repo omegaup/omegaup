@@ -10,7 +10,7 @@ import { clarificationStoreConfig } from './clarificationsStore';
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import fetchMock from 'jest-fetch-mock';
-import { onRankingWithEventsChanged } from './ranking';
+import { onRankingChanged } from './ranking';
 
 const navbarProblems: types.NavbarProblemsetProblem[] = [
   {
@@ -277,7 +277,7 @@ describe('EventsSocket', () => {
 
     expect(socket.socketStatus).toEqual(SocketStatus.Connected);
 
-    expect(onRankingWithEventsChanged).toHaveBeenCalledWith({
+    expect(onRankingChanged).toHaveBeenCalledWith({
       currentUsername: 'omegaUp',
       navbarProblems: [
         {
@@ -297,7 +297,6 @@ describe('EventsSocket', () => {
           text: 'B. Problem 2',
         },
       ],
-      problemsetId: 1,
       scoreboard: {
         finish_time: '1970-01-01T00:00:00.000Z',
         problems: [
@@ -353,8 +352,7 @@ describe('EventsSocket', () => {
         time: '1970-01-01T00:00:00.000Z',
         title: 'omegaUp',
       },
-      scoreboardToken: 'token',
     });
-    expect(onRankingWithEventsChanged).toHaveBeenCalled();
+    expect(onRankingChanged).toHaveBeenCalled();
   });
 });

@@ -3,50 +3,12 @@ import { types } from '../api_types';
 import { myRunsStore } from './runsStore';
 import { omegaup } from '../omegaup';
 import { getMaxScore } from './navigation';
-import * as api from '../api';
 
 export interface RankingRequest {
   problemsetId: number;
   scoreboardToken: string;
   currentUsername: string;
   navbarProblems: types.NavbarProblemsetProblem[];
-}
-
-export function onRankingWithEventsChanged({
-  scoreboard,
-  currentUsername,
-  navbarProblems,
-  problemsetId,
-  scoreboardToken,
-}: {
-  scoreboard: types.Scoreboard;
-  currentUsername: string;
-  navbarProblems: types.NavbarProblemsetProblem[];
-  problemsetId: number;
-  scoreboardToken: null | string;
-}): {
-  ranking: types.ScoreboardRankingEntry[];
-  users: omegaup.UserRank[];
-} {
-  const { currentRanking, ranking, users } = onRankingChanged({
-    scoreboard,
-    currentUsername,
-    navbarProblems,
-  });
-
-  api.Problemset.scoreboardEvents({
-    problemset_id: problemsetId,
-    token: scoreboardToken,
-  })
-    .then((response) =>
-      onRankingEvents({
-        events: response.events,
-        currentRanking,
-      }),
-    )
-    .catch(ui.ignoreError);
-
-  return { ranking, users };
 }
 
 export function onRankingEvents({
