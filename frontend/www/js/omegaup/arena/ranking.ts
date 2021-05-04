@@ -4,27 +4,6 @@ import { myRunsStore } from './runsStore';
 import { omegaup } from '../omegaup';
 import { getMaxScore } from './navigation';
 
-interface Problem {
-  accepts_submissions: boolean;
-  alias: string;
-  commit: string;
-  input_limit: number;
-  languages: string[];
-  lastSubmission?: Date;
-  letter?: string;
-  nextSubmissionTimestamp?: Date;
-  points: number;
-  problemsetter?: types.ProblemsetterInfo;
-  quality_seal: boolean;
-  quality_payload?: types.ProblemQualityPayload;
-  runs?: types.Run[];
-  settings?: types.ProblemSettingsDistrib;
-  source?: string;
-  statement?: types.ProblemStatement;
-  title: string;
-  visibility: number;
-}
-
 export interface RankingRequest {
   problemsetId: number;
   scoreboardToken: string;
@@ -32,16 +11,92 @@ export interface RankingRequest {
   navbarProblems: types.NavbarProblemsetProblem[];
 }
 
-// Implement this function in a new PR
-export function onRankingEvents(events: types.ScoreboardEvent[]): void {
+export function onRankingEvents({
+  events,
+  currentRanking,
+  startTimestamp = 0,
+  finishTimestamp = Date.now(),
+  placesToShowInChart = 10,
+}: {
+  events: types.ScoreboardEvent[];
+  startTimestamp?: number;
+  finishTimestamp?: number;
+  placesToShowInChart?: number;
+  currentRanking: { [username: string]: number };
+}): {
+  series: (Highcharts.SeriesLineOptions & { rank: number })[];
+  navigatorData: number[][];
+} {
+  const dataInSeries: { [name: string]: number[][] } = {};
+  const navigatorData: number[][] = [[startTimestamp, 0]];
+  const series: (Highcharts.SeriesLineOptions & { rank: number })[] = [];
+  const usernames: { [name: string]: string } = {};
+
   // Don't trust input data (data might not be sorted)
-  // TODO: use events
   events.sort((a, b) => a.delta - b.delta);
-  createChart();
+
+  // group points by person
+  for (const curr of events) {
+    // limit chart to top n users
+    if (currentRanking[curr.username] > placesToShowInChart) continue;
+
+    const name = curr.name ?? curr.username;
+
+    if (!dataInSeries[name]) {
+      dataInSeries[name] = [[startTimestamp, 0]];
+      usernames[name] = curr.username;
+    }
+    dataInSeries[name].push([
+      startTimestamp + curr.delta * 60 * 1000,
+      curr.total.points,
+    ]);
+
+    // check if to add to navigator
+    if (curr.total.points > navigatorData[navigatorData.length - 1][1]) {
+      navigatorData.push([
+        startTimestamp + curr.delta * 60 * 1000,
+        curr.total.points,
+      ]);
+    }
+  }
+
+  // convert datas to series
+  for (const name of Object.keys(dataInSeries)) {
+    dataInSeries[name].push([
+      finishTimestamp,
+      dataInSeries[name][dataInSeries[name].length - 1][1],
+    ]);
+    series.push({
+      type: 'line',
+      name: name,
+      rank: currentRanking[usernames[name]],
+      data: dataInSeries[name],
+      step: 'right',
+    });
+  }
+
+  series.sort((a, b) => a.rank - b.rank);
+
+  navigatorData.push([
+    finishTimestamp,
+    navigatorData[navigatorData.length - 1][1],
+  ]);
+
+  return { series, navigatorData };
 }
 
-export function createChart(): void {
-  // Implement this function in a new PR
+export function createChart({
+  series,
+  navigatorData,
+}: {
+  series: (Highcharts.SeriesLineOptions & { rank: number })[];
+  navigatorData: number[][];
+}): {
+  series: (Highcharts.SeriesLineOptions & { rank: number })[];
+  navigatorData: number[][];
+} {
+  // TODO: Implement this function in a new PR
+  return { series, navigatorData };
 }
 
 export function updateProblemScore({
@@ -90,11 +145,12 @@ export function onRankingChanged({
 }): {
   ranking: types.ScoreboardRankingEntry[];
   users: omegaup.UserRank[];
+  currentRanking: { [username: string]: number };
 } {
   const users: omegaup.UserRank[] = [];
-  const problems: { [alias: string]: Problem } = {};
+  const problems: { [alias: string]: types.NavbarProblemsetProblem } = {};
   const ranking: types.ScoreboardRankingEntry[] = scoreboard.ranking;
-  const newRanking: { [username: string]: number } = {};
+  const currentRanking: { [username: string]: number } = {};
   const order: { [problemAlias: string]: number } = {};
   const currentRankingState: { [username: string]: { place: number } } = {};
 
@@ -102,9 +158,13 @@ export function onRankingChanged({
     order[problem.alias] = i;
   }
 
+  for (const problem of navbarProblems) {
+    problems[problem.alias] = problem;
+  }
+
   // Push scoreboard to ranking table
-  for (const [i, rank] of ranking.entries()) {
-    newRanking[rank.username] = i;
+  for (const [i, rank] of scoreboard.ranking.entries()) {
+    currentRanking[rank.username] = i;
     const username = ui.rankingUsername(rank);
     currentRankingState[username] = { place: rank.place ?? 0 };
 
@@ -114,23 +174,17 @@ export function onRankingChanged({
       if (
         problems[alias] &&
         rank.username === currentUsername &&
-        problems[alias].languages.length > 0
+        problems[alias].acceptsSubmissions
       ) {
-        const currentPoints = problems[alias].points;
+        const currentProblem = problems[alias];
 
-        const currentProblem = navbarProblems.find(
-          (problem) => problem.alias === alias,
+        currentProblem.hasRuns = problem.runs > 0;
+        currentProblem.bestScore = getMaxScore(
+          myRunsStore.state.runs,
+          alias,
+          problem.points,
         );
-
-        if (currentProblem) {
-          currentProblem.hasRuns = problem.runs > 0;
-          currentProblem.bestScore = getMaxScore(
-            myRunsStore.state.runs,
-            alias,
-            problem.points,
-          );
-          currentProblem.maxScore = currentPoints;
-        }
+        currentProblem.maxScore = problem.points;
       }
     }
 
@@ -147,5 +201,5 @@ export function onRankingChanged({
       });
     }
   }
-  return { ranking, users };
+  return { ranking, users, currentRanking };
 }
