@@ -11,6 +11,7 @@ import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import fetchMock from 'jest-fetch-mock';
 import { onRankingChanged } from './ranking';
+import { mocked } from 'ts-jest/utils';
 
 const navbarProblems: types.NavbarProblemsetProblem[] = [
   {
@@ -228,7 +229,8 @@ describe('EventsSocket', () => {
     jest.runOnlyPendingTimers();
     await server?.connected;
 
-    onRankingChanged.mockReturnValueOnce({
+    const onRankingChangedMock = mocked(onRankingChanged, true);
+    onRankingChangedMock.mockReturnValueOnce({
       users: [],
       ranking: [],
       currentRanking: { omegaUp: 0 },
