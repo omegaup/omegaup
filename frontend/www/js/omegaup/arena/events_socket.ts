@@ -103,7 +103,7 @@ export class EventsSocket {
         virtualRankingChange(data.scoreboard);
         return;
       }*/
-      onRankingChanged({
+      const { currentRanking } = onRankingChanged({
         scoreboard: data.scoreboard,
         currentUsername: this.currentUsername,
         navbarProblems: this.navbarProblems,
@@ -113,7 +113,12 @@ export class EventsSocket {
         problemset_id: this.problemsetId,
         token: this.scoreboardToken,
       })
-        .then((response) => onRankingEvents(response.events))
+        .then((response) =>
+          onRankingEvents({
+            events: response.events,
+            currentRanking,
+          }),
+        )
         .catch(ui.ignoreError);
     }
   }
@@ -193,7 +198,7 @@ export class EventsSocket {
       token: this.scoreboardToken,
     })
       .then((scoreboard) => {
-        onRankingChanged({
+        const { currentRanking } = onRankingChanged({
           scoreboard,
           currentUsername: this.currentUsername,
           navbarProblems: this.navbarProblems,
@@ -203,7 +208,12 @@ export class EventsSocket {
           problemset_id: this.problemsetId,
           token: this.scoreboardToken,
         })
-          .then((response) => onRankingEvents(response.events))
+          .then((response) =>
+            onRankingEvents({
+              events: response.events,
+              currentRanking,
+            }),
+          )
           .catch(ui.ignoreError);
       })
       .catch(ui.ignoreError);
@@ -236,7 +246,7 @@ export class EventsSocket {
           token: this.scoreboardToken,
         })
           .then((scoreboard) => {
-            onRankingChanged({
+            const { currentRanking } = onRankingChanged({
               scoreboard,
               currentUsername: this.currentUsername,
               navbarProblems: this.navbarProblems,
@@ -246,7 +256,12 @@ export class EventsSocket {
               problemset_id: this.problemsetId,
               token: this.scoreboardToken,
             })
-              .then((response) => onRankingEvents(response.events))
+              .then((response) =>
+                onRankingEvents({
+                  events: response.events,
+                  currentRanking,
+                }),
+              )
               .catch(ui.ignoreError);
           })
           .catch(ui.ignoreError);

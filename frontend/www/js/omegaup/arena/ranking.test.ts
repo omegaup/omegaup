@@ -1,7 +1,11 @@
 jest.mock('../../../third_party/js/diff_match_patch.js');
 
 import { types } from '../api_types';
-import { onRankingChanged, updateProblemScore } from './ranking';
+import {
+  onRankingChanged,
+  onRankingEvents,
+  updateProblemScore,
+} from './ranking';
 
 describe('ranking', () => {
   const scoreboard: types.Scoreboard = {
@@ -32,7 +36,7 @@ describe('ranking', () => {
           {
             alias: 'problem_alias_2',
             points: 100,
-            runs: 3,
+            runs: 1,
             percent: 0,
             penalty: 5,
           },
@@ -47,6 +51,40 @@ describe('ranking', () => {
     time: new Date(),
     title: 'contest',
   };
+  const scoreboardEvents: types.ScoreboardEvent[] = [
+    {
+      classname: 'user-rank-unranked',
+      username: 'omegaUp',
+      country: 'MX',
+      delta: 7,
+      is_invited: true,
+      problem: {
+        alias: 'problem_alias',
+        points: 100,
+        penalty: 3,
+      },
+      total: {
+        points: 100,
+        penalty: 3,
+      },
+    },
+    {
+      classname: 'user-rank-unranked',
+      username: 'omegaUp',
+      country: 'MX',
+      delta: 7.5,
+      is_invited: true,
+      problem: {
+        alias: 'problem_alias_2',
+        points: 100,
+        penalty: 5,
+      },
+      total: {
+        points: 100,
+        penalty: 5,
+      },
+    },
+  ];
   const navbarProblems: types.NavbarProblemsetProblem[] = [
     {
       acceptsSubmissions: true,
@@ -72,7 +110,7 @@ describe('ranking', () => {
         alias: 'problem_alias',
         previousScore: 100,
         username: 'omegaUp',
-        scoreboard: scoreboard,
+        scoreboard,
       };
       const scoreboardRanking = updateProblemScore(params);
       expect(scoreboardRanking).toEqual([
@@ -93,7 +131,7 @@ describe('ranking', () => {
               penalty: 5,
               percent: 0,
               points: 100,
-              runs: 3,
+              runs: 1,
             },
           ],
           total: {
@@ -114,6 +152,34 @@ describe('ranking', () => {
       const { ranking, users } = onRankingChanged(params);
       expect(ranking[0].total.points).toEqual(200);
       expect(users[0].position).toEqual(0);
+    });
+
+    it('Should get ranking events for charts', () => {
+      const { currentRanking } = onRankingChanged({
+        currentUsername: 'omegaUp',
+        scoreboard: scoreboard,
+        navbarProblems: navbarProblems,
+      });
+      const params = {
+        events: scoreboardEvents,
+        currentRanking,
+        startTimestamp: Date.now() - 10000,
+        finishTimestamp: Date.now() + 10000,
+      };
+      const { series, navigatorData } = onRankingEvents(params);
+      expect(navigatorData).toEqual([
+        [expect.any(Number), 0],
+        [expect.any(Number), 100],
+        [expect.any(Number), 100],
+      ]);
+      expect(series).toEqual([
+        expect.objectContaining({
+          name: 'omegaUp',
+          rank: 0,
+          step: 'right',
+          type: 'line',
+        }),
+      ]);
     });
   });
 });
