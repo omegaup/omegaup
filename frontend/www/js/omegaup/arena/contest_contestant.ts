@@ -37,7 +37,7 @@ OmegaUp.on('ready', () => {
 
   let ranking: types.ScoreboardRankingEntry[];
   let users: omegaup.UserRank[];
-  let rankingChartOptions: Highcharts.Options | null;
+  let rankingChartOptions: Highcharts.Options | null = null;
   if (payload.scoreboard && payload.scoreboardEvents) {
     const rankingInfo = onRankingChanged({
       scoreboard: payload.scoreboard,
@@ -58,13 +58,15 @@ OmegaUp.on('ready', () => {
       startTimestamp,
       finishTimestamp,
     });
-    rankingChartOptions = createChart({
-      series,
-      navigatorData,
-      startTimestamp,
-      finishTimestamp,
-      maxPoints: rankingInfo.maxPoints,
-    });
+    if (series.length) {
+      rankingChartOptions = createChart({
+        series,
+        navigatorData,
+        startTimestamp,
+        finishTimestamp,
+        maxPoints: rankingInfo.maxPoints,
+      });
+    }
   }
 
   const contestContestant = new Vue({

@@ -4,6 +4,19 @@ import { myRunsStore } from './runsStore';
 import { omegaup } from '../omegaup';
 import { getMaxScore } from './navigation';
 
+export const scoreboardColors = [
+  '#FB3F51',
+  '#FF5D40',
+  '#FFA240',
+  '#FFC740',
+  '#59EA3A',
+  '#37DD6F',
+  '#34D0BA',
+  '#3AAACF',
+  '#8144D6',
+  '#CD35D3',
+];
+
 export interface RankingRequest {
   problemsetId: number;
   scoreboardToken: string;
@@ -97,22 +110,7 @@ export function createChart({
   maxPoints: number;
   startTimestamp: number;
   finishTimestamp: number;
-}): Highcharts.Options | null {
-  if (!series.length) return null;
-
-  const scoreboardColors = [
-    '#FB3F51',
-    '#FF5D40',
-    '#FFA240',
-    '#FFC740',
-    '#59EA3A',
-    '#37DD6F',
-    '#34D0BA',
-    '#3AAACF',
-    '#8144D6',
-    '#CD35D3',
-  ];
-
+}): Highcharts.Options {
   return {
     chart: { height: 300, spacingTop: 20 },
 
@@ -143,7 +141,7 @@ export function createChart({
     navigator: {
       series: {
         type: 'line',
-        step: true,
+        step: 'left',
         lineWidth: 3,
         lineColor: '#333',
         data: navigatorData,
@@ -153,7 +151,7 @@ export function createChart({
     rangeSelector: { enabled: false },
 
     series: series,
-  } as Highcharts.Options;
+  };
 }
 
 export function updateProblemScore({
