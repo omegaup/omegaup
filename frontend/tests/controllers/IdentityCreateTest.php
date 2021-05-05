@@ -344,7 +344,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 $group['group']->alias
             ),
             'group_alias' => $group['group']->alias,
-       ]));
+        ]));
         $updatedMembers = \OmegaUp\Controllers\Group::apiMembers(
             new \OmegaUp\Request([
                 'auth_token' => $creatorLogin->auth_token,
