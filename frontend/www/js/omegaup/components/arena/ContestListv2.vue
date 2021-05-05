@@ -12,7 +12,7 @@ import T from '../../lang';
   components: {},
 })
 export default class ArenaContestList extends Vue {
-  @Prop() contests!: types.ContestLisItem[];
+  @Prop() contests!: types.ContestListItem[];
   T = T;
 }
 </script>
