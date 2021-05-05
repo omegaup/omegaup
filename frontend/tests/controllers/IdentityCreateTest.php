@@ -216,8 +216,8 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testUploadCsvFile() {
         // Identity creator group member will upload csv file
         [
-           'user' => $creator,
-           'identity' => $creatorIdentity,
+            'user' => $creator,
+            'identity' => $creatorIdentity,
         ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
         $group = \OmegaUp\Test\Factories\Groups::createGroup(
@@ -230,34 +230,34 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
-           'auth_token' => $creatorLogin->auth_token,
-        'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
-            'identities.csv',
-            $group['group']->alias
-        ),
-           'group_alias' => $group['group']->alias,
+            'auth_token' => $creatorLogin->auth_token,
+            'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                'identities.csv',
+                $group['group']->alias,
+            ),
+            'group_alias' => $group['group']->alias,
         ]));
         $originalResponse = \OmegaUp\Controllers\Group::apiMembers(
             new \OmegaUp\Request([
-               'auth_token' => $creatorLogin->auth_token,
-               'group_alias' => $group['group']->alias,
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $group['group']->alias,
             ])
         );
         $this->assertCount(5, $originalResponse['identities']);
 
         // Call api again, names should have changed
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
-           'auth_token' => $creatorLogin->auth_token,
-        'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
-            'identities_updated.csv',
-            $group['group']->alias
-        ),
-           'group_alias' => $group['group']->alias,
+            'auth_token' => $creatorLogin->auth_token,
+            'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                'identities_updated.csv',
+                $group['group']->alias,
+            ),
+            'group_alias' => $group['group']->alias,
         ]));
         $updatedResponse = \OmegaUp\Controllers\Group::apiMembers(
             new \OmegaUp\Request([
-               'auth_token' => $creatorLogin->auth_token,
-               'group_alias' => $group['group']->alias,
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $group['group']->alias,
             ])
         );
         $this->assertCount(6, $updatedResponse['identities']);
@@ -284,34 +284,34 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
-           'auth_token' => $creatorLogin->auth_token,
-        'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
-            'identities.csv',
-            $group['group']->alias
-        ),
-           'group_alias' => $group['group']->alias,
+            'auth_token' => $creatorLogin->auth_token,
+            'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                'identities.csv',
+                $group['group']->alias
+            ),
+            'group_alias' => $group['group']->alias,
         ]));
         $originalResponse = \OmegaUp\Controllers\Group::apiMembers(
             new \OmegaUp\Request([
-               'auth_token' => $creatorLogin->auth_token,
-               'group_alias' => $group['group']->alias,
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $group['group']->alias,
             ])
         );
         $this->assertCount(5, $originalResponse['identities']);
 
         // Call api again, names should have changed
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
-           'auth_token' => $creatorLogin->auth_token,
-        'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
-            'identities_updated.csv',
-            $group['group']->alias
-        ),
-           'group_alias' => $group['group']->alias,
+            'auth_token' => $creatorLogin->auth_token,
+            'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                'identities_updated.csv',
+                $group['group']->alias
+            ),
+            'group_alias' => $group['group']->alias,
         ]));
         $updatedResponse = \OmegaUp\Controllers\Group::apiMembers(
             new \OmegaUp\Request([
-               'auth_token' => $creatorLogin->auth_token,
-               'group_alias' => $group['group']->alias,
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $group['group']->alias,
             ])
         );
         $this->assertCount(6, $updatedResponse['identities']);
@@ -330,25 +330,25 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
         }
         $removedMembers = \OmegaUp\Controllers\Group::apiMembers(
             new \OmegaUp\Request([
-               'auth_token' => $creatorLogin->auth_token,
-               'group_alias' => $group['group']->alias,
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $group['group']->alias,
             ])
         );
         $this->assertEmpty($removedMembers['identities']);
 
         // Call api again, identities should appear in the group again
         \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
-           'auth_token' => $creatorLogin->auth_token,
-        'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
-            'identities.csv',
-            $group['group']->alias
-        ),
-           'group_alias' => $group['group']->alias,
-        ]));
+            'auth_token' => $creatorLogin->auth_token,
+            'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                'identities.csv',
+                $group['group']->alias
+            ),
+            'group_alias' => $group['group']->alias,
+       ]));
         $updatedMembers = \OmegaUp\Controllers\Group::apiMembers(
             new \OmegaUp\Request([
-               'auth_token' => $creatorLogin->auth_token,
-               'group_alias' => $group['group']->alias,
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $group['group']->alias,
             ])
         );
         $this->assertCount(5, $updatedMembers['identities']);
