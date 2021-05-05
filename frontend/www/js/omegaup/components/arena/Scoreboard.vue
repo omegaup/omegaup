@@ -3,7 +3,10 @@
     <!-- id-lint off -->
     <div id="ranking-chart"></div>
     <!-- id-lint on -->
-    <highcharts v-if="rankingChartOptions" :options="rankingChartOptions"></highcharts>
+    <highcharts
+      v-if="rankingChartOptions"
+      :options="rankingChartOptions"
+    ></highcharts>
     <label v-if="showInvitedUsersFilter">
       <input
         v-model="onlyShowExplicitlyInvited"

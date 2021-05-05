@@ -81,7 +81,7 @@ export function onRankingEvents({
     finishTimestamp,
     navigatorData[navigatorData.length - 1][1],
   ]);
-  
+
   return { series, navigatorData };
 }
 
@@ -95,8 +95,8 @@ export function createChart({
   series: (Highcharts.SeriesLineOptions & { rank: number })[];
   navigatorData: number[][];
   maxPoints: number;
-  startTimestamp: number,
-  finishTimestamp: number,
+  startTimestamp: number;
+  finishTimestamp: number;
 }): Highcharts.Options | null {
   if (!series.length) return null;
 
@@ -114,46 +114,46 @@ export function createChart({
   ];
 
   return {
-      chart: { height: 300, spacingTop: 20 },
+    chart: { height: 300, spacingTop: 20 },
 
-      colors: scoreboardColors,
+    colors: scoreboardColors,
 
-      xAxis: {
-        ordinal: false,
-        min: startTimestamp,
-        max: finishTimestamp,
+    xAxis: {
+      ordinal: false,
+      min: startTimestamp,
+      max: finishTimestamp,
+    },
+
+    yAxis: {
+      showLastLabel: true,
+      showFirstLabel: false,
+      min: 0,
+      max: maxPoints,
+    },
+
+    plotOptions: {
+      series: {
+        animation: false,
+        lineWidth: 3,
+        states: { hover: { lineWidth: 3 } },
+        marker: { radius: 5, symbol: 'circle', lineWidth: 1 },
       },
+    },
 
-      yAxis: {
-        showLastLabel: true,
-        showFirstLabel: false,
-        min: 0,
-        max: maxPoints,
+    navigator: {
+      series: {
+        type: 'line',
+        step: true,
+        lineWidth: 3,
+        lineColor: '#333',
+        data: navigatorData,
       },
+    },
 
-      plotOptions: {
-        series: {
-          animation: false,
-          lineWidth: 3,
-          states: { hover: { lineWidth: 3 } },
-          marker: { radius: 5, symbol: 'circle', lineWidth: 1 },
-        },
-      },
+    rangeSelector: { enabled: false },
 
-      navigator: {
-        series: {
-          type: 'line',
-          step: true,
-          lineWidth: 3,
-          lineColor: '#333',
-          data: navigatorData,
-        },
-      },
-
-      rangeSelector: { enabled: false },
-
-      series: series,
-    } as Highcharts.Options;
+    series: series,
+  } as Highcharts.Options;
 }
 
 export function updateProblemScore({
@@ -203,7 +203,7 @@ export function onRankingChanged({
   ranking: types.ScoreboardRankingEntry[];
   users: omegaup.UserRank[];
   currentRanking: { [username: string]: number };
-  maxPoints: number
+  maxPoints: number;
 } {
   const users: omegaup.UserRank[] = [];
   const problems: { [alias: string]: types.NavbarProblemsetProblem } = {};

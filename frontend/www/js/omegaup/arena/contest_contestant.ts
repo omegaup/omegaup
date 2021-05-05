@@ -48,14 +48,23 @@ OmegaUp.on('ready', () => {
     users = rankingInfo.users;
 
     const startTimestamp = payload.contest.start_time.getTime();
-    const finishTimestamp =  Math.min(payload.contest.finish_time?.getTime() || Infinity, Date.now());
+    const finishTimestamp = Math.min(
+      payload.contest.finish_time?.getTime() || Infinity,
+      Date.now(),
+    );
     const { series, navigatorData } = onRankingEvents({
       events: payload.scoreboardEvents,
       currentRanking: rankingInfo.currentRanking,
       startTimestamp,
       finishTimestamp,
     });
-    rankingChartOptions = createChart({ series, navigatorData, startTimestamp, finishTimestamp, maxPoints: rankingInfo.maxPoints });
+    rankingChartOptions = createChart({
+      series,
+      navigatorData,
+      startTimestamp,
+      finishTimestamp,
+      maxPoints: rankingInfo.maxPoints,
+    });
   }
 
   const contestContestant = new Vue({

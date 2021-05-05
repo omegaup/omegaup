@@ -163,7 +163,7 @@ describe('ranking', () => {
       const params = {
         events: scoreboardEvents,
         currentRanking,
-        maxPoints
+        maxPoints,
         startTimestamp: Date.now() - 10000,
         finishTimestamp: Date.now() + 10000,
       };
