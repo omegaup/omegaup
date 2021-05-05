@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
-     * @return array<string, array{name: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp|null, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int|null, problems: array{problem_alias: string, problem_id: int, order: int}[]}>
+     * @return array<string, array{assignment_alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, max_points: float, name: string, order: int, problems: list<array{order: int, problem_alias: string, problem_id: int}>, publish_time_delay: int|null, start_time: \OmegaUp\Timestamp}>
      */
     final public static function getProblemsAssignmentByCourseAlias(
         \OmegaUp\DAO\VO\Courses $course
@@ -50,7 +50,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 `pp`.`problem_id` ASC;
         ';
         $val = [$course->alias];
-        /** @var list<array{assignment_alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, max_points: float, name: string, order: int, problem_alias: string, problem_id: int, problem_order: int, publish_time_delay: int|null, start_time: \OmegaUp\Timestamp}> $problemsAssignments */
+        /** @var list<array{assignment_alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, max_points: float, name: string, order: int, problem_alias: null|string, problem_id: int|null, problem_order: int|null, publish_time_delay: int|null, start_time: \OmegaUp\Timestamp}> $problemsAssignments */
         $problemsAssignments = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $val
@@ -74,10 +74,13 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     'problems' => [],
                 ];
             }
+            if (is_null($assignment['problem_alias'])) {
+                continue;
+            }
             $result[$assignmentAlias]['problems'][] = [
                 'problem_alias' => $assignment['problem_alias'],
-                'problem_id' => $assignment['problem_id'],
-                'order' => $assignment['problem_order'],
+                'problem_id' => intval($assignment['problem_id']),
+                'order' => intval($assignment['problem_order']),
             ];
         }
 
