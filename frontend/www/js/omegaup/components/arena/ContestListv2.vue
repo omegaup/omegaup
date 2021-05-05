@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span>Contest list: {{ contests }}</span>
+    <span>{{ contests }}</span>
   </div>
 </template>
 
