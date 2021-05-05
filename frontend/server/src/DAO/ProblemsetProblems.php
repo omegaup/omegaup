@@ -34,16 +34,17 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 p.problem_id,
                 pp.order as problem_order
             FROM
-                Problems p
-            INNER JOIN
-                Problemset_Problems pp ON pp.problem_id = p.problem_id
-            INNER JOIN
-                Assignments a ON pp.problemset_id = a.problemset_id
+                Assignments a
+            LEFT JOIN
+                Problemset_Problems pp ON pp.problemset_id = a.problemset_id
+            LEFT JOIN
+                Problems p ON pp.problem_id = p.problem_id
             INNER JOIN
                 Courses c ON a.course_id = c.course_id
             WHERE
                 c.alias = ?
             ORDER BY
+                a.`order` ASC,
                 a.`assignment_id` ASC,
                 pp.`order` ASC,
                 `pp`.`problem_id` ASC;

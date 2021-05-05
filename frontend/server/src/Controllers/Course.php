@@ -719,6 +719,11 @@ class Course extends \OmegaUp\Controllers\Controller {
                 }
 
                 foreach ($assignmentProblems['problems'] as $problem) {
+                    if (is_null($problem['problem_alias'])) {
+                        // When assignment does not have problems, there is
+                        // nothing to do here
+                        continue;
+                    }
                     // Create and assign problems to new course
                     self::addProblemToAssignment(
                         $problem['problem_alias'],
