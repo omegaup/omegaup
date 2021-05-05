@@ -397,8 +397,25 @@ class Identity extends \OmegaUp\Controllers\Controller {
         if (!is_null($preexistingIdentity)) {
             $identity->identity_id = $preexistingIdentity->identity_id;
             $identity->user_id = $preexistingIdentity->user_id;
-            // No need to save the object here since it will be updated a bit
-            // later.
+            // No need to save the Identities object here since it will be
+            // updated a bit later.
+
+            $preexistingIdentityInGroup = \OmegaUp\DAO\Identities::findByUsernameAndGroup(
+                $identity->username,
+                intval($group->group_id)
+            );
+
+            if (!is_null($preexistingIdentityInGroup)) {
+                return;
+            }
+            // But, there is a scenario where identity was previously removed
+            // from the group, in this case we need to add it again.
+            \OmegaUp\DAO\GroupsIdentities::create(
+                new \OmegaUp\DAO\VO\GroupsIdentities([
+                    'group_id' => intval($group->group_id),
+                    'identity_id' => $identity->identity_id,
+                ])
+            );
             return;
         }
         \OmegaUp\DAO\Identities::create($identity);

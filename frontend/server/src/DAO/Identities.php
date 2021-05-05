@@ -55,6 +55,36 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
+    public static function findByUsernameAndGroup(
+        string $username,
+        int $groupId
+    ): ?\OmegaUp\DAO\VO\Identities {
+        $sql = 'SELECT
+                   i.*
+                FROM
+                  `Identities` i
+                INNER JOIN
+                  `Groups_Identities` gi
+                ON
+                  gi.identity_id = i.identity_id
+                INNER JOIN
+                  `Groups_` g
+                ON
+                  g.group_id = gi.group_id
+                WHERE
+                  i.username = ?
+                  AND g.group_id = ?
+                LIMIT
+                  0, 1';
+        $params = [ $username, $groupId ];
+        /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+        if (empty($rs)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\Identities($rs);
+    }
+
     /**
      * @return list<\OmegaUp\DAO\VO\Identities>
      */
