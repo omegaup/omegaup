@@ -5,6 +5,8 @@ import {
   onRankingChanged,
   onRankingEvents,
   updateProblemScore,
+  createChart,
+  scoreboardColors,
 } from './ranking';
 
 describe('ranking', () => {
@@ -181,6 +183,112 @@ describe('ranking', () => {
           type: 'line',
         }),
       ]);
+    });
+
+    it('Should get ranking chart options object', () => {
+      const startTimestamp = Date.now() - 10000;
+      const finishTimestamp = Date.now() + 10000;
+      const { currentRanking, maxPoints } = onRankingChanged({
+        currentUsername: 'omegaUp',
+        scoreboard: scoreboard,
+        navbarProblems: navbarProblems,
+      });
+      const params = {
+        events: scoreboardEvents,
+        currentRanking,
+        maxPoints,
+        startTimestamp,
+        finishTimestamp,
+      };
+
+      const { series, navigatorData } = onRankingEvents(params);
+      expect(navigatorData).toEqual([
+        [expect.any(Number), 0],
+        [expect.any(Number), 100],
+        [expect.any(Number), 100],
+      ]);
+      expect(series).toEqual([
+        expect.objectContaining({
+          name: 'omegaUp',
+          rank: 0,
+          step: 'right',
+          type: 'line',
+        }),
+      ]);
+
+      const rankingChartOptions = createChart({
+        series,
+        navigatorData,
+        startTimestamp,
+        finishTimestamp,
+        maxPoints,
+      });
+      expect(rankingChartOptions).toEqual(
+        expect.objectContaining({
+          chart: {
+            height: 300,
+            spacingTop: 20,
+          },
+          colors: scoreboardColors,
+          navigator: {
+            series: {
+              data: [
+                [expect.any(Number), 0],
+                [expect.any(Number), 100],
+                [expect.any(Number), 100],
+              ],
+              lineColor: '#333',
+              lineWidth: 3,
+              step: 'left',
+              type: 'line',
+            },
+          },
+          plotOptions: {
+            series: {
+              animation: false,
+              lineWidth: 3,
+              marker: {
+                lineWidth: 1,
+                radius: 5,
+                symbol: 'circle',
+              },
+              states: {
+                hover: {
+                  lineWidth: 3,
+                },
+              },
+            },
+          },
+          rangeSelector: {
+            enabled: false,
+          },
+          series: [
+            {
+              data: [
+                [expect.any(Number), 0],
+                [expect.any(Number), 100],
+                [expect.any(Number), 100],
+                [expect.any(Number), 100],
+              ],
+              name: 'omegaUp',
+              rank: 0,
+              step: 'right',
+              type: 'line',
+            },
+          ],
+          xAxis: {
+            max: expect.any(Number),
+            min: expect.any(Number),
+            ordinal: false,
+          },
+          yAxis: {
+            max: 200,
+            min: 0,
+            showFirstLabel: false,
+            showLastLabel: true,
+          },
+        }),
+      );
     });
   });
 });
