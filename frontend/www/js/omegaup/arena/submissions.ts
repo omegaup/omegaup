@@ -4,10 +4,9 @@ import * as ui from '../ui';
 import * as time from '../time';
 import { types } from '../api_types';
 import { myRunsStore, runsStore } from './runsStore';
-import { OmegaUp } from '../omegaup';
+import { omegaup, OmegaUp } from '../omegaup';
 import JSZip from 'jszip';
 import type problem_Details from '../components/problem/Details.vue';
-import { omegaup } from '../omegaup';
 import T from '../lang';
 
 interface RunSubmit {
