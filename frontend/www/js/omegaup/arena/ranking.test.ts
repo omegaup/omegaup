@@ -155,7 +155,7 @@ describe('ranking', () => {
     });
 
     it('Should get ranking events for charts', () => {
-      const { currentRanking } = onRankingChanged({
+      const { currentRanking, maxPoints } = onRankingChanged({
         currentUsername: 'omegaUp',
         scoreboard: scoreboard,
         navbarProblems: navbarProblems,
@@ -163,6 +163,7 @@ describe('ranking', () => {
       const params = {
         events: scoreboardEvents,
         currentRanking,
+        maxPoints
         startTimestamp: Date.now() - 10000,
         finishTimestamp: Date.now() + 10000,
       };

@@ -234,6 +234,7 @@ describe('EventsSocket', () => {
       users: [],
       ranking: [],
       currentRanking: { omegaUp: 0 },
+      maxPoints: 300,
     });
     server?.send({
       message: '/scoreboard/update/',
