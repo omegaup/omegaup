@@ -39,7 +39,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
- * @psalm-type ContestDetailsPayload=array{clarifications: list<Clarification>, contest: ContestPublicDetails, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, scoreboard?: Scoreboard, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null, users: list<ContestUser>}
+ * @psalm-type ContestDetailsPayload=array{clarifications: list<Clarification>, contest: ContestPublicDetails, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null, users: list<ContestUser>}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
@@ -713,6 +713,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'scoreboard' => self::getScoreboard(
                         $contest,
                         $problemset,
+                        $r->identity
+                    ),
+                    'scoreboardEvents' => self::getScoreboardEvents(
+                        $contest,
                         $r->identity
                     ),
                 ],
@@ -3516,26 +3520,33 @@ class Contest extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $token = $r->ensureOptionalString('token');
-        $response = self::validateDetails($contestAlias, $r->identity, $token);
+        [
+            'contest' => $contest,
+        ] = self::validateDetails($contestAlias, $r->identity, $token);
 
-        $params = \OmegaUp\ScoreboardParams::fromContest($response['contest']);
+        return [
+            'events' => self::getScoreboardEvents($contest, $r->identity),
+        ];
+    }
+
+    /**
+     * @return list<ScoreboardEvent>
+     */
+    private static function getScoreboardEvents(
+        \OmegaUp\DAO\VO\Contests $contest,
+        ?\OmegaUp\DAO\VO\Identities $identity
+    ) {
+        $params = \OmegaUp\ScoreboardParams::fromContest($contest);
         $params->admin = (
-            !is_null($r->identity) &&
-            \OmegaUp\Authorization::isContestAdmin(
-                $r->identity,
-                $response['contest']
-            ) &&
-            !\OmegaUp\DAO\Contests::isVirtual($response['contest'])
+            !is_null($identity) &&
+            \OmegaUp\Authorization::isContestAdmin($identity, $contest) &&
+            !\OmegaUp\DAO\Contests::isVirtual($contest)
         );
-        $params->show_all_runs = !\OmegaUp\DAO\Contests::isVirtual(
-            $response['contest']
-        );
+        $params->show_all_runs = !\OmegaUp\DAO\Contests::isVirtual($contest);
         $scoreboard = new \OmegaUp\Scoreboard($params);
 
         // Push scoreboard data in response
-        return [
-            'events' => $scoreboard->events(),
-        ];
+        return $scoreboard->events();
     }
 
     /**

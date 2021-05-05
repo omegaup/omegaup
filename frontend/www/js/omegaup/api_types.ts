@@ -1862,6 +1862,7 @@ export namespace types {
     contestAdmin: boolean;
     problems: types.NavbarProblemsetProblem[];
     scoreboard?: types.Scoreboard;
+    scoreboardEvents?: types.ScoreboardEvent[];
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     submissionDeadline?: Date;
     users: types.ContestUser[];
