@@ -2511,6 +2511,7 @@ export namespace types {
     languages: string[];
     letter?: string;
     limits: types.SettingLimits;
+    nextSubmissionTimestamp?: Date;
     order: string;
     points: number;
     preferred_language?: string;

@@ -138,8 +138,14 @@ OmegaUp.on('ready', () => {
             runs,
             code,
             language,
-          }: ActiveProblem & { code: string; language: string }) => {
+            target,
+          }: ActiveProblem & {
+            code: string;
+            language: string;
+            target: Vue & { nextSubmissionTimestamp: Date };
+          }) => {
             api.Run.create({
+              contest_alias: payload.contest.alias,
               problem_alias: problem.alias,
               language: language,
               source: code,
@@ -154,6 +160,8 @@ OmegaUp.on('ready', () => {
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
                 });
+                target.nextSubmissionTimestamp =
+                  response.nextSubmissionTimestamp;
               })
               .catch((run) => {
                 submitRunFailed({

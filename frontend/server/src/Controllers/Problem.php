@@ -25,7 +25,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type ArenaProblemDetails=array{accepts_submissions: bool, alias: string, commit: string, input_limit: int, languages: list<string>, letter?: string, points: float, problem_id?: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>,  settings?: ProblemSettingsDistrib, source?: string, statement?: ProblemStatement, title: string, visibility: int}
  * @psalm-type BestSolvers=array{classname: string, language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}
- * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp: null|\OmegaUp\Timestamp, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
  * @psalm-type ProblemAdmin=array{role: string, username: string}
@@ -2543,7 +2543,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         bool $showSolvers,
         bool $preventProblemsetOpen,
         ?string $contestAlias = null
-    ): ?array {
+    ): array {
         $response = [];
 
         // Get the expected commit version.
@@ -2666,6 +2666,28 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $loggedIdentity,
                 $problemset
             );
+
+            // Get all the available runs done by the current_user
+            $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
+                intval($problem->problem_id),
+                $isPracticeMode ? null : $problemsetId,
+                intval($loggedIdentity->identity_id)
+            );
+
+            // Add each filtered run to an array
+            $results = [];
+            foreach ($runsArray as $run) {
+                $run['alias'] = strval($problem->alias);
+                $run['username'] = strval($loggedIdentity->username);
+                $results[] = $run;
+            }
+            $response['runs'] = $results;
+
+            \OmegaUp\DAO\ProblemViewed::MarkProblemViewed(
+                intval($loggedIdentity->identity_id),
+                intval($problem->problem_id)
+            );
+
             if (!$response['admin'] || $preventProblemsetOpen !== true) {
                 if (is_null($problemset->problemset_id)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
@@ -2681,21 +2703,33 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'problemsetNotFound'
                     );
                 }
-                $isPracticeMode = (
-                    $container instanceof \OmegaUp\DAO\VO\Contests &&
-                    $container->admission_mode !== 'private' &&
-                    $container->finish_time->time < \OmegaUp\Time::get()
-                );
-                if (!$isPracticeMode) {
-                    // Check and save first time access is not needed for
-                    // contests in practice mode
-                    \OmegaUp\DAO\ProblemsetIdentities::checkAndSaveFirstTimeAccess(
-                        $loggedIdentity,
-                        $container,
-                        \OmegaUp\Authorization::canSubmitToProblemset(
+                if ($container instanceof \OmegaUp\DAO\VO\Contests) {
+                    $isPracticeMode = (
+                        $container->admission_mode !== 'private' &&
+                        $container->finish_time->time < \OmegaUp\Time::get()
+                    );
+                    if (!$isPracticeMode) {
+                        // Check and save first time access is not needed for
+                        // contests in practice mode
+                        \OmegaUp\DAO\ProblemsetIdentities::checkAndSaveFirstTimeAccess(
                             $loggedIdentity,
-                            $problemset
-                        )
+                            $container,
+                            \OmegaUp\Authorization::canSubmitToProblemset(
+                                $loggedIdentity,
+                                $problemset
+                            )
+                        );
+                    }
+
+                    $lastRunTime = null;
+
+                    if (($n = count($runsArray)) > 0) {
+                        $lastRun = $runsArray[$n - 1];
+                        $lastRunTime = $lastRun['time'];
+                    }
+                    $response['nextSubmissionTimestamp'] = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
+                        $container,
+                        $lastRunTime
                     );
                 }
             }
@@ -2718,29 +2752,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         } elseif ($showSolvers) {
             $response['solvers'] = \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
-                intval($problem->problem_id)
-            );
-        }
-
-        if (!is_null($loggedIdentity)) {
-            // Get all the available runs done by the current_user
-            $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
-                intval($problem->problem_id),
-                $isPracticeMode ? null : $problemsetId,
-                intval($loggedIdentity->identity_id)
-            );
-
-            // Add each filtered run to an array
-            $results = [];
-            foreach ($runsArray as $run) {
-                $run['alias'] = strval($problem->alias);
-                $run['username'] = strval($loggedIdentity->username);
-                $results[] = $run;
-            }
-            $response['runs'] = $results;
-
-            \OmegaUp\DAO\ProblemViewed::MarkProblemViewed(
-                intval($loggedIdentity->identity_id),
                 intval($problem->problem_id)
             );
         }
