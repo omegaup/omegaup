@@ -394,15 +394,13 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(
             $identity->username
         );
-        if (!is_null($preexistingIdentity)) {
+        if (is_null($preexistingIdentity)) {
+            \OmegaUp\DAO\Identities::create($identity);
+        } else {
             $identity->identity_id = $preexistingIdentity->identity_id;
             $identity->user_id = $preexistingIdentity->user_id;
-            // No need to save the object here since it will be updated a bit
-            // later.
-            return;
         }
-        \OmegaUp\DAO\Identities::create($identity);
-        \OmegaUp\DAO\GroupsIdentities::create(
+        \OmegaUp\DAO\GroupsIdentities::replace(
             new \OmegaUp\DAO\VO\GroupsIdentities([
                 'group_id' => intval($group->group_id),
                 'identity_id' => $identity->identity_id,

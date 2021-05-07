@@ -79,6 +79,7 @@
       <omegaup-arena-scoreboard
         :problems="problems"
         :ranking="ranking"
+        :ranking-chart-options="rankingChartOptions"
         :last-updated="lastUpdated"
         :digits-after-decimal-point="digitsAfterDecimalPoint"
         :show-penalty="showPenalty"
@@ -124,6 +125,7 @@
 </template>
 
 <script lang="ts">
+import * as Highcharts from 'highcharts/highstock';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
@@ -179,6 +181,7 @@ export default class ArenaContest extends Vue {
   @Prop({ default: null }) guid!: null | string;
   @Prop() minirankingUsers!: omegaup.UserRank[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
+  @Prop() rankingChartOptions!: Highcharts.Options;
   @Prop() lastUpdated!: Date;
   @Prop() submissionDeadline!: Date;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;

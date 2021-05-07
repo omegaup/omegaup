@@ -381,6 +381,62 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($courseAlias, $courseClonedData['alias']);
     }
 
+    public function testClonePublicCourseWithEmptyContent() {
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = self::login($admin);
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $admin,
+            $adminLogin,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $courseAliasForClonedCourse = \OmegaUp\Test\Utils::createRandomString();
+
+        $login = self::login($identity);
+        $courseClonedData = \OmegaUp\Controllers\Course::apiClone(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => $courseAliasForClonedCourse,
+                'start_time' => \OmegaUp\Time::get(),
+            ])
+        );
+        [
+            'assignments' => $assignments,
+        ] = \OmegaUp\Controllers\Course::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'alias' => $courseData['course_alias']
+            ])
+        );
+        [
+            'assignments' => $assignmentsForClonedCourse,
+        ] = \OmegaUp\Controllers\Course::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'alias' => $courseAliasForClonedCourse
+            ])
+        );
+        // All the fields should be the same in a cloned course, except
+        // following ones
+        foreach ($assignments as &$assignment) {
+            unset($assignment['problemset_id']);
+            unset($assignment['scoreboard_url']);
+            unset($assignment['scoreboard_url_admin']);
+        }
+        foreach ($assignmentsForClonedCourse as &$assignment) {
+            unset($assignment['problemset_id']);
+            unset($assignment['scoreboard_url']);
+            unset($assignment['scoreboard_url_admin']);
+        }
+
+        $this->assertEquals($assignments, $assignmentsForClonedCourse);
+    }
+
     private function createCourseWithCloneToken(int $creationTime = (2 * 60)) {
         ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
         $adminLogin = self::login($admin);
