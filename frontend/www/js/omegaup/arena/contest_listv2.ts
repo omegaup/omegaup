@@ -6,7 +6,7 @@ import arena_ContestList from '../components/arena/ContestListv2.vue';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
-  const payload = types.payloadParsers.ContestListPayload();
+  const payload = types.payloadParsers.ContestListv2Payload();
   new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contestlist': arena_ContestList },
