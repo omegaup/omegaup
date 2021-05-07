@@ -72,10 +72,12 @@ describe('ContestListv2.vue', () => {
       },
     });
 
-    const span = wrapper.find('span');
-    expect(span.exists()).toBe(true);
+    const currentContestTab = wrapper.findComponent({
+      ref: 'currentContestTab',
+    });
 
-    expect(span.text()).toContain('Current Contest 1');
+    expect(currentContestTab.exists()).toBe(true);
+    expect(currentContestTab.text()).toContain('Current Contest 1');
   });
 
   it('Should show the future contest list', async () => {
@@ -85,10 +87,12 @@ describe('ContestListv2.vue', () => {
       },
     });
 
-    const span = wrapper.find('span');
-    expect(span.exists()).toBe(true);
+    const futureContestTab = wrapper.findComponent({
+      ref: 'futureContestTab',
+    });
 
-    expect(span.text()).toContain('Future Contest 1');
+    expect(futureContestTab.exists()).toBe(true);
+    expect(futureContestTab.text()).toContain('Future Contest 1');
   });
 
   it('Should show the past contest list', async () => {
@@ -98,9 +102,11 @@ describe('ContestListv2.vue', () => {
       },
     });
 
-    const span = wrapper.find('span');
-    expect(span.exists()).toBe(true);
+    const pastContestTab = wrapper.findComponent({
+      ref: 'pastContestTab',
+    });
 
-    expect(span.text()).toContain('Past Contest 1');
+    expect(pastContestTab.exists()).toBe(true);
+    expect(pastContestTab.text()).toContain('Past Contest 1');
   });
 });
