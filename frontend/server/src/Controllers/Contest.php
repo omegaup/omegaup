@@ -953,6 +953,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * @return array{smartyProperties: array{payload: ContestListv2Payload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     * @omegaup-request-param string $query
      */
     public static function getContestListDetailsv2ForTypeScript(
         \OmegaUp\Request $r
