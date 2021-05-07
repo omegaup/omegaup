@@ -8,8 +8,8 @@ import arena_ContestList from './ContestListv2.vue';
 describe('ContestListv2.vue', () => {
   const daySeconds = 24 * 60 * 60 * 1000;
   const today = new Date();
-  const yesterday = new Date(Date.now() - daySeconds);
-  const tomorrow = new Date(Date.now() + daySeconds);
+  const yesterday = new Date(today.getTime() - daySeconds);
+  const tomorrow = new Date(today.getTime() + daySeconds);
 
   const contests: types.ContestList = {
     current: [
