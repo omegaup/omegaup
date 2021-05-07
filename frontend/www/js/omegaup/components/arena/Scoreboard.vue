@@ -3,6 +3,10 @@
     <!-- id-lint off -->
     <div id="ranking-chart"></div>
     <!-- id-lint on -->
+    <highcharts
+      v-if="rankingChartOptions"
+      :options="rankingChartOptions"
+    ></highcharts>
     <label v-if="showInvitedUsersFilter">
       <input
         v-model="onlyShowExplicitlyInvited"
@@ -84,16 +88,23 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
+import * as Highcharts from 'highcharts/highstock';
+import { Chart } from 'highcharts-vue';
 import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 
-@Component
+@Component({
+  components: {
+    highcharts: Chart,
+  },
+})
 export default class ArenaScoreboard extends Vue {
   @Prop({ default: 10 }) numberOfPositions!: number;
   @Prop() problems!: omegaup.Problem[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
+  @Prop() rankingChartOptions!: Highcharts.Options | null;
   @Prop() lastUpdated!: Date;
   @Prop({ default: true }) showInvitedUsersFilter!: boolean;
   @Prop({ default: true }) showPenalty!: boolean;
