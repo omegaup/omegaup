@@ -243,24 +243,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return list<ContestListItem>
-     */
-    public static function getContestList2() {
-        $contests = \OmegaUp\DAO\Contests::getCurrentContests();
-
-        $addedContests = [];
-        foreach ($contests as $contestInfo) {
-            $contestInfo['duration'] = (is_null($contestInfo['window_length']) ?
-                $contestInfo['finish_time']->time - $contestInfo['start_time']->time :
-                ($contestInfo['window_length'] * 60)
-            );
-
-            $addedContests[] = $contestInfo;
-        }
-        return $addedContests;
-    }
-
-    /**
      * Returns a list of contests where current user has admin rights (or is
      * the director).
      *
@@ -972,7 +954,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{smartyProperties: array{payload: ContestListPayload2, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getContestListDetailsForTypeScript2(
+    public static function getContestListDetailsv2ForTypeScript(
         \OmegaUp\Request $r
     ) {
         try {
@@ -982,22 +964,57 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->identity = null;
         }
 
-        $contests = [];
-        $contests['current'] = self::getContestList2();
-        $contests['future'] = self::getContestList2();
-        $contests['past'] = self::getContestList2();
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('page_size');
+
+        $page = (isset($r['page']) ? intval($r['page']) : 1);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 100);
+
+        \OmegaUp\Validators::validateStringOfLengthInRange(
+            $r['query'],
+            'query',
+            /*$minLength=*/ 0,
+            /*$maxLength=*/ 256,
+            /*$required=*/ false
+        );
+
+        $contests = [
+            'current' => self::getContestList(
+                $r->identity,
+                $r['query'],
+                $page,
+                $pageSize,
+                \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
+                \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+            ),
+            'future' => self::getContestList(
+                $r->identity,
+                $r['query'],
+                $page,
+                $pageSize,
+                \OmegaUp\DAO\Enum\ActiveStatus::FUTURE,
+                \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+            ),
+            'past' => self::getContestList(
+                $r->identity,
+                $r['query'],
+                $page,
+                $pageSize,
+                \OmegaUp\DAO\Enum\ActiveStatus::PAST,
+                \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+            )
+        ];
 
         return [
             'smartyProperties' => [
                 'payload' => [
-                    'isLogged' => !is_null($r->identity),
                     'contests' => $contests,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleContestList'
                 ),
             ],
-            'entrypoint' => 'arena_contest_list2',
+            'entrypoint' => 'arena_contest_listv2',
         ];
     }
 
