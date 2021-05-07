@@ -721,7 +721,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
             // TODO: Replace next lines with: $result['entrypoint'] = 'arena_contest_contestant';
             // when arena contest migration is over
-            $result['entrypoint'] = 'arena_contest_contestant';
+            $result['template'] = 'arena.contest.contestant.tpl';
+            unset($result['entrypoint']);
             return $result;
         }
         $result['smartyProperties']['payload']['needsBasicInformation'] = false;
