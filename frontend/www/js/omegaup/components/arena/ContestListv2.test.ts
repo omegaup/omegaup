@@ -35,9 +35,9 @@ describe('ContestListv2.vue', () => {
         alias: 'Future-Contest-1',
         description: 'hello contest 1',
         contest_id: 1,
-        finish_time: new Date(tomorrow.getTime() +  daySeconds),
+        finish_time: new Date(tomorrow.getTime() + daySeconds),
         last_updated: today,
-        original_finish_time: new Date(tomorrow.getTime() +  daySeconds),
+        original_finish_time: new Date(tomorrow.getTime() + daySeconds),
         problemset_id: 1,
         recommended: false,
         rerun_id: 0,
@@ -62,7 +62,7 @@ describe('ContestListv2.vue', () => {
         title: 'Past Contest 1',
         window_length: 300,
       },
-    ]
+    ],
   };
 
   it('Should show the current contest list', async () => {
