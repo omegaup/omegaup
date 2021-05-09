@@ -3,6 +3,7 @@
     :active-tab="activeTab"
     :contest-title="contest.title"
     :is-admin="isAdmin"
+    :clarifications="currentClarifications"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #socket-status>
@@ -50,6 +51,7 @@
           <div v-else class="problem main">
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
+              :next-submission-timestamp="nextSubmissionTimestamp"
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="activeProblem.runs"
@@ -79,6 +81,7 @@
       <omegaup-arena-scoreboard
         :problems="problems"
         :ranking="ranking"
+        :ranking-chart-options="rankingChartOptions"
         :last-updated="lastUpdated"
         :digits-after-decimal-point="digitsAfterDecimalPoint"
         :show-penalty="showPenalty"
@@ -124,6 +127,7 @@
 </template>
 
 <script lang="ts">
+import * as Highcharts from 'highcharts/highstock';
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
@@ -179,6 +183,7 @@ export default class ArenaContest extends Vue {
   @Prop({ default: null }) guid!: null | string;
   @Prop() minirankingUsers!: omegaup.UserRank[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
+  @Prop() rankingChartOptions!: Highcharts.Options;
   @Prop() lastUpdated!: Date;
   @Prop() submissionDeadline!: Date;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
@@ -191,6 +196,7 @@ export default class ArenaContest extends Vue {
   currentClarifications = this.clarifications;
   activeProblem: ActiveProblem | null = this.problem;
   shouldShowRunDetails = false;
+  nextSubmissionTimestamp: Date | null = null;
   now = new Date();
 
   get socketIcon(): string {
@@ -224,8 +230,12 @@ export default class ArenaContest extends Vue {
     this.$emit('navigate-to-problem', request);
   }
 
-  onRunSubmitted(run: { code: string; language: string }): void {
-    this.$emit('submit-run', { ...run, ...this.activeProblem });
+  onRunSubmitted(request: { code: string; language: string }): void {
+    this.$emit('submit-run', {
+      ...request,
+      ...this.activeProblem,
+      target: this,
+    });
   }
 
   @Watch('problem')
@@ -235,6 +245,14 @@ export default class ArenaContest extends Vue {
       return;
     }
     this.onNavigateToProblem(newValue);
+  }
+
+  @Watch('problemInfo')
+  onProblemInfoChanged(newValue: types.ProblemInfo | null): void {
+    if (!newValue) {
+      return;
+    }
+    this.nextSubmissionTimestamp = newValue.nextSubmissionTimestamp ?? null;
   }
 
   @Watch('clarifications')

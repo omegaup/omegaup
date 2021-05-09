@@ -297,7 +297,7 @@ export class Arena {
 
   summaryView: Vue & { contest: omegaup.Contest };
 
-  rankingChart: Highcharts.Chart | null = null;
+  rankingChart: Highcharts.StockChart | null = null;
 
   constructor(options: ArenaOptions) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -1350,7 +1350,7 @@ export class Arena {
         navigator: {
           series: {
             type: 'line',
-            step: true,
+            step: 'right',
             lineWidth: 3,
             lineColor: '#333',
             data: navigatorSeries,
@@ -1360,7 +1360,7 @@ export class Arena {
         rangeSelector: { enabled: false },
 
         series: series,
-      } as Highcharts.Options,
+      },
     );
   }
 

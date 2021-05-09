@@ -37,7 +37,7 @@ OmegaUp.on('ready', () => {
 
   let ranking: types.ScoreboardRankingEntry[];
   let users: omegaup.UserRank[];
-  let currentRanking: { [username: string]: number };
+  let rankingChartOptions: Highcharts.Options | null = null;
   if (payload.scoreboard && payload.scoreboardEvents) {
     const rankingInfo = onRankingChanged({
       scoreboard: payload.scoreboard,
@@ -46,18 +46,27 @@ OmegaUp.on('ready', () => {
     });
     ranking = rankingInfo.ranking;
     users = rankingInfo.users;
-    currentRanking = rankingInfo.currentRanking;
 
+    const startTimestamp = payload.contest.start_time.getTime();
+    const finishTimestamp = Math.min(
+      payload.contest.finish_time?.getTime() || Infinity,
+      Date.now(),
+    );
     const { series, navigatorData } = onRankingEvents({
       events: payload.scoreboardEvents,
-      currentRanking,
-      startTimestamp: payload.contest.start_time.getTime(),
-      finishTimestamp: Math.min(
-        payload.contest.finish_time.getTime(),
-        Date.now(),
-      ),
+      currentRanking: rankingInfo.currentRanking,
+      startTimestamp,
+      finishTimestamp,
     });
-    createChart({ series, navigatorData });
+    if (series.length) {
+      rankingChartOptions = createChart({
+        series,
+        navigatorData,
+        startTimestamp,
+        finishTimestamp,
+        maxPoints: rankingInfo.maxPoints,
+      });
+    }
   }
 
   const contestContestant = new Vue({
@@ -72,6 +81,7 @@ OmegaUp.on('ready', () => {
       guid: null as null | string,
       problemAlias: null as null | string,
       ranking,
+      rankingChartOptions,
       users,
       lastUpdated: new Date(0),
       digitsAfterDecimalPoint: 2,
@@ -94,6 +104,7 @@ OmegaUp.on('ready', () => {
           problemAlias: this.problemAlias,
           minirankingUsers: this.users,
           ranking: this.ranking,
+          rankingChartOptions: this.rankingChartOptions,
           lastUpdated: this.lastUpdated,
           digitsAfterDecimalPoint: this.digitsAfterDecimalPoint,
           showPenalty: this.showPenalty,
@@ -127,8 +138,14 @@ OmegaUp.on('ready', () => {
             runs,
             code,
             language,
-          }: ActiveProblem & { code: string; language: string }) => {
+            target,
+          }: ActiveProblem & {
+            code: string;
+            language: string;
+            target: Vue & { nextSubmissionTimestamp: Date };
+          }) => {
             api.Run.create({
+              contest_alias: payload.contest.alias,
               problem_alias: problem.alias,
               language: language,
               source: code,
@@ -143,6 +160,8 @@ OmegaUp.on('ready', () => {
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
                 });
+                target.nextSubmissionTimestamp =
+                  response.nextSubmissionTimestamp;
               })
               .catch((run) => {
                 submitRunFailed({
