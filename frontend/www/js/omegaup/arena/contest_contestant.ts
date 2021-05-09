@@ -24,6 +24,8 @@ import {
   submitRunFailed,
 } from './submissions';
 import { createChart, onRankingChanged, onRankingEvents } from './ranking';
+import { EventsSocket } from './events_socket';
+import rankingStore from './rankingStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -46,6 +48,8 @@ OmegaUp.on('ready', () => {
     });
     ranking = rankingInfo.ranking;
     users = rankingInfo.users;
+    rankingStore.commit('updateRanking', ranking);
+    rankingStore.commit('updateMinirankingUsers', users);
 
     const startTimestamp = payload.contest.start_time.getTime();
     const finishTimestamp = Math.min(
@@ -66,6 +70,7 @@ OmegaUp.on('ready', () => {
         finishTimestamp,
         maxPoints: rankingInfo.maxPoints,
       });
+      rankingStore.commit('updateRankingChartOptions', rankingChartOptions);
     }
   }
 
@@ -80,9 +85,6 @@ OmegaUp.on('ready', () => {
       showNewClarificationPopup: false,
       guid: null as null | string,
       problemAlias: null as null | string,
-      ranking,
-      rankingChartOptions,
-      users,
       lastUpdated: new Date(0),
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
@@ -102,9 +104,9 @@ OmegaUp.on('ready', () => {
           activeTab,
           guid: this.guid,
           problemAlias: this.problemAlias,
-          minirankingUsers: this.users,
-          ranking: this.ranking,
-          rankingChartOptions: this.rankingChartOptions,
+          minirankingUsers: rankingStore.state.minirankingUsers,
+          ranking: rankingStore.state.ranking,
+          rankingChartOptions: rankingStore.state.rankingChartOptions,
           lastUpdated: this.lastUpdated,
           digitsAfterDecimalPoint: this.digitsAfterDecimalPoint,
           showPenalty: this.showPenalty,
@@ -223,6 +225,21 @@ OmegaUp.on('ready', () => {
     contestContestant,
     getOptionsFromLocation(window.location.hash),
   );
+
+  const socket = new EventsSocket({
+    disableSockets: false,
+    problemsetAlias: payload.contest.alias,
+    locationProtocol: window.location.protocol,
+    locationHost: window.location.host,
+    problemsetId: payload.contest.problemset_id,
+    scoreboardToken: null,
+    clarificationsOffset: 1,
+    clarificationsRowcount: 30,
+    navbarProblems: payload.problems,
+    currentUsername: commonPayload.currentUsername,
+    intervalInMilliseconds: 5 * 60 * 1000,
+  });
+  socket.connect();
 
   setInterval(() => {
     refreshContestClarifications({

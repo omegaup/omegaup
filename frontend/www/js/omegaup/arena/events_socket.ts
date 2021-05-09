@@ -9,6 +9,7 @@ import clarificationStore from './clarificationsStore';
 import { onRankingChanged, onRankingEvents } from './ranking';
 import { updateRun } from './submissions';
 import { types } from '../api_types';
+import rankingStore from './rankingStore';
 
 export enum SocketStatus {
   Waiting = '↻',
@@ -103,11 +104,13 @@ export class EventsSocket {
         virtualRankingChange(data.scoreboard);
         return;
       }*/
-      const { currentRanking } = onRankingChanged({
+      const { currentRanking, ranking, users } = onRankingChanged({
         scoreboard: data.scoreboard,
         currentUsername: this.currentUsername,
         navbarProblems: this.navbarProblems,
       });
+      rankingStore.commit('updateRanking', ranking);
+      rankingStore.commit('updateMinirankingUsers', users);
 
       api.Problemset.scoreboardEvents({
         problemset_id: this.problemsetId,

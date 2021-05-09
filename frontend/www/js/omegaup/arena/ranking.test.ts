@@ -1,6 +1,7 @@
 jest.mock('../../../third_party/js/diff_match_patch.js');
 
 import { types } from '../api_types';
+import T from '../lang';
 import {
   onRankingChanged,
   onRankingEvents,
@@ -276,16 +277,23 @@ describe('ranking', () => {
               type: 'line',
             },
           ],
+          title: {
+            text: T.wordsSubmissions,
+          },
           xAxis: {
             max: expect.any(Number),
             min: expect.any(Number),
             ordinal: false,
+            type: 'datetime',
           },
           yAxis: {
             max: 200,
             min: 0,
             showFirstLabel: false,
             showLastLabel: true,
+            title: {
+              text: T.wordsSubmissions,
+            },
           },
         }),
       );
