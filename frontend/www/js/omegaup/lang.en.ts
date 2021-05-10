@@ -1134,6 +1134,7 @@ const translations: { [key: string]: string; } = {
   schoolsOfTheMonthCandidates: "Candidates to School of the Month",
   schoolsOfTheMonthRank: "Top 100 schools of previous month",
   schoolsStartUsingCourses: "Start using Courses",
+  scoreboardLastUpdated: "Last time updated: %(datetime)",
   scoreboardShowOnlyInvitedIdentities: "Show invited contestants only",
   searchUser: "Search user",
   selectProblemLevelDesc: "In order to add the problem, you must to choose its corresponding level",

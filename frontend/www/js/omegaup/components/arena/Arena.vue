@@ -114,6 +114,11 @@ export default class Arena extends Vue {
 .practice {
   background: var(--arena-practice-background-color) url(/media/gradient.png)
     repeat-x 0 0 !important;
+
+  .nav-tabs .nav-link {
+    background-color: var(--arena-contest-navtabs-link-background-color);
+    border-top-color: var(--arena-contest-navtabs-link-border-top-color);
+  }
 }
 
 [data-arena-wrapper] {
@@ -133,11 +138,6 @@ export default class Arena extends Vue {
 .clock {
   font-size: 3em;
   line-height: 0.4em;
-}
-
-.nav-tabs .nav-link {
-  background-color: var(--arena-contest-navtabs-link-background-color);
-  border-top-color: var(--arena-contest-navtabs-link-border-top-color);
 }
 
 .navleft {

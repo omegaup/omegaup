@@ -33,7 +33,7 @@
               @navigate-to-problem="onNavigateToProblem"
             ></omegaup-arena-navbar-problems>
             <omegaup-arena-navbar-miniranking
-              :users="minirankingUsers"
+              :users="miniRankingUsers"
               :show-ranking="true"
             ></omegaup-arena-navbar-miniranking>
           </div>
@@ -181,7 +181,7 @@ export default class ArenaContest extends Vue {
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
   @Prop({ default: null }) guid!: null | string;
-  @Prop() minirankingUsers!: omegaup.UserRank[];
+  @Prop() miniRankingUsers!: omegaup.UserRank[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
   @Prop() rankingChartOptions!: Highcharts.Options;
   @Prop() lastUpdated!: Date;

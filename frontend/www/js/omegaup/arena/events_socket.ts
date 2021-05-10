@@ -104,13 +104,19 @@ export class EventsSocket {
         virtualRankingChange(data.scoreboard);
         return;
       }*/
-      const { currentRanking, ranking, users } = onRankingChanged({
+      const {
+        currentRanking,
+        ranking,
+        users,
+        lastTimeUpdated,
+      } = onRankingChanged({
         scoreboard: data.scoreboard,
         currentUsername: this.currentUsername,
         navbarProblems: this.navbarProblems,
       });
       rankingStore.commit('updateRanking', ranking);
       rankingStore.commit('updateMinirankingUsers', users);
+      rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
 
       api.Problemset.scoreboardEvents({
         problemset_id: this.problemsetId,

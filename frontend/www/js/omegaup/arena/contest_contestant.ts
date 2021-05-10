@@ -34,12 +34,12 @@ OmegaUp.on('ready', () => {
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
-
   trackClarifications(payload.clarifications);
 
   let ranking: types.ScoreboardRankingEntry[];
   let users: omegaup.UserRank[];
   let rankingChartOptions: Highcharts.Options | null = null;
+  let lastTimeUpdated: null | Date;
   if (payload.scoreboard && payload.scoreboardEvents) {
     const rankingInfo = onRankingChanged({
       scoreboard: payload.scoreboard,
@@ -48,8 +48,10 @@ OmegaUp.on('ready', () => {
     });
     ranking = rankingInfo.ranking;
     users = rankingInfo.users;
+    lastTimeUpdated = rankingInfo.lastTimeUpdated;
     rankingStore.commit('updateRanking', ranking);
     rankingStore.commit('updateMinirankingUsers', users);
+    rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
 
     const startTimestamp = payload.contest.start_time.getTime();
     const finishTimestamp = Math.min(
@@ -85,7 +87,6 @@ OmegaUp.on('ready', () => {
       showNewClarificationPopup: false,
       guid: null as null | string,
       problemAlias: null as null | string,
-      lastUpdated: new Date(0),
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
     }),
@@ -104,10 +105,10 @@ OmegaUp.on('ready', () => {
           activeTab,
           guid: this.guid,
           problemAlias: this.problemAlias,
-          minirankingUsers: rankingStore.state.minirankingUsers,
+          miniRankingUsers: rankingStore.state.miniRankingUsers,
           ranking: rankingStore.state.ranking,
           rankingChartOptions: rankingStore.state.rankingChartOptions,
-          lastUpdated: this.lastUpdated,
+          lastUpdated: rankingStore.state.lastTimeUpdated,
           digitsAfterDecimalPoint: this.digitsAfterDecimalPoint,
           showPenalty: this.showPenalty,
         },

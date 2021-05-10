@@ -1134,6 +1134,7 @@ const translations: { [key: string]: string; } = {
   schoolsOfTheMonthCandidates: "(Candida735 70 Sch001 0f 7h3 M0n7h)",
   schoolsOfTheMonthRank: "(T0p 100 5ch0015 0f pr3vi0u5 m0n7h)",
   schoolsStartUsingCourses: "(S7ar7 u5ing C0ur535)",
+  scoreboardLastUpdated: "(La57 7im3 upda73d: %(datetime))",
   scoreboardShowOnlyInvitedIdentities: "(Sh0w invi73d c0n7357an75 0n1y)",
   searchUser: "(S3arch u53r)",
   selectProblemLevelDesc: "(In 0rd3r 70 add 7h3 pr0b13m, y0u mu57 70 ch0053 i75 c0rr35p0nding 13v31)",

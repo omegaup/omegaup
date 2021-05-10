@@ -6,18 +6,21 @@ import { omegaup } from '../omegaup';
 Vue.use(Vuex);
 
 export interface RankingState {
-  minirankingUsers: omegaup.UserRank[];
+  miniRankingUsers: omegaup.UserRank[];
 
   ranking: types.ScoreboardRankingEntry[];
 
   rankingChartOptions: Highcharts.Options;
+
+  lastTimeUpdated: null | Date;
 }
 
 export const rankingStoreConfig = {
   state: {
-    minirankingUsers: [],
+    miniRankingUsers: [],
     ranking: [],
     rankingChartOptions: {},
+    lastTimeUpdated: null,
   },
   mutations: {
     updateMinirankingUsers(
@@ -37,6 +40,9 @@ export const rankingStoreConfig = {
       rankingChartOptions: Highcharts.Options,
     ) {
       Vue.set(state, 'rankingChartOptions', rankingChartOptions);
+    },
+    updateLastTimeUpdated(state: RankingState, lastTimeUpdated: Date) {
+      Vue.set(state, 'lastTimeUpdated', lastTimeUpdated);
     },
   },
 };
