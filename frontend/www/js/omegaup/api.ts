@@ -1279,6 +1279,10 @@ export const Problem = {
     messages.ProblemDetailsResponse
   >('/api/problem/details/', (x) => {
     x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date);
+    if (x.nextSubmissionTimestamp)
+      x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
+        x.nextSubmissionTimestamp,
+      );
     if (x.problemsetter)
       x.problemsetter = ((x) => {
         if (x.creation_date)
