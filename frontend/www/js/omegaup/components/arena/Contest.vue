@@ -30,7 +30,7 @@
               :problems="problems"
               :active-problem="activeProblemAlias"
               :in-assignment="false"
-              :digits-after-decimal-point="contest.partialScore ? 2 : 0"
+              :digits-after-decimal-point="contest.partial_score ? digitsAfterDecimalPoint : 0"
               @disable-active-problem="activeProblem = null"
               @navigate-to-problem="onNavigateToProblem"
             ></omegaup-arena-navbar-problems>
