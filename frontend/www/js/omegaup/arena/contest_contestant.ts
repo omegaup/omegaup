@@ -5,7 +5,6 @@ import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
 import arena_Contest from '../components/arena/Contest.vue';
-import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { getOptionsFromLocation } from './location';
 import {
@@ -24,6 +23,7 @@ import {
   submitRunFailed,
 } from './submissions';
 import { createChart, onRankingChanged, onRankingEvents } from './ranking';
+import { myRunsStore } from './runsStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -74,7 +74,7 @@ OmegaUp.on('ready', () => {
     components: { 'omegaup-arena-contest': arena_Contest },
     data: () => ({
       problemInfo: null as types.ProblemInfo | null,
-      problem: null as ActiveProblem | null,
+      problem: null as types.NavbarProblemsetProblem | null,
       problems: payload.problems as types.NavbarProblemsetProblem[],
       popupDisplayed: PopupDisplayed.None,
       showNewClarificationPopup: false,
@@ -108,13 +108,17 @@ OmegaUp.on('ready', () => {
           lastUpdated: this.lastUpdated,
           digitsAfterDecimalPoint: this.digitsAfterDecimalPoint,
           showPenalty: this.showPenalty,
+          runs: myRunsStore.state.runs,
         },
         on: {
-          'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
+          'navigate-to-problem': ({
+            problem,
+          }: {
+            problem: types.NavbarProblemsetProblem;
+          }) => {
             navigateToProblem({
               type: NavigationType.ForContest,
               problem,
-              runs,
               target: contestContestant,
               problems: this.problems,
               contestAlias: payload.contest.alias,
@@ -135,11 +139,11 @@ OmegaUp.on('ready', () => {
           },
           'submit-run': ({
             problem,
-            runs,
             code,
             language,
             target,
-          }: ActiveProblem & {
+          }: {
+            problem: types.NavbarProblemsetProblem;
             code: string;
             language: string;
             target: Vue & { nextSubmissionTimestamp: Date };
@@ -152,7 +156,6 @@ OmegaUp.on('ready', () => {
             })
               .then((response) => {
                 submitRun({
-                  runs,
                   guid: response.guid,
                   submitDelay: response.submit_delay,
                   language,

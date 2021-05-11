@@ -54,7 +54,7 @@
               :next-submission-timestamp="nextSubmissionTimestamp"
               :problem="problemInfo"
               :active-tab="'problems'"
-              :runs="activeProblem.runs"
+              :runs="runs"
               :popup-displayed="popupDisplayed"
               :guid="guid"
               :should-show-run-details="shouldShowRunDetails"
@@ -64,7 +64,7 @@
                 (selectedTab) =>
                   $emit('reset-hash', {
                     selectedTab,
-                    alias: activeProblem.problem.alias,
+                    alias: activeProblemAlias,
                   })
               "
               @submit-run="onRunSubmitted"
@@ -144,11 +144,6 @@ import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { omegaup } from '../../omegaup';
 import { ContestClarificationType } from '../../arena/clarifications';
 
-export interface ActiveProblem {
-  runs: types.Run[];
-  problem: types.NavbarProblemsetProblem;
-}
-
 @Component({
   components: {
     'omegaup-arena-clarification-list': arena_ClarificationList,
@@ -167,7 +162,7 @@ export default class ArenaContest extends Vue {
   @Prop() contestAdmin!: boolean;
   @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
-  @Prop({ default: null }) problem!: ActiveProblem | null;
+  @Prop({ default: null }) problem!: types.NavbarProblemsetProblem | null;
   @Prop() problemInfo!: types.ProblemInfo;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop({ default: false }) isEphemeralExperimentEnabled!: boolean;
@@ -189,12 +184,13 @@ export default class ArenaContest extends Vue {
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   @Prop({ default: true }) showPenalty!: boolean;
   @Prop({ default: true }) socketConnected!: boolean;
+  @Prop() runs!: types.Run[];
 
   T = T;
   ui = ui;
   ContestClarificationType = ContestClarificationType;
   currentClarifications = this.clarifications;
-  activeProblem: ActiveProblem | null = this.problem;
+  activeProblem: types.NavbarProblemsetProblem | null = this.problem;
   shouldShowRunDetails = false;
   nextSubmissionTimestamp: Date | null = null;
   now = new Date();
@@ -210,7 +206,7 @@ export default class ArenaContest extends Vue {
   }
 
   get activeProblemAlias(): null | string {
-    return this.activeProblem?.problem.alias ?? null;
+    return this.activeProblem?.alias ?? null;
   }
 
   get deadline(): Date {
@@ -225,21 +221,21 @@ export default class ArenaContest extends Vue {
     return `/arena/${this.contest.alias}/practice/`;
   }
 
-  onNavigateToProblem(request: ActiveProblem) {
-    this.activeProblem = request;
-    this.$emit('navigate-to-problem', request);
+  onNavigateToProblem(problem: types.NavbarProblemsetProblem) {
+    this.activeProblem = problem;
+    this.$emit('navigate-to-problem', { problem });
   }
 
   onRunSubmitted(request: { code: string; language: string }): void {
     this.$emit('submit-run', {
       ...request,
-      ...this.activeProblem,
+      ...{ problem: this.activeProblem },
       target: this,
     });
   }
 
   @Watch('problem')
-  onActiveProblemChanged(newValue: ActiveProblem | null): void {
+  onActiveProblemChanged(newValue: types.NavbarProblemsetProblem | null): void {
     if (!newValue) {
       this.activeProblem = null;
       return;
