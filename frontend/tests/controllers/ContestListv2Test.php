@@ -7,40 +7,161 @@
  */
 
 class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
-    public function testPublicCurrentContestList() {
-        $secondsDay = 24 * 60  * 60;
-        $now = time();
-        $yesterday = $now - $secondsDay;
-        $tomorrow = $now + $secondsDay;
+    private const ADMISSION_MODES = [
+        'public',
+        'private'
+    ];
+
+    private const TIMES = [
+        'current',
+        'future',
+        'past'
+    ];
+
+    private const SECONDS_PER_DAY = 24 * 60  * 60;
+
+    /**
+     * Creates six kinds of contests {public, private} x {current, future, past}.
+     *
+     * @return array{contestData: array{current: list<array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>, future: list<array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>, past: list<array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>}, invitedUserIdentity: \OmegaUp\DAO\VO\Identities}
+     */
+    private function createContests(): array {
+        $contestData = [];
+        $now = \OmegaUp\Time::get();
+        $yesterday = $now - self::SECONDS_PER_DAY;
+        $beforeYesterday = $yesterday - self::SECONDS_PER_DAY;
+        $tomorrow = $now + self::SECONDS_PER_DAY;
+        $afterTomorrow = $tomorrow + self::SECONDS_PER_DAY;
+
+        $intervals = [
+            'current' => [
+                'startTime'     => $yesterday,
+                'finishTime'    => $tomorrow
+            ],
+            'future' => [
+                'startTime'     => $tomorrow,
+                'finishTime'    => $afterTomorrow
+            ],
+            'past' => [
+                'startTime'     => $beforeYesterday,
+                'finishTime'    => $yesterday
+            ],
+        ];
+
+        // Create user that will be invited
+        ['identity' => $invitedUserIdentity] = \OmegaUp\Test\Factories\User::createUser();
+
+        foreach (self::TIMES as $time) {
+            $contestData[$time] = [];
+
+            foreach (self::ADMISSION_MODES as $admissionMode) {
+                // Create contests
+                $individualContestData = \OmegaUp\Test\Factories\Contest::createContest(
+                    new \OmegaUp\Test\Factories\ContestParams([
+                        'admissionMode' => $admissionMode,
+                        'startTime' => new \OmegaUp\Timestamp(
+                            $intervals[$time]['startTime']
+                        ),
+                        'finishTime' => new \OmegaUp\Timestamp(
+                            $intervals[$time]['finishTime']
+                        ),
+                        'requestsUserInformation' => 'optional',
+                    ])
+                );
+
+                if ($admissionMode === 'private') {
+                    // Add user to the private contest
+                    \OmegaUp\Test\Factories\Contest::addUser(
+                        $individualContestData,
+                        $invitedUserIdentity
+                    );
+                }
+
+                $contestData[$time][] = $individualContestData;
+            }
+        }
+
+        return [
+            'contestData' => $contestData,
+            'invitedUserIdentity' => $invitedUserIdentity,
+        ];
+    }
+
+    /**
+     * Extracts only the information about the "contest" model and also can filter by admission mode.
+     *
+     * @param array{current: list<array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>, future: list<array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>, past: list<array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>} $contestData
+     * @param string|null $admissionMode
+     *
+     * @return array{current: list<\OmegaUp\DAO\VO\Contests|null>, future: list<\OmegaUp\DAO\VO\Contests|null>, past: list<\OmegaUp\DAO\VO\Contests|null>}
+     */
+    private function extractContests(
+        array $contestData,
+        string $admissionMode = null
+    ): array {
         $contests = [];
 
-        // Create public contests
-        for ($i = 0; $i < 2; ++$i) {
-            $contests[] = \OmegaUp\Test\Factories\Contest::createContest(
-                new \OmegaUp\Test\Factories\ContestParams([
-                    'admissionMode' => 'public',
-                    'startTime' => new \OmegaUp\Timestamp($yesterday),
-                    'finishTime' => new \OmegaUp\Timestamp($tomorrow),
-                    'requestsUserInformation' => 'optional',
-                ])
-            )['contest'];
+        foreach (self::TIMES as $time) {
+            $contests[$time] = [];
+
+            foreach ($contestData[$time] as $data) {
+                if (
+                    ! is_null(
+                        $admissionMode
+                    ) and $data['contest']->admission_mode !== $admissionMode
+                ) {
+                    continue;
+                }
+
+                $contests[$time][] = $data['contest'];
+            }
         }
+
+        return $contests;
+    }
+
+    /**
+     * Extracts only the aliases from the contests.
+     *
+     * @param array{current: list<\OmegaUp\DAO\VO\Contests|null>, future: list<\OmegaUp\DAO\VO\Contests|null>, past: list<\OmegaUp\DAO\VO\Contests|null>}>} $contests
+     *
+     * @return array{current: list<string>, future: list<string>, past: list<string>}
+     */
+    private function extractAliases(array $contests): array {
+        $aliases = [];
+
+        foreach (self::TIMES as $time) {
+            $aliases[$time] = [];
+
+            foreach ($contests[$time] as $contest) {
+                $aliases[$time][] = isset(
+                    $contest->alias
+                ) ? $contest->alias : $contest['alias'];
+            }
+
+            // This is important to have the same order
+            sort($aliases[$time]);
+        }
+
+        return $aliases;
+    }
+
+    public function testPublicContestsNotLoggedIn() {
+        [
+            'contestData' => $contestData,
+            'invitedUserIdentity' => $invitedUserIdentity,
+        ] = $this->createContests();
 
         $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
             new \OmegaUp\Request()
         )['smartyProperties']['payload'];
 
-        $contestListPayloadAliases = array_map(
-            fn ($contest) => $contest['alias'],
-            $contestListPayload['contests']['current']
-        );
-        $contestAliases = array_map(
-            fn ($contest) => $contest->alias,
-            $contests
-        );
+        $contests = $this->extractContests($contestData, 'public');
 
-        sort($contestListPayloadAliases);
-        sort($contestAliases);
+        $contestListPayloadAliases = $this->extractAliases(
+            $contestListPayload['contests']
+        );
+        $contestAliases = $this->extractAliases($contests);
 
         $this->assertEquals(
             $contestListPayloadAliases,
@@ -48,66 +169,27 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    public function testPrivateCurrentContestList() {
-        $secondsDay = 24 * 60  * 60;
-        $now = time();
-        $yesterday = $now - $secondsDay;
-        $tomorrow = $now + $secondsDay;
-        $contests = [];
+    public function testPrivateContestsForInvitedUser() {
+        [
+            'contestData' => $contestData,
+            'invitedUserIdentity' => $invitedUserIdentity,
+        ] = $this->createContests();
 
-        // Create user
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        // Logging user
+        $login = self::login($invitedUserIdentity);
 
-        // Create public contests
-        for ($i = 0; $i < 2; ++$i) {
-            $contests[] = \OmegaUp\Test\Factories\Contest::createContest(
-                new \OmegaUp\Test\Factories\ContestParams([
-                    'admissionMode' => 'public',
-                    'startTime' => new \OmegaUp\Timestamp($yesterday),
-                    'finishTime' => new \OmegaUp\Timestamp($tomorrow),
-                    'requestsUserInformation' => 'optional',
-                ])
-            )['contest'];
-        }
-
-        // Create private contests
-        for ($i = 0; $i < 2; ++$i) {
-            $contestData = \OmegaUp\Test\Factories\Contest::createContest(
-                new \OmegaUp\Test\Factories\ContestParams([
-                    'admissionMode' => 'private',
-                    'startTime' => new \OmegaUp\Timestamp($yesterday),
-                    'finishTime' => new \OmegaUp\Timestamp($tomorrow),
-                    'requestsUserInformation' => 'optional',
-                ])
-            );
-
-            // Add user to our contest
-            \OmegaUp\Test\Factories\Contest::addUser(
-                $contestData,
-                $identity
-            );
-
-            $contests[] = $contestData['contest'];
-        }
-
-        $userLogin = self::login($identity);
         $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
             new \OmegaUp\Request([
-                'auth_token' => $userLogin->auth_token,
+                'auth_token' => $login->auth_token,
             ])
         )['smartyProperties']['payload'];
 
-        $contestListPayloadAliases = array_map(
-            fn ($contest) => $contest['alias'],
-            $contestListPayload['contests']['current']
-        );
-        $contestAliases = array_map(
-            fn ($contest) => $contest->alias,
-            $contests
-        );
+        $contests = $this->extractContests($contestData);
 
-        sort($contestListPayloadAliases);
-        sort($contestAliases);
+        $contestListPayloadAliases = $this->extractAliases(
+            $contestListPayload['contests']
+        );
+        $contestAliases = $this->extractAliases($contests);
 
         $this->assertEquals(
             $contestListPayloadAliases,
@@ -115,107 +197,29 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    public function testPublicFutureContestList() {
-        $secondsDay = 24 * 60  * 60;
-        $now = time();
-        $tomorrow = $now + $secondsDay;
-        $afterTomorrow = $tomorrow + $secondsDay;
-        $contests = [];
+    public function testPrivateContestsForNonInvitedUser() {
+        [
+            'contestData' => $contestData
+        ] = $this->createContests();
 
-        // Create public contests
-        for ($i = 0; $i < 2; ++$i) {
-            $contests[] = \OmegaUp\Test\Factories\Contest::createContest(
-                new \OmegaUp\Test\Factories\ContestParams([
-                    'admissionMode' => 'public',
-                    'startTime' => new \OmegaUp\Timestamp($tomorrow),
-                    'finishTime' => new \OmegaUp\Timestamp($afterTomorrow),
-                    'requestsUserInformation' => 'optional',
-                ])
-            )['contest'];
-        }
+        // Create user that wont be invited
+        ['identity' => $nonInvitedUserIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
-            new \OmegaUp\Request()
-        )['smartyProperties']['payload'];
+        // Logging user
+        $login = self::login($nonInvitedUserIdentity);
 
-        $contestListPayloadAliases = array_map(
-            fn ($contest) => $contest['alias'],
-            $contestListPayload['contests']['future']
-        );
-        $contestAliases = array_map(
-            fn ($contest) => $contest->alias,
-            $contests
-        );
-
-        sort($contestListPayloadAliases);
-        sort($contestAliases);
-
-        $this->assertEquals(
-            $contestListPayloadAliases,
-            $contestAliases
-        );
-    }
-
-    public function testPrivateFutureContestList() {
-        $secondsDay = 24 * 60  * 60;
-        $now = time();
-        $tomorrow = $now + $secondsDay;
-        $afterTomorrow = $tomorrow + $secondsDay;
-        $contests = [];
-
-        // Create user
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-
-        // Create public contests
-        for ($i = 0; $i < 2; ++$i) {
-            $contests[] = \OmegaUp\Test\Factories\Contest::createContest(
-                new \OmegaUp\Test\Factories\ContestParams([
-                    'admissionMode' => 'public',
-                    'startTime' => new \OmegaUp\Timestamp($tomorrow),
-                    'finishTime' => new \OmegaUp\Timestamp($afterTomorrow),
-                    'requestsUserInformation' => 'optional',
-                ])
-            )['contest'];
-        }
-
-        // Create private contests
-        for ($i = 0; $i < 2; ++$i) {
-            $contestData = \OmegaUp\Test\Factories\Contest::createContest(
-                new \OmegaUp\Test\Factories\ContestParams([
-                    'admissionMode' => 'private',
-                    'startTime' => new \OmegaUp\Timestamp($tomorrow),
-                    'finishTime' => new \OmegaUp\Timestamp($afterTomorrow),
-                    'requestsUserInformation' => 'optional',
-                ])
-            );
-
-            // Add user to our contest
-            \OmegaUp\Test\Factories\Contest::addUser(
-                $contestData,
-                $identity
-            );
-
-            $contests[] = $contestData['contest'];
-        }
-
-        $userLogin = self::login($identity);
         $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
             new \OmegaUp\Request([
-                'auth_token' => $userLogin->auth_token,
+                'auth_token' => $login->auth_token,
             ])
         )['smartyProperties']['payload'];
 
-        $contestListPayloadAliases = array_map(
-            fn ($contest) => $contest['alias'],
-            $contestListPayload['contests']['future']
-        );
-        $contestAliases = array_map(
-            fn ($contest) => $contest->alias,
-            $contests
-        );
+        $contests = $this->extractContests($contestData, 'public');
 
-        sort($contestListPayloadAliases);
-        sort($contestAliases);
+        $contestListPayloadAliases = $this->extractAliases(
+            $contestListPayload['contests']
+        );
+        $contestAliases = $this->extractAliases($contests);
 
         $this->assertEquals(
             $contestListPayloadAliases,
@@ -223,107 +227,29 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    public function testPublicPastContestList() {
-        $secondsDay = 24 * 60  * 60;
-        $now = time();
-        $yesterday = $now - $secondsDay;
-        $beforeYesterday = $yesterday - $secondsDay;
-        $contests = [];
+    public function testPrivateContestsForSystemAdmin() {
+        [
+            'contestData' => $contestData
+        ] = $this->createContests();
 
-         // Create public contests
-        for ($i = 0; $i < 2; ++$i) {
-            $contests[] = \OmegaUp\Test\Factories\Contest::createContest(
-                new \OmegaUp\Test\Factories\ContestParams([
-                    'admissionMode' => 'public',
-                    'startTime' => new \OmegaUp\Timestamp($beforeYesterday),
-                    'finishTime' => new \OmegaUp\Timestamp($yesterday),
-                    'requestsUserInformation' => 'optional',
-                ])
-            )['contest'];
-        }
+        // Create admin user (system admin)
+        ['user' => $user, 'identity' => $adminUserIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
 
-        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
-            new \OmegaUp\Request()
-        )['smartyProperties']['payload'];
+        // Logging user
+        $login = self::login($adminUserIdentity);
 
-        $contestListPayloadAliases = array_map(
-            fn ($contest) => $contest['alias'],
-            $contestListPayload['contests']['past']
-        );
-        $contestAliases = array_map(
-            fn ($contest) => $contest->alias,
-            $contests
-        );
-
-        sort($contestListPayloadAliases);
-        sort($contestAliases);
-
-        $this->assertEquals(
-            $contestListPayloadAliases,
-            $contestAliases
-        );
-    }
-
-    public function testPrivatePastContestList() {
-        $secondsDay = 24 * 60  * 60;
-        $now = time();
-        $yesterday = $now - $secondsDay;
-        $beforeYesterday = $yesterday - $secondsDay;
-        $contests = [];
-
-        // Create user
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-
-         // Create public contests
-        for ($i = 0; $i < 2; ++$i) {
-            $contests[] = \OmegaUp\Test\Factories\Contest::createContest(
-                new \OmegaUp\Test\Factories\ContestParams([
-                    'admissionMode' => 'public',
-                    'startTime' => new \OmegaUp\Timestamp($beforeYesterday),
-                    'finishTime' => new \OmegaUp\Timestamp($yesterday),
-                    'requestsUserInformation' => 'optional',
-                ])
-            )['contest'];
-        }
-
-         // Create private contests
-        for ($i = 0; $i < 2; ++$i) {
-            $contestData = \OmegaUp\Test\Factories\Contest::createContest(
-                new \OmegaUp\Test\Factories\ContestParams([
-                   'admissionMode' => 'private',
-                   'startTime' => new \OmegaUp\Timestamp($beforeYesterday),
-                   'finishTime' => new \OmegaUp\Timestamp($yesterday),
-                   'requestsUserInformation' => 'optional',
-                ])
-            );
-
-           // Add user to our contest
-            \OmegaUp\Test\Factories\Contest::addUser(
-                $contestData,
-                $identity
-            );
-
-            $contests[] = $contestData['contest'];
-        }
-
-        $userLogin = self::login($identity);
         $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
             new \OmegaUp\Request([
-                'auth_token' => $userLogin->auth_token,
+                'auth_token' => $login->auth_token,
             ])
         )['smartyProperties']['payload'];
 
-        $contestListPayloadAliases = array_map(
-            fn ($contest) => $contest['alias'],
-            $contestListPayload['contests']['past']
-        );
-        $contestAliases = array_map(
-            fn ($contest) => $contest->alias,
-            $contests
-        );
+        $contests = $this->extractContests($contestData);
 
-        sort($contestListPayloadAliases);
-        sort($contestAliases);
+        $contestListPayloadAliases = $this->extractAliases(
+            $contestListPayload['contests']
+        );
+        $contestAliases = $this->extractAliases($contests);
 
         $this->assertEquals(
             $contestListPayloadAliases,
