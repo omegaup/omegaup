@@ -23,7 +23,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Creates six kinds of contests {public, private} x {current, future, past}.
      *
-     * @return array{contestData: array{current: list<array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>, future: list<array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>, past: list<array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>}, invitedUserIdentity: \OmegaUp\DAO\VO\Identities}
+     * @return array{contestData: array{current: list<array{contest: \OmegaUp\DAO\VO\Contests, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>, future: list<array{contest: \OmegaUp\DAO\VO\Contests, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>, past: list<array{contest: \OmegaUp\DAO\VO\Contests, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>}, invitedUserIdentity: \OmegaUp\DAO\VO\Identities}
      */
     private function createContests(): array {
         $contestData = [];
@@ -58,6 +58,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
                 // Create contests
                 $individualContestData = \OmegaUp\Test\Factories\Contest::createContest(
                     new \OmegaUp\Test\Factories\ContestParams([
+                        'title' => "{$time}-{$admissionMode}",
                         'admissionMode' => $admissionMode,
                         'startTime' => new \OmegaUp\Timestamp(
                             $intervals[$time]['startTime']
@@ -88,42 +89,9 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Extracts only the information about the "contest" model and also can filter by admission mode.
-     *
-     * @param array{current: list<array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>, future: list<array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>, past: list<array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}>} $contestData
-     * @param string|null $admissionMode
-     *
-     * @return array{current: list<\OmegaUp\DAO\VO\Contests|null>, future: list<\OmegaUp\DAO\VO\Contests|null>, past: list<\OmegaUp\DAO\VO\Contests|null>}
-     */
-    private function extractContests(
-        array $contestData,
-        string $admissionMode = null
-    ): array {
-        $contests = [];
-
-        foreach (self::TIMES as $time) {
-            $contests[$time] = [];
-
-            foreach ($contestData[$time] as $data) {
-                if (
-                    ! is_null(
-                        $admissionMode
-                    ) and $data['contest']->admission_mode !== $admissionMode
-                ) {
-                    continue;
-                }
-
-                $contests[$time][] = $data['contest'];
-            }
-        }
-
-        return $contests;
-    }
-
-    /**
      * Extracts only the aliases from the contests.
      *
-     * @param array{current: list<\OmegaUp\DAO\VO\Contests|null>, future: list<\OmegaUp\DAO\VO\Contests|null>, past: list<\OmegaUp\DAO\VO\Contests|null>}>} $contests
+     * @param ContestList $contests
      *
      * @return array{current: list<string>, future: list<string>, past: list<string>}
      */
@@ -134,16 +102,36 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             $aliases[$time] = [];
 
             foreach ($contests[$time] as $contest) {
-                $aliases[$time][] = isset(
-                    $contest->alias
-                ) ? $contest->alias : $contest['alias'];
+                $aliases[$time][] = $contest['alias'];
             }
-
-            // This is important to have the same order
-            sort($aliases[$time]);
         }
 
         return $aliases;
+    }
+
+    /**
+     * Check contest aliases match, it can also check contests with specific admission mode.
+     *
+     * @param array{current: list<string>, future: list<string>, past: list<string>} $contestAliases
+     * @param string|null $onlyAdmissionMode
+     */
+    private function assertContestAliasesAreCorrect(
+        array $contestAliases,
+        string $onlyAdmissionMode = null
+    ) {
+        foreach (self::TIMES as $time) {
+            $aliases = [];
+
+            if (! is_null($onlyAdmissionMode)) {
+                $aliases[] = "{$time}-{$onlyAdmissionMode}";
+            } else {
+                foreach (self::ADMISSION_MODES as $admissionMode) {
+                    $aliases[] = "{$time}-{$admissionMode}";
+                }
+            }
+
+            $this->assertEqualsCanonicalizing($contestAliases[$time], $aliases);
+        }
     }
 
     public function testPublicContestsNotLoggedIn() {
@@ -156,16 +144,13 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request()
         )['smartyProperties']['payload'];
 
-        $contests = $this->extractContests($contestData, 'public');
-
         $contestListPayloadAliases = $this->extractAliases(
             $contestListPayload['contests']
         );
-        $contestAliases = $this->extractAliases($contests);
 
-        $this->assertEquals(
+        $this->assertContestAliasesAreCorrect(
             $contestListPayloadAliases,
-            $contestAliases
+            'public'
         );
     }
 
@@ -184,17 +169,11 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['smartyProperties']['payload'];
 
-        $contests = $this->extractContests($contestData);
-
         $contestListPayloadAliases = $this->extractAliases(
             $contestListPayload['contests']
         );
-        $contestAliases = $this->extractAliases($contests);
 
-        $this->assertEquals(
-            $contestListPayloadAliases,
-            $contestAliases
-        );
+        $this->assertContestAliasesAreCorrect($contestListPayloadAliases);
     }
 
     public function testPrivateContestsForNonInvitedUser() {
@@ -214,16 +193,13 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['smartyProperties']['payload'];
 
-        $contests = $this->extractContests($contestData, 'public');
-
         $contestListPayloadAliases = $this->extractAliases(
             $contestListPayload['contests']
         );
-        $contestAliases = $this->extractAliases($contests);
 
-        $this->assertEquals(
+        $this->assertContestAliasesAreCorrect(
             $contestListPayloadAliases,
-            $contestAliases
+            'public'
         );
     }
 
@@ -244,16 +220,10 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['smartyProperties']['payload'];
 
-        $contests = $this->extractContests($contestData);
-
         $contestListPayloadAliases = $this->extractAliases(
             $contestListPayload['contests']
         );
-        $contestAliases = $this->extractAliases($contests);
 
-        $this->assertEquals(
-            $contestListPayloadAliases,
-            $contestAliases
-        );
+        $this->assertContestAliasesAreCorrect($contestListPayloadAliases);
     }
 }
