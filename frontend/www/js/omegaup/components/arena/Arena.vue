@@ -1,7 +1,7 @@
 <template>
   <div data-arena-wrapper :class="backgroundClass">
     <div class="text-center mt-4 pt-2">
-      <h2>
+      <h2 class="mb-4">
         <span>{{ contestTitle }}</span>
         <slot name="socket-status">
           <sup class="socket-status-error" title="WebSocket">✗</sup>
@@ -133,6 +133,10 @@ export default class Arena extends Vue {
 
 .socket-status-ok {
   color: var(--arena-socket-status-ok-color);
+}
+
+.socket-status {
+  cursor: help;
 }
 
 .clock {

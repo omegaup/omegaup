@@ -26,6 +26,7 @@ import {
 import { createChart, onRankingChanged, onRankingEvents } from './ranking';
 import { EventsSocket } from './events_socket';
 import rankingStore from './rankingStore';
+import socketStore from './socketStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -111,6 +112,7 @@ OmegaUp.on('ready', () => {
           lastUpdated: rankingStore.state.lastTimeUpdated,
           digitsAfterDecimalPoint: this.digitsAfterDecimalPoint,
           showPenalty: this.showPenalty,
+          socketStatus: socketStore.state.socketStatus,
         },
         on: {
           'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {

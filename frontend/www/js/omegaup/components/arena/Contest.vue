@@ -7,7 +7,9 @@
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #socket-status>
-      <sup :class="socketClass" title="WebSocket">{{ socketIcon }}</sup>
+      <sup :class="socketClass" :title="socketStatusTitle">{{
+        socketStatus
+      }}</sup>
     </template>
     <template #clock>
       <div v-if="isContestFinished" class="alert alert-warning" role="alert">
@@ -143,6 +145,7 @@ import omegaup_Markdown from '../Markdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { omegaup } from '../../omegaup';
 import { ContestClarificationType } from '../../arena/clarifications';
+import { SocketStatus } from '../../arena/events_socket';
 
 export interface ActiveProblem {
   runs: types.Run[];
@@ -188,7 +191,7 @@ export default class ArenaContest extends Vue {
   @Prop() submissionDeadline!: Date;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   @Prop({ default: true }) showPenalty!: boolean;
-  @Prop({ default: true }) socketConnected!: boolean;
+  @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
 
   T = T;
   ui = ui;
@@ -199,14 +202,24 @@ export default class ArenaContest extends Vue {
   nextSubmissionTimestamp: Date | null = null;
   now = new Date();
 
-  get socketIcon(): string {
-    if (this.socketConnected) return '•';
-    return '✗';
+  get socketClass(): string {
+    if (this.socketStatus === SocketStatus.Connected) {
+      return 'socket-status socket-status-ok';
+    }
+    if (this.socketStatus === SocketStatus.Failed) {
+      return 'socket-status socket-status-error';
+    }
+    return 'socket-status';
   }
 
-  get socketClass(): string {
-    if (this.socketConnected) return 'socket-status-ok';
-    return 'socket-status-error';
+  get socketStatusTitle(): string {
+    if (this.socketStatus === SocketStatus.Connected) {
+      return T.socketStatusConnected;
+    }
+    if (this.socketStatus === SocketStatus.Failed) {
+      return T.socketStatusFailed;
+    }
+    return T.socketStatusWaiting;
   }
 
   get activeProblemAlias(): null | string {
