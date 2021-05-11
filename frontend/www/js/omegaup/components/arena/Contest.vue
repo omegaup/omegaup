@@ -184,7 +184,7 @@ export default class ArenaContest extends Vue {
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   @Prop({ default: true }) showPenalty!: boolean;
   @Prop({ default: true }) socketConnected!: boolean;
-  @Prop() runs!: types.Run[];
+  @Prop({ default: () => [] }) runs!: types.Run[];
 
   T = T;
   ui = ui;

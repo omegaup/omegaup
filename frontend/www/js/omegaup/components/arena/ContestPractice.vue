@@ -149,7 +149,7 @@ export default class ArenaContestPractice extends Vue {
   @Prop() activeTab!: string;
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
-  @Prop() runs!: types.Run[];
+  @Prop({ default: () => [] }) runs!: types.Run[];
 
   T = T;
   ui = ui;
@@ -168,7 +168,7 @@ export default class ArenaContestPractice extends Vue {
   }
 
   onRunSubmitted(run: { code: string; language: string }): void {
-    this.$emit('submit-run', Object.assign({}, run, { problem: this.problem }));
+    this.$emit('submit-run', { ...run, ...{ problem: this.activeProblem } });
   }
 
   onClarificationResponse(response: types.Clarification): void {
