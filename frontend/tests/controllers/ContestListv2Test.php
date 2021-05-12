@@ -127,7 +127,6 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEqualsCanonicalizing(
-            $contestListPayloadAliases,
             [
                 'current' => [
                     'current-public',
@@ -138,7 +137,8 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
                 'past' => [
                     'past-public'
                 ]
-            ]
+            ],
+            $contestListPayloadAliases
         );
     }
 
@@ -162,7 +162,6 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEqualsCanonicalizing(
-            $contestListPayloadAliases,
             [
                 'current' => [
                     'current-private',
@@ -176,7 +175,8 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
                     'past-private',
                     'past-public',
                 ]
-            ]
+            ],
+            $contestListPayloadAliases
         );
     }
 
@@ -202,7 +202,6 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEqualsCanonicalizing(
-            $contestListPayloadAliases,
             [
                 'current' => [
                     'current-public',
@@ -213,7 +212,8 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
                 'past' => [
                     'past-public'
                 ]
-            ]
+            ],
+            $contestListPayloadAliases,
         );
     }
 
@@ -239,7 +239,6 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEqualsCanonicalizing(
-            $contestListPayloadAliases,
             [
                 'current' => [
                     'current-private',
@@ -253,7 +252,8 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
                     'past-private',
                     'past-public',
                 ]
-            ]
+            ],
+            $contestListPayloadAliases
         );
     }
 }
