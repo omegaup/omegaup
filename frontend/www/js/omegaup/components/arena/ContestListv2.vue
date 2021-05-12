@@ -5,7 +5,8 @@
     </div>
     <b-card no-body>
       <b-tabs
-        v-model="tabIndex"
+        v-model="activeTab"
+        class="sidebar"
         pills
         card
         vertical
@@ -13,23 +14,23 @@
       >
         <b-tab
           ref="currentContestTab"
-          :title="T.wordsCurrent"
-          :title-link-class="titleLinkClass(0)"
+          :title="T.contestListCurrent"
+          :title-link-class="titleLinkClass(ContestTab.Current)"
           active
         >
           {{ contests.current }}
         </b-tab>
         <b-tab
           ref="futureContestTab"
-          :title="T.wordsUpcoming"
-          :title-link-class="titleLinkClass(1)"
+          :title="T.contestListFuture"
+          :title-link-class="titleLinkClass(ContestTab.Future)"
         >
           {{ contests.future }}
         </b-tab>
         <b-tab
           ref="pastContestTab"
-          :title="T.wordsPast"
-          :title-link-class="titleLinkClass(2)"
+          :title="T.contestListPast"
+          :title-link-class="titleLinkClass(ContestTab.Past)"
         >
           {{ contests.past }}
         </b-tab>
@@ -52,16 +53,23 @@ import { TabsPlugin, CardPlugin } from 'bootstrap-vue';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 
+export enum ContestTab {
+  Current = 0,
+  Future = 1,
+  Past = 2,
+}
+
 @Component({
   components: {},
 })
 export default class ArenaContestList extends Vue {
   @Prop() contests!: types.ContestList;
   T = T;
-  tabIndex = 0;
+  ContestTab = ContestTab;
+  activeTab: ContestTab = ContestTab.Current;
 
-  titleLinkClass(idx: number) {
-    if (this.tabIndex === idx) {
+  titleLinkClass(tab: ContestTab) {
+    if (this.activeTab === tab) {
       return ['text-center', 'active-title-link'];
     } else {
       return ['text-center', 'title-link'];
@@ -70,18 +78,30 @@ export default class ArenaContestList extends Vue {
 }
 </script>
 
-<style type="text/css">
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .title {
   font-size: 32px;
   margin-bottom: 30px;
 }
-.custom-nav {
-  background-color: #efefef;
-}
-.custom-nav .active-title-link {
-  background-color: #5588dd !important;
-}
-.custom-nav .title-link {
-  color: #5588dd !important;
+.sidebar {
+  /deep/ .custom-nav {
+    background-color: var(
+      --arena-contest-list-sidebar-tab-list-background-color
+    );
+
+    .active-title-link {
+      background-color: var(
+        --arena-contest-list-sidebar-tab-list-link-background-color--active
+      ) !important;
+    }
+
+    .title-link {
+      color: var(
+        --arena-contest-list-sidebar-tab-list-link-font-color
+      ) !important;
+    }
+  }
 }
 </style>
