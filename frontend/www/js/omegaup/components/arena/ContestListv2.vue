@@ -10,7 +10,7 @@
         pills
         card
         vertical
-        nav-wrapper-class="custom-nav col-sm-4 col-md-2"
+        nav-wrapper-class="contest-list-nav col-sm-4 col-md-2"
       >
         <b-tab
           ref="currentContestTab"
@@ -81,12 +81,8 @@ export default class ArenaContestList extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
-.title {
-  font-size: 32px;
-  margin-bottom: 30px;
-}
 .sidebar {
-  /deep/ .custom-nav {
+  /deep/ .contest-list-nav {
     background-color: var(
       --arena-contest-list-sidebar-tab-list-background-color
     );
