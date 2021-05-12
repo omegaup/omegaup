@@ -1,24 +1,24 @@
 <template>
-  <li class="dropdown">
-    <audio v-if="isAdmin" ref="notification-audio" data-notification-audio>
+  <li class="nav-item dropdown d-none d-lg-flex align-items-center">
+    <audio ref="notification-audio" data-notification-audio>
       <source src="/media/notification.mp3" type="audio/mpeg" />
     </audio>
     <a
       aria-expanded="false"
       aria-haspopup="true"
-      class="notification-button dropdown-toggle"
+      class="nav-link dropdown-toggle px-2 notification-toggle"
       data-toggle="dropdown"
       href="#"
       role="button"
-      ><span class="glyphicon glyphicon-bell"></span>
+    >
+      <font-awesome-icon :icon="['fas', 'bell']" />
       <span
         v-if="clarifications && clarifications.length > 0"
-        class="notification-counter label"
-        :class="{ 'label-danger': clarifications.length > 0 }"
+        class="badge badge-danger count-badge"
         >{{ clarifications.length }}</span
       ></a
     >
-    <ul class="dropdown-menu">
+    <ul class="dropdown-menu dropdown-menu-right notification-dropdown">
       <li v-if="!clarifications || clarifications.length === 0" class="empty">
         {{ T.notificationsNoNewNotifications }}
       </li>
@@ -52,7 +52,7 @@
         <li class="divider" role="separator"></li>
         <li>
           <a href="#" @click.prevent="onMarkAllAsRead"
-            ><span class="glyphicon glyphicon-align-right"></span>
+            ><font-awesome-icon :icon="['fas', 'align-right']" />
             {{ T.notificationsMarkAllAsRead }}</a
           >
         </li>
@@ -66,22 +66,30 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import type { types } from '../../api_types';
 import T from '../../lang';
 
-@Component
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faBell, faAlignRight } from '@fortawesome/free-solid-svg-icons';
+library.add(faBell, faAlignRight);
+
+@Component({
+  components: {
+    FontAwesomeIcon,
+  },
+})
 export default class Clarifications extends Vue {
-  @Prop() initialClarifications!: types.Clarification[];
+  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
+
   @Prop() isAdmin!: boolean;
   T = T;
 
   flashInterval: number = 0;
-  clarifications: types.Clarification[] = this.initialClarifications;
 
-  @Watch('initialClarifications')
+  @Watch('clarifications')
   onPropertyChanged(newValue: types.Clarification[]): void {
     this.clarifications = newValue;
-    const audio = this.$refs.notificationAudio as HTMLMediaElement;
-    if (audio !== null) {
-      audio.play();
-    }
+    const audio = this.$refs['notification-audio'] as HTMLMediaElement;
+    if (!audio) return;
+    audio.play();
   }
 
   @Watch('clarifications')

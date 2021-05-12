@@ -1,7 +1,7 @@
 <template>
   <div data-arena-wrapper :class="backgroundClass">
     <div class="text-center mt-4 pt-2">
-      <h2>
+      <h2 class="mb-4">
         <span>{{ contestTitle }}</span>
         <slot name="socket-status">
           <sup class="socket-status-error" title="WebSocket">✗</sup>
@@ -27,6 +27,11 @@
           @click="onTabSelected(tab.name)"
         >
           {{ tab.text }}
+          <span
+            v-if="tab.name === 'clarifications' && clarifications.length"
+            :class="{ unread: unreadClarifications }"
+            >({{ clarifications.length }})</span
+          >
         </a>
       </li>
     </ul>
@@ -62,18 +67,28 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { types } from '../../api_types';
 import T from '../../lang';
 import { Tab } from '../problem/Details.vue';
 
 @Component
 export default class Arena extends Vue {
   @Prop({ default: false }) shouldShowRuns!: boolean;
+  @Prop({ default: false }) isAdmin!: boolean;
+  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() contestTitle!: string;
   @Prop() activeTab!: string;
   @Prop() backgroundClass!: string;
 
   T = T;
   selectedTab = this.activeTab;
+  clarificationsHasBeenRead = true;
+
+  get unreadClarifications() {
+    return (
+      this.activeTab !== 'clarifications' || this.clarificationsHasBeenRead
+    );
+  }
 
   get availableTabs(): Tab[] {
     const tabs = [
@@ -103,6 +118,9 @@ export default class Arena extends Vue {
 
   @Emit('update:activeTab')
   onTabSelected(tabName: string): string {
+    if (tabName === 'clarifications') {
+      this.clarificationsHasBeenRead = false;
+    }
     this.selectedTab = tabName;
     return this.selectedTab;
   }
@@ -114,6 +132,11 @@ export default class Arena extends Vue {
 .practice {
   background: var(--arena-practice-background-color) url(/media/gradient.png)
     repeat-x 0 0 !important;
+
+  .nav-tabs .nav-link {
+    background-color: var(--arena-contest-navtabs-link-background-color);
+    border-top-color: var(--arena-contest-navtabs-link-border-top-color);
+  }
 }
 
 [data-arena-wrapper] {
@@ -130,14 +153,13 @@ export default class Arena extends Vue {
   color: var(--arena-socket-status-ok-color);
 }
 
+.socket-status {
+  cursor: help;
+}
+
 .clock {
   font-size: 3em;
   line-height: 0.4em;
-}
-
-.nav-tabs .nav-link {
-  background-color: var(--arena-contest-navtabs-link-background-color);
-  border-top-color: var(--arena-contest-navtabs-link-border-top-color);
 }
 
 .navleft {
@@ -161,5 +183,9 @@ export default class Arena extends Vue {
   padding: 1em;
   margin-top: -1.5em;
   margin-right: -1em;
+}
+
+.unread {
+  font-weight: bold;
 }
 </style>

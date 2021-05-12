@@ -193,7 +193,7 @@ export class Arena {
   clarificationsOffset: number = 0;
   clarificationsRowcount: number = 20;
   activeTab: string = 'problems';
-  clarifications: { [key: number]: HTMLElement } = {};
+  transitionalClarifications: { [key: number]: HTMLElement } = {};
   submissionGap: number = 0;
 
   // Clarification refresh interval.
@@ -222,7 +222,7 @@ export class Arena {
     socketStatus: HTMLElement | null;
   };
 
-  initialClarifications: types.Clarification[] = [];
+  clarifications: types.Clarification[] = [];
 
   navbarAssignments: Vue | null = null;
 
@@ -256,7 +256,7 @@ export class Arena {
 
   commonNavbar:
     | (Vue & {
-        initialClarifications: types.Clarification[];
+        clarifications: types.Clarification[];
         graderInfo: types.GraderStatus | null;
         errorMessage: string | null;
         graderQueueLength: number;
@@ -347,7 +347,7 @@ export class Arena {
           graderInfo: null,
           graderQueueLength: -1,
           errorMessage: null,
-          initialClarifications: [],
+          clarifications: [],
           notifications: [],
         }),
         render: function (createElement) {
@@ -367,7 +367,7 @@ export class Arena {
               graderInfo: this.graderInfo,
               graderQueueLength: this.graderQueueLength,
               errorMessage: this.errorMessage,
-              initialClarifications: this.initialClarifications,
+              clarifications: this.clarifications,
             },
           });
         },
@@ -1379,16 +1379,16 @@ export class Arena {
     let r: HTMLElement | null = null;
     const anchor = `clarifications/clarification-${clarification.clarification_id}`;
     const clarifications =
-      this.commonNavbar?.initialClarifications ?? this.initialClarifications;
-    if (this.clarifications[clarification.clarification_id]) {
-      r = this.clarifications[clarification.clarification_id];
+      this.commonNavbar?.clarifications ?? this.clarifications;
+    if (this.transitionalClarifications[clarification.clarification_id]) {
+      r = this.transitionalClarifications[clarification.clarification_id];
       if (this.problemsetAdmin) {
-        this.initialClarifications = clarifications.filter(
+        this.clarifications = clarifications.filter(
           (notification) =>
             notification.clarification_id !== clarification.clarification_id,
         );
         if (this.commonNavbar !== null) {
-          this.commonNavbar.initialClarifications = this.initialClarifications;
+          this.commonNavbar.clarifications = this.clarifications;
         }
       } else {
         clarifications.push(clarification);
@@ -1401,7 +1401,7 @@ export class Arena {
         r.classList.remove('template');
         r.classList.add('inserted');
         $('.clarifications tbody.clarification-list').prepend(r);
-        this.clarifications[clarification.clarification_id] = r;
+        this.transitionalClarifications[clarification.clarification_id] = r;
       }
       if (this.problemsetAdmin) {
         if (clarifications !== null) {
@@ -1512,14 +1512,14 @@ export class Arena {
 
     const previouslyAnswered = this.answeredClarifications;
     this.answeredClarifications = 0;
-    this.clarifications = {};
+    this.transitionalClarifications = {};
 
     for (let i = clarifications.length - 1; i >= 0; i--) {
       this.updateClarification(clarifications[i]);
     }
 
     if (this.commonNavbar !== null) {
-      this.commonNavbar.initialClarifications = clarifications
+      this.commonNavbar.clarifications = clarifications
         .filter((clarification) =>
           // Removing all unsolved clarifications.
           this.problemsetAdmin
@@ -1532,7 +1532,7 @@ export class Arena {
         )
         .reverse();
     } else {
-      this.initialClarifications = clarifications
+      this.clarifications = clarifications
         .filter((clarification) =>
           // Removing all unsolved clarifications.
           this.problemsetAdmin
