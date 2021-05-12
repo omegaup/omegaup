@@ -104,34 +104,12 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             foreach ($contests[$time] as $contest) {
                 $aliases[$time][] = $contest['alias'];
             }
+
+            // This is important to have the same order
+            sort($aliases[$time]);
         }
 
         return $aliases;
-    }
-
-    /**
-     * Check contest aliases match, it can also check contests with specific admission mode.
-     *
-     * @param array{current: list<string>, future: list<string>, past: list<string>} $contestAliases
-     * @param string|null $onlyAdmissionMode
-     */
-    private function assertContestAliasesAreCorrect(
-        array $contestAliases,
-        string $onlyAdmissionMode = null
-    ) {
-        foreach (self::TIMES as $time) {
-            $aliases = [];
-
-            if (! is_null($onlyAdmissionMode)) {
-                $aliases[] = "{$time}-{$onlyAdmissionMode}";
-            } else {
-                foreach (self::ADMISSION_MODES as $admissionMode) {
-                    $aliases[] = "{$time}-{$admissionMode}";
-                }
-            }
-
-            $this->assertEqualsCanonicalizing($contestAliases[$time], $aliases);
-        }
     }
 
     public function testPublicContestsNotLoggedIn() {
@@ -148,9 +126,19 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             $contestListPayload['contests']
         );
 
-        $this->assertContestAliasesAreCorrect(
+        $this->assertEqualsCanonicalizing(
             $contestListPayloadAliases,
-            'public'
+            [
+                'current' => [
+                    'current-public',
+                ],
+                'future' => [
+                    'future-public',
+                ],
+                'past' => [
+                    'past-public'
+                ]
+            ]
         );
     }
 
@@ -173,7 +161,23 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             $contestListPayload['contests']
         );
 
-        $this->assertContestAliasesAreCorrect($contestListPayloadAliases);
+        $this->assertEqualsCanonicalizing(
+            $contestListPayloadAliases,
+            [
+                'current' => [
+                    'current-private',
+                    'current-public',
+                ],
+                'future' => [
+                    'future-private',
+                    'future-public',
+                ],
+                'past' => [
+                    'past-private',
+                    'past-public',
+                ]
+            ]
+        );
     }
 
     public function testPrivateContestsForNonInvitedUser() {
@@ -197,9 +201,19 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             $contestListPayload['contests']
         );
 
-        $this->assertContestAliasesAreCorrect(
+        $this->assertEqualsCanonicalizing(
             $contestListPayloadAliases,
-            'public'
+            [
+                'current' => [
+                    'current-public',
+                ],
+                'future' => [
+                    'future-public',
+                ],
+                'past' => [
+                    'past-public'
+                ]
+            ]
         );
     }
 
@@ -224,6 +238,22 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             $contestListPayload['contests']
         );
 
-        $this->assertContestAliasesAreCorrect($contestListPayloadAliases);
+        $this->assertEqualsCanonicalizing(
+            $contestListPayloadAliases,
+            [
+                'current' => [
+                    'current-private',
+                    'current-public',
+                ],
+                'future' => [
+                    'future-private',
+                    'future-public',
+                ],
+                'past' => [
+                    'past-private',
+                    'past-public',
+                ]
+            ]
+        );
     }
 }
