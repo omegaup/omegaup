@@ -97,7 +97,6 @@
         :clarifications="currentClarifications"
         :is-admin="contestAdmin"
         :show-new-clarification-popup="showNewClarificationPopup"
-        :id-clarification="idClarification"
         @new-clarification="
           (contestClarification) =>
             $emit('new-clarification', {
@@ -190,7 +189,6 @@ export default class ArenaContest extends Vue {
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   @Prop({ default: true }) showPenalty!: boolean;
   @Prop({ default: true }) socketConnected!: boolean;
-  @Prop({ default: null }) idClarification!: null | number;
 
   T = T;
   ui = ui;

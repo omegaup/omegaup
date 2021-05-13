@@ -234,7 +234,7 @@ table.clarifications {
 
 .clarifications tbody tr.selected td,
 .clarifications tbody tr.selected {
-  border: 3px solid rgb(95, 116, 236);
+  border: 3px solid var(--header-primary-color);
 }
 
 .clarifications tbody tr.resolved {

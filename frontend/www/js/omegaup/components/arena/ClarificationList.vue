@@ -85,7 +85,7 @@
             v-for="clarification in filteredClarifications"
             :key="clarification.clarification_id"
             :is-admin="isAdmin"
-            :selected="clarification.clarification_id === idClarification"
+            :selected="clarificationSelected(clarification.clarification_id)"
             :clarification="clarification"
             @clarification-response="
               (response) =>
@@ -109,6 +109,7 @@ import { types } from '../../api_types';
 import arena_Clarification from './Clarification.vue';
 import arena_NewClarification from './NewClarificationPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
+import clarificationsStore from '../../arena/clarificationsStore';
 
 export enum PopupDisplayed {
   None,
@@ -132,7 +133,6 @@ export default class ArenaClarificationList extends Vue {
   @Prop() username!: null | string;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
   @Prop({ default: false }) allowFilterByAssignment!: boolean;
-  @Prop({ default: null }) idClarification!: null | number;
 
   T = T;
   PopupDisplayed = PopupDisplayed;
@@ -147,6 +147,10 @@ export default class ArenaClarificationList extends Vue {
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
     this.$emit('update:activeTab', 'clarifications');
+  }
+
+  clarificationSelected(clarificationId: number) {
+    return clarificationsStore.state.index[clarificationId].selected;
   }
 
   get assignmentsNames(): Array<string | null> {

@@ -1,5 +1,6 @@
 import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import { PopupDisplayed } from '../components/problem/Details.vue';
+import clarificationsStore from './clarificationsStore';
 
 export interface LocationOptions {
   problem: ActiveProblem | null;
@@ -7,7 +8,6 @@ export interface LocationOptions {
   guid: null | string;
   problemAlias: null | string;
   showNewClarificationPopup: boolean;
-  idClarification: null | number;
 }
 
 export function getOptionsFromLocation(location: string): LocationOptions {
@@ -17,7 +17,6 @@ export function getOptionsFromLocation(location: string): LocationOptions {
     guid: null,
     problemAlias: null,
     showNewClarificationPopup: false,
-    idClarification: null,
   };
 
   // Location string is of the forms:
@@ -54,7 +53,10 @@ export function getOptionsFromLocation(location: string): LocationOptions {
       if (match.groups.popup === 'new') {
         response.showNewClarificationPopup = true;
       } else if (match.groups.alias?.startsWith('clarification-')) {
-        response.idClarification = parseInt(match.groups.alias.split('-')[1]);
+        clarificationsStore.commit(
+          'selectClarification',
+          parseInt(match.groups.alias.split('-')[1]),
+        );
       }
       break;
     default:

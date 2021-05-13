@@ -86,7 +86,6 @@ OmegaUp.on('ready', () => {
       lastUpdated: new Date(0),
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
-      idClarification: null,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
@@ -109,7 +108,6 @@ OmegaUp.on('ready', () => {
           lastUpdated: this.lastUpdated,
           digitsAfterDecimalPoint: this.digitsAfterDecimalPoint,
           showPenalty: this.showPenalty,
-          idClarification: this.idClarification,
         },
         on: {
           'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
