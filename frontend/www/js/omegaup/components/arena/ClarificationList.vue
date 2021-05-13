@@ -150,6 +150,14 @@ export default class ArenaClarificationList extends Vue {
   }
 
   clarificationSelected(clarificationId: number) {
+    if (
+      !Object.prototype.hasOwnProperty.call(
+        clarificationsStore.state.index,
+        clarificationId,
+      )
+    ) {
+      return;
+    }
     return clarificationsStore.state.index[clarificationId].selected;
   }
 
