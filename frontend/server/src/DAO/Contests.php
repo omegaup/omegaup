@@ -425,7 +425,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             SELECT
                 $columns,
                 p.scoreboard_url,
-                p.scoreboard_url_admin
+                p.scoreboard_url_admin,
+                count(Problemset_Identities.identity_id) AS `contestants`
             FROM
                 Contests
             INNER JOIN
@@ -458,11 +459,16 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             ON
                 pi.problemset_id = p.problemset_id AND
                 pi.identity_id = ?
+            LEFT JOIN
+                Problemset_Identities
+            ON
+                Contests.problemset_id = Problemset_Identities.problemset_id
             WHERE
                 $recommendedCondition AND
                 $activeCondition AND
                 $queryCondition AND
                 archived = 0
+            GROUP BY Contests.contest_id
         ";
         $params = [
             \OmegaUp\Authorization::CONTESTANT_ROLE,
@@ -512,13 +518,19 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $sql = "
             SELECT
-                $columns
+                $columns,
+                count(Problemset_Identities.identity_id) AS `contestants`
             FROM
                 Contests
+            LEFT JOIN
+                Problemset_Identities
+            ON
+                Contests.problemset_id = Problemset_Identities.problemset_id
             WHERE
                 $recommended_check  AND $end_check AND $query_check
                 AND `admission_mode` != 'private'
                 AND archived = 0
+            GROUP BY Contests.contest_id
             ORDER BY
                 `last_updated` DESC,
                 `recommended` DESC,
@@ -583,7 +595,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $sql = "
                  (
                     SELECT
-                        $columns
+                        $columns,
+                        count(Problemset_Identities.identity_id) AS `contestants`
                     FROM
                         Contests
                     INNER JOIN
@@ -594,10 +607,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         Identities
                     ON
                         ACLs.owner_id = Identities.user_id
+                    LEFT JOIN
+                        Problemset_Identities
+                    ON
+                        Contests.problemset_id = Problemset_Identities.problemset_id
                     WHERE
                         Contests.admission_mode = 'private' AND Identities.identity_id = ? AND
                         $recommended_check AND $end_check AND $query_check
                         AND archived = 0
+                    GROUP BY Contests.contest_id
                  ) ";
         $params = [$identityId];
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
@@ -611,7 +629,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  UNION DISTINCT
                  (
                     SELECT
-                        $columns
+                        $columns,
+                        count(Problemset_Identities.identity_id) AS `contestants`
                     FROM
                         Contests
                     INNER JOIN
@@ -622,6 +641,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         Contests.admission_mode = 'private' AND Problemset_Identities.identity_id = ? AND
                         $recommended_check AND $end_check AND $query_check
                         AND archived = 0
+                    GROUP BY Contests.contest_id
                  ) ";
         $params[] = $identityId;
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
@@ -635,13 +655,18 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  UNION DISTINCT
                  (
                     SELECT
-                        $columns
+                        $columns,
+                        count(Problemset_Identities.identity_id) AS `contestants`
                     FROM
                         Contests
                     INNER JOIN
                         Problemsets
                     ON
                         Problemsets.problemset_id = Contests.problemset_id
+                    LEFT JOIN
+                        Problemset_Identities
+                    ON
+                        Contests.problemset_id = Problemset_Identities.problemset_id
                     INNER JOIN
                         Group_Roles gr
                     ON
@@ -656,6 +681,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         gi.identity_id = ? AND
                         $recommended_check AND $end_check AND $query_check
                         AND archived = 0
+                    GROUP BY Contests.contest_id
                  ) ";
         $params[] = \OmegaUp\Authorization::CONTESTANT_ROLE;
         $params[] = $identityId;
@@ -670,7 +696,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  UNION DISTINCT
                  (
                      SELECT
-                         $columns
+                         $columns,
+                         count(Problemset_Identities.identity_id) AS `contestants`
                      FROM
                          Contests
                      INNER JOIN
@@ -681,12 +708,17 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                          Identities
                      ON
                          Identities.user_id = User_Roles.user_id
+                    LEFT JOIN
+                         Problemset_Identities
+                     ON
+                         Contests.problemset_id = Problemset_Identities.problemset_id
                      WHERE
                          Contests.admission_mode = 'private' AND
                          Identities.identity_id = ? AND
                          User_Roles.role_id = ? AND
                          $recommended_check AND $end_check AND $query_check
                         AND archived = 0
+                    GROUP BY Contests.contest_id
                  ) ";
         $params[] = $identityId;
         $params[] = \OmegaUp\Authorization::ADMIN_ROLE;
@@ -701,7 +733,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  UNION DISTINCT
                  (
                      SELECT
-                         $columns
+                         $columns,
+                         count(Problemset_Identities.identity_id) AS `contestants`
                      FROM
                          Contests
                      INNER JOIN
@@ -710,12 +743,17 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                          Groups_Identities
                      ON
                          Groups_Identities.group_id = Group_Roles.group_id
+                     LEFT JOIN
+                         Problemset_Identities
+                     ON
+                         Contests.problemset_id = Problemset_Identities.problemset_id
                      WHERE
                          Contests.admission_mode = 'private' AND
                          Groups_Identities.identity_id = ? AND
                          Group_Roles.role_id = ? AND
                          $recommended_check AND $end_check AND $query_check
                         AND archived = 0
+                     GROUP BY Contests.contest_id
                  ) ";
         $params[] = $identityId;
         $params[] = \OmegaUp\Authorization::ADMIN_ROLE;
@@ -729,12 +767,18 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  UNION DISTINCT
                  (
                      SELECT
-                         $columns
+                         $columns,
+                         count(Problemset_Identities.identity_id) AS `contestants`
                      FROM
                          Contests
+                     LEFT JOIN
+                         Problemset_Identities
+                     ON
+                         Contests.problemset_id = Problemset_Identities.problemset_id
                      WHERE
                          admission_mode <> 'private' AND $recommended_check AND $end_check AND $query_check
                         AND archived = 0
+                     GROUP BY Contests.contest_id
                  )
                  ORDER BY
                      CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
@@ -776,15 +820,21 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $sql = "
                SELECT
-                    $columns
+                    $columns,
+                    count(Problemset_Identities.identity_id) AS `contestants`
                 FROM
                     `Contests`
+                LEFT JOIN
+                    Problemset_Identities
+                ON
+                    Contests.problemset_id = Problemset_Identities.problemset_id
                 WHERE
                     `admission_mode` <> 'private'
                     AND $recommended_check
                     AND $end_check
                     AND $query_check
                     AND archived = 0
+                GROUP BY Contests.contest_id
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,
@@ -826,10 +876,16 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         $sql = "
                 SELECT
-                    $columns
+                    $columns,
+                    count(Problemset_Identities.identity_id) AS `contestants`
                 FROM
                     Contests
+                LEFT JOIN
+                    Problemset_Identities
+                ON
+                    Contests.problemset_id = Problemset_Identities.problemset_id
                 WHERE $recommended_check AND $end_check AND $query_check AND archived = 0
+                GROUP BY Contests.contest_id
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
                     `recommended` DESC,
