@@ -1,31 +1,34 @@
 <template>
-  <li class="nav-item dropdown d-none d-lg-flex align-items-center">
-    <audio ref="notification-audio" data-notification-audio>
+  <li class="dropdown">
+    <audio v-if="isAdmin" ref="notification-audio" data-notification-audio>
       <source src="/media/notification.mp3" type="audio/mpeg" />
     </audio>
     <a
       aria-expanded="false"
       aria-haspopup="true"
-      class="nav-link dropdown-toggle px-2 notification-toggle"
+      class="notification-button dropdown-toggle"
       data-toggle="dropdown"
       href="#"
       role="button"
-    >
-      <font-awesome-icon :icon="['fas', 'bell']" />
+      ><span class="glyphicon glyphicon-bell"></span>
       <span
-        v-if="clarifications && clarifications.length > 0"
-        class="badge badge-danger count-badge"
-        >{{ clarifications.length }}</span
+        v-if="unreadClarifications && unreadClarifications.length > 0"
+        class="notification-counter label"
+        :class="{ 'label-danger': unreadClarifications.length > 0 }"
+        >{{ unreadClarifications.length }}</span
       ></a
     >
-    <ul class="dropdown-menu dropdown-menu-right notification-dropdown">
-      <li v-if="!clarifications || clarifications.length === 0" class="empty">
+    <ul class="dropdown-menu">
+      <li
+        v-if="!unreadClarifications || unreadClarifications.length === 0"
+        class="empty"
+      >
         {{ T.notificationsNoNewNotifications }}
       </li>
       <li v-else>
         <ul class="notification-drawer">
           <li
-            v-for="clarification in clarifications"
+            v-for="clarification in unreadClarifications"
             :key="clarification.clarification_id"
           >
             <button
@@ -48,11 +51,11 @@
           </li>
         </ul>
       </li>
-      <template v-if="clarifications && clarifications.length > 1">
+      <template v-if="unreadClarifications && unreadClarifications.length > 1">
         <li class="divider" role="separator"></li>
         <li>
           <a href="#" @click.prevent="onMarkAllAsRead"
-            ><font-awesome-icon :icon="['fas', 'align-right']" />
+            ><span class="glyphicon glyphicon-align-right"></span>
             {{ T.notificationsMarkAllAsRead }}</a
           >
         </li>
@@ -66,16 +69,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import type { types } from '../../api_types';
 import T from '../../lang';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faBell, faAlignRight } from '@fortawesome/free-solid-svg-icons';
-library.add(faBell, faAlignRight);
-
-@Component({
-  components: {
-    FontAwesomeIcon,
-  },
-})
+@Component
 export default class Clarifications extends Vue {
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
 
@@ -83,16 +77,17 @@ export default class Clarifications extends Vue {
   T = T;
 
   flashInterval: number = 0;
+  unreadClarifications = this.clarifications;
 
   @Watch('clarifications')
   onPropertyChanged(newValue: types.Clarification[]): void {
-    this.clarifications = newValue;
+    this.unreadClarifications = newValue;
     const audio = this.$refs['notification-audio'] as HTMLMediaElement;
     if (!audio) return;
     audio.play();
   }
 
-  @Watch('clarifications')
+  @Watch('unreadClarifications')
   onPropertyChange(newValue: types.Clarification[]): void {
     if (newValue.length > 0) {
       if (this.flashInterval) return;
@@ -121,18 +116,18 @@ export default class Clarifications extends Vue {
 
   onCloseClicked(clarification: types.Clarification): void {
     const id = `clarification-${clarification.clarification_id}`;
-    this.clarifications = this.clarifications.filter(
+    this.unreadClarifications = this.clarifications.filter(
       (element) => element.clarification_id !== clarification.clarification_id,
     );
     localStorage.setItem(id, Date.now().toString());
   }
 
   onMarkAllAsRead(): void {
-    for (const clarification of this.clarifications) {
+    for (const clarification of this.unreadClarifications) {
       const id = `clarification-${clarification.clarification_id}`;
       localStorage.setItem(id, Date.now().toString());
     }
-    this.clarifications = [];
+    this.unreadClarifications = [];
   }
 }
 </script>
@@ -186,6 +181,7 @@ export default class Clarifications extends Vue {
 
 .notification-drawer li {
   padding: 3px 20px;
+  list-style: none;
   border-top: 1px solid
     var(--notifications-clarifications-drawer-li-border-top-color);
 }

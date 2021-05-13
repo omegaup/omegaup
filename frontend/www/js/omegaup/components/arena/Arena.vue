@@ -82,11 +82,11 @@ export default class Arena extends Vue {
 
   T = T;
   selectedTab = this.activeTab;
-  clarificationsHasBeenRead = true;
+  clarificationsHaveBeenRead = false;
 
   get unreadClarifications() {
     return (
-      this.activeTab !== 'clarifications' || this.clarificationsHasBeenRead
+      this.activeTab !== 'clarifications' && !this.clarificationsHaveBeenRead
     );
   }
 
@@ -119,7 +119,7 @@ export default class Arena extends Vue {
   @Emit('update:activeTab')
   onTabSelected(tabName: string): string {
     if (tabName === 'clarifications') {
-      this.clarificationsHasBeenRead = false;
+      this.clarificationsHaveBeenRead = true;
     }
     this.selectedTab = tabName;
     return this.selectedTab;

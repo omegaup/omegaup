@@ -180,7 +180,7 @@
         <ul v-else class="nav navbar-nav navbar-right">
           <omegaup-notifications-clarifications
             v-if="inContest"
-            :clarifications="clarifications"
+            :clarifications="notificationsClarifications"
             :is-admin="isAdmin"
           ></omegaup-notifications-clarifications>
           <li
@@ -326,7 +326,8 @@ export default class Navbar extends Vue {
   @Prop() graderInfo!: types.GraderStatus | null;
   @Prop() graderQueueLength!: number;
   @Prop() errorMessage!: string | null;
-  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
+  @Prop({ default: () => [] })
+  notificationsClarifications!: types.Clarification[];
 
   notifications: types.Notification[] = [];
   T = T;

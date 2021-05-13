@@ -7,6 +7,7 @@ export interface LocationOptions {
   guid: null | string;
   problemAlias: null | string;
   showNewClarificationPopup: boolean;
+  idClarification: null | number;
 }
 
 export function getOptionsFromLocation(location: string): LocationOptions {
@@ -16,6 +17,7 @@ export function getOptionsFromLocation(location: string): LocationOptions {
     guid: null,
     problemAlias: null,
     showNewClarificationPopup: false,
+    idClarification: null,
   };
 
   // Location string is of the forms:
@@ -51,6 +53,8 @@ export function getOptionsFromLocation(location: string): LocationOptions {
     case 'clarifications':
       if (match.groups.popup === 'new') {
         response.showNewClarificationPopup = true;
+      } else if (match.groups.alias?.startsWith('clarification-')) {
+        response.idClarification = parseInt(match.groups.alias.split('-')[1]);
       }
       break;
     default:

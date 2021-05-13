@@ -85,6 +85,7 @@
             v-for="clarification in filteredClarifications"
             :key="clarification.clarification_id"
             :is-admin="isAdmin"
+            :selected="clarification.clarification_id === idClarification"
             :clarification="clarification"
             @clarification-response="
               (response) =>
@@ -131,6 +132,7 @@ export default class ArenaClarificationList extends Vue {
   @Prop() username!: null | string;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
   @Prop({ default: false }) allowFilterByAssignment!: boolean;
+  @Prop({ default: null }) idClarification!: null | number;
 
   T = T;
   PopupDisplayed = PopupDisplayed;

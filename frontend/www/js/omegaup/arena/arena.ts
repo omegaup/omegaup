@@ -193,7 +193,7 @@ export class Arena {
   clarificationsOffset: number = 0;
   clarificationsRowcount: number = 20;
   activeTab: string = 'problems';
-  transitionalClarifications: { [key: number]: HTMLElement } = {};
+  clarifications: { [key: number]: HTMLElement } = {};
   submissionGap: number = 0;
 
   // Clarification refresh interval.
@@ -222,7 +222,7 @@ export class Arena {
     socketStatus: HTMLElement | null;
   };
 
-  clarifications: types.Clarification[] = [];
+  notificationsClarifications: types.Clarification[] = [];
 
   navbarAssignments: Vue | null = null;
 
@@ -256,7 +256,7 @@ export class Arena {
 
   commonNavbar:
     | (Vue & {
-        clarifications: types.Clarification[];
+        notificationsClarifications: types.Clarification[];
         graderInfo: types.GraderStatus | null;
         errorMessage: string | null;
         graderQueueLength: number;
@@ -347,7 +347,7 @@ export class Arena {
           graderInfo: null,
           graderQueueLength: -1,
           errorMessage: null,
-          clarifications: [],
+          notificationsClarifications: [],
           notifications: [],
         }),
         render: function (createElement) {
@@ -367,7 +367,7 @@ export class Arena {
               graderInfo: this.graderInfo,
               graderQueueLength: this.graderQueueLength,
               errorMessage: this.errorMessage,
-              clarifications: this.clarifications,
+              notificationsClarifications: this.notificationsClarifications,
             },
           });
         },
@@ -1375,20 +1375,24 @@ export class Arena {
       .catch(ui.ignoreError);
   }
 
-  updateClarification(clarification: types.Clarification): void {
+  updateClarification(
+    clarification: types.Clarification,
+    selected: boolean = false,
+  ): void {
     let r: HTMLElement | null = null;
     const anchor = `clarifications/clarification-${clarification.clarification_id}`;
     const clarifications =
-      this.commonNavbar?.clarifications ?? this.clarifications;
-    if (this.transitionalClarifications[clarification.clarification_id]) {
-      r = this.transitionalClarifications[clarification.clarification_id];
+      this.commonNavbar?.notificationsClarifications ??
+      this.notificationsClarifications;
+    if (this.clarifications[clarification.clarification_id]) {
+      r = this.clarifications[clarification.clarification_id];
       if (this.problemsetAdmin) {
-        this.clarifications = clarifications.filter(
+        this.notificationsClarifications = clarifications.filter(
           (notification) =>
             notification.clarification_id !== clarification.clarification_id,
         );
         if (this.commonNavbar !== null) {
-          this.commonNavbar.clarifications = this.clarifications;
+          this.commonNavbar.notificationsClarifications = this.notificationsClarifications;
         }
       } else {
         clarifications.push(clarification);
@@ -1400,8 +1404,13 @@ export class Arena {
       if (r) {
         r.classList.remove('template');
         r.classList.add('inserted');
+        if (selected) {
+          r.classList.add('selected');
+        } else {
+          r.classList.remove('selected');
+        }
         $('.clarifications tbody.clarification-list').prepend(r);
-        this.transitionalClarifications[clarification.clarification_id] = r;
+        this.clarifications[clarification.clarification_id] = r;
       }
       if (this.problemsetAdmin) {
         if (clarifications !== null) {
@@ -1509,17 +1518,23 @@ export class Arena {
     } else if (clarifications.length >= this.clarificationsRowcount) {
       $('#clarifications-count').html(`(${this.clarificationsRowcount}+)`);
     }
+    const match = /#(?<tab>\w+)\/(?<name>\w+)-(?<id>\d+)/g.exec(
+      window.location.hash,
+    );
 
     const previouslyAnswered = this.answeredClarifications;
     this.answeredClarifications = 0;
-    this.transitionalClarifications = {};
+    this.clarifications = {};
 
     for (let i = clarifications.length - 1; i >= 0; i--) {
-      this.updateClarification(clarifications[i]);
+      const selected =
+        clarifications[i].clarification_id ===
+        parseInt(match?.groups?.id ?? '');
+      this.updateClarification(clarifications[i], selected);
     }
 
     if (this.commonNavbar !== null) {
-      this.commonNavbar.clarifications = clarifications
+      this.commonNavbar.notificationsClarifications = clarifications
         .filter((clarification) =>
           // Removing all unsolved clarifications.
           this.problemsetAdmin
@@ -1532,7 +1547,7 @@ export class Arena {
         )
         .reverse();
     } else {
-      this.clarifications = clarifications
+      this.notificationsClarifications = clarifications
         .filter((clarification) =>
           // Removing all unsolved clarifications.
           this.problemsetAdmin
@@ -1743,6 +1758,17 @@ export class Arena {
         this.navbarProblems.activeProblem = null;
       }
     } else if (this.activeTab == 'clarifications') {
+      const r = document.querySelector('.selected') as HTMLElement | null;
+      if (r) {
+        r.classList.remove('selected');
+      }
+      const match = /#(?<tab>\w+)\/(?<name>\w+)-(?<id>\d+)/g.exec(
+        window.location.hash,
+      );
+      const id = parseInt(match?.groups?.id ?? '');
+      if (id && this.clarifications[id]) {
+        this.clarifications[id].classList.add('selected');
+      }
       if (window.location.hash == '#clarifications/new') {
         $('#overlay form').hide();
         $('#overlay, #clarification').show();
