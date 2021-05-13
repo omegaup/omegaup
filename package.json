@@ -107,6 +107,8 @@
     "@fortawesome/free-brands-svg-icons": "^5.13.0",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/vue-fontawesome": "^0.1.9",
+    "bootstrap": "^4.6.0",
+    "bootstrap-vue": "^2.21.2",
     "codemirror": "^5.58.2",
     "jest-websocket-mock": "^2.2.0",
     "jszip": "^3.1.5",
