@@ -1,5 +1,7 @@
 #!/bin/bash
 
+PWD="$(dirname "$(realpath "${0}")")"
+
 if [[ -z "$1" ]]; then
   echo "Usage: $0 <location>"
   exit 1
@@ -29,6 +31,6 @@ fi
 echo "deploying resource group..."
 az deployment group create \
   --resource-group "${resource_group}" \
-  --template-file omegaup-runner-template.json \
-  --parameter "customData=$(base64 --wrap=0 cloud-init.yml)" \
+  --template-file "${PWD}/omegaup-runner-template.json" \
+  --parameter "customData=$(base64 --wrap=0 "${PWD}/cloud-init.yml")" \
   --subscription "${subscription}"
