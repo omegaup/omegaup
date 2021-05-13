@@ -14,19 +14,19 @@
         },
         "instanceCount": {
             "type": "string",
-            "defaultValue": "1"
+            "defaultValue": "2"
         },
         "autoScaleDefault": {
             "type": "string",
-            "defaultValue": "1"
+            "defaultValue": "2"
         },
         "autoScaleMin": {
             "type": "string",
-            "defaultValue": "1"
+            "defaultValue": "2"
         },
         "autoScaleMax": {
             "type": "string",
-            "defaultValue": "1"
+            "defaultValue": "8"
         }
     },
     "variables": {
@@ -124,7 +124,7 @@
                                     "metricResourceUri": "[variables('vmssId')]",
                                     "timeGrain": "PT1M",
                                     "statistic": "Average",
-                                    "timeWindow": "PT5M",
+                                    "timeWindow": "PT1M",
                                     "timeAggregation": "Average",
                                     "operator": "GreaterThan",
                                     "threshold": "75"
@@ -132,8 +132,8 @@
                                 "scaleAction": {
                                     "direction": "Increase",
                                     "type": "ChangeCount",
-                                    "value": "1",
-                                    "cooldown": "PT1M"
+                                    "value": "3",
+                                    "cooldown": "PT5M"
                                 }
                             },
                             {
@@ -146,13 +146,13 @@
                                     "timeWindow": "PT5M",
                                     "timeAggregation": "Average",
                                     "operator": "LessThan",
-                                    "threshold": "10"
+                                    "threshold": "20"
                                 },
                                 "scaleAction": {
                                     "direction": "Decrease",
                                     "type": "ChangeCount",
                                     "value": "1",
-                                    "cooldown": "PT1M"
+                                    "cooldown": "PT2M"
                                 }
                             }
                         ]
