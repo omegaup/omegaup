@@ -256,4 +256,178 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             $contestListPayloadAliases
         );
     }
+
+    /**
+     * Create 2 contests, add 2 contestants (invited users) to the first contest and add 0 contestants to the second one.
+     *
+     * @param string $admissionMode (optional) Contest Admission Mode
+     *
+     * @return array{firstContestData: array{contest: \OmegaUp\DAO\VO\Contests, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}, secondContestData: array{contest: \OmegaUp\DAO\VO\Contests, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}, firstInvitedUserIdentity: \OmegaUp\DAO\VO\Identities, secondInvitedUserIdentity: \OmegaUp\DAO\VO\Identities}
+     */
+    private function createContestsAndAddContestants(string $admissionMode = 'public'): array {
+        // Create contest that will have 2 contestants
+        $firstContestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'title' => 'contest-with-contestants',
+                'admissionMode' => $admissionMode,
+                'requestsUserInformation' => 'optional',
+            ])
+        );
+
+        // Create first user that will be invited
+        ['identity' => $firstInvitedUserIdentity] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $firstContestData,
+            $firstInvitedUserIdentity
+        );
+
+        // Create second user that will be invited
+        ['identity' => $secondInvitedUserIdentity] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $firstContestData,
+            $secondInvitedUserIdentity
+        );
+
+        // Create contest that will have 0 contestants
+        $secondContestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'title' => 'contest-without-contestants',
+                'admissionMode' => $admissionMode,
+                'requestsUserInformation' => 'optional',
+            ])
+        );
+
+        return [
+            'firstContestData' => $firstContestData,
+            'secondContestData' => $secondContestData,
+            'firstInvitedUserIdentity' => $firstInvitedUserIdentity,
+            'secondInvitedUserIdentity' => $secondInvitedUserIdentity,
+        ];
+    }
+
+    public function testContestantsColumnAsUserNotLoggedIn() {
+        [
+            'firstContestData' => $firstContestData,
+            'secondContestData' => $secondContestData,
+            'firstInvitedUserIdentity' => $firstInvitedUserIdentity,
+            'secondInvitedUserIdentity' => $secondInvitedUserIdentity,
+        ] = $this->createContestsAndAddContestants();
+
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+            new \OmegaUp\Request()
+        )['smartyProperties']['payload'];
+
+        $contests = $contestListPayload['contests']['current'];
+
+        if ($contests[0]['title'] === 'contest-with-contestants') {
+            $contestWithContestants = $contests[0];
+            $contestWithoutContestants = $contests[1];
+        } else {
+            $contestWithContestants = $contests[1];
+            $contestWithoutContestants = $contests[0];
+        }
+
+        $this->assertEquals(2, $contestWithContestants['contestants']);
+        $this->assertEquals(0, $contestWithoutContestants['contestants']);
+    }
+
+    public function testContestantsColumnAsCreatorUser() {
+        [
+            'firstContestData' => $firstContestData,
+            'secondContestData' => $secondContestData,
+            'firstInvitedUserIdentity' => $firstInvitedUserIdentity,
+            'secondInvitedUserIdentity' => $secondInvitedUserIdentity,
+        ] = $this->createContestsAndAddContestants('private');
+
+        $firstContestCreator = $firstContestData['director'];
+
+        // Logging user
+        $login = self::login($firstInvitedUserIdentity);
+
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $contests = $contestListPayload['contests']['current'];
+        $contestWithContestants = $contests[0];
+
+        $this->assertEquals(2, $contestWithContestants['contestants']);
+
+        $secondContestCreator = $secondContestData['director'];
+
+        // Logging user
+        $login = self::login($secondContestCreator);
+
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $contests = $contestListPayload['contests']['current'];
+        $contestWithoutContestants = $contests[0];
+
+        $this->assertEquals(0, $contestWithoutContestants['contestants']);
+    }
+
+    public function testContestantsColumnAsInvitedUser() {
+        [
+            'firstContestData' => $firstContestData,
+            'secondContestData' => $secondContestData,
+            'firstInvitedUserIdentity' => $firstInvitedUserIdentity,
+            'secondInvitedUserIdentity' => $secondInvitedUserIdentity,
+        ] = $this->createContestsAndAddContestants('private');
+
+        // Logging user
+        $login = self::login($firstInvitedUserIdentity);
+
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $contests = $contestListPayload['contests']['current'];
+        $contestWithContestants = $contests[0];
+
+        $this->assertEquals(2, $contestWithContestants['contestants']);
+    }
+
+    public function testContestantsColumnAsSystemAdmin() {
+        [
+            'firstContestData' => $firstContestData,
+            'secondContestData' => $secondContestData,
+            'firstInvitedUserIdentity' => $firstInvitedUserIdentity,
+            'secondInvitedUserIdentity' => $secondInvitedUserIdentity,
+        ] = $this->createContestsAndAddContestants('private');
+
+        // Create admin user (system admin)
+        ['user' => $user, 'identity' => $adminUserIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        // Logging user
+        $login = self::login($adminUserIdentity);
+
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $contests = $contestListPayload['contests']['current'];
+
+        if ($contests[0]['title'] === 'contest-with-contestants') {
+            $contestWithContestants = $contests[0];
+            $contestWithoutContestants = $contests[1];
+        } else {
+            $contestWithContestants = $contests[1];
+            $contestWithoutContestants = $contests[0];
+        }
+
+        $this->assertEquals(2, $contestWithContestants['contestants']);
+        $this->assertEquals(0, $contestWithoutContestants['contestants']);
+    }
 }

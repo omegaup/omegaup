@@ -631,11 +631,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                     SELECT
                         $columns,
-                        count(Problemset_Identities.identity_id) AS `contestants`
+                        count(pi2.identity_id) AS `contestants`
                     FROM
                         Contests
                     INNER JOIN
                         Problemset_Identities
+                    ON
+                        Contests.problemset_id = Problemset_Identities.problemset_id
+                    LEFT JOIN
+                        Problemset_Identities pi2
                     ON
                         Contests.problemset_id = Problemset_Identities.problemset_id
                     WHERE
