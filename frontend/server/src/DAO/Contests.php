@@ -13,8 +13,7 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  *
- * @psalm-type Contest=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
- * @psalm-type Contestv2=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type Contest=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
   */
 class Contests extends \OmegaUp\DAO\Base\Contests {
     /** @var string */
@@ -400,7 +399,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     /**
      * Returns all contests where a user is participating in.
      *
-     * @return list<Contestv2>
+     * @return list<Contest>
      */
     final public static function getContestsParticipating(
         int $identityId,
@@ -427,7 +426,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 $columns,
                 p.scoreboard_url,
                 p.scoreboard_url_admin,
-                count(Problemset_Identities.identity_id) AS `contestants`
+                COUNT(Problemset_Identities.identity_id) AS `contestants`
             FROM
                 Contests
             INNER JOIN
@@ -520,7 +519,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $sql = "
             SELECT
                 $columns,
-                count(Problemset_Identities.identity_id) AS `contestants`
+                COUNT(Problemset_Identities.identity_id) AS `contestants`
             FROM
                 Contests
             LEFT JOIN
@@ -597,7 +596,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                     SELECT
                         $columns,
-                        count(Problemset_Identities.identity_id) AS `contestants`
+                        COUNT(Problemset_Identities.identity_id) AS `contestants`
                     FROM
                         Contests
                     INNER JOIN
@@ -631,7 +630,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                     SELECT
                         $columns,
-                        count(pi2.identity_id) AS `contestants`
+                        COUNT(pi2.identity_id) AS `contestants`
                     FROM
                         Contests
                     INNER JOIN
@@ -661,7 +660,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                     SELECT
                         $columns,
-                        count(Problemset_Identities.identity_id) AS `contestants`
+                        COUNT(Problemset_Identities.identity_id) AS `contestants`
                     FROM
                         Contests
                     INNER JOIN
@@ -702,7 +701,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                      SELECT
                          $columns,
-                         count(Problemset_Identities.identity_id) AS `contestants`
+                         COUNT(Problemset_Identities.identity_id) AS `contestants`
                      FROM
                          Contests
                      INNER JOIN
@@ -739,7 +738,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                      SELECT
                          $columns,
-                         count(Problemset_Identities.identity_id) AS `contestants`
+                         COUNT(Problemset_Identities.identity_id) AS `contestants`
                      FROM
                          Contests
                      INNER JOIN
@@ -773,7 +772,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                      SELECT
                          $columns,
-                         count(Problemset_Identities.identity_id) AS `contestants`
+                         COUNT(Problemset_Identities.identity_id) AS `contestants`
                      FROM
                          Contests
                      LEFT JOIN
@@ -826,7 +825,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $sql = "
                SELECT
                     $columns,
-                    count(Problemset_Identities.identity_id) AS `contestants`
+                    COUNT(Problemset_Identities.identity_id) AS `contestants`
                 FROM
                     `Contests`
                 LEFT JOIN
@@ -882,7 +881,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $sql = "
                 SELECT
                     $columns,
-                    count(Problemset_Identities.identity_id) AS `contestants`
+                    COUNT(Problemset_Identities.identity_id) AS `contestants`
                 FROM
                     Contests
                 LEFT JOIN
