@@ -54,7 +54,7 @@ export function getOptionsFromLocation(location: string): LocationOptions {
         response.showNewClarificationPopup = true;
       } else if (match.groups.alias?.startsWith('clarification-')) {
         clarificationsStore.commit(
-          'selectClarification',
+          'selectClarificationId',
           parseInt(match.groups.alias.split('-')[1]),
         );
       }

@@ -149,16 +149,10 @@ export default class ArenaClarificationList extends Vue {
     this.$emit('update:activeTab', 'clarifications');
   }
 
-  clarificationSelected(clarificationId: number) {
-    if (
-      !Object.prototype.hasOwnProperty.call(
-        clarificationsStore.state.index,
-        clarificationId,
-      )
-    ) {
-      return;
-    }
-    return clarificationsStore.state.index[clarificationId].selected;
+  clarificationSelected(clarificationId: number): boolean {
+    return (
+      clarificationsStore.state.selectedClarificationId === clarificationId
+    );
   }
 
   get assignmentsNames(): Array<string | null> {

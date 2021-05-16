@@ -5,6 +5,7 @@ import * as api from '../api';
 import T from '../lang';
 import { omegaup, OmegaUp } from '../omegaup';
 import { types, messages } from '../api_types';
+import clarificationsStore from './clarificationsStore';
 import { myRunsStore, runsStore } from './runsStore';
 import * as time from '../time';
 import * as ui from '../ui';
@@ -1375,10 +1376,7 @@ export class Arena {
       .catch(ui.ignoreError);
   }
 
-  updateClarification(
-    clarification: types.Clarification,
-    selected: boolean = false,
-  ): void {
+  updateClarification(clarification: types.Clarification): void {
     let r: HTMLElement | null = null;
     const anchor = `clarifications/clarification-${clarification.clarification_id}`;
     const clarifications =
@@ -1404,11 +1402,6 @@ export class Arena {
       if (r) {
         r.classList.remove('template');
         r.classList.add('inserted');
-        if (selected) {
-          r.classList.add('selected');
-        } else {
-          r.classList.remove('selected');
-        }
         $('.clarifications tbody.clarification-list').prepend(r);
         this.clarifications[clarification.clarification_id] = r;
       }
@@ -1518,20 +1511,16 @@ export class Arena {
     } else if (clarifications.length >= this.clarificationsRowcount) {
       $('#clarifications-count').html(`(${this.clarificationsRowcount}+)`);
     }
-    const match = /#(?<tab>\w+)\/(?<name>\w+)-(?<id>\d+)/g.exec(
-      window.location.hash,
-    );
 
     const previouslyAnswered = this.answeredClarifications;
     this.answeredClarifications = 0;
     this.clarifications = {};
 
     for (let i = clarifications.length - 1; i >= 0; i--) {
-      const selected =
-        clarifications[i].clarification_id ===
-        parseInt(match?.groups?.id ?? '');
-      this.updateClarification(clarifications[i], selected);
+      this.updateClarification(clarifications[i]);
     }
+
+    this.selectRowTable();
 
     if (this.commonNavbar !== null) {
       this.commonNavbar.notificationsClarifications = clarifications
@@ -1758,17 +1747,12 @@ export class Arena {
         this.navbarProblems.activeProblem = null;
       }
     } else if (this.activeTab == 'clarifications') {
-      const r = document.querySelector('.selected') as HTMLElement | null;
-      if (r) {
-        r.classList.remove('selected');
-      }
       const match = /#(?<tab>\w+)\/(?<name>\w+)-(?<id>\d+)/g.exec(
         window.location.hash,
       );
-      const id = parseInt(match?.groups?.id ?? '');
-      if (id && this.clarifications[id]) {
-        this.clarifications[id].classList.add('selected');
-      }
+      const clarificationId = parseInt(match?.groups?.id ?? '');
+      clarificationsStore.commit('selectClarificationId', clarificationId);
+      this.selectRowTable();
       if (window.location.hash == '#clarifications/new') {
         $('#overlay form').hide();
         $('#overlay, #clarification').show();
@@ -1789,6 +1773,17 @@ export class Arena {
       } else if (this.activeTab == 'clarifications') {
         $('#clarifications-count').css('font-weight', 'normal');
       }
+    }
+  }
+
+  selectRowTable(): void {
+    const r = document.querySelector('.selected') as HTMLElement | null;
+    if (r) {
+      r.classList.remove('selected');
+    }
+    const id = clarificationsStore.state.selectedClarificationId ?? null;
+    if (id && this.clarifications[id]) {
+      this.clarifications[id].classList.add('selected');
     }
   }
 
