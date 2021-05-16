@@ -35,7 +35,7 @@
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :problem="problemInfo"
               :active-tab="'problems'"
-              :runs="problemRuns"
+              :runs="runs"
               :popup-displayed="popupDisplayed"
               :guid="guid"
               :problem-alias="problemAlias"
@@ -45,7 +45,7 @@
                 (selectedTab) =>
                   $emit('reset-hash', {
                     selectedTab,
-                    alias: activeProblem.problem.alias,
+                    alias: activeProblemAlias,
                   })
               "
               @submit-run="onRunSubmitted"
@@ -125,11 +125,6 @@ import omegaup_Markdown from '../Markdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { ContestClarificationType } from '../../arena/clarifications';
 
-export interface ActiveProblem {
-  runs: types.Run[];
-  problem: types.NavbarProblemsetProblem;
-}
-
 @Component({
   components: {
     'omegaup-arena-clarification-list': arena_ClarificationList,
@@ -145,7 +140,7 @@ export default class ArenaContestPractice extends Vue {
   @Prop() contestAdmin!: boolean;
   @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
-  @Prop({ default: null }) problem!: ActiveProblem | null;
+  @Prop({ default: null }) problem!: types.NavbarProblemsetProblem | null;
   @Prop() problemInfo!: types.ProblemInfo;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop({ default: false }) isEphemeralExperimentEnabled!: boolean;
@@ -154,29 +149,26 @@ export default class ArenaContestPractice extends Vue {
   @Prop() activeTab!: string;
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
+  @Prop({ default: () => [] }) runs!: types.Run[];
 
   T = T;
   ui = ui;
   currentClarifications = this.clarifications;
   ContestClarificationType = ContestClarificationType;
-  activeProblem: ActiveProblem | null = this.problem;
+  activeProblem: types.NavbarProblemsetProblem | null = this.problem;
   shouldShowRunDetails = false;
 
   get activeProblemAlias(): null | string {
-    return this.activeProblem?.problem.alias ?? null;
+    return this.activeProblem?.alias ?? null;
   }
 
-  get problemRuns(): types.Run[] {
-    return this.problem?.runs ?? [];
-  }
-
-  onNavigateToProblem(request: ActiveProblem) {
-    this.activeProblem = request;
-    this.$emit('navigate-to-problem', request);
+  onNavigateToProblem(problem: types.NavbarProblemsetProblem) {
+    this.activeProblem = problem;
+    this.$emit('navigate-to-problem', { problem });
   }
 
   onRunSubmitted(run: { code: string; language: string }): void {
-    this.$emit('submit-run', Object.assign({}, run, this.problem));
+    this.$emit('submit-run', { ...run, problem: this.activeProblem });
   }
 
   onClarificationResponse(response: types.Clarification): void {
@@ -191,7 +183,7 @@ export default class ArenaContestPractice extends Vue {
   }
 
   @Watch('problem')
-  onActiveProblemChanged(newValue: ActiveProblem | null): void {
+  onActiveProblemChanged(newValue: types.NavbarProblemsetProblem | null): void {
     if (!newValue) {
       this.activeProblem = null;
       return;

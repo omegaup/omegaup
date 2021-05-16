@@ -6,7 +6,6 @@ import { types } from '../api_types';
 import { myRunsStore } from './runsStore';
 import problemsStore from './problemStore';
 import { PopupDisplayed } from '../components/problem/Details.vue';
-import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import { trackRun } from './submissions';
 
 export enum NavigationType {
@@ -18,9 +17,8 @@ interface BaseNavigation {
   target: Vue & {
     problemInfo: types.ProblemInfo | null;
     popupDisplayed?: PopupDisplayed;
-    problem: ActiveProblem | null;
+    problem: types.NavbarProblemsetProblem | null;
   };
-  runs: types.Run[];
   problem: types.NavbarProblemsetProblem;
   problems: types.NavbarProblemsetProblem[];
 }
@@ -46,7 +44,6 @@ export async function navigateToProblem(
     contestAlias = request.contestAlias;
   }
   const { target, problem, problems } = request;
-  let { runs } = request;
   if (
     Object.prototype.hasOwnProperty.call(
       problemsStore.state.problems,
@@ -76,10 +73,13 @@ export async function navigateToProblem(
       problemInfo.title = currentProblem?.text ?? '';
       target.problemInfo = problemInfo;
       problem.alias = problemInfo.alias;
-      runs = myRunsStore.state.runs;
-      problem.bestScore = getMaxScore(runs, problemInfo.alias, 0);
+      problem.bestScore = getMaxScore(
+        myRunsStore.state.runs,
+        problemInfo.alias,
+        0,
+      );
       problemsStore.commit('addProblem', problemInfo);
-      target.problem = { problem, runs };
+      target.problem = problem;
       if (target.popupDisplayed === PopupDisplayed.RunSubmit) {
         setLocationHash(`#problems/${problem.alias}/new-run`);
         return;
