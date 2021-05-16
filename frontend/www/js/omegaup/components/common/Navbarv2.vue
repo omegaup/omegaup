@@ -357,7 +357,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import notifications_List from '../notification/List.vue';
-import notifications_Clarifications from '../notification/Clarifications.vue';
+import notifications_Clarifications from '../notification/Clarificationsv2.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
 import common_GraderBadge from '../common/GraderBadge.vue';
 
