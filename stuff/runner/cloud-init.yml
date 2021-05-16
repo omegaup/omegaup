@@ -1,0 +1,111 @@
+#cloud-config
+packages:
+  - xz-utils
+  - jq
+
+users:
+  - name: lhchavez
+    home: /home/lhchavez
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCnjhoOKyTPYdNViybSdZUobS5WsOuhZnGO3QWQqI8K5+op8gEzBJaV1XfwVMewbBFv1t8NNANBlqbkjAGwrbLVixz156fcnTpVKaXPF7L31UTSv3x3/7gjRkAnNAexVNQOR5uLzEqaC1WLzTZf1iN4VMLskmuEE1PYAR7JBoE7jwKc5w67Iu0aELhiZ2nGSXkNU9fuSA3O/EFRQMtUVY8KvRuCN5iSTuHhL3vm4TE39ZYfSCsPok0PAbnR0eIFObQYkp/EaJZitqALmxr9gFsK5AxlfbbGiOXlUP1et4tA1/6ep3CPCnUy6TNCwKuOdC8kMzHg9tYIl0qtpgibuLU3 lhchavez@lhc-desktop
+    sudo: ALL=(ALL) NOPASSWD:ALL
+  - name: omegaup
+    home: /var/lib/omegaup
+    shell: /usr/sbin/nologin
+
+write_files:
+  - encoding: gzip
+    content: !!binary |
+      H4sIAAAAAAAAA3WQMW7DMAxFd57CF0h0Ag1tUhSZGtQ1MhgeFJl1idKSQElJfPsIcdVO3Uh+8vGT
+      fecoDbDHaIVCIu+0n3EyXWjYT5GzhCaiXMginIxLcZVz2Eh2DmVbxafPhKIdpquX720yMmFq/umF
+      vl2jAT6WgDrSHBihK3rFw6v4HH6zlxvatkCTVjmKOpNTlV1twqksJjftSdAmL4tWFyOK6Vxb4R3j
+      g2H4apYIu2PX2i8cM5exo2eyi6axGDm8/dV3bGJcy9AfXAEwD49X4Pi86Dlzok0uzn9uhjsoPdI2
+      UgEAAA==
+    owner: root:root
+    path: /etc/systemd/system/omegaup-logslurp.service
+    permissions: '0644'
+
+runcmd:
+  - |
+    # Download all the payloads from GitHub and extract them.
+    for url in $(echo "https://github.com/omegaup/omegajail/releases/download/v3.7.0/omegajail-focal-rootfs-x86_64.tar.xz
+    https://github.com/omegaup/omegajail/releases/download/v3.7.0/omegajail-focal-distrib-x86_64.tar.xz
+    https://github.com/omegaup/quark/releases/download/v1.4.2-6c2fe41/omegaup-runner.tar.xz
+    https://github.com/omegaup/logslurp/releases/download/v0.2.0/omegaup-logslurp.tar.xz"); do
+      echo "downloading ${url}..."
+      curl --silent --location --url "${url}" | tar xJ -C /
+    done
+    for url in $(echo "https://s3.amazonaws.com/omegaup-dist/omegaup-runner-config.tar.xz"); do
+      echo "downloading ${url}..."
+      curl --silent --location --url "${url}" | tar xj -C /
+    done
+
+    # Create the directory layout for configuration and runtime files.
+    mkdir -p /etc/omegaup/runner /etc/omegaup/logslurp /var/log/omegaup /var/lib/omegaup
+
+    # Get the instance's fully-qualified domain name.
+    location="$(curl \
+                  --silent \
+                  --header Metadata:true \
+                  --noproxy "*" \
+                  "http://169.254.169.254/metadata/instance?api-version=2020-09-01"  | \
+                jq -r '.compute.location')"
+    hostname="$(hostname | sed -e 's/^\(.*[^0]\)0\+\([0-9]\+\)$/vm\2.omegaup-runner/')"
+    fqdn="${hostname}.${location}.cloudapp.azure.com"
+    cat <<EOF > /etc/omegaup/logslurp/config.json
+    {
+        "streams": [
+            {
+                "labels": {
+                    "environment": "runner",
+                    "host": "${fqdn}",
+                    "job": "omegaup-runner"
+                },
+                "path": "/var/log/omegaup/runner.log",
+                "timestamp_layout": "2006-01-02T15:04:05-0700",
+                "regexp": "(?m)^t=(?P<ts>\\\\d+-\\\\d+-\\\\d+T\\\\d+:\\\\d+:\\\\d+[-+]\\\\d+) lvl=(?P<lvl>[^ ]+?) (.*?)$"
+            }
+        ]
+    }
+    EOF
+    cat <<EOF > /etc/omegaup/runner/config.json
+    {
+            "Logging": {
+                    "File": "/var/log/omegaup/runner.log"
+            },
+            "Runner": {
+                    "Hostname": "${fqdn}",
+                    "RuntimePath": "/var/lib/omegaup/runner",
+                    "GraderURL": "https://grader.omegaup.com:11302"
+            },
+            "TLS": {
+                    "CertFile": "/etc/omegaup/runner/certificate.pem",
+                    "KeyFile": "/etc/omegaup/runner/key.pem"
+            },
+            "Tracing": {
+                    "File": "/var/log/omegaup/runner.tracing.json"
+            }
+    }
+    EOF
+
+    # Split the certificate into private key and certificate chain.
+    openssl pkey \
+        -in /var/lib/waagent/Microsoft.Azure.KeyVault/omegaup-runner-vault.omegaup-runner \
+        -out /etc/omegaup/runner/key.pem
+    openssl crl2pkcs7 \
+        -nocrl \
+        -certfile /var/lib/waagent/Microsoft.Azure.KeyVault/omegaup-runner-vault.omegaup-runner | \
+      openssl pkcs7 -print_certs | \
+      grep '^[^,]\+$' > /etc/omegaup/runner/certificate.pem
+
+    # Fix all the permissions
+    chmod 0600 /etc/omegaup/logslurp/config.json /etc/omegaup/runner/key.pem /etc/omegaup/runner/certificate.pem
+    chown -R omegaup:omegaup /etc/omegaup /var/log/omegaup /var/lib/omegaup
+
+    # And finally, enable all the services so that they can start running.
+    /bin/systemctl daemon-reload
+    /bin/systemctl enable omegaup-logslurp
+    /bin/systemctl start omegaup-logslurp
+    /bin/systemctl enable omegaup-runner
+    /bin/systemctl start omegaup-runner
