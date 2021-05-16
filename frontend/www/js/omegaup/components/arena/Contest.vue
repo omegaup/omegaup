@@ -229,7 +229,7 @@ export default class ArenaContest extends Vue {
   onRunSubmitted(request: { code: string; language: string }): void {
     this.$emit('submit-run', {
       ...request,
-      ...{ problem: this.activeProblem },
+      problem: this.activeProblem,
       target: this,
     });
   }

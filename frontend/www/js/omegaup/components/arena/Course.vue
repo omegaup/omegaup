@@ -148,7 +148,7 @@ export default class ArenaCourse extends Vue {
   }
 
   onRunSubmitted(run: { code: string; language: string }): void {
-    this.$emit('submit-run', { ...run, ...{ problem: this.activeProblem } });
+    this.$emit('submit-run', { ...run, problem: this.activeProblem });
   }
 
   @Watch('problem')
