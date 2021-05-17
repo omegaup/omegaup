@@ -110,7 +110,7 @@
                 "enabled": true,
                 "profiles": [
                     {
-                        "name": "Profile1",
+                        "name": "Default",
                         "capacity": {
                             "minimum": "[parameters('autoScaleMin')]",
                             "maximum": "[parameters('autoScaleMax')]",
@@ -118,41 +118,43 @@
                         },
                         "rules": [
                             {
-                                "metricTrigger": {
-                                    "metricName": "Percentage CPU",
-                                    "metricNamespace": "",
-                                    "metricResourceUri": "[variables('vmssId')]",
-                                    "timeGrain": "PT1M",
-                                    "statistic": "Average",
-                                    "timeWindow": "PT1M",
-                                    "timeAggregation": "Average",
-                                    "operator": "GreaterThan",
-                                    "threshold": "75"
-                                },
                                 "scaleAction": {
                                     "direction": "Increase",
                                     "type": "ChangeCount",
                                     "value": "3",
                                     "cooldown": "PT5M"
+                                },
+                                "metricTrigger": {
+                                    "metricName": "performanceCounters/requestsInQueue",
+                                    "metricNamespace": "microsoft.insights/components",
+                                    "metricResourceUri": "/subscriptions/9fc6c11d-9406-42f8-9a78-3813ed0875fa/resourceGroups/omegaup-grader/providers/microsoft.insights/components/omegaup-grader",
+                                    "operator": "GreaterThan",
+                                    "statistic": "Max",
+                                    "threshold": 5,
+                                    "timeAggregation": "Maximum",
+                                    "timeGrain": "PT1M",
+                                    "timeWindow": "PT1M",
+                                    "dividePerInstance": true
                                 }
                             },
                             {
-                                "metricTrigger": {
-                                    "metricName": "Percentage CPU",
-                                    "metricNamespace": "",
-                                    "metricResourceUri": "[variables('vmssId')]",
-                                    "timeGrain": "PT1M",
-                                    "statistic": "Average",
-                                    "timeWindow": "PT5M",
-                                    "timeAggregation": "Average",
-                                    "operator": "LessThan",
-                                    "threshold": "20"
-                                },
                                 "scaleAction": {
                                     "direction": "Decrease",
                                     "type": "ChangeCount",
                                     "value": "1",
-                                    "cooldown": "PT2M"
+                                    "cooldown": "PT5M"
+                                },
+                                "metricTrigger": {
+                                    "metricName": "performanceCounters/requestsInQueue",
+                                    "metricNamespace": "microsoft.insights/components",
+                                    "metricResourceUri": "/subscriptions/9fc6c11d-9406-42f8-9a78-3813ed0875fa/resourceGroups/omegaup-grader/providers/microsoft.insights/components/omegaup-grader",
+                                    "operator": "LessThan",
+                                    "statistic": "Max",
+                                    "threshold": 1,
+                                    "timeAggregation": "Maximum",
+                                    "timeGrain": "PT1M",
+                                    "timeWindow": "PT5M",
+                                    "dividePerInstance": true
                                 }
                             }
                         ]
