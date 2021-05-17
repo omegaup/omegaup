@@ -1777,7 +1777,9 @@ export class Arena {
   }
 
   selectRowTable(): void {
-    const r = document.querySelector('.selected') as HTMLElement | null;
+    const r = document.querySelector(
+      '#clarifications .clarification-list .selected',
+    ) as HTMLElement | null;
     if (r) {
       r.classList.remove('selected');
     }

@@ -30,6 +30,7 @@
           <li
             v-for="clarification in unreadClarifications"
             :key="clarification.clarification_id"
+            :data-clarification="clarification.clarification_id"
           >
             <button
               :aria-label="T.wordsClose"
@@ -53,7 +54,7 @@
       </li>
       <template v-if="unreadClarifications && unreadClarifications.length > 1">
         <li class="divider" role="separator"></li>
-        <li>
+        <li data-mark-all-as-read-button>
           <a href="#" @click.prevent="onMarkAllAsRead"
             ><span class="glyphicon glyphicon-align-right"></span>
             {{ T.notificationsMarkAllAsRead }}</a
