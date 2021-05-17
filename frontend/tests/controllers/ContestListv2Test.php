@@ -320,17 +320,19 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties']['payload'];
 
         $contests = $contestListPayload['contests']['current'];
+        $contestContestants = [];
 
-        if ($contests[0]['title'] === 'contest-with-contestants') {
-            $contestWithContestants = $contests[0];
-            $contestWithoutContestants = $contests[1];
-        } else {
-            $contestWithContestants = $contests[1];
-            $contestWithoutContestants = $contests[0];
+        foreach ($contests as $contest) {
+            $contestContestants[$contest['title']] = $contest['contestants'];
         }
 
-        $this->assertEquals(2, $contestWithContestants['contestants']);
-        $this->assertEquals(0, $contestWithoutContestants['contestants']);
+        $this->assertEqualsCanonicalizing(
+            [
+                'contest-with-contestants' => 2,
+                'contest-without-contestants' => 0,
+            ],
+            $contestContestants,
+        );
     }
 
     public function testContestantsColumnAsCreatorUser() {
@@ -353,9 +355,18 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties']['payload'];
 
         $contests = $contestListPayload['contests']['current'];
-        $contestWithContestants = $contests[0];
+        $contestContestants = [];
 
-        $this->assertEquals(2, $contestWithContestants['contestants']);
+        foreach ($contests as $contest) {
+            $contestContestants[$contest['title']] = $contest['contestants'];
+        }
+
+        $this->assertEqualsCanonicalizing(
+            [
+                'contest-with-contestants' => 2,
+            ],
+            $contestContestants,
+        );
 
         $secondContestCreator = $secondContestData['director'];
 
@@ -369,9 +380,18 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties']['payload'];
 
         $contests = $contestListPayload['contests']['current'];
-        $contestWithoutContestants = $contests[0];
+        $contestContestants = [];
 
-        $this->assertEquals(0, $contestWithoutContestants['contestants']);
+        foreach ($contests as $contest) {
+            $contestContestants[$contest['title']] = $contest['contestants'];
+        }
+
+        $this->assertEqualsCanonicalizing(
+            [
+                'contest-without-contestants' => 0,
+            ],
+            $contestContestants,
+        );
     }
 
     public function testContestantsColumnAsInvitedUser() {
@@ -392,9 +412,18 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties']['payload'];
 
         $contests = $contestListPayload['contests']['current'];
-        $contestWithContestants = $contests[0];
+        $contestContestants = [];
 
-        $this->assertEquals(2, $contestWithContestants['contestants']);
+        foreach ($contests as $contest) {
+            $contestContestants[$contest['title']] = $contest['contestants'];
+        }
+
+        $this->assertEqualsCanonicalizing(
+            [
+                'contest-with-contestants' => 2,
+            ],
+            $contestContestants,
+        );
     }
 
     public function testContestantsColumnAsSystemAdmin() {
@@ -418,16 +447,18 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties']['payload'];
 
         $contests = $contestListPayload['contests']['current'];
+        $contestContestants = [];
 
-        if ($contests[0]['title'] === 'contest-with-contestants') {
-            $contestWithContestants = $contests[0];
-            $contestWithoutContestants = $contests[1];
-        } else {
-            $contestWithContestants = $contests[1];
-            $contestWithoutContestants = $contests[0];
+        foreach ($contests as $contest) {
+            $contestContestants[$contest['title']] = $contest['contestants'];
         }
 
-        $this->assertEquals(2, $contestWithContestants['contestants']);
-        $this->assertEquals(0, $contestWithoutContestants['contestants']);
+        $this->assertEqualsCanonicalizing(
+            [
+                'contest-with-contestants' => 2,
+                'contest-without-contestants' => 0,
+            ],
+            $contestContestants,
+        );
     }
 }
