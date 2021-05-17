@@ -505,6 +505,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Test\Factories\ContestParams([
                 'contestDirector' => $organizerIdentity,
                 'contestDirectorUser' => $organizerUser,
+                'admissionMode' => 'private',
                 'requestsUserInformation' => 'optional',
             ])
         );
@@ -540,12 +541,18 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Test\Factories\ContestParams([
                 'contestDirector' => $organizerIdentity,
                 'contestDirectorUser' => $organizerUser,
+                'admissionMode' => 'private',
                 'requestsUserInformation' => 'optional',
             ])
         );
 
         // Create invited user
         ['identity' => $invitedUserIdentity] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contestData,
+            $invitedUserIdentity
+        );
 
         // Logging user
         $login = self::login($invitedUserIdentity);
@@ -578,6 +585,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Test\Factories\ContestParams([
                 'contestDirector' => $organizerIdentity,
                 'contestDirectorUser' => $organizerUser,
+                'admissionMode' => 'private',
                 'requestsUserInformation' => 'optional',
             ])
         );
