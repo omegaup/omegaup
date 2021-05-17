@@ -427,7 +427,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 $columns,
                 p.scoreboard_url,
                 p.scoreboard_url_admin,
-                Identities.username AS `organizer`
+                organizer.username AS `organizer`
             FROM
                 Contests
             INNER JOIN
@@ -461,13 +461,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 pi.problemset_id = p.problemset_id AND
                 pi.identity_id = ?
             INNER JOIN
-                ACLs
+                ACLs a
             ON
-                Contests.acl_id = ACLs.acl_id
+                Contests.acl_id = a.acl_id
             INNER JOIN
-                Identities
+                Identities organizer
             ON
-                ACLs.owner_id = Identities.user_id
+                a.owner_id = organizer.user_id
             WHERE
                 $recommendedCondition AND
                 $activeCondition AND
@@ -523,17 +523,17 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $sql = "
             SELECT
                 $columns,
-                Identities.username AS `organizer`
+                organizer.username AS `organizer`
             FROM
                 Contests
             INNER JOIN
-                ACLs
+                ACLs a
             ON
-                Contests.acl_id = ACLs.acl_id
+                Contests.acl_id = a.acl_id
             INNER JOIN
-                Identities
+                Identities organizer
             ON
-                ACLs.owner_id = Identities.user_id
+                a.owner_id = organizer.user_id
             WHERE
                 $recommended_check  AND $end_check AND $query_check
                 AND `admission_mode` != 'private'
@@ -603,19 +603,19 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                     SELECT
                         $columns,
-                        Identities.username AS `organizer`
+                        organizer.username AS `organizer`
                     FROM
                         Contests
                     INNER JOIN
-                        ACLs
+                        ACLs a
                     ON
-                        ACLs.acl_id = Contests.acl_id
+                        Contests.acl_id = a.acl_id
                     INNER JOIN
-                        Identities
+                        Identities organizer
                     ON
-                        ACLs.owner_id = Identities.user_id
+                        a.owner_id = organizer.user_id
                     WHERE
-                        Contests.admission_mode = 'private' AND Identities.identity_id = ? AND
+                        Contests.admission_mode = 'private' AND organizer.identity_id = ? AND
                         $recommended_check AND $end_check AND $query_check
                         AND archived = 0
                  ) ";
@@ -632,7 +632,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                     SELECT
                         $columns,
-                        Identities.username AS `organizer`
+                        organizer.username AS `organizer`
                     FROM
                         Contests
                     INNER JOIN
@@ -640,13 +640,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     ON
                         Contests.problemset_id = Problemset_Identities.problemset_id
                     INNER JOIN
-                        ACLs
+                        ACLs a
                     ON
-                        Contests.acl_id = ACLs.acl_id
+                        Contests.acl_id = a.acl_id
                     INNER JOIN
-                        Identities
+                        Identities organizer
                     ON
-                        ACLs.owner_id = Identities.user_id
+                        a.owner_id = organizer.user_id
                     WHERE
                         Contests.admission_mode = 'private' AND Problemset_Identities.identity_id = ? AND
                         $recommended_check AND $end_check AND $query_check
@@ -665,7 +665,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                     SELECT
                         $columns,
-                        Identities.username AS `organizer`
+                        organizer.username AS `organizer`
                     FROM
                         Contests
                     INNER JOIN
@@ -682,13 +682,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     ON
                         gi.group_id = gr.group_id
                     INNER JOIN
-                        ACLs
+                        ACLs a
                     ON
-                        Contests.acl_id = ACLs.acl_id
+                        Contests.acl_id = a.acl_id
                     INNER JOIN
-                        Identities
+                        Identities organizer
                     ON
-                        ACLs.owner_id = Identities.user_id
+                        a.owner_id = organizer.user_id
                     WHERE
                         Contests.admission_mode = 'private' AND
                         gi.identity_id = ? AND
@@ -709,7 +709,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                      SELECT
                          $columns,
-                         Identities2.username AS `organizer`
+                         organizer.username AS `organizer`
                      FROM
                          Contests
                      INNER JOIN
@@ -721,13 +721,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                      ON
                          Identities.user_id = User_Roles.user_id
                      INNER JOIN
-                         ACLs
+                         ACLs a
                      ON
-                         Contests.acl_id = ACLs.acl_id
+                         Contests.acl_id = a.acl_id
                      INNER JOIN
-                         Identities Identities2
+                         Identities organizer
                      ON
-                         ACLs.owner_id = Identities2.user_id
+                         a.owner_id = organizer.user_id
                      WHERE
                          Contests.admission_mode = 'private' AND
                          Identities.identity_id = ? AND
@@ -749,7 +749,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                      SELECT
                          $columns,
-                         Identities.username AS `organizer`
+                         organizer.username AS `organizer`
                      FROM
                          Contests
                      INNER JOIN
@@ -759,13 +759,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                      ON
                          Groups_Identities.group_id = Group_Roles.group_id
                      INNER JOIN
-                         ACLs
+                         ACLs a
                      ON
-                         Contests.acl_id = ACLs.acl_id
+                         Contests.acl_id = a.acl_id
                      INNER JOIN
-                         Identities
+                         Identities organizer
                      ON
-                         ACLs.owner_id = Identities.user_id
+                         a.owner_id = organizer.user_id
                      WHERE
                          Contests.admission_mode = 'private' AND
                          Groups_Identities.identity_id = ? AND
@@ -786,17 +786,17 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                      SELECT
                          $columns,
-                         Identities.username AS `organizer`
+                         organizer.username AS `organizer`
                      FROM
                          Contests
                      INNER JOIN
-                         ACLs
+                         ACLs a
                      ON
-                         Contests.acl_id = ACLs.acl_id
+                         Contests.acl_id = a.acl_id
                      INNER JOIN
-                         Identities
+                         Identities organizer
                      ON
-                         ACLs.owner_id = Identities.user_id
+                         a.owner_id = organizer.user_id
                      WHERE
                          admission_mode <> 'private' AND $recommended_check AND $end_check AND $query_check
                         AND archived = 0
@@ -842,17 +842,17 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $sql = "
                SELECT
                     $columns,
-                    Identities.username AS `organizer`
+                    organizer.username AS `organizer`
                 FROM
                     `Contests`
                 INNER JOIN
-                    ACLs
+                    ACLs a
                 ON
-                    Contests.acl_id = ACLs.acl_id
+                    Contests.acl_id = a.acl_id
                 INNER JOIN
-                    Identities
+                    Identities organizer
                 ON
-                    ACLs.owner_id = Identities.user_id
+                    a.owner_id = organizer.user_id
                 WHERE
                     `admission_mode` <> 'private'
                     AND $recommended_check
@@ -901,17 +901,17 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $sql = "
                 SELECT
                     $columns,
-                    Identities.username AS `organizer`
+                    organizer.username AS `organizer`
                 FROM
                     Contests
                 INNER JOIN
-                    ACLs
+                    ACLs a
                 ON
-                    Contests.acl_id = ACLs.acl_id
+                    Contests.acl_id = a.acl_id
                 INNER JOIN
-                    Identities
+                    Identities organizer
                 ON
-                    ACLs.owner_id = Identities.user_id
+                    a.owner_id = organizer.user_id
                 WHERE $recommended_check AND $end_check AND $query_check AND archived = 0
                 ORDER BY
                     CASE WHEN original_finish_time > NOW() THEN 1 ELSE 0 END DESC,
