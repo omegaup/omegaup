@@ -16,7 +16,6 @@ interface RunSubmit {
   submitDelay: number;
   language: string;
   problemAlias: string;
-  runs: types.Run[];
 }
 
 interface SubmissionResponse {
