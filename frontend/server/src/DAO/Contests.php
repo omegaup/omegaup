@@ -14,7 +14,7 @@ namespace OmegaUp\DAO;
  * @package docs
  *
  * @psalm-type Contest=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
- * @psalm-type Contestv2=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type Contestv2=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
   */
 class Contests extends \OmegaUp\DAO\Base\Contests {
     /** @var string */
@@ -427,8 +427,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 $columns,
                 p.scoreboard_url,
                 p.scoreboard_url_admin,
-                COUNT(Problemset_Identities.identity_id) AS `contestants`,
-                organizer.username AS `organizer`
+                COUNT(contestants.identity_id) AS `contestants`,
+                organizer.username AS `organizer`,
+                (pi.identity_id IS NOT NULL) AS `participating`
             FROM
                 Contests
             INNER JOIN
@@ -462,9 +463,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 pi.problemset_id = p.problemset_id AND
                 pi.identity_id = ?
             LEFT JOIN
-                Problemset_Identities
+                Problemset_Identities contestants
             ON
-                Contests.problemset_id = Problemset_Identities.problemset_id
+                Contests.problemset_id = contestants.problemset_id
             INNER JOIN
                 ACLs a
             ON
@@ -500,14 +501,14 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $params[] = intval($offset);
         $params[] = intval($pageSize);
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
      * Returns all recent public contests.
      *
-     * @return list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
+     * @return list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
      */
     final public static function getRecentPublicContests(
         int $user_id,
@@ -529,14 +530,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $sql = "
             SELECT
                 $columns,
-                COUNT(Problemset_Identities.identity_id) AS `contestants`,
-                organizer.username AS `organizer`
+                COUNT(contestants.identity_id) AS `contestants`,
+                organizer.username AS `organizer`,
+                (participating.identity_id IS NOT NULL) AS `participating`
             FROM
                 Contests
             LEFT JOIN
-                Problemset_Identities
+                Problemset_Identities contestants
             ON
-                Contests.problemset_id = Problemset_Identities.problemset_id
+                Contests.problemset_id = contestants.problemset_id
             INNER JOIN
                 ACLs a
             ON
@@ -545,6 +547,11 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 Identities organizer
             ON
                 a.owner_id = organizer.user_id
+            LEFT JOIN
+                Problemset_Identities participating
+            ON
+                Contests.problemset_id = participating.problemset_id AND
+                participating.identity_id = ?
             WHERE
                 $recommended_check  AND $end_check AND $query_check
                 AND `admission_mode` != 'private'
@@ -557,7 +564,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 `contest_id` DESC
             LIMIT ?, ?;";
 
-        $params = [];
+        $params = [$user_id];
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {
@@ -567,7 +574,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $params[] = intval($offset);
         $params[] = intval($pageSize);
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
@@ -591,7 +598,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      * UNION
      * Todos los concursos públicos.
      *
-     * @return list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
+     * @return list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool,  problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
      */
     final public static function getAllContestsForIdentity(
         int $identityId,
@@ -615,14 +622,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                     SELECT
                         $columns,
-                        COUNT(Problemset_Identities.identity_id) AS `contestants`,
-                        organizer.username AS `organizer`
+                        COUNT(contestants.identity_id) AS `contestants`,
+                        organizer.username AS `organizer`,
+                        (participating.identity_id IS NOT NULL) AS `participating`
                     FROM
                         Contests
                     LEFT JOIN
-                        Problemset_Identities
+                        Problemset_Identities contestants
                     ON
-                        Contests.problemset_id = Problemset_Identities.problemset_id
+                        Contests.problemset_id = contestants.problemset_id
                     INNER JOIN
                         ACLs a
                     ON
@@ -631,13 +639,18 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         Identities organizer
                     ON
                         a.owner_id = organizer.user_id
+                    LEFT JOIN
+                        Problemset_Identities participating
+                    ON
+                        Contests.problemset_id = participating.problemset_id AND
+                        participating.identity_id = ?
                     WHERE
                         Contests.admission_mode = 'private' AND organizer.identity_id = ? AND
                         $recommended_check AND $end_check AND $query_check
                         AND archived = 0
                     GROUP BY Contests.contest_id, organizer.identity_id
                  ) ";
-        $params = [$identityId];
+        $params = [$identityId, $identityId];
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {
@@ -650,18 +663,19 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                     SELECT
                         $columns,
-                        COUNT(pi2.identity_id) AS `contestants`,
-                        organizer.username AS `organizer`
+                        COUNT(contestants.identity_id) AS `contestants`,
+                        organizer.username AS `organizer`,
+                        (participating.identity_id IS NOT NULL) AS `participating`
                     FROM
                         Contests
                     INNER JOIN
-                        Problemset_Identities
+                        Problemset_Identities participating
                     ON
-                        Contests.problemset_id = Problemset_Identities.problemset_id
+                        Contests.problemset_id = participating.problemset_id
                     LEFT JOIN
-                        Problemset_Identities pi2
+                        Problemset_Identities contestants
                     ON
-                        Contests.problemset_id = Problemset_Identities.problemset_id
+                        Contests.problemset_id = contestants.problemset_id
                     INNER JOIN
                         ACLs a
                     ON
@@ -671,7 +685,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     ON
                         a.owner_id = organizer.user_id
                     WHERE
-                        Contests.admission_mode = 'private' AND Problemset_Identities.identity_id = ? AND
+                        Contests.admission_mode = 'private' AND participating.identity_id = ? AND
                         $recommended_check AND $end_check AND $query_check
                         AND archived = 0
                     GROUP BY Contests.contest_id, organizer.identity_id
@@ -689,8 +703,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                     SELECT
                         $columns,
-                        COUNT(Problemset_Identities.identity_id) AS `contestants`,
-                        organizer.username AS `organizer`
+                        COUNT(contestants.identity_id) AS `contestants`,
+                        organizer.username AS `organizer`,
+                        (gi.identity_id IS NOT NULL) AS `participating`
                     FROM
                         Contests
                     INNER JOIN
@@ -698,9 +713,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     ON
                         Problemsets.problemset_id = Contests.problemset_id
                     LEFT JOIN
-                        Problemset_Identities
+                        Problemset_Identities contestants
                     ON
-                        Contests.problemset_id = Problemset_Identities.problemset_id
+                        Contests.problemset_id = contestants.problemset_id
                     INNER JOIN
                         Group_Roles gr
                     ON
@@ -739,8 +754,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                      SELECT
                          $columns,
-                         COUNT(Problemset_Identities.identity_id) AS `contestants`,
-                         organizer.username AS `organizer`
+                         COUNT(contestants.identity_id) AS `contestants`,
+                         organizer.username AS `organizer`,
+                         (participating.identity_id IS NOT NULL) AS `participating`
                      FROM
                          Contests
                      INNER JOIN
@@ -752,9 +768,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                      ON
                          Identities.user_id = User_Roles.user_id
                      LEFT JOIN
-                         Problemset_Identities
+                         Problemset_Identities contestants
                      ON
-                         Contests.problemset_id = Problemset_Identities.problemset_id
+                         Contests.problemset_id = contestants.problemset_id
                      INNER JOIN
                          ACLs a
                      ON
@@ -763,6 +779,11 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                          Identities organizer
                      ON
                          a.owner_id = organizer.user_id
+                     LEFT JOIN
+                         Problemset_Identities participating
+                     ON
+                         Contests.problemset_id = participating.problemset_id AND
+                         participating.identity_id = ?
                      WHERE
                          Contests.admission_mode = 'private' AND
                          Identities.identity_id = ? AND
@@ -771,6 +792,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         AND archived = 0
                     GROUP BY Contests.contest_id, organizer.identity_id
                  ) ";
+        $params[] = $identityId;
         $params[] = $identityId;
         $params[] = \OmegaUp\Authorization::ADMIN_ROLE;
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
@@ -785,8 +807,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                      SELECT
                          $columns,
-                         COUNT(Problemset_Identities.identity_id) AS `contestants`,
-                         organizer.username AS `organizer`
+                         COUNT(contestants.identity_id) AS `contestants`,
+                         organizer.username AS `organizer`,
+                         (participating.identity_id IS NOT NULL) AS `participating`
                      FROM
                          Contests
                      INNER JOIN
@@ -796,9 +819,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                      ON
                          Groups_Identities.group_id = Group_Roles.group_id
                      LEFT JOIN
-                         Problemset_Identities
+                         Problemset_Identities contestants
                      ON
-                         Contests.problemset_id = Problemset_Identities.problemset_id
+                         Contests.problemset_id = contestants.problemset_id
                      INNER JOIN
                          ACLs a
                      ON
@@ -807,6 +830,11 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                          Identities organizer
                      ON
                          a.owner_id = organizer.user_id
+                     LEFT JOIN
+                         Problemset_Identities participating
+                     ON
+                         Contests.problemset_id = participating.problemset_id AND
+                         participating.identity_id = ?
                      WHERE
                          Contests.admission_mode = 'private' AND
                          Groups_Identities.identity_id = ? AND
@@ -815,6 +843,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         AND archived = 0
                      GROUP BY Contests.contest_id, organizer.identity_id
                  ) ";
+        $params[] = $identityId;
         $params[] = $identityId;
         $params[] = \OmegaUp\Authorization::ADMIN_ROLE;
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
@@ -828,14 +857,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                  (
                      SELECT
                          $columns,
-                         COUNT(Problemset_Identities.identity_id) AS `contestants`,
-                         organizer.username AS `organizer`
+                         COUNT(contestants.identity_id) AS `contestants`,
+                         organizer.username AS `organizer`,
+                         (participating.identity_id IS NOT NULL) AS `participating`
                      FROM
                          Contests
                      LEFT JOIN
-                         Problemset_Identities
+                         Problemset_Identities contestants
                      ON
-                        Contests.problemset_id = Problemset_Identities.problemset_id
+                        Contests.problemset_id = contestants.problemset_id
                      INNER JOIN
                          ACLs a
                      ON
@@ -844,6 +874,11 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                          Identities organizer
                      ON
                          a.owner_id = organizer.user_id
+                     LEFT JOIN
+                         Problemset_Identities participating
+                     ON
+                         Contests.problemset_id = participating.problemset_id AND
+                         participating.identity_id = ?
                      WHERE
                          admission_mode <> 'private' AND $recommended_check AND $end_check AND $query_check
                         AND archived = 0
@@ -855,6 +890,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                      `original_finish_time` DESC
                  LIMIT ?, ?
                 ";
+        $params[] = $identityId;
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {
@@ -863,12 +899,12 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
         $params[] = intval($offset);
         $params[] = intval($renglones_por_pagina);
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     /**
-     * @return list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
+     * @return list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
      */
     final public static function getAllPublicContests(
         int $pagina = 1,
@@ -890,14 +926,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $sql = "
                SELECT
                     $columns,
-                    COUNT(Problemset_Identities.identity_id) AS `contestants`,
-                    organizer.username AS `organizer`
+                    COUNT(contestants.identity_id) AS `contestants`,
+                    organizer.username AS `organizer`,
+                    FALSE AS `participating`
                 FROM
                     `Contests`
                 LEFT JOIN
-                    Problemset_Identities
+                    Problemset_Identities contestants
                 ON
-                    Contests.problemset_id = Problemset_Identities.problemset_id
+                    Contests.problemset_id = contestants.problemset_id
                 INNER JOIN
                     ACLs a
                 ON
@@ -929,11 +966,11 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
         $params[] = intval($offset);
         $params[] = intval($renglones_por_pagina);
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
-    /** @return list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
+    /** @return list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
      */
     final public static function getAllContests(
         int $pagina = 1,
@@ -955,14 +992,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $sql = "
                 SELECT
                     $columns,
-                    COUNT(Problemset_Identities.identity_id) AS `contestants`,
-                    organizer.username AS `organizer`
+                    COUNT(contestants.identity_id) AS `contestants`,
+                    organizer.username AS `organizer`,
+                    TRUE AS `participating`
                 FROM
                     Contests
                 LEFT JOIN
-                    Problemset_Identities
+                    Problemset_Identities contestants
                 ON
-                    Contests.problemset_id = Problemset_Identities.problemset_id
+                    Contests.problemset_id = contestants.problemset_id
                 INNER JOIN
                     ACLs a
                 ON
@@ -989,7 +1027,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
         $params[] = intval($offset);
         $params[] = intval($renglones_por_pagina);
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
