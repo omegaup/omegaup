@@ -11,7 +11,6 @@ import {
   navigateToProblem,
 } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
-import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 import { storeConfig } from './problemStore';
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
@@ -62,7 +61,7 @@ const problemDetails: types.ProblemInfo = {
 const vueInstance: Vue & {
   problemInfo: types.ProblemInfo;
   popupDisplayed?: PopupDisplayed;
-  problem: ActiveProblem | null;
+  problem: types.NavbarProblemsetProblem | null;
 } = new Vue({
   components: {
     'omegaup-arena-contest-practice': arena_ContestPractice,
@@ -124,7 +123,6 @@ describe('navigation.ts', () => {
       const params: NavigationRequest = {
         type: NavigationType.ForContest,
         target: vueInstance,
-        runs: [],
         problems: navbarProblems,
         problem: navbarProblems[0],
         contestAlias: 'contest_alias',
@@ -140,7 +138,6 @@ describe('navigation.ts', () => {
       const params: NavigationRequest = {
         type: NavigationType.ForContest,
         target: vueInstance,
-        runs: [],
         problems: navbarProblems,
         problem: navbarProblems[0],
         contestAlias: 'contest_alias',
