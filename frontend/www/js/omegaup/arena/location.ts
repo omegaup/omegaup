@@ -1,9 +1,9 @@
-import { ActiveProblem } from '../components/arena/ContestPractice.vue';
+import { types } from '../api_types';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import clarificationsStore from './clarificationsStore';
 
 export interface LocationOptions {
-  problem: ActiveProblem | null;
+  problem: types.NavbarProblemsetProblem | null;
   popupDisplayed: PopupDisplayed;
   guid: null | string;
   problemAlias: null | string;
@@ -31,21 +31,18 @@ export function getOptionsFromLocation(location: string): LocationOptions {
   switch (match?.groups?.tab) {
     case 'problems':
       response.problem = {
-        problem: {
-          alias: match?.groups?.alias,
-          text: '',
-          acceptsSubmissions: true,
-          bestScore: 0,
-          maxScore: 0,
-          hasRuns: false,
-        },
-        runs: [],
+        alias: match?.groups?.alias,
+        text: '',
+        acceptsSubmissions: true,
+        bestScore: 0,
+        maxScore: 0,
+        hasRuns: false,
       };
       if (match.groups.popup === 'new-run') {
         response.popupDisplayed = PopupDisplayed.RunSubmit;
       } else if (match.groups.popup?.startsWith('show-run')) {
         response.guid = match.groups.popup.split(':')[1];
-        response.problemAlias = response.problem.problem.alias;
+        response.problemAlias = response.problem.alias;
         response.popupDisplayed = PopupDisplayed.RunDetails;
       }
       break;

@@ -24,7 +24,6 @@ import common_Navbar from '../components/common/Navbar.vue';
 import omegaup_Markdown from '../components/Markdown.vue';
 import problem_SettingsSummary from '../components/problem/SettingsSummary.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
-import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 
 import ArenaAdmin from './admin_arena';
 
@@ -434,8 +433,10 @@ export class Arena {
               currentAssignment: self.currentProblemset,
             },
             on: {
-              'navigate-to-problem': (request: ActiveProblem) => {
-                window.location.hash = `#problems/${request.problem.alias}`;
+              'navigate-to-problem': (
+                problem: types.NavbarProblemsetProblem,
+              ) => {
+                window.location.hash = `#problems/${problem.alias}`;
               },
             },
           });

@@ -110,7 +110,7 @@ export default class ArenaNavbarProblems extends Vue {
   }
 
   onNavigateToProblem(problem: types.NavbarProblemsetProblem) {
-    this.$emit('navigate-to-problem', { problem, runs: [] });
+    this.$emit('navigate-to-problem', problem);
   }
 }
 </script>

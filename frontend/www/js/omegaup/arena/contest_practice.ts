@@ -4,9 +4,7 @@ import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
-import arena_ContestPractice, {
-  ActiveProblem,
-} from '../components/arena/ContestPractice.vue';
+import arena_ContestPractice from '../components/arena/ContestPractice.vue';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import {
   showSubmission,
@@ -24,6 +22,7 @@ import {
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
 import { navigateToProblem, NavigationType } from './navigation';
+import { myRunsStore } from './runsStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -40,7 +39,7 @@ OmegaUp.on('ready', () => {
     components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
     data: () => ({
       problemInfo: null as types.ProblemInfo | null,
-      problem: null as ActiveProblem | null,
+      problem: null as types.NavbarProblemsetProblem | null,
       problems: payload.problems as types.NavbarProblemsetProblem[],
       popupDisplayed: PopupDisplayed.None,
       showNewClarificationPopup: false,
@@ -64,13 +63,17 @@ OmegaUp.on('ready', () => {
           guid: this.guid,
           problemAlias: this.problemAlias,
           isAdmin: this.isAdmin,
+          runs: myRunsStore.state.runs,
         },
         on: {
-          'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
+          'navigate-to-problem': ({
+            problem,
+          }: {
+            problem: types.NavbarProblemsetProblem;
+          }) => {
             navigateToProblem({
               type: NavigationType.ForContest,
               problem,
-              runs,
               target: contestPractice,
               problems: this.problems,
               contestAlias: payload.contest.alias,
@@ -91,10 +94,13 @@ OmegaUp.on('ready', () => {
           },
           'submit-run': ({
             problem,
-            runs,
             code,
             language,
-          }: ActiveProblem & { code: string; language: string }) => {
+          }: {
+            code: string;
+            language: string;
+            problem: types.NavbarProblemsetProblem;
+          }) => {
             api.Run.create({
               problem_alias: problem.alias,
               language: language,
@@ -102,7 +108,6 @@ OmegaUp.on('ready', () => {
             })
               .then((response) => {
                 submitRun({
-                  runs,
                   guid: response.guid,
                   submitDelay: response.submit_delay,
                   language,

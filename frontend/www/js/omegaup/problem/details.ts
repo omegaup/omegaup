@@ -117,7 +117,6 @@ OmegaUp.on('ready', () => {
           'submit-run': ({
             code,
             language,
-            runs,
             nominationStatus,
           }: {
             code: string;
@@ -135,7 +134,6 @@ OmegaUp.on('ready', () => {
                   response.nextSubmissionTimestamp;
 
                 submitRun({
-                  runs,
                   guid: response.guid,
                   submitDelay: response.submit_delay,
                   language,
