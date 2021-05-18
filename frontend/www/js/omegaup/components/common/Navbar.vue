@@ -315,7 +315,7 @@ export default class Navbar extends Vue {
   @Prop() isReviewer!: boolean;
   @Prop() gravatarURL51!: string;
   @Prop() gravatarURL128!: string;
-  @Prop() associatedIdentities!: types.AssociatedIdentity[];
+  @Prop({ default: () => [] }) associatedIdentities!: types.AssociatedIdentity[];
   @Prop() currentEmail!: string;
   @Prop() currentName!: string;
   @Prop() currentUsername!: string;
