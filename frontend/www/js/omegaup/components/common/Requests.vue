@@ -1,8 +1,12 @@
 <template>
-  <div v-if="requests.length" class="card mt-3">
+  <div v-if="requests.length" class="card mt-3" data-requests>
     <h5 class="card-header">
       {{ T.pendingRegistrations }}
     </h5>
+    <label class="text-right m-3">
+      <input v-model="showAllRequests" type="checkbox" />
+      {{ T.pendingRegistrationsShowAll }}
+    </label>
     <table class="table mb-0">
       <thead>
         <tr>
@@ -15,7 +19,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="request in requests" :key="request.username">
+        <tr v-for="request in filteredRequests" :key="request.username">
           <td class="text-center">
             <omegaup-username
               :classname="request.classname"
@@ -81,10 +85,18 @@ export default class Requests extends Vue {
   T = T;
   time = time;
   requests: types.IdentityRequest[] = this.data;
+  showAllRequests = false;
 
   @Watch('data')
   onDataChange(): void {
     this.requests = this.data;
+  }
+
+  get filteredRequests(): types.IdentityRequest[] {
+    if (this.showAllRequests) {
+      return this.requests;
+    }
+    return this.requests.filter((request) => !request.accepted);
   }
 }
 </script>
