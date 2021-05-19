@@ -5,7 +5,7 @@ import * as api from '../api';
 import * as ui from '../ui';
 
 import Vue from 'vue';
-import arena_Course, { ActiveProblem } from '../components/arena/Course.vue';
+import arena_Course from '../components/arena/Course.vue';
 import { getOptionsFromLocation } from './location';
 import {
   showSubmission,
@@ -39,7 +39,7 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       problemInfo: null as types.ProblemInfo | null,
-      problem: null as ActiveProblem | null,
+      problem: null as types.NavbarProblemsetProblem | null,
       problems: payload.currentAssignment
         .problems as types.NavbarProblemsetProblem[],
       showNewClarificationPopup: false,
@@ -64,11 +64,14 @@ OmegaUp.on('ready', () => {
           guid: this.guid,
         },
         on: {
-          'navigate-to-problem': ({ problem, runs }: ActiveProblem) => {
+          'navigate-to-problem': ({
+            problem,
+          }: {
+            problem: types.NavbarProblemsetProblem;
+          }) => {
             navigateToProblem({
               type: NavigationType.ForSingleProblemOrCourse,
               problem,
-              runs,
               target: arenaCourse,
               problems: this.problems,
             });
@@ -87,10 +90,13 @@ OmegaUp.on('ready', () => {
           },
           'submit-run': ({
             problem,
-            runs,
             code,
             language,
-          }: ActiveProblem & { code: string; language: string }) => {
+          }: {
+            code: string;
+            language: string;
+            problem: types.NavbarProblemsetProblem;
+          }) => {
             api.Run.create({
               problem_alias: problem.alias,
               language: language,
@@ -98,7 +104,6 @@ OmegaUp.on('ready', () => {
             })
               .then((response) => {
                 submitRun({
-                  runs,
                   guid: response.guid,
                   submitDelay: response.submit_delay,
                   language,

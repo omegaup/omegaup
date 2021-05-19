@@ -101,11 +101,6 @@ import arena_Summary from './Summary.vue';
 import problem_Details from '../problem/Details.vue';
 import { SocketStatus } from '../../arena/events_socket';
 
-export interface ActiveProblem {
-  runs: types.Run[];
-  problem: types.NavbarProblemsetProblem;
-}
-
 @Component({
   components: {
     'omegaup-arena': arena_Arena,
@@ -120,7 +115,7 @@ export default class ArenaCourse extends Vue {
   @Prop() currentAssignment!: types.ArenaAssignment;
   @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
-  @Prop({ default: null }) problem!: ActiveProblem | null;
+  @Prop({ default: null }) problem!: types.NavbarProblemsetProblem | null;
   @Prop() problemInfo!: types.ProblemInfo;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() activeTab!: string;
@@ -128,15 +123,16 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
+  @Prop({ default: () => [] }) runs!: types.Run[];
 
   T = T;
   currentClarifications = this.clarifications;
-  activeProblem: ActiveProblem | null = this.problem;
+  activeProblem: types.NavbarProblemsetProblem | null = this.problem;
   shouldShowRunDetails = false;
   clock = '00:00:00';
 
   get activeProblemAlias(): null | string {
-    return this.activeProblem?.problem.alias ?? null;
+    return this.activeProblem?.alias ?? null;
   }
 
   get socketClass(): string {
@@ -159,17 +155,17 @@ export default class ArenaCourse extends Vue {
     return T.socketStatusWaiting;
   }
 
-  onNavigateToProblem(activeProblem: ActiveProblem) {
-    this.activeProblem = activeProblem;
-    this.$emit('navigate-to-problem', activeProblem);
+  onNavigateToProblem(problem: types.NavbarProblemsetProblem) {
+    this.activeProblem = problem;
+    this.$emit('navigate-to-problem', { problem });
   }
 
   onRunSubmitted(run: { code: string; language: string }): void {
-    this.$emit('submit-run', Object.assign({}, run, this.activeProblem));
+    this.$emit('submit-run', { ...run, problem: this.activeProblem });
   }
 
   @Watch('problem')
-  onActiveProblemChanged(newValue: ActiveProblem | null): void {
+  onActiveProblemChanged(newValue: types.NavbarProblemsetProblem | null): void {
     if (!newValue) {
       this.activeProblem = null;
       return;
