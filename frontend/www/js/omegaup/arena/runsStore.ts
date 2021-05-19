@@ -1,6 +1,8 @@
 import Vue from 'vue';
-import { createStore, Store } from 'vuex';
+import Vuex from 'vuex';
 import { types } from '../api_types';
+
+Vue.use(Vuex);
 
 export interface RunFilters {
   offset?: number;
@@ -21,13 +23,11 @@ export interface RunsState {
   filters?: RunFilters;
 }
 
-export const runsStoreConfig = createStore({
-  state() {
-    return {
-      runs: [],
-      index: {},
-      filters: {},
-    };
+export const runsStoreConfig = {
+  state: {
+    runs: [],
+    index: {},
+    filters: {},
   },
   mutations: {
     addRun(state: RunsState, run: types.Run) {
@@ -59,9 +59,9 @@ export const runsStoreConfig = createStore({
       delete state.filters[filter];
     },
   },
-});
+};
 
-export const myRunsStore = new Store<RunsState>({
+export const myRunsStore = new Vuex.Store<RunsState>({
   state: {
     runs: [],
     index: {},
@@ -86,4 +86,4 @@ export const myRunsStore = new Store<RunsState>({
   },
 });
 
-export const runsStore = new Store<RunsState>(runsStoreConfig);
+export const runsStore = new Vuex.Store<RunsState>(runsStoreConfig);

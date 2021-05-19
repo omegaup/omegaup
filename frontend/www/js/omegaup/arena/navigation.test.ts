@@ -12,7 +12,8 @@ import {
 } from './navigation';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { storeConfig } from './problemStore';
-import { Store } from 'vuex';
+import { createLocalVue } from '@vue/test-utils';
+import Vuex from 'vuex';
 import fetchMock from 'jest-fetch-mock';
 
 const problemDetails: types.ProblemInfo = {
@@ -141,7 +142,9 @@ describe('navigation.ts', () => {
         problem: navbarProblems[0],
         contestAlias: 'contest_alias',
       };
-      new Store(storeConfig);
+      const localVue = createLocalVue();
+      localVue.use(Vuex);
+      new Vuex.Store(storeConfig);
       await navigateToProblem(params);
       expect(setLocationHash).toHaveBeenCalledWith(
         `#problems/${params.problem.alias}/new-run`,

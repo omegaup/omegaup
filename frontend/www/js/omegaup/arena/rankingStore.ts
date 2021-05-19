@@ -1,7 +1,9 @@
 import Vue from 'vue';
-import { createStore, Store } from 'vuex';
+import Vuex from 'vuex';
 import { types } from '../api_types';
 import { omegaup } from '../omegaup';
+
+Vue.use(Vuex);
 
 export interface RankingState {
   miniRankingUsers: omegaup.UserRank[];
@@ -13,14 +15,12 @@ export interface RankingState {
   lastTimeUpdated: null | Date;
 }
 
-export const rankingStoreConfig = createStore({
-  state() {
-    return {
-      miniRankingUsers: [],
-      ranking: [],
-      rankingChartOptions: {},
-      lastTimeUpdated: null,
-    };
+export const rankingStoreConfig = {
+  state: {
+    miniRankingUsers: [],
+    ranking: [],
+    rankingChartOptions: {},
+    lastTimeUpdated: null,
   },
   mutations: {
     updateMinirankingUsers(
@@ -45,6 +45,6 @@ export const rankingStoreConfig = createStore({
       Vue.set(state, 'lastTimeUpdated', lastTimeUpdated);
     },
   },
-});
+};
 
-export default new Store<RankingState>(rankingStoreConfig);
+export default new Vuex.Store<RankingState>(rankingStoreConfig);
