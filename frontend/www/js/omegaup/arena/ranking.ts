@@ -273,6 +273,6 @@ export function onRankingChanged({
     users,
     currentRanking,
     maxPoints,
-    lastTimeUpdated: scoreboard.time,
+    lastTimeUpdated: scoreboard.time as Date,
   };
 }

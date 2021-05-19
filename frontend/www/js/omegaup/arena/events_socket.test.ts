@@ -278,7 +278,7 @@ describe('EventsSocket', () => {
           },
         ],
         title: 'omegaUp',
-        time: new Date(0),
+        time: 0,
         start_time: new Date(0),
         finish_time: new Date(0),
       } as types.Scoreboard,
@@ -358,7 +358,7 @@ describe('EventsSocket', () => {
           },
         ],
         start_time: '1970-01-01T00:00:00.000Z',
-        time: '1970-01-01T00:00:00.000Z',
+        time: new Date(0),
         title: 'omegaUp',
       },
     });

@@ -1229,7 +1229,7 @@ export class Arena {
     if (this.scoreboard) {
       this.scoreboard.ranking = ranking;
       if (scoreboard.time) {
-        this.scoreboard.lastUpdated = scoreboard.time;
+        this.scoreboard.lastUpdated = scoreboard.time as Date;
       }
     }
 
