@@ -463,15 +463,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 pi.problemset_id = p.problemset_id AND
                 pi.identity_id = ?
             LEFT JOIN
-                Problemset_Identities contestants
+                Problemset_Identities AS contestants
             ON
                 Contests.problemset_id = contestants.problemset_id
             INNER JOIN
-                ACLs a
+                ACLs AS a
             ON
                 Contests.acl_id = a.acl_id
             INNER JOIN
-                Identities organizer
+                Identities AS organizer
             ON
                 a.owner_id = organizer.user_id
             WHERE
@@ -511,7 +511,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      * @return list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>
      */
     final public static function getRecentPublicContests(
-        int $user_id,
+        int $identity_id,
         int $page = 1,
         int $pageSize = 1000,
         ?string $query = null
@@ -536,15 +536,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             FROM
                 Contests
             LEFT JOIN
-                Problemset_Identities contestants
+                Problemset_Identities AS contestants
             ON
                 Contests.problemset_id = contestants.problemset_id
             INNER JOIN
-                ACLs a
+                ACLs AS a
             ON
                 Contests.acl_id = a.acl_id
             INNER JOIN
-                Identities organizer
+                Identities AS organizer
             ON
                 a.owner_id = organizer.user_id
             LEFT JOIN
@@ -564,7 +564,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 `contest_id` DESC
             LIMIT ?, ?;";
 
-        $params = [$user_id];
+        $params = [$identity_id];
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
             $params[] = $filter['query'];
         } elseif ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::SIMPLE) {
@@ -628,15 +628,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     FROM
                         Contests
                     LEFT JOIN
-                        Problemset_Identities contestants
+                        Problemset_Identities AS contestants
                     ON
                         Contests.problemset_id = contestants.problemset_id
                     INNER JOIN
-                        ACLs a
+                        ACLs AS a
                     ON
                         Contests.acl_id = a.acl_id
                     INNER JOIN
-                        Identities organizer
+                        Identities AS organizer
                     ON
                         a.owner_id = organizer.user_id
                     LEFT JOIN
@@ -673,15 +673,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     ON
                         Contests.problemset_id = participating.problemset_id
                     LEFT JOIN
-                        Problemset_Identities contestants
+                        Problemset_Identities AS contestants
                     ON
                         Contests.problemset_id = contestants.problemset_id
                     INNER JOIN
-                        ACLs a
+                        ACLs AS a
                     ON
                         Contests.acl_id = a.acl_id
                     INNER JOIN
-                        Identities organizer
+                        Identities AS organizer
                     ON
                         a.owner_id = organizer.user_id
                     WHERE
@@ -713,7 +713,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     ON
                         Problemsets.problemset_id = Contests.problemset_id
                     LEFT JOIN
-                        Problemset_Identities contestants
+                        Problemset_Identities AS contestants
                     ON
                         Contests.problemset_id = contestants.problemset_id
                     INNER JOIN
@@ -726,11 +726,11 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     ON
                         gi.group_id = gr.group_id
                     INNER JOIN
-                        ACLs a
+                        ACLs AS a
                     ON
                         Contests.acl_id = a.acl_id
                     INNER JOIN
-                        Identities organizer
+                        Identities AS organizer
                     ON
                         a.owner_id = organizer.user_id
                     WHERE
@@ -768,15 +768,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                      ON
                          Identities.user_id = User_Roles.user_id
                      LEFT JOIN
-                         Problemset_Identities contestants
+                         Problemset_Identities AS contestants
                      ON
                          Contests.problemset_id = contestants.problemset_id
                      INNER JOIN
-                         ACLs a
+                         ACLs AS a
                      ON
                          Contests.acl_id = a.acl_id
                      INNER JOIN
-                         Identities organizer
+                         Identities AS organizer
                      ON
                          a.owner_id = organizer.user_id
                      LEFT JOIN
@@ -819,15 +819,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                      ON
                          Groups_Identities.group_id = Group_Roles.group_id
                      LEFT JOIN
-                         Problemset_Identities contestants
+                         Problemset_Identities AS contestants
                      ON
                          Contests.problemset_id = contestants.problemset_id
                      INNER JOIN
-                         ACLs a
+                         ACLs AS a
                      ON
                          Contests.acl_id = a.acl_id
                      INNER JOIN
-                         Identities organizer
+                         Identities AS organizer
                      ON
                          a.owner_id = organizer.user_id
                      LEFT JOIN
@@ -863,15 +863,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                      FROM
                          Contests
                      LEFT JOIN
-                         Problemset_Identities contestants
+                         Problemset_Identities AS contestants
                      ON
                         Contests.problemset_id = contestants.problemset_id
                      INNER JOIN
-                         ACLs a
+                         ACLs AS a
                      ON
                          Contests.acl_id = a.acl_id
                      INNER JOIN
-                         Identities organizer
+                         Identities AS organizer
                      ON
                          a.owner_id = organizer.user_id
                      LEFT JOIN
@@ -932,15 +932,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 FROM
                     `Contests`
                 LEFT JOIN
-                    Problemset_Identities contestants
+                    Problemset_Identities AS contestants
                 ON
                     Contests.problemset_id = contestants.problemset_id
                 INNER JOIN
-                    ACLs a
+                    ACLs AS a
                 ON
                     Contests.acl_id = a.acl_id
                 INNER JOIN
-                    Identities organizer
+                    Identities AS organizer
                 ON
                     a.owner_id = organizer.user_id
                 WHERE
@@ -998,15 +998,15 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 FROM
                     Contests
                 LEFT JOIN
-                    Problemset_Identities contestants
+                    Problemset_Identities AS contestants
                 ON
                     Contests.problemset_id = contestants.problemset_id
                 INNER JOIN
-                    ACLs a
+                    ACLs AS a
                 ON
                     Contests.acl_id = a.acl_id
                 INNER JOIN
-                    Identities organizer
+                    Identities AS organizer
                 ON
                     a.owner_id = organizer.user_id
                 WHERE $recommended_check AND $end_check AND $query_check AND archived = 0
