@@ -70,7 +70,7 @@
 		{/if}
 {/if}
 {if isset($headerPayload) && $headerPayload.bootstrap4}
-    <script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
+	<script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
 	<div id="common-navbar"></div>
 	{js_include entrypoint="common_navbar"}
 	<main role="main">
@@ -85,7 +85,7 @@
 	<div id="root">
 	<div id="common-navbar"></div>
 	{if isset($headerPayload)}
-	    <script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
+		<script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
 	{else}
 		<script type="text/json" id="header-payload">{[]}</script>
 	{/if}
