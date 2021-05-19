@@ -98,7 +98,7 @@ export class EventsSocket {
       data.clarification.time = time.remoteTime(data.clarification.time * 1000);
       clarificationStore.commit('addClarification', data.clarification);
     } else if (data.message == '/scoreboard/update/') {
-      data.time = time.remoteTime(data.time * 1000);
+      data.scoreboard.time = time.remoteTime(data.scoreboard.time * 1000);
       // TODO: Uncomment next block when virtual contest is migrated
       /*if (problemsetAdmin && data.scoreboard_type != 'admin') {
         if (options.originalContestAlias == null) return;

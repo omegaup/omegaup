@@ -268,9 +268,11 @@ export function onRankingChanged({
       });
     }
   }
-  const lastTimeUpdated =
-    typeof scoreboard.time !== 'number'
-      ? scoreboard.time
-      : new Date(scoreboard.time * 1000);
-  return { ranking, users, currentRanking, maxPoints, lastTimeUpdated };
+  return {
+    ranking,
+    users,
+    currentRanking,
+    maxPoints,
+    lastTimeUpdated: scoreboard.time,
+  };
 }
