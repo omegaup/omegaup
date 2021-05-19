@@ -7,7 +7,11 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
     public function testFullRankByProblemSolved() {
         // Create a user and sumbit a run with him
         ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'quality_seal' => true,
+            ])
+        );
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $contestantIdentity
@@ -36,6 +40,65 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         $this->assertTrue($found);
+    }
+
+    /**
+     * Tests getCoderOfTheMonth
+     */
+    public function testCoderOfTheMonth() {
+        ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => 'testuser1']
+            )
+        );
+        foreach (range(0, 4) as $_) {
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                'quality_seal' => true,
+                ])
+            );
+            $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problemData,
+                $contestantIdentity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData, 100, 'AC');
+        }
+
+        ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => 'testuser2']
+            )
+        );
+        foreach (range(0, 4) as $_) {
+            if ($_ === 3) {
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+                    new \OmegaUp\Test\Factories\ProblemParams([
+                    'quality_seal' => true,
+                    ])
+                );
+            } else {
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+            }
+            $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problemData,
+                $contestantIdentity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData, 100, 'AC');
+        }
+
+        // Refresh Rank
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
+            new \OmegaUp\Request([
+                'date' => date('Y-m-d', \OmegaUp\Time::get()),
+                'category' => 'all'
+                ])
+        );
+        $this->assertEquals(
+            $response['coderinfo']['username'],
+            'testuser1'
+        );
     }
 
     /**
@@ -83,7 +146,11 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
     public function testFullRankByProblemSolvedNoPrivateProblems() {
         // Create a user and sumbit a run with him
         ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'quality_seal' => true,
+            ])
+        );
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $contestantIdentity
@@ -94,6 +161,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'visibility' => 'private',
+            'quality_seal' => true,
         ]));
         $runDataPrivate = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataPrivate,
@@ -135,7 +203,11 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetUserRankInfo() {
         // Create a user and sumbit a run with him/her
         ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser();
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'quality_seal' => true,
+            ])
+        );
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $contestantIdentity
@@ -183,7 +255,11 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         ] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identityWithNoCountry);
 
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'quality_seal' => true,
+            ])
+        );
         $runDataContestantWithNoCountry = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identityWithNoCountry
@@ -267,8 +343,16 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUserRankWithStateCollision() {
         // Create two problems
-        $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem();
-        $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'quality_seal' => true,
+            ])
+        );
+        $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'quality_seal' => true,
+            ])
+        );
 
         // Create two users from Maranhao, Brasil
         [
@@ -383,7 +467,11 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
     public function testUserRankingClassName() {
         // Create a user and sumbit a run with them
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'quality_seal' => true,
+            ])
+        );
         $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemData,
             $identity
@@ -410,11 +498,19 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $firstPlaceUser, 'identity' => $firstPlaceIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($firstPlaceIdentity);
         $problems = [];
-        $extraProblem = \OmegaUp\Test\Factories\Problem::createProblem();
+        $extraProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'quality_seal' => true,
+            ])
+        );
         for (
             $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
         ) {
-            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'quality_seal' => true,
+                ])
+            );
             $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
                 $problems[$i],
                 $firstPlaceIdentity,
@@ -489,18 +585,18 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         $problems = [];
 
         ['user' => $users[0], 'identity' => $identities[0]] = \OmegaUp\Test\Factories\User::createUser();
-        $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+        $problems[] = \OmegaUp\Test\Factories\Problem::createQualityProblemWithAuthor(
             $identities[0]
         );
-        $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+        $problems[] = \OmegaUp\Test\Factories\Problem::createQualityProblemWithAuthor(
             $identities[0]
         );
 
         ['user' => $users[1], 'identity' => $identities[1]] = \OmegaUp\Test\Factories\User::createUser();
-        $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+        $problems[] = \OmegaUp\Test\Factories\Problem::createQualityProblemWithAuthor(
             $identities[1]
         );
-        $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+        $problems[] = \OmegaUp\Test\Factories\Problem::createQualityProblemWithAuthor(
             $identities[1]
         );
 
@@ -592,7 +688,11 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         // Adding some problems
         $problemsData = [];
         foreach (range(0, 2) as $_) {
-            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'quality_seal' => true,
+                ])
+            );
         }
 
         // Identity creator group member will upload csv file
