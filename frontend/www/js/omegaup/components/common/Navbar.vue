@@ -180,7 +180,7 @@
         <ul v-else class="nav navbar-nav navbar-right">
           <omegaup-notifications-clarifications
             v-if="inContest"
-            :initial-clarifications="initialClarifications"
+            :clarifications="notificationsClarifications"
             :is-admin="isAdmin"
           ></omegaup-notifications-clarifications>
           <li
@@ -315,7 +315,8 @@ export default class Navbar extends Vue {
   @Prop() isReviewer!: boolean;
   @Prop() gravatarURL51!: string;
   @Prop() gravatarURL128!: string;
-  @Prop() associatedIdentities!: types.AssociatedIdentity[];
+  @Prop({ default: () => [] })
+  associatedIdentities!: types.AssociatedIdentity[];
   @Prop() currentEmail!: string;
   @Prop() currentName!: string;
   @Prop() currentUsername!: string;
@@ -326,10 +327,10 @@ export default class Navbar extends Vue {
   @Prop() graderInfo!: types.GraderStatus | null;
   @Prop() graderQueueLength!: number;
   @Prop() errorMessage!: string | null;
-  @Prop() initialClarifications!: types.Clarification[];
+  @Prop({ default: () => [] })
+  notificationsClarifications!: types.Clarification[];
 
   notifications: types.Notification[] = [];
-  clarifications: types.Clarification[] = this.initialClarifications;
   T = T;
 
   get formattedLoginURL(): string {

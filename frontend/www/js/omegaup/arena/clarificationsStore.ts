@@ -11,12 +11,15 @@ export interface ClarificationState {
   // The mapping of clarificationIds to indices on the clarifications array
   // useful to keep the correct order
   index: Record<number, number>;
+
+  selectedClarificationId: null | number;
 }
 
 export const clarificationStoreConfig = {
   state: {
     clarifications: [],
     index: {},
+    selectedClarificationId: null,
   },
   mutations: {
     addClarification(
@@ -47,9 +50,16 @@ export const clarificationStoreConfig = {
       );
       state.clarifications.push(clarification);
     },
+    selectClarificationId(
+      state: ClarificationState,
+      clarificationId: null | number,
+    ) {
+      state.selectedClarificationId = clarificationId;
+    },
     clear(state: ClarificationState) {
       state.clarifications.splice(0);
       state.index = {};
+      state.selectedClarificationId = null;
     },
   },
 };
