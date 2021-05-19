@@ -1,8 +1,6 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
+import { createStore, Store } from 'vuex';
 import { types } from '../api_types';
-
-Vue.use(Vuex);
 
 export interface ClarificationState {
   // The list of clarifications
@@ -13,10 +11,12 @@ export interface ClarificationState {
   index: Record<number, number>;
 }
 
-export const clarificationStoreConfig = {
-  state: {
-    clarifications: [],
-    index: {},
+export const clarificationStoreConfig = createStore({
+  state() {
+    return {
+      clarifications: [],
+      index: {},
+    };
   },
   mutations: {
     addClarification(
@@ -52,6 +52,6 @@ export const clarificationStoreConfig = {
       state.index = {};
     },
   },
-};
+});
 
-export default new Vuex.Store<ClarificationState>(clarificationStoreConfig);
+export default new Store<ClarificationState>(clarificationStoreConfig);

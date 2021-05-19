@@ -1,7 +1,5 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
-
-Vue.use(Vuex);
+import { createStore, Store } from 'vuex';
 
 export interface SocketState {
   socketStatus: SocketStatus;
@@ -13,15 +11,17 @@ enum SocketStatus {
   Connected = '•',
 }
 
-export const socketStoreConfig = {
-  state: {
-    socketStatus: SocketStatus.Waiting,
+export const socketStoreConfig = createStore({
+  state() {
+    return {
+      socketStatus: SocketStatus.Waiting,
+    };
   },
   mutations: {
     updateSocketStatus(state: SocketState, socketStatus: SocketStatus) {
       Vue.set(state, 'socketStatus', socketStatus);
     },
   },
-};
+});
 
-export default new Vuex.Store<SocketState>(socketStoreConfig);
+export default new Store<SocketState>(socketStoreConfig);
