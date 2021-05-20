@@ -1,5 +1,6 @@
 import { types } from '../api_types';
 import { PopupDisplayed } from '../components/problem/Details.vue';
+import clarificationsStore from './clarificationsStore';
 
 export interface LocationOptions {
   problem: types.NavbarProblemsetProblem | null;
@@ -48,6 +49,11 @@ export function getOptionsFromLocation(location: string): LocationOptions {
     case 'clarifications':
       if (match.groups.popup === 'new') {
         response.showNewClarificationPopup = true;
+      } else if (match.groups.alias?.startsWith('clarification-')) {
+        clarificationsStore.commit(
+          'selectClarificationId',
+          parseInt(match.groups.alias.split('-')[1]),
+        );
       }
       break;
     default:
