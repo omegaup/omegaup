@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import { types } from '../../api_types';
 
 import arena_Arena from './Arena.vue';
 
@@ -16,5 +17,33 @@ describe('Arena.vue', () => {
     expect(wrapper.find('div[data-arena-wrapper]>div>h2>span').text()).toBe(
       'Hello omegaUp',
     );
+  });
+
+  it('Should mark as read clarifications tab', async () => {
+    const wrapper = shallowMount(arena_Arena, {
+      propsData: {
+        contestTitle: 'Hello omegaUp',
+        activeTab: 'problems',
+        clarifications: [
+          {
+            answer: 'Si',
+            author: 'user',
+            clarification_id: 1,
+            message: 'hello',
+            problem_alias: 'problem',
+            public: false,
+            time: new Date(0),
+          },
+        ] as types.Clarification[],
+      },
+    });
+
+    expect(
+      wrapper.find('a[aria-controls="clarifications"] > span').classes(),
+    ).toContain('unread');
+    await wrapper.find('a[aria-controls="clarifications"]').trigger('click');
+    expect(
+      wrapper.find('a[aria-controls="clarifications"] > span').classes(),
+    ).not.toContain('unread');
   });
 });

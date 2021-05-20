@@ -99,6 +99,12 @@ export class EventsSocket {
       clarificationStore.commit('addClarification', data.clarification);
     } else if (data.message == '/scoreboard/update/') {
       data.scoreboard.time = time.remoteTime(data.scoreboard.time * 1000);
+      data.scoreboard.start_time = time.remoteTime(
+        data.scoreboard.start_time * 1000,
+      );
+      data.scoreboard.finish_time = time.remoteTime(
+        data.scoreboard.finish_time * 1000,
+      );
       // TODO: Uncomment next block when virtual contest is migrated
       /*if (problemsetAdmin && data.scoreboard_type != 'admin') {
         if (options.originalContestAlias == null) return;

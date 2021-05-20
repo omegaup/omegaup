@@ -4,6 +4,7 @@ import * as api from '../api';
 import { types } from '../api_types';
 import * as ui from '../ui';
 import Vue from 'vue';
+import clarificationsStore from '../arena/clarificationsStore';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload('header-payload');
@@ -40,7 +41,7 @@ OmegaUp.on('ready', () => {
           graderInfo: this.graderInfo,
           graderQueueLength: this.graderQueueLength,
           errorMessage: this.errorMessage,
-          initialClarifications: [],
+          clarifications: clarificationsStore.state.clarifications,
         },
         on: {
           'read-notifications': (

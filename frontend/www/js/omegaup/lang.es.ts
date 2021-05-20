@@ -702,6 +702,7 @@ const translations: { [key: string]: string; } = {
   passwordResetResetTitle: "Restablecer contrase\u00f1a",
   passwordResetTokenWasGeneratedSuccessfully: "El token fue generado exitosamente",
   pendingRegistrations: "Solicitudes pendientes",
+  pendingRegistrationsShowAll: "Mostrar todas las solicitudes",
   privacyPolicyNotice: "Al dar clic en Registrar aceptas las [Pol\u00edticas de Uso y Privacidad](http://blog.omegaup.com/privacy-policy/) del sitio, as\u00ed como el [C\u00f3digo de Conducta](https://blog.omegaup.com/codigo-de-conducta-en-omegaup/).",
   privacyStatementNotFound: "La declaraci\u00f3n de privacidad no fue encontrada.",
   privateTagsPlaceholder: "Ej. universidad, 2019, clase-2020",

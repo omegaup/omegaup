@@ -27,6 +27,11 @@
           @click="onTabSelected(tab.name)"
         >
           {{ tab.text }}
+          <span
+            v-if="tab.name === 'clarifications' && clarifications.length"
+            :class="{ unread: unreadClarifications }"
+            >({{ clarifications.length }})</span
+          >
         </a>
       </li>
     </ul>
@@ -62,18 +67,28 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { types } from '../../api_types';
 import T from '../../lang';
 import { Tab } from '../problem/Details.vue';
 
 @Component
 export default class Arena extends Vue {
   @Prop({ default: false }) shouldShowRuns!: boolean;
+  @Prop({ default: false }) isAdmin!: boolean;
+  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() contestTitle!: string;
   @Prop() activeTab!: string;
   @Prop() backgroundClass!: string;
 
   T = T;
   selectedTab = this.activeTab;
+  clarificationsHaveBeenRead = false;
+
+  get unreadClarifications() {
+    return (
+      this.activeTab !== 'clarifications' && !this.clarificationsHaveBeenRead
+    );
+  }
 
   get availableTabs(): Tab[] {
     const tabs = [
@@ -103,6 +118,9 @@ export default class Arena extends Vue {
 
   @Emit('update:activeTab')
   onTabSelected(tabName: string): string {
+    if (tabName === 'clarifications') {
+      this.clarificationsHaveBeenRead = true;
+    }
     this.selectedTab = tabName;
     return this.selectedTab;
   }
@@ -165,5 +183,9 @@ export default class Arena extends Vue {
   padding: 1em;
   margin-top: -1.5em;
   margin-right: -1em;
+}
+
+.unread {
+  font-weight: bold;
 }
 </style>
