@@ -277,10 +277,10 @@ describe('EventsSocket', () => {
           },
         ],
         title: 'omegaUp',
-        time: new Date(0),
-        start_time: new Date(0),
-        finish_time: new Date(0),
-      } as types.Scoreboard,
+        time: 0,
+        start_time: 0,
+        finish_time: 0,
+      },
     });
 
     expect(socket.socketStatus).toEqual(SocketStatus.Connected);
@@ -306,7 +306,7 @@ describe('EventsSocket', () => {
         },
       ],
       scoreboard: {
-        finish_time: '1970-01-01T00:00:00.000Z',
+        finish_time: new Date(0),
         problems: [
           {
             alias: 'problem_1',
@@ -356,8 +356,8 @@ describe('EventsSocket', () => {
             username: 'omegaUp',
           },
         ],
-        start_time: '1970-01-01T00:00:00.000Z',
-        time: '1970-01-01T00:00:00.000Z',
+        start_time: new Date(0),
+        time: new Date(0),
         title: 'omegaUp',
       },
     });
