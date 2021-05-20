@@ -3106,7 +3106,7 @@ export namespace types {
     problems: { alias: string; order: number }[];
     ranking: types.ScoreboardRankingEntry[];
     start_time: Date;
-    time: Date | number;
+    time: Date;
     title: string;
   }
 

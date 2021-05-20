@@ -278,7 +278,7 @@ describe('EventsSocket', () => {
           },
         ],
         title: 'omegaUp',
-        time: 0,
+        time: new Date(0),
         start_time: new Date(0),
         finish_time: new Date(0),
       } as types.Scoreboard,
