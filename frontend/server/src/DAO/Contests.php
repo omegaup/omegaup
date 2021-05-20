@@ -582,6 +582,8 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $params[] = intval($pageSize);
 
         /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+
         $contests = [];
         foreach ($rs as $row) {
             $row['participating'] = boolval($row['participating']);
