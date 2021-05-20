@@ -52,7 +52,7 @@ class Teams extends \OmegaUp\DAO\VO\VO {
     public $team_id = 0;
 
     /**
-     * [Campo no documentado]
+     * La identidad asociada al equipo
      *
      * @var int|null
      */

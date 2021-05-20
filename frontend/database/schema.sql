@@ -1046,7 +1046,7 @@ CREATE TABLE `Team_Users` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Teams` (
   `team_id` int NOT NULL AUTO_INCREMENT,
-  `identity_id` int NOT NULL,
+  `identity_id` int NOT NULL COMMENT 'La identidad asociada al equipo',
   PRIMARY KEY (`team_id`),
   KEY `identity_id` (`identity_id`),
   CONSTRAINT `fk_ti_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)

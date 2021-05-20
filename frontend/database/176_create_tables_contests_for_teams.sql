@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS `Team_Groups` (
 -- Create Teams table
 CREATE TABLE IF NOT EXISTS `Teams` (
   `team_id` int(11) AUTO_INCREMENT NOT NULL,
-  `identity_id` int NOT NULL,
+  `identity_id` int NOT NULL COMMENT 'La identidad asociada al equipo',
   PRIMARY KEY (`team_id`),
   KEY `identity_id` (`identity_id`),
   CONSTRAINT `fk_ti_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
