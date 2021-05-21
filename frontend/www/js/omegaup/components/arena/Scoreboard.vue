@@ -94,6 +94,7 @@ import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
+import * as time from '../../time';
 
 @Component({
   components: {
@@ -114,8 +115,11 @@ export default class ArenaScoreboard extends Vue {
   ui = ui;
   onlyShowExplicitlyInvited = true;
 
-  get lastUpdatedString(): string {
-    return !this.lastUpdated ? '' : this.lastUpdated.toString();
+  get lastUpdatedString(): null | string {
+    if (!this.lastUpdated) return null;
+    return ui.formatString(T.scoreboardLastUpdated, {
+      datetime: time.formatDateTime(this.lastUpdated),
+    });
   }
 
   legendClass(idx: number): string {
