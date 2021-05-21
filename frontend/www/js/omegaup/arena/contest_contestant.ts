@@ -51,7 +51,7 @@ OmegaUp.on('ready', () => {
     users = rankingInfo.users;
     lastTimeUpdated = rankingInfo.lastTimeUpdated;
     rankingStore.commit('updateRanking', ranking);
-    rankingStore.commit('updateMinirankingUsers', users);
+    rankingStore.commit('updateMiniRankingUsers', users);
     rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
 
     const startTimestamp = payload.contest.start_time.getTime();

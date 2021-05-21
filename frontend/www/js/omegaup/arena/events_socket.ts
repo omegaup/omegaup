@@ -122,7 +122,7 @@ export class EventsSocket {
         navbarProblems: this.navbarProblems,
       });
       rankingStore.commit('updateRanking', ranking);
-      rankingStore.commit('updateMinirankingUsers', users);
+      rankingStore.commit('updateMiniRankingUsers', users);
       rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
 
       api.Problemset.scoreboardEvents({

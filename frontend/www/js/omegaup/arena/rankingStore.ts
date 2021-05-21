@@ -23,7 +23,7 @@ export const rankingStoreConfig = {
     lastTimeUpdated: null,
   },
   mutations: {
-    updateMinirankingUsers(
+    updateMiniRankingUsers(
       state: RankingState,
       miniRankingUsers: omegaup.UserRank[],
     ) {
