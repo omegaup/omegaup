@@ -1,7 +1,7 @@
 const path = require('path');
 
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const { VueLoaderPlugin } = require('vue-loader');
 
 module.exports = {
   name: 'grader',

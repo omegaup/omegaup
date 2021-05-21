@@ -3,7 +3,7 @@ const path = require('path');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const { VueLoaderPlugin } = require('vue-loader')
+const { VueLoaderPlugin } = require('vue-loader');
 
 const defaultBadgeIcon = fs.readFileSync('./frontend/badges/default_icon.svg');
 
@@ -148,7 +148,10 @@ module.exports = {
     new ForkTsCheckerWebpackPlugin({
       typescript: {
         extensions: {
-          vue: true,
+          vue: {
+            enabled: true,
+            compiler: '@vue/compiler-sfc',
+          },
         },
       },
       formatter: 'codeframe',
@@ -176,7 +179,7 @@ module.exports = {
           priority: 20,
         },
         vendor: {
-          name: module => {
+          name: (module) => {
             const packageName = module.context.match(
               /\/node_modules\/([^@/]+)/,
             )[1];
