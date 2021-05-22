@@ -8,6 +8,9 @@ namespace OmegaUp;
  * @author joemmanuel
  */
 class Validators {
+    // The maximum length for aliases.
+    const ALIAS_MAX_LENGTH = 32;
+
     /**
      * Check if email is valid
      */
@@ -172,20 +175,23 @@ class Validators {
         return (
             preg_match('/^(?:[a-zA-Z0-9_-]+:)?[a-zA-Z0-9_-]+$/', $alias) === 1
             && !self::isRestrictedAlias($alias)
-            && strlen($alias) <= 32
+            && strlen($alias) <= Validators::ALIAS_MAX_LENGTH
         );
     }
 
     /**
      * Returns whether the alias is valid.
      *
-     * @param string $alias
      * @return boolean
      */
-    public static function alias(string $alias): bool {
+    public static function alias(
+        string $alias,
+        int $maxLength = Validators::ALIAS_MAX_LENGTH
+    ): bool {
         return (
             preg_match('/^[a-zA-Z0-9_-]+$/', $alias) === 1
             && !self::isRestrictedAlias($alias)
+            && strlen($alias) <= $maxLength
         );
     }
 
