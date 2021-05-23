@@ -26,6 +26,7 @@
         <div
           v-for="clarification in unreadClarifications"
           :key="clarification.clarification_id"
+          :data-clarification="clarification.clarification_id"
           class="d-flex align-items-center flex-wrap px-4"
         >
           <hr class="w-100 my-2" />
@@ -52,7 +53,7 @@
       </transition-group>
       <template v-if="unreadClarifications && unreadClarifications.length > 1">
         <li class="divider" role="separator"></li>
-        <li>
+        <li data-mark-all-as-read-button>
           <a href="#" @click.prevent="onMarkAllAsRead"
             ><font-awesome-icon :icon="['fas', 'align-right']" />
             {{ T.notificationsMarkAllAsRead }}</a
@@ -124,7 +125,7 @@ export default class Clarifications extends Vue {
 
   onCloseClicked(clarification: types.Clarification): void {
     const id = `clarification-${clarification.clarification_id}`;
-    this.unreadClarifications = this.clarifications.filter(
+    this.unreadClarifications = this.unreadClarifications.filter(
       (element) => element.clarification_id !== clarification.clarification_id,
     );
     localStorage.setItem(id, Date.now().toString());

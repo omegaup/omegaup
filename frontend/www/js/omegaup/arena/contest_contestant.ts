@@ -23,6 +23,9 @@ import {
   submitRunFailed,
 } from './submissions';
 import { createChart, onRankingChanged, onRankingEvents } from './ranking';
+import { EventsSocket } from './events_socket';
+import rankingStore from './rankingStore';
+import socketStore from './socketStore';
 import { myRunsStore } from './runsStore';
 
 OmegaUp.on('ready', () => {
@@ -32,12 +35,12 @@ OmegaUp.on('ready', () => {
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
-
   trackClarifications(payload.clarifications);
 
   let ranking: types.ScoreboardRankingEntry[];
   let users: omegaup.UserRank[];
   let rankingChartOptions: Highcharts.Options | null = null;
+  let lastTimeUpdated: null | Date;
   if (payload.scoreboard && payload.scoreboardEvents) {
     const rankingInfo = onRankingChanged({
       scoreboard: payload.scoreboard,
@@ -46,6 +49,10 @@ OmegaUp.on('ready', () => {
     });
     ranking = rankingInfo.ranking;
     users = rankingInfo.users;
+    lastTimeUpdated = rankingInfo.lastTimeUpdated;
+    rankingStore.commit('updateRanking', ranking);
+    rankingStore.commit('updateMiniRankingUsers', users);
+    rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
 
     const startTimestamp = payload.contest.start_time.getTime();
     const finishTimestamp = Math.min(
@@ -66,6 +73,7 @@ OmegaUp.on('ready', () => {
         finishTimestamp,
         maxPoints: rankingInfo.maxPoints,
       });
+      rankingStore.commit('updateRankingChartOptions', rankingChartOptions);
     }
   }
 
@@ -80,10 +88,6 @@ OmegaUp.on('ready', () => {
       showNewClarificationPopup: false,
       guid: null as null | string,
       problemAlias: null as null | string,
-      ranking,
-      rankingChartOptions,
-      users,
-      lastUpdated: new Date(0),
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
     }),
@@ -102,12 +106,13 @@ OmegaUp.on('ready', () => {
           activeTab,
           guid: this.guid,
           problemAlias: this.problemAlias,
-          minirankingUsers: this.users,
-          ranking: this.ranking,
-          rankingChartOptions: this.rankingChartOptions,
-          lastUpdated: this.lastUpdated,
+          miniRankingUsers: rankingStore.state.miniRankingUsers,
+          ranking: rankingStore.state.ranking,
+          rankingChartOptions: rankingStore.state.rankingChartOptions,
+          lastUpdated: rankingStore.state.lastTimeUpdated,
           digitsAfterDecimalPoint: this.digitsAfterDecimalPoint,
           showPenalty: this.showPenalty,
+          socketStatus: socketStore.state.socketStatus,
           runs: myRunsStore.state.runs,
         },
         on: {
@@ -226,6 +231,21 @@ OmegaUp.on('ready', () => {
     contestContestant,
     getOptionsFromLocation(window.location.hash),
   );
+
+  const socket = new EventsSocket({
+    disableSockets: false,
+    problemsetAlias: payload.contest.alias,
+    locationProtocol: window.location.protocol,
+    locationHost: window.location.host,
+    problemsetId: payload.contest.problemset_id,
+    scoreboardToken: null,
+    clarificationsOffset: 1,
+    clarificationsRowcount: 30,
+    navbarProblems: payload.problems,
+    currentUsername: commonPayload.currentUsername,
+    intervalInMilliseconds: 5 * 60 * 1000,
+  });
+  socket.connect();
 
   setInterval(() => {
     refreshContestClarifications({

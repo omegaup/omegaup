@@ -2,6 +2,7 @@ jest.mock('../../../../third_party/js/diff_match_patch.js');
 
 import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
+import { SocketStatus } from '../../arena/events_socket';
 import T from '../../lang';
 import * as time from '../../time';
 
@@ -145,7 +146,7 @@ describe('Contest.vue', () => {
       },
     });
 
-    expect(wrapper.find('.socket-status-ok').text()).toBe('•');
+    expect(wrapper.find('.socket-status').text()).toBe(SocketStatus.Waiting);
     expect(wrapper.find('a[data-problem=problemOmegaUp]').text()).toBe(
       'A. hello problem omegaUp',
     );

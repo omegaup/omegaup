@@ -31,9 +31,9 @@
         </div>
         <div
           v-if="problem.acceptsSubmissions"
-          class="col-xs-7 solved text-right w-50 pr-4"
+          class="col-xs-7 solved text-right w-50 pr-3"
         >
-          <span
+          <span class="mr-1"
             >({{
               parseFloat(problem.bestScore).toFixed(digitsAfterDecimalPoint)
             }}

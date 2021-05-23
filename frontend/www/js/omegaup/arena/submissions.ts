@@ -212,8 +212,6 @@ function displayRunDetails({
 export function updateRun({ run }: { run: types.Run }): void {
   trackRun({ run });
 
-  // TODO: Implement websocket support
-
   if (run.status != 'ready') {
     updateRunFallback({ run });
     return;

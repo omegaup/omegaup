@@ -160,7 +160,6 @@ Here we can add code.
         runDetailsData,
         user,
         nominationStatus,
-        initialClarifications: [],
         activeTab: 'problems',
         runs: [] as types.Run[],
         allRuns: [] as types.Run[],
@@ -184,7 +183,6 @@ Here we can add code.
         runDetailsData,
         user,
         nominationStatus,
-        initialClarifications: [],
         activeTab: 'problems',
         runs,
         allRuns: runs,
@@ -217,7 +215,6 @@ Here we can add code.
         runDetailsData,
         user,
         nominationStatus,
-        initialClarifications: [],
         activeTab: 'problems',
         runs,
         allRuns: runs,
@@ -249,7 +246,7 @@ Here we can add code.
   });
 
   it('Should handle problem clarifications', async () => {
-    const clarifications = [
+    const clarifications: types.Clarification[] = [
       {
         answer: undefined,
         author: 'omegaUp',
@@ -280,11 +277,10 @@ Here we can add code.
         runDetailsData,
         user,
         nominationStatus,
-        initialClarifications: [],
         activeTab: 'problems',
         runs,
         allRuns: runs,
-        clarifications: clarifications as types.Clarification[],
+        clarifications: clarifications,
         solutionStatus: 'not_found',
         histogram,
         showNewRunWindow: false,
@@ -306,7 +302,6 @@ Here we can add code.
         runDetailsData,
         user,
         nominationStatus,
-        initialClarifications: [],
         activeTab: 'problems',
         runs,
         allRuns: runs,
@@ -340,7 +335,6 @@ int main() {
         runDetailsData,
         user,
         nominationStatus,
-        initialClarifications: [],
         activeTab: 'problems',
         runs,
         allRuns: runs,
