@@ -5,6 +5,7 @@ import * as api from '../api';
 import T from '../lang';
 import { omegaup, OmegaUp } from '../omegaup';
 import { types, messages } from '../api_types';
+import clarificationsStore from './clarificationsStore';
 import { myRunsStore, runsStore } from './runsStore';
 import * as time from '../time';
 import * as ui from '../ui';
@@ -221,7 +222,7 @@ export class Arena {
     socketStatus: HTMLElement | null;
   };
 
-  initialClarifications: types.Clarification[] = [];
+  notificationsClarifications: types.Clarification[] = [];
 
   navbarAssignments: Vue | null = null;
 
@@ -255,7 +256,7 @@ export class Arena {
 
   commonNavbar:
     | (Vue & {
-        initialClarifications: types.Clarification[];
+        notificationsClarifications: types.Clarification[];
         graderInfo: types.GraderStatus | null;
         errorMessage: string | null;
         graderQueueLength: number;
@@ -346,7 +347,7 @@ export class Arena {
           graderInfo: null,
           graderQueueLength: -1,
           errorMessage: null,
-          initialClarifications: [],
+          notificationsClarifications: [],
           notifications: [],
         }),
         render: function (createElement) {
@@ -366,7 +367,7 @@ export class Arena {
               graderInfo: this.graderInfo,
               graderQueueLength: this.graderQueueLength,
               errorMessage: this.errorMessage,
-              initialClarifications: this.initialClarifications,
+              notificationsClarifications: this.notificationsClarifications,
             },
           });
         },
@@ -1380,16 +1381,17 @@ export class Arena {
     let r: HTMLElement | null = null;
     const anchor = `clarifications/clarification-${clarification.clarification_id}`;
     const clarifications =
-      this.commonNavbar?.initialClarifications ?? this.initialClarifications;
+      this.commonNavbar?.notificationsClarifications ??
+      this.notificationsClarifications;
     if (this.clarifications[clarification.clarification_id]) {
       r = this.clarifications[clarification.clarification_id];
       if (this.problemsetAdmin) {
-        this.initialClarifications = clarifications.filter(
+        this.notificationsClarifications = clarifications.filter(
           (notification) =>
             notification.clarification_id !== clarification.clarification_id,
         );
         if (this.commonNavbar !== null) {
-          this.commonNavbar.initialClarifications = this.initialClarifications;
+          this.commonNavbar.notificationsClarifications = this.notificationsClarifications;
         }
       } else {
         clarifications.push(clarification);
@@ -1519,8 +1521,10 @@ export class Arena {
       this.updateClarification(clarifications[i]);
     }
 
+    this.selectRowTable();
+
     if (this.commonNavbar !== null) {
-      this.commonNavbar.initialClarifications = clarifications
+      this.commonNavbar.notificationsClarifications = clarifications
         .filter((clarification) =>
           // Removing all unsolved clarifications.
           this.problemsetAdmin
@@ -1533,7 +1537,7 @@ export class Arena {
         )
         .reverse();
     } else {
-      this.initialClarifications = clarifications
+      this.notificationsClarifications = clarifications
         .filter((clarification) =>
           // Removing all unsolved clarifications.
           this.problemsetAdmin
@@ -1744,6 +1748,12 @@ export class Arena {
         this.navbarProblems.activeProblem = null;
       }
     } else if (this.activeTab == 'clarifications') {
+      const match = /#(?<tab>\w+)\/(?<name>\w+)-(?<id>\d+)/g.exec(
+        window.location.hash,
+      );
+      const clarificationId = parseInt(match?.groups?.id ?? '');
+      clarificationsStore.commit('selectClarificationId', clarificationId);
+      this.selectRowTable();
       if (window.location.hash == '#clarifications/new') {
         $('#overlay form').hide();
         $('#overlay, #clarification').show();
@@ -1764,6 +1774,19 @@ export class Arena {
       } else if (this.activeTab == 'clarifications') {
         $('#clarifications-count').css('font-weight', 'normal');
       }
+    }
+  }
+
+  selectRowTable(): void {
+    const r = document.querySelector(
+      '#clarifications .clarification-list .selected',
+    ) as HTMLElement | null;
+    if (r) {
+      r.classList.remove('selected');
+    }
+    const id = clarificationsStore.state.selectedClarificationId ?? null;
+    if (id && this.clarifications[id]) {
+      this.clarifications[id].classList.add('selected');
     }
   }
 

@@ -220,14 +220,12 @@
             </li>
           </ul>
           <ul v-else class="navbar-nav navbar-right">
-            <!--
-              TODO: Hay que darle soporte a estos dos componentes
             <omegaup-notifications-clarifications
-              v-bind:initialClarifications="initialClarifications"
               v-if="inContest"
+              :clarifications="clarifications"
             ></omegaup-notifications-clarifications>
-            -->
             <omegaup-notification-list
+              v-else
               :notifications="notifications"
               @read="readNotifications"
             ></omegaup-notification-list>
@@ -359,7 +357,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import notifications_List from '../notification/List.vue';
-import notifications_Clarifications from '../notification/Clarifications.vue';
+import notifications_Clarifications from '../notification/Clarificationsv2.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
 import common_GraderBadge from '../common/GraderBadge.vue';
 
@@ -397,9 +395,8 @@ export default class Navbar extends Vue {
   @Prop() graderQueueLength!: number;
   @Prop() errorMessage!: string | null;
   @Prop({ default: 0 }) profileProgress!: number;
-  @Prop() initialClarifications!: types.Clarification[];
+  @Prop() clarifications!: types.Clarification[];
 
-  clarifications: types.Clarification[] = this.initialClarifications;
   T = T;
 
   get formattedLoginURL(): string {

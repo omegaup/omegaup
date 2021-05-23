@@ -6,7 +6,9 @@
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #socket-status>
-      <sup :class="socketClass" title="WebSocket">{{ socketIcon }}</sup>
+      <sup :class="socketClass" :title="socketStatusTitle">{{
+        socketStatus
+      }}</sup>
     </template>
     <template #clock>
       <div class="clock">{{ clock }}</div>
@@ -97,6 +99,7 @@ import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_Summary from './Summary.vue';
 import problem_Details from '../problem/Details.vue';
+import { SocketStatus } from '../../arena/events_socket';
 
 @Component({
   components: {
@@ -118,7 +121,7 @@ export default class ArenaCourse extends Vue {
   @Prop() activeTab!: string;
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
-  @Prop({ default: true }) socketConnected!: boolean;
+  @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
   @Prop({ default: () => [] }) runs!: types.Run[];
 
@@ -132,14 +135,24 @@ export default class ArenaCourse extends Vue {
     return this.activeProblem?.alias ?? null;
   }
 
-  get socketIcon(): string {
-    if (this.socketConnected) return '•';
-    return '✗';
+  get socketClass(): string {
+    if (this.socketStatus === SocketStatus.Connected) {
+      return 'socket-status socket-status-ok';
+    }
+    if (this.socketStatus === SocketStatus.Failed) {
+      return 'socket-status socket-status-error';
+    }
+    return 'socket-status';
   }
 
-  get socketClass(): string {
-    if (this.socketConnected) return 'socket-status-ok';
-    return 'socket-status-error';
+  get socketStatusTitle(): string {
+    if (this.socketStatus === SocketStatus.Connected) {
+      return T.socketStatusConnected;
+    }
+    if (this.socketStatus === SocketStatus.Failed) {
+      return T.socketStatusFailed;
+    }
+    return T.socketStatusWaiting;
   }
 
   onNavigateToProblem(problem: types.NavbarProblemsetProblem) {

@@ -3,6 +3,7 @@
     :class="{
       resolved: clarification.answer,
       'direct-message': isDirectMessage,
+      'border border-primary': selected,
     }"
   >
     <td
@@ -97,6 +98,7 @@ import * as time from '../../time';
 export default class ArenaClarification extends Vue {
   @Prop() clarification!: types.Clarification;
   @Prop({ default: false }) isAdmin!: boolean;
+  @Prop({ default: false }) selected!: boolean;
 
   T = T;
   time = time;
@@ -178,5 +180,9 @@ export default class ArenaClarification extends Vue {
     rgba(var(--clarification-direct-message-gradient-to-background-color), 0.5)
   );
   background-color: var(--clarification-direct-message-background-color);
+}
+
+.border {
+  border-width: 3px !important;
 }
 </style>
