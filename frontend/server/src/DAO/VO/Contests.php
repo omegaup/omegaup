@@ -43,6 +43,7 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         'archived' => true,
         'certificate_cutoff' => true,
         'certificates_status' => true,
+        'contest_for_teams' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -219,6 +220,11 @@ class Contests extends \OmegaUp\DAO\VO\VO {
             $this->certificates_status = is_scalar(
                 $data['certificates_status']
             ) ? strval($data['certificates_status']) : '';
+        }
+        if (isset($data['contest_for_teams'])) {
+            $this->contest_for_teams = boolval(
+                $data['contest_for_teams']
+            );
         }
     }
 
@@ -412,4 +418,11 @@ class Contests extends \OmegaUp\DAO\VO\VO {
      * @var string
      */
     public $certificates_status = 'uninitiated';
+
+    /**
+     * Bandera que indica si el concurso es para equipos.
+     *
+     * @var bool
+     */
+    public $contest_for_teams = false;
 }
