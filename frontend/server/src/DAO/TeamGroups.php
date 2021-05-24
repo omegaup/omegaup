@@ -23,7 +23,7 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
                     `tg`.`alias` = ?
                 LIMIT 1;';
         $params = [$alias];
-        /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, team_group_id: int, name: string}|null */
+        /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string, team_group_id: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -39,8 +39,7 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
                 WHERE
                     `tg`.`name` = ?
                 LIMIT 1;';
-
-        /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, team_group_id: int, name: string}|null */
+        /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string, team_group_id: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($rs)) {
             return null;
