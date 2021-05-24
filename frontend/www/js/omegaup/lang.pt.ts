@@ -1188,7 +1188,7 @@ const translations: { [key: string]: string; } = {
   tagSourceVoted: "Etiqueta dos usu\u00e1rios",
   teamsGroupEditTeams: "Equipes",
   teamsGroupEditTitleWithName: "Editar grupo de equipes %(name)",
-  teamsGroupUploadIdentitiesAsTeams: "Equipes de upload",
+  teamsGroupUploadIdentitiesAsTeams: "Subir equipes",
   titleInUse: "T\u00edtulo j\u00e1 existe. Por favor, escolha um t\u00edtulo diferente. ",
   tokenDecodeCorrupted: "Ocorreu um problema ao decodificar o token.",
   tokenDecodeExpired: "O token que voc\u00ea est\u00e1 tentando usar j\u00e1 expirou.",
