@@ -148,7 +148,7 @@ class Problem {
                     str_replace(' ', '-', $params->title)
                 ),
                 0,
-                32
+                \OmegaUp\Validators::ALIAS_MAX_LENGTH
             ),
             'author_username' => $params->author->username,
             'validator' => $params->validator,
