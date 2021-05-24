@@ -92,6 +92,45 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
     }
 
     /**
+     * @return list<array{classname: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: string}>
+     */
+    public static function getTeamGroupIdentities(
+        \OmegaUp\DAO\VO\TeamGroups $teamGroup
+    ) {
+        $sql = 'SELECT
+                    i.username,
+                    i.name,
+                    \'decline\' AS gender,
+                    c.name AS country,
+                    c.country_id,
+                    s.name AS state,
+                    s.state_id,
+                    sc.name AS school,
+                    sc.school_id AS school_id,
+                    \'user-rank-unranked\' AS `classname`
+                FROM
+                    Groups_Identities gi
+                INNER JOIN
+                    Identities i ON i.identity_id = gi.identity_id
+                LEFT JOIN
+                    States s ON s.state_id = i.state_id AND s.country_id = i.country_id
+                LEFT JOIN
+                    Countries c ON c.country_id = s.country_id
+                LEFT JOIN
+                    Identities_Schools isc ON isc.identity_school_id = i.current_identity_school_id
+                LEFT JOIN
+                    Schools sc ON sc.school_id = isc.school_id
+                WHERE
+                    gi.group_id = ?;';
+
+        /** @var list<array{classname: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$teamGroup->team_group_id]
+        );
+    }
+
+    /**
      * @return list<array{identity_id: int}>
      */
     public static function getGroupIdentities(\OmegaUp\DAO\VO\Groups $group) {

@@ -662,6 +662,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleScoreboardmerge: "Scoreboard Merge",
   omegaupTitleStudentsProgress: "Progreso de los estudiantes",
   omegaupTitleSupportDashboard: "Tablero de soporte",
+  omegaupTitleTeamGroupsEdit: "Editar grupo de equipos",
   omegaupTitleUpdatePrivileges: "Actualizar privilegios",
   omegaupTitleUsersRank: "Ranking de usuarios",
   onlyDemotionsSupported: "Solamente se pueden resolver demociones por ahora.",

@@ -1468,6 +1468,14 @@ export namespace types {
       );
     }
 
+    export function TeamGroupEditPayload(
+      elementId: string = 'payload',
+    ): types.TeamGroupEditPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function UserProfileDetailsPayload(
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
@@ -3269,6 +3277,15 @@ export namespace types {
   export interface TagWithProblemCount {
     name: string;
     problemCount: number;
+  }
+
+  export interface TeamGroupEditPayload {
+    countries: dao.Countries[];
+    identities: types.Identity[];
+    isOrganizer: boolean;
+    teamGroupAlias: string;
+    teamGroupDescription?: string;
+    teamGroupName?: string;
   }
 
   export interface UserInfoForProblem {

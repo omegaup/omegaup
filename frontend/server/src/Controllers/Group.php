@@ -8,6 +8,7 @@
  * @psalm-type Identity=array{classname?: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, password?: string, school: null|string, school_id: int|null, school_name?: string, state: null|string, state_id: null|string, username: string}
  * @psalm-type GroupScoreboard=array{alias: string, create_time: string, description: null|string, name: string}
  * @psalm-type GroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, groupAlias: string, groupDescription: null|string, groupName: null|string, identities: list<Identity>, isOrganizer: bool, scoreboards: list<GroupScoreboard>}
+ * @psalm-type TeamGroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<Identity>, teamGroupAlias: string, teamGroupDescription: null|string, teamGroupName: null|string, isOrganizer: bool}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ScoreboardContest=array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}
  * @psalm-type GroupScoreboardContestsPayload=array{availableContests: list<ContestListItem>, contests: list<ScoreboardContest>, scoreboardAlias: string, groupAlias: string}
@@ -147,6 +148,27 @@ class Group extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
         return $group;
+    }
+
+    /**
+     * Validate team group param
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     */
+    public static function validateTeamGroupAndOwner(
+        string $teamGroupAlias,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): ?\OmegaUp\DAO\VO\TeamGroups {
+        $teamGroup = \OmegaUp\DAO\TeamGroups::getByAlias($teamGroupAlias);
+        if (is_null($teamGroup)) {
+            return null;
+        }
+
+        if (!\OmegaUp\Authorization::isTeamGroupAdmin($identity, $teamGroup)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        return $teamGroup;
     }
 
     /**
@@ -434,12 +456,6 @@ class Group extends \OmegaUp\Controllers\Controller {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
-        $isOrganizer = \OmegaUp\Experiments::getInstance()->isEnabled(
-            \OmegaUp\Experiments::IDENTITIES
-        ) && \OmegaUp\Authorization::canCreateGroupIdentities(
-            $r->identity
-        );
-
         $groupAlias = $r->ensureString(
             'group',
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
@@ -493,6 +509,60 @@ class Group extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'group_edit',
+        ];
+    }
+
+    /**
+     * @return array{smartyProperties: array{payload: TeamGroupEditPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @omegaup-request-param string $team_group_alias
+     */
+    public static function getTeamGroupEditDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ) {
+        // Authenticate user
+        $r->ensureMainUserIdentity();
+
+        $teamGroupAlias = $r->ensureString(
+            'team_group_alias',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
+        );
+        $teamGroup = self::validateTeamGroupAndOwner(
+            $teamGroupAlias,
+            $r->identity
+        );
+        if (is_null($teamGroup) || is_null($teamGroup->team_group_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'team_group_alias'
+            );
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'teamGroupAlias' => $teamGroupAlias,
+                    'teamGroupName' => $teamGroup->name,
+                    'teamGroupDescription' => $teamGroup->description,
+                    'countries' => \OmegaUp\DAO\Countries::getAll(
+                        null,
+                        100,
+                        'name'
+                    ),
+                    'identities' => \OmegaUp\DAO\GroupsIdentities::getTeamGroupIdentities(
+                        $teamGroup
+                    ),
+                    'isOrganizer' => \OmegaUp\Experiments::getInstance()->isEnabled(
+                        \OmegaUp\Experiments::IDENTITIES
+                    ) && \OmegaUp\Authorization::canCreateGroupIdentities(
+                        $r->identity
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleTeamGroupsEdit'
+                ),
+            ],
+            'entrypoint' => 'team_group_edit',
         ];
     }
 
