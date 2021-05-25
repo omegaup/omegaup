@@ -577,14 +577,14 @@ class Group extends \OmegaUp\Controllers\Controller {
         string $alias,
         string $name,
         string $description,
-        int $ownerId
+        int $ownerUserId
     ): \OmegaUp\DAO\VO\TeamGroups {
         $teamGroup = new \OmegaUp\DAO\VO\TeamGroups([
             'alias' => $alias,
             'name' => $name,
             'description' => $description,
         ]);
-        $teamGroupAcl = new \OmegaUp\DAO\VO\ACLs(['owner_id' => $ownerId]);
+        $teamGroupAcl = new \OmegaUp\DAO\VO\ACLs(['owner_id' => $ownerUserId]);
 
         \OmegaUp\DAO\DAO::transBegin();
 
