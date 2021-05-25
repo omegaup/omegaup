@@ -60,16 +60,17 @@ class Groups {
     /**
      * Create teams group
      *
-     * @return array{group: \OmegaUp\DAO\VO\Groups, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string}}
+     * @return array{teamGroup: \OmegaUp\DAO\VO\TeamGroups, owner: \OmegaUp\DAO\VO\Identities|null}
      */
     public static function createTeamsGroup(
+        ?\OmegaUp\DAO\VO\Users $user = null,
         ?\OmegaUp\DAO\VO\Identities $owner = null,
         ?string $name = null,
         ?string $description = null,
         ?string $alias = null,
         ?\OmegaUp\Test\ScopedLoginToken $login = null
     ) {
-        if (is_null($owner)) {
+        if (is_null($owner) || is_null($user)) {
             [
                 'user' => $user,
                 'identity' => $owner,

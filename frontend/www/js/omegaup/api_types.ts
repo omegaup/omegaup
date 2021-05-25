@@ -3283,9 +3283,7 @@ export namespace types {
     countries: dao.Countries[];
     identities: types.Identity[];
     isOrganizer: boolean;
-    teamGroupAlias: string;
-    teamGroupDescription?: string;
-    teamGroupName?: string;
+    teamGroup: { alias: string; description?: string; name?: string };
   }
 
   export interface UserInfoForProblem {
