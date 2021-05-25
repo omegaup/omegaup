@@ -58,6 +58,69 @@ class Groups {
     }
 
     /**
+     * Create teams group
+     *
+     * @return array{group: \OmegaUp\DAO\VO\Groups, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string}}
+     */
+    public static function createTeamsGroup(
+        ?\OmegaUp\DAO\VO\Identities $owner = null,
+        ?string $name = null,
+        ?string $description = null,
+        ?string $alias = null,
+        ?\OmegaUp\Test\ScopedLoginToken $login = null
+    ) {
+        if (is_null($owner)) {
+            [
+                'user' => $user,
+                'identity' => $owner,
+            ] = \OmegaUp\Test\Factories\User::createUser();
+        }
+
+        if (is_null($name)) {
+            $name = \OmegaUp\Test\Utils::createRandomString();
+        }
+
+        if (is_null($description)) {
+            $description = \OmegaUp\Test\Utils::createRandomString();
+        }
+
+        if (is_null($alias)) {
+            $alias = \OmegaUp\Test\Utils::createRandomString();
+        }
+
+        if (is_null($login)) {
+            $login = \OmegaUp\Test\ControllerTestCase::login($owner);
+        }
+
+        // TODO: Replace following lines with:
+        // \OmegaUp\Controllers\Group::apiCreateTeamGroup(new Request(...));
+        // When PR #5431 is aproved and merged
+        $teamGroup = new \OmegaUp\DAO\VO\TeamGroups([
+            'alias' => $alias,
+            'name' => $name,
+            'description' => $description,
+        ]);
+        $teamGroupAcl = new \OmegaUp\DAO\VO\ACLs(
+            ['owner_id' => $user->user_id]
+        );
+        \OmegaUp\DAO\ACLs::create($teamGroupAcl);
+        $teamGroup->acl_id = $teamGroupAcl->acl_id;
+        \OmegaUp\DAO\TeamGroups::create($teamGroup);
+
+        $createdTeamGroup = \OmegaUp\DAO\TeamGroups::getByAlias($alias);
+        if (is_null($createdTeamGroup)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseGroupNotFound'
+            );
+        }
+
+        return [
+            'owner' => $owner,
+            'teamGroup' => $createdTeamGroup,
+        ];
+    }
+
+    /**
      * Add identity to group helper
      *
      * @param array{group: \OmegaUp\DAO\VO\Groups, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string}} $groupData

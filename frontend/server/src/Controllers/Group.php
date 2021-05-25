@@ -456,6 +456,12 @@ class Group extends \OmegaUp\Controllers\Controller {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
+        $isOrganizer = \OmegaUp\Experiments::getInstance()->isEnabled(
+            \OmegaUp\Experiments::IDENTITIES
+        ) && \OmegaUp\Authorization::canCreateGroupIdentities(
+            $r->identity
+        );
+
         $groupAlias = $r->ensureString(
             'group',
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
@@ -541,9 +547,11 @@ class Group extends \OmegaUp\Controllers\Controller {
         return [
             'smartyProperties' => [
                 'payload' => [
-                    'teamGroupAlias' => $teamGroupAlias,
-                    'teamGroupName' => $teamGroup->name,
-                    'teamGroupDescription' => $teamGroup->description,
+                    'teamGroup' => [
+                        'alias' => $teamGroupAlias,
+                        'name' => $teamGroup->name,
+                        'description' => $teamGroup->description,
+                    ],
                     'countries' => \OmegaUp\DAO\Countries::getAll(
                         null,
                         100,

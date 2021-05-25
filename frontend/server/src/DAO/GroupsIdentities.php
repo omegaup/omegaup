@@ -5,6 +5,8 @@ namespace OmegaUp\DAO;
 /**
  * GroupsIdentities Data Access Object (DAO).
  *
+ * @psalm-type Identity=array{classname?: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, password?: string, school: null|string, school_id: int|null, school_name?: string, state: null|string, state_id: null|string, username: string}
+ *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\GroupsIdentities}.
@@ -92,7 +94,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
     }
 
     /**
-     * @return list<array{classname: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: string}>
+     * @return list<Identity>
      */
     public static function getTeamGroupIdentities(
         \OmegaUp\DAO\VO\TeamGroups $teamGroup
@@ -100,14 +102,33 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
         $sql = 'SELECT
                     i.username,
                     i.name,
-                    \'decline\' AS gender,
+                    i.gender,
                     c.name AS country,
                     c.country_id,
                     s.name AS state,
                     s.state_id,
                     sc.name AS school,
                     sc.school_id AS school_id,
-                    \'user-rank-unranked\' AS `classname`
+                    IFNULL(
+                        (
+                            SELECT `urc`.classname FROM
+                                `User_Rank_Cutoffs` urc
+                            WHERE
+                                `urc`.score <= (
+                                        SELECT
+                                            `ur`.`score`
+                                        FROM
+                                            `User_Rank` `ur`
+                                        WHERE
+                                            `ur`.`user_id` = `i`.`user_id`
+                                    )
+                            ORDER BY
+                                `urc`.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        "user-rank-unranked"
+                    ) `classname`
                 FROM
                     Groups_Identities gi
                 INNER JOIN
