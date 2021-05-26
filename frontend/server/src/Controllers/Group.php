@@ -69,7 +69,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param null|string $alias
+     * @omegaup-request-param string $alias
      * @omegaup-request-param string $description
      * @omegaup-request-param string $name
      */
@@ -646,5 +646,75 @@ class Group extends \OmegaUp\Controllers\Controller {
             ],
             'entrypoint' => 'group_scoreboard_contests',
         ];
+    }
+
+    /**
+     * Utility function to create a new team group.
+     */
+    public static function createTeamGroup(
+        string $alias,
+        string $name,
+        string $description,
+        int $ownerUserId
+    ): \OmegaUp\DAO\VO\TeamGroups {
+        $teamGroup = new \OmegaUp\DAO\VO\TeamGroups([
+            'alias' => $alias,
+            'name' => $name,
+            'description' => $description,
+        ]);
+        $teamGroupAcl = new \OmegaUp\DAO\VO\ACLs(['owner_id' => $ownerUserId]);
+
+        \OmegaUp\DAO\DAO::transBegin();
+
+        try {
+            \OmegaUp\DAO\ACLs::create($teamGroupAcl);
+            $teamGroup->acl_id = $teamGroupAcl->acl_id;
+
+            \OmegaUp\DAO\TeamGroups::create($teamGroup);
+
+            self::$log->info("Team group {$alias} created.");
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'aliasInUse',
+                    $e
+                );
+            }
+            throw $e;
+        }
+
+        return $teamGroup;
+    }
+
+    /**
+     * New team group
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $alias
+     * @omegaup-request-param string $description
+     * @omegaup-request-param string $name
+     */
+    public static function apiCreateTeamGroup(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+
+        $teamGroupAlias = $r->ensureString(
+            'alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $name = $r->ensureString('name');
+        $description = $r->ensureString('description');
+
+        self::createTeamGroup(
+            $teamGroupAlias,
+            $name,
+            $description,
+            $r->user->user_id
+        );
+
+        return ['status' => 'ok'];
     }
 }
