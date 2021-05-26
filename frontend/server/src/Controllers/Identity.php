@@ -329,8 +329,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
         /** @var list<array{country_id: string, gender: string, name: string, password: string, school_name: string, state_id: string, username: string}>|null $identities */
         $identities = json_decode($encodedIdentities, true);
-
-        if (!is_array($identities)) {
+        if (!is_array($identities) || empty($identities)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
                 'identities'

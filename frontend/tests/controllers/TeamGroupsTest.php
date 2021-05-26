@@ -205,4 +205,134 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertStringContainsString('Team', $identity['name']);
         }
     }
+
+    public function testUploadCsvFileWithNoPrivilegesUser() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        try {
+            \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                        'team_identities.csv',
+                        $teamGroup->alias,
+                    ),
+                    'team_group_alias' => $teamGroup->alias,
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+    }
+
+    public function testUploadCsvFileWithWrongAlias() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        try {
+            \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+                new \OmegaUp\Request([
+                    'auth_token' => $creatorLogin->auth_token,
+                    'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                        'team_identities.csv',
+                        $teamGroup->alias,
+                    ),
+                    'team_group_alias' => 'fake_alias',
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            $this->assertEquals('groupNotFound', $e->getMessage());
+        }
+    }
+
+    public function testUploadCsvFileWithWrongFile() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        try {
+            \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+                new \OmegaUp\Request([
+                    'auth_token' => $creatorLogin->auth_token,
+                    'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                        'malformed_team_identities.csv',
+                        $teamGroup->alias,
+                    ),
+                    'team_group_alias' => $teamGroup->alias,
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
+    }
+
+    public function testUploadCsvFileWithDuplicatedTeamUsername() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        try {
+            \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+                new \OmegaUp\Request([
+                    'auth_token' => $creatorLogin->auth_token,
+                    'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                        'duplicated_team_identities.csv',
+                        $teamGroup->alias,
+                    ),
+                    'team_group_alias' => $teamGroup->alias,
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals('aliasInUse', $e->getMessage());
+        }
+    }
 }
