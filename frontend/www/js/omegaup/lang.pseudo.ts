@@ -662,6 +662,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleScoreboardmerge: "(Sc0r3b0ardm3rg3)",
   omegaupTitleStudentsProgress: "(S7ud3n75' pr0gr355)",
   omegaupTitleSupportDashboard: "(Supp0r7 da5hb0ard)",
+  omegaupTitleTeamGroupsEdit: "(Edi7 73am gr0up)",
   omegaupTitleUpdatePrivileges: "(Upda73 privi13g35)",
   omegaupTitleUsersRank: "(U53r ranking)",
   onlyDemotionsSupported: "(R3501u7i0n 0n1y 5upp0r73d f0r d3m07i0n5 f0r n0w.)",
