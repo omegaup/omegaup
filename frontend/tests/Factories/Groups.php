@@ -63,16 +63,14 @@ class Groups {
      * @return array{teamGroup: \OmegaUp\DAO\VO\TeamGroups, owner: \OmegaUp\DAO\VO\Identities|null}
      */
     public static function createTeamsGroup(
-        ?\OmegaUp\DAO\VO\Users $user = null,
         ?\OmegaUp\DAO\VO\Identities $owner = null,
         ?string $name = null,
         ?string $description = null,
         ?string $alias = null,
         ?\OmegaUp\Test\ScopedLoginToken $login = null
     ) {
-        if (is_null($owner) || is_null($user)) {
+        if (is_null($owner)) {
             [
-                'user' => $user,
                 'identity' => $owner,
             ] = \OmegaUp\Test\Factories\User::createUser();
         }
@@ -93,20 +91,14 @@ class Groups {
             $login = \OmegaUp\Test\ControllerTestCase::login($owner);
         }
 
-        // TODO: Replace following lines with:
-        // \OmegaUp\Controllers\Group::apiCreateTeamGroup(new Request(...));
-        // When PR #5431 is aproved and merged
-        $teamGroup = new \OmegaUp\DAO\VO\TeamGroups([
-            'alias' => $alias,
-            'name' => $name,
-            'description' => $description,
-        ]);
-        $teamGroupAcl = new \OmegaUp\DAO\VO\ACLs(
-            ['owner_id' => $user->user_id]
+        \OmegaUp\Controllers\Group::apiCreateTeamGroup(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'alias' => $alias,
+                'name' => $name,
+                'description' => $description,
+            ])
         );
-        \OmegaUp\DAO\ACLs::create($teamGroupAcl);
-        $teamGroup->acl_id = $teamGroupAcl->acl_id;
-        \OmegaUp\DAO\TeamGroups::create($teamGroup);
 
         $createdTeamGroup = \OmegaUp\DAO\TeamGroups::getByAlias($alias);
         if (is_null($createdTeamGroup)) {
