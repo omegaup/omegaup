@@ -1468,6 +1468,14 @@ export namespace types {
       );
     }
 
+    export function TeamGroupEditPayload(
+      elementId: string = 'payload',
+    ): types.TeamGroupEditPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function UserProfileDetailsPayload(
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
@@ -3275,6 +3283,13 @@ export namespace types {
     problemCount: number;
   }
 
+  export interface TeamGroupEditPayload {
+    countries: dao.Countries[];
+    identities: types.Identity[];
+    isOrganizer: boolean;
+    teamGroup: { alias: string; description?: string; name?: string };
+  }
+
   export interface UserInfoForProblem {
     admin: boolean;
     loggedIn: boolean;
@@ -3805,6 +3820,8 @@ export namespace messages {
   export type GroupCreateResponse = {};
   export type GroupCreateScoreboardRequest = { [key: string]: any };
   export type GroupCreateScoreboardResponse = {};
+  export type GroupCreateTeamGroupRequest = { [key: string]: any };
+  export type GroupCreateTeamGroupResponse = {};
   export type GroupDetailsRequest = { [key: string]: any };
   export type GroupDetailsResponse = {
     group: {
@@ -4683,6 +4700,9 @@ export namespace controllers {
     createScoreboard: (
       params?: messages.GroupCreateScoreboardRequest,
     ) => Promise<messages.GroupCreateScoreboardResponse>;
+    createTeamGroup: (
+      params?: messages.GroupCreateTeamGroupRequest,
+    ) => Promise<messages.GroupCreateTeamGroupResponse>;
     details: (
       params?: messages.GroupDetailsRequest,
     ) => Promise<messages.GroupDetailsResponse>;

@@ -57,7 +57,8 @@ abstract class Contests {
                 `recommended` = ?,
                 `archived` = ?,
                 `certificate_cutoff` = ?,
-                `certificates_status` = ?
+                `certificates_status` = ?,
+                `contest_for_teams` = ?
             WHERE
                 (
                     `contest_id` = ?
@@ -115,6 +116,7 @@ abstract class Contests {
                 intval($Contests->certificate_cutoff)
             ),
             $Contests->certificates_status,
+            intval($Contests->contest_for_teams),
             intval($Contests->contest_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -162,7 +164,8 @@ abstract class Contests {
                 `Contests`.`recommended`,
                 `Contests`.`archived`,
                 `Contests`.`certificate_cutoff`,
-                `Contests`.`certificates_status`
+                `Contests`.`certificates_status`,
+                `Contests`.`contest_for_teams`
             FROM
                 `Contests`
             WHERE
@@ -270,7 +273,8 @@ abstract class Contests {
                 `Contests`.`recommended`,
                 `Contests`.`archived`,
                 `Contests`.`certificate_cutoff`,
-                `Contests`.`certificates_status`
+                `Contests`.`certificates_status`,
+                `Contests`.`contest_for_teams`
             FROM
                 `Contests`
         ';
@@ -346,8 +350,10 @@ abstract class Contests {
                     `recommended`,
                     `archived`,
                     `certificate_cutoff`,
-                    `certificates_status`
+                    `certificates_status`,
+                    `contest_for_teams`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -428,6 +434,7 @@ abstract class Contests {
                 intval($Contests->certificate_cutoff)
             ),
             $Contests->certificates_status,
+            intval($Contests->contest_for_teams),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

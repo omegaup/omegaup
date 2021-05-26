@@ -3,6 +3,7 @@ import { types } from '../api_types';
 import { myRunsStore } from './runsStore';
 import { omegaup } from '../omegaup';
 import { getMaxScore } from './navigation';
+import T from '../lang';
 
 export const scoreboardColors = [
   '#FB3F51',
@@ -117,6 +118,7 @@ export function createChart({
     colors: scoreboardColors,
 
     xAxis: {
+      type: 'datetime',
       ordinal: false,
       min: startTimestamp,
       max: finishTimestamp,
@@ -127,6 +129,9 @@ export function createChart({
       showFirstLabel: false,
       min: 0,
       max: maxPoints,
+      title: {
+        text: T.wordsSubmissions,
+      },
     },
 
     plotOptions: {
@@ -136,6 +141,10 @@ export function createChart({
         states: { hover: { lineWidth: 3 } },
         marker: { radius: 5, symbol: 'circle', lineWidth: 1 },
       },
+    },
+
+    title: {
+      text: T.wordsSubmissions,
     },
 
     navigator: {
@@ -202,6 +211,7 @@ export function onRankingChanged({
   users: omegaup.UserRank[];
   currentRanking: { [username: string]: number };
   maxPoints: number;
+  lastTimeUpdated: Date;
 } {
   const users: omegaup.UserRank[] = [];
   const problems: { [alias: string]: types.NavbarProblemsetProblem } = {};
@@ -242,7 +252,6 @@ export function onRankingChanged({
           alias,
           problem.points,
         );
-        currentProblem.maxScore = problem.points;
       }
     }
 
@@ -259,5 +268,11 @@ export function onRankingChanged({
       });
     }
   }
-  return { ranking, users, currentRanking, maxPoints };
+  return {
+    ranking,
+    users,
+    currentRanking,
+    maxPoints,
+    lastTimeUpdated: scoreboard.time,
+  };
 }

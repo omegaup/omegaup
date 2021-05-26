@@ -7,7 +7,9 @@
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #socket-status>
-      <sup :class="socketClass" title="WebSocket">{{ socketIcon }}</sup>
+      <sup :class="socketClass" :title="socketStatusTitle">{{
+        socketStatus
+      }}</sup>
     </template>
     <template #clock>
       <div v-if="isContestFinished" class="alert alert-warning" role="alert">
@@ -28,12 +30,14 @@
               :problems="problems"
               :active-problem="activeProblemAlias"
               :in-assignment="false"
-              :digits-after-decimal-point="contest.partialScore ? 2 : 0"
+              :digits-after-decimal-point="
+                contest.partial_score ? digitsAfterDecimalPoint : 0
+              "
               @disable-active-problem="activeProblem = null"
               @navigate-to-problem="onNavigateToProblem"
             ></omegaup-arena-navbar-problems>
             <omegaup-arena-navbar-miniranking
-              :users="minirankingUsers"
+              :users="miniRankingUsers"
               :show-ranking="true"
             ></omegaup-arena-navbar-miniranking>
           </div>
@@ -143,6 +147,7 @@ import omegaup_Markdown from '../Markdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { omegaup } from '../../omegaup';
 import { ContestClarificationType } from '../../arena/clarifications';
+import { SocketStatus } from '../../arena/events_socket';
 
 @Component({
   components: {
@@ -176,13 +181,14 @@ export default class ArenaContest extends Vue {
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
   @Prop({ default: null }) guid!: null | string;
-  @Prop() minirankingUsers!: omegaup.UserRank[];
+  @Prop() miniRankingUsers!: omegaup.UserRank[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
   @Prop() rankingChartOptions!: Highcharts.Options;
   @Prop() lastUpdated!: Date;
   @Prop() submissionDeadline!: Date;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   @Prop({ default: true }) showPenalty!: boolean;
+  @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: true }) socketConnected!: boolean;
   @Prop({ default: () => [] }) runs!: types.Run[];
 
@@ -195,14 +201,24 @@ export default class ArenaContest extends Vue {
   nextSubmissionTimestamp: Date | null = null;
   now = new Date();
 
-  get socketIcon(): string {
-    if (this.socketConnected) return '•';
-    return '✗';
+  get socketClass(): string {
+    if (this.socketStatus === SocketStatus.Connected) {
+      return 'socket-status socket-status-ok';
+    }
+    if (this.socketStatus === SocketStatus.Failed) {
+      return 'socket-status socket-status-error';
+    }
+    return 'socket-status';
   }
 
-  get socketClass(): string {
-    if (this.socketConnected) return 'socket-status-ok';
-    return 'socket-status-error';
+  get socketStatusTitle(): string {
+    if (this.socketStatus === SocketStatus.Connected) {
+      return T.socketStatusConnected;
+    }
+    if (this.socketStatus === SocketStatus.Failed) {
+      return T.socketStatusFailed;
+    }
+    return T.socketStatusWaiting;
   }
 
   get activeProblemAlias(): null | string {

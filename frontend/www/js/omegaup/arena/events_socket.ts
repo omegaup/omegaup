@@ -9,6 +9,8 @@ import clarificationStore from './clarificationsStore';
 import { onRankingChanged, onRankingEvents } from './ranking';
 import { updateRun } from './submissions';
 import { types } from '../api_types';
+import rankingStore from './rankingStore';
+import socketStore from './socketStore';
 
 export enum SocketStatus {
   Waiting = '↻',
@@ -109,11 +111,19 @@ export class EventsSocket {
         virtualRankingChange(data.scoreboard);
         return;
       }*/
-      const { currentRanking } = onRankingChanged({
+      const {
+        currentRanking,
+        ranking,
+        users,
+        lastTimeUpdated,
+      } = onRankingChanged({
         scoreboard: data.scoreboard,
         currentUsername: this.currentUsername,
         navbarProblems: this.navbarProblems,
       });
+      rankingStore.commit('updateRanking', ranking);
+      rankingStore.commit('updateMiniRankingUsers', users);
+      rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
 
       api.Problemset.scoreboardEvents({
         problemset_id: this.problemsetId,
@@ -138,6 +148,7 @@ export class EventsSocket {
     if (this.shouldRetry && this.retries > 0) {
       this.retries--;
       this.socketStatus = SocketStatus.Waiting;
+      socketStore.commit('updateSocketStatus', this.socketStatus);
       setTimeout(
         () => this.connectSocket(),
         Math.random() * (this.intervalInMilliseconds / 2),
@@ -145,6 +156,7 @@ export class EventsSocket {
       return;
     }
     this.socketStatus = SocketStatus.Failed;
+    socketStore.commit('updateSocketStatus', this.socketStatus);
   }
 
   private connectSocket(): Promise<void> {
@@ -157,6 +169,7 @@ export class EventsSocket {
         socket.onopen = () => {
           this.shouldRetry = true;
           this.socketStatus = SocketStatus.Connected;
+          socketStore.commit('updateSocketStatus', this.socketStatus);
           this.socketKeepalive = setInterval(
             () => socket.send('"ping"'),
             this.intervalInMilliseconds,
@@ -179,10 +192,12 @@ export class EventsSocket {
   connect(): void {
     if (this.disableSockets || this.problemsetAlias === 'admin') {
       this.socketStatus = SocketStatus.Failed;
+      socketStore.commit('updateSocketStatus', this.socketStatus);
       return;
     }
 
     this.socketStatus = SocketStatus.Waiting;
+    socketStore.commit('updateSocketStatus', this.socketStatus);
     ui.reportEvent('events-socket', 'attempt');
 
     this.connectSocket()
