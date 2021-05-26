@@ -243,6 +243,7 @@ class Utils {
             'School_Of_The_Month',
             'Submissions',
             'Submission_Log',
+            'Team_Groups',
             'User_Roles',
             'User_Rank',
             'Users',

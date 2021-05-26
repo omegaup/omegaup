@@ -259,7 +259,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
                 self::saveIdentityGroupInsideTransaction(
                     $newIdentity,
-                    $group
+                    intval($group->group_id)
                 );
 
                 // Create IdentitySchool
@@ -273,6 +273,138 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 // Save current_identity_school_id on Identity
                 $newIdentity->current_identity_school_id = $identitySchool->identity_school_id;
                 \OmegaUp\DAO\Identities::update($newIdentity);
+            }
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
+
+        return [
+            'status' => 'ok'
+        ];
+    }
+
+    /**
+     * Entry point for Create bulk Identities for teams API
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $team_group_alias
+     * @omegaup-request-param string $identities
+     */
+    public static function apiBulkCreateForTeams(\OmegaUp\Request $r): array {
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(
+            \OmegaUp\Experiments::IDENTITIES
+        );
+
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isGroupIdentityCreator($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+        $teamGroupAlias = $r->ensureString(
+            'team_group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $teamGroup = \OmegaUp\Controllers\Group::validateTeamGroupAndOwner(
+            $teamGroupAlias,
+            $r->identity
+        );
+        if (is_null($teamGroup)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'groupNotFound'
+            );
+        }
+
+        if (is_null($teamGroup->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'groupNotFound'
+            );
+        }
+
+        $encodedIdentities = $r->ensureString('identities');
+
+        /** @var list<array{country_id: string, gender: string, name: string, password: string, school_name: string, state_id: string, username: string}>|null $identities */
+        $identities = json_decode($encodedIdentities, true);
+
+        if (!is_array($identities)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'identities'
+            );
+        }
+        /** @var array<string, bool> $seenUsernames */
+        $seenUsernames = [];
+        foreach ($identities as $identity) {
+            if (isset($seenUsernames[$identity['username']])) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'aliasInUse'
+                );
+            }
+            $seenUsernames[$identity['username']] = true;
+        }
+
+        // Save objects into DB
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+
+            foreach ($identities as $identity) {
+                // Prepare DAOs
+                $countryId = empty(
+                    $identity['country_id']
+                ) ? null : strval(
+                    $identity['country_id']
+                );
+                $stateId = empty(
+                    $identity['state_id']
+                ) ? null : strval(
+                    $identity['state_id']
+                );
+                $newIdentity = self::createIdentity(
+                    $identity['username'],
+                    $identity['name'],
+                    $identity['password'],
+                    $countryId,
+                    $stateId,
+                    $identity['gender'],
+                    $teamGroup->alias
+                );
+
+                $state = null;
+                if (!is_null($countryId) && !is_null($stateId)) {
+                    $state = \OmegaUp\DAO\States::getByPK(
+                        $countryId,
+                        $stateId
+                    );
+                }
+                $schoolId = \OmegaUp\Controllers\School::createSchool(
+                    trim($identity['school_name']),
+                    $state
+                );
+
+                self::saveIdentityGroupInsideTransaction(
+                    $newIdentity,
+                    intval($teamGroup->team_group_id)
+                );
+
+                // Create IdentitySchool
+                $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
+                    'identity_id' => $newIdentity->identity_id,
+                    'school_id' => $schoolId,
+                ]);
+
+                \OmegaUp\DAO\IdentitiesSchools::create($identitySchool);
+
+                // Save current_identity_school_id on Identity
+                $newIdentity->current_identity_school_id = $identitySchool->identity_school_id;
+                \OmegaUp\DAO\Identities::update($newIdentity);
+
+                \OmegaUp\DAO\Teams::create(new \OmegaUp\DAO\VO\Teams([
+                    'identity_id' => $newIdentity->identity_id,
+                ]));
             }
 
             \OmegaUp\DAO\DAO::transEnd();
@@ -358,7 +490,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      */
     private static function saveIdentityGroupInsideTransaction(
         \OmegaUp\DAO\VO\Identities $identity,
-        \OmegaUp\DAO\VO\Groups $group
+        int $groupOrTeamGroupId
     ): void {
         if (is_null($identity->username)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -402,7 +534,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
         \OmegaUp\DAO\GroupsIdentities::replace(
             new \OmegaUp\DAO\VO\GroupsIdentities([
-                'group_id' => intval($group->group_id),
+                'group_id' => $groupOrTeamGroupId,
                 'identity_id' => $identity->identity_id,
             ])
         );

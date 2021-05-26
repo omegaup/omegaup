@@ -154,4 +154,55 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('aliasInUse', $e->getMessage());
         }
     }
+
+    /**
+     * Basic test for uploading csv file with identities as teams
+     */
+    public function testUploadCsvFile() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        // Call api using identity creator group member
+        $response = \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities.csv',
+                    $teamGroup->alias,
+                ),
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        [
+            'identities' => $identities,
+        ] = \OmegaUp\Controllers\Group::getTeamGroupEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'team_group_alias' => $teamGroup->alias,
+                'auth_token' => $creatorLogin->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertCount(5, $identities);
+
+        foreach ($identities as $identity) {
+            $this->assertStringContainsString(
+                $teamGroup->alias,
+                $identity['username']
+            );
+            $this->assertStringContainsString('Team', $identity['name']);
+        }
+    }
 }

@@ -1156,6 +1156,10 @@ export const Identity = {
     messages.IdentityBulkCreateRequest,
     messages.IdentityBulkCreateResponse
   >('/api/identity/bulkCreate/'),
+  bulkCreateForTeams: apiCall<
+    messages.IdentityBulkCreateForTeamsRequest,
+    messages.IdentityBulkCreateForTeamsResponse
+  >('/api/identity/bulkCreateForTeams/'),
   changePassword: apiCall<
     messages.IdentityChangePasswordRequest,
     messages.IdentityChangePasswordResponse

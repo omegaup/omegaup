@@ -3924,6 +3924,8 @@ export namespace messages {
   // Identity
   export type IdentityBulkCreateRequest = { [key: string]: any };
   export type IdentityBulkCreateResponse = {};
+  export type IdentityBulkCreateForTeamsRequest = { [key: string]: any };
+  export type IdentityBulkCreateForTeamsResponse = {};
   export type IdentityChangePasswordRequest = { [key: string]: any };
   export type IdentityChangePasswordResponse = {};
   export type IdentityCreateRequest = { [key: string]: any };
@@ -4738,6 +4740,9 @@ export namespace controllers {
     bulkCreate: (
       params?: messages.IdentityBulkCreateRequest,
     ) => Promise<messages.IdentityBulkCreateResponse>;
+    bulkCreateForTeams: (
+      params?: messages.IdentityBulkCreateForTeamsRequest,
+    ) => Promise<messages.IdentityBulkCreateForTeamsResponse>;
     changePassword: (
       params?: messages.IdentityChangePasswordRequest,
     ) => Promise<messages.IdentityChangePasswordResponse>;
