@@ -109,6 +109,7 @@
   - [`/api/group/members/`](#apigroupmembers)
   - [`/api/group/myList/`](#apigroupmylist)
   - [`/api/group/removeUser/`](#apigroupremoveuser)
+  - [`/api/group/teams/`](#apigroupteams)
   - [`/api/group/update/`](#apigroupupdate)
 - [GroupScoreboard](#groupscoreboard)
   - [`/api/groupScoreboard/addContest/`](#apigroupscoreboardaddcontest)
@@ -2242,9 +2243,9 @@ Members of a group (usernames only).
 
 ### Returns
 
-| Name         | Type                                                                                                                                                                       |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `identities` | `{ classname: string; country?: string; country_id?: string; name?: string; school?: string; school_id?: number; state?: string; state_id?: string; username: string; }[]` |
+| Name         | Type               |
+| ------------ | ------------------ |
+| `identities` | `types.Identity[]` |
 
 ## `/api/group/myList/`
 
@@ -2274,6 +2275,24 @@ Remove user from group
 ### Returns
 
 _Nothing_
+
+## `/api/group/teams/`
+
+### Description
+
+Teams of a teams group
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+
+### Returns
+
+| Name         | Type               |
+| ------------ | ------------------ |
+| `identities` | `types.Identity[]` |
 
 ## `/api/group/update/`
 

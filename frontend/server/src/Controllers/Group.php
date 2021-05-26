@@ -150,6 +150,27 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Validate team group param
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     */
+    public static function validateTeamGroupAndOwner(
+        string $teamGroupAlias,
+        \OmegaUp\DAO\VO\Identities $identity
+    ): ?\OmegaUp\DAO\VO\TeamGroups {
+        $teamGroup = \OmegaUp\DAO\TeamGroups::getByAlias($teamGroupAlias);
+        if (is_null($teamGroup)) {
+            return null;
+        }
+
+        if (!\OmegaUp\Authorization::isTeamGroupAdmin($identity, $teamGroup)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        return $teamGroup;
+    }
+
+    /**
      * Add identity to group
      *
      * @param \OmegaUp\Request $r
@@ -351,7 +372,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{identities: list<array{classname: string, country?: null|string, country_id?: null|string, name?: null|string, school?: null|string, school_id?: int|null, state?: null|string, state_id?: null|string, username: string}>}
+     * @return array{identities: list<Identity>}
      *
      * @omegaup-request-param string $group_alias
      */
@@ -370,8 +391,39 @@ class Group extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'identities' => \OmegaUp\DAO\GroupsIdentities::GetMemberIdentities(
+            'identities' => \OmegaUp\DAO\GroupsIdentities::getMemberIdentities(
                 $group
+            ),
+        ];
+    }
+
+    /**
+     * Teams of a teams group
+     *
+     * @return array{identities: list<Identity>}
+     *
+     * @omegaup-request-param string $team_group_alias
+     */
+    public static function apiTeams(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+        $teamGroupAlias = $r->ensureString(
+            'team_group_alias',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
+        );
+        $teamGroup = self::validateTeamGroupAndOwner(
+            $teamGroupAlias,
+            $r->identity
+        );
+        if (is_null($teamGroup)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'team_group_alias'
+            );
+        }
+
+        return [
+            'identities' => \OmegaUp\DAO\GroupsIdentities::getTeamGroupIdentities(
+                $teamGroup
             ),
         ];
     }

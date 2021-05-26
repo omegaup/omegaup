@@ -1110,6 +1110,9 @@ export const Group = {
     messages.GroupRemoveUserRequest,
     messages.GroupRemoveUserResponse
   >('/api/group/removeUser/'),
+  teams: apiCall<messages.GroupTeamsRequest, messages.GroupTeamsResponse>(
+    '/api/group/teams/',
+  ),
   update: apiCall<messages.GroupUpdateRequest, messages.GroupUpdateResponse>(
     '/api/group/update/',
   ),

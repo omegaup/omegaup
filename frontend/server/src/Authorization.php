@@ -453,6 +453,16 @@ class Authorization {
         return self::isAdmin($identity, $group);
     }
 
+    public static function isTeamGroupAdmin(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\TeamGroups $teamGroup
+    ): bool {
+        if (is_null($identity->user_id)) {
+            return false;
+        }
+        return self::isAdmin($identity, $teamGroup);
+    }
+
     private static function isOwner(
         \OmegaUp\DAO\VO\Identities $identity,
         int $aclId
