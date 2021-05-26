@@ -1081,6 +1081,10 @@ export const Group = {
     messages.GroupCreateScoreboardRequest,
     messages.GroupCreateScoreboardResponse
   >('/api/group/createScoreboard/'),
+  createTeamGroup: apiCall<
+    messages.GroupCreateTeamGroupRequest,
+    messages.GroupCreateTeamGroupResponse
+  >('/api/group/createTeamGroup/'),
   details: apiCall<messages.GroupDetailsRequest, messages.GroupDetailsResponse>(
     '/api/group/details/',
   ),
