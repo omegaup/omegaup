@@ -3801,6 +3801,8 @@ export namespace messages {
   export type GroupCreateResponse = {};
   export type GroupCreateScoreboardRequest = { [key: string]: any };
   export type GroupCreateScoreboardResponse = {};
+  export type GroupCreateTeamGroupRequest = { [key: string]: any };
+  export type GroupCreateTeamGroupResponse = {};
   export type GroupDetailsRequest = { [key: string]: any };
   export type GroupDetailsResponse = {
     group: {
@@ -4679,6 +4681,9 @@ export namespace controllers {
     createScoreboard: (
       params?: messages.GroupCreateScoreboardRequest,
     ) => Promise<messages.GroupCreateScoreboardResponse>;
+    createTeamGroup: (
+      params?: messages.GroupCreateTeamGroupRequest,
+    ) => Promise<messages.GroupCreateTeamGroupResponse>;
     details: (
       params?: messages.GroupDetailsRequest,
     ) => Promise<messages.GroupDetailsResponse>;
