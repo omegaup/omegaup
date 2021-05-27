@@ -109,6 +109,7 @@
   - [`/api/group/list/`](#apigrouplist)
   - [`/api/group/members/`](#apigroupmembers)
   - [`/api/group/myList/`](#apigroupmylist)
+  - [`/api/group/removeTeam/`](#apigroupremoveteam)
   - [`/api/group/removeUser/`](#apigroupremoveuser)
   - [`/api/group/update/`](#apigroupupdate)
 - [GroupScoreboard](#groupscoreboard)
@@ -2276,6 +2277,23 @@ Returns a list of groups by owner
 | Name     | Type                                                                         |
 | -------- | ---------------------------------------------------------------------------- |
 | `groups` | `{ alias: string; create_time: Date; description: string; name: string; }[]` |
+
+## `/api/group/removeTeam/`
+
+### Description
+
+Remove team from teams group
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+| `usernameOrEmail`  | `string` |             |
+
+### Returns
+
+_Nothing_
 
 ## `/api/group/removeUser/`
 

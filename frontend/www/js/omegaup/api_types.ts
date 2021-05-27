@@ -3854,6 +3854,8 @@ export namespace messages {
       name: string;
     }[];
   };
+  export type GroupRemoveTeamRequest = { [key: string]: any };
+  export type GroupRemoveTeamResponse = {};
   export type GroupRemoveUserRequest = { [key: string]: any };
   export type GroupRemoveUserResponse = {};
   export type GroupUpdateRequest = { [key: string]: any };
@@ -4711,6 +4713,9 @@ export namespace controllers {
     myList: (
       params?: messages.GroupMyListRequest,
     ) => Promise<messages.GroupMyListResponse>;
+    removeTeam: (
+      params?: messages.GroupRemoveTeamRequest,
+    ) => Promise<messages.GroupRemoveTeamResponse>;
     removeUser: (
       params?: messages.GroupRemoveUserRequest,
     ) => Promise<messages.GroupRemoveUserResponse>;

@@ -1110,6 +1110,10 @@ export const Group = {
     })(x.groups);
     return x;
   }),
+  removeTeam: apiCall<
+    messages.GroupRemoveTeamRequest,
+    messages.GroupRemoveTeamResponse
+  >('/api/group/removeTeam/'),
   removeUser: apiCall<
     messages.GroupRemoveUserRequest,
     messages.GroupRemoveUserResponse
