@@ -1046,10 +1046,13 @@ CREATE TABLE `Team_Users` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Teams` (
   `team_id` int NOT NULL AUTO_INCREMENT,
+  `team_group_id` int NOT NULL COMMENT 'Id del grupo de equipos',
   `identity_id` int NOT NULL COMMENT 'La identidad asociada al equipo',
   PRIMARY KEY (`team_id`),
   KEY `identity_id` (`identity_id`),
-  CONSTRAINT `fk_ti_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
+  KEY `team_group_id` (`team_group_id`),
+  CONSTRAINT `fk_ti_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
+  CONSTRAINT `fk_ttg_team_group_id` FOREIGN KEY (`team_group_id`) REFERENCES `Team_Groups` (`team_group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
