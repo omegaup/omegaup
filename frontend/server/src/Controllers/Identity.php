@@ -259,7 +259,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
                 self::saveIdentityGroupInsideTransaction(
                     $newIdentity,
-                    intval($group->group_id)
+                    $group
                 );
 
                 // Create IdentitySchool
@@ -384,9 +384,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $state
                 );
 
-                self::saveIdentityGroupInsideTransaction(
+                self::saveIdentityTeamInsideTransaction(
                     $newIdentity,
-                    intval($teamGroup->team_group_id)
+                    $teamGroup
                 );
 
                 // Create IdentitySchool
@@ -400,10 +400,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 // Save current_identity_school_id on Identity
                 $newIdentity->current_identity_school_id = $identitySchool->identity_school_id;
                 \OmegaUp\DAO\Identities::update($newIdentity);
-
-                \OmegaUp\DAO\Teams::create(new \OmegaUp\DAO\VO\Teams([
-                    'identity_id' => $newIdentity->identity_id,
-                ]));
             }
 
             \OmegaUp\DAO\DAO::transEnd();
@@ -489,7 +485,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      */
     private static function saveIdentityGroupInsideTransaction(
         \OmegaUp\DAO\VO\Identities $identity,
-        int $groupOrTeamGroupId
+        \OmegaUp\DAO\VO\Groups $group
     ): void {
         if (is_null($identity->username)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -533,10 +529,64 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
         \OmegaUp\DAO\GroupsIdentities::replace(
             new \OmegaUp\DAO\VO\GroupsIdentities([
-                'group_id' => $groupOrTeamGroupId,
+                'group_id' => intval($group->group_id),
                 'identity_id' => $identity->identity_id,
             ])
         );
+    }
+
+    /**
+     * Save object Identities in DB, and add user into team group.
+     * This function is expected to be called inside a transaction.
+     */
+    private static function saveIdentityTeamInsideTransaction(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\TeamGroups $teamGroup
+    ): void {
+        if (is_null($identity->username)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotExist'
+            );
+        }
+        if (is_null($identity->country_id) && !is_null($identity->state_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidStateNeedsToBelongToCountry',
+                $identity->username
+            );
+        } elseif (
+            !is_null($identity->country_id)
+            && !is_null($identity->state_id)
+        ) {
+            $countryStates = \OmegaUp\DAO\States::getByCountry(
+                $identity->country_id
+            );
+            $states = array_map(
+                /**
+                 * @param \OmegaUp\DAO\VO\States $state
+                 */
+                fn ($state) => $state->state_id,
+                $countryStates
+            );
+            if (!in_array($identity->state_id, $states)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalidStateDoesNotBelongToCountry',
+                    $identity->username
+                );
+            }
+        }
+        $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(
+            $identity->username
+        );
+        if (is_null($preexistingIdentity)) {
+            \OmegaUp\DAO\Identities::create($identity);
+        } else {
+            $identity->identity_id = $preexistingIdentity->identity_id;
+            $identity->user_id = $preexistingIdentity->user_id;
+        }
+        \OmegaUp\DAO\Teams::create(new \OmegaUp\DAO\VO\Teams([
+            'team_group_id' => $teamGroup->team_group_id,
+            'identity_id' => $identity->identity_id,
+        ]));
     }
 
     /**

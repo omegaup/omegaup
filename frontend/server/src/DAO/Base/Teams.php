@@ -32,12 +32,18 @@ abstract class Teams {
             UPDATE
                 `Teams`
             SET
+                `team_group_id` = ?,
                 `identity_id` = ?
             WHERE
                 (
                     `team_id` = ?
                 );';
         $params = [
+            (
+                is_null($Teams->team_group_id) ?
+                null :
+                intval($Teams->team_group_id)
+            ),
             (
                 is_null($Teams->identity_id) ?
                 null :
@@ -65,6 +71,7 @@ abstract class Teams {
         $sql = '
             SELECT
                 `Teams`.`team_id`,
+                `Teams`.`team_group_id`,
                 `Teams`.`identity_id`
             FROM
                 `Teams`
@@ -148,6 +155,7 @@ abstract class Teams {
         $sql = '
             SELECT
                 `Teams`.`team_id`,
+                `Teams`.`team_group_id`,
                 `Teams`.`identity_id`
             FROM
                 `Teams`
@@ -199,11 +207,18 @@ abstract class Teams {
         $sql = '
             INSERT INTO
                 `Teams` (
+                    `team_group_id`,
                     `identity_id`
                 ) VALUES (
+                    ?,
                     ?
                 );';
         $params = [
+            (
+                is_null($Teams->team_group_id) ?
+                null :
+                intval($Teams->team_group_id)
+            ),
             (
                 is_null($Teams->identity_id) ?
                 null :
