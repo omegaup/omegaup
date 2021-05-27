@@ -557,7 +557,7 @@ class Group extends \OmegaUp\Controllers\Controller {
                         100,
                         'name'
                     ),
-                    'identities' => \OmegaUp\DAO\GroupsIdentities::getTeamGroupIdentities(
+                    'identities' => \OmegaUp\DAO\Teams::getTeamGroupIdentities(
                         $teamGroup
                     ),
                     'isOrganizer' => \OmegaUp\Experiments::getInstance()->isEnabled(
