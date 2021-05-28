@@ -174,11 +174,20 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $creatorLogin
         );
 
+        // Users to associate
+        foreach (range(0, 9) as $id) {
+            \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams([
+                    'username' => "user{$id}",
+                ])
+            );
+        }
+
         // Call api using identity creator group member
         $response = \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
             new \OmegaUp\Request([
                 'auth_token' => $creatorLogin->auth_token,
-                'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
                 ),
@@ -198,6 +207,15 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(5, $identities);
 
         foreach ($identities as $identity) {
+            $dbIdentity = \OmegaUp\DAO\Identities::findByUsername(
+                $identity['username']
+            );
+            $team = \OmegaUp\DAO\Teams::getByIdentityId(
+                $dbIdentity->identity_id
+            );
+            $result = \OmegaUp\DAO\TeamUsers::getByTeamId($team->team_id);
+            // All the teams have 2 associated users
+            $this->assertCount(2, $result);
             $this->assertStringContainsString(
                 $teamGroup->alias,
                 $identity['username']
@@ -228,7 +246,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
-                    'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                         'team_identities.csv',
                         $teamGroup->alias,
                     ),
@@ -260,7 +278,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
                 new \OmegaUp\Request([
                     'auth_token' => $creatorLogin->auth_token,
-                    'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                         'team_identities.csv',
                         $teamGroup->alias,
                     ),
@@ -292,7 +310,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
                 new \OmegaUp\Request([
                     'auth_token' => $creatorLogin->auth_token,
-                    'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                         'malformed_team_identities.csv',
                         $teamGroup->alias,
                     ),
@@ -324,7 +342,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
                 new \OmegaUp\Request([
                     'auth_token' => $creatorLogin->auth_token,
-                    'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                         'duplicated_team_identities.csv',
                         $teamGroup->alias,
                     ),

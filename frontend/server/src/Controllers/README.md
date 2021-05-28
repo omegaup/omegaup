@@ -2428,8 +2428,8 @@ Entry point for Create bulk Identities for teams API
 
 | Name               | Type     | Description |
 | ------------------ | -------- | ----------- |
-| `identities`       | `string` |             |
 | `team_group_alias` | `string` |             |
+| `team_identities`  | `string` |             |
 
 ### Returns
 
