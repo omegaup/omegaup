@@ -26,6 +26,7 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
                 WHERE
                     `team_id` = ?
                 LIMIT 100;';
+        /** @var list<array{team_id: int, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$teamId]);
         $usersTeams = [];
         foreach ($rs as $row) {
