@@ -58,6 +58,62 @@ class Groups {
     }
 
     /**
+     * Create teams group
+     *
+     * @return array{teamGroup: \OmegaUp\DAO\VO\TeamGroups, owner: \OmegaUp\DAO\VO\Identities|null}
+     */
+    public static function createTeamsGroup(
+        ?\OmegaUp\DAO\VO\Identities $owner = null,
+        ?string $name = null,
+        ?string $description = null,
+        ?string $alias = null,
+        ?\OmegaUp\Test\ScopedLoginToken $login = null
+    ) {
+        if (is_null($owner)) {
+            [
+                'identity' => $owner,
+            ] = \OmegaUp\Test\Factories\User::createUser();
+        }
+
+        if (is_null($name)) {
+            $name = \OmegaUp\Test\Utils::createRandomString();
+        }
+
+        if (is_null($description)) {
+            $description = \OmegaUp\Test\Utils::createRandomString();
+        }
+
+        if (is_null($alias)) {
+            $alias = \OmegaUp\Test\Utils::createRandomString();
+        }
+
+        if (is_null($login)) {
+            $login = \OmegaUp\Test\ControllerTestCase::login($owner);
+        }
+
+        \OmegaUp\Controllers\Group::apiCreateTeamGroup(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'alias' => $alias,
+                'name' => $name,
+                'description' => $description,
+            ])
+        );
+
+        $createdTeamGroup = \OmegaUp\DAO\TeamGroups::getByAlias($alias);
+        if (is_null($createdTeamGroup)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseGroupNotFound'
+            );
+        }
+
+        return [
+            'owner' => $owner,
+            'teamGroup' => $createdTeamGroup,
+        ];
+    }
+
+    /**
      * Add identity to group helper
      *
      * @param array{group: \OmegaUp\DAO\VO\Groups, owner: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{status: string}} $groupData

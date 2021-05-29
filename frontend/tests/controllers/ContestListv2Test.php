@@ -512,11 +512,9 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($organizerIdentity);
 
         $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
-            new \OmegaUp\Request(
-                new \OmegaUp\Request([
-                    'auth_token' => $login->auth_token,
-                ])
-            )
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
         )['smartyProperties']['payload'];
 
         $contest = $contestListPayload['contests']['current'][0];
@@ -556,11 +554,9 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($invitedUserIdentity);
 
         $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
-            new \OmegaUp\Request(
-                new \OmegaUp\Request([
-                    'auth_token' => $login->auth_token,
-                ])
-            )
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
         )['smartyProperties']['payload'];
 
         $contest = $contestListPayload['contests']['current'][0];
@@ -595,15 +591,156 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($adminUserIdentity);
 
         $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
-            new \OmegaUp\Request(
-                new \OmegaUp\Request([
-                    'auth_token' => $login->auth_token,
-                ])
-            )
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
         )['smartyProperties']['payload'];
 
         $contest = $contestListPayload['contests']['current'][0];
 
         $this->assertEquals($organizerUsername, $contest['organizer']);
+    }
+
+    public function testParticipatingColumnAsUserNotLoggedIn() {
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'requestsUserInformation' => 'optional',
+            ])
+        );
+
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+            new \OmegaUp\Request()
+        )['smartyProperties']['payload'];
+
+        $contest = $contestListPayload['contests']['current'][0];
+
+        $this->assertFalse($contest['participating']);
+    }
+
+    public function testParticipatingColumnAsInvitedUser() {
+        // Create contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'admissionMode' => 'private',
+                'requestsUserInformation' => 'optional',
+            ])
+        );
+
+        // Create invited user
+        ['identity' => $invitedUserIdentity] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contestData,
+            $invitedUserIdentity
+        );
+
+        // Logging user
+        $login = self::login($invitedUserIdentity);
+
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $contest = $contestListPayload['contests']['current'][0];
+
+        $this->assertTrue($contest['participating']);
+    }
+
+    public function testParticipatingColumnAsNonInvitedUser() {
+        // Create contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'requestsUserInformation' => 'optional',
+            ])
+        );
+
+        // Create non-invited user
+        ['identity' => $nonInvitedUserIdentity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Logging user
+        $login = self::login($nonInvitedUserIdentity);
+
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $contest = $contestListPayload['contests']['current'][0];
+
+        $this->assertFalse($contest['participating']);
+    }
+
+    public function testParticipatingColumnAsInvitedGroup() {
+        // Create new private contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'admissionMode' => 'private',
+                'requestsUserInformation' => 'optional',
+            ])
+        );
+
+        // Create invited user for invited group
+        ['identity' => $invitedUserIdentity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create group that will be invited
+        $invitedGroupData = \OmegaUp\Test\Factories\Groups::createGroup();
+
+        // Add user to the group
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $invitedGroupData,
+            $invitedUserIdentity
+        );
+
+        // Add group to the private contest
+        $login = self::login($contestData['director']);
+        \OmegaUp\Controllers\Contest::apiAddGroup(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => strval(
+                    $contestData['request']['alias']
+                ),
+                'group' => $invitedGroupData['group']->alias,
+            ])
+        );
+
+        $login = self::login($invitedUserIdentity);
+
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $contest = $contestListPayload['contests']['current'][0];
+
+        $this->assertTrue($contest['participating']);
+    }
+
+    public function testParticipatingColumnAsSystemAdmin() {
+        // Create contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'requestsUserInformation' => 'optional',
+            ])
+        );
+
+        // Create admin user (system admin)
+        ['identity' => $adminUserIdentity] = \OmegaUp\Test\Factories\User::createAdminUser();
+
+        // Logging user
+        $login = self::login($adminUserIdentity);
+
+        $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $contest = $contestListPayload['contests']['current'][0];
+
+        $this->assertTrue($contest['participating']);
     }
 }
