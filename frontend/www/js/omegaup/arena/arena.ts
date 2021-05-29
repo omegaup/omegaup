@@ -923,15 +923,19 @@ export class Arena {
   }
 
   updateClock(): void {
-    const countdownTime = this.submissionDeadline || this.finishTime;
+    const finishTime = this.finishTime
+      ? time.remoteDate(this.finishTime)
+      : null;
+    const countdownTime = this.submissionDeadline || finishTime;
     if (this.startTime === null || countdownTime === null || !OmegaUp.ready) {
       return;
     }
 
     const now = Date.now();
+    const startTime = time.remoteDate(this.startTime);
     let clock = '';
-    if (now < this.startTime.getTime()) {
-      clock = `-${time.formatDelta(this.startTime.getTime() - now)}`;
+    if (now < startTime.getTime()) {
+      clock = `-${time.formatDelta(startTime.getTime() - now)}`;
     } else if (now > countdownTime.getTime()) {
       // Contest for this user is over
       clock = '00:00:00';
@@ -941,7 +945,7 @@ export class Arena {
       }
 
       // Show go-to-practice-mode messages on contest end
-      if (this.finishTime && now > this.finishTime.getTime()) {
+      if (finishTime && now > finishTime.getTime()) {
         if (this.options.contestAlias) {
           ui.warning(
             `<a href="/arena/${this.options.contestAlias}/practice/">${T.arenaContestEndedUsePractice}</a>`,
@@ -2006,15 +2010,19 @@ export class Arena {
     const problem = this.problems[this.currentProblem.alias];
     if (typeof problem !== 'undefined') {
       if (typeof problem.nextSubmissionTimestamp !== 'undefined') {
-        nextSubmissionTimestamp = new Date(problem.nextSubmissionTimestamp);
+        nextSubmissionTimestamp = new Date(
+          time.remoteTime(problem.nextSubmissionTimestamp.getTime()),
+        );
       } else if (
         typeof problem.runs !== 'undefined' &&
         typeof this.currentProblemset?.submissions_gap !== 'undefined' &&
         problem.runs.length > 0
       ) {
         nextSubmissionTimestamp = new Date(
-          problem.runs[problem.runs.length - 1].time.getTime() +
-            this.currentProblemset.submissions_gap * 1000,
+          time.remoteTime(
+            problem.runs[problem.runs.length - 1].time.getTime() +
+              this.currentProblemset.submissions_gap * 1000,
+          ),
         );
       }
     }
