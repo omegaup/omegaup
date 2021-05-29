@@ -2,8 +2,6 @@
 
 /**
  * Testing synchronization between User and Identity
- *
- * @author juan.pablo
  */
 class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
     /**

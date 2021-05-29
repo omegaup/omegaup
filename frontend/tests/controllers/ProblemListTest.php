@@ -1,8 +1,6 @@
 <?php
 /**
  * Description of ProblemListTest
- *
- * @author joemmanuel
  */
 class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     public function setUp(): void {

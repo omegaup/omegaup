@@ -2,8 +2,6 @@
 
 /**
  * Description of ListContests
- *
- * @author joemmanuel
  */
 
 class ContestListTest extends \OmegaUp\Test\ControllerTestCase {

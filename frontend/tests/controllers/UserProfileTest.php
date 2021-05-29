@@ -2,8 +2,6 @@
 
 /**
  * Test getting general user Info methods
- *
- * @author Alberto
  */
 class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
     /*

@@ -2,8 +2,6 @@
 
 /**
  * Simple test for cppCourseGraduate Badge
- *
- * @author RuizYugen
  */
 // phpcs:ignore Squiz.Classes.ValidClassName.NotCamelCaps
 class Badge_cppCourseGraduateTest extends \OmegaUp\Test\BadgesTestCase {

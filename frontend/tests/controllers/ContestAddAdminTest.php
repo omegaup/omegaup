@@ -2,8 +2,6 @@
 
 /**
  * Description of ContestAddAdminTest
- *
- * @author joemmanuel
  */
 class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAddContestAdmin() {

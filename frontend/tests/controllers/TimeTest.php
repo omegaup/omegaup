@@ -2,8 +2,6 @@
 
 /**
  * Description of TimeTest
- *
- * @author joemmanuel
  */
 class TimeTest extends \OmegaUp\Test\ControllerTestCase {
     public function testTimeApi() {

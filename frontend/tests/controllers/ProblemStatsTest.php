@@ -2,8 +2,6 @@
 
 /**
  * Description of ContestStatsTest
- *
- * @author joemmanuel
  */
 class ProblemStatsTest extends \OmegaUp\Test\ControllerTestCase {
     /**

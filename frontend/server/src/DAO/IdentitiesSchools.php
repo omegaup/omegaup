@@ -8,8 +8,6 @@ namespace OmegaUp\DAO;
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Identities_Schools}.
- *
- * @author carlosabcs
  * @access public
  */
 class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {

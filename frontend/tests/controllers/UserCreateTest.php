@@ -2,8 +2,6 @@
 
 /**
  * UserCreateTest
- *
- * @author joemmanuel
  */
 
 class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
