@@ -9,7 +9,6 @@ namespace OmegaUp\DAO;
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Teams}.
  *
- * @author juan.pablo
  * @access public
  * @package docs
  *
