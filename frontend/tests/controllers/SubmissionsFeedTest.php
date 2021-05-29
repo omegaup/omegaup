@@ -1,10 +1,5 @@
 <?php
 
-/**
- *
- * @author carlosabcs
- */
-
 class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
     public function testSubmissionsFeed() {
         /**

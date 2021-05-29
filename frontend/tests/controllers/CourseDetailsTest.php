@@ -1,10 +1,5 @@
 <?php
 
-/**
- *
- * @author alan
- */
-
 class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetCourseDetailsValid() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();

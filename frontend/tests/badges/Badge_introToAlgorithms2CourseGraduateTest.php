@@ -2,8 +2,6 @@
 
 /**
  * Simple test for introToAlgorithms2CourseGraduate Badge
- *
- * @author RodCross
  */
 // phpcs:ignore Squiz.Classes.ValidClassName.NotCamelCaps
 class Badge_introToAlgorithms2CourseGraduateTest extends \OmegaUp\Test\BadgesTestCase {

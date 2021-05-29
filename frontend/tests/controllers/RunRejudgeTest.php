@@ -2,8 +2,6 @@
 
 /**
  * Description of RunRejudgeTest
- *
- * @author joemmanuel
  */
 
 class RunRejudgeTest extends \OmegaUp\Test\ControllerTestCase {

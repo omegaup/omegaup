@@ -4,8 +4,6 @@
 
 /**
  * ProblemForfeitedController
- *
- * @author carlosabcs
  */
 class ProblemForfeited extends \OmegaUp\Controllers\Controller {
     // For each 10 solved problems, 1 solution is granted

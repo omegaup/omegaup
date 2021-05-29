@@ -13,8 +13,6 @@
  * @psalm-type GroupScoreboardContestsPayload=array{availableContests: list<ContestListItem>, contests: list<ScoreboardContest>, scoreboardAlias: string, groupAlias: string}
  * @psalm-type Group=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
  * @psalm-type GroupListPayload=array{groups: list<Group>}
- *
- * @author joemmanuel
  */
 
 class Group extends \OmegaUp\Controllers\Controller {

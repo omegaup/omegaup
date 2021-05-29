@@ -2,8 +2,6 @@
 
 /**
  * Tests for apiUpdate and apiChangePassword in IdentityController
- *
- * @author juan.pablo
  */
 
 class IdentityUpdateTest extends \OmegaUp\Test\ControllerTestCase {

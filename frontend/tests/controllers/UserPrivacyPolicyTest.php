@@ -1,8 +1,6 @@
 <?php
 /**
  * Description of UserPrivacyPolicyTest
- *
- * @author juan.pablo
  */
 class UserPrivacyPolicyTest extends \OmegaUp\Test\ControllerTestCase {
     /**

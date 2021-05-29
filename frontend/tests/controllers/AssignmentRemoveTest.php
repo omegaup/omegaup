@@ -1,8 +1,5 @@
 <?php
 
-/**
- * @author juan.pablo
- */
 class AssignmentRemoveTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAssignmentRemove() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(

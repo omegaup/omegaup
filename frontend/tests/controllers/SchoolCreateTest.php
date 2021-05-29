@@ -1,10 +1,5 @@
 <?php
 
-/**
- *
- * @author joemmanuel
- */
-
 class SchoolCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Create school happy path

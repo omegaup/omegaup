@@ -2,8 +2,6 @@
 
 /**
  * Description of ClarificationDetailsTest
- *
- * @author joemmanuel
  */
 
 class ClarificationDetailsTest extends \OmegaUp\Test\ControllerTestCase {

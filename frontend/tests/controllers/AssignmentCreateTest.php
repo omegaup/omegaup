@@ -1,8 +1,5 @@
 <?php
 
-/**
- * @author alanboy
- */
 class AssignmentCreateTest extends \OmegaUp\Test\ControllerTestCase {
     private static $login = null;
     private static $courseAlias = null;

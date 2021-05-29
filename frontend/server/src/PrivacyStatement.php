@@ -2,9 +2,6 @@
 
 namespace OmegaUp;
 
-/**
- * @author juan.pablo
- */
 class PrivacyStatement {
     /**
      * @param null|int $languageId

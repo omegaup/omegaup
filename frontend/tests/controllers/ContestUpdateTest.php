@@ -2,8 +2,6 @@
 
 /**
  * Description of ContestUpdateContest
- *
- * @author joemmanuel
  */
 class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**

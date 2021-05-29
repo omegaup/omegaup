@@ -2,8 +2,6 @@
 
 /**
  * Description of ContestArchiveContest
- *
- * @author joemmanuel
  */
 class ContestArchiveTest extends \OmegaUp\Test\ControllerTestCase {
     public function testArchiveContest() {

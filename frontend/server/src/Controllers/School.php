@@ -5,8 +5,6 @@
 /**
  * SchoolController
  *
- * @author joemmanuel
- *
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type School=array{country_id: string|null, name: string, ranking: int|null, school_id: int, score: float}
  * @psalm-type SchoolCoderOfTheMonth=array{time: string, username: string, classname: string}

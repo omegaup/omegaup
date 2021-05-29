@@ -2,8 +2,6 @@
 
 /**
  * Description of UserResetPassword
- *
- * @author joemmanuel
  */
 class UserResetPasswordTest extends \OmegaUp\Test\ControllerTestCase {
     /**
