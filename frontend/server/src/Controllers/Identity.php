@@ -426,7 +426,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'parameterInvalidStateNeedsToBelongToCountry',
                 $identity->username
             );
-        } elseif (
+        }
+        if (
             !is_null($identity->country_id)
             && !is_null($identity->state_id)
         ) {
