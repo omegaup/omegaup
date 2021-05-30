@@ -2,8 +2,6 @@
 
 /**
  * Tests for apiCreate and apiBulkCreate in IdentityController
- *
- * @author juan.pablo
  */
 
 class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {

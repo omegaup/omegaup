@@ -4,8 +4,6 @@ namespace OmegaUp;
 
 /**
  * Class to abstract access to a problem's artifacts.
- *
- * @author lhchavez
  */
 class ProblemArtifacts {
     /** @var \Logger */

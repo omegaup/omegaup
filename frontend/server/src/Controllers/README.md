@@ -104,6 +104,7 @@
   - [`/api/group/addUser/`](#apigroupadduser)
   - [`/api/group/create/`](#apigroupcreate)
   - [`/api/group/createScoreboard/`](#apigroupcreatescoreboard)
+  - [`/api/group/createTeamGroup/`](#apigroupcreateteamgroup)
   - [`/api/group/details/`](#apigroupdetails)
   - [`/api/group/list/`](#apigrouplist)
   - [`/api/group/members/`](#apigroupmembers)
@@ -2157,11 +2158,11 @@ New group
 
 ### Parameters
 
-| Name          | Type           | Description |
-| ------------- | -------------- | ----------- |
-| `description` | `string`       |             |
-| `name`        | `string`       |             |
-| `alias`       | `null\|string` |             |
+| Name          | Type     | Description |
+| ------------- | -------- | ----------- |
+| `alias`       | `string` |             |
+| `description` | `string` |             |
+| `name`        | `string` |             |
 
 ### Returns
 
@@ -2181,6 +2182,24 @@ Create a scoreboard set to a group
 | `name`        | `string`       |             |
 | `alias`       | `null\|string` |             |
 | `description` | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/group/createTeamGroup/`
+
+### Description
+
+New team group
+
+### Parameters
+
+| Name          | Type     | Description |
+| ------------- | -------- | ----------- |
+| `alias`       | `string` |             |
+| `description` | `string` |             |
+| `name`        | `string` |             |
 
 ### Returns
 

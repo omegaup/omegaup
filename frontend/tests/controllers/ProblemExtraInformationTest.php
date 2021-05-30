@@ -2,8 +2,6 @@
 
 /**
  * Description of Problem With Extra Information
- *
- * @author juan.pablo
  */
 
 class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
