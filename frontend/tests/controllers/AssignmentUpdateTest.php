@@ -1,8 +1,5 @@
 <?php
 
-/**
- * @author alanboy
- */
 class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     private static $login = null;
     private static $courseData = null;

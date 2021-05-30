@@ -1,8 +1,5 @@
 <?php
 
-/**
- * @author alanboy
- */
 class InterviewCreateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testCreateAndListInterview() {
         ['user' => $interviewer, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();

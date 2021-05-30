@@ -2,8 +2,6 @@
 
 /**
  * Description of ProblemUpdateTest
- *
- * @author joemmanuel
  */
 
 class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {

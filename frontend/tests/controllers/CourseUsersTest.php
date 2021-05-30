@@ -2,8 +2,6 @@
 
 /**
  * Description of CourseUsersTest
- *
- * @author juan.pablo
  */
 
 class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {

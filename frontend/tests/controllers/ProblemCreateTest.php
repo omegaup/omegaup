@@ -2,8 +2,6 @@
 
 /**
  * Tests for apiCreate in ProblemController
- *
- * @author joemmanuel
  */
 
 class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {

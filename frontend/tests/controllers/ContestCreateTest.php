@@ -2,8 +2,6 @@
 
 /**
  * ContestCreateTest
- *
- * @author joemmanuel
  */
 
 class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {

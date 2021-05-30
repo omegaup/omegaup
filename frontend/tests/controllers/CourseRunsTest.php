@@ -2,8 +2,6 @@
 
 /**
  * Description of CourseRunsTest
- *
- * @author juan.pablo
  */
 
 class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {

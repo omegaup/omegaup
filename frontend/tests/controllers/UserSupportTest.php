@@ -2,8 +2,6 @@
 
 /**
  * Test administrative tasks for support team
- *
- * @author juan.pablo
  */
 class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
     /**

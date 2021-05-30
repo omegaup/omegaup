@@ -2,8 +2,6 @@
 
 /**
  * GroupsTest
- *
- * @author joemmanuel
  */
 
 class GroupsTest extends \OmegaUp\Test\ControllerTestCase {

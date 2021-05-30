@@ -2,8 +2,6 @@
 
 /**
  * Tests of the \OmegaUp\Controllers\Contest::apiRemoveProblem
- *
- * @author edhzsz
  */
 
 class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {

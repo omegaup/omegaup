@@ -4,8 +4,6 @@
 
 /**
  *  IdentityController
- *
- * @author juan.pablo
  */
 class Identity extends \OmegaUp\Controllers\Controller {
     /**
