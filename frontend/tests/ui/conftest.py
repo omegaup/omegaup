@@ -82,6 +82,7 @@ class JavaScriptLogCollector:
 
 
 class Driver:  # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-public-methods
     '''Wraps the state needed to run a test.'''
 
     # pylint: disable=too-many-arguments
@@ -196,6 +197,21 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                  '//%s//div[@data-value = "%s"]' %
                  (parent_xpath, value)))).click()
 
+    def typeahead_helper_v2(self, parent_selector, value):
+        '''Helper to interact with Typeahead elements.'''
+
+        tt_input = self.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 '%s .tags-input input[type="text"]' % parent_selector)))
+        tt_input.click()
+        tt_input.send_keys(value)
+        self.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                 '%s ul.typeahead-dropdown li:first-of-type' %
+                 (parent_selector)))).click()
+
     def send_keys(self,  # pylint: disable=no-self-use
                   element: WebElement,
                   value: str,
@@ -249,12 +265,10 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         self.wait.until(lambda _: self.browser.current_url != home_page_url)
         self._wait_for_page_loaded()
 
-        self.wait.until(
-            EC.visibility_of_element_located(
-                (By.ID, 'user'))).send_keys(username)
-        self.browser.find_element_by_id('pass').send_keys(password)
+        self.browser.find_element_by_name('login_username').send_keys(username)
+        self.browser.find_element_by_name('login_password').send_keys(password)
         with self.page_transition():
-            self.browser.find_element_by_id('login_form').submit()
+            self.browser.find_element_by_name('login').click()
 
         try:
             yield
@@ -289,13 +303,14 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                      '//a[contains(@href, "/login/")]'))).click()
 
         # Login screen
-        self.browser.find_element_by_id('reg_username').send_keys(user)
-        self.browser.find_element_by_id('reg_email').send_keys(
+        self.browser.find_element_by_name('reg_username').send_keys(user)
+        self.browser.find_element_by_name('reg_email').send_keys(
             'email_%s@localhost.localdomain' % user)
-        self.browser.find_element_by_id('reg_pass').send_keys(passw)
-        self.browser.find_element_by_id('reg_pass2').send_keys(passw)
+        self.browser.find_element_by_name('reg_password').send_keys(passw)
+        self.browser.find_element_by_name(
+            'reg_password_confirmation').send_keys(passw)
         with self.page_transition():
-            self.browser.find_element_by_id('register-form').submit()
+            self.browser.find_element_by_name('sign_up').click()
 
         # Enable experiment
         user_id = util.database_utils.mysql(

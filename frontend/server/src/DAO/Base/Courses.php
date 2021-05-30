@@ -43,7 +43,10 @@ abstract class Courses {
                 `school_id` = ?,
                 `needs_basic_information` = ?,
                 `requests_user_information` = ?,
-                `show_scoreboard` = ?
+                `show_scoreboard` = ?,
+                `languages` = ?,
+                `archived` = ?,
+                `minimum_progress_for_certificate` = ?
             WHERE
                 (
                     `course_id` = ?
@@ -77,6 +80,13 @@ abstract class Courses {
             intval($Courses->needs_basic_information),
             $Courses->requests_user_information,
             intval($Courses->show_scoreboard),
+            $Courses->languages,
+            intval($Courses->archived),
+            (
+                is_null($Courses->minimum_progress_for_certificate) ?
+                null :
+                intval($Courses->minimum_progress_for_certificate)
+            ),
             intval($Courses->course_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -110,7 +120,10 @@ abstract class Courses {
                 `Courses`.`school_id`,
                 `Courses`.`needs_basic_information`,
                 `Courses`.`requests_user_information`,
-                `Courses`.`show_scoreboard`
+                `Courses`.`show_scoreboard`,
+                `Courses`.`languages`,
+                `Courses`.`archived`,
+                `Courses`.`minimum_progress_for_certificate`
             FROM
                 `Courses`
             WHERE
@@ -204,7 +217,10 @@ abstract class Courses {
                 `Courses`.`school_id`,
                 `Courses`.`needs_basic_information`,
                 `Courses`.`requests_user_information`,
-                `Courses`.`show_scoreboard`
+                `Courses`.`show_scoreboard`,
+                `Courses`.`languages`,
+                `Courses`.`archived`,
+                `Courses`.`minimum_progress_for_certificate`
             FROM
                 `Courses`
         ';
@@ -266,8 +282,14 @@ abstract class Courses {
                     `school_id`,
                     `needs_basic_information`,
                     `requests_user_information`,
-                    `show_scoreboard`
+                    `show_scoreboard`,
+                    `languages`,
+                    `archived`,
+                    `minimum_progress_for_certificate`
                 ) VALUES (
+                    ?,
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -310,6 +332,13 @@ abstract class Courses {
             intval($Courses->needs_basic_information),
             $Courses->requests_user_information,
             intval($Courses->show_scoreboard),
+            $Courses->languages,
+            intval($Courses->archived),
+            (
+                is_null($Courses->minimum_progress_for_certificate) ?
+                null :
+                intval($Courses->minimum_progress_for_certificate)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

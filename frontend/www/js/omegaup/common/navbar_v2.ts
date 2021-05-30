@@ -1,15 +1,24 @@
 import common_NavbarV2 from '../components/common/Navbarv2.vue';
-import { omegaup, OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import { types } from '../api_types';
-import T from '../lang';
 import * as ui from '../ui';
 import Vue from 'vue';
+import clarificationsStore from '../arena/clarificationsStore';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload('header-payload');
   const commonNavbar = new Vue({
     el: '#common-navbar',
+    components: {
+      'omegaup-common-navbar': common_NavbarV2,
+    },
+    data: () => ({
+      notifications: [] as types.Notification[],
+      graderInfo: null as types.GraderStatus | null,
+      graderQueueLength: -1,
+      errorMessage: null as string | null,
+    }),
     render: function (createElement) {
       return createElement('omegaup-common-navbar', {
         props: {
@@ -18,6 +27,10 @@ OmegaUp.on('ready', () => {
           isLoggedIn: payload.isLoggedIn,
           isReviewer: payload.isReviewer,
           gravatarURL51: payload.gravatarURL51,
+          gravatarURL128: payload.gravatarURL128,
+          associatedIdentities: payload.associatedIdentities,
+          currentEmail: payload.currentEmail,
+          currentName: payload.currentName,
           currentUsername: payload.currentUsername,
           isAdmin: payload.isAdmin,
           isMainUserIdentity: payload.isMainUserIdentity,
@@ -28,7 +41,7 @@ OmegaUp.on('ready', () => {
           graderInfo: this.graderInfo,
           graderQueueLength: this.graderQueueLength,
           errorMessage: this.errorMessage,
-          initialClarifications: [],
+          clarifications: clarificationsStore.state.clarifications,
         },
         on: {
           'read-notifications': (
@@ -49,17 +62,17 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'change-account': (usernameOrEmail: string) => {
+            api.Identity.selectIdentity({
+              usernameOrEmail: usernameOrEmail,
+            })
+              .then(() => {
+                window.location.reload();
+              })
+              .catch(ui.apiError);
+          },
         },
       });
-    },
-    data: {
-      notifications: <types.Notification[]>[],
-      graderInfo: <types.GraderStatus | null>null,
-      graderQueueLength: -1,
-      errorMessage: <string | null>null,
-    },
-    components: {
-      'omegaup-common-navbar': common_NavbarV2,
     },
   });
 

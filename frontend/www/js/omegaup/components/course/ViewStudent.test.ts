@@ -1,10 +1,8 @@
 import { mount, shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import course_ViewStudent from './ViewStudent.vue';
 
@@ -83,9 +81,8 @@ describe('ViewStudent.vue', () => {
       },
     });
 
-    const assignments = <HTMLInputElement>(
-      wrapper.find('select[data-assignment]').element
-    );
+    const assignments = wrapper.find('select[data-assignment]')
+      .element as HTMLInputElement;
     assignments.value = 'assignment';
     await assignments.dispatchEvent(new Event('change'));
     expect(wrapper.find('div[data-markdown-statement]').text()).toBe(

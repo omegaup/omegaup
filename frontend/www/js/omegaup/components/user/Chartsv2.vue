@@ -1,59 +1,55 @@
 <template>
   <div class="card-body">
     <label
-      ><input type="radio" v-model="type" value="delta" />
+      ><input v-model="type" type="radio" value="delta" />
       {{ T.profileStatisticsDelta }}</label
     >
     <label
-      ><input type="radio" v-model="type" value="cumulative" />
+      ><input v-model="type" type="radio" value="cumulative" />
       {{ T.profileStatisticsCumulative }}</label
     >
     <label
-      ><input type="radio" v-model="type" value="total" />
+      ><input v-model="type" type="radio" value="total" />
       {{ T.profileStatisticsTotal }}</label
     >
-    <div class="period-group text-center" v-if="type != 'total' && type != ''">
+    <div v-if="type != 'total' && type != ''" class="period-group text-center">
       <label
-        ><input name="period" type="radio" v-model="period" value="day" />
+        ><input v-model="period" name="period" type="radio" value="day" />
         {{ T.profileStatisticsDay }}</label
       >
       <label
-        ><input name="period" type="radio" v-model="period" value="week" />
+        ><input v-model="period" name="period" type="radio" value="week" />
         {{ T.profileStatisticsWeek }}</label
       >
       <label
-        ><input name="period" type="radio" v-model="period" value="month" />
+        ><input v-model="period" name="period" type="radio" value="month" />
         {{ T.profileStatisticsMonth }}</label
       >
       <label
-        ><input name="period" type="radio" v-model="period" value="year" />
+        ><input v-model="period" name="period" type="radio" value="year" />
         {{ T.profileStatisticsYear }}</label
       >
     </div>
     <highcharts
-      v-bind:options="periodStatisticOptions"
-      v-bind:updateArgs="updateArgs"
       v-if="type !== 'total'"
+      :options="periodStatisticOptions"
+      :update-args="updateArgs"
     ></highcharts>
     <highcharts
-      v-bind:options="aggregateStatisticOptions"
-      v-bind:updateArgs="updateArgs"
-      v-else=""
+      v-else
+      :options="aggregateStatisticOptions"
+      :update-args="updateArgs"
     ></highcharts>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { Chart } from 'highcharts-vue';
-import * as Highcharts from 'highcharts';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import * as Highcharts from 'highcharts/highstock';
 import * as ui from '../../ui';
-
-interface Data {
-  runs: omegaup.RunInfo[];
-}
 
 interface GroupedPeriods {
   day: omegaup.VerdictByDate;
@@ -119,10 +115,8 @@ const emptyPeriodRunCount = {
   },
 })
 export default class UserCharts extends Vue {
-  @Prop() data!: Data;
+  @Prop() data!: omegaup.RunInfo[];
   @Prop() username!: string;
-  @Prop() periodStatisticOptions!: Chart;
-  @Prop() aggregateStatisticOptions!: Chart;
 
   T = T;
   ui = ui;
@@ -130,35 +124,16 @@ export default class UserCharts extends Vue {
   period: 'day' | 'week' | 'month' | 'year' = 'day';
   updateArgs = [true, true, { duration: 500 }];
 
-  @Watch('type')
-  onTypeChanged(newValue: string): void {
-    if (newValue === 'total') {
-      this.onRenderAggregateStatistics();
-    } else {
-      this.onRenderPeriodStatistics();
-    }
-  }
-
-  @Watch('period')
-  onPeriodChanged(): void {
-    this.onRenderPeriodStatistics();
-  }
-
-  mounted(): void {
-    this.onRenderPeriodStatistics();
-  }
-
   get totalRuns(): number {
     let total = 0;
-    for (const runs of this.data.runs) {
+    for (const runs of this.data) {
       total += runs.runs;
     }
     return total;
   }
 
   get normalizedRunCounts(): NormalizedRunCounts[] {
-    const total = this.totalRuns;
-    const stats = this.data.runs;
+    const stats = this.data;
     const runs = stats.reduce(
       (total: omegaup.Run, amount: omegaup.RunInfo) => {
         total[amount.verdict] += amount.runs;
@@ -233,7 +208,7 @@ export default class UserCharts extends Vue {
   }
 
   get groupedPeriods(): GroupedPeriods {
-    const stats = this.data.runs;
+    const stats = this.data;
     const periods: Array<'day' | 'week' | 'month' | 'year'> = [
       'day',
       'week',
@@ -283,14 +258,113 @@ export default class UserCharts extends Vue {
     return this.normalizedPeriodRunCounts[this.period];
   }
 
-  onRenderPeriodStatistics(): void {
-    const runs: omegaup.RunCounts = this.normalizedRunCountsForPeriod;
-    const data = this.type === 'delta' ? runs.delta : runs.cumulative;
-    this.$emit('emit-update-period-statistics', this, runs.categories, data);
+  get runs(): omegaup.RunCounts {
+    return this.normalizedRunCountsForPeriod;
   }
 
-  onRenderAggregateStatistics(): void {
-    this.$emit('emit-update-aggregate-statistics', this);
+  get runsForPeriod(): omegaup.RunData[] {
+    return this.type === 'delta' ? this.runs.delta : this.runs.cumulative;
+  }
+
+  get periodStatisticOptions(): Highcharts.Options {
+    return {
+      title: {
+        text: ui.formatString(T.profileStatisticsVerdictsOf, {
+          user: this.username,
+        }),
+      },
+      chart: { type: 'column' },
+      xAxis: {
+        categories: this.runs.categories,
+        title: { text: T.profileStatisticsPeriod },
+        labels: {
+          rotation: -45,
+        },
+      },
+      yAxis: {
+        min: 0,
+        title: { text: T.profileStatisticsNumberOfSolvedProblems },
+        stackLabels: {
+          enabled: false,
+          style: {
+            fontWeight: 'bold',
+            color: 'gray',
+          },
+        },
+      },
+      legend: {
+        align: 'right',
+        x: -30,
+        verticalAlign: 'top',
+        y: 25,
+        floating: true,
+        backgroundColor: 'white',
+        borderColor: '#CCC',
+        borderWidth: 1,
+        shadow: false,
+      },
+      tooltip: {
+        headerFormat: '<b>{point.x}</b><br/>',
+        pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}',
+      },
+      plotOptions: {
+        column: {
+          stacking: 'normal',
+          dataLabels: {
+            enabled: false,
+            color: 'white',
+          },
+        },
+      },
+      series: this.runsForPeriod.map(
+        (x) =>
+          ({
+            data: x.data,
+            name: x.name,
+            type: 'column',
+          } as Highcharts.SeriesColumnOptions),
+      ),
+    };
+  }
+
+  get aggregateStatisticOptions(): Highcharts.Options {
+    return {
+      title: {
+        text: ui.formatString(T.profileStatisticsVerdictsOf, {
+          user: this.username,
+        }),
+      },
+      chart: {
+        plotShadow: false,
+        type: 'pie',
+      },
+      xAxis: {
+        title: { text: '' },
+      },
+      yAxis: {
+        title: { text: '' },
+      },
+      tooltip: { pointFormat: '{series.name}: {point.y}' },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          dataLabels: {
+            enabled: true,
+            color: '#000000',
+            connectorColor: '#000000',
+            format: '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y})',
+          },
+        },
+      },
+      series: [
+        {
+          name: T.profileStatisticsRuns,
+          data: this.normalizedRunCounts,
+          type: 'pie',
+        },
+      ],
+    };
   }
 }
 </script>

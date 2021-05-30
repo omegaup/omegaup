@@ -1,10 +1,5 @@
 <?php
 
-/**
- *
- * @author pablo
- */
-
 class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
     public function setUp(): void {
         parent::setUp();
@@ -30,6 +25,19 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
             $privateCourseData,
             $this->identity
         );
+
+        // This course shouldn't affect all the tests as it won't be listed
+        $publicArchivedCourseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $this->adminUser,
+            self::login($this->adminUser),
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+        $archivedCourse = \OmegaUp\DAO\Courses::getByPK(
+            $publicArchivedCourseData['course']->course_id
+        );
+        $archivedCourse->archived = 1;
+        \OmegaUp\DAO\Courses::update($archivedCourse);
+        $this->courseAliases[] = $publicArchivedCourseData['course_alias'];
     }
 
     protected $adminUser;
@@ -82,7 +90,45 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(2, $course_array['counts']['test']);
     }
 
-    public function testGetCourseListForSmarty() {
+    public function testListCoursesMine() {
+        $adminLogin = self::login($this->adminUser);
+
+        $archivedCourses = \OmegaUp\Controllers\Course::getCourseMineDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+            ])
+        )['smartyProperties']['payload']['courses']['admin']['filteredCourses']['archived']['courses'];
+        $this->assertCount(1, $archivedCourses);
+        $this->assertEquals(
+            $this->courseAliases[3],
+            $archivedCourses[0]['alias']
+        );
+    }
+
+    public function testGetListAndArchiveCourses() {
+        $userLogin = self::login($this->identity);
+
+        $this->assertNumberOfCoursesByType(
+            $userLogin,
+            /*$numberOfStudentCourses=*/1,
+            /*$numberOfPublicCourses=*/2
+        );
+
+        $adminLogin = self::login($this->adminUser);
+        \OmegaUp\Controllers\Course::apiArchive(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $this->courseAliases[2],
+            'archive' => true
+        ]));
+
+        $this->assertNumberOfCoursesByType(
+            $userLogin,
+            /*$numberOfStudentCourses=*/0,
+            /*$numberOfPublicCourses=*/2
+        );
+    }
+
+    public function testGetCourseListForTypeScript() {
         $userLogin = self::login($this->identity);
 
         // Public courses are visible in student courses list when users were
@@ -112,7 +158,7 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         int $numberOfStudentCourses,
         int $numberOfPublicCourses
     ) {
-        $response = \OmegaUp\Controllers\Course::getCourseSummaryListDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Course::getCourseSummaryListDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
             ])

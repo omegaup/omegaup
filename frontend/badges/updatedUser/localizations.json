@@ -1,7 +1,7 @@
 {
   "es": {
     "name": "Perfil Actualizado",
-    "description": "El usuario ha completado la información en su perfil."
+    "description": "Otorgado a personas que han completado la información en su perfil."
   },
   "en": {
     "name": "Updated Profile",
@@ -9,6 +9,6 @@
   },
   "pt": {
     "name": "Perfil Atualizado",
-    "description": "O usuário hem completou as informações em seu perfil."
+    "description": "Concedido às pessoas que completaram as informações em seu perfil."
   }
 }

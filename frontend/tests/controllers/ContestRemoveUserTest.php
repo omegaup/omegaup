@@ -2,8 +2,6 @@
 
 /**
  * Description of ContestRemoveUserTest
- *
- * @author joemmanuel
  */
 class ContestRemoveUserTest extends \OmegaUp\Test\ControllerTestCase {
     public function testRemoveUser() {

@@ -1,6 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
@@ -37,8 +35,11 @@ describe('NavbarProblems.vue', () => {
       },
     });
 
-    expect(wrapper.find('div[data-breadcrumbs]').text()).toBe(
-      `${T.navCourses} > Curso de prueba > Tarea de prueba`,
+    expect(wrapper.find('div[data-breadcrumbs]').text()).toMatch(
+      new RegExp(
+        `${T.navCourses}.+?>.+?Curso de prueba.+?>.+?Tarea de prueba`,
+        'ms',
+      ),
     );
   });
 

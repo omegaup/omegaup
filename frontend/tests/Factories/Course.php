@@ -4,6 +4,7 @@ namespace OmegaUp\Test\Factories;
 
 class Course {
     /**
+     * @param $languages list<string>
      * @return array{admin: \OmegaUp\DAO\VO\Identities, course_alias: string, request: \OmegaUp\Request}
      */
     public static function createCourse(
@@ -14,7 +15,8 @@ class Course {
         string $showScoreboard = 'false',
         ?int $courseDuration = 120,
         ?string $courseAlias = null,
-        ?bool $needsBasicInformation = false
+        ?bool $needsBasicInformation = false,
+        ?array $languages = \OmegaUp\Controllers\Run::DEFAULT_LANGUAGES
     ): array {
         if (is_null($admin)) {
             ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -37,6 +39,7 @@ class Course {
         }
 
         $courseAlias = $courseAlias ?? \OmegaUp\Test\Utils::createRandomString();
+        $courseName = \OmegaUp\Test\Utils::createRandomString();
         if (is_null($adminLogin)) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
@@ -44,7 +47,7 @@ class Course {
         $courseStartTime = \OmegaUp\Time::get();
         $r = new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'name' => $courseName,
             'alias' => $courseAlias,
             'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => $courseStartTime,
@@ -55,6 +58,12 @@ class Course {
             'requests_user_information' => $requestsUserInformation,
             'show_scoreboard' => $showScoreboard,
             'needs_basic_information' => $needsBasicInformation,
+            'languages' => !is_null(
+                $languages
+            ) ? implode(
+                ',',
+                $languages
+            ) : null,
         ]);
 
         \OmegaUp\Controllers\Course::apiCreate($r);
@@ -63,6 +72,7 @@ class Course {
             'request' => $r,
             'admin' => $admin,
             'course_alias' => $courseAlias,
+            'course_name' => $courseName,
         ];
     }
 
@@ -80,7 +90,7 @@ class Course {
         ?int $assignmentDuration = 120,
         ?string $courseAlias = null,
         ?bool $needsBasicInformation = false
-    ) {
+    ): array {
         if (is_null($admin)) {
             ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
             $adminLogin = \OmegaUp\Test\ControllerTestCase::login($admin);
@@ -419,7 +429,7 @@ class Course {
         \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAssignmentData['request']['course_alias'],
-            'assignment_alias' => $courseAssignmentData['request']['assignment_alias'],
+            'assignment_alias' => $courseAssignmentData['request']['alias'],
         ]));
     }
 

@@ -7,12 +7,12 @@
       <h4>{{ T.userRoles }}</h4>
       <table class="table">
         <tbody>
-          <tr v-for="role in roles">
+          <tr v-for="role in roles" :key="role.name">
             <td>
               <input
-                type="checkbox"
                 v-model="role.value"
-                v-on:change.prevent="onChangeRole($event, role)"
+                type="checkbox"
+                @change.prevent="onChangeRole($event, role)"
               />
             </td>
 
@@ -23,12 +23,12 @@
       <h4>{{ T.userGroups }}</h4>
       <table class="table">
         <tbody>
-          <tr v-for="group in groups">
+          <tr v-for="group in groups" :key="group.alias">
             <td>
               <input
-                type="checkbox"
                 v-model="group.value"
-                v-on:change.prevent="onChangeGroup($event, group)"
+                type="checkbox"
+                @change.prevent="onChangeGroup($event, group)"
               />
             </td>
 
@@ -43,16 +43,17 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 
 @Component
 export default class AdminRoles extends Vue {
   @Prop() initialRoles!: omegaup.Role[];
-  @Prop() initialGroups!: omegaup.Group[];
+  @Prop() initialGroups!: types.Group[];
 
   T = T;
   roles: omegaup.Role[] = this.initialRoles;
-  groups: omegaup.Group[] = this.initialGroups;
+  groups: types.Group[] = this.initialGroups;
 
   @Emit()
   onChangeRole(
@@ -61,18 +62,18 @@ export default class AdminRoles extends Vue {
   ): omegaup.Selectable<omegaup.Role> {
     return {
       value: role,
-      selected: (<HTMLInputElement>ev.target).checked,
+      selected: (ev.target as HTMLInputElement).checked,
     };
   }
 
   @Emit()
   onChangeGroup(
     ev: Event,
-    group: omegaup.Group,
-  ): omegaup.Selectable<omegaup.Group> {
+    group: types.Group,
+  ): omegaup.Selectable<types.Group> {
     return {
       value: group,
-      selected: (<HTMLInputElement>ev.target).checked,
+      selected: (ev.target as HTMLInputElement).checked,
     };
   }
 }

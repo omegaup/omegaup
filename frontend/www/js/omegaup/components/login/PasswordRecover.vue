@@ -6,15 +6,15 @@
         <div class="form-group">
           <h5 class="card-title">{{ T.profileEmail }}</h5>
           <input
+            v-model="email"
             type="text"
             name="email"
             class="form-control"
-            v-model="email"
           />
         </div>
         <button
           class="btn btn-primary form-control"
-          v-on:click.prevent="$emit('forgot-password', email)"
+          @click.prevent="$emit('forgot-password', email)"
         >
           {{ T.wordsSend }}
         </button>
@@ -24,8 +24,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { Vue, Component } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component

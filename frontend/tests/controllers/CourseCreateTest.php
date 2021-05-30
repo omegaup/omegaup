@@ -138,6 +138,100 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    public function testCreateCourseWithDefinedLanguages() {
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+        $name = \OmegaUp\Test\Utils::createRandomString();
+        $expectedLanguages = ['py2', 'py3'];
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+
+        $response = \OmegaUp\Controllers\Course::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => $name,
+                'alias' => $alias,
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'start_time' => (\OmegaUp\Time::get() + 60),
+                'finish_time' => (\OmegaUp\Time::get() + 120),
+                'languages' => implode(',', $expectedLanguages),
+            ])
+        );
+
+        $this->assertEquals('ok', $response['status']);
+        $course = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'alias' => $alias,
+        ]));
+
+        $this->assertTrue(
+            !array_diff($course['languages'], $expectedLanguages)
+        );
+    }
+
+    public function testCreateCourseWithWrongLanguage() {
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+        $name = \OmegaUp\Test\Utils::createRandomString();
+        $expectedLanguages = ['py2', 'px3'];
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\Course::apiCreate(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => $name,
+                    'alias' => $alias,
+                    'description' => \OmegaUp\Test\Utils::createRandomString(),
+                    'start_time' => (\OmegaUp\Time::get() + 60),
+                    'finish_time' => (\OmegaUp\Time::get() + 120),
+                    'languages' => implode(',', $expectedLanguages),
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterNotInExpectedSet', $e->getMessage());
+        }
+    }
+
+    public function testEditLanguagesInCourse() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
+        $login = self::login($courseData['admin']);
+        $course = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'alias' => $courseData['course_alias'],
+        ]));
+
+        $this->assertTrue(
+            !array_diff(
+                $course['languages'],
+                array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
+            )
+        );
+
+        $expectedNewLanguages = ['py2', 'py3'];
+
+        $response = \OmegaUp\Controllers\Course::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'alias' => $courseData['course_alias'],
+                'languages' => implode(',', $expectedNewLanguages),
+            ])
+        );
+
+        $this->assertEquals('ok', $response['status']);
+        $course = \OmegaUp\Controllers\Course::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'alias' => $courseData['course_alias'],
+        ]));
+
+        $this->assertTrue(
+            !array_diff($course['languages'], $expectedNewLanguages)
+        );
+    }
+
     public function testCreateSchoolAssignment() {
         // Create a test course
         [
@@ -529,6 +623,24 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Should have thrown exception');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+    }
+
+    public function testCreateCourseWithInvalidAlias() {
+        $login = self::login(self::$curatorIdentity);
+        try {
+            \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => 'wrong alias',
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'start_time' => (\OmegaUp\Time::get() + 60),
+                'finish_time' => (\OmegaUp\Time::get() + 120),
+                'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
+            ]));
+            $this->fail('Should have thrown exception');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
         }
     }
 

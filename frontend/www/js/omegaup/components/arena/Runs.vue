@@ -1,41 +1,26 @@
 <template>
   <div class="mt-2">
-    <template v-if="globalRuns">
-      <!-- TODO: This code should be removed when we stop using jquery and the
-        migration to vue was over -->
-      <!-- id-lint off -->
-      <div id="overlay">
-        <div id="run-details"></div>
-      </div>
-      <!-- id-lint on -->
-      <div class="card-header">
-        <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
-      </div>
-    </template>
     <div class="table-responsive">
-      <table class="runs table table-striped">
+      <table
+        class="runs table table-striped"
+        :class="{ global: showAllRuns, local: !showAllRuns }"
+      >
         <caption>
           {{
             T.wordsSubmissions
           }}
           <div v-if="showPager">
-            <button
-              v-bind:disabled="filterOffset <= 0"
-              v-on:click="filterOffset--"
-            >
+            <button :disabled="filterOffset <= 0" @click="filterOffset--">
               &lt;
             </button>
             {{ filterOffset + 1 }}
-            <button
-              v-bind:disabled="runs.length < rowCount"
-              v-on:click="filterOffset++"
-            >
+            <button :disabled="runs.length < rowCount" @click="filterOffset++">
               &gt;
             </button>
 
             <label
               >{{ T.wordsVerdict }}:
-              <select v-model="filterVerdict">
+              <select v-model="filterVerdict" class="form-control">
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="AC">AC</option>
                 <option value="PA">PA</option>
@@ -54,7 +39,7 @@
 
             <label
               >{{ T.wordsStatus }}:
-              <select v-model="filterStatus">
+              <select v-model="filterStatus" class="form-control">
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="new">new</option>
                 <option value="waiting">waiting</option>
@@ -66,7 +51,7 @@
 
             <label
               >{{ T.wordsLanguage }}:
-              <select v-model="filterLanguage">
+              <select v-model="filterLanguage" class="form-control">
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="cpp17-gcc">C++17 (g++ 9.3)</option>
                 <option value="cpp17-clang">C++17 (clang++ 10.0)</option>
@@ -84,7 +69,7 @@
                 <option value="lua">Lua (5.3)</option>
                 <option value="kp">Karel (Pascal)</option>
                 <option value="kj">Karel (Java)</option>
-                <option value="cat">{#wordsJustOutput#}</option>
+                <option value="cat">{{ T.wordsJustOutput }}</option>
               </select>
             </label>
 
@@ -92,15 +77,15 @@
               <label
                 >{{ T.wordsProblem }}:
                 <omegaup-autocomplete
-                  v-bind:init="initProblemAutocomplete"
                   v-model="filterProblem"
+                  :init="initProblemAutocomplete"
                 ></omegaup-autocomplete>
               </label>
               <button
                 type="button"
                 class="close"
-                style="float: none;"
-                v-on:click="filterProblem = ''"
+                style="float: none"
+                @click="filterProblem = ''"
               >
                 &times;
               </button>
@@ -110,35 +95,35 @@
               <label
                 >{{ T.wordsUser }}:
                 <omegaup-autocomplete
-                  v-bind:init="initUserAutocomplete"
                   v-model="filterUsername"
+                  :init="initUserAutocomplete"
                 ></omegaup-autocomplete>
               </label>
               <button
                 type="button"
                 class="close"
-                style="float: none;"
-                v-on:click="filterUsername = ''"
+                style="float: none"
+                @click="filterUsername = ''"
               >
                 &times;
               </button>
             </template>
 
             <div class="row">
-              <div class="col-sm col-12" v-if="filters.length > 0">
+              <div v-if="filters.length > 0" class="col-sm col-12">
                 <span
-                  class="btn btn-secondary mr-3"
                   v-for="filter in filters"
-                  v-bind:key="filter.name"
+                  :key="filter.name"
+                  class="btn-secondary mr-3"
                 >
                   <span class="mr-2"
                     >{{ filter.name }}: {{ filter.value }}</span
                   >
-                  <a v-on:click="onRemoveFilter(filter.name)">
-                    <font-awesome-icon v-bind:icon="['fas', 'times']" />
+                  <a @click="onRemoveFilter(filter.name)">
+                    <font-awesome-icon :icon="['fas', 'times']" />
                   </a>
                 </span>
-                <a v-on:click="onRemoveFilter('all')" href="#">
+                <a href="#" @click="onRemoveFilter('all')">
                   <span class="mr-2">{{ T.wordsRemoveFilter }}</span>
                 </a>
               </div>
@@ -159,85 +144,89 @@
             <th>{{ T.wordsLanguage }}</th>
             <th class="numeric">{{ T.wordsMemory }}</th>
             <th class="numeric">{{ T.wordsRuntime }}</th>
-            <th colspan="3">{{ T.wordsActions }}</th>
+            <th v-if="showDetails && !showDisqualify && !showRejudge">
+              {{ T.wordsActions }}
+            </th>
+            <th v-else></th>
           </tr>
         </thead>
         <tfoot v-if="problemAlias != null">
           <tr>
             <td colspan="10">
               <a
-                v-bind:href="`/arena/${contestAlias}/practice/`"
                 v-if="isContestFinished"
+                :href="`/arena/${contestAlias}/practice/`"
                 >{{ T.arenaContestEndedUsePractice }}</a
               >
               <a
-                v-on:click="$emit('new-submission')"
-                v-bind:href="newSubmissionUrl"
                 v-else
+                :href="newSubmissionUrl"
+                @click="$emit('new-submission')"
                 >{{ newSubmissionDescription }}</a
               >
             </td>
           </tr>
         </tfoot>
         <tbody>
-          <tr v-for="run in filteredRuns" v-bind:key="run.guid">
+          <tr v-for="run in filteredRuns" :key="run.guid">
             <td>{{ time.formatTimestamp(run.time) }}</td>
             <td>
-              <acronym v-bind:title="run.guid">
+              <acronym :title="run.guid" data-run-guid>
                 <tt>{{ run.guid.substring(0, 8) }}</tt>
               </acronym>
             </td>
-            <td v-if="showUser">
+            <td v-if="showUser" class="text-break-all">
               <omegaup-user-username
-                v-bind:classname="run.classname"
-                v-bind:username="run.username"
-                v-bind:country="run.country_id"
-                v-bind:linkify="true"
-                v-on:emit-click="(username) => (filterUsername = username)"
+                :classname="run.classname"
+                :username="run.username"
+                :country="run.country_id"
+                :linkify="true"
+                :emit-click-event="true"
+                @click="(username) => (filterUsername = username)"
               ></omegaup-user-username>
-              <a v-bind:href="`/profile/${run.username}/`" class="ml-2">
-                <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
+              <a :href="`/profile/${run.username}/`" class="ml-2">
+                <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
-            <td v-if="showContest">
+            <td v-if="showContest" class="text-break-all">
               <a
                 href="#"
-                v-on:click="onEmitFilterChanged(run.contest_alias, 'contest')"
+                @click="onEmitFilterChanged(run.contest_alias, 'contest')"
                 >{{ run.contest_alias }}</a
               >
               <a
-                v-bind:href="`/arena/${run.contest_alias}/`"
                 v-if="run.contest_alias"
+                :href="`/arena/${run.contest_alias}/`"
                 class="ml-2"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
+                <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
-            <td v-if="showProblem">
-              <a href="#" v-on:click.prevent="filterProblem = run.alias">{{
+            <td v-if="showProblem" class="text-break-all">
+              <a href="#" @click.prevent="filterProblem = run.alias">{{
                 run.alias
               }}</a>
-              <a v-bind:href="`/arena/problem/${run.alias}/`" class="ml-2">
-                <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
+              <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
+                <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
             <td
-              v-bind:style="{ backgroundColor: statusColor(run) }"
+              :class="statusClass(run)"
               data-run-status
-              class="text-center"
+              class="text-center opacity-4 font-weight-bold"
             >
-              <span>{{ status(run) }}</span>
+              <span class="mr-1">{{ status(run) }}</span>
 
               <button
-                type="button"
                 v-if="!!statusHelp(run)"
-                v-bind:data-content="statusHelp(run)"
-                v-on:click="showVerdictHelp"
+                type="button"
+                :data-content="statusHelp(run)"
                 data-toggle="popover"
                 data-trigger="focus"
-                class="btn btn-outline-dark btn-sm"
+                class="btn-outline-dark btn-sm"
+                @click="showVerdictHelp"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'question-circle']" />
+                <font-awesome-icon :icon="['fas', 'question-circle']" />
               </button>
             </td>
             <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
@@ -246,79 +235,63 @@
             <td>{{ run.language }}</td>
             <td class="numeric">{{ memory(run) }}</td>
             <td class="numeric">{{ runtime(run) }}</td>
-            <td v-if="showRejudge">
+            <td v-if="showDetails && !showDisqualify && !showRejudge">
               <button
-                type="button"
-                v-bind:title="T.wordsRejudge"
-                v-on:click="$emit('rejudge', run)"
-                class="btn btn-outline-dark btn-sm"
-              >
-                <font-awesome-icon v-bind:icon="['fas', 'redo-alt']" />
-              </button>
-            </td>
-            <td v-if="showDisqualify">
-              <button
-                type="button"
-                v-bind:title="T.wordsDisqualify"
-                v-on:click="$emit('disqualify', run)"
-                class="btn btn-outline-dark btn-sm"
-              >
-                <font-awesome-icon v-bind:icon="['fas', 'ban']" />
-              </button>
-            </td>
-            <td v-if="showDetails">
-              <button
-                type="button"
+                class="details btn-outline-dark btn-sm"
                 data-run-details
-                v-on:click="$emit('details', run)"
-                class="details btn btn-outline-dark btn-sm"
+                @click="$emit('details', run)"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'search-plus']" />
+                <font-awesome-icon :icon="['fas', 'search-plus']" />
               </button>
             </td>
+            <td v-else-if="showDetails || showDisqualify || showRejudge">
+              <div class="dropdown">
+                <button
+                  class="btn-secondary dropdown-toggle"
+                  type="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  {{ T.wordsActions }}
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li v-if="showDetails" data-actions-details>
+                    <button
+                      class="btn-link dropdown-item"
+                      @click="$emit('details', run)"
+                    >
+                      {{ T.wordsDetails }}
+                    </button>
+                  </li>
+                  <li v-if="showRejudge" data-actions-rejudge>
+                    <button
+                      class="btn-link dropdown-item"
+                      @click="$emit('rejudge', run)"
+                    >
+                      {{ T.wordsRejudge }}
+                    </button>
+                  </li>
+                  <li role="separator" class="divider"></li>
+                  <li v-if="showDisqualify" data-actions-disqualify>
+                    <button
+                      class="btn-link dropdown-item"
+                      @click="$emit('disqualify', run)"
+                    >
+                      {{ T.wordsDisqualify }}
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </td>
+            <td v-else></td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-caption {
-  caption-side: top;
-}
-
-.runs {
-  width: 100%;
-  border: 1px solid #ccc;
-  margin-top: 2em;
-}
-
-.runs caption {
-  font-weight: bold;
-  font-size: 1em;
-  margin-bottom: 1em;
-}
-
-.runs td,
-.runs th {
-  border: 1px solid #ccc;
-  border-width: 1px 0;
-  text-align: center;
-}
-
-.runs tfoot td a {
-  display: block;
-  padding: 0.5em;
-  text-decoration: none;
-  color: #000;
-  background: #ccc;
-  text-align: center;
-}
-.runs tfoot td a:hover {
-  background: #fff;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
@@ -348,6 +321,7 @@ library.add(faExternalLinkAlt);
 library.add(faTimes);
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface JQuery {
     popover(action: string): JQuery;
   }
@@ -361,6 +335,7 @@ declare global {
   },
 })
 export default class Runs extends Vue {
+  @Prop({ default: false }) showAllRuns!: boolean;
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: true }) isProblemsetOpened!: boolean;
   @Prop({ default: false }) showContest!: boolean;
@@ -377,7 +352,6 @@ export default class Runs extends Vue {
   @Prop({ default: null }) username!: string | null;
   @Prop({ default: 100 }) rowCount!: number;
   @Prop() runs!: types.Run[];
-  @Prop({ default: false }) globalRuns!: boolean;
 
   T = T;
   time = time;
@@ -401,9 +375,9 @@ export default class Runs extends Vue {
       !this.filterContest &&
       !this.filterVerdict
     ) {
-      return this.runs;
+      return this.sortedRuns;
     }
-    return this.runs.filter((run) => {
+    return this.sortedRuns.filter((run) => {
       if (this.filterVerdict) {
         if (this.filterVerdict == 'NO-AC') {
           if (run.verdict == 'AC') {
@@ -432,6 +406,12 @@ export default class Runs extends Vue {
     });
   }
 
+  get sortedRuns(): types.Run[] {
+    return this.runs
+      .slice()
+      .sort((a, b) => b.time.getTime() - a.time.getTime());
+  }
+
   get newSubmissionUrl(): string {
     if (this.isProblemsetOpened) {
       return `#problems/${this.problemAlias}/new-run`;
@@ -446,6 +426,7 @@ export default class Runs extends Vue {
     return T.arenaContestNotOpened;
   }
 
+  // eslint-disable-next-line no-undef -- This is defined in TypeScript.
   initProblemAutocomplete(el: JQuery<HTMLElement>) {
     if (this.problemsetProblems.length !== 0) {
       typeahead.problemsetProblemTypeahead(
@@ -460,6 +441,7 @@ export default class Runs extends Vue {
     }
   }
 
+  // eslint-disable-next-line no-undef -- This is defined in TypeScript.
   initUserAutocomplete(el: JQuery<HTMLElement>) {
     if (this.problemsetProblems.length !== 0 && this.contestAlias) {
       typeahead.userContestTypeahead(el, this.contestAlias);
@@ -539,23 +521,22 @@ export default class Runs extends Vue {
   }
 
   showVerdictHelp(ev: Event): void {
-    $(<HTMLElement>ev.target).popover('show');
+    $(ev.target as HTMLElement).popover('show');
   }
 
-  statusColor(run: types.Run): string {
+  statusClass(run: types.Run): string {
     if (run.status != 'ready') return '';
-
-    if (run.type == 'disqualified') return '#F00';
-
+    if (run.type == 'disqualified') return 'status-disqualified';
     if (run.verdict == 'AC') {
-      return '#CF6';
-    } else if (run.verdict == 'CE') {
-      return '#F90';
-    } else if (run.verdict == 'JE' || run.verdict == 'VE') {
-      return '#F00';
-    } else {
-      return '';
+      return 'status-ac';
     }
+    if (run.verdict == 'CE') {
+      return 'status-ce';
+    }
+    if (run.verdict == 'JE' || run.verdict == 'VE') {
+      return 'status-je-ve';
+    }
+    return '';
   }
 
   status(run: types.Run): string {
@@ -584,7 +565,7 @@ export default class Runs extends Vue {
   }
 
   @Watch('username')
-  onUsernameChanged(newValue: string | null, oldValue: string | null) {
+  onUsernameChanged(newValue: string | null) {
     if (!newValue) {
       this.filterUsername = '';
     } else {
@@ -593,7 +574,7 @@ export default class Runs extends Vue {
   }
 
   @Watch('problemAlias')
-  onProblemAliasChanged(newValue: string | null, oldValue: string | null) {
+  onProblemAliasChanged(newValue: string | null) {
     if (!newValue) {
       this.filterProblem = '';
     } else {
@@ -602,32 +583,32 @@ export default class Runs extends Vue {
   }
 
   @Watch('filterLanguage')
-  onFilterLanguageChanged(newValue: string, oldValue: string) {
+  onFilterLanguageChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'language');
   }
 
   @Watch('filterOffset')
-  onFilterOffsetChanged(newValue: number, oldValue: number) {
+  onFilterOffsetChanged() {
     this.$emit('filter-changed');
   }
 
   @Watch('filterProblem')
-  onFilterProblemChanged(newValue: string, oldValue: number) {
+  onFilterProblemChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'problem');
   }
 
   @Watch('filterStatus')
-  onFilterStatusChanged(newValue: string, oldValue: number) {
+  onFilterStatusChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'status');
   }
 
   @Watch('filterUsername')
-  onFilterUsernameChanged(newValue: string, oldValue: number) {
+  onFilterUsernameChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'username');
   }
 
   @Watch('filterVerdict')
-  onFilterVerdictChanged(newValue: string, oldValue: number) {
+  onFilterVerdictChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'verdict');
   }
 
@@ -686,3 +667,63 @@ export default class Runs extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+caption {
+  caption-side: top;
+}
+
+.text-break-all {
+  word-break: break-all;
+}
+
+.runs {
+  width: 100%;
+  border: 1px solid var(--arena-runs-table-border-color);
+  margin-top: 2em;
+}
+
+.runs caption {
+  font-weight: bold;
+  font-size: 1em;
+  margin-bottom: 1em;
+}
+
+.runs td,
+.runs th {
+  border: 1px solid var(--arena-runs-table-td-border-color);
+  border-width: 1px 0;
+  text-align: center;
+}
+
+.runs tfoot td a {
+  display: block;
+  padding: 0.5em;
+  text-decoration: none;
+  color: var(--arena-runs-table-tfoot-font-color);
+  background: var(--arena-runs-table-tfoot-background-color);
+  text-align: center;
+}
+
+.runs tfoot td a:hover {
+  background: var(--arena-runs-table-tfoot-background-color--hoover);
+}
+
+.status-disqualified {
+  background: var(--arena-runs-table-status-disqualified-background-color);
+  color: var(--arena-runs-table-status-disqualified-font-color);
+}
+.status-je-ve {
+  background: var(--arena-runs-table-status-je-ve-background-color);
+  color: var(--arena-runs-table-status-je-ve-font-color);
+}
+.status-ac {
+  background: var(--arena-runs-table-status-ac-background-color);
+  color: var(--arena-runs-table-status-ac-font-color);
+}
+.status-ce {
+  background: var(--arena-runs-table-status-ce-background-color);
+  color: var(--arena-runs-table-status-ce-font-color);
+}
+</style>

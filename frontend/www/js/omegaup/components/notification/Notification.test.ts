@@ -1,10 +1,4 @@
 import { mount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
-
-import T from '../../lang';
-import * as ui from '../../ui';
-import { omegaup } from '../../omegaup';
 
 import notification_Notification from './Notification.vue';
 

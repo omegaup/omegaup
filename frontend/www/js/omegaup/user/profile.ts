@@ -1,0 +1,30 @@
+import Vue from 'vue';
+
+import { OmegaUp } from '../omegaup';
+import { types } from '../api_types';
+
+import user_Profile from '../components/user/Profilev2.vue';
+
+OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.UserProfileDetailsPayload();
+  new Vue({
+    el: '#main-container',
+    components: {
+      'omegaup-user-profile': user_Profile,
+    },
+    render: function (createElement) {
+      return createElement('omegaup-user-profile', {
+        props: {
+          data: payload.extraProfileDetails,
+          profile: payload.profile,
+          profileBadges: new Set(
+            payload.extraProfileDetails?.ownedBadges?.map(
+              (badge) => badge.badge_alias,
+            ),
+          ),
+          visitorBadges: new Set(payload.extraProfileDetails?.badges),
+        },
+      });
+    },
+  });
+});

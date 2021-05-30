@@ -1,9 +1,9 @@
+jest.mock('../../../../third_party/js/diff_match_patch.js');
+
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import arena_RunDetails from './RunDetails.vue';
 
@@ -11,7 +11,7 @@ describe('RunDetails.vue', () => {
   it('Should handle run details', () => {
     const wrapper = shallowMount(arena_RunDetails, {
       propsData: {
-        data: <types.RunDetails>{
+        data: {
           admin: false,
           alias: 'sumas',
           cases: {},
@@ -35,7 +35,6 @@ describe('RunDetails.vue', () => {
             verdict: 'PA',
             wall_time: 0.699709,
           },
-          feedback: 'none',
           groups: [],
           guid: '80bbe93bc01c1d47ff9fb396dfaff741',
           judged_by: '',
@@ -46,7 +45,7 @@ describe('RunDetails.vue', () => {
           source_link: false,
           source_name: 'Main.py3',
           source_url: 'blob:http://localhost:8001/url',
-        },
+        } as types.RunDetails,
       },
     });
 

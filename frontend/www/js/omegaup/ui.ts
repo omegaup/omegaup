@@ -1,7 +1,13 @@
-import { types } from './api_types';
 import T from './lang';
 import { formatDate, formatDateTime } from './time';
 import { omegaup } from './omegaup';
+
+export enum MessageType {
+  Danger = 'alert-danger',
+  Info = 'alert-info',
+  Success = 'alert-success',
+  Warning = 'alert-warning',
+}
 
 export function navigateTo(href: string): void {
   window.location.href = href;
@@ -14,9 +20,7 @@ function escapeString(s: string): string {
 
 export { escapeString as escape };
 
-export function buildURLQuery(queryParameters: {
-  [key: string]: string;
-}): string {
+export function buildURLQuery(queryParameters: { [key: string]: any }): string {
   return Object.entries(queryParameters)
     .map(([key, value]) => {
       const encodedKey = encodeURIComponent(key);
@@ -55,7 +59,7 @@ export function formatString(
 ): string {
   const re = new RegExp('%\\(([^!)]+)(?:!([^)]+))?\\)', 'g');
   return template.replace(re, (match, key, modifier) => {
-    if (!values.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(values, key)) {
       // If the array does not provide a replacement for the key, just return
       // the original substring.
       return match;
@@ -71,7 +75,15 @@ export function formatString(
   });
 }
 
-export function displayStatus(message: string, type: string): void {
+export function displayStatus({
+  message,
+  type,
+  autoHide,
+}: {
+  message: string;
+  type: MessageType;
+  autoHide?: boolean;
+}): void {
   if ($('#status .message').length == 0) {
     console.error('Showing warning but there is no status div');
   }
@@ -96,7 +108,7 @@ export function displayStatus(message: string, type: string): void {
         statusElement
           .removeClass('animating')
           .attr('data-counter', statusCounter + 2);
-        if (type == 'alert-success') {
+        if (type == 'alert-success' && autoHide) {
           setTimeout(() => {
             dismissNotifications(statusCounter + 2);
           }, 5000);
@@ -106,19 +118,23 @@ export function displayStatus(message: string, type: string): void {
 }
 
 export function error(message: string): void {
-  displayStatus(message, 'alert-danger');
+  displayStatus({ message: message, type: MessageType.Danger });
 }
 
 export function info(message: string): void {
-  displayStatus(message, 'alert-info');
+  displayStatus({ message: message, type: MessageType.Info });
 }
 
-export function success(message: string): void {
-  displayStatus(message, 'alert-success');
+export function success(message: string, autoHide: boolean = true): void {
+  displayStatus({
+    message: message,
+    type: MessageType.Success,
+    autoHide: autoHide,
+  });
 }
 
 export function warning(message: string): void {
-  displayStatus(message, 'alert-warning');
+  displayStatus({ message: message, type: MessageType.Warning });
 }
 
 export function apiError(response: { error?: string; payload?: any }): void {
@@ -130,10 +146,10 @@ export function apiError(response: { error?: string; payload?: any }): void {
   );
 }
 
-export function ignoreError(response: {
-  error?: string;
-  payload?: any;
-}): void {}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function ignoreError(response: { error?: string; payload?: any }): void {
+  return;
+}
 
 export function dismissNotifications(originalStatusCounter?: number): void {
   const statusElement = $('#status');
@@ -167,7 +183,7 @@ export function prettyPrintJSON(json: JSONType): string {
 }
 
 export function syntaxHighlight(json: JSONType): string {
-  const jsonRE = /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g;
+  const jsonRE = /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g;
   return json
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

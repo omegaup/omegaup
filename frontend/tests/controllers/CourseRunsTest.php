@@ -2,8 +2,6 @@
 
 /**
  * Description of CourseRunsTest
- *
- * @author juan.pablo
  */
 
 class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
@@ -85,5 +83,6 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         $this->assertEquals($runData['request']['source'], $response['source']);
+        $this->assertNull($response['feedback']); // Feedback should be null
     }
 }

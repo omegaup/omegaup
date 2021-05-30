@@ -8,8 +8,6 @@ namespace OmegaUp\DAO;
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Runs}.
- *
- * @author alanboy
  * @access public
  * @package docs
  */
@@ -930,38 +928,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
-    final public static function isRunInsideSubmissionGap(
-        ?int $problemsetId,
-        ?\OmegaUp\DAO\VO\Contests $contest,
-        int $problemId,
-        int $identityId
-    ): bool {
-        $lastRunTime = \OmegaUp\DAO\Submissions::getLastSubmissionTime(
-            $identityId,
-            $problemId,
-            $problemsetId
-        );
-        if (is_null($lastRunTime)) {
-            return true;
-        }
-
-        $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
-        if (!is_null($contest)) {
-            // Get submissions gap
-            $submissionGap = max(
-                $submissionGap,
-                intval($contest->submissions_gap)
-            );
-        }
-
-        return \OmegaUp\Time::get() >= ($lastRunTime->time + $submissionGap);
-    }
-
     /**
      * Returns the time of the next submission to the current problem
      */
     final public static function nextSubmissionTimestamp(
-        ?\OmegaUp\DAO\VO\Contests $contest
+        ?\OmegaUp\DAO\VO\Contests $contest = null,
+        ?\OmegaUp\Timestamp $lastSubmissionTime = null
     ): \OmegaUp\Timestamp {
         $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
         if (!is_null($contest)) {
@@ -971,7 +943,14 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 intval($contest->submissions_gap)
             );
         }
-        return new \OmegaUp\Timestamp(\OmegaUp\Time::get() + $submissionGap);
+
+        if (is_null($lastSubmissionTime)) {
+            return new \OmegaUp\Timestamp(\OmegaUp\Time::get());
+        }
+
+        return new \OmegaUp\Timestamp(
+            $lastSubmissionTime->time + $submissionGap
+        );
     }
 
     /**

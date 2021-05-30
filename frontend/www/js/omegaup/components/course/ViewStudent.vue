@@ -2,18 +2,18 @@
   <div class="omegaup-course-viewstudent card">
     <div class="card-header">
       <h2>
-        <a v-bind:href="courseUrl">{{ course.name }}</a>
+        <a :href="courseUrl">{{ course.name }}</a>
       </h2>
     </div>
     <div class="card-body">
       <form>
         <div class="form-group col-md-3">
           <label>{{ T.courseStudentSelectStudent }}</label>
-          <select class="ml-1 form-control" v-model="selectedStudent">
+          <select v-model="selectedStudent" class="ml-1 form-control">
             <option
-              v-bind:value="student"
               v-for="student in students"
-              v-bind:key="student.username"
+              :key="student.username"
+              :value="student"
             >
               {{ student.name || student.username }}
             </option>
@@ -24,14 +24,14 @@
         <div class="form-group col-md-3">
           <label>{{ T.courseStudentSelectAssignment }}</label>
           <select
-            class="ml-1 form-control"
             v-model="selectedAssignment"
+            class="ml-1 form-control"
             data-assignment
           >
             <option
-              v-bind:value="assignment.alias"
               v-for="assignment in assignments"
-              v-bind:key="assignment.alias"
+              :key="assignment.alias"
+              :value="assignment.alias"
             >
               {{ assignment.name }}
             </option>
@@ -40,7 +40,7 @@
       </form>
       <div v-if="selectedAssignment">
         <omegaup-markdown
-          v-bind:markdown="getAssignmentDescription(selectedAssignment)"
+          :markdown="getAssignmentDescription(selectedAssignment)"
         ></omegaup-markdown>
         <hr />
         <div class="card">
@@ -48,16 +48,16 @@
             <template v-if="points(selectedAssignment) === 0">
               {{ T.studentProgressOnlyLecturesDescription }}
             </template>
-            <ul class="nav nav-pills card-header-pills" v-else>
+            <ul v-else class="nav nav-pills card-header-pills">
               <li
+                v-for="problem in problemsWithPoints"
+                :key="problem.alias"
                 class="nav-item"
                 role="presentation"
-                v-bind:class="{
+                :class="{
                   active:
                     selectedProblem && problem.alias === selectedProblem.alias,
                 }"
-                v-for="problem in problemsWithPoints"
-                v-bind:key="problem.alias"
               >
                 <a
                   aria-controls="home"
@@ -65,8 +65,8 @@
                   href="#home"
                   class="nav-link"
                   role="tab"
-                  v-bind:data-problem-alias="problem.alias"
-                  v-on:click="selectedProblem = problem"
+                  :data-problem-alias="problem.alias"
+                  @click="selectedProblem = problem"
                 >
                   <template v-if="problem.runs.length &gt; 0">
                     {{ bestScore(problem) * problem.points }} /
@@ -104,10 +104,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="(run, index) in selectedProblem.runs"
-                    v-bind:key="index"
-                  >
+                  <tr v-for="(run, index) in selectedProblem.runs" :key="index">
                     <td>{{ time.formatDateTime(run.time) }}</td>
                     <td>{{ run.verdict }}</td>
                     <td class="numeric">{{ 100 * run.score }}</td>
@@ -156,6 +153,7 @@ export default class CourseViewStudent extends Vue {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   points(assignmentAlias: string): number {
     return this.problems.reduce(
       (accumulator: number, problem: types.CourseProblem) =>
@@ -178,10 +176,9 @@ export default class CourseViewStudent extends Vue {
   }
 
   mounted(): void {
-    let self = this;
-    window.addEventListener('popstate', function (ev: PopStateEvent): void {
-      self.selectedStudent =
-        (ev.state && ev.state.student) || self.initialStudent;
+    window.addEventListener('popstate', (ev: PopStateEvent) => {
+      this.selectedStudent =
+        (ev.state && ev.state.student) || this.initialStudent;
     });
   }
 
@@ -230,7 +227,7 @@ export default class CourseViewStudent extends Vue {
   }
 
   @Watch('selectedAssignment')
-  onSelectedAssignmentChange(newVal: string) {
+  onSelectedAssignmentChange() {
     this.$emit('update', this.selectedStudent, this.selectedAssignment);
   }
 

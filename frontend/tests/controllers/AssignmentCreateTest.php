@@ -1,8 +1,5 @@
 <?php
 
-/**
- * @author alanboy
- */
 class AssignmentCreateTest extends \OmegaUp\Test\ControllerTestCase {
     private static $login = null;
     private static $courseAlias = null;
@@ -109,6 +106,27 @@ class AssignmentCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'courseDoesNotHaveUnlimitedDuration',
                 $e->getMessage()
             );
+        }
+    }
+
+    public function testCreateAssignmentWithInvalidAlias() {
+        try {
+            \OmegaUp\Controllers\Course::apiCreateAssignment(
+                new \OmegaUp\Request([
+                    'auth_token' => self::$login->auth_token,
+                    'name' => \OmegaUp\Test\Utils::createRandomString(),
+                    'alias' => 'invalid alias',
+                    'description' => \OmegaUp\Test\Utils::createRandomString(),
+                    'start_time' => self::$courseStartTime,
+                    'finish_time' => self::$courseStartTime + 120,
+                    'course_alias' => self::$courseAlias,
+                    'assignment_type' => 'homework',
+                    'course' => self::$course,
+                ])
+            );
+            $this->fail('Should have thrown an exception');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
         }
     }
 }

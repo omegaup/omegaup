@@ -203,7 +203,7 @@ def test_user_ranking_contest_when_scoreboard_show_time_finished(driver):
     driver.register_user(user2, password)
 
     create_contest_admin(driver, alias, problem, [user1, user2],
-                         driver.user_username, scoreboard_time_percent=0)
+                         driver.user_username, scoreboard_time_percent=1)
 
     with driver.login(user1, password):
         create_run_user(driver, alias, problem, 'Main.cpp17-gcc',
@@ -310,6 +310,20 @@ def create_contest_admin(driver, contest_alias, problem, users, user,
 
         assert (('/contest/%s/edit/' % contest_alias) in
                 driver.browser.current_url), driver.browser.current_url
+
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, 'input[data-title]'))).send_keys('(Updated)')
+
+        driver.browser.find_element_by_css_selector(
+            'form.contest-form').submit()
+
+        message_link = driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR, '#status span.message a')))
+
+        assert (contest_alias in
+                message_link.get_attribute('href')), 'Update contest failed'
 
         add_problem_to_contest(driver, problem)
 
@@ -466,12 +480,19 @@ def create_contest(driver, alias, scoreboard_time_percent=100):
 def add_students_contest(driver, users):
     '''Add students to a recently contest.'''
 
-    util.add_students(
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'a[data-nav-contest-edit]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH, '//a[@data-nav-contestant]')))
+    util.add_students_to_contest(
         driver, users,
-        tab_xpath='//li[contains(@class, "contestants")]//a',
+        tab_xpath='//a[@data-nav-contestant]',
         container_xpath='//div[contains(@class, "contestants-input-area")]',
-        parent_xpath='div[contains(@class, "contestants")]',
-        submit_locator=(By.CLASS_NAME, 'user-add-single'))
+        parent_selector='.contestants',
+        submit_locator=(By.CLASS_NAME, 'user-add-typeahead'))
 
 
 @util.annotate
@@ -481,7 +502,11 @@ def add_students_bulk(driver, users):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             ('li.contestants > a')))).click()
+             'a[data-nav-contest-edit]'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             ('a.contestants')))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR, 'div.contestants')))
@@ -510,10 +535,13 @@ def add_problem_to_contest(driver, problem):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             'li.problems > a'))).click()
+             'a[data-nav-contest-edit]'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'a.problems'))).click()
 
-    driver.typeahead_helper('*[contains(@class, "problems-container")]',
-                            problem)
+    driver.typeahead_helper_v2('.problems-container', problem)
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH,
@@ -527,7 +555,7 @@ def add_problem_to_contest(driver, problem):
         EC.visibility_of_element_located(
             (By.XPATH,
              '//*[contains(concat(" ", normalize-space(@class), " "), " table'
-             ' ")]//a[text()="%s"]' % problem)))
+             ' ")]//a[@href="/arena/problem/%s/"]' % problem)))
 
 
 @util.annotate
@@ -574,7 +602,11 @@ def change_contest_admission_mode(driver, contest_admission_mode):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             'li.admission-mode > a'))).click()
+             'a[data-nav-contest-edit]'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'a.admission-mode'))).click()
     Select(driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,

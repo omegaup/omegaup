@@ -2,8 +2,6 @@
 
 /**
  * Simple test for legacy user Badge
- *
- * @author RuizYugen
  */
 // phpcs:ignore Squiz.Classes.ValidClassName.NotCamelCaps
 class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {

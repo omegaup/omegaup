@@ -30,9 +30,6 @@
               <a href="/rank/">{{ T.navRanking }}</a>
             </li>
             <li class="mt-1">
-              <a href="/schools/">{{ T.navSchools }}</a>
-            </li>
-            <li class="mt-1">
               <a href="https://blog.omegaup.com">{{ T.navBlog }}</a>
             </li>
           </ul>
@@ -63,16 +60,16 @@
             </li>
             <li class="mt-1">
               <a href="https://github.com/omegaup/omegaup">
-                <font-awesome-icon v-bind:icon="['fab', 'github']" />
+                <font-awesome-icon :icon="['fab', 'github']" />
               </a>
             </li>
             <li class="mt-1">
               <a
+                v-if="!omegaUpLockDown && isLoggedIn"
                 href="https://github.com/omegaup/omegaup/issues/new"
-                v-on:click="$event.target.href = reportAnIssueURL()"
                 target="_blank"
                 rel="nofollow"
-                v-if="!omegaUpLockDown && isLoggedIn"
+                @click="$event.target.href = reportAnIssueURL()"
                 >{{ T.reportAnIssue }}</a
               >
             </li>
@@ -87,12 +84,12 @@
           </ul>
           <div class="social-icons my-0 mx-auto">
             <a href="https://github.com/omegaup/omegaup/">
-              <font-awesome-icon v-bind:icon="['fab', 'github']" />
+              <font-awesome-icon :icon="['fab', 'github']" />
               GitHub
             </a>
             |
             <a href="https://www.facebook.com/omegaup/">
-              <font-awesome-icon v-bind:icon="['fab', 'facebook']" />
+              <font-awesome-icon :icon="['fab', 'facebook']" />
               Facebook
             </a>
           </div>
@@ -107,7 +104,7 @@
           {{ T.wordsCopyright }}
         </div>
         <div class="d-none d-md-block">
-          <ul class="m-0">
+          <ul class="m-0 list-unstyled text-right">
             <li>
               <a
                 href="https://blog.omegaup.com/codigo-de-conducta-en-omegaup/"
@@ -125,53 +122,6 @@
     </div>
   </footer>
 </template>
-
-<style lang="scss">
-@import '../../../../sass/main.scss';
-
-.common-footer {
-  background-color: $omegaup-primary--darker;
-  color: $omegaup-white;
-
-  .footer-navigation {
-    .footer-brand {
-      max-width: 200px;
-      @media only screen and (max-width: 767px) {
-        max-width: 100%;
-      }
-
-      .footer-logo,
-      .slogan {
-        margin-top: -2.5rem;
-      }
-
-      .slogan {
-        text-transform: uppercase;
-      }
-    }
-
-    .footer-list-section {
-      // On small sizes, this will work as an inline grid (not 100% width)
-      @media only screen and (max-width: 767px) {
-        display: inline-grid;
-      }
-    }
-  }
-
-  a {
-    text-decoration: none;
-    color: white;
-
-    &:hover {
-      color: gray;
-    }
-  }
-
-  .copy {
-    background-color: $omegaup-primary--darkest;
-  }
-}
-</style>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
@@ -196,3 +146,72 @@ export default class Footer extends Vue {
   reportAnIssueURL = reportAnIssueURL;
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.common-footer {
+  background-color: $omegaup-primary--darker;
+  color: $omegaup-white;
+
+  .footer-navigation {
+    .footer-brand {
+      max-width: 200px;
+
+      @media only screen and (max-width: 767px) {
+        max-width: 100%;
+      }
+
+      .footer-logo,
+      .slogan {
+        margin-top: -2.5rem;
+      }
+
+      .slogan {
+        text-transform: uppercase;
+      }
+    }
+
+    .footer-list-section {
+      // On small sizes, this will work as an inline grid (not 100% width)
+      @media only screen and (max-width: 767px) {
+        display: inline-grid;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0 auto;
+        text-align: center;
+
+        li {
+          margin-top: 8px;
+          padding: 0;
+
+          a {
+            text-decoration: none;
+            color: white;
+
+            &:hover {
+              color: gray;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  a {
+    text-decoration: none;
+    color: white;
+
+    &:hover {
+      color: gray;
+    }
+  }
+
+  .copy {
+    background-color: $omegaup-primary--darkest;
+  }
+}
+</style>

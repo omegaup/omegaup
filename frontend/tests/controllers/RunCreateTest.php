@@ -2,8 +2,6 @@
 
 /**
  * Description of CreateRun
- *
- * @author joemmanuel
  */
 
 class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
@@ -164,7 +162,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Validate defaults
         $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
-        $this->assertEquals('new', $run->status);
+        $this->assertEquals('uploading', $run->status);
         $this->assertEquals(0, $run->runtime);
         $this->assertEquals(0, $run->memory);
         $this->assertEquals(0, $run->score);

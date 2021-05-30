@@ -4,38 +4,38 @@
       <div class="form-group col-md-6">
         <label>{{ T.problemEditFormLanguages }}</label>
         <select
+          v-model="currentLanguages"
           name="languages"
           class="form-control"
-          v-bind:class="{ 'is-invalid': errors.includes('languages') }"
-          v-model="languages"
+          :class="{ 'is-invalid': errors.includes('languages') }"
           required
         >
           <option
             v-for="(languageText, languageIndex) in validLanguages"
-            v-bind:value="languageIndex"
-            v-bind:key="languageIndex"
+            :key="languageIndex"
+            :value="languageIndex"
           >
-            {{ languageText }}</option
-          >
+            {{ languageText }}
+          </option>
         </select>
       </div>
       <div class="form-group col-md-6">
         <label>{{ T.problemEditFormValidatorType }}</label>
         <select
+          v-model="validator"
           name="validator"
           class="form-control"
-          v-bind:class="{ 'is-invalid': errors.includes('validator') }"
-          v-model="validator"
-          v-bind:disabled="languages === ''"
+          :class="{ 'is-invalid': errors.includes('validator') }"
+          :disabled="currentLanguages === ''"
           required
         >
           <option
             v-for="(validatorText, validatorIndex) in validatorTypes"
-            v-bind:value="validatorIndex"
-            v-bind:key="validatorIndex"
+            :key="validatorIndex"
+            :value="validatorIndex"
           >
-            {{ validatorText }}</option
-          >
+            {{ validatorText }}
+          </option>
         </select>
       </div>
     </div>
@@ -46,11 +46,11 @@
         }}</label>
         <input
           name="validator_time_limit"
-          v-bind:value="validatorTimeLimit"
-          v-bind:disabled="languages === '' || validator !== 'custom'"
+          :value="validatorTimeLimit"
+          :disabled="currentLanguages === '' || validator !== 'custom'"
           type="text"
           class="form-control"
-          v-bind:class="{
+          :class="{
             'is-invalid': errors.includes('validator_time_limit'),
           }"
           required
@@ -61,11 +61,11 @@
         <label for="time_limit">{{ T.problemEditFormTimeLimit }}</label>
         <input
           name="time_limit"
-          v-bind:value="timeLimit"
-          v-bind:disabled="languages === ''"
+          :value="timeLimit"
+          :disabled="currentLanguages === ''"
           type="text"
           class="form-control"
-          v-bind:class="{ 'is-invalid': errors.includes('time_limit') }"
+          :class="{ 'is-invalid': errors.includes('time_limit') }"
           required
         />
       </div>
@@ -78,11 +78,11 @@
         }}</label>
         <input
           name="overall_wall_time_limit"
-          v-bind:class="{
+          :class="{
             'is-invalid': errors.includes('overall_wall_time_limit'),
           }"
-          v-bind:value="overallWallTimeLimit"
-          v-bind:disabled="languages === ''"
+          :value="overallWallTimeLimit"
+          :disabled="currentLanguages === ''"
           type="text"
           class="form-control"
           required
@@ -93,11 +93,11 @@
         <label for="extra_wall_time">{{ T.wordsExtraWallTimeMs }}</label>
         <input
           name="extra_wall_time"
-          v-bind:value="extraWallTime"
-          v-bind:disabled="languages === ''"
+          :value="extraWallTime"
+          :disabled="currentLanguages === ''"
           type="text"
           class="form-control"
-          v-bind:class="{ 'is-invalid': errors.includes('extra_wall_time') }"
+          :class="{ 'is-invalid': errors.includes('extra_wall_time') }"
           required
         />
       </div>
@@ -108,11 +108,11 @@
         <label for="memory_limit">{{ T.problemEditFormMemoryLimit }}</label>
         <input
           name="memory_limit"
-          v-bind:value="memoryLimit"
-          v-bind:disabled="languages === ''"
+          :value="memoryLimit"
+          :disabled="currentLanguages === ''"
           type="text"
           class="form-control"
-          v-bind:class="{ 'is-invalid': errors.includes('memory_limit') }"
+          :class="{ 'is-invalid': errors.includes('memory_limit') }"
           required
         />
       </div>
@@ -121,11 +121,11 @@
         <label for="output_limit">{{ T.problemEditFormOutputLimit }}</label>
         <input
           name="output_limit"
-          v-bind:value="outputLimit"
-          v-bind:disabled="languages === ''"
+          :value="outputLimit"
+          :disabled="currentLanguages === ''"
           type="text"
           class="form-control"
-          v-bind:class="{ 'is-invalid': errors.includes('output_limit') }"
+          :class="{ 'is-invalid': errors.includes('output_limit') }"
           required
         />
       </div>
@@ -133,11 +133,11 @@
         <label for="input_limit">{{ T.problemEditFormInputLimit }}</label>
         <input
           name="input_limit"
-          v-bind:value="inputLimit"
-          v-bind:disabled="languages === ''"
+          :value="inputLimit"
+          :disabled="currentLanguages === ''"
           type="text"
           class="form-control"
-          v-bind:class="{ 'is-invalid': errors.includes('input_limit') }"
+          :class="{ 'is-invalid': errors.includes('input_limit') }"
           required
         />
       </div>
@@ -146,7 +146,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component
@@ -158,7 +158,7 @@ export default class Settings extends Vue {
   @Prop() inputLimit!: number;
   @Prop() overallWallTimeLimit!: number;
   @Prop() validatorTimeLimit!: number;
-  @Prop() initialLanguage!: string;
+  @Prop() languages!: string;
   @Prop() validLanguages!: Array<string>;
   @Prop() initialValidator!: string;
   @Prop() validatorTypes!: Array<string>;
@@ -167,16 +167,17 @@ export default class Settings extends Vue {
   T = T;
 
   validator = this.initialValidator;
-  languages = this.initialLanguage;
+  currentLanguages = this.languages;
 
   @Watch('initialValidator')
   onInitialValidatorChange(newInitial: string): void {
     this.validator = newInitial;
   }
 
-  @Watch('initialLanguage')
-  onInitialLanguageChange(newInitial: string): void {
-    this.languages = newInitial;
+  @Emit('update:languages')
+  @Watch('currentLanguages')
+  onCurrentLanguagesChange(newValue: string): string {
+    return newValue;
   }
 }
 </script>

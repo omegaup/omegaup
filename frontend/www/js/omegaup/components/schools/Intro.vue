@@ -40,29 +40,8 @@
   </div>
 </template>
 
-<style>
-.header-bg {
-  background-image: url(/media/teacher3.jpg);
-  background-position-x: -200px;
-  background-position-y: -270px;
-  color: white;
-  height: 250px;
-  padding: 10px;
-  text-align: center;
-}
-
-.header-bg h1 {
-  font-size: 40px;
-  margin-top: 80px;
-  text-shadow: 1px 1px #678dd7;
-}
-body {
-  background: #fff;
-}
-</style>
-
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 
 import T from '../../lang';
 
@@ -71,3 +50,26 @@ export default class Intro extends Vue {
   T = T;
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+.header-bg {
+  background-image: url(/media/teacher3.jpg);
+  background-position-x: -200px;
+  background-position-y: -270px;
+  color: var(--schools-intro-header-text-color);
+  height: 250px;
+  padding: 10px;
+  text-align: center;
+}
+
+.header-bg h1 {
+  font-size: 40px;
+  margin-top: 80px;
+  text-shadow: 1px 1px var(--schools-intro-header-title-text-shadow-color);
+}
+
+body {
+  background: var(--schools-intro-body-background-color);
+}
+</style>

@@ -4,39 +4,39 @@
       <div class="form-row mb-3">
         <label class="col-form-label">{{ T.wordsSearchBy }}</label>
         <div class="col-md-4">
-          <select name="column" class="form-control" v-model="selectColumn">
+          <select v-model="selectColumn" name="column" class="form-control">
             <option
               v-for="(columnText, columnIndex) in columns"
-              v-bind:value="columnIndex"
+              :value="columnIndex"
             >
-              {{ columnText }}</option
-            >
+              {{ columnText }}
+            </option>
           </select>
         </div>
         <div class="col-md-4">
           <omegaup-autocomplete
-            v-bind:init="(el) => typeahead.problemTypeahead(el)"
-            v-model="queryProblem"
-            v-bind:placeholder="T.wordsKeyword"
-            class="form-control"
             v-show="selectColumn == 'problem_alias'"
+            v-model="queryProblem"
+            :init="(el) => typeahead.problemTypeahead(el)"
+            :placeholder="T.wordsKeyword"
+            class="form-control"
           ></omegaup-autocomplete>
           <omegaup-autocomplete
-            v-bind:init="(el) => typeahead.userTypeahead(el)"
-            v-model="queryUsername"
-            v-bind:placeholder="T.wordsKeyword"
-            class="form-control"
             v-show="
               selectColumn == 'nominator_username' ||
               selectColumn == 'author_username'
             "
+            v-model="queryUsername"
+            :init="(el) => typeahead.userTypeahead(el)"
+            :placeholder="T.wordsKeyword"
+            class="form-control"
           ></omegaup-autocomplete>
         </div>
       </div>
       <button
         class="btn btn-primary"
-        v-on:click.prevent="
-          $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
+        @click.prevent="
+          $emit('go-to-page', 1, getStatus(), getQuery(), selectColumn)
         "
       >
         {{ T.wordsSearch }}
@@ -55,13 +55,13 @@
         <a v-if="isAdmin" href="/group/omegaup:quality-reviewer/edit/#members">
           {{ T.addUsersToReviewerGroup }}
         </a>
-        <div class="pull-right" v-if="!myView">
+        <div v-if="!myView" class="pull-right">
           <label>
             <input
-              type="checkbox"
               v-model="showAll"
-              v-on:change="
-                $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
+              type="checkbox"
+              @change="
+                $emit('go-to-page', 1, getStatus(), getQuery(), selectColumn)
               "
             />
             {{ T.qualityNominationShowAll }}
@@ -71,29 +71,50 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th>{{ T.wordsAlias }}</th>
+            <th>
+              {{ T.wordsAlias }}
+              <omegaup-common-sort-controls
+                ref="sortControlByTitle"
+                column="title"
+                :sort-order="sortOrder"
+                :column-name="columnName"
+                @apply-filter="onApplyFilter"
+              ></omegaup-common-sort-controls>
+            </th>
             <th v-if="!myView">{{ T.wordsNominator }}</th>
             <th>{{ T.wordsAuthor }}</th>
-            <th>{{ T.wordsSubmissionDate }}</th>
+            <th>
+              {{ T.wordsSubmissionDate }}
+              <omegaup-common-sort-controls
+                ref="sortControlByTime"
+                column="time"
+                :sort-order="sortOrder"
+                :column-name="columnName"
+                @apply-filter="onApplyFilter"
+              ></omegaup-common-sort-controls>
+            </th>
             <th v-if="!myView" data-name="reason">{{ T.wordsReason }}</th>
             <th class="text-center">{{ T.wordsStatus }}</th>
             <th><!-- view button --></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="nomination in nominations">
+          <tr
+            v-for="nomination in orderedNominations"
+            :key="`nomination-${nomination.qualitynomination_id}`"
+          >
             <td>
-              <a v-bind:href="problemUrl(nomination.problem.alias)">{{
+              <a :href="problemUrl(nomination.problem.alias)">{{
                 nomination.problem.title
               }}</a>
             </td>
             <td v-if="!myView">
-              <a v-bind:href="userUrl(nomination.nominator.username)">{{
+              <a :href="userUrl(nomination.nominator.username)">{{
                 nomination.nominator.username
               }}</a>
             </td>
             <td>
-              <a v-bind:href="userUrl(nomination.author.username)">{{
+              <a :href="userUrl(nomination.author.username)">{{
                 nomination.author.username
               }}</a>
             </td>
@@ -102,9 +123,7 @@
             <td class="text-center">{{ nomination.status }}</td>
             <td>
               <a
-                v-bind:href="
-                  nominationDetailsUrl(nomination.qualitynomination_id)
-                "
+                :href="nominationDetailsUrl(nomination.qualitynomination_id)"
                 >{{ T.wordsDetails }}</a
               >
             </td>
@@ -112,10 +131,10 @@
         </tbody>
       </table>
       <omegaup-common-paginator
-        v-bind:pager-items="pagerItems"
-        v-on:page-changed="
+        :pager-items="pagerItems"
+        @page-changed="
           (page) =>
-            $emit('goToPage', page, getStatus(), getQuery(), selectColumn)
+            $emit('go-to-page', page, getStatus(), getQuery(), selectColumn)
         "
       ></omegaup-common-paginator>
     </div>
@@ -123,7 +142,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -131,11 +150,13 @@ import common_Paginator from '../common/Paginatorv2.vue';
 import { types } from '../../api_types';
 import Autocomplete from '../Autocomplete.vue';
 import * as typeahead from '../../typeahead';
+import common_SortControls from '../common/SortControls.vue';
 
 @Component({
   components: {
     'omegaup-common-paginator': common_Paginator,
     'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-sort-controls': common_SortControls,
   },
 })
 export default class QualityNominationList extends Vue {
@@ -151,6 +172,9 @@ export default class QualityNominationList extends Vue {
   ui = ui;
   typeahead = typeahead;
 
+  sortOrder: omegaup.SortOrder = omegaup.SortOrder.Ascending;
+  columnName = 'title';
+
   queryProblem = '';
   queryUsername = '';
   selectColumn = '';
@@ -159,6 +183,22 @@ export default class QualityNominationList extends Vue {
     nominator_username: T.wordsNominator,
     author_username: T.wordsAuthor,
   };
+
+  get orderedNominations(): types.NominationListItem[] {
+    const order = this.sortOrder === omegaup.SortOrder.Ascending ? 1 : -1;
+
+    switch (this.columnName) {
+      case 'time':
+        return this.nominations.sort(
+          (a, b) => order * (a.time.getTime() - b.time.getTime()),
+        );
+      case 'title':
+      default:
+        return this.nominations.sort(
+          (a, b) => order * a.problem.title.localeCompare(b.problem.title),
+        );
+    }
+  }
 
   @Watch('selectColumn')
   onPropertyChanged() {
@@ -195,6 +235,15 @@ export default class QualityNominationList extends Vue {
 
   nominationDetailsUrl(nominationId: number): string {
     return `/nomination/${nominationId}/`;
+  }
+
+  onApplyFilter(columnName: string, sortOrder: string): void {
+    this.columnName = columnName;
+
+    this.sortOrder =
+      sortOrder === omegaup.SortOrder.Ascending
+        ? omegaup.SortOrder.Ascending
+        : omegaup.SortOrder.Descending;
   }
 }
 </script>

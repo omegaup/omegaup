@@ -43,9 +43,9 @@ function typeaheadWrapper<T>(
     contest_alias?: string;
   }) => Promise<T[]>,
 ) {
-  let lastRequest = <
-    [string, (results: T[]) => void, (results: T[]) => void] | null
-  >null;
+  let lastRequest:
+    | [string, (results: T[]) => void, (results: T[]) => void]
+    | null = null;
   let pendingRequest = false;
   function wrappedCall(
     query: string,
@@ -65,7 +65,7 @@ function typeaheadWrapper<T>(
 
         // If there is a pending request, send it out now.
         if (!lastRequest) return;
-        let currentRequest = lastRequest;
+        const currentRequest = lastRequest;
         lastRequest = null;
         wrappedCall(...currentRequest);
       });
@@ -106,7 +106,7 @@ export function problemTypeahead(
 ) {
   if (!cb) {
     cb = (event: Event, val: types.ProblemListItem) =>
-      $(<EventTarget>event.target).val(val.alias);
+      $(event.target as EventTarget).val(val.alias);
   }
   elem
     .typeahead<types.ProblemListItem>(
@@ -160,7 +160,7 @@ export function problemsetProblemTypeahead(
 
   if (!cb) {
     cb = (event: Event, problem) =>
-      $(<EventTarget>event.target).val(problem.alias);
+      $(event.target as EventTarget).val(problem.alias);
   }
 
   elem
@@ -189,7 +189,7 @@ export function schoolTypeahead(
 ) {
   if (!cb) {
     cb = (event: Event, val: { id: number; label: string; value: string }) =>
-      $(<EventTarget>event.target).val(val.value);
+      $(event.target as EventTarget).val(val.value);
   }
   elem
     .typeahead<{ id: number; label: string; value: string }>(
@@ -219,7 +219,7 @@ export function tagTypeahead(
 ) {
   if (!cb) {
     cb = (event: Event, val: { name: string }) =>
-      $(<EventTarget>event.target).val(val.name);
+      $(event.target as EventTarget).val(val.name);
   }
   elem
     .typeahead<{ name: string }>(
@@ -243,7 +243,7 @@ export function userContestTypeahead(
   contestAlias: string,
 ): void {
   const cb = (event: Event, val: { label: string; value: string }) =>
-    $(<EventTarget>event.target)
+    $(event.target as EventTarget)
       .attr('data-value', val.value)
       .val(val.label);
   elem
@@ -287,7 +287,7 @@ export function userTypeahead(
 ): void {
   if (!cb) {
     cb = (event: Event, val: types.UserListItem) =>
-      $(<EventTarget>event.target).val(val.label);
+      $(event.target as EventTarget).val(val.label);
   }
   typeahead<types.UserListItem>(elem, api.User.list, cb);
 }
@@ -298,7 +298,7 @@ export function groupTypeahead(
 ): void {
   if (!cb) {
     cb = (event: Event, val: { label: string; value: string }) =>
-      $(<EventTarget>event.target)
+      $(event.target as EventTarget)
         .attr('data-value', val.value)
         .val(val.label);
   }

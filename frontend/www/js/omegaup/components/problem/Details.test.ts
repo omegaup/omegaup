@@ -1,13 +1,15 @@
+jest.mock('../../../../third_party/js/diff_match_patch.js');
+
 import { mount } from '@vue/test-utils';
-import expect from 'expect';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
+import T from '../../lang';
 import * as time from '../../time';
 
 import problem_Details from './Details.vue';
 
 describe('Details.vue', () => {
   const date = new Date();
-  const sampleProblem = <types.ProblemInfo>{
+  const problem: types.ProblemInfo = {
     alias: 'triangulos',
     accepts_submissions: true,
     karel_problem: false,
@@ -53,55 +55,306 @@ describe('Details.vue', () => {
     statement: {
       images: {},
       sources: {},
-      language: 'es',
-      markdown: '# test',
+      language: 'en',
+      markdown: `# test with embed code
+Here we can add code.
+<details>
+  <summary>
+    Example:
+  </summary>
+
+  {{sample.cpp}}
+
+  </details>
+      `,
     },
     title: 'Triangulos',
     visibility: 2,
     input_limit: 1000,
   };
 
-  const user = <types.UserInfoForProblem>{
+  const runDetailsData: types.RunDetails = {
+    admin: false,
+    alias: 'sumas',
+    cases: {},
+    details: {
+      compile_meta: {
+        Main: {
+          memory: 12091392,
+          sys_time: 0.029124,
+          time: 0.174746,
+          verdict: 'OK',
+          wall_time: 0.51659,
+        },
+      },
+      contest_score: 5,
+      groups: [],
+      judged_by: 'localhost',
+      max_score: 100,
+      memory: 10407936,
+      score: 0.05,
+      time: 0.31891,
+      verdict: 'PA',
+      wall_time: 0.699709,
+    },
+    guid: '80bbe93bc01c1d47ff9fb396dfaff741',
+    judged_by: '',
+    language: 'py3',
+    logs: '',
+    show_diff: 'none',
+    source: 'print(3)',
+    source_link: false,
+    source_name: 'Main.py3',
+    source_url: 'blob:http://localhost:8001/url',
+  };
+
+  const user: types.UserInfoForProblem = {
     admin: true,
     loggedIn: true,
     reviewer: true,
   };
 
-  const nominationStatus = <types.NominationStatus>{
+  const nominationStatus: types.NominationStatus = {
     alreadyReviewed: false,
+    canNominateProblem: false,
+    language: 'en',
     dismissed: false,
-    dismissedBeforeAC: false,
+    dismissedBeforeAc: false,
     nominated: false,
-    nominatedBeforeAC: false,
+    nominatedBeforeAc: false,
     solved: false,
     tried: false,
   };
 
-  const histogram = <types.Histogram>{
+  const histogram: types.Histogram = {
     difficulty: 0.0,
-    difficultyHistogram: undefined,
+    difficultyHistogram: '[0,1,2,3,4]',
     quality: 0.0,
-    qualityHistogram: undefined,
+    qualityHistogram: '[0,1,2,3,4]',
   };
 
-  it('Should handle no nomination payload', () => {
+  const runs: types.Run[] = [
+    {
+      alias: 'Hello',
+      classname: 'user-rank-unranked',
+      country: 'xx',
+      guid: 'abcdefg',
+      language: 'py3',
+      memory: 0,
+      penalty: 0,
+      runtime: 0,
+      score: 1,
+      status: 'ready',
+      submit_delay: 0,
+      time: new Date(),
+      username: 'omegaUp',
+      verdict: 'AC',
+    },
+  ];
+
+  it('Should handle details for a problem', () => {
     const wrapper = mount(problem_Details, {
       propsData: {
-        problem: sampleProblem,
-        user: user,
-        nominationStatus: nominationStatus,
-        initialClarifications: [],
+        initialTab: 'problems',
+        problem,
+        runDetailsData,
+        user,
+        nominationStatus,
         activeTab: 'problems',
-        runs: <types.Run[]>[],
-        allRuns: <types.Run[]>[],
-        clarifications: <types.Clarification[]>[],
+        runs: [] as types.Run[],
+        allRuns: [] as types.Run[],
+        clarifications: [] as types.Clarification[],
         solutionStatus: 'not_found',
-        histogram: histogram,
+        histogram,
         showNewRunWindow: false,
+        publicTags: [],
       },
     });
 
-    expect(wrapper.text()).toContain(sampleProblem.points);
+    expect(wrapper.text()).toContain(problem.points);
     expect(wrapper.text()).toContain(time.formatDate(date));
+  });
+
+  it('Should handle run details for a problem', async () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        initialTab: 'problems',
+        problem,
+        runDetailsData,
+        user,
+        nominationStatus,
+        activeTab: 'problems',
+        runs,
+        allRuns: runs,
+        clarifications: [] as types.Clarification[],
+        solutionStatus: 'not_found',
+        histogram,
+        showNewRunWindow: false,
+        publicTags: [],
+        shouldShowTabs: true,
+      },
+    });
+
+    await wrapper.find('a[href="#runs"]').trigger('click');
+    await wrapper.find('td div.dropdown>button.btn-secondary').trigger('click');
+    await wrapper
+      .find(
+        '.tab-content .show table tbody tr td div.dropdown ul li[data-actions-details] button',
+      )
+      .trigger('click');
+    expect(
+      wrapper.find('.tab-content .show div[data-overlay]').html(),
+    ).toBeTruthy();
+  });
+
+  it('Should handle run actions for a run in a given problem', async () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        initialTab: 'problems',
+        problem,
+        runDetailsData,
+        user,
+        nominationStatus,
+        activeTab: 'problems',
+        runs,
+        allRuns: runs,
+        clarifications: [] as types.Clarification[],
+        solutionStatus: 'not_found',
+        histogram,
+        showNewRunWindow: false,
+        publicTags: [],
+        shouldShowTabs: true,
+      },
+    });
+
+    await wrapper.find('a[href="#runs"]').trigger('click');
+    await wrapper.find('td div.dropdown>button.btn-secondary').trigger('click');
+    await wrapper
+      .find(
+        '.tab-content .show table tbody tr td div.dropdown ul li[data-actions-rejudge] button',
+      )
+      .trigger('click');
+    expect(wrapper.emitted('rejudge')).toBeDefined();
+
+    await wrapper.find('td div.dropdown>button.btn-secondary').trigger('click');
+    await wrapper
+      .find(
+        '.tab-content .show table tbody tr td div.dropdown ul li[data-actions-disqualify] button',
+      )
+      .trigger('click');
+    expect(wrapper.emitted('disqualify')).toBeDefined();
+  });
+
+  it('Should handle problem clarifications', async () => {
+    const clarifications: types.Clarification[] = [
+      {
+        answer: undefined,
+        author: 'omegaUp',
+        clarification_id: 1,
+        contest_alias: 'Concurso de prueba',
+        message: 'Clarificación de prueba 1',
+        problem_alias: 'Problema de prueba',
+        public: true,
+        receiver: undefined,
+        time: new Date(),
+      },
+      {
+        answer: 'Ok',
+        author: 'omegaUp',
+        clarification_id: 2,
+        contest_alias: undefined,
+        message: 'Clarificación de prueba 2',
+        problem_alias: 'Problema de prueba',
+        public: false,
+        receiver: undefined,
+        time: new Date(),
+      },
+    ];
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        initialTab: 'problems',
+        problem,
+        runDetailsData,
+        user,
+        nominationStatus,
+        activeTab: 'problems',
+        runs,
+        allRuns: runs,
+        clarifications: clarifications,
+        solutionStatus: 'not_found',
+        histogram,
+        showNewRunWindow: false,
+        publicTags: [],
+        shouldShowTabs: true,
+      },
+    });
+    await wrapper.find('a[href="#clarifications"]').trigger('click');
+    expect(wrapper.find('.tab-content .show table thead tr th').text()).toBe(
+      T.wordsContest,
+    );
+  });
+
+  it('Should handle unrecognized source filename error', () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        initialTab: 'problems',
+        problem,
+        runDetailsData,
+        user,
+        nominationStatus,
+        activeTab: 'problems',
+        runs,
+        allRuns: runs,
+        clarifications: [] as types.Clarification[],
+        solutionStatus: 'not_found',
+        histogram,
+        showNewRunWindow: false,
+        publicTags: [],
+        shouldShowTabs: true,
+      },
+    });
+
+    expect(wrapper.find('div[data-markdown-statement]').text()).toContain(
+      'Unrecognized source filename: sample.cpp',
+    );
+  });
+
+  it('Should handle a valid source filename with content', async () => {
+    problem.statement.sources = {
+      'sample.cpp': `#include <iostream>
+
+int main() {
+  std::cout << "This is only an example";
+  return 0;
+}`,
+    };
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        initialTab: 'problems',
+        problem,
+        runDetailsData,
+        user,
+        nominationStatus,
+        activeTab: 'problems',
+        runs,
+        allRuns: runs,
+        clarifications: [] as types.Clarification[],
+        solutionStatus: 'not_found',
+        histogram,
+        showNewRunWindow: false,
+        publicTags: [],
+        shouldShowTabs: true,
+      },
+    });
+
+    expect(wrapper.find('details').attributes()).toMatchObject({});
+    await wrapper.find('details > summary').trigger('click');
+    expect(wrapper.find('details').attributes()).toMatchObject({ open: '' });
+    expect(wrapper.find('div[data-markdown-statement]').text()).toContain(
+      '#include <iostream>',
+    );
+    expect(wrapper.find('div[data-markdown-statement]').text()).toContain(
+      'This is only an example',
+    );
   });
 });

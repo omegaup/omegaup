@@ -1,172 +1,233 @@
 <template>
-  <div class="omegaup-admin-support panel-primary panel">
-    <div class="panel-heading">
-      <h2 class="panel-title">
+  <div class="card">
+    <div class="text-white bg-primary card-header">
+      <div class="card-title h4">
         {{ T.omegaupTitleSupportDashboard }}
         <span v-if="username != null">- {{ username }}</span>
-      </h2>
+      </div>
     </div>
-    <div class="panel-body">
-      <div class="row">
-        <form class="form" v-on:submit.prevent="onSearchEmail">
-          <div class="col-md-4">
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <form class="form w-100" @submit.prevent="onSearchEmail">
             <div class="input-group">
               <input
+                v-model="email"
                 class="form-control"
                 name="email"
                 type="text"
-                v-bind:disabled="username != null"
-                v-bind:placeholder="T.email"
-                v-model="email"
+                required="required"
+                :disabled="username != null"
+                :placeholder="T.email"
               />
-              <span class="input-group-btn"
-                ><button
-                  class="btn btn-default"
-                  type="button"
-                  v-bind:disabled="username != null"
-                  v-on:click.prevent="onSearchEmail"
+              <div class="input-group-append">
+                <button
+                  class="btn btn-outline-secondary"
+                  type="submit"
+                  :disabled="username != null"
                 >
                   {{ T.wordsSearch }}
-                </button></span
-              >
+                </button>
+              </div>
             </div>
+          </form>
+        </div>
+      </div>
+      <template v-if="username != null">
+        <div class="row mb-3">
+          <div class="col-md">
+            <form class="form w-100" @submit.prevent="onVerifyUser">
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                :disabled="verified"
+                @click.prevent="onVerifyUser"
+              >
+                <template v-if="verified">
+                  <font-awesome-icon icon="check" :style="{ color: 'green' }" />
+                  {{ T.userVerified }}
+                </template>
+                <template v-else>
+                  {{ T.userVerify }}
+                </template>
+              </button>
+            </form>
           </div>
-        </form>
-        <form
-          class="form"
-          v-on:submit.prevent="onVerifyUser"
-          v-show="username != null"
-        >
-          <div class="col-md-4 bottom-margin">
+          <div class="col-md">
+            <label v-if="lastLogin != null" class="font-weight-bold">
+              {{
+                ui.formatString(T.userLastLogin, {
+                  lastLogin: time.formatDateTime(lastLogin),
+                })
+              }}
+            </label>
+            <label v-else>
+              {{ T.userNeverLoggedIn }}
+            </label>
+          </div>
+          <div v-if="birthDate != null" class="col-md">
+            <label class="font-weight-bold">
+              {{
+                ui.formatString(T.userBirthDate, {
+                  birthDate: time.formatDate(birthDate),
+                })
+              }}
+            </label>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <form class="form w-100" @submit.prevent="onGenerateToken">
+            <div class="col-md-12">
+              <div class="input-group">
+                <input
+                  :value="link"
+                  class="form-control"
+                  name="link"
+                  type="text"
+                  :placeholder="T.passwordGenerateTokenDesc"
+                  readonly
+                  @focus="$event.target.select()"
+                />
+                <div class="input-group-append">
+                  <button
+                    v-clipboard="() => link"
+                    :disabled="!link"
+                    class="btn btn-outline-secondary"
+                    name="copy"
+                    type="button"
+                    data-copy-to-clipboard
+                    :aria-label="T.passwordCopyToken"
+                    :title="T.passwordCopyToken"
+                    @click.prevent="
+                      ui.success(T.passwordResetLinkCopiedToClipboard)
+                    "
+                  >
+                    <font-awesome-icon icon="clipboard" />
+                  </button>
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    :title="T.passwordGenerateTokenDesc"
+                    @click.prevent="onGenerateToken"
+                  >
+                    {{ T.passwordGenerateToken }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="row mb-3">
+          <form class="form w-100" @submit.prevent="onUpdateEmail">
+            <div class="col-md-12">
+              <div class="input-group">
+                <input
+                  v-model="newEmail"
+                  class="form-control"
+                  name="new_email"
+                  type="text"
+                  required="required"
+                  :placeholder="T.adminSupportTypeNewEmail"
+                />
+                <div class="input-group-append">
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="submit"
+                    :title="T.adminSupportTypeNewEmail"
+                  >
+                    {{ T.wordsSaveChanges }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="row float-right">
+          <div class="col-md-12">
             <button
-              class="btn btn-default btn-block"
-              type="button"
-              v-bind:disabled="verified"
-              v-on:click.prevent="onVerifyUser"
+              class="btn btn-secondary"
+              type="reset"
+              @click.prevent="onReset"
             >
-              <template v-if="verified">
-                <span aria-hidden="true" class="glyphicon glyphicon-ok"></span>
-                {{ T.userVerified }}
-              </template>
-              <template v-else="">
-                {{ T.userVerify }}
-              </template>
+              {{ T.wordsCancel }}
             </button>
           </div>
-          <div class="col-md-4 bottom-margin" v-show="username != null">
-            <label>
-              <template v-if="lastLogin != null">
-                {{
-                  ui.formatString(T.userLastLogin, {
-                    lastLogin: lastLogin.toLocaleString(T.locale),
-                  })
-                }}
-              </template>
-              <template v-else="">
-                {{ T.userNeverLoggedIn }}
-              </template></label
-            >
-          </div>
-        </form>
-      </div>
-      <div class="row bottom-margin">
-        <form
-          class="form bottom-margin"
-          v-on:submit.prevent="onGenerateToken"
-          v-show="username != null"
-        >
-          <div class="col-md-12">
-            <div class="input-group bottom-margin">
-              <input
-                class="form-control"
-                name="link"
-                type="text"
-                v-bind:placeholder="T.passwordGenerateTokenDesc"
-                v-model="link"
-              />
-              <span class="input-group-btn"
-                ><button
-                  class="btn btn-default"
-                  name="copy"
-                  type="button"
-                  v-bind:aria-label="T.passwordCopyToken"
-                  v-bind:disabled="link == ''"
-                  v-bind:title="T.passwordCopyToken"
-                  v-on:click.prevent="onCopyToken"
-                >
-                  <span
-                    aria-hidden="true"
-                    class="glyphicon glyphicon-copy"
-                  ></span>
-                </button>
-                <button
-                  class="btn btn-default"
-                  type="button"
-                  v-bind:title="T.passwordGenerateTokenDesc"
-                  v-on:click.prevent="onGenerateToken"
-                >
-                  {{ T.passwordGenerateToken }}
-                </button></span
-              >
-            </div>
-            <div class="text-right">
-              <button
-                class="btn btn-primary submit"
-                type="reset"
-                v-on:click.prevent="onReset"
-              >
-                {{ T.wordsCancel }}
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import Clipboard from 'v-clipboard';
 import T from '../../lang';
 import * as ui from '../../ui';
+import * as time from '../../time';
 
-@Component
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+Vue.use(Clipboard);
+
+export interface UpdateEmailRequest {
+  email: string;
+  newEmail: string;
+}
+
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
+  },
+})
 export default class AdminSupport extends Vue {
   @Prop() username!: string;
   @Prop() verified!: boolean;
   @Prop() link!: string;
-  @Prop() lastLogin!: Date;
+  @Prop() lastLogin!: null | Date;
+  @Prop() birthDate!: null | Date;
 
   T = T;
   ui = ui;
-  email: string = '';
+  time = time;
+  email: null | string = null;
+  newEmail: null | string = null;
 
   @Emit('search-email')
-  onSearchEmail(): string {
+  onSearchEmail(): null | string {
+    if (this.email == null) return null;
     return this.email;
   }
 
+  @Emit('update-email')
+  onUpdateEmail(): null | UpdateEmailRequest {
+    if (this.email == null || this.newEmail == null) return null;
+    return { email: this.email, newEmail: this.newEmail };
+  }
+
   @Emit('verify-user')
-  onVerifyUser(): string {
+  onVerifyUser(): null | string {
+    if (this.email == null) return null;
     return this.email;
   }
 
   @Emit('generate-token')
-  onGenerateToken(): string {
+  onGenerateToken(): null | string {
+    if (this.email == null) return null;
     return this.email;
   }
 
-  onCopyToken(): void {
-    let copyText: HTMLInputElement = <HTMLInputElement>(
-      this.$el.querySelector('input[name=link]')
-    );
-    copyText.select();
-    document.execCommand('copy');
-    this.$emit('copy-token');
-  }
-
-  onReset(): void {
-    this.$emit('reset');
+  @Emit('reset')
+  onReset() {
+    this.email = null;
+    this.newEmail = null;
   }
 }
 </script>

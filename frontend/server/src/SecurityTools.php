@@ -244,8 +244,8 @@ class SecurityTools {
     }
 
     /**
-     * Gets a Bearer authorization token for a particular user to be used the
-     * gitserver that is valid for a single problem for 5 minutes.
+     * Gets a Bearer authorization token for any user to clone a given course
+     * that is valid for 7 days.
      *
      * @param array<string, string> $claims
      * @param string $issuer

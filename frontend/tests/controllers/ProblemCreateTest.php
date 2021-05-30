@@ -2,8 +2,6 @@
 
 /**
  * Tests for apiCreate in ProblemController
- *
- * @author joemmanuel
  */
 
 class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
@@ -49,7 +47,14 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Verify DB data
         $this->assertEquals($r['title'], $problem->title);
-        $this->assertEquals(substr($r['title'], 0, 32), $problem->alias);
+        $this->assertEquals(
+            substr(
+                $r['title'],
+                0,
+                \OmegaUp\Validators::ALIAS_MAX_LENGTH
+            ),
+            $problem->alias
+        );
         $this->assertEquals($r['order'], $problem->order);
         $this->assertEquals($r['source'], $problem->source);
         $this->assertEqualSets($r['languages'], $problem->languages);
@@ -81,6 +86,43 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(0, $problem->submissions);
         $this->assertEquals(0, $problem->accepted);
         $this->assertEquals(0, $problem->difficulty);
+    }
+
+    /**
+     * A PHPUnit data provider for testCreateWithInvalidAlias.
+     *
+     * @return list<list<string>>
+     */
+    public function invalidAliasValueProvider(): array {
+        return [
+            ['this has a space'],
+            ['this-alias-is-way-too-long-and-should-be-rejected'],
+            ['colons:are-disallowed'],
+            ['new'],  // restricted alias
+        ];
+    }
+
+    /**
+     * @dataProvider invalidAliasValueProvider
+     */
+    public function testCreateWithInvalidAlias(string $alias) {
+        // Get the problem data
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r = $problemData['request'];
+        $r['auth_token'] = $login->auth_token;
+        $r['problem_alias'] = $alias;
+
+        // Call the API
+        try {
+            \OmegaUp\Controllers\Problem::apiCreate($r);
+            $this->fail('Problem creation should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'parameterInvalid');
+        }
     }
 
     /**
@@ -287,7 +329,14 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Verify DB data
         $this->assertEquals($r['title'], $problem->title);
-        $this->assertEquals(substr($r['title'], 0, 32), $problem->alias);
+        $this->assertEquals(
+            substr(
+                $r['title'],
+                0,
+                \OmegaUp\Validators::ALIAS_MAX_LENGTH
+            ),
+            $problem->alias
+        );
         $this->assertEquals($r['order'], $problem->order);
         $this->assertEquals($r['source'], $problem->source);
 
@@ -578,6 +627,7 @@ if __name__ == \'__main__\':
                 $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem(
                     new \OmegaUp\Test\Factories\ProblemParams([
                         'problem_level' => $level,
+                        'quality_seal' => true,
                     ])
                 );
             }
@@ -585,7 +635,7 @@ if __name__ == \'__main__\':
 
         $problemsCount = [];
         $total = 0;
-        $response = \OmegaUp\Controllers\Problem::getProblemCollectionDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Problem::getProblemCollectionDetailsForTypeScript(
             new \OmegaUp\Request([])
         )['smartyProperties']['payload'];
         foreach ($response['problemCount'] as $levelTag) {
@@ -715,7 +765,14 @@ if __name__ == \'__main__\':
 
         // Verify DB data
         $this->assertEquals($r['title'], $problem->title);
-        $this->assertEquals(substr($r['title'], 0, 32), $problem->alias);
+        $this->assertEquals(
+            substr(
+                $r['title'],
+                0,
+                \OmegaUp\Validators::ALIAS_MAX_LENGTH
+            ),
+            $problem->alias
+        );
         $this->assertEquals($r['order'], $problem->order);
         $this->assertEquals($r['source'], $problem->source);
 
@@ -879,7 +936,7 @@ if __name__ == \'__main__\':
                 str_replace(' ', '-', $title)
             ),
             0,
-            32
+            \OmegaUp\Validators::ALIAS_MAX_LENGTH
         );
 
         \OmegaUp\Controllers\Problem::apiCreate(new \OmegaUp\Request([

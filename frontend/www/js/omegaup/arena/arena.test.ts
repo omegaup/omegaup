@@ -1,4 +1,4 @@
-import expect from 'expect';
+jest.mock('../../../third_party/js/diff_match_patch.js');
 
 import * as arena from './arena';
 import { OmegaUp } from '../omegaup';
@@ -10,8 +10,6 @@ describe('arena', () => {
         new window.URL('http://localhost:8001/arena/test/'),
       );
       expect(options.contestAlias).toEqual('test');
-      expect(options.isPractice).toEqual(false);
-      expect(options.isOnlyProblem).toEqual(false);
       expect(options.disableClarifications).toEqual(false);
       expect(options.disableSockets).toEqual(false);
       expect(options.scoreboardToken).toEqual(null);
@@ -25,7 +23,6 @@ describe('arena', () => {
         new window.URL('http://localhost:8001/arena/test/practice'),
       );
       expect(options.contestAlias).toEqual('test');
-      expect(options.isPractice).toEqual(true);
     });
 
     it('Should detect only problems', () => {
@@ -33,8 +30,6 @@ describe('arena', () => {
         new window.URL('http://localhost:8001/arena/problem/test/'),
       );
       expect(options.contestAlias).toEqual(null);
-      expect(options.onlyProblemAlias).toEqual('test');
-      expect(options.isOnlyProblem).toEqual(true);
     });
 
     it('Should detect ws=off', () => {
@@ -46,7 +41,7 @@ describe('arena', () => {
   });
 
   describe('Arena', () => {
-    before(() => {
+    beforeEach(() => {
       OmegaUp.ready = true;
     });
 

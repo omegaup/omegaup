@@ -1,6 +1,4 @@
 import { mount, shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -8,9 +6,11 @@ import * as ui from '../../ui';
 import arena_RunSubmit from './RunSubmit.vue';
 
 describe('RunSubmit.vue', () => {
+  const currentDate = new Date();
+  const now = currentDate.getTime();
+
   it('Should handle disabled button', () => {
-    const now = new Date();
-    const future = now.getTime() + 10 * 1000;
+    const future = now + 10 * 1000;
     const nextSubmission = new Date(future);
     const wrapper = mount(arena_RunSubmit, {
       propsData: {
@@ -35,6 +35,8 @@ describe('RunSubmit.vue', () => {
   });
 
   it('Should handle enable button', () => {
+    const past = now - 1 * 1000;
+    const nextSubmission = new Date(past);
     const wrapper = shallowMount(arena_RunSubmit, {
       propsData: {
         languages: [
@@ -42,7 +44,7 @@ describe('RunSubmit.vue', () => {
           { py3: 'Python 3.6' },
           { java: 'Java' },
         ],
-        nextSubmissionTimestamp: new Date(),
+        nextSubmissionTimestamp: nextSubmission,
         preferredLanguage: 'es',
       },
     });

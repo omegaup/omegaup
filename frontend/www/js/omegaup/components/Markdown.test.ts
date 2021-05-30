@@ -1,6 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
 
 import omegaup_Markdown from './Markdown.vue';
 

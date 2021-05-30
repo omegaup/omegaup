@@ -1,22 +1,21 @@
 <template>
-  <form data-run-submit v-on:submit.prevent="onSubmit">
+  <form data-run-submit @submit.prevent="onSubmit">
     <div class="close-container">
-      <button type="button" class="close" v-on:click="$emit('dismiss')">
-        ❌
-      </button>
+      <button type="button" class="close" @click="$emit('dismiss')">❌</button>
     </div>
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">
         {{ T.wordsLanguage }}
       </label>
       <div class="col-sm-4">
-        <select class="form-control" name="language" v-model="selectedLanguage">
+        <select v-model="selectedLanguage" class="form-control" name="language">
           <option
-            v-bind:key="key"
-            v-bind:value="key"
             v-for="(language, key) in allowedLanguages"
-            >{{ language }}</option
+            :key="key"
+            :value="key"
           >
+            {{ language }}
+          </option>
         </select>
       </div>
     </div>
@@ -29,11 +28,11 @@
     <div class="form-group row">
       <label class="col-sm-7 col-form-label">{{ T.arenaRunSubmitPaste }}</label>
     </div>
-    <div class="code-view form-group">
+    <div class="code-view">
       <omegaup-arena-code-view
-        v-bind:language="selectedLanguage"
-        v-bind:readonly="false"
         v-model="code"
+        :language="selectedLanguage"
+        :readonly="false"
       ></omegaup-arena-code-view>
     </div>
     <div class="form-group row">
@@ -41,7 +40,7 @@
         {{ T.arenaRunSubmitUpload }}
       </label>
       <div class="col-sm-7">
-        <input type="file" name="file" ref="inputFile" />
+        <input ref="inputFile" type="file" name="file" />
       </div>
     </div>
     <div class="form-group row">
@@ -49,15 +48,15 @@
         <button
           type="submit"
           class="btn btn-primary"
-          v-bind:disabled="!canSubmit"
+          :disabled="!canSubmit || waitingForServerResponse"
         >
           <omegaup-countdown
             v-if="!canSubmit"
-            v-bind:target-time="nextSubmissionTimestamp"
-            v-bind:countdown-format="
+            :target-time="nextSubmissionTimestamp"
+            :countdown-format="
               omegaup.CountdownFormat.WaitBetweenUploadsSeconds
             "
-            v-on:emit-finish="now = Date.now()"
+            @finish="now = Date.now()"
           ></omegaup-countdown>
           <span v-else>{{ T.wordsSend }}</span>
         </button>
@@ -65,73 +64,6 @@
     </div>
   </form>
 </template>
-
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-.CodeMirror pre.CodeMirror-line {
-  padding: 0px 35px;
-}
-
-form[data-run-submit] {
-  background: #eee;
-  width: 80%;
-  height: 90%;
-  margin: auto;
-  border: 2px solid #ccc;
-  padding: 1em;
-  position: absolute;
-  overflow-y: auto;
-  overflow-x: hidden;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  .close-container {
-    width: 100%;
-    .close {
-      position: absolute;
-      top: 0;
-      right: 0;
-      background-color: $omegaup-white;
-      border: 1px solid #ccc;
-      border-width: 0 0 1px 1px;
-      font-size: 110%;
-      width: 25px;
-      height: 25px;
-      &:hover {
-        background-color: #eee;
-      }
-    }
-  }
-  .languages {
-    width: 100%;
-  }
-  .filename-extension {
-    width: 100%;
-  }
-  .run-submit-paste-text {
-    width: 100%;
-  }
-  .code-view {
-    width: 100%;
-    flex-grow: 1;
-    overflow: auto;
-  }
-  .upload-file {
-    width: 100%;
-  }
-  .submit-run {
-    width: 100%;
-  }
-}
-
-input[type='submit'] {
-  font-size: 110%;
-  padding: 0.3em 0.5em;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
@@ -159,6 +91,7 @@ export default class ArenaRunSubmit extends Vue {
   selectedLanguage = '';
   code = '';
   now: number = Date.now();
+  waitingForServerResponse = false;
 
   get canSubmit(): boolean {
     return this.nextSubmissionTimestamp.getTime() < this.now;
@@ -190,7 +123,7 @@ export default class ArenaRunSubmit extends Vue {
       { language: 'rb', name: 'Ruby (2.7)' },
       { language: 'cs', name: 'C# (8.0, dotnet 3.1)' },
       { language: 'pas', name: 'Pascal (fpc 3.0)' },
-      { language: 'cat', name: 'Output Only' },
+      { language: 'cat', name: T.outputOnly },
       { language: 'hs', name: 'Haskell (ghc 8.6)' },
       { language: 'lua', name: 'Lua (5.3)' },
     ];
@@ -227,7 +160,7 @@ export default class ArenaRunSubmit extends Vue {
     this.selectedLanguage = newValue;
   }
 
-  onSubmit(ev: Event): void {
+  onSubmit(): void {
     if (!this.canSubmit) {
       alert(
         ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
@@ -243,13 +176,14 @@ export default class ArenaRunSubmit extends Vue {
       alert(T.arenaRunSubmitMissingLanguage);
       return;
     }
-    const file = this.inputFile.files![0];
+    const file = this.inputFile.files?.[0];
     if (file) {
       const reader = new FileReader();
 
       reader.onload = (e) => {
         const result = e.target?.result ?? null;
         if (result === null) return;
+        this.waitingForServerResponse = true;
         this.$emit('submit-run', result as string, this.selectedLanguage);
       };
 
@@ -284,9 +218,9 @@ export default class ArenaRunSubmit extends Vue {
         }
         reader.readAsText(file, 'UTF-8');
       } else {
-        // 100kB _must_ be enough for anybody.
-        if (file.size >= 100 * 1024) {
-          alert(ui.formatString(T.arenaRunSubmitFilesize, { limit: '100kB' }));
+        // 512kiB _must_ be enough for anybody.
+        if (file.size >= 512 * 1024) {
+          alert(ui.formatString(T.arenaRunSubmitFilesize, { limit: '512kiB' }));
           return;
         }
         reader.readAsDataURL(file);
@@ -299,6 +233,7 @@ export default class ArenaRunSubmit extends Vue {
       alert(T.arenaRunSubmitEmptyCode);
       return;
     }
+    this.waitingForServerResponse = true;
     this.$emit('submit-run', this.code, this.selectedLanguage);
   }
 
@@ -306,6 +241,81 @@ export default class ArenaRunSubmit extends Vue {
     this.code = '';
     this.inputFile.type = 'text';
     this.inputFile.type = 'file';
+    this.waitingForServerResponse = false;
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+form[data-run-submit] {
+  background: var(--arena-run-submit-form-background-color);
+  width: 80%;
+  height: 90%;
+  margin: auto;
+  border: 2px solid var(--arena-run-submit-form-border-color);
+  padding: 1em;
+  position: absolute;
+  overflow-y: auto;
+  overflow-x: hidden;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: -1;
+
+  .close-container {
+    width: 100%;
+
+    .close {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: var(--arena-form-close-background-color);
+      border: 1px solid var(--arena-form-close-border-color);
+      border-width: 0 0 1px 1px;
+      font-size: 110%;
+      width: 25px;
+      height: 25px;
+
+      &:hover {
+        background-color: var(--arena-form-close-background-color--hover);
+      }
+    }
+  }
+
+  .languages {
+    width: 100%;
+  }
+
+  .filename-extension {
+    width: 100%;
+  }
+
+  .run-submit-paste-text {
+    width: 100%;
+  }
+
+  .code-view {
+    width: 100%;
+    flex-grow: 1;
+    overflow: auto;
+  }
+
+  .upload-file {
+    width: 100%;
+  }
+
+  .submit-run {
+    width: 100%;
+  }
+}
+
+input[type='submit'] {
+  font-size: 110%;
+  padding: 0.3em 0.5em;
+}
+</style>

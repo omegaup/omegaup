@@ -1,27 +1,27 @@
 <template>
   <div class="mt-4">
-    <ul class="nav justify-content-center nav-tabs">
+    <ul v-if="shouldShowTabs" class="nav justify-content-center nav-tabs">
       <li
+        v-for="tab in availableTabs"
+        :key="tab.name"
         class="nav-item"
         role="tablist"
-        v-for="tab in availableTabs"
-        v-bind:key="tab.name"
       >
         <a
-          v-bind:href="`#${tab.name}`"
+          :href="`#${tab.name}`"
           class="nav-link"
           data-toggle="tab"
           role="tab"
-          v-bind:aria-controls="tab.name"
-          v-bind:class="{ active: selectedTab === tab.name }"
-          v-bind:aria-selected="selectedTab === tab.name"
-          v-on:click="onTabSelected(tab.name)"
+          :aria-controls="tab.name"
+          :class="{ active: selectedTab === tab.name }"
+          :aria-selected="selectedTab === tab.name"
+          @click="onTabSelected(tab.name)"
         >
           {{ tab.text }}
           <span
-            class="clarifications-count"
-            v-bind:class="{ 'font-weight-bold': hasUnreadClarifications }"
             v-if="tab.name === 'clarifications'"
+            class="clarifications-count"
+            :class="{ 'font-weight-bold': hasUnreadClarifications }"
             >{{ clarificationsCount }}</span
           >
         </a>
@@ -29,33 +29,37 @@
     </ul>
     <div class="tab-content">
       <div
+        v-if="problem"
         class="tab-pane fade p-4"
-        v-bind:class="{ 'show active': selectedTab === 'problems' }"
+        :class="{ 'show active': selectedTab === 'problems' }"
       >
         <omegaup-problem-settings-summary
-          v-bind:problem="problem"
-          v-bind:show-visibility-indicators="true"
-          v-bind:show-edit-link="this.user.admin"
+          :problem="problem"
+          :show-visibility-indicators="showVisibilityIndicators"
+          :show-edit-link="user.admin"
         ></omegaup-problem-settings-summary>
 
-        <div class="karel-js-link my-3" v-if="problem.karel_problem">
+        <div v-if="problem.karel_problem" class="karel-js-link my-3">
           <a
             class="p-3"
-            v-bind:href="`/karel.js/${
+            :href="`/karel.js/${
               problem.sample_input ? `#mundo:${problem.sample_input}` : ''
             }`"
             target="_blank"
           >
             {{ T.openInKarelJs }}
-            <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
+            <font-awesome-icon :icon="['fas', 'external-link-alt']" />
           </a>
         </div>
 
         <div class="mt-4 markdown">
           <omegaup-markdown
-            v-bind:markdown="problem.statement.markdown"
-            v-bind:image-mapping="problem.statement.images"
-            v-bind:problem-settings="problem.settings"
+            ref="statement-markdown"
+            :markdown="problem.statement.markdown"
+            :source-mapping="problem.statement.sources"
+            :image-mapping="problem.statement.images"
+            :problem-settings="problem.settings"
+            @rendered="onProblemRendered"
           ></omegaup-markdown>
         </div>
         <hr class="my-3" />
@@ -66,10 +70,10 @@
           <div>
             {{ T.wordsProblemsetter }}:
             <omegaup-username
-              v-bind:classname="problem.problemsetter.classname"
-              v-bind:username="problem.problemsetter.username"
-              v-bind:name="problem.problemsetter.name"
-              v-bind:linkify="true"
+              :classname="problem.problemsetter.classname"
+              :username="problem.problemsetter.username"
+              :name="problem.problemsetter.name"
+              :linkify="true"
             ></omegaup-username>
           </div>
           <div>
@@ -79,149 +83,192 @@
               })
             }}
           </div>
+          <slot name="quality-nomination-buttons">
+            <div v-if="visibilityOfPromotionButton">
+              <button class="btn btn-link" @click="onNewPromotion">
+                {{ T.qualityNominationRateProblem }}
+              </button>
+            </div>
+            <div v-if="user.loggedIn">
+              <button
+                class="btn btn-link"
+                @click="onReportInappropriateProblem"
+              >
+                {{ T.wordsReportProblem }}
+              </button>
+            </div>
+            <div v-if="user.reviewer && !nominationStatus.alreadyReviewed">
+              <button class="btn btn-link" @click="onNewPromotionAsReviewer">
+                {{ T.reviewerNomination }}
+              </button>
+            </div>
+          </slot>
         </template>
-        <omegaup-quality-nomination-review
-          v-if="user.reviewer && !nominationStatus.already_reviewed"
-          v-on:submit="
-            (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
-          "
-        ></omegaup-quality-nomination-review>
-        <omegaup-quality-nomination-demotion
-          v-on:submit="
-            (qualityDemotionComponent) =>
-              $emit('submit-demotion', qualityDemotionComponent)
-          "
-        ></omegaup-quality-nomination-demotion>
-        <omegaup-quality-nomination-promotion
-          v-if="this.user.loggedIn"
-          v-bind:can-nominate-problem="nominationStatus.canNoominateProblem"
-          v-bind:dismissed="nominationStatus.dismissed"
-          v-bind:dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
-          v-bind:nominated="nominationStatus.nominated"
-          v-bind:nomination-before-a-c="nominationStatus.nominationBeforeAC"
-          v-bind:solved="nominationStatus.solved"
-          v-bind:tried="nominationStatus.tried"
-          v-bind:problem-alias="problem.alias"
-          v-on:submit="
-            (qualityPromotionComponent) =>
-              $emit('submit-promotion', qualityPromotionComponent)
-          "
-          v-on:dismiss="
-            (qualityPromotionComponent) =>
-              $emit('dismiss-promotion', qualityPromotionComponent)
-          "
-        ></omegaup-quality-nomination-promotion>
         <omegaup-overlay
-          v-bind:show-overlay="showOverlay"
-          v-on:overlay-hidden="onPopupDismissed"
-          v-if="this.user.loggedIn"
+          v-if="user.loggedIn"
+          :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
+          @hide-overlay="onPopupDismissed"
         >
-          <omegaup-arena-runsubmit
-            slot="popup-content"
-            v-bind:preferred-language="problem.preferred_language"
-            v-bind:languages="problem.languages"
-            v-bind:initial-show-form="showFormRunSubmit"
-            v-on:dismiss="onPopupDismissed"
-            v-on:submit-run="
-              (code, selectedLanguage) => onRunSubmitted(code, selectedLanguage)
-            "
-          ></omegaup-arena-runsubmit>
+          <template #popup>
+            <omegaup-arena-runsubmit-popup
+              v-show="currentPopupDisplayed === PopupDisplayed.RunSubmit"
+              :preferred-language="problem.preferred_language"
+              :languages="problem.languages"
+              :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
+              @dismiss="onPopupDismissed"
+              @submit-run="onRunSubmitted"
+            ></omegaup-arena-runsubmit-popup>
+            <omegaup-arena-rundetails-popup
+              v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
+              :data="currentRunDetailsData"
+              @dismiss="onPopupDismissed"
+            ></omegaup-arena-rundetails-popup>
+            <omegaup-quality-nomination-promotion-popup
+              v-show="currentPopupDisplayed === PopupDisplayed.Promotion"
+              :solved="nominationStatus && nominationStatus.solved"
+              :tried="nominationStatus && nominationStatus.tried"
+              @submit="
+                (qualityPromotionComponent) =>
+                  $emit('submit-promotion', qualityPromotionComponent)
+              "
+              @dismiss="
+                (qualityPromotionComponent, isDismissed) =>
+                  onPopupPromotionDismissed(
+                    qualityPromotionComponent,
+                    isDismissed,
+                  )
+              "
+            ></omegaup-quality-nomination-promotion-popup>
+            <omegaup-quality-nomination-demotion-popup
+              v-show="currentPopupDisplayed === PopupDisplayed.Demotion"
+              @dismiss="currentPopupDisplayed = PopupDisplayed.None"
+              @submit="
+                (qualityDemotionComponent) =>
+                  $emit('submit-demotion', qualityDemotionComponent)
+              "
+            ></omegaup-quality-nomination-demotion-popup>
+            <omegaup-quality-nomination-reviewer-popup
+              v-show="currentPopupDisplayed === PopupDisplayed.Reviewer"
+              :allow-user-add-tags="allowUserAddTags"
+              :level-tags="levelTags"
+              :problem-level="problemLevel"
+              :public-tags="publicTags"
+              :selected-public-tags="selectedPublicTags"
+              :selected-private-tags="selectedPrivateTags"
+              :problem-alias="problem.alias"
+              :problem-title="problem.title"
+              @dismiss="currentPopupDisplayed = PopupDisplayed.None"
+              @submit="
+                (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
+              "
+            ></omegaup-quality-nomination-reviewer-popup>
+          </template>
         </omegaup-overlay>
         <omegaup-arena-runs
-          v-bind:problem-alias="problem.alias"
-          v-bind:runs="runs"
-          v-bind:show-details="true"
-          v-bind:problemset-problems="[]"
-          v-on:new-submission="onNewSubmission"
+          :problem-alias="problem.alias"
+          :contest-alias="contestAlias"
+          :runs="runs"
+          :show-details="true"
+          :problemset-problems="[]"
+          :is-contest-finished="isContestFinished"
+          @details="(run) => onRunDetails(run.guid)"
+          @new-submission="onNewSubmission"
         ></omegaup-arena-runs>
         <omegaup-problem-feedback
-          v-bind:quality-histogram="histogram.qualityHistogram"
-          v-bind:difficulty-histogram="histogram.difficultyHistogram"
-          v-bind:quality-score="histogram.quality"
-          v-bind:difficulty-score="histogram.difficulty"
+          :quality-histogram="parsedQualityHistogram"
+          :difficulty-histogram="parsedDifficultyHistogram"
+          :quality-score="histogramQuality"
+          :difficulty-score="histogramDifficulty"
         ></omegaup-problem-feedback>
-        <omegaup-arena-solvers v-bind:solvers="solvers"></omegaup-arena-solvers>
+        <slot name="best-solvers-list">
+          <omegaup-arena-solvers :solvers="solvers"></omegaup-arena-solvers>
+        </slot>
       </div>
       <div
         class="tab-pane fade p-4"
-        v-bind:class="{ 'show active': selectedTab === 'solution' }"
+        :class="{ 'show active': selectedTab === 'solution' }"
       >
         <omegaup-problem-solution
-          v-bind:status="solutionStatus"
-          v-bind:solution="solution"
-          v-bind:available-tokens="availableTokens"
-          v-bind:all-tokens="allTokens"
-          v-on:get-solution="$emit('get-solution')"
-          v-on:get-tokens="$emit('get-tokens')"
-          v-on:unlock-solution="$emit('unlock-solution')"
+          :status="solutionStatus"
+          :solution="solution"
+          :available-tokens="availableTokens"
+          :all-tokens="allTokens"
+          @get-solution="$emit('get-solution')"
+          @get-tokens="$emit('get-tokens')"
+          @unlock-solution="$emit('unlock-solution')"
         ></omegaup-problem-solution>
       </div>
       <div
         class="tab-pane fade p-4"
-        v-bind:class="{ 'show active': selectedTab === 'runs' }"
+        :class="{ 'show active': selectedTab === 'runs' }"
       >
         <omegaup-arena-runs
-          v-bind:runs="allRuns"
-          v-bind:show-details="true"
-          v-bind:show-user="true"
-          v-bind:show-rejudge="true"
-          v-bind:show-pager="true"
-          v-bind:show-disqualify="true"
-          v-bind:problemset-problems="[]"
+          :show-all-runs="true"
+          :runs="allRuns"
+          :show-details="true"
+          :show-user="true"
+          :show-rejudge="true"
+          :show-pager="true"
+          :show-disqualify="true"
+          :problemset-problems="[]"
+          @details="(run) => onRunDetails(run.guid)"
+          @rejudge="(run) => $emit('rejudge', run)"
+          @disqualify="(run) => $emit('disqualify', run)"
+          @filter-changed="
+            (filter, value) => $emit('apply-filter', filter, value)
+          "
         ></omegaup-arena-runs>
+        <omegaup-overlay
+          v-if="user.loggedIn"
+          :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
+          @hide-overlay="onPopupDismissed"
+        >
+          <template #popup>
+            <omegaup-arena-rundetails-popup
+              v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
+              :data="currentRunDetailsData"
+              @dismiss="onPopupDismissed"
+            ></omegaup-arena-rundetails-popup>
+          </template>
+        </omegaup-overlay>
       </div>
       <div
         class="tab-pane fade p-4"
-        v-bind:class="{ 'show active': selectedTab === 'clarifications' }"
+        :class="{ 'show active': selectedTab === 'clarifications' }"
       >
         <omegaup-arena-clarification-list
-          v-bind:clarifications="clarifications"
-          v-bind:in-contest="false"
-          v-on:clarification-response="
-            (id, responseText, isPublic) =>
-              $emit('clarification-response', id, responseText, isPublic)
-          "
-        ></omegaup-arena-clarification-list>
+          :clarifications="currentClarifications"
+          :in-contest="false"
+          :is-admin="true"
+          @clarification-response="onClarificationResponse"
+        >
+          <template #new-clarification><div></div></template>
+          <template #table-title>
+            <th class="text-center" scope="col">{{ T.wordsContest }}</th>
+          </template>
+        </omegaup-arena-clarification-list>
       </div>
     </div>
   </div>
 </template>
 
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-
-table td {
-  padding: 0.5rem;
-}
-
-.karel-js-link {
-  border: 1px solid #eee;
-  border-left: 0;
-  border-radius: 3px;
-
-  a {
-    border-left: 5px solid #1b809e;
-    display: block;
-  }
-}
-</style>
-
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Emit, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_Runs from '../arena/Runs.vue';
-import arena_RunSubmit from '../arena/RunSubmit.vue';
+import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
+import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
 import problem_Solution from './Solution.vue';
-import qualitynomination_Demotion from '../qualitynomination/DemotionPopup.vue';
-import qualitynomination_Promotion from '../qualitynomination/Popup.vue';
-import qualitynomination_QualityReview from '../qualitynomination/ReviewerPopup.vue';
+import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopup.vue';
+import qualitynomination_PromotionPopup from '../qualitynomination/PromotionPopup.vue';
+import qualitynomination_ReviewerPopup from '../qualitynomination/ReviewerPopup.vue';
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
@@ -243,9 +290,18 @@ library.add(
   faExternalLinkAlt,
 );
 
-interface Tab {
+export interface Tab {
   name: string;
   text: string;
+}
+
+export enum PopupDisplayed {
+  None,
+  RunSubmit,
+  RunDetails,
+  Promotion,
+  Demotion,
+  Reviewer,
 }
 
 @Component({
@@ -253,7 +309,8 @@ interface Tab {
     FontAwesomeIcon,
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-runs': arena_Runs,
-    'omegaup-arena-runsubmit': arena_RunSubmit,
+    'omegaup-arena-runsubmit-popup': arena_RunSubmitPopup,
+    'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-arena-solvers': arena_Solvers,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-overlay': omegaup_Overlay,
@@ -261,9 +318,9 @@ interface Tab {
     'omegaup-problem-feedback': problem_Feedback,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
     'omegaup-problem-solution': problem_Solution,
-    'omegaup-quality-nomination-review': qualitynomination_QualityReview,
-    'omegaup-quality-nomination-demotion': qualitynomination_Demotion,
-    'omegaup-quality-nomination-promotion': qualitynomination_Promotion,
+    'omegaup-quality-nomination-reviewer-popup': qualitynomination_ReviewerPopup,
+    'omegaup-quality-nomination-demotion-popup': qualitynomination_DemotionPopup,
+    'omegaup-quality-nomination-promotion-popup': qualitynomination_PromotionPopup,
   },
 })
 export default class ProblemDetails extends Vue {
@@ -273,7 +330,7 @@ export default class ProblemDetails extends Vue {
     },
   })
   allRuns!: types.Run[];
-  @Prop() initialClarifications!: types.Clarification[];
+  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() problem!: types.ProblemInfo;
   @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
@@ -284,19 +341,38 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: 0 }) availableTokens!: number;
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
-  @Prop() showNewRunWindow!: boolean;
+  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
+  @Prop() allowUserAddTags!: boolean;
+  @Prop() levelTags!: string[];
+  @Prop() problemLevel!: string;
+  @Prop() publicTags!: string[];
+  @Prop() selectedPublicTags!: string[];
+  @Prop() selectedPrivateTags!: string[];
+  @Prop() hasBeenNominated!: boolean;
+  @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
+  @Prop({ default: null }) guid!: null | string;
+  @Prop({ default: null }) problemAlias!: null | string;
+  @Prop() isAdmin!: boolean;
+  @Prop({ default: false }) showVisibilityIndicators!: boolean;
+  @Prop() nextSubmissionTimestamp!: null | Date;
+  @Prop({ default: false }) shouldShowTabs!: boolean;
+  @Prop({ default: false }) shouldShowRunDetails!: boolean;
+  @Prop({ default: false }) isContestFinished!: boolean;
+  @Prop({ default: null }) contestAlias!: string | null;
 
+  @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
+
+  PopupDisplayed = PopupDisplayed;
   T = T;
   ui = ui;
   time = time;
   selectedTab = this.activeTab;
-  clarifications = this.initialClarifications || [];
-  showFormRunSubmit = this.showNewRunWindow;
-  showOverlay = this.showNewRunWindow;
+  currentClarifications = this.clarifications;
+  currentPopupDisplayed = this.popupDisplayed;
   hasUnreadClarifications =
-    this.initialClarifications?.length > 0 &&
-    this.activeTab !== 'clarifications';
+    this.clarifications?.length > 0 && this.activeTab !== 'clarifications';
+  currentRunDetailsData = this.runDetailsData;
 
   get availableTabs(): Tab[] {
     const tabs = [
@@ -325,27 +401,187 @@ export default class ProblemDetails extends Vue {
   }
 
   get clarificationsCount(): string {
-    if (this.clarifications.length === 0) return '';
-    return `(${this.clarifications.length})`;
+    if (this.currentClarifications.length === 0) return '';
+    if (this.currentClarifications.length > 9) return '(9+)';
+    return `(${this.currentClarifications.length})`;
+  }
+
+  get visibilityOfPromotionButton(): boolean {
+    return (
+      (this.nominationStatus?.tried || this.nominationStatus?.solved) &&
+      !this.hasBeenNominated
+    );
+  }
+
+  get parsedQualityHistogram(): null | number[] {
+    const qualityHistogram = this.histogram?.qualityHistogram;
+    if (!qualityHistogram) {
+      return null;
+    }
+    return JSON.parse(qualityHistogram);
+  }
+
+  get parsedDifficultyHistogram(): null | number[] {
+    const difficultyHistogram = this.histogram?.difficultyHistogram;
+    if (!difficultyHistogram) {
+      return null;
+    }
+    return JSON.parse(difficultyHistogram);
+  }
+
+  get histogramQuality(): number {
+    return this.histogram?.quality ?? 0;
+  }
+
+  get histogramDifficulty(): number {
+    return this.histogram?.difficulty ?? 0;
   }
 
   onNewSubmission(): void {
     if (!this.user.loggedIn) {
       this.$emit('redirect-login-page');
+      return;
     }
-    this.showOverlay = true;
-    this.showFormRunSubmit = true;
+    this.currentPopupDisplayed = PopupDisplayed.RunSubmit;
+  }
+
+  onRunDetails(guid: string): void {
+    this.$emit('show-run', {
+      request: {
+        guid,
+        isAdmin: this.isAdmin,
+        problemAlias: this.problem.alias,
+      },
+      target: this,
+    });
+    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+  }
+
+  onNewPromotion(): void {
+    if (!this.user.loggedIn) {
+      this.$emit('redirect-login-page');
+      return;
+    }
+    this.currentPopupDisplayed = PopupDisplayed.Promotion;
+  }
+
+  onNewPromotionAsReviewer(): void {
+    this.currentPopupDisplayed = PopupDisplayed.Reviewer;
+  }
+
+  onReportInappropriateProblem(): void {
+    this.currentPopupDisplayed = PopupDisplayed.Demotion;
   }
 
   onPopupDismissed(): void {
-    this.showOverlay = false;
-    this.showFormRunSubmit = false;
+    this.currentPopupDisplayed = PopupDisplayed.None;
     this.$emit('update:activeTab', this.selectedTab);
   }
 
-  onRunSubmitted(code: string, selectedLanguage: string): void {
-    this.$emit('submit-run', code, selectedLanguage);
+  onPopupPromotionDismissed(
+    qualityPromotionComponent: qualitynomination_PromotionPopup,
+    isDismissed: boolean,
+  ): void {
     this.onPopupDismissed();
+    this.$emit('dismiss-promotion', qualityPromotionComponent, isDismissed);
+  }
+
+  onProblemRendered(): void {
+    // TODO: We should probably refactor how the Markdown component is handled,
+    // one for problems (with MathJax and the problem-specific logic) and another
+    // for all other uses.
+    //
+    // It might be better for all of these things, plus the Markdown templating
+    // system altogether to be replaced by the Markdown Vue component be able
+    // to inject Vue components into the DOM after it's being rendered, so that
+    // all the templating and interactivity can be handled by Vue instead of by
+    // JavaScript.
+    const libinteractiveInterfaceNameElement = this.statementMarkdown.$el.querySelector(
+      'span.libinteractive-interface-name',
+    ) as HTMLElement;
+    if (
+      libinteractiveInterfaceNameElement &&
+      this.problem.settings?.interactive?.module_name
+    ) {
+      libinteractiveInterfaceNameElement.innerText = this.problem.settings.interactive.module_name.replace(
+        /\.idl$/,
+        '',
+      );
+    }
+
+    const outputOnlyDownloadElement = this.statementMarkdown.$el.querySelector(
+      '.output-only-download a',
+    );
+    if (outputOnlyDownloadElement) {
+      outputOnlyDownloadElement.setAttribute(
+        'href',
+        `/probleminput/${this.problem.alias}/${this.problem.commit}/${this.problem.alias}-input.zip`,
+      );
+    }
+
+    const libinteractiveDownloadFormElement = this.statementMarkdown.$el.querySelector(
+      '.libinteractive-download form',
+    ) as HTMLElement;
+    if (libinteractiveDownloadFormElement) {
+      libinteractiveDownloadFormElement.addEventListener(
+        'submit',
+        (e: Event) => {
+          e.preventDefault();
+
+          const form = e.target as HTMLElement;
+          const alias = this.problem.alias;
+          const commit = this.problem.commit;
+          const os = (form.querySelector('.download-os') as HTMLInputElement)
+            ?.value;
+          const lang = (form.querySelector(
+            '.download-lang',
+          ) as HTMLInputElement)?.value;
+          const extension = os == 'unix' ? '.tar.bz2' : '.zip';
+
+          ui.navigateTo(
+            `${window.location.protocol}//${window.location.host}/templates/${alias}/${commit}/${alias}_${os}_${lang}${extension}`,
+          );
+        },
+      );
+    }
+
+    const libinteractiveDownloadLangElement = this.statementMarkdown.$el.querySelector(
+      '.libinteractive-download .download-lang',
+    ) as HTMLSelectElement;
+    if (libinteractiveDownloadLangElement) {
+      libinteractiveDownloadLangElement.addEventListener(
+        'change',
+        (e: Event) => {
+          let form = e.target as HTMLElement;
+          while (!form.classList.contains('libinteractive-download')) {
+            if (!form.parentElement) {
+              return;
+            }
+            form = form.parentElement;
+          }
+          (form.querySelector(
+            '.libinteractive-extension',
+          ) as HTMLElement).innerText = libinteractiveDownloadLangElement.value;
+        },
+      );
+    }
+  }
+
+  onRunSubmitted(code: string, selectedLanguage: string): void {
+    this.$emit('submit-run', {
+      code,
+      language: selectedLanguage,
+      runs: this.runs,
+      nominationStatus: this.nominationStatus,
+    });
+    this.onPopupDismissed();
+  }
+
+  onClarificationResponse(response: types.Clarification): void {
+    this.$emit('clarification-response', {
+      clarification: response,
+      target: this,
+    });
   }
 
   @Emit('update:activeTab')
@@ -357,21 +593,66 @@ export default class ProblemDetails extends Vue {
     return this.selectedTab;
   }
 
-  @Watch('initialClarifications')
-  onInitialClarificationsChanged(newValue: types.Clarification[]): void {
-    this.clarifications = newValue;
-  }
-
-  @Watch('showNewRunWindow')
-  onShowNewRunWindowChanged(newValue: boolean): void {
-    if (!newValue) return;
-    this.onNewSubmission();
-  }
-
   @Watch('clarifications')
+  onInitialClarificationsChanged(newValue: types.Clarification[]): void {
+    this.currentClarifications = newValue;
+  }
+
+  @Watch('popupDisplayed')
+  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
+    this.currentPopupDisplayed = newValue;
+    if (newValue === PopupDisplayed.None) return;
+    if (newValue === PopupDisplayed.RunSubmit) {
+      this.onNewSubmission();
+      return;
+    }
+    if (newValue === PopupDisplayed.Promotion) {
+      ui.reportEvent('quality-nomination', 'shown');
+      return;
+    }
+    if (newValue === PopupDisplayed.RunDetails && this.guid) {
+      this.onRunDetails(this.guid);
+    }
+  }
+
+  @Watch('currentClarifications')
   onClarificationsChanged(newValue: types.Clarification[]): void {
     if (this.selectedTab === 'clarifications' || newValue.length === 0) return;
     this.hasUnreadClarifications = true;
   }
+
+  @Watch('shouldShowRunDetails')
+  onShouldShowRunDetailsChanged(newValue: boolean): void {
+    if (newValue && this.guid) {
+      this.$emit('show-run', {
+        request: {
+          guid: this.guid,
+          isAdmin: this.isAdmin,
+          problemAlias: this.currentRunDetailsData?.alias,
+        },
+        target: this,
+      });
+    }
+  }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+table td {
+  padding: 0.5rem;
+}
+
+.karel-js-link {
+  border: 1px solid var(--arena-problem-details-karel-link-border-color);
+  border-left: 0;
+  border-radius: 3px;
+
+  a {
+    border-left: 5px solid
+      var(--arena-problem-details-karel-link-border-left-color);
+    display: block;
+  }
+}
+</style>

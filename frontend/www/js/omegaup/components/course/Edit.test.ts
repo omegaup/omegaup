@@ -1,10 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
 
-import T from '../../lang';
-import { omegaup } from '../../omegaup';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import course_Edit from './Edit.vue';
 
@@ -16,10 +12,11 @@ describe('Edit.vue', () => {
     const courseName = 'Test course';
     const wrapper = shallowMount(course_Edit, {
       propsData: {
-        data: <types.CourseEditPayload>{
+        data: {
           course: {
             admission_mode: 'registration',
             alias: 'test-course',
+            archived: false,
             assignments: [
               {
                 problemset_id: 1,
@@ -36,6 +33,7 @@ describe('Edit.vue', () => {
                 assignment_type: 'test',
               },
             ],
+            clarifications: [],
             needs_basic_information: false,
             description: '# Test',
             finish_time: undefined,
@@ -50,6 +48,7 @@ describe('Edit.vue', () => {
             student_count: 1,
             unlimited_duration: false,
           },
+          allLanguages: { kp: 'Karel Pascal', kj: 'Karel Java' },
           assignmentProblems: [],
           selectedAssignment: undefined,
           students: [],
@@ -57,7 +56,7 @@ describe('Edit.vue', () => {
           admins: [],
           groupsAdmins: [],
           tags: [],
-        },
+        } as types.CourseEditPayload,
         initialTab: 'course',
       },
     });
@@ -71,5 +70,6 @@ describe('Edit.vue', () => {
     await wrapper.find('a[data-tab-admins]').trigger('click');
     await wrapper.find('a[data-tab-clone]').trigger('click');
     await wrapper.find('a[data-tab-course]').trigger('click');
+    await wrapper.find('a[data-tab-archive]').trigger('click');
   });
 });

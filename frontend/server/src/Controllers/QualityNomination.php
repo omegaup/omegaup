@@ -203,6 +203,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTagAnalysisOfRecurrences',
         'problemTagUnformattedInputAndOutput',
         'problemTagFileSeeking',
+        'problemTagLinearSearch',
+        'problemTagSetsMultisets',
+        'problemTagMapsMultimaps',
     ];
 
     const LEVEL_TAGS = [
@@ -633,9 +636,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         // Validate request
         $r->ensureMainUserIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
         /**
@@ -648,7 +651,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'contents'
             );
         }
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -674,7 +677,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param bool|null $all
-     * @omegaup-request-param null|string $problem_alias
+     * @omegaup-request-param string $problem_alias
      * @omegaup-request-param int $qualitynomination_id
      * @omegaup-request-param string $rationale
      * @omegaup-request-param 'banned'|'open'|'resolved'|'warning' $status
@@ -715,9 +718,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             return ['status' => 'ok'];
         }
 
-        \OmegaUp\Validators::validateValidAlias(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         if (is_null($qualitynomination->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -782,7 +785,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $problemParams = new \OmegaUp\ProblemParams([
             'visibility' => $newProblemVisibility,
-            'problem_alias' => $r['problem_alias'],
+            'problem_alias' => $problemAlias,
         ], /*$isRequired=*/ false);
 
         try {
@@ -859,7 +862,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'email' => $email,
             'name' => $username,
         ] = $adminUser;
-        $user = \OmegaUp\DAO\Identities::findByUsernameOrName($username)[0];
+        $user = \OmegaUp\DAO\Identities::findByUsername($username);
+        if (is_null($user)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
 
         $emailParams = [
             'reason' => htmlspecialchars($rationale),
@@ -1246,7 +1252,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param int $qualitynomination_id
      */
-    public static function getDetailsForSmarty(
+    public static function getDetailsForTypeScript(
         \OmegaUp\Request $r
     ): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -1279,7 +1285,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
-    public static function getListForSmarty(\OmegaUp\Request $r): array {
+    public static function getListForTypeScript(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
@@ -1318,7 +1324,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
-    public static function getMyListForSmarty(\OmegaUp\Request $r): array {
+    public static function getMyListForTypeScript(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();

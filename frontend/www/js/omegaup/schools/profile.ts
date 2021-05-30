@@ -17,8 +17,11 @@ OmegaUp.on('ready', () => {
       `${solvedProblemsCount.year}-${solvedProblemsCount.month}`,
   );
 
-  const schoolProfile = new Vue({
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-school-profile': school_Profile,
+    },
     render: function (createElement) {
       return createElement('omegaup-school-profile', {
         props: {
@@ -69,9 +72,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    components: {
-      'omegaup-school-profile': school_Profile,
     },
   });
 });

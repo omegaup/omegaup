@@ -5,9 +5,10 @@ namespace OmegaUp\DAO;
 /**
  * Users Data Access Object (DAO).
  *
- * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link \OmegaUp\DAO\VO\Users}.
- * @author alanboy
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Users}.
+ *
  * @access public
  * @package docs
  */
@@ -151,6 +152,67 @@ class Users extends \OmegaUp\DAO\Base\Users {
         $user['birth_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
             $user['birth_date']
         );
+
+        return $user;
+    }
+
+    /**
+     * @return array{classname: string, country_id: string, email: null|string}
+     */
+    final public static function getBasicProfileDataByPk(?int $userId): array {
+        if (is_null($userId)) {
+            return [
+                'classname' => 'user-rank-unranked',
+                'country_id' => 'xx',
+                'email' => null,
+            ];
+        }
+        $sql = 'SELECT
+                    IFNULL(i.`country_id`, "xx") AS country_id,
+                    e.`email`,
+                    IFNULL(
+                        (
+                            SELECT urc.classname FROM
+                                User_Rank_Cutoffs urc
+                            WHERE
+                                urc.score <= (
+                                        SELECT
+                                            ur.score
+                                        FROM
+                                            User_Rank ur
+                                        WHERE
+                                            ur.user_id = i.user_id
+                                    )
+                            ORDER BY
+                                urc.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        \'user-rank-unranked\'
+                    ) AS classname
+                FROM
+                    Users u
+                INNER JOIN
+                    Identities i ON u.main_identity_id = i.identity_id
+                LEFT JOIN
+                    Emails e ON u.main_email_id = e.email_id
+                WHERE
+                    u.`user_id` = ?
+                LIMIT
+                    1;';
+        /** @var array{classname: string, country_id: string, email: null|string}|null */
+        $user = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$userId]
+        );
+
+        if (is_null($user)) {
+            return [
+                'classname' => 'user-rank-unranked',
+                'country_id' => 'xx',
+                'email' => null,
+            ];
+        }
 
         return $user;
     }

@@ -1,40 +1,30 @@
 <template>
-  <div class="card panel panel-default">
-    <div class="card-header panel-heading">
-      <h4 class="card-title panel-title">
-        {{ title }}
+  <div class="card">
+    <div v-if="!isProfile" class="card-header">
+      <h4 class="card-title">
+        {{ T.omegaupTitleBadges }}
         <span class="badge badge-secondary">{{ badges.length }} </span>
       </h4>
     </div>
-    <div class="card-body panel-body">
+    <div class="card-body">
       <div class="container-fluid">
         <div class="row">
           <omegaup-badge
-            v-bind:badge="badge"
-            v-bind:key="idx"
             v-for="(badge, idx) in badges"
+            :key="idx"
+            :badge="badge"
           ></omegaup-badge>
         </div>
       </div>
     </div>
-    <div class="card-footer panel-footer" v-if="this.showAllBadgesLink">
-      <a
-        class="badges-link"
-        href="/badge/list/"
-        v-if="this.showAllBadgesLink"
-        >{{ T.wordsBadgesSeeAll }}</a
-      >
+    <div v-if="showAllBadgesLink" class="card-footer">
+      <a v-if="showAllBadgesLink" class="badges-link" href="/badge/list/">{{
+        T.wordsBadgesSeeAll
+      }}</a>
     </div>
     <div v-show="!badges"><img src="/media/wait.gif" /></div>
   </div>
 </template>
-
-<style>
-a.badges-link {
-  color: #337ab7;
-  font-size: 1rem;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -53,6 +43,7 @@ export default class BadgeList extends Vue {
   @Prop() showAllBadgesLink!: boolean;
 
   T = T;
+  isProfile = this.showAllBadgesLink;
 
   get badges(): types.Badge[] {
     return Array.from(this.allBadges)
@@ -74,14 +65,16 @@ export default class BadgeList extends Vue {
       });
   }
 
-  get title(): string {
-    return this.showAllBadgesLink
-      ? T.wordsBadgesObtained
-      : T.omegaupTitleBadges;
-  }
-
   getBadgeName(alias: string): string {
     return T[`badge_${alias}_name`];
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+a.badges-link {
+  color: var(--badges-link-font-color);
+  font-size: 1rem;
+}
+</style>

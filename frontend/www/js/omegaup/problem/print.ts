@@ -1,16 +1,19 @@
 import Vue from 'vue';
 
-import { types } from '../api_types';
+import type { types } from '../api_types';
 
 import omegaup_Markdown from '../components/Markdown.vue';
 
 (() => {
-  const problemDetails = <types.ProblemDetails>(
-    JSON.parse((<HTMLElement>document.getElementById('payload')).innerText)
-  );
+  const problemDetails = JSON.parse(
+    (document.getElementById('payload') as HTMLElement).innerText,
+  ) as types.ProblemDetails;
 
-  const contestIntro = new Vue({
-    el: <HTMLElement>document.querySelector('div.statement'),
+  new Vue({
+    el: document.querySelector('div.statement') as HTMLElement,
+    components: {
+      'omegaup-markdown': omegaup_Markdown,
+    },
     render: function (createElement) {
       return createElement('omegaup-markdown', {
         props: {
@@ -20,9 +23,6 @@ import omegaup_Markdown from '../components/Markdown.vue';
           problemSettings: problemDetails.settings,
         },
       });
-    },
-    components: {
-      'omegaup-markdown': omegaup_Markdown,
     },
   });
 })();

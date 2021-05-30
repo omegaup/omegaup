@@ -2,8 +2,6 @@
 
 /**
  * ContestCreateTest
- *
- * @author joemmanuel
  */
 
 class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
@@ -132,6 +130,26 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    public function testCreateContestWithInvalidAlias() {
+        // Create a valid contest Request object
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest();
+        $r = $contestData['request'];
+        $contestDirector = $contestData['director'];
+
+        $r['alias'] = 'blank spaces not allowed';
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($contestDirector);
+        $r['auth_token'] = $login->auth_token;
+
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
+    }
+
     /**
      * Public contest without problems is not valid.
      */
@@ -185,11 +203,8 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
-                'contestMustBeCreatedInPrivateMode',
-                $e->getMessage()
-            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('cannotAddProb', $e->getMessage());
         }
     }
 
@@ -221,7 +236,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('problemIsPrivate', $e->getMessage());
+            $this->assertEquals('cannotAddProb', $e->getMessage());
         }
     }
 

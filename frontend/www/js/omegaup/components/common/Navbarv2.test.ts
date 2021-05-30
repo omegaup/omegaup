@@ -1,29 +1,8 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
-import * as ui from '../../ui';
 
 import common_Navbarv2 from './Navbarv2.vue';
-
-const baseNavbarProps = {
-  currentUsername: 'user',
-  errorMessage: null,
-  graderInfo: null,
-  graderQueueLength: -1,
-  gravatarURL51:
-    'https://secure.gravatar.com/avatar/568c0ec2147500d7cd09cc8bbc8e5ec4?s=51',
-  inContest: true,
-  initialClarifications: [],
-  isAdmin: false,
-  isLoggedIn: true,
-  isMainUserIdentity: true,
-  isReviewer: false,
-  lockDownImage: 'data:image/png;base64...',
-  navbarSection: '',
-  omegaUpLockDown: false,
-};
 
 describe('Navbarv2.vue', () => {
   it('Should handle empty navbar (in contest only)', async () => {
@@ -36,7 +15,7 @@ describe('Navbarv2.vue', () => {
         gravatarURL51:
           'https://secure.gravatar.com/avatar/568c0ec2147500d7cd09cc8bbc8e5ec4?s=51',
         inContest: true,
-        initialClarifications: [],
+        clarifications: [],
         isAdmin: false,
         isLoggedIn: true,
         isMainUserIdentity: true,
@@ -44,6 +23,7 @@ describe('Navbarv2.vue', () => {
         lockDownImage: 'data:image/png;base64...',
         navbarSection: '',
         omegaUpLockDown: false,
+        allIdentities: [{ username: 'user', default: true }],
       },
     });
 
@@ -63,7 +43,7 @@ describe('Navbarv2.vue', () => {
         gravatarURL51:
           'https://secure.gravatar.com/avatar/568c0ec2147500d7cd09cc8bbc8e5ec4?s=51',
         inContest: false,
-        initialClarifications: [],
+        clarifications: [],
         isAdmin: false,
         isLoggedIn: true,
         isMainUserIdentity: true,
@@ -71,6 +51,7 @@ describe('Navbarv2.vue', () => {
         lockDownImage: 'data:image/png;base64...',
         navbarSection: '',
         omegaUpLockDown: false,
+        associatedIdentities: [{ username: 'user', default: true }],
       },
     });
 
@@ -90,7 +71,7 @@ describe('Navbarv2.vue', () => {
         gravatarURL51:
           'https://secure.gravatar.com/avatar/568c0ec2147500d7cd09cc8bbc8e5ec4?s=51',
         inContest: false,
-        initialClarifications: [],
+        clarifications: [],
         isAdmin: false,
         isLoggedIn: false,
         isMainUserIdentity: true,
@@ -98,6 +79,7 @@ describe('Navbarv2.vue', () => {
         lockDownImage: 'data:image/png;base64...',
         navbarSection: '',
         omegaUpLockDown: false,
+        associatedIdentities: [{ username: 'user', default: true }],
       },
     });
 

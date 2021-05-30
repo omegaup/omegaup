@@ -7,9 +7,9 @@
       <h4 v-if="!includeUser && submissions.length > 0">
         {{ T.wordsBy }}
         <omegaup-username
-          v-bind:username="submissions[0].username"
-          v-bind:classname="submissions[0].classname"
-          v-bind:linkify="true"
+          :username="submissions[0].username"
+          :classname="submissions[0].classname"
+          :linkify="true"
         ></omegaup-username>
       </h4>
     </div>
@@ -22,20 +22,18 @@
           })
         }}
       </h5>
-      <div class="card-body" v-if="includeUser">
+      <div v-if="includeUser" class="card-body">
         <label
           ><omegaup-autocomplete
-            class="form-control"
-            v-bind:init="(el) => typeahead.userTypeahead(el)"
             v-model="searchedUsername"
+            class="form-control"
+            :init="(el) => typeahead.userTypeahead(el)"
           ></omegaup-autocomplete
         ></label>
         <a
           class="btn btn-primary"
           type="button"
-          v-bind:href="`/submissions/${encodeURIComponent(
-            this.searchedUsername,
-          )}/`"
+          :href="`/submissions/${encodeURIComponent(searchedUsername)}/`"
         >
           {{ T.searchUser }}
         </a>
@@ -45,12 +43,12 @@
           <thead>
             <tr>
               <th scope="col" class="text-center">{{ T.wordsTime }}</th>
-              <th scope="col" class="text-center" v-if="includeUser">
+              <th v-if="includeUser" scope="col" class="text-center">
                 {{ T.wordsUser }}
               </th>
               <th scope="col" class="text-center">{{ T.wordsProblem }}</th>
               <th
-                v-bind:class="{ 'fixed-width-column': includeUser }"
+                :class="{ 'fixed-width-column': includeUser }"
                 class="text-center"
                 scope="col"
               >
@@ -64,33 +62,33 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-bind:key="index" v-for="(submission, index) in submissions">
+            <tr v-for="(submission, index) in submissions" :key="index">
               <td class="text-center">
                 {{ time.formatDateTime(submission.time) }}
               </td>
-              <td class="text-center" v-if="includeUser">
+              <td v-if="includeUser" class="text-center">
                 <omegaup-username
-                  v-bind:username="submission.username"
-                  v-bind:classname="submission.classname"
-                  v-bind:linkify="true"
+                  :username="submission.username"
+                  :classname="submission.classname"
+                  :linkify="true"
                 >
                 </omegaup-username>
                 <br />
                 <a
                   class="school-text"
-                  v-bind:href="`/schools/profile/${submission.school_id}/`"
+                  :href="`/schools/profile/${submission.school_id}/`"
                   >{{ submission.school_name }}</a
                 >
               </td>
               <td class="text-center">
-                <a v-bind:href="`/arena/problem/${submission.alias}/`">{{
+                <a :href="`/arena/problem/${submission.alias}/`">{{
                   submission.title
                 }}</a>
               </td>
               <td class="text-center">{{ submission.language }}</td>
               <td
                 class="text-center verdict"
-                v-bind:class="`verdict-${submission.verdict}`"
+                :class="`verdict-${submission.verdict}`"
               >
                 {{ T[`verdict${submission.verdict}`] }}
               </td>
@@ -123,38 +121,12 @@
       </div>
       <div class="card-footer">
         <omegaup-common-paginator
-          v-bind:pagerItems="pagerItems"
+          :pager-items="pagerItems"
         ></omegaup-common-paginator>
       </div>
     </div>
   </div>
 </template>
-
-<style>
-table.submissions-table > tbody > tr > td {
-  vertical-align: middle;
-}
-.verdict-AC {
-  background: #cf6;
-}
-
-.verdict-CE {
-  background: #f90;
-}
-
-.verdict-JE,
-.verdict-VE {
-  background: #f00;
-}
-
-.school-text {
-  font-size: 0.9em;
-}
-
-.fixed-width-column {
-  width: 180px;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -197,3 +169,31 @@ export default class SubmissionsList extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+table.submissions-table > tbody > tr > td {
+  vertical-align: middle;
+}
+
+.verdict-AC {
+  background: var(--arena-submissions-list-verdict-ac-background-color);
+}
+
+.verdict-CE {
+  background: --arena-submissions-list-verdict-ce-background-color;
+}
+
+.verdict-JE,
+.verdict-VE {
+  background: var(--arena-submissions-list-verdict-je-ve-background-color);
+}
+
+.school-text {
+  font-size: 0.9em;
+}
+
+.fixed-width-column {
+  width: 180px;
+}
+</style>

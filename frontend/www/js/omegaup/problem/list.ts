@@ -2,14 +2,12 @@ import Vue from 'vue';
 import problem_List from '../components/problem/List.vue';
 import { types } from '../api_types';
 import { omegaup, OmegaUp } from '../omegaup';
-import T from '../lang';
-import * as api from '../api';
 import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemListPayload();
   const queryString = window.location.search;
-  let sortOrder = 'desc';
+  let sortOrder: omegaup.SortOrder = omegaup.SortOrder.Descending;
   let columnName = 'problem_id';
   let language = 'all';
   let query = '';
@@ -18,7 +16,10 @@ OmegaUp.on('ready', () => {
     if (urlParams.get('sort_order')) {
       const sortOrderParam = urlParams.get('sort_order');
       if (sortOrderParam) {
-        sortOrder = sortOrderParam;
+        sortOrder =
+          sortOrderParam === 'desc'
+            ? omegaup.SortOrder.Descending
+            : omegaup.SortOrder.Ascending;
       }
     }
     if (urlParams.get('order_by')) {
@@ -40,14 +41,17 @@ OmegaUp.on('ready', () => {
       }
     }
   }
-  const problemsList = new Vue({
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-problem-list': problem_List,
+    },
     render: function (createElement) {
       return createElement('omegaup-problem-list', {
         props: {
           problems: payload.problems,
           loggedIn: payload.loggedIn,
-          currentTags: payload.currentTags,
+          selectedTags: payload.selectedTags,
           pagerItems: payload.pagerItems,
           wizardTags: payload.tagData,
           language: payload.language,
@@ -79,9 +83,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    components: {
-      'omegaup-problem-list': problem_List,
     },
   });
 });

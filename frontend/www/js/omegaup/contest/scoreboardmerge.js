@@ -1,5 +1,5 @@
 import contest_ScoreboardMerge from '../components/contest/ScoreboardMerge.vue';
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import T from '../lang';
 import * as ui from '../ui';
 import * as api from '../api';
@@ -36,7 +36,8 @@ OmegaUp.on('ready', function () {
                   }
                   // Fill scoreboard object
                   for (const index in ranking) {
-                    if (!ranking.hasOwnProperty(index)) continue;
+                    if (!Object.prototype.hasOwnProperty.call(ranking, index))
+                      continue;
                     const place = parseInt(index) + 1;
                     const entry = ranking[index];
                     scoreboard.push({

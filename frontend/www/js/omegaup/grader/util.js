@@ -3,7 +3,7 @@ export function vuexGet(store, name) {
   var o = store.state;
   for (let p of name.split('.')) {
     if (typeof o === 'undefined') return undefined;
-    if (!o.hasOwnProperty(p)) return undefined;
+    if (!Object.prototype.hasOwnProperty.call(o, p)) return undefined;
     o = o[p];
   }
   return o;

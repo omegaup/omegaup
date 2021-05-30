@@ -2,8 +2,6 @@
 
 /**
  * Description of ProblemUpdateTest
- *
- * @author joemmanuel
  */
 
 class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
@@ -2087,7 +2085,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Login API
         $login = self::login($problemData['author']);
 
-        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem' => $problemData['request']['problem_alias'],
@@ -2109,7 +2107,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
 
         // Updating more than one statement at the same time
-        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem' => $problemData['request']['problem_alias'],

@@ -1,9 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import course_Details from './Details.vue';
 
@@ -12,10 +10,12 @@ describe('Details.vue', () => {
     const courseName = 'Test course';
     const wrapper = shallowMount(course_Details, {
       propsData: {
-        course: <types.CourseDetails>{
+        course: {
           admission_mode: 'registration',
           alias: 'test-course',
+          archived: false,
           assignments: [],
+          clarifications: [],
           needs_basic_information: false,
           description: '# Test',
           finish_time: new Date(),
@@ -29,8 +29,8 @@ describe('Details.vue', () => {
           start_time: new Date(),
           student_count: 1,
           unlimited_duration: false,
-        },
-        progress: <types.AssignmentProgress>{},
+        } as types.CourseDetails,
+        progress: {} as types.AssignmentProgress,
       },
     });
 
@@ -47,10 +47,12 @@ describe('Details.vue', () => {
     const courseName = 'Test course';
     const wrapper = shallowMount(course_Details, {
       propsData: {
-        course: <types.CourseDetails>{
+        course: {
           admission_mode: 'registration',
           alias: 'test-course',
+          archived: false,
           assignments: [],
+          clarifications: [],
           needs_basic_information: false,
           description: '# Test',
           finish_time: new Date(),
@@ -64,8 +66,8 @@ describe('Details.vue', () => {
           start_time: new Date(),
           student_count: 1,
           unlimited_duration: false,
-        },
-        progress: <types.AssignmentProgress>{},
+        } as types.CourseDetails,
+        progress: {} as types.AssignmentProgress,
       },
     });
 
@@ -80,9 +82,10 @@ describe('Details.vue', () => {
     const courseName = 'Test course';
     const wrapper = shallowMount(course_Details, {
       propsData: {
-        course: <types.CourseDetails>{
+        course: {
           admission_mode: 'public',
           alias: 'test-course',
+          archived: false,
           assignments: [
             {
               alias: 'test-assignment',
@@ -99,6 +102,7 @@ describe('Details.vue', () => {
               problemset_id: 0,
             },
           ],
+          clarifications: [],
           needs_basic_information: false,
           description: '# Test',
           finish_time: undefined,
@@ -112,13 +116,13 @@ describe('Details.vue', () => {
           start_time: new Date(),
           student_count: 1,
           unlimited_duration: true,
-        },
-        progress: <types.AssignmentProgress>{
-          'test-assignment': <types.Progress>{
+        } as types.CourseDetails,
+        progress: {
+          'test-assignment': {
             score: 0,
             max_score: 1,
-          },
-        },
+          } as types.Progress,
+        } as types.AssignmentProgress,
       },
     });
 

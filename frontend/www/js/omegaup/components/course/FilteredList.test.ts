@@ -1,17 +1,14 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import course_FilteredList from './FilteredList.vue';
 
 const noop = () => {};
 const baseFilteredCoursesListProps = {
   activeTab: 'past',
-  courses: <types.CoursesByAccessMode>{
+  courses: {
     accessMode: 'public',
     activeTab: 'current',
     filteredCourses: {
@@ -24,6 +21,7 @@ const baseFilteredCoursesListProps = {
               lesson: 2,
               test: 1,
             },
+            description: 'Test description',
             finish_time: null,
             name: 'Curso de introducción',
             start_time: new Date(),
@@ -34,6 +32,7 @@ const baseFilteredCoursesListProps = {
           {
             alias: 'cpluplus',
             counts: {},
+            description: 'Test description',
             finish_time: new Date(),
             name: 'Introducción a C++',
             start_time: new Date(),
@@ -49,7 +48,7 @@ const baseFilteredCoursesListProps = {
         timeType: 'past',
       },
     },
-  },
+  } as types.CoursesByAccessMode,
 };
 Object.defineProperty(window, 'scrollTo', { value: noop, writable: true });
 

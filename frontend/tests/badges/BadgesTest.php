@@ -2,8 +2,6 @@
 
 /**
  * Test to ensure that all the badges are in the correct format.
- *
- * @author carlosabcs
  */
 class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
     private static function getSortedExpectedResults(array $expected): array {
@@ -123,7 +121,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
      */
     public function testBadge(string $badgeAlias) {
         $this->assertTrue(
-            \OmegaUp\Validators::isValidAlias($badgeAlias),
+            \OmegaUp\Validators::alias($badgeAlias),
             'The alias for this badge is invalid.'
         );
 
@@ -342,7 +340,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
             )
         );
 
-        $smartyResult = \OmegaUp\Controllers\Badge::getDetailsForSmarty(new \OmegaUp\Request([
+        $smartyResult = \OmegaUp\Controllers\Badge::getDetailsForTypeScript(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'badge_alias' => 'problemSetter'
         ]));

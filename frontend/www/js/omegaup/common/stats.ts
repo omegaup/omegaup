@@ -30,9 +30,10 @@ OmegaUp.on('ready', () => {
   };
 
   const normalizeRunCounts = (stats: types.StatsPayload) => {
-    let result = [];
+    const result = [];
     for (const verdict in stats.verdict_counts) {
-      if (!stats.verdict_counts.hasOwnProperty(verdict)) continue;
+      if (!Object.prototype.hasOwnProperty.call(stats.verdict_counts, verdict))
+        continue;
       if (verdict === 'NO-AC') continue;
       if (verdict === 'AC') {
         result.push({
@@ -71,33 +72,12 @@ OmegaUp.on('ready', () => {
     return categoriesDistributionValues;
   };
 
-  let statsChart = new Vue({
+  const statsChart = new Vue({
     el: '#main-container',
-    render: function (createElement) {
-      return createElement('omegaup-common-stats', {
-        props: {
-          stats: this.stats,
-          verdictChartOptions: this.verdictChartOptions,
-          distributionChartOptions: this.distributionChartOptions,
-          pendingChartOptions: this.pendingChartOptions,
-        },
-        on: {
-          'update-series': (series: types.StatsPayload): void => {
-            statsChart.verdictChartOptions.series[0].data = normalizeRunCounts(
-              series,
-            );
-            statsChart.distributionChartOptions.series[0].data = getDistribution(
-              series,
-            );
-            statsChart.distributionChartOptions.xAxis.categories = getCategories(
-              series,
-            );
-            statsChart.stats.pending_runs = series.pending_runs;
-          },
-        },
-      });
+    components: {
+      'omegaup-common-stats': common_Stats,
     },
-    data: {
+    data: () => ({
       stats: payload,
       verdictChartOptions: {
         chart: {
@@ -165,7 +145,7 @@ OmegaUp.on('ready', () => {
           events: {
             load: (ev: Event): void => {
               // set up the updating of the chart each second
-              const series = (<Highcharts.Chart>(ev.target as unknown))
+              const series = ((ev.target as unknown) as Highcharts.Chart)
                 .series[0];
               setInterval(() => {
                 const x = new Date().getTime(), // current time
@@ -205,9 +185,30 @@ OmegaUp.on('ready', () => {
           useUTC: true,
         },
       },
-    },
-    components: {
-      'omegaup-common-stats': common_Stats,
+    }),
+    render: function (createElement) {
+      return createElement('omegaup-common-stats', {
+        props: {
+          stats: this.stats,
+          verdictChartOptions: this.verdictChartOptions,
+          distributionChartOptions: this.distributionChartOptions,
+          pendingChartOptions: this.pendingChartOptions,
+        },
+        on: {
+          'update-series': (series: types.StatsPayload): void => {
+            statsChart.verdictChartOptions.series[0].data = normalizeRunCounts(
+              series,
+            );
+            statsChart.distributionChartOptions.series[0].data = getDistribution(
+              series,
+            );
+            statsChart.distributionChartOptions.xAxis.categories = getCategories(
+              series,
+            );
+            statsChart.stats.pending_runs = series.pending_runs;
+          },
+        },
+      });
     },
   });
 

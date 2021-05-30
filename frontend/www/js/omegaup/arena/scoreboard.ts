@@ -1,15 +1,15 @@
 import * as api from '../api';
 import { types } from '../api_types';
-import { Arena } from './arena';
+import { Arena, ArenaOptions } from './arena';
 import { OmegaUp } from '../omegaup';
 import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
   const headerPayload = types.payloadParsers.CommonPayload('header-payload');
-  const params = /\/arena\/([^\/]+)\/scoreboard\/([^\/]+)\/?/.exec(
+  const params = /\/arena\/([^/]+)\/scoreboard\/([^/]+)\/?/.exec(
     window.location.pathname,
   );
-  const options = {
+  const options: ArenaOptions = {
     // There is no UI to show clarifications with scoreboard-only views.
     disableClarifications: true,
     contestAlias: params?.[1] ?? null,
@@ -22,9 +22,6 @@ OmegaUp.on('ready', () => {
     disableSockets: false,
     isInterview: false,
     isLockdownMode: false,
-    isOnlyProblem: false,
-    isPractice: false,
-    onlyProblemAlias: null,
     originalContestAlias: null,
     preferredLanguage: null,
     problemsetAdmin: false,

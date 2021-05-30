@@ -1,4 +1,4 @@
-import expect from 'expect';
+jest.mock('../../../third_party/js/diff_match_patch.js');
 
 import * as arena from './arena';
 import ArenaAdmin from './admin_arena';
@@ -6,7 +6,7 @@ import { OmegaUp } from '../omegaup';
 
 describe('arena', () => {
   describe('ArenaAdmin', () => {
-    before(() => {
+    beforeEach(() => {
       // Create the mountpoint for the arena.Runs component.
       const runsDiv = document.createElement('div');
       runsDiv.id = 'runs';
@@ -24,7 +24,7 @@ describe('arena', () => {
       const options = arena.GetDefaultOptions();
 
       const arenaInstance = new arena.Arena(options);
-      const adminInstance = new ArenaAdmin(arenaInstance);
+      new ArenaAdmin(arenaInstance);
       expect(arenaInstance.problemsetAdmin).toEqual(true);
     });
   });

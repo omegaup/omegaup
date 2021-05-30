@@ -4,10 +4,11 @@ namespace OmegaUp;
 
 /**
  * Conjunto de validadores genéricos
- *
- * @author joemmanuel
  */
 class Validators {
+    // The maximum length for aliases.
+    const ALIAS_MAX_LENGTH = 32;
+
     /**
      * Check if email is valid
      */
@@ -129,70 +130,106 @@ class Validators {
     }
 
     /**
-     * @param mixed $parameter
-     * @param string $parameterName
-     * @param bool $required
-     * @psalm-assert string $parameter
-     */
-    public static function validateValidAlias(
-        $parameter,
-        string $parameterName,
-        bool $required = true
-    ): void {
-        if (!self::isPresent($parameter, $parameterName, $required)) {
-            return;
-        }
-
-        if (
-            !is_string($parameter) ||
-            empty($parameter) ||
-            strlen($parameter) > 32
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidAlias',
-                $parameterName
-            );
-        }
-        if (self::isRestrictedAlias($parameter)) {
-            $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                'aliasInUse'
-            );
-            $exception->addCustomMessageToArray('parameter', $parameterName);
-            throw $exception;
-        }
-        if (!self::isValidAlias($parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidAlias',
-                $parameterName
-            );
-        }
-    }
-
-    /**
-     * Returns whether the alias is valid and is not a restricted alias.
+     * Checks whether the string parameter is of a certain length.
      *
-     * @param string $alias
-     * @return boolean
+     * @param string   $parameter the parameter
+     * @param int|null $minLength the (optional) minimum length
+     * @param int|null $maxLength the (optional) maximum length
+     *
+     * @return true when the parameter's length is within the specified bounds.
      */
-    public static function isValidAlias(string $alias): bool {
-        return preg_match(
-            '/^[a-zA-Z0-9_-]+$/',
-            $alias
-        ) === 1 && !self::isRestrictedAlias(
-            $alias
-        );
+    public static function stringOfLengthInRange(
+        string $parameter,
+        ?int $minLength,
+        ?int $maxLength
+    ): bool {
+        if (!is_null($minLength) && strlen($parameter) < $minLength) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterStringTooShort',
+                /*$parameter=*/null,
+                ['min_length' => strval($minLength)]
+            );
+        }
+        if (!is_null($maxLength) && strlen($parameter) > $maxLength) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterStringTooLong',
+                /*$parameter=*/null,
+                ['max_length' => strval($maxLength)]
+            );
+        }
+        return true;
     }
 
     /**
      * Returns whether the alias is valid.
+     * The form of namespaced alias is: "namespace:alias"
      *
      * @param string $alias
      * @return boolean
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
-    public static function alias(string $alias): bool {
-        return \OmegaUp\Validators::isValidAlias($alias);
+    public static function namespacedAlias(string $alias): bool {
+        return (
+            preg_match('/^(?:[a-zA-Z0-9_-]+:)?[a-zA-Z0-9_-]+$/', $alias) === 1
+            && !self::isRestrictedAlias($alias)
+            && strlen($alias) <= Validators::ALIAS_MAX_LENGTH
+        );
+    }
+
+    /**
+     * Returns whether the alias is valid.
+     *
+     * @return boolean
+     */
+    public static function alias(
+        string $alias,
+        int $maxLength = Validators::ALIAS_MAX_LENGTH
+    ): bool {
+        return (
+            preg_match('/^[a-zA-Z0-9_-]+$/', $alias) === 1
+            && !self::isRestrictedAlias($alias)
+            && strlen($alias) <= $maxLength
+        );
+    }
+
+    /**
+     * Returns whether the username or email is valid.
+     *
+     * @param string $usernameOrEmail
+     * @return boolean
+     */
+    public static function usernameOrEmail(string $usernameOrEmail): bool {
+        return (
+            self::email($usernameOrEmail)
+            || self::normalUsername($usernameOrEmail)
+            || self::identityUsername($usernameOrEmail)
+        );
+    }
+
+    /**
+     * Returns whether the username is valid.
+     *
+     * @param string $username
+     * @return boolean
+     */
+    public static function normalUsername(string $username): bool {
+        return preg_match('/^[a-zA-Z0-9_.-]+$/', $username) !== 0;
+    }
+
+    /**
+     * Returns whether the username of an identity is valid.
+     *
+     * @param string $username
+     * @return boolean
+     */
+    public static function identityUsername(string $username): bool {
+        return (
+            preg_match(
+                '/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/',
+                $username
+            ) !== 0
+        );
     }
 
     /**
@@ -204,44 +241,6 @@ class Validators {
     public static function isRestrictedAlias(string $alias): bool {
         $restrictedAliases = ['new', 'admin', 'problem', 'list', 'mine', 'omegaup', 'collection'];
         return in_array(strtolower($alias), $restrictedAliases);
-    }
-
-    /**
-     * Enforces namespaced alias (of the form "namespace:alias").
-     *
-     * @param mixed $parameter
-     * @param string $parameterName
-     * @psalm-assert string $parameter
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
-     */
-    public static function validateValidNamespacedAlias(
-        $parameter,
-        string $parameterName
-    ): void {
-        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
-            return;
-        }
-        if (
-            !is_string($parameter) ||
-            strlen($parameter) < 2 ||
-            strlen($parameter) > 32
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidAlias',
-                $parameterName
-            );
-        }
-        if (self::isRestrictedAlias($parameter)) {
-            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                'aliasInUse'
-            );
-        }
-        if (!preg_match('/^(?:[a-zA-Z0-9_-]+:)?[a-zA-Z0-9_-]+$/', $parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidAlias',
-                $parameterName
-            );
-        }
     }
 
     /**

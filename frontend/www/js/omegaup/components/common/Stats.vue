@@ -5,9 +5,9 @@
       <div class="total-runs">
         {{ totalRuns }}
       </div>
-      <highcharts v-bind:options="verdictChartOptions"></highcharts>
-      <highcharts v-bind:options="distributionChartOptions"></highcharts>
-      <highcharts v-bind:options="pendingChartOptions"></highcharts>
+      <highcharts :options="verdictChartOptions"></highcharts>
+      <highcharts :options="distributionChartOptions"></highcharts>
+      <highcharts :options="pendingChartOptions"></highcharts>
     </div>
   </div>
 </template>

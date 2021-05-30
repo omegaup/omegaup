@@ -137,7 +137,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $details = \OmegaUp\Controllers\Course::getCourseAdminDetailsForSmarty(
+        $details = \OmegaUp\Controllers\Course::getCourseAdminDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],
@@ -164,7 +164,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Student tries to access into the course in admin mode
         try {
-            \OmegaUp\Controllers\Course::getCourseAdminDetailsForSmarty(
+            \OmegaUp\Controllers\Course::getCourseAdminDetailsForTypeScript(
                 new \OmegaUp\Request([
                     'auth_token' => $userLogin->auth_token,
                     'course_alias' => $courseData['course_alias'],
@@ -190,7 +190,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         $addedAdminLogin = self::login($identity);
 
         // Now, user is able to access into a course in admin mode
-        $details = \OmegaUp\Controllers\Course::getCourseAdminDetailsForSmarty(
+        $details = \OmegaUp\Controllers\Course::getCourseAdminDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $addedAdminLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],

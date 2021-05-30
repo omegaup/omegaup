@@ -2,8 +2,6 @@
 
 /**
  * Testing synchronization between User and Identity
- *
- * @author juan.pablo
  */
 class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
     /**
@@ -93,8 +91,9 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
         $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
             $r['auth_token']
-        );
+        )['loginIdentity'];
         unset($identityDb['classname']);
+        unset($identityDb['acting_identity_id']);
         $identityDb = new \OmegaUp\DAO\VO\Identities($identityDb);
         $graduationDate = null;
         if (!is_null($identityDb->current_identity_school_id)) {
@@ -142,8 +141,9 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
         $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
             $r['auth_token']
-        );
+        )['loginIdentity'];
         unset($identityDb['classname']);
+        unset($identityDb['acting_identity_id']);
         $identityDb = new \OmegaUp\DAO\VO\Identities($identityDb);
         $graduationDate = null;
         if (!is_null($identityDb->current_identity_school_id)) {
@@ -203,7 +203,7 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
         $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
             $r['auth_token']
-        );
+        )['loginIdentity'];
 
         // Getting identity data from db
         $identity = \OmegaUp\DAO\Identities::getByPK($userDb->main_identity_id);

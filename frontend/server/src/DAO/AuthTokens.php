@@ -9,7 +9,9 @@ namespace OmegaUp\DAO;
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\AuthTokens}.
  *
- * @author alanboy
+ * @psalm-type IdentityExt=array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}
+ * @psalm-type AuthIdentityExt=array{currentIdentity: IdentityExt, loginIdentity: IdentityExt}
+ *
  * @access public
  * @package docs
  */
@@ -37,11 +39,12 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
     }
 
     /**
-     * @return array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null
+     * @return AuthIdentityExt|null
      */
     public static function getIdentityByToken(string $authToken) {
-        $sql = 'SELECT
+        $sql = "SELECT
                     i.*,
+                    aut.identity_id = i.identity_id AS `is_main_identity`,
                     IFNULL(
                         (
                             SELECT `urc`.`classname` FROM
@@ -60,21 +63,60 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
                             LIMIT
                                 1
                         ),
-                        "user-rank-unranked"
+                        'user-rank-unranked'
                     ) `classname`
                 FROM
-                    `Identities` i
+                    `Auth_Tokens` aut
                 INNER JOIN
-                    `Auth_Tokens` at
+                    `Identities` i
                 ON
-                    at.identity_id = i.identity_id
+                    i.identity_id IN (aut.identity_id, aut.acting_identity_id)
                 WHERE
-                    at.token = ?;';
-        /** @var array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+                    aut.token = ?
+                ORDER BY
+                    `is_main_identity` DESC;";
+        /** @var list<array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, is_main_identity: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$authToken]
         );
+        if (empty($rs)) {
+            return null;
+        }
+        if (count($rs) === 1) {
+            unset($rs[0]['is_main_identity']);
+            return [
+                'currentIdentity' => $rs[0],
+                'loginIdentity' => $rs[0],
+            ];
+        }
+        $currentIdentity = array_pop($rs);
+        $loginIdentity = array_pop($rs);
+        unset($currentIdentity['is_main_identity']);
+        unset($loginIdentity['is_main_identity']);
+
+        return [
+            'currentIdentity' => $currentIdentity,
+            'loginIdentity' => $loginIdentity,
+        ];
+    }
+
+    public static function updateActingIdentityId(
+        string $token,
+        int $actingIdentityId
+    ): int {
+        $sql = 'UPDATE
+                    `Auth_Tokens`
+                SET
+                    `acting_identity_id` = ?
+                WHERE
+                    token = ?;';
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$actingIdentityId, $token]
+        );
+
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     public static function expireAuthTokens(int $identity_id): int {
@@ -97,7 +139,7 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
                     `Auth_Tokens` at
                 WHERE
                     at.identity_id = ?;';
-        /** @var list<array{create_time: \OmegaUp\Timestamp, identity_id: int, token: string, user_id: int|null}> */
+        /** @var list<array{acting_identity_id: int|null, create_time: \OmegaUp\Timestamp, identity_id: int, token: string, user_id: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId]

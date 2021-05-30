@@ -3,21 +3,18 @@
     <h3 class="col-12 mb-3 display-4">{{ title }}</h3>
     <div
       class="p-3 col-md-6 mt-2 mt-md-0"
-      v-bind:class="{ 'order-md-2': imageToRight }"
+      :class="{ 'order-md-2': imageToRight }"
     >
-      <img class="img-fluid" v-bind:src="imageSrc" />
+      <img class="img-fluid" :src="imageSrc" />
     </div>
-    <div
-      class="col-md-6 mt-2 mt-md-0"
-      v-bind:class="{ 'order-md-1': imageToRight }"
-    >
+    <div class="col-md-6 mt-2 mt-md-0" :class="{ 'order-md-1': imageToRight }">
       <p class="section-description">{{ description }}</p>
       <a
         v-for="(button, index) in buttons"
-        v-bind:key="index"
+        :key="index"
         class="btn btn-primary section-link mx-2 mb-3"
         role="button"
-        v-bind:href="button.href"
+        :href="button.href"
       >
         {{ button.text }}
       </a>
@@ -25,8 +22,25 @@
   </div>
 </template>
 
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+
+@Component
+export default class Homepage extends Vue {
+  @Prop() title!: string;
+  @Prop() description!: string;
+  @Prop() buttons!: {
+    text: string;
+    href: string;
+  }[];
+  @Prop() imageSrc!: string;
+  @Prop({ default: false }) imageToRight!: boolean;
+}
+</script>
+
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
+
 h3.display-4 {
   color: $omegaup-primary--darker;
   font-weight: normal;
@@ -45,19 +59,3 @@ a.section-link {
   color: $omegaup-white;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-
-@Component
-export default class Homepage extends Vue {
-  @Prop() title!: string;
-  @Prop() description!: string;
-  @Prop() buttons!: {
-    text: string;
-    href: string;
-  }[];
-  @Prop() imageSrc!: string;
-  @Prop({ default: false }) imageToRight!: boolean;
-}
-</script>

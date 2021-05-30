@@ -2,8 +2,6 @@
 
 /**
  * Tests for apiCreate and apiBulkCreate in IdentityController
- *
- * @author juan.pablo
  */
 
 class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
@@ -233,6 +231,60 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $creatorLogin->auth_token,
             'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                 'identities.csv',
+                $group['group']->alias,
+            ),
+            'group_alias' => $group['group']->alias,
+        ]));
+        $originalResponse = \OmegaUp\Controllers\Group::apiMembers(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $group['group']->alias,
+            ])
+        );
+        $this->assertCount(5, $originalResponse['identities']);
+
+        // Call api again, names should have changed
+        \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                'identities_updated.csv',
+                $group['group']->alias,
+            ),
+            'group_alias' => $group['group']->alias,
+        ]));
+        $updatedResponse = \OmegaUp\Controllers\Group::apiMembers(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $group['group']->alias,
+            ])
+        );
+        $this->assertCount(6, $updatedResponse['identities']);
+        $this->assertNotEquals(
+            $originalResponse['identities'],
+            $updatedResponse['identities']
+        );
+    }
+
+    public function testRemoveIdentitiesFromGroupAndAddThemAgain() {
+        // Identity creator group member will upload csv file
+        [
+           'user' => $creator,
+           'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                'identities.csv',
                 $group['group']->alias
             ),
             'group_alias' => $group['group']->alias,
@@ -265,6 +317,39 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $originalResponse['identities'],
             $updatedResponse['identities']
         );
+
+        // Now, we are going to remove all identities from the group
+        foreach ($updatedResponse['identities'] as $identity) {
+            \OmegaUp\Controllers\Group::apiRemoveUser(new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'usernameOrEmail' => $identity['username'],
+                'group_alias' => $group['group']->alias
+            ]));
+        }
+        $removedMembers = \OmegaUp\Controllers\Group::apiMembers(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $group['group']->alias,
+            ])
+        );
+        $this->assertEmpty($removedMembers['identities']);
+
+        // Call api again, identities should appear in the group again
+        \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                'identities.csv',
+                $group['group']->alias
+            ),
+            'group_alias' => $group['group']->alias,
+        ]));
+        $updatedMembers = \OmegaUp\Controllers\Group::apiMembers(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $group['group']->alias,
+            ])
+        );
+        $this->assertCount(5, $updatedMembers['identities']);
     }
 
     /**
@@ -328,8 +413,46 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Should not have allowed bulk user creation');
-        } catch (\OmegaUp\Exceptions\DatabaseOperationException $e) {
-            // OK.
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'parameterInvalidStateDoesNotBelongToCountry',
+                $e->getMessage()
+            );
+        }
+    }
+
+    public function testUploadCsvFileWithEmptyCountryAndSelectedState() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        try {
+            // Call api using identity creator group team member
+            $response = \OmegaUp\Controllers\Identity::apiBulkCreate(
+                new \OmegaUp\Request([
+                    'auth_token' => $creatorLogin->auth_token,
+                    'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                        'identities_wrong_state_id.csv',
+                        $group['group']->alias
+                    ),
+                    'group_alias' => $group['group']->alias,
+                ])
+            );
+            $this->fail('Should not have allowed bulk user creation');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'parameterInvalidStateNeedsToBelongToCountry',
+                $e->getMessage()
+            );
         }
     }
 

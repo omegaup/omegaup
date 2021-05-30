@@ -107,6 +107,36 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
+    public static function resolveAssociatedIdentity(
+        string $usernameOrEmail,
+        \OmegaUp\DAO\VO\Identities $currentIdentity
+    ): ?\OmegaUp\DAO\VO\Identities {
+        if (is_null($currentIdentity->user_id)) {
+            return null;
+        }
+        $sql = 'SELECT
+                    i.*
+                FROM
+                    Identities i
+                INNER JOIN
+                    Emails e
+                ON
+                    e.user_id = i.user_id
+                WHERE
+                    i.user_id = ?
+                    AND (i.username = ? OR e.email = ?)
+                LIMIT 1;';
+        $args = [$currentIdentity->user_id, $usernameOrEmail, $usernameOrEmail];
+
+        /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null $rs */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
+        if (is_null($rs)) {
+            return null;
+        }
+
+        return new \OmegaUp\DAO\VO\Identities($rs);
+    }
+
     public static function savePassword(\OmegaUp\DAO\VO\Identities $identities): int {
         $sql = '
             UPDATE
@@ -126,12 +156,13 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return null|array{within_last_day: bool, verified: bool, username: string, last_login: \OmegaUp\Timestamp|null}
+     * @return array{birth_date: \OmegaUp\Timestamp|null, last_login: \OmegaUp\Timestamp|null, username: string, verified: bool, within_last_day: bool}|null
      */
     public static function getExtraInformation(string $email): ?array {
         $sql = 'SELECT
                   u.reset_sent_at,
                   u.verified,
+                  u.birth_date,
                   IFNULL(i.username, "") AS `username`,
                   (
                     SELECT
@@ -157,7 +188,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                   u.user_id DESC
                 LIMIT
                   0, 1';
-        /** @var array{last_login: \OmegaUp\Timestamp|null, reset_sent_at: \OmegaUp\Timestamp|null, username: string, verified: bool}|null */
+        /** @var array{birth_date: null|string, last_login: \OmegaUp\Timestamp|null, reset_sent_at: \OmegaUp\Timestamp|null, username: string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$email]);
         if (empty($rs)) {
             return null;
@@ -171,6 +202,9 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             ),
             'verified' => $rs['verified'] == 1,
             'username' => $rs['username'],
+            'birth_date' => \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+                $rs['birth_date']
+            ),
             'last_login' => $rs['last_login'],
         ];
     }
@@ -330,7 +364,12 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     /**
      * @return list<array{username: string, default: bool}>
      */
-    public static function getAssociatedIdentities(int $userId): array {
+    public static function getAssociatedIdentities(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): array {
+        if (is_null($identity->user_id)) {
+            return [];
+        }
         $sql = '
             SELECT
                 i.username,
@@ -347,7 +386,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 ';
 
         /** @var list<array{identity_id: int, main_identity_id: int|null, username: string}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$identity->user_id]
+        );
         $result = [];
         foreach ($rs as $identity) {
             $result[] = [

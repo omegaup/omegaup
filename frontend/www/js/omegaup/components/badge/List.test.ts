@@ -1,5 +1,4 @@
-import { shallowMount, mount } from '@vue/test-utils';
-import expect from 'expect';
+import { shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
 import badge_List from './List.vue';
@@ -10,8 +9,8 @@ describe('List.vue', () => {
     const wrapper = shallowMount(badge_List, {
       propsData: {
         showAllBadgesLink: true,
-        allBadges: <Set<string>>new Set([badgeAlias]),
-        visitorBadges: <Set<string>>new Set([badgeAlias]),
+        allBadges: new Set([badgeAlias]) as Set<string>,
+        visitorBadges: new Set([badgeAlias]) as Set<string>,
       },
     });
     expect(wrapper.find('.badges-link').text()).toBe(T.wordsBadgesSeeAll);

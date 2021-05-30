@@ -7,7 +7,7 @@ body {
 // darle focus.
 .nav-tabs.nav-justified > li > a:hover,
 .nav-tabs.nav-justified > li > a:focus {
-  background-color: #FFFFFF;
+  background-color: #fff;
 }
 
 // Clase para quitar el padding de algn contenedor o div tag
@@ -35,7 +35,7 @@ body {
 // navegación. Si agregamos un elemento invisible del alto del navbar, todo
 // cuadra de nuevo.
 :target::before {
-  content: "";
+  content: '';
   display: block;
   height: 51px;
   margin: -51px 0 0;
@@ -51,12 +51,16 @@ body {
   top: 61px;
   width: 100%;
 }
+
 /* FIXME: TODO LO ANTERIOR DEBE IRSE CON BS3 */
 
+/* stylelint-disable-next-line no-descending-specificity */
 a {
   color: $omegaup-links;
   text-decoration: none;
   transition: color 0.1 ease;
+
+  /* stylelint-disable-next-line no-descending-specificity */
   &:hover {
     color: $omegaup-links--hover;
     text-decoration: none;
@@ -70,6 +74,18 @@ a.card-header-help {
     color: $omegaup-links--hover;
     text-decoration: none;
   }
+}
+
+pre > code {
+  padding: 9.5px;
+  margin: 0 0 10px;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: fit-content;
+  display: block;
 }
 
 .empty-table-message {

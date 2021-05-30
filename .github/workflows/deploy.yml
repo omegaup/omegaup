@@ -3,12 +3,12 @@ name: Deploy
 on:
   push:
     branches:
-      - master
+      - main
       - release
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v2
@@ -30,6 +30,7 @@ jobs:
           tar --xz --create --file "${TARBALL}" -C frontend/www js/dist css/dist media/dist
           AWS_ACCESS_KEY_ID=${{ secrets.AWS_BUILD_ARTIFACTS_ACCESS_KEY_ID }} \
           AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_BUILD_ARTIFACTS_SECRET_ACCESS_KEY }} \
+          AWS_REGION=us-east-1 \
             aws s3 cp \
             "${TARBALL}" \
             "s3://omegaup-build-artifacts/webpack-artifacts/${{ github.sha }}.tar.xz"

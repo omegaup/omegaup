@@ -2,8 +2,6 @@
 
 /**
  * Description of Problem With Extra Information
- *
- * @author juan.pablo
  */
 
 class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
@@ -21,13 +19,13 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         $r = new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
         ]);
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             $r
         )['smartyProperties'];
 
-        $this->assertFalse($result['payload']['user']['logged_in']);
-        $this->assertFalse($result['karel_problem']);
-        $this->assertFalse($result['problem_admin']);
+        $this->assertFalse($result['payload']['user']['loggedIn']);
+        $this->assertFalse($result['payload']['problem']['karel_problem']);
+        $this->assertFalse($result['payload']['user']['admin']);
 
         // Normal user is able to see the problem.
         [
@@ -36,13 +34,13 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         ] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             $r
         )['smartyProperties'];
 
-        $this->assertTrue($result['payload']['user']['logged_in']);
-        $this->assertFalse($result['karel_problem']);
-        $this->assertFalse($result['problem_admin']);
+        $this->assertTrue($result['payload']['user']['loggedIn']);
+        $this->assertFalse($result['payload']['problem']['karel_problem']);
+        $this->assertFalse($result['payload']['user']['admin']);
     }
 
     public function testQualityPayload() {
@@ -54,17 +52,17 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($identity);
 
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
             ])
         )['smartyProperties'];
-        $payload = $result['quality_payload'];
+        $payload = $result['payload']['nominationStatus'];
         $this->assertFalse($payload['nominated']);
-        $this->assertFalse($payload['nominatedBeforeAC']);
+        $this->assertFalse($payload['nominatedBeforeAc']);
         $this->assertFalse($payload['dismissed']);
-        $this->assertFalse($payload['dismissedBeforeAC']);
+        $this->assertFalse($payload['dismissedBeforeAc']);
         $this->assertFalse($payload['tried']);
         $this->assertFalse($payload['solved']);
 
@@ -75,17 +73,17 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA', 60);
         $login = self::login($identity);
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
             ])
         )['smartyProperties'];
-        $payload = $result['quality_payload'];
+        $payload = $result['payload']['nominationStatus'];
         $this->assertFalse($payload['nominated']);
-        $this->assertFalse($payload['nominatedBeforeAC']);
+        $this->assertFalse($payload['nominatedBeforeAc']);
         $this->assertFalse($payload['dismissed']);
-        $this->assertFalse($payload['dismissedBeforeAC']);
+        $this->assertFalse($payload['dismissedBeforeAc']);
         $this->assertTrue($payload['tried']);
         $this->assertFalse($payload['solved']);
 
@@ -98,17 +96,17 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'contents' => json_encode(['before_ac' => true]),
             ])
         );
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
             ])
         )['smartyProperties'];
-        $payload = $result['quality_payload'];
+        $payload = $result['payload']['nominationStatus'];
         $this->assertFalse($payload['nominated']);
-        $this->assertFalse($payload['nominatedBeforeAC']);
+        $this->assertFalse($payload['nominatedBeforeAc']);
         $this->assertFalse($payload['dismissed']);
-        $this->assertTrue($payload['dismissedBeforeAC']);
+        $this->assertTrue($payload['dismissedBeforeAc']);
         $this->assertTrue($payload['tried']);
         $this->assertFalse($payload['solved']);
 
@@ -128,13 +126,13 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'contents' => json_encode([]),
             ])
         );
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
             ])
         )['smartyProperties'];
-        $payload = $result['quality_payload'];
+        $payload = $result['payload']['nominationStatus'];
         $this->assertFalse($payload['nominated']);
         $this->assertTrue($payload['dismissed']);
         $this->assertTrue($payload['tried']);
@@ -151,13 +149,13 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 ]),
             ])
         );
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
             ])
         )['smartyProperties'];
-        $payload = $result['quality_payload'];
+        $payload = $result['payload']['nominationStatus'];
         $this->assertTrue($payload['nominated']);
         $this->assertTrue($payload['dismissed']);
         $this->assertTrue($payload['tried']);
@@ -176,7 +174,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Problem author should get the problem as unlocked
         $login = self::login($problemData['author']);
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
@@ -184,7 +182,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties'];
         $this->assertEquals(
             \OmegaUp\Controllers\Problem::SOLUTION_UNLOCKED,
-            $result['payload']['solution_status']
+            $result['payload']['solutionStatus']
         );
 
         // Normal user should see the problem as locked
@@ -193,7 +191,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
             'identity' => $identity,
         ] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
@@ -201,7 +199,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties'];
         $this->assertEquals(
             \OmegaUp\Controllers\Problem::SOLUTION_LOCKED,
-            $result['payload']['solution_status']
+            $result['payload']['solutionStatus']
         );
 
         // Problem with no solutions should return NOT_FOUND
@@ -210,7 +208,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'imagetest.zip',
             ])
         );
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForTypeScript(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
@@ -218,7 +216,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties'];
         $this->assertEquals(
             \OmegaUp\Controllers\Problem::SOLUTION_NOT_FOUND,
-            $result['payload']['solution_status']
+            $result['payload']['solutionStatus']
         );
     }
 }

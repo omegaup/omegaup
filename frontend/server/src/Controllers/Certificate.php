@@ -13,7 +13,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $uuid
      */
-    public static function getDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getDetailsForTypeScript(\OmegaUp\Request $r) {
         return [
             'smartyProperties' => [
                 'payload' => [

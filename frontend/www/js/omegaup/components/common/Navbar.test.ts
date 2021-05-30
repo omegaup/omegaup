@@ -1,9 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
-import * as ui from '../../ui';
 
 import common_Navbar from './Navbar.vue';
 
@@ -18,7 +15,7 @@ describe('Navbar.vue', () => {
         gravatarURL51:
           'https://secure.gravatar.com/avatar/568c0ec2147500d7cd09cc8bbc8e5ec4?s=51',
         inContest: true,
-        initialClarifications: [],
+        clarifications: [],
         isAdmin: false,
         isLoggedIn: true,
         isMainUserIdentity: true,
@@ -26,6 +23,7 @@ describe('Navbar.vue', () => {
         lockDownImage: 'data:image/png;base64...',
         navbarSection: '',
         omegaUpLockDown: false,
+        allIdentities: [{ username: 'user', default: true }],
       },
     });
 
@@ -45,7 +43,7 @@ describe('Navbar.vue', () => {
         gravatarURL51:
           'https://secure.gravatar.com/avatar/568c0ec2147500d7cd09cc8bbc8e5ec4?s=51',
         inContest: false,
-        initialClarifications: [],
+        clarifications: [],
         isAdmin: false,
         isLoggedIn: true,
         isMainUserIdentity: true,
@@ -53,6 +51,7 @@ describe('Navbar.vue', () => {
         lockDownImage: 'data:image/png;base64...',
         navbarSection: '',
         omegaUpLockDown: false,
+        associatedIdentities: [{ username: 'user', default: true }],
       },
     });
 
@@ -72,7 +71,7 @@ describe('Navbar.vue', () => {
         gravatarURL51:
           'https://secure.gravatar.com/avatar/568c0ec2147500d7cd09cc8bbc8e5ec4?s=51',
         inContest: false,
-        initialClarifications: [],
+        clarifications: [],
         isAdmin: false,
         isLoggedIn: false,
         isMainUserIdentity: true,
@@ -80,6 +79,7 @@ describe('Navbar.vue', () => {
         lockDownImage: 'data:image/png;base64...',
         navbarSection: '',
         omegaUpLockDown: false,
+        associatedIdentities: [{ username: 'user', default: true }],
       },
     });
 

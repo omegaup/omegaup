@@ -1,11 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
-import T from '../../lang';
 import { omegaup } from '../../omegaup';
 
 import course_StudentProgress from './StudentProgress.vue';
 import { types } from '../../api_types';
+import * as ui from '../../ui';
+import T from '../../lang';
 
 describe('StudentProgress.vue', () => {
   it('Should handle scores', async () => {
@@ -14,7 +13,7 @@ describe('StudentProgress.vue', () => {
         course: {
           alias: 'hello',
         },
-        assignment: <omegaup.Assignment[]>[
+        assignments: [
           {
             alias: 'assignment',
             assignment_type: 'homework',
@@ -25,10 +24,12 @@ describe('StudentProgress.vue', () => {
             order: 1,
             scoreboard_url: '',
             scoreboard_url_admin: '',
+            max_points: 200,
           } as omegaup.Assignment,
-        ],
-        student: <types.StudentProgress>{
+        ] as omegaup.Assignment[],
+        student: {
           name: 'student',
+          classname: 'user-rank-unranked',
           points: {
             ['assignment']: {
               ['problem1']: 100,
@@ -38,22 +39,30 @@ describe('StudentProgress.vue', () => {
           progress: {
             ['assignment']: {
               ['problem1']: 55,
-              ['problem2']: 44,
+              ['problem2']: 45,
             },
           },
           score: {
             ['assignment']: {
               ['problem1']: 55,
-              ['problem2']: 44,
+              ['problem2']: 45,
             },
           },
           username: 'student',
+        } as types.StudentProgress,
+        problemTitles: {
+          problem1: 'Problem 1',
+          problem2: 'Problem 2',
         },
       },
     });
-    expect(wrapper.find('div.bg-yellow'));
-    expect(wrapper.find('div.bg-red'));
-    expect(wrapper.find('div[title="55%"]'));
-    expect(wrapper.find('div[title="44%"]'));
+    expect(wrapper.find('div.bg-yellow').exists()).toBe(true);
+    expect(wrapper.find('div.bg-red').exists()).toBe(true);
+    expect(wrapper.find('td[data-global-score]').text()).toBe(
+      '50% ' +
+        ui.formatString(T.studentProgressDescriptionTotalPoints, {
+          points: 100,
+        }),
+    );
   });
 });

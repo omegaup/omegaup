@@ -1,97 +1,146 @@
 <template>
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-sm-10">
-        <div class="omegaup-course-viewprogress card">
-          <div class="card-header">
-            <h2>
-              <a v-bind:href="courseUrl">{{ course.name }}</a>
-            </h2>
-          </div>
-          <div class="card-body table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th class="text-center">{{ T.wordsName }}</th>
-                  <th
-                    v-bind:key="assignment.alias"
-                    class="score text-center"
-                    v-for="assignment in assignments"
-                  >
-                    {{ assignment.name }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <omegaup-student-progress
-                  v-for="student in students"
-                  v-bind:key="student.username"
-                  v-bind:student="student"
-                  v-bind:assignments="assignments"
-                  v-bind:course="course"
+  <div class="row">
+    <div class="col-lg-10 mb-3">
+      <div class="card">
+        <h2 class="card-header">
+          <a :href="courseUrl">{{ course.name }}</a>
+        </h2>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="text-center align-middle">
+                  <span>
+                    {{ T.wordsName }}
+                    <omegaup-common-sort-controls
+                      column="student"
+                      :sort-order="sortOrder"
+                      :column-name="columnName"
+                      @apply-filter="onApplyFilter"
+                    ></omegaup-common-sort-controls>
+                  </span>
+                </th>
+                <th
+                  v-for="assignment in assignments"
+                  :key="assignment.alias"
+                  class="score text-center align-middle"
                 >
-                </omegaup-student-progress>
-              </tbody>
-            </table>
-          </div>
+                  <span>
+                    {{ assignment.name }}
+                    <span class="d-block">
+                      {{ getTotalPointsByAssignment(assignment) }}
+                      <a
+                        v-if="assignment.max_points === 0"
+                        data-toggle="tooltip"
+                        rel="tooltip"
+                        :title="T.studentProgressOnlyLecturesDescription"
+                        ><img src="/media/question.png"
+                      /></a>
+                    </span>
+                  </span>
+                </th>
+                <th class="text-center align-middle">
+                  <span>
+                    {{ T.courseProgressGlobalScore }}
+                    <span class="d-block">{{
+                      getTotalPointsByCourse(assignments)
+                    }}</span>
+                    <omegaup-common-sort-controls
+                      column="total"
+                      :sort-order="sortOrder"
+                      :column-name="columnName"
+                      @apply-filter="onApplyFilter"
+                    ></omegaup-common-sort-controls>
+                  </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <omegaup-course-student-progress
+                v-for="student in orderedStudents"
+                :key="student.username"
+                :student="student"
+                :assignments="assignments"
+                :course="course"
+                :problem-titles="problemTitles"
+                :column-name="columnName"
+                :sort-order="sortOrder"
+                @apply-filter="onApplyFilter"
+              >
+              </omegaup-course-student-progress>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer">
+          <omegaup-common-paginator
+            :pager-items="pagerItems"
+          ></omegaup-common-paginator>
         </div>
       </div>
-      <div class="col-sm-2">
-        <div class="card sticky-top sticky-offset">
-          <div class="card-header p-1">
-            <p class="card-title text-sm-center mb-1">
-              {{ T.courseStudentsProgressExportToSpreadsheet }}
-            </p>
-          </div>
-          <div class="card-body">
-            <a
-              class="btn btn-primary btn-sm mr-1"
-              v-bind:download="csvFilename"
-              v-bind:href="csvDataUrl"
-              >.csv</a
-            >
-            <a
-              class="btn btn-primary btn-sm"
-              v-bind:download="odsFilename"
-              v-bind:href="odsDataUrl"
-              >.ods</a
-            >
-          </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card sticky-top sticky-offset">
+        <div class="card-header p-1">
+          <p class="card-title text-sm-center mb-1">
+            {{ T.courseStudentsProgressExportToSpreadsheet }}
+          </p>
+        </div>
+        <div class="card-body">
+          <a
+            class="btn btn-primary btn-sm w-100 my-1"
+            :download="csvFilename"
+            :href="csvDataUrl"
+            >.csv</a
+          >
+          <a
+            class="btn btn-primary btn-sm w-100 my-1"
+            :download="odsFilename"
+            :href="odsDataUrl"
+            >.ods</a
+          >
         </div>
       </div>
     </div>
   </div>
-  <!-- panel -->
 </template>
 
-<style>
-.panel-body {
-  overflow: auto;
-  white-space: nowrap;
-}
-.sticky-offset {
-  top: 4rem;
-}
-</style>
-
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 import AsyncComputedPlugin from 'vue-async-computed';
 import AsyncComputed from 'vue-async-computed-decorator';
 import JSZip from 'jszip';
-import StudentProgress from './StudentProgress.vue';
+import common_SortControls from '../common/SortControls.vue';
+import course_StudentProgress from './StudentProgress.vue';
+import common_Paginator from '../common/Paginatorv2.vue';
 
 Vue.use(AsyncComputedPlugin);
 
-function escapeCsv(cell: any): string {
-  if (typeof cell === 'undefined') {
+class Percentage {
+  value: number;
+
+  constructor(value: number) {
+    this.value = value;
+  }
+
+  toString() {
+    return `${(this.value * 100).toFixed(2)}%`;
+  }
+}
+
+type TableCell = undefined | null | number | string | Percentage;
+
+export function escapeCsv(cell: TableCell): string {
+  if (typeof cell === 'undefined' || cell === null) {
     return '';
   }
-  if (typeof cell === 'number') {
-    cell = Math.round(cell);
+  if (cell instanceof Percentage) {
+    cell = cell.toString();
+  } else if (typeof cell === 'number') {
+    cell = cell.toFixed(2);
   }
   if (typeof cell !== 'string') {
     cell = JSON.stringify(cell);
@@ -106,9 +155,9 @@ function escapeCsv(cell: any): string {
   return '"' + cell.replace('"', '""') + '"';
 }
 
-function escapeXml(str: string): string {
-  if (str === null) return '';
-  return str
+export function escapeXml(cell: TableCell): string {
+  if (typeof cell !== 'string') return '';
+  return cell
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -116,32 +165,27 @@ function escapeXml(str: string): string {
     .replace(/"/g, '&quot;');
 }
 
-function toCsv(table: string[][]): string {
+export function toCsv(table: TableCell[][]): string {
   return table.map((row) => row.map(escapeCsv).join(',')).join('\r\n');
 }
 
-function toOds(courseName: string, table: string[][]): string {
-  let result = '<table:table table:name="' + escapeXml(courseName) + '">\n';
-  result +=
-    '<table:table-column table:number-columns-repeated="' +
-    table[0].length +
-    '"/>\n';
-  for (let row of table) {
+export function toOds(courseName: string, table: TableCell[][]): string {
+  let result = `<table:table table:name="${escapeXml(courseName)}">\n`;
+  result += `<table:table-column table:number-columns-repeated="${table[0].length}"/>\n`;
+  for (const row of table) {
     result += '<table:table-row>\n';
-    for (let cell of row) {
-      if (typeof cell === 'number') {
-        let num: number = cell;
-        result +=
-          '<table:table-cell office:value-type="float" office:value="' +
-          cell +
-          '"><text:p>' +
-          num.toPrecision(2) +
-          '</text:p></table:table-cell>';
+    for (const cell of row) {
+      if (cell instanceof Percentage) {
+        result += `<table:table-cell office:value-type="percentage" office:value="${cell.value}"><text:p>${cell}</text:p></table:table-cell>`;
+      } else if (typeof cell === 'number') {
+        const num: number = cell;
+        result += `<table:table-cell office:value-type="float" office:value="${num}"><text:p>${num.toPrecision(
+          2,
+        )}</text:p></table:table-cell>`;
       } else {
-        result +=
-          '<table:table-cell office:value-type="string"><text:p>' +
-          escapeXml(cell) +
-          '</text:p></table:table-cell>';
+        result += `<table:table-cell office:value-type="string"><text:p>${escapeXml(
+          cell,
+        )}</text:p></table:table-cell>`;
       }
     }
     result += '</table:table-row>\n';
@@ -149,25 +193,36 @@ function toOds(courseName: string, table: string[][]): string {
   result += '</table:table>';
   return result;
 }
+
 @Component({
-  components: { 'omegaup-student-progress': StudentProgress },
+  components: {
+    'omegaup-common-sort-controls': common_SortControls,
+    'omegaup-course-student-progress': course_StudentProgress,
+    'omegaup-common-paginator': common_Paginator,
+  },
 })
 export default class CourseViewProgress extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: types.CourseDetails;
   @Prop() students!: types.StudentProgress[];
+  @Prop() problemTitles!: { [key: string]: string };
+  @Prop() pagerItems!: types.PageItem[];
 
   T = T;
+  sortOrder: omegaup.SortOrder = omegaup.SortOrder.Ascending;
+  columnName = 'student';
 
   score(
     student: types.StudentProgress,
     assignment: omegaup.Assignment,
   ): number {
-    if (!student.progress.hasOwnProperty(assignment.alias)) {
+    if (
+      !Object.prototype.hasOwnProperty.call(student.score, assignment.alias)
+    ) {
       return 0;
     }
 
-    return Object.values(student.progress[assignment.alias]).reduce(
+    return Object.values(student.score[assignment.alias]).reduce(
       (accumulator: number, currentValue: number) => accumulator + currentValue,
       0,
     );
@@ -177,23 +232,54 @@ export default class CourseViewProgress extends Vue {
     return `/course/${this.course.alias}/student/${student.username}/`;
   }
 
+  get orderedStudents(): types.StudentProgress[] {
+    switch (this.columnName) {
+      case 'student':
+        if (this.sortOrder === omegaup.SortOrder.Descending) {
+          return this.students.sort((a, b) =>
+            a.username > b.username ? 1 : b.username > a.username ? -1 : 0,
+          );
+        }
+        return this.students.sort((a, b) =>
+          a.username < b.username ? 1 : b.username < a.username ? -1 : 0,
+        );
+      case 'total': {
+        const sortFactor =
+          this.sortOrder === omegaup.SortOrder.Descending ? 1 : -1;
+        return this.students
+          .map((student) => ({
+            value: student,
+            sortKey: this.getGlobalScoreByStudent(student).value,
+          }))
+          .sort((a, b) => sortFactor * (a.sortKey - b.sortKey))
+          .map((sortableStudent) => sortableStudent.value);
+      }
+      default:
+        return this.students.sort((a, b) =>
+          a.username > b.username ? 1 : b.username > a.username ? -1 : 0,
+        );
+    }
+  }
+
   get courseUrl(): string {
     return `/course/${this.course.alias}/`;
   }
 
-  get progressTable(): string[][] {
-    let table: string[][] = [];
-    let header = [T.profileUsername, T.wordsName];
-    for (let assignment of this.assignments) {
+  get progressTable(): TableCell[][] {
+    const table: TableCell[][] = [];
+    const header = [T.profileUsername, T.wordsName];
+    for (const assignment of this.assignments) {
       header.push(assignment.name);
     }
+    header.push(T.courseProgressGlobalScore);
     table.push(header);
-    for (let student of this.students) {
-      let row: string[] = [student.username, student.name || ''];
+    for (const student of this.students) {
+      const row: TableCell[] = [student.username, student.name || ''];
 
-      for (let assignment of this.assignments) {
-        row.push(String(this.score(student, assignment)));
+      for (const assignment of this.assignments) {
+        row.push(this.score(student, assignment));
       }
+      row.push(this.getGlobalScoreByStudent(student));
 
       table.push(row);
     }
@@ -212,6 +298,39 @@ export default class CourseViewProgress extends Vue {
 
   get odsFilename(): string {
     return `${this.course.alias}.ods`;
+  }
+
+  get totalPoints(): number {
+    return this.assignments
+      .map((assignment) => assignment.max_points ?? 0)
+      .reduce((acc, curr) => acc + curr, 0);
+  }
+
+  getTotalPointsByCourse(): string {
+    return ui.formatString(T.studentProgressDescriptionTotalPoints, {
+      points: this.totalPoints,
+    });
+  }
+
+  getTotalPointsByAssignment(assignment: omegaup.Assignment): string {
+    return ui.formatString(T.studentProgressDescriptionTotalPoints, {
+      points: assignment.max_points,
+    });
+  }
+
+  getGlobalScoreByStudent(student: types.StudentProgress): Percentage {
+    const totalPoints = this.assignments
+      .map((assignment) => assignment.max_points ?? 0)
+      .reduce((acc, curr) => acc + curr, 0);
+    if (!totalPoints) {
+      return new Percentage(0);
+    }
+
+    return new Percentage(
+      this.assignments
+        .map((assignment) => this.score(student, assignment) / totalPoints)
+        .reduce((acc, curr) => acc + curr, 0),
+    );
   }
 
   @AsyncComputed()
@@ -286,5 +405,24 @@ export default class CourseViewProgress extends Vue {
       }),
     );
   }
+
+  onApplyFilter(columnName: string, sortOrder: string): void {
+    this.columnName = columnName;
+    this.sortOrder =
+      sortOrder === omegaup.SortOrder.Ascending
+        ? omegaup.SortOrder.Ascending
+        : omegaup.SortOrder.Descending;
+  }
 }
 </script>
+
+<style scoped>
+.panel-body {
+  overflow: auto;
+  white-space: nowrap;
+}
+
+.sticky-offset {
+  top: 4rem;
+}
+</style>

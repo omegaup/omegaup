@@ -1,20 +1,20 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <form class="publish-form" v-on:submit.prevent="onSubmit">
+      <form class="publish-form" @submit.prevent="onSubmit">
         <div class="form-group">
           <label>{{ T.contestNewFormAdmissionModeSelect }}</label>
           <a
             data-toggle="tooltip"
             rel="tooltip"
-            v-bind:title="T.courseEditAdmissionModeDescription"
+            :title="T.courseEditAdmissionModeDescription"
           >
             <img src="/media/question.png" />
           </a>
           <select
+            v-model="admissionMode"
             class="form-control"
             name="admission-mode"
-            v-model="admissionMode"
           >
             <option value="private">
               {{ T.admissionModeManualOnly }}
@@ -22,39 +22,36 @@
             <option value="registration">
               {{ T.admissionModeShareURL }}
             </option>
-            <option value="public" v-if="shouldShowPublicOption">
+            <option v-if="shouldShowPublicOption" value="public">
               {{ T.admissionModePublic }}
             </option>
           </select>
-          <div class="form-group" v-show="admissionMode === 'registration'">
+          <div v-show="admissionMode === 'registration'" class="form-group">
             <input
               class="form-control mb-2 mt-2"
               type="text"
               readonly
-              v-bind:value="courseURL"
+              :value="courseURL"
             />
             <div class="form-inline">
               <button
+                v-clipboard="courseURL"
                 class="btn btn-primary"
                 type="button"
-                v-on:click="copiedToClipboard = true"
-                v-clipboard="courseURL"
+                @click="copiedToClipboard = true"
               >
                 {{ T.wordsCopyToClipboard }}
               </button>
-              <span class="ml-3" v-if="copiedToClipboard === true">
+              <span v-if="copiedToClipboard === true" class="ml-3">
                 <font-awesome-icon
                   icon="check-circle"
                   size="2x"
-                  v-bind:style="{ color: 'green' }"
+                  :style="{ color: 'green' }"
                 />
                 {{ T.passwordResetLinkCopiedToClipboard }}
               </span>
             </div>
           </div>
-          <p class="help-block">
-            <span v-html="admissionModeDescription"></span>
-          </p>
         </div>
         <div class="text-right">
           <button class="btn btn-primary change-admission-mode" type="submit">
@@ -70,6 +67,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import Clipboard from 'v-clipboard';
 import T from '../../lang';
+import omegaup_Markdown from '../Markdown.vue';
 
 import {
   FontAwesomeIcon,
@@ -86,11 +84,11 @@ Vue.use(Clipboard);
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
+    'omegaup-markdown': omegaup_Markdown,
   },
 })
 export default class CourseAdmissionMode extends Vue {
   @Prop() initialAdmissionMode!: string;
-  @Prop() admissionModeDescription!: string;
   @Prop() courseAlias!: string;
   @Prop() shouldShowPublicOption!: boolean;
 
@@ -103,7 +101,7 @@ export default class CourseAdmissionMode extends Vue {
   }
 
   @Watch('copiedToClipboard')
-  onPropertyChanged(newValue: boolean): void {
+  onPropertyChanged(): void {
     setTimeout(() => (this.copiedToClipboard = false), 5000);
   }
 

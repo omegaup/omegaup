@@ -29,6 +29,9 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         'needs_basic_information' => true,
         'requests_user_information' => true,
         'show_scoreboard' => true,
+        'languages' => true,
+        'archived' => true,
+        'minimum_progress_for_certificate' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -120,6 +123,21 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         if (isset($data['show_scoreboard'])) {
             $this->show_scoreboard = boolval(
                 $data['show_scoreboard']
+            );
+        }
+        if (isset($data['languages'])) {
+            $this->languages = is_scalar(
+                $data['languages']
+            ) ? strval($data['languages']) : '';
+        }
+        if (isset($data['archived'])) {
+            $this->archived = boolval(
+                $data['archived']
+            );
+        }
+        if (isset($data['minimum_progress_for_certificate'])) {
+            $this->minimum_progress_for_certificate = intval(
+                $data['minimum_progress_for_certificate']
             );
         }
     }
@@ -216,4 +234,25 @@ class Courses extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $show_scoreboard = false;
+
+    /**
+     * Un filtro (opcional) de qué lenguajes se pueden usar en un curso
+     *
+     * @var string|null
+     */
+    public $languages = null;
+
+    /**
+     * Indica si el curso ha sido archivado por el administrador.
+     *
+     * @var bool
+     */
+    public $archived = false;
+
+    /**
+     * Progreso mínimo que debe cumplir el estudiante para que se le otorgue el diploma del curso. NULL indica que el curso no da diplomas.
+     *
+     * @var int|null
+     */
+    public $minimum_progress_for_certificate = null;
 }

@@ -1,9 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
-
-import T from '../../lang';
-import * as ui from '../../ui';
 
 import common_SortControls from './SortControls.vue';
 
@@ -35,6 +30,6 @@ describe('SortControls.vue', () => {
 
     await wrapper.find('a').trigger('click');
 
-    expect(wrapper.emitted('emit-apply-filter')).toEqual([['title', 'asc']]);
+    expect(wrapper.emitted('apply-filter')).toEqual([['title', 'asc']]);
   });
 });

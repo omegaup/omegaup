@@ -1,9 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
 
 import problem_SearchBar from './SearchBar.vue';
 

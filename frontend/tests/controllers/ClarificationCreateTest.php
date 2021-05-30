@@ -2,15 +2,13 @@
 
 /**
  * Description of ClarificationCreateTest
- *
- * @author joemmanuel
  */
 
 class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Helper function to setup environment needed to create a clarification
      *
-     * @return array{problemData: array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}, contestData: array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}, contestant: \OmegaUp\DAO\VO\Identities}
+     * @return array{problemData: array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}, contestData: array{contest: \OmegaUp\DAO\VO\Contests, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users}, contestant: \OmegaUp\DAO\VO\Identities}
      */
     private function setupContest(
         bool $isGraderExpectedToBeCalled

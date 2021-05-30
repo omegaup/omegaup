@@ -1,19 +1,19 @@
 .markdown {
   h1 {
     font-size: 1.3em;
-    margin: 1.0em 0 0.5em 0;
+    margin: 1em 0 0.5em 0;
     font-weight: bold;
   }
 
   h2 {
     font-size: 1.1em;
-    margin: 1.0em 0 0.5em 0;
+    margin: 1em 0 0.5em 0;
     font-weight: bold;
   }
 
   h3 {
-    font-size: 1.0em;
-    margin: 1.0em 0 0.5em 0;
+    font-size: 1em;
+    margin: 1em 0 0.5em 0;
     font-weight: bold;
   }
 
@@ -21,7 +21,6 @@
     line-height: 150%;
     text-align: justify;
   }
-
 
   ul {
     list-style: disc;
@@ -53,7 +52,7 @@
 
   table.sample_io {
     margin: 5px;
-    padding : 5px;
+    padding: 5px;
 
     tbody {
       background: #eee;
@@ -76,8 +75,8 @@
       word-break: keep-all;
       word-wrap: normal;
       background: transparent;
-      border: 0px;
-      padding: 0px;
+      border: 0;
+      padding: 0;
       margin: inherit;
     }
   }

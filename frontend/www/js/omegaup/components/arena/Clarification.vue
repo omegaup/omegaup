@@ -1,8 +1,24 @@
 <template>
-  <tr v-bind:class="{ resolved: clarification.answer }">
+  <tr
+    :class="{
+      resolved: clarification.answer,
+      'direct-message': isDirectMessage,
+      'border border-primary': selected,
+    }"
+  >
+    <td
+      v-if="
+        'assignment_alias' in clarification && clarification.assignment_alias
+      "
+      class="text-center align-middle"
+    >
+      {{ clarification.assignment_alias }}
+    </td>
     <td class="text-center align-middle">
       {{
-        inContest ? clarification.contest_alias : clarification.problem_alias
+        'contest_alias' in clarification && clarification.contest_alias
+          ? clarification.contest_alias
+          : clarification.problem_alias
       }}
     </td>
     <td class="text-center align-middle">{{ clarification.author }}</td>
@@ -12,15 +28,15 @@
     <td class="align-middle">
       <pre>{{ clarification.message }}</pre>
     </td>
-    <td class="align-middle">
+    <td v-if="isAdmin" class="align-middle">
       <template v-if="clarification.answer">
         <pre>{{ clarification.answer }}</pre>
         <div v-if="!showUpdateAnswer" class="form-check mt-2 mt-xl-0">
           <label class="form-check-label">
             <input
+              v-model="showUpdateAnswer"
               class="form-check-input"
               type="checkbox"
-              v-model="showUpdateAnswer"
             />
             {{ T.clarificationUpdateAnswer }}
           </label>
@@ -31,29 +47,28 @@
         class="form-inline justify-content-between"
       >
         <div class="form-group">
-          <select class="form-control" v-model="selectedResponse">
+          <select v-model="selectedResponse" class="form-control">
             <option
               v-for="response in responses"
-              v-bind:value="response.value"
-              v-bind:key="response.value"
+              :key="response.value"
+              :value="response.value"
             >
-              {{ response.text }}</option
-            >
+              {{ response.text }}
+            </option>
           </select>
         </div>
         <div
-          class="form-group mt-2 mt-xl-0"
           v-if="selectedResponse === 'other'"
+          class="form-group mt-2 mt-xl-0"
         >
-          <textarea v-model="message" v-bind:placeholder="T.wordsAnswer">
-          </textarea>
+          <textarea v-model="message" :placeholder="T.wordsAnswer"> </textarea>
         </div>
         <div class="form-check mt-2 mt-xl-0">
           <label class="form-check-label">
             <input
+              v-model="isPublic"
               class="form-check-input"
               type="checkbox"
-              v-model="isPublic"
             />
             {{ T.wordsPublic }}
           </label>
@@ -61,34 +76,17 @@
         <button
           class="btn btn-primary btn-sm mt-2 mt-lg-2"
           type="submit"
-          v-on:click.prevent="sendClarificationResponse"
+          @click.prevent="sendClarificationResponse"
         >
           {{ T.wordsSend }}
         </button>
       </form>
     </td>
+    <td v-else class="align-middle">
+      <pre v-if="clarification.answer">{{ clarification.answer }}</pre>
+    </td>
   </tr>
 </template>
-
-<style lang="scss" scoped>
-.resolved {
-  color: rgb(70, 136, 71);
-  background-image: linear-gradient(
-    rgb(223, 240, 216) 0px,
-    rgb(200, 229, 188) 100%
-  );
-  background-color: rgb(223, 240, 216);
-}
-
-.direct-message {
-  color: rgb(125, 117, 18);
-  background-image: linear-gradient(
-    rgb(253, 245, 154) 0px,
-    rgba(255, 249, 181, 0.5) 100%
-  );
-  background-color: rgb(223, 240, 216);
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -97,9 +95,10 @@ import { types } from '../../api_types';
 import * as time from '../../time';
 
 @Component
-export default class ArenaClarificationForm extends Vue {
+export default class ArenaClarification extends Vue {
   @Prop() clarification!: types.Clarification;
-  @Prop() inContest!: boolean;
+  @Prop({ default: false }) isAdmin!: boolean;
+  @Prop({ default: false }) selected!: boolean;
 
   T = T;
   time = time;
@@ -131,6 +130,12 @@ export default class ArenaClarificationForm extends Vue {
     },
   ];
 
+  get isDirectMessage(): boolean {
+    return (
+      this.clarification.answer == null && this.clarification.receiver != null
+    );
+  }
+
   get responseText(): string {
     const response = this.responses.find(
       (response) => response.value === this.selectedResponse,
@@ -142,13 +147,42 @@ export default class ArenaClarificationForm extends Vue {
   }
 
   sendClarificationResponse(): void {
-    this.$emit(
-      'clarification-response',
-      this.clarification.clarification_id,
-      this.responseText,
-      this.isPublic,
-    );
+    const response: types.Clarification = {
+      clarification_id: this.clarification.clarification_id,
+      answer: this.responseText,
+      public: this.isPublic,
+      message: this.message,
+      problem_alias: this.clarification.problem_alias,
+      time: new Date(),
+    };
     this.showUpdateAnswer = false;
+    this.$emit('clarification-response', response);
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.resolved {
+  color: var(--clarification-resolved-font-color);
+  background-image: linear-gradient(
+    var(--clarification-resolved-gradient-from-background-color),
+    var(--clarification-resolved-gradient-to-background-color)
+  );
+  background-color: var(--clarification-resolved-background-color);
+}
+
+.direct-message {
+  color: var(--clarification-direct-message-font-color);
+  background-image: linear-gradient(
+    var(--clarification-direct-message-gradient-from-background-color),
+    rgba(var(--clarification-direct-message-gradient-to-background-color), 0.5)
+  );
+  background-color: var(--clarification-direct-message-background-color);
+}
+
+.border {
+  border-width: 3px !important;
+}
+</style>

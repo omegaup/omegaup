@@ -1,8 +1,6 @@
-import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
+jest.mock('../../../../third_party/js/diff_match_patch.js');
 
-import { omegaup } from '../../omegaup';
+import { shallowMount } from '@vue/test-utils';
 
 import arena_DiffView from './DiffView.vue';
 

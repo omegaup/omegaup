@@ -15,44 +15,26 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="solver in solvers" v-bind:key="solver.username">
-        <td>
+      <tr v-for="solver in solvers" :key="solver.username">
+        <td data-submission-user>
           <omegaup-username
-            v-bind:classname="solver.classname"
-            v-bind:username="solver.username"
-            v-bind:linkify="true"
+            :classname="solver.classname"
+            :username="solver.username"
+            :linkify="true"
           ></omegaup-username>
         </td>
-        <td>{{ solver.language }}</td>
-        <td>{{ (solver.runtime / 1000.0).toFixed(2) }}</td>
-        <td>{{ (solver.memory / (1024 * 1024)).toFixed(2) }}</td>
-        <td>{{ time.formatTimestamp(solver.time) }}</td>
+        <td data-submission-language>{{ solver.language }}</td>
+        <td data-submission-memory>
+          {{ (solver.memory / (1024 * 1024)).toFixed(2) }}
+        </td>
+        <td data-submission-runtime>
+          {{ (solver.runtime / 1000.0).toFixed(2) }}
+        </td>
+        <td data-submission-time>{{ time.formatTimestamp(solver.time) }}</td>
       </tr>
     </tbody>
   </table>
 </template>
-
-<style lang="scss" scoped>
-table {
-  width: 100%;
-  border: 1px solid #ccc;
-  margin-top: 2em;
-}
-
-caption {
-  caption-side: top;
-  font-weight: bold;
-  font-size: 1em;
-  margin-bottom: 1em;
-}
-
-td,
-th {
-  border: 1px solid #ccc;
-  border-width: 1px 0;
-  text-align: center;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -73,3 +55,26 @@ export default class Solvers extends Vue {
   time = time;
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+table {
+  width: 100%;
+  border: 1px solid var(--arena-solvers-table-border-color);
+  margin-top: 2em;
+}
+
+caption {
+  caption-side: top;
+  font-weight: bold;
+  font-size: 1em;
+  margin-bottom: 1em;
+}
+
+td,
+th {
+  border: 1px solid var(--arena-solvers-td-border-color);
+  border-width: 1px 0;
+  text-align: center;
+}
+</style>

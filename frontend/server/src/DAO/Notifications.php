@@ -8,15 +8,20 @@ namespace OmegaUp\DAO;
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Notifications}.
- *
- * @author alanboy
  * @access public
  * @package docs
  */
 class Notifications extends \OmegaUp\DAO\Base\Notifications {
+    const CONTEST_CLARIFICATION_REQUEST = 'contest-clarification-request';
+    const CONTEST_CLARIFICATION_RESPONSE = 'contest-clarification-response';
+    const COURSE_CLARIFICATION_REQUEST = 'course-clarification-request';
+    const COURSE_CLARIFICATION_RESPONSE = 'course-clarification-response';
     const COURSE_REGISTRATION_ACCEPTED = 'course-registration-accepted';
     const COURSE_REGISTRATION_REJECTED = 'course-registration-rejected';
     const COURSE_REGISTRATION_REQUEST = 'course-registration-request';
+    const COURSE_SUBMISSION_FEEDBACK = 'course-submission-feedback';
+    const COURSE_REGISTRATION_MANUAL = 'course-registration-manual';
+    const COURSE_ADMINISTRATOR_ADDED = 'course-administrator-added';
     const DEMOTION = 'demotion';
 
     /**

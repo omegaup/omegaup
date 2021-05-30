@@ -87,12 +87,12 @@ class Badge extends \OmegaUp\Controllers\Controller {
      */
     public static function apiMyBadgeAssignationTime(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
-            $r['badge_alias'],
-            'badge_alias'
+        $badgeAlias = $r->ensureString(
+            'badge_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateBadgeExists(
-            $r['badge_alias'],
+            $badgeAlias,
             self::getAllBadges()
         );
         return [
@@ -100,7 +100,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
                 null :
                 \OmegaUp\DAO\UsersBadges::getUserBadgeAssignationTime(
                     $r->user,
-                    $r['badge_alias']
+                    $badgeAlias
                 ),
         ];
     }
@@ -114,15 +114,15 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $badge_alias
      */
     public static function apiBadgeDetails(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateValidAlias(
-            $r['badge_alias'],
-            'badge_alias'
+        $badgeAlias = $r->ensureString(
+            'badge_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateBadgeExists(
-            $r['badge_alias'],
+            $badgeAlias,
             self::getAllBadges()
         );
-        return self::getBadgeDetails($r['badge_alias']);
+        return self::getBadgeDetails($badgeAlias);
     }
 
     /**
@@ -150,7 +150,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{smartyProperties: array{payload: BadgeListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
-    public static function getBadgeListForSmarty(\OmegaUp\Request $r) {
+    public static function getBadgeListForTypeScript(\OmegaUp\Request $r) {
         $r->ensureIdentity();
         $badges = self::apiList($r);
         $ownedBadges = self::apiMyList($r);
@@ -169,25 +169,25 @@ class Badge extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{smartyProperties: array{payload: BadgeDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
-     * @omegaup-request-param null|string $badge_alias
+     * @omegaup-request-param string $badge_alias
      */
-    public static function getDetailsForSmarty(\OmegaUp\Request $r) {
+    public static function getDetailsForTypeScript(\OmegaUp\Request $r) {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
-            $r['badge_alias'],
-            'badge_alias'
+        $badgeAlias = $r->ensureString(
+            'badge_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
         \OmegaUp\Validators::validateBadgeExists(
-            $r['badge_alias'],
+            $badgeAlias,
             \OmegaUp\Controllers\Badge::getAllBadges()
         );
 
-        $details = self::getBadgeDetails($r['badge_alias']);
+        $details = self::getBadgeDetails($badgeAlias);
         if (!is_null($r->user)) {
             $details['assignation_time'] = \OmegaUp\DAO\UsersBadges::getUserBadgeAssignationTime(
                 $r->user,
-                $r['badge_alias']
+                $badgeAlias
             );
         }
         return [

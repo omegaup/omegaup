@@ -8,8 +8,8 @@
         <div class="col-sm-9 field-data">
           https://omegaup.com/profile/<strong
             ><omegaup-user-username
-              v-bind:classname="profile.classname"
-              v-bind:username="profile.username"
+              :classname="profile.classname"
+              :username="profile.username"
             ></omegaup-user-username></strong
           >/
         </div>
@@ -57,7 +57,7 @@
             <strong>{{ T.profileSchool }}</strong>
           </div>
           <div class="col-sm-9 field-data">
-            <a v-bind:href="`/schools/profile/${profile.school_id}/`"
+            <a :href="`/schools/profile/${profile.school_id}/`"
               ><strong>{{ profile.school }}</strong></a
             >
           </div>
@@ -74,7 +74,7 @@
 
         <div class="form-group row padding-field">
           <div class="col-sm-3">
-            <strong>{{ T.profileRank }}</strong
+            <strong>{{ T.profileAuthorRank }}</strong
             ><a href="https://blog.omegaup.com/categorias/" target="_blank"
               ><em class="glyphicon glyphicon-question-sign"></em
             ></a>
@@ -82,40 +82,21 @@
           <div class="col-sm-9 field-data">
             <strong
               ><omegaup-user-username
-                v-bind:classname="profile.classname"
-                v-bind:username="rank"
-              ></omegaup-user-username
-            ></strong>
+                v-if="rank"
+                :classname="profile.classname"
+                :username="rank"
+              ></omegaup-user-username>
+              <p v-else>{{ T.authorRankUnranked }}</p>
+            </strong>
           </div>
         </div>
       </div>
     </div>
-    <a
-      v-if="!profile.is_private"
-      v-bind:href="`/submissions/${profile.username}/`"
-    >
+    <a v-if="!profile.is_private" :href="`/submissions/${profile.username}/`">
       {{ T.wordsSeeLatestSubmissions }}
     </a>
   </div>
 </template>
-
-<style>
-.fields-border > .form-group,
-.fields-border div > .form-group {
-  border-color: #e9e9e9 !important;
-  border-style: solid !important;
-  border-width: 0 0 0.05rem 0 !important;
-}
-
-.field-data {
-  color: gray;
-}
-
-.padding-field {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -134,3 +115,23 @@ export default class UserBasicInfo extends Vue {
   T = T;
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.fields-border > .form-group,
+.fields-border div > .form-group {
+  border-color: var(--user-basic-info-form-group-border-color) !important;
+  border-style: solid !important;
+  border-width: 0 0 0.05rem 0 !important;
+}
+
+.field-data {
+  color: var(--user-basic-info-field-data-font-color);
+}
+
+.padding-field {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+</style>

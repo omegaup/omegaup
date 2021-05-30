@@ -8,17 +8,20 @@ OmegaUp.on('ready', function () {
 
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-activity-feed': activity_Feed,
+    },
     render: function (createElement) {
       return createElement('omegaup-activity-feed', {
         props: {
+          page: payload.page,
+          length: payload.length,
           type: payload.type,
           alias: payload.alias,
           report: payload.events,
+          pagerItems: payload.pagerItems,
         },
       });
-    },
-    components: {
-      'omegaup-activity-feed': activity_Feed,
     },
   });
 });

@@ -25,6 +25,12 @@ class Request extends \ArrayObject {
     public $identity = null;
 
     /**
+     * The object of the identity currently logged in.
+     * @var null|\OmegaUp\DAO\VO\Identities
+     */
+    public $loginIdentity = null;
+
+    /**
      * The method that will be called.
      * @var null|callable
      */
@@ -89,6 +95,17 @@ class Request extends \ArrayObject {
      */
     public static function requestId(): string {
         return \OmegaUp\Request::$_requestId;
+    }
+
+    /**
+     * @return bool whether a user has been logged with the main identity or not
+     */
+    public function isLoggedAsMainIdentity(): bool {
+        return (
+            !is_null($this->user)
+            && !is_null($this->loginIdentity)
+            && $this->user->main_identity_id === $this->loginIdentity->identity_id
+        );
     }
 
     /**
@@ -206,11 +223,18 @@ class Request extends \ArrayObject {
             strval($mixedVal) :
             ''
         );
-        if (!is_null($validator) && !$validator($val)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalid',
-                $key
-            );
+        if (!is_null($validator)) {
+            try {
+                if (!$validator($val)) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterInvalid',
+                        $key
+                    );
+                }
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+                $e->parameter = $key;
+                throw $e;
+            }
         }
         $this[$key] = $val;
         return $val;
@@ -410,6 +434,7 @@ class Request extends \ArrayObject {
         }
         $this->user = null;
         $this->identity = null;
+        $this->loginIdentity = null;
         $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $this
         );
@@ -417,6 +442,7 @@ class Request extends \ArrayObject {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
         }
         $this->identity = $session['identity'];
+        $this->loginIdentity = $session['loginIdentity'];
         if (!is_null($session['user'])) {
             $this->user = $session['user'];
         }

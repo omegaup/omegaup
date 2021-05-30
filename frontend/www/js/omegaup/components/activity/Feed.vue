@@ -2,8 +2,8 @@
   <div class="post">
     <div class="copy">
       <h1>
-        <a v-bind:href="`/${type}/${alias}/`">{{ alias }}</a> —
-        {{ T.wordsActivityReport }}
+        <a :href="`/${type}/${alias}/`">{{ alias }}</a> —
+        {{ T.activityReport }}
       </h1>
       <p>{{ wordsReportSummary }}</p>
       <!-- Nav tabs -->
@@ -16,9 +16,9 @@
             role="tab"
             aria-controls="report"
             aria-selected="true"
-            v-on:click="showTab = 'report'"
-            v-bind:class="{ active: showTab === 'report' }"
-            >{{ T.wordsActivityReportReport }}</a
+            :class="{ active: showTab === 'report' }"
+            @click="showTab = 'report'"
+            >{{ T.activityReportReport }}</a
           >
         </li>
         <li class="nav-item" role="presentation">
@@ -29,9 +29,9 @@
             role="tab"
             aria-controls="users"
             aria-selected="false"
-            v-on:click="showTab = 'users'"
-            v-bind:class="{ active: showTab === 'users' }"
-            >{{ T.wordsActivityReportUsers }}</a
+            :class="{ active: showTab === 'users' }"
+            @click="showTab = 'users'"
+            >{{ T.activityReportUsers }}</a
           >
         </li>
         <li class="nav-item" role="presentation">
@@ -42,94 +42,101 @@
             role="tab"
             aria-controls="origins"
             aria-selected="false"
-            v-on:click="showTab = 'origins'"
-            v-bind:class="{ active: showTab === 'origins' }"
-            >{{ T.wordsActivityReportOrigins }}</a
+            :class="{ active: showTab === 'origins' }"
+            @click="showTab = 'origins'"
+            >{{ T.activityReportOrigins }}</a
           >
         </li>
       </ul>
       <!-- Tab panes -->
       <div class="tab-content mt-2">
         <div
+          v-show="showTab === 'report'"
           class="tab-pane"
           role="tabpanel"
           aria-labelledby="report-tab"
-          v-bind:class="{
+          :class="{
             active: showTab === 'report',
           }"
-          v-show="showTab === 'report'"
         >
-          <table class="table">
-            <thead>
-              <tr>
-                <th>{{ T.profileUsername }}</th>
-                <th>{{ T.wordsTime }}</th>
-                <th>{{ T.wordsActivityReportOrigin }}</th>
-                <th colspan="2">{{ T.wordsActivityReportEvent }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="event in report">
-                <td>
-                  <omegaup-user-username
-                    v-bind:classname="event.classname"
-                    v-bind:username="event.username"
-                    v-bind:linkify="true"
-                  ></omegaup-user-username>
-                </td>
-                <td>{{ time.formatDateTime(event.time) }}</td>
-                <td>{{ event.ip.toString() }}</td>
-                <td>{{ event.event.name }}</td>
-                <td>
-                  <span v-if="event.event.problem">
-                    <a v-bind:href="`/arena/problem/${event.event.problem}/`">{{
-                      event.event.problem
-                    }}</a>
-                  </span>
-                  <span v-if="event.event.courseAlias" class="mr-2">
-                    <a v-bind:href="`/course/${event.event.courseAlias}/`">{{
-                      event.event.courseName
-                    }}</a>
-                  </span>
-                  <span v-if="event.event.cloneResult">{{
-                    event.event.cloneResult
-                  }}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="card">
+            <table class="table mb-0">
+              <thead>
+                <tr>
+                  <th>{{ T.profileUsername }}</th>
+                  <th>{{ T.wordsTime }}</th>
+                  <th>{{ T.activityReportOrigin }}</th>
+                  <th colspan="2">{{ T.activityReportEvent }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="event in report">
+                  <td>
+                    <omegaup-user-username
+                      :classname="event.classname"
+                      :username="event.username"
+                      :linkify="true"
+                    ></omegaup-user-username>
+                  </td>
+                  <td>{{ time.formatDateTime(event.time) }}</td>
+                  <td>{{ event.ip.toString() }}</td>
+                  <td>{{ event.event.name }}</td>
+                  <td>
+                    <span v-if="event.event.problem">
+                      <a :href="`/arena/problem/${event.event.problem}/`">{{
+                        event.event.problem
+                      }}</a>
+                    </span>
+                    <span v-if="event.event.courseAlias" class="mr-2">
+                      <a :href="`/course/${event.event.courseAlias}/`">{{
+                        event.event.courseName
+                      }}</a>
+                    </span>
+                    <span v-if="event.event.cloneResult">{{
+                      event.event.cloneResult
+                    }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="card-footer">
+              <omegaup-common-paginator
+                :pager-items="pagerItems"
+              ></omegaup-common-paginator>
+            </div>
+          </div>
         </div>
         <div
+          v-show="showTab === 'users'"
           class="tab-pane"
           role="tabpanel"
           aria-labelledby="users-tab"
-          v-bind:class="{
+          :class="{
             active: showTab === 'users',
           }"
-          v-show="showTab === 'users'"
         >
           <p v-if="users.length &lt;= 0">
-            {{ T.wordsActivityReportNoDuplicatesForUsers }}
+            {{ T.activityReportNoDuplicatesForUsers }}
           </p>
-          <table class="table" v-else>
+          <table v-else class="table">
             <caption>
               {{
-                T.wordsActivityReportDuplicatesForUsersDescription
+                T.activityReportDuplicatesForUsersDescription
               }}
             </caption>
             <thead>
               <tr>
                 <th>{{ T.profileUsername }}</th>
-                <th>{{ T.wordsActivityReportOrigin }}</th>
+                <th>{{ T.activityReportOrigin }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="user in users">
                 <td>
                   <omegaup-user-username
-                    v-bind:linkify="true"
-                    v-bind:classname="user.classname"
-                    v-bind:username="user.username"
+                    :linkify="true"
+                    :classname="user.classname"
+                    :username="user.username"
                   ></omegaup-user-username>
                 </td>
                 <td>
@@ -140,26 +147,26 @@
           </table>
         </div>
         <div
+          v-show="showTab === 'origins'"
           class="tab-pane"
           role="tabpanel"
           aria-labelledby="origins-tab"
-          v-bind:class="{
+          :class="{
             active: showTab === 'origins',
           }"
-          v-show="showTab === 'origins'"
         >
           <p v-if="origins.length &lt;= 0">
-            {{ T.wordsActivityReportNoDuplicatesForOrigins }}
+            {{ T.activityReportNoDuplicatesForOrigins }}
           </p>
-          <table class="table" v-else>
+          <table v-else class="table">
             <caption>
               {{
-                T.wordsActivityReportDuplicatesForOriginsDescription
+                T.activityReportDuplicatesForOriginsDescription
               }}
             </caption>
             <thead>
               <tr>
-                <th>{{ T.wordsActivityReportOrigin }}</th>
+                <th>{{ T.activityReportOrigin }}</th>
                 <th>{{ T.profileUsername }}</th>
               </tr>
             </thead>
@@ -169,9 +176,9 @@
                 <td>
                   <span v-for="user in origin.usernames" class="mx-1">
                     <omegaup-user-username
-                      v-bind:linkify="true"
-                      v-bind:classname="user.classname"
-                      v-bind:username="user.username"
+                      :linkify="true"
+                      :classname="user.classname"
+                      :username="user.username"
                     ></omegaup-user-username
                   ></span>
                 </td>
@@ -190,6 +197,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import user_Username from '../user/Username.vue';
+import common_Paginator from '../common/Paginatorv2.vue';
 
 interface Mapping {
   [key: string]: string[];
@@ -209,17 +217,19 @@ interface Origin {
   }[];
 }
 
-const availableTabs = ['report', 'users', 'origins'];
-
 @Component({
   components: {
     'omegaup-user-username': user_Username,
+    'omegaup-common-paginator': common_Paginator,
   },
 })
 export default class ActivityFeed extends Vue {
+  @Prop() page!: number;
+  @Prop() length!: number;
   @Prop() type!: string;
   @Prop() alias!: string;
   @Prop() report!: types.ActivityEvent[];
+  @Prop() pagerItems!: types.PageItem[];
 
   T = T;
   time = time;
@@ -235,8 +245,8 @@ export default class ActivityFeed extends Vue {
 
   get wordsReportSummary(): string {
     return this.type == 'contest'
-      ? T.wordsActivityReportSummaryContest
-      : T.wordsActivityReportSummaryCourse;
+      ? T.activityReportSummaryContest
+      : T.activityReportSummaryCourse;
   }
 
   get classByUser(): { [key: string]: string } {
@@ -249,10 +259,9 @@ export default class ActivityFeed extends Vue {
   }
 
   get users(): User[] {
-    let self = this;
     let userMapping: Mapping = {};
     for (let evt of this.report) {
-      self.addMapping(userMapping, evt.username, String(evt.ip));
+      this.addMapping(userMapping, evt.username, String(evt.ip));
     }
     let users: User[] = [];
     let sortedUsers = Object.keys(userMapping);
@@ -263,7 +272,7 @@ export default class ActivityFeed extends Vue {
       ips.sort();
       users.push({
         username: user,
-        classname: self.classByUser[user],
+        classname: this.classByUser[user],
         ips: ips,
       });
     }
@@ -271,10 +280,9 @@ export default class ActivityFeed extends Vue {
   }
 
   get origins(): Origin[] {
-    let self = this;
     let originMapping: Mapping = {};
     for (let evt of this.report) {
-      self.addMapping(originMapping, String(evt.ip), evt.username);
+      this.addMapping(originMapping, String(evt.ip), evt.username);
     }
     let origins: Origin[] = [];
     let sortedOrigins = Object.keys(originMapping);
@@ -286,7 +294,7 @@ export default class ActivityFeed extends Vue {
       origins.push({
         origin: origin,
         usernames: users.map((u) => {
-          return { username: u, classname: self.classByUser[u] };
+          return { username: u, classname: this.classByUser[u] };
         }),
       });
     }

@@ -4,10 +4,12 @@ import * as api from '../api';
 import { types } from '../api_types';
 import T from '../lang';
 import arena_Runs from '../components/arena/Runs.vue';
+import arena_Runsv2 from '../components/arena/Runsv2.vue';
 import * as ui from '../ui';
 import * as time from '../time';
 
-import { Arena, runsStore } from './arena';
+import { Arena } from './arena';
+import { runsStore } from './runsStore';
 
 export default class ArenaAdmin {
   arena: Arena;
@@ -15,6 +17,7 @@ export default class ArenaAdmin {
   runsList: Vue;
 
   constructor(arena: Arena) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
 
     this.arena = arena;
@@ -24,13 +27,16 @@ export default class ArenaAdmin {
     this.setUpPagers();
     this.runsList = new Vue({
       el: globalRuns ? '#main-container' : '#runs table.runs',
+      components: {
+        'omegaup-arena-runs': globalRuns ? arena_Runsv2 : arena_Runs,
+      },
       render: function (createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
             contestAlias: arena.options.contestAlias,
             runs: runsStore.state.runs,
             showContest: arena.options.contestAlias == 'admin',
-            showProblem: !arena.options.isOnlyProblem,
+            showProblem: true,
             showDetails: true,
             showDisqualify: true,
             showPager: true,
@@ -48,7 +54,7 @@ export default class ArenaAdmin {
                 return;
               }
               api.Run.disqualify({ run_alias: run.guid })
-                .then((data) => {
+                .then(() => {
                   run.type = 'disqualified';
                   arena.updateRunFallback(run.guid);
                 })
@@ -59,7 +65,7 @@ export default class ArenaAdmin {
             },
             rejudge: (run: types.Run) => {
               api.Run.rejudge({ run_alias: run.guid, debug: false })
-                .then((data) => {
+                .then(() => {
                   run.status = 'rejudging';
                   self.arena.updateRunFallback(run.guid);
                 })
@@ -68,52 +74,55 @@ export default class ArenaAdmin {
           },
         });
       },
-      components: { 'omegaup-arena-runs': arena_Runs },
     });
   }
 
   setUpPagers(): void {
-    $('.clarifpager .clarifpagerprev').on('click', () => {
-      if (this.arena.clarificationsOffset > 0) {
-        this.arena.clarificationsOffset -= this.arena.clarificationsRowcount;
+    document
+      .querySelector('.clarifpager .clarifpagerprev')
+      ?.addEventListener('click', () => {
+        if (this.arena.clarificationsOffset > 0) {
+          this.arena.clarificationsOffset -= this.arena.clarificationsRowcount;
+          if (this.arena.clarificationsOffset < 0) {
+            this.arena.clarificationsOffset = 0;
+          }
+
+          this.refreshClarifications();
+        }
+      });
+
+    document
+      .querySelector('.clarifpager .clarifpagernext')
+      ?.addEventListener('click', () => {
+        this.arena.clarificationsOffset += this.arena.clarificationsRowcount;
         if (this.arena.clarificationsOffset < 0) {
           this.arena.clarificationsOffset = 0;
         }
 
         this.refreshClarifications();
+      });
+
+    this.arena.elements.clarification?.addEventListener('submit', () => {
+      const clarificationElement = this.arena.elements.clarification;
+      if (clarificationElement === null) {
+        return;
       }
-    });
-
-    $('.clarifpager .clarifpagernext').on('click', () => {
-      this.arena.clarificationsOffset += this.arena.clarificationsRowcount;
-      if (this.arena.clarificationsOffset < 0) {
-        this.arena.clarificationsOffset = 0;
-      }
-
-      this.refreshClarifications();
-    });
-
-    this.arena.elements.clarification.on('submit', (e: Event) => {
-      $('input', this.arena.elements.clarification).attr(
-        'disabled',
-        'disabled',
-      );
+      clarificationElement
+        .querySelectorAll('input')
+        .forEach((input) => input.setAttribute('disabled', 'disabled'));
       api.Clarification.create({
         contest_alias: this.arena.options.contestAlias,
-        problem_alias: $(
+        problem_alias: (clarificationElement.querySelector(
           'select[name="problem"]',
-          this.arena.elements.clarification,
-        ).val(),
-        username: $(
+        ) as HTMLInputElement).value,
+        username: (clarificationElement.querySelector(
           'select[name="user"]',
-          this.arena.elements.clarification,
-        ).val(),
-        message: $(
+        ) as HTMLInputElement).value,
+        message: (clarificationElement.querySelector(
           'textarea[name="message"]',
-          this.arena.elements.clarification,
-        ).val(),
+        ) as HTMLInputElement).value,
       })
-        .then((response) => {
+        .then(() => {
           this.arena.hideOverlay();
           this.refreshClarifications();
         })
@@ -121,7 +130,9 @@ export default class ArenaAdmin {
           alert(e.error);
         })
         .finally(() => {
-          $('input', this.arena.elements.clarification).prop('disabled', false);
+          clarificationElement
+            .querySelectorAll('input')
+            .forEach((input) => input.removeAttribute('disabled'));
         });
 
       return false;
@@ -129,30 +140,23 @@ export default class ArenaAdmin {
   }
 
   refreshRuns(): void {
-    const runsListComponent = <arena_Runs>this.runsList.$children[0];
+    const runsListComponent = this.runsList.$children[0] as arena_Runs;
 
-    var options = {
-      assignment_alias: <string | undefined>undefined,
-      contest_alias: <string | undefined>undefined,
-      course_alias: <string | undefined>undefined,
+    const options = {
+      assignment_alias: undefined as string | undefined,
+      contest_alias: undefined as string | undefined,
+      course_alias: undefined as string | undefined,
       problem_alias: runsListComponent.filterProblem || undefined,
       offset: runsListComponent.filterOffset * runsListComponent.rowCount,
       rowcount: runsListComponent.rowCount,
       verdict: runsListComponent.filterVerdict || undefined,
       language: runsListComponent.filterLanguage || undefined,
       username: runsListComponent.filterUsername || undefined,
-      show_all: <boolean | undefined>undefined,
+      show_all: undefined as boolean | undefined,
       status: runsListComponent.filterStatus || undefined,
     };
 
-    if (this.arena.options.onlyProblemAlias) {
-      options.show_all = true;
-      options.problem_alias = this.arena.options.onlyProblemAlias;
-      api.Problem.runs(options)
-        .then(time.remoteTimeAdapter)
-        .then((response) => this.runsChanged(response))
-        .catch(ui.apiError);
-    } else if (this.arena.options.contestAlias === 'admin') {
+    if (this.arena.options.contestAlias === 'admin') {
       api.Run.list(options)
         .then(time.remoteTimeAdapter)
         .then((response) => this.runsChanged(response))
@@ -175,20 +179,7 @@ export default class ArenaAdmin {
   }
 
   refreshClarifications(): void {
-    if (this.arena.options.onlyProblemAlias) {
-      api.Problem.clarifications({
-        problem_alias: this.arena.options.onlyProblemAlias,
-        offset: this.arena.clarificationsOffset,
-        rowcount: this.arena.clarificationsRowcount,
-      })
-        .then(time.remoteTimeAdapter)
-        .then((response) =>
-          this.arena.clarificationsChange(response.clarifications),
-        )
-        .catch(ui.apiError);
-    } else {
-      this.arena.refreshClarifications();
-    }
+    this.arena.refreshClarifications();
   }
 
   runsChanged(data: { runs: types.Run[] }): void {

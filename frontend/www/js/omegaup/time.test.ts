@@ -1,5 +1,3 @@
-import expect from 'expect';
-
 import * as time from './time';
 
 describe('time', () => {
@@ -98,7 +96,7 @@ describe('time', () => {
   });
 
   describe('remoteTimeAdapter', () => {
-    before(() => {
+    beforeEach(() => {
       time._setRemoteDeltaTime(1);
     });
 

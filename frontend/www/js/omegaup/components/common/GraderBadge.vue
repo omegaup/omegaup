@@ -1,34 +1,8 @@
 <template>
-  <span class="grader-count badge" v-bind:class="graderBadgeClass">{{
+  <span class="grader-count badge" :class="graderBadgeClass">{{
     graderCounter
   }}</span>
 </template>
-
-<style>
-.grader-error {
-  color: #b94a48;
-  background-image: linear-gradient(
-    rgb(242, 222, 222) 0px,
-    rgb(231, 195, 195) 100%
-  );
-  background-color: rgb(242, 222, 222);
-}
-
-.grader-ok {
-  color: #468847;
-  background-image: linear-gradient(
-    rgb(223, 240, 216) 0px,
-    rgb(200, 229, 188) 100%
-  );
-  background-color: rgb(223, 240, 216);
-}
-
-.grader-warning {
-  color: #c09853;
-  background-image: linear-gradient(to bottom, #fcf8e3 0, #f8efc0 100%);
-  border-color: #f5e79e;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -59,3 +33,34 @@ export default class GraderCountBadge extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+.grader-error {
+  color: var(--badges-grader-error-font-color);
+  background-image: linear-gradient(
+    var(--badges-grader-error-gradient-from-background-color),
+    var(--badges-grader-error-gradient-to-background-color)
+  );
+  background-color: var(--badges-grader-error-background-color);
+}
+
+.grader-ok {
+  color: var(--badges-grader-ok-font-color);
+  background-image: linear-gradient(
+    var(--badges-grader-ok-gradient-from-background-color),
+    var(--badges-grader-ok-gradient-to-background-color)
+  );
+  background-color: var(--badges-grader-ok-background-color);
+}
+
+.grader-warning {
+  color: var(--badges-grader-warning-font-color);
+  background-image: linear-gradient(
+    to bottom,
+    var(--badges-grader-warning-from-font-color) 0,
+    var(--badges-grader-warning-to-font-color) 100%
+  );
+  border-color: var(--badges-grader-warning-border-color);
+}
+</style>

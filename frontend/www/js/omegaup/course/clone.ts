@@ -8,8 +8,12 @@ import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseCloneDetailsPayload();
+  const headerPayload = types.payloadParsers.CommonPayload();
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-clone': course_Clone,
+    },
     render: function (createElement) {
       return createElement('omegaup-course-clone', {
         props: {
@@ -17,6 +21,7 @@ OmegaUp.on('ready', () => {
           classname: payload.creator.classname,
           course: payload.details,
           token: payload.token,
+          currentUsername: headerPayload.currentUsername,
         },
         on: {
           clone: (
@@ -32,20 +37,18 @@ OmegaUp.on('ready', () => {
               token: token,
               start_time: startTime.getTime() / 1000,
             })
-              .then((data) => {
+              .then(() => {
                 ui.success(
                   ui.formatString(T.courseEditCourseClonedSuccessfully, {
                     course_alias: alias,
                   }),
+                  /*autoHide=*/ false,
                 );
               })
               .catch(ui.apiError);
           },
         },
       });
-    },
-    components: {
-      'omegaup-course-clone': course_Clone,
     },
   });
 });

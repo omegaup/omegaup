@@ -8,8 +8,6 @@ namespace OmegaUp\DAO;
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Problems}.
- *
- * @author alanboy
  * @access public
  * @package docs
  */
@@ -17,7 +15,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     /**
      * @param list<string> $tags
      */
-    final private static function addTagFilter(
+    private static function addTagFilter(
         string $identityType,
         ?int $identityId,
         array $tags,
@@ -83,6 +81,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param null|array{0: int, 1: int} $difficultyRange
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
+     * @param list<string> $authors
      * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int, problem_id: int}>, count: int}
      */
     final public static function byIdentityType(
@@ -99,7 +98,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $minVisibility,
         bool $requireAllTags,
         array $programmingLanguages,
-        ?array $difficultyRange
+        ?array $difficultyRange,
+        bool $onlyQualitySeal,
+        ?string $level,
+        string $difficulty,
+        array $authors
     ) {
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
@@ -117,6 +120,21 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ';
         }
 
+        $clauses = [];
+
+        $levelJoin = '';
+        if (!is_null($level)) {
+            $levelJoin = '
+            INNER JOIN
+                Problems_Tags pt ON p.problem_id = pt.problem_id
+            INNER JOIN
+                Tags t ON t.tag_id = pt.tag_id
+            ';
+            $clauses[] = [
+                't.name = ?', [$level]
+            ];
+        }
+
         // Use BINARY mode to force case sensitive comparisons when ordering by title.
         $collation = ($orderBy === 'title') ? 'COLLATE utf8mb4_bin' : '';
         $select = '';
@@ -126,22 +144,85 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         // Clauses is an array of 2-tuples that contains a chunk of SQL and the
         // arguments that are needed for that chunk.
         /** @var list<array{0: string, 1: list<string>}> */
-        $clauses = [];
         foreach ($programmingLanguages as $programmingLanguage) {
             $clauses[] = [
                 'FIND_IN_SET(?, p.languages) > 0',
                 [$programmingLanguage],
             ];
         }
-        if (!is_null($difficultyRange) && count($difficultyRange) === 2) {
-            $conditions = 'p.difficulty >= ? AND p.difficulty <= ?';
-            if ($difficultyRange[0] === 0) {
-                $conditions = '(p.difficulty IS NULL OR (p.difficulty >= ? AND p.difficulty <= ?))';
+
+        // Convert the difficulty in text form to a range
+        if (is_null($difficultyRange)) {
+            $difficultyRange = [];
+            switch ($difficulty) {
+                case 'easy':
+                    $difficultyRange[] = 0;
+                    $difficultyRange[] = 1;
+                    break;
+                case 'medium':
+                    $difficultyRange[] = 2;
+                    $difficultyRange[] = 2;
+                    break;
+                case 'hard':
+                    $difficultyRange[] = 3;
+                    $difficultyRange[] = 4;
+                    break;
+            }
+        }
+
+        if (count($difficultyRange) === 2) {
+            $difficultyBounds = [];
+            switch ($difficultyRange[0]) {
+                case '0':
+                    $difficultyBounds[] = 0;
+                    break;
+                case '1':
+                    $difficultyBounds[] = 0.5;
+                    break;
+                case '2':
+                    $difficultyBounds[] = 1.5;
+                    break;
+                case '3':
+                    $difficultyBounds[] = 2.5;
+                    break;
+                case '4':
+                    $difficultyBounds[] = 3.5;
+                    break;
+            }
+            switch ($difficultyRange[1]) {
+                case '0':
+                    $difficultyBounds[] = 0.5;
+                    break;
+                case '1':
+                    $difficultyBounds[] = 1.5;
+                    break;
+                case '2':
+                    $difficultyBounds[] = 2.5;
+                    break;
+                case '3':
+                    $difficultyBounds[] = 3.5;
+                    break;
+                case '4':
+                    $difficultyBounds[] = 4;
+                    break;
+            }
+
+            if ($difficultyBounds[1] === 4) {
+                $upperBoundComparison = '<=';
+            } else {
+                $upperBoundComparison = '<';
+            }
+            if ($difficultyBounds[0] === 0) {
+                // If the lower limit is equal to 0, take into account problems
+                // without difficulty.
+                $conditions = "(p.difficulty IS NULL OR (p.difficulty >= ? AND p.difficulty {$upperBoundComparison} ?))";
+            } else {
+                $conditions = "p.difficulty >= ? AND p.difficulty {$upperBoundComparison} ?";
             }
 
             $clauses[] = [
                 $conditions,
-                $difficultyRange,
+                $difficultyBounds,
             ];
         }
 
@@ -190,7 +271,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         Submissions.identity_id = Identities.identity_id
                     GROUP BY
                         Problems.problem_id
-                    ) ps ON ps.problem_id = p.problem_id ' . $languageJoin;
+                    ) ps ON ps.problem_id = p.problem_id ' . $languageJoin . $levelJoin;
 
             $clauses[] = [
                 'p.visibility > ?',
@@ -239,7 +320,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     INNER JOIN
                         Group_Roles gr ON gr.group_id = gi.group_id
                     WHERE gi.identity_id = ? AND gr.role_id = ?
-                ) gr ON p.acl_id = gr.acl_id ' . $languageJoin;
+                ) gr ON p.acl_id = gr.acl_id ' . $languageJoin . $levelJoin;
             $args[] = $identityId;
             $args[] = $userId;
             $args[] = \OmegaUp\Authorization::ADMIN_ROLE;
@@ -270,7 +351,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         p.* ';
             $sql = '
                     FROM
-                        Problems p ' . $languageJoin;
+                        Problems p ' . $languageJoin . $levelJoin;
 
             $clauses[] = [
                 'p.visibility >= ?',
@@ -291,6 +372,40 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $args,
                 $clauses
             );
+        }
+
+        if (!empty($authors)) {
+            $placeholders = join(',', array_fill(0, count($authors), '?'));
+            $sql .= "
+                INNER JOIN (
+                    SELECT
+                        pp.problem_id
+                    FROM
+                        Problems pp
+                    INNER JOIN
+                        ACLs acl
+                    ON
+                        pp.acl_id = acl.acl_id
+                    INNER JOIN
+                        User_Rank ur
+                    ON
+                        ur.user_id = acl.owner_id
+                    WHERE ur.user_id IN (
+                        SELECT
+                            user_id
+                        FROM
+                            User_Rank
+                        WHERE username IN ($placeholders)
+                    )
+                ) pa ON pa.problem_id = p.problem_id";
+
+            $args = array_merge($args, $authors);
+        }
+
+        if ($onlyQualitySeal) {
+            $clauses[] = [
+                'p.quality_seal = ?', [1]
+            ];
         }
 
         // Finally flatten all WHERE clauses, and add a 'WHERE' if applicable.
@@ -391,6 +506,42 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
+     * Gets a certain problem based on its alias and the problemset
+     * it is supposed to be part of.
+     *
+     * @return null|\OmegaUp\DAO\VO\Problems
+     */
+    final public static function getByAliasAndProblemset(
+        string $alias,
+        int $problemsetId
+    ): ?\OmegaUp\DAO\VO\Problems {
+        $sql = '
+            SELECT
+                p.*
+            FROM
+                Problems p
+            INNER JOIN
+                Problemset_Problems pp ON pp.problem_id = p.problem_id
+            INNER JOIN
+                Problemsets ps ON ps.problemset_id = pp.problemset_id
+            WHERE
+                p.alias = ?
+                AND ps.problemset_id = ?
+            ';
+        $params = [
+            $alias,
+            $problemsetId
+        ];
+
+        /** @var array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}|null */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+        if (is_null($rs)) {
+                return null;
+        }
+        return new \OmegaUp\DAO\VO\Problems($rs);
+    }
+
+    /**
      * @return list<array{name: string, source: string}>
      */
     final public static function getTagsForProblem(
@@ -465,7 +616,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      */
     final public static function getProblemsSolved(int $identityId): array {
         $sql = '
-            SELECT DISTINCT
+            SELECT
                 p.*
             FROM
                 Problems p
@@ -475,7 +626,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 Runs r ON r.run_id = s.current_run_id
             WHERE
                 r.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
+            GROUP BY
+                p.problem_id
             ORDER BY
+                min(s.time) DESC,
                 p.problem_id DESC;
         ';
         $val = [$identityId];
@@ -1136,7 +1290,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     /**
      * @return list<array{name: string, problems_per_tag: int}>
      */
-    final public static function getProblemsPerTagCount(): array {
+    final public static function getQualityProblemsPerTagCount(): array {
         $sql = "SELECT
                     t.name, COUNT(p.problem_id) AS problems_per_tag
                 FROM
@@ -1151,10 +1305,57 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     t.tag_id = pt.tag_id
                 WHERE
                     t.name LIKE CONCAT('problemLevel','%')
+                    AND p.quality_seal = 1
                 GROUP BY
                     t.name;";
 
         /** @var list<array{name: string, problems_per_tag: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+    }
+
+    final public static function getRandomLanguageProblemAlias(): string {
+        $sql = "SELECT
+                    alias
+                FROM
+                    Problems p
+                    INNER JOIN
+                    Problems_Tags pt
+                ON
+                    p.problem_id = pt.problem_id
+                INNER JOIN
+                    Tags t
+                ON
+                    t.tag_id = pt.tag_id
+                WHERE
+                    quality_seal = 1
+                    AND (t.name LIKE CONCAT('problemLevel','%') AND t.name NOT LIKE 'problemLevelBasicKarel')
+                ORDER BY
+                    RAND() LIMIT 1;";
+
+        /** @var string */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
+    }
+
+    final public static function getRandomKarelProblemAlias(): string {
+        $sql = "SELECT
+                    alias
+                FROM
+                    Problems p
+                    INNER JOIN
+                    Problems_Tags pt
+                ON
+                    p.problem_id = pt.problem_id
+                INNER JOIN
+                    Tags t
+                ON
+                    t.tag_id = pt.tag_id
+                WHERE
+                    quality_seal = 1
+                    AND t.name = 'problemLevelBasicKarel'
+                ORDER BY
+                    RAND() LIMIT 1;";
+
+        /** @var string */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
     }
 }

@@ -1,5 +1,6 @@
 import * as ui from './ui';
 import * as api from './api';
+import { types } from './api_types';
 import * as errors from './errors';
 import * as time from './time';
 
@@ -9,7 +10,7 @@ export class Experiments {
 
   constructor(experimentList: Array<string>) {
     if (!experimentList) return;
-    for (let experiment of experimentList)
+    for (const experiment of experimentList)
       this.enabledExperiments[experiment] = true;
   }
 
@@ -21,7 +22,7 @@ export class Experiments {
   // The list of all enabled experiments for a particular request should have
   // been injected into the DOM by Smarty.
   static loadGlobal(): Experiments {
-    const experimentsNode = document.getElementById(
+    const experimentsNode = document?.getElementById(
       'omegaup-enabled-experiments',
     );
     let experimentsList: Array<string> = [];
@@ -30,7 +31,7 @@ export class Experiments {
   }
 
   isEnabled(name: string): boolean {
-    return this.enabledExperiments.hasOwnProperty(name);
+    return Object.prototype.hasOwnProperty.call(this.enabledExperiments, name);
   }
 }
 
@@ -43,12 +44,12 @@ export class EventListenerList {
 
   constructor(listenerList: Array<() => void>) {
     if (!listenerList) return;
-    for (let listener of listenerList) this.listenerList.push(listener);
+    for (const listener of listenerList) this.listenerList.push(listener);
   }
 
   notify(): void {
     this.ready = true;
-    for (let listener of this.listenerList) listener();
+    for (const listener of this.listenerList) listener();
     this.listenerList = [];
   }
 
@@ -146,18 +147,6 @@ export namespace omegaup {
     school_id?: number;
   }
 
-  export interface Commit {
-    author: Signature;
-    commit: string;
-    commiter: Signature;
-    message: string;
-    parents: string[];
-    tree: {
-      [file: string]: string;
-    };
-    version: string;
-  }
-
   export interface Contest {
     alias: string;
     title: string;
@@ -206,15 +195,6 @@ export namespace omegaup {
     alias?: string;
   }
 
-  export interface ContestProblem {
-    alias: string;
-    text: string;
-    acceptsSubmissions: boolean;
-    bestScore: number;
-    maxScore: number;
-    hasRuns?: boolean;
-  }
-
   export interface ContestResult {
     data: omegaup.Contest;
     length?: string;
@@ -254,10 +234,6 @@ export namespace omegaup {
     verdict: string;
   }
 
-  interface CourseProgress {
-    [assignment: string]: number;
-  }
-
   export interface DetailsGroup {
     cases: omegaup.Case[];
     contest_score: number;
@@ -274,26 +250,6 @@ export namespace omegaup {
     config: boolean;
     hash: string;
     name: string;
-  }
-
-  export interface Group {
-    alias: string;
-    create_time: Date;
-    description: string;
-    name: string;
-  }
-
-  export interface Identity extends User {
-    name: string;
-    username: string;
-    school: string;
-    school_name?: string;
-    gender?: string;
-    password?: string;
-    school_id: number;
-    country_id: string;
-    state_id: string;
-    classname: string;
   }
 
   export interface IdentityContest {
@@ -373,8 +329,9 @@ export namespace omegaup {
 
   export interface QueryParameters {
     some_tags: boolean;
-    min_difficulty: number;
-    max_difficulty: number;
+    min_difficulty?: number;
+    max_difficulty?: number;
+    difficulty_range: string;
     order_by: string;
     sort_order: string;
     only_karel?: boolean;
@@ -475,12 +432,6 @@ export namespace omegaup {
     rank: omegaup.SchoolsRank[];
   }
 
-  export interface Signature {
-    email: string;
-    name: string;
-    time: string;
-  }
-
   export interface Stats {
     total_runs: string;
     pending_runs: Array<string>;
@@ -558,7 +509,7 @@ export namespace omegaup {
     ready: boolean = false;
     experiments: Experiments | null = null;
     email?: string;
-    identity?: omegaup.Identity;
+    identity?: types.Identity;
 
     _documentReady: boolean = false;
     _initialized: boolean = false;
@@ -605,14 +556,16 @@ export namespace omegaup {
     }
 
     _notify(eventName: string): void {
-      if (!this._listeners.hasOwnProperty(eventName)) return;
+      if (!Object.prototype.hasOwnProperty.call(this._listeners, eventName))
+        return;
       this._listeners[eventName].notify();
     }
 
     on(events: string, handler: () => void): void {
       this._initialize();
       for (const eventName of events.split(' ')) {
-        if (!this._listeners.hasOwnProperty(eventName)) continue;
+        if (!Object.prototype.hasOwnProperty.call(this._listeners, eventName))
+          continue;
         this._listeners[eventName].add(handler);
       }
     }
@@ -625,22 +578,22 @@ export namespace omegaup {
     }
 
     convertTimes(item: { [key: string]: any }): any {
-      if (item.hasOwnProperty('time')) {
+      if (Object.prototype.hasOwnProperty.call(item, 'time')) {
         item.time = time.remoteTime(item.time * 1000);
       }
-      if (item.hasOwnProperty('end_time')) {
+      if (Object.prototype.hasOwnProperty.call(item, 'end_time')) {
         item.end_time = time.remoteTime(item.end_time * 1000);
       }
-      if (item.hasOwnProperty('start_time')) {
+      if (Object.prototype.hasOwnProperty.call(item, 'start_time')) {
         item.start_time = time.remoteTime(item.start_time * 1000);
       }
-      if (item.hasOwnProperty('finish_time')) {
+      if (Object.prototype.hasOwnProperty.call(item, 'finish_time')) {
         item.finish_time = time.remoteTime(item.finish_time * 1000);
       }
-      if (item.hasOwnProperty('last_updated')) {
+      if (Object.prototype.hasOwnProperty.call(item, 'last_updated')) {
         item.last_updated = time.remoteTime(item.last_updated * 1000);
       }
-      if (item.hasOwnProperty('submission_deadline')) {
+      if (Object.prototype.hasOwnProperty.call(item, 'submission_deadline')) {
         item.submission_deadline = time.remoteTime(
           item.submission_deadline * 1000,
         );

@@ -46,36 +46,36 @@ OmegaUp.on('ready', () => {
   const markdownStatement =
     localStorage.getItem('wmdinput') || defaultStatement;
 
-  const problemDetails = new Vue({
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-problem-statementedit': problem_StatementEdit,
+    },
     render: function (createElement) {
       return createElement('omegaup-problem-statementedit', {
         props: {
           alias: 'problema',
           title: 'Tu problema',
           source: 'fuente',
-          problemsetter: <types.ProblemsetterInfo>{
+          problemsetter: {
             classname: 'user-rank-unranked',
             name: 'tu-usuario',
             username: 'tu_usuario',
-          },
-          statement: <types.ProblemStatement>{
+          } as types.ProblemsetterInfo,
+          statement: {
             markdown: markdownStatement,
             language: 'es',
             images: {},
-          },
+          } as types.ProblemStatement,
           markdownType: 'statements',
           showEditControls: false,
         },
         on: {
-          'update:markdownContents': (contents: string) => {
-            localStorage.setItem('wmdinput', contents);
+          'update:statement': (statement: types.ProblemStatement) => {
+            localStorage.setItem('wmdinput', statement.markdown);
           },
         },
       });
-    },
-    components: {
-      'omegaup-problem-statementedit': problem_StatementEdit,
     },
   });
 });

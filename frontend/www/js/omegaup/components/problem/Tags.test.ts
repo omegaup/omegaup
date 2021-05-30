@@ -1,10 +1,6 @@
 import { mount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
 
-import { types } from '../../api_types';
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
 
 import problem_Tags from './Tags.vue';
 
@@ -13,7 +9,7 @@ const baseProblemTagsPropsData = {
   canAddNewTags: true,
   initialAllowTags: true,
   isCreate: true,
-  levelTags: <string[]>[
+  levelTags: [
     'problemLevelAdvancedCompetitiveProgramming',
     'problemLevelAdvancedSpecializedTopics',
     'problemLevelBasicIntroductionToProgramming',
@@ -22,9 +18,9 @@ const baseProblemTagsPropsData = {
     'problemLevelIntermediateDataStructuresAndAlgorithms',
     'problemLevelIntermediateMathsInProgramming',
   ],
-  publicTags: <string[]>['some', 'public', 'tags'],
-  selectedPrivateTags: <string[]>[],
-  selectedPublicTags: <string[]>[],
+  publicTags: ['some', 'public', 'tags'],
+  selectedPrivateTags: [] as string[],
+  selectedPublicTags: [] as string[],
   title: '',
 };
 

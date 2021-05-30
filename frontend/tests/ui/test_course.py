@@ -117,7 +117,7 @@ def test_user_ranking_course(driver):
 
         enter_course_assignments_page(driver, course_alias)
         util.check_scoreboard_events(driver, assignment_alias, url,
-                                     num_elements=1, scoreboard='Public')
+                                     num_elements=1, scoreboard='Scoreboard')
 
         enter_course_assignments_page(driver, course_alias)
         with driver.page_transition():
@@ -147,6 +147,27 @@ def test_user_ranking_course(driver):
                 break
         assert (('#ranking') in
                 driver.browser.current_url), driver.browser.current_url
+
+    with driver.login_admin():
+        show_run_details_course(driver, course_alias, assignment_alias)
+
+
+def show_run_details_course(driver: conftest.Driver, course_alias: str,
+                            assignment_alias: str) -> None:
+    '''It shows details popup for a certain submission in a course.'''
+    enter_course_assignments_page(driver, course_alias)
+    with driver.page_transition():
+        driver.wait.until(EC.element_to_be_clickable(
+            (By.XPATH, '//a[@href = "/course/%s/assignment/%s/admin/"]'
+             % (course_alias, assignment_alias)))).click()
+
+    util.show_run_details(driver,
+                          table_classname='local',
+                          dropdown_classname='open',
+                          code='#include <iostream>',
+                          has_been_migrated=False)
+
+    driver.browser.find_element_by_css_selector('#overlay').click()
 
 
 def test_create_identities_for_course(driver):

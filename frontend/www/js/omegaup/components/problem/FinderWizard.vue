@@ -2,65 +2,65 @@
   <transition name="modal">
     <div class="modal-mask">
       <div class="modal-container">
-        <button class="close" v-on:click="$emit('close')">❌</button>
+        <button class="close" @click="$emit('close')">❌</button>
         <form-wizard
           color="#678DD7"
-          v-bind:back-button-text="T.wordsBack"
-          v-bind:finish-button-text="T.wordsConfirm"
-          v-bind:next-button-text="T.wordsNext"
-          v-bind:subtitle="T.wizardDescription"
-          v-bind:title="T.wizardTitle"
-          v-on:on-complete="searchProblems"
-          ><tab-content v-bind:title="T.wizardStepOne"
+          :back-button-text="T.wordsBack"
+          :finish-button-text="T.wordsConfirm"
+          :next-button-text="T.wordsNext"
+          :subtitle="T.wizardDescription"
+          :title="T.wizardTitle"
+          @on-complete="searchProblems"
+          ><tab-content :title="T.wizardStepOne"
             ><toggle-button
-              v-bind:color="{ checked: '#678DD7', unchecked: '#343a40' }"
-              v-bind:font-size="12"
-              v-bind:height="35"
-              v-bind:labels="{
+              v-model="karel"
+              :color="{ checked: '#678DD7', unchecked: '#343a40' }"
+              :font-size="12"
+              :height="35"
+              :labels="{
                 checked: `${T.wordsKarel}`,
                 unchecked: `${T.wordsAnyLanguage}`,
               }"
-              v-bind:value="karel"
-              v-bind:width="160"
-              v-model="karel"
+              :value="karel"
+              :width="160"
             ></toggle-button>
             <tags-input
-              element-id="tags"
-              v-bind:existing-tags="tagObjects"
-              v-bind:only-existing-tags="true"
-              v-bind:placeholder="T.wordsAddTag"
-              v-bind:typeahead="true"
               v-model="selectedTags"
+              element-id="tags"
+              :existing-tags="tagObjects"
+              :only-existing-tags="true"
+              :placeholder="T.wordsAddTag"
+              :typeahead="true"
             ></tags-input
           ></tab-content>
-          <tab-content v-bind:title="T.wizardStepTwo"
+          <tab-content :title="T.wizardStepTwo"
             ><vue-slider
-              tooltip="none"
-              v-bind:adsorb="true"
-              v-bind:dot-size="18"
-              v-bind:enable-cross="false"
-              v-bind:included="true"
-              v-bind:marks="SLIDER_MARKS"
-              v-bind:max="4"
-              v-bind:min="0"
               v-model="difficultyRange"
+              tooltip="none"
+              :adsorb="true"
+              :dot-size="18"
+              :enable-cross="false"
+              :included="true"
+              :marks="SLIDER_MARKS"
+              :max="4"
+              :min="0"
             ></vue-slider
           ></tab-content>
-          <tab-content v-bind:title="T.wizardStepThree">
+          <tab-content :title="T.wizardStepThree">
             <div class="tab-select">
               <label
+                v-for="priority in PRIORITIES"
                 class="tab-select-el"
-                v-bind:class="{
+                :class="{
                   'tab-select-el-active': priority.type === selectedPriority,
                 }"
-                v-for="priority in PRIORITIES"
                 >{{ priority.text }}
                 <input
+                  v-model="selectedPriority"
                   class="hidden-radio"
                   name="priority"
                   type="radio"
-                  v-bind:value="priority.type"
-                  v-model="selectedPriority"
+                  :value="priority.type"
               /></label>
             </div> </tab-content
         ></form-wizard>
@@ -68,101 +68,6 @@
     </div>
   </transition>
 </template>
-
-<style>
-.modal-mask {
-  position: fixed;
-  z-index: 99999;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  transition: opacity 0.3s ease;
-}
-
-.modal-container {
-  background: #eee;
-  width: 800px;
-  margin: 2.5em auto 0;
-  border: 2px solid #ccc;
-  padding: 1em;
-  position: relative;
-  overflow: auto;
-}
-
-.close {
-  float: none;
-  text-align: right;
-  width: 100%;
-}
-
-.wizard-tab-content {
-  text-align: center;
-}
-
-.tags-input {
-  margin: 1em 0 3em;
-}
-
-.tags-input input {
-  padding-left: 0.25em;
-}
-
-.tags-input-remove {
-  width: 1rem;
-  height: 1rem;
-}
-
-.tags-input-badge {
-  font-size: 1em;
-}
-
-.typeahead-badges {
-  margin-top: 0.35em;
-}
-
-.tags-input-remove:before,
-.tags-input-remove:after,
-.tags-input-typeahead-item-highlighted-default,
-.vue-slider-process {
-  background-color: #678dd7;
-}
-
-.vue-slider {
-  margin: 1em 2em 5em;
-}
-
-.vue-slider-rail {
-  height: 12.5px;
-}
-
-.tab-select {
-  margin: 2em 3em 3em;
-  width: 90%;
-  display: flex;
-}
-
-.tab-select-el {
-  display: block;
-  cursor: pointer;
-  padding: 0.25em 1em;
-  border: 1px solid #678dd7;
-  flex: 1;
-  text-align: center;
-  color: #678dd7;
-}
-
-.tab-select-el:hover,
-.tab-select-el-active {
-  color: #fff;
-  background: #678dd7;
-}
-
-.hidden-radio {
-  display: none;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -234,7 +139,7 @@ export default class ProblemFinderWizard extends Vue {
     this.possibleTags.forEach((tagObject) => {
       tagObjects.push({
         key: tagObject.name,
-        value: T.hasOwnProperty(tagObject.name)
+        value: Object.prototype.hasOwnProperty.call(T, tagObject.name)
           ? T[tagObject.name]
           : tagObject.name,
       });
@@ -246,8 +151,7 @@ export default class ProblemFinderWizard extends Vue {
     // Build query parameters
     let queryParameters: omegaup.QueryParameters = {
       some_tags: true,
-      min_difficulty: this.difficultyRange[0],
-      max_difficulty: this.difficultyRange[1],
+      difficulty_range: `${this.difficultyRange[0].toString()},${this.difficultyRange[1].toString()}`,
       order_by: this.selectedPriority,
       sort_order: 'desc',
     };
@@ -261,3 +165,99 @@ export default class ProblemFinderWizard extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+.modal-mask {
+  position: fixed;
+  z-index: 99999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(var(--finder-wizard-modal-mask-background-color), 0.5);
+  transition: opacity 0.3s ease;
+}
+
+.modal-container {
+  background: var(--finder-wizard-modal-container-background-color);
+  width: 800px;
+  margin: 2.5em auto 0;
+  border: 2px solid var(--finder-wizard-modal-container-border-color);
+  padding: 1em;
+  position: relative;
+  overflow: auto;
+}
+
+.close {
+  float: none;
+  text-align: right;
+  width: 100%;
+}
+
+.wizard-tab-content {
+  text-align: center;
+}
+
+.tags-input {
+  margin: 1em 0 3em;
+}
+
+.tags-input input {
+  padding-left: 0.25em;
+}
+
+.tags-input-remove {
+  width: 1rem;
+  height: 1rem;
+}
+
+.tags-input-badge {
+  font-size: 1em;
+}
+
+.typeahead-badges {
+  margin-top: 0.35em;
+}
+
+.tags-input-remove::before,
+.tags-input-remove::after,
+.tags-input-typeahead-item-highlighted-default,
+.vue-slider-process {
+  background-color: var(--finder-wizard-slider-process-background-color);
+}
+
+.vue-slider {
+  margin: 1em 2em 5em;
+}
+
+.vue-slider-rail {
+  height: 12.5px;
+}
+
+.tab-select {
+  margin: 2em 3em 3em;
+  width: 90%;
+  display: flex;
+}
+
+.tab-select-el {
+  display: block;
+  cursor: pointer;
+  padding: 0.25em 1em;
+  border: 1px solid var(--finder-wizard-tab-select-el-border-color);
+  flex: 1;
+  text-align: center;
+  color: var(--finder-wizard-tab-select-el-font-color);
+}
+
+.tab-select-el:hover,
+.tab-select-el-active {
+  color: var(--finder-wizard-tab-select-el-font-color--active);
+  background: var(--finder-wizard-tab-select-el-background-color--active);
+}
+
+.hidden-radio {
+  display: none;
+}
+</style>

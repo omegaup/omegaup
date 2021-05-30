@@ -2,43 +2,44 @@
   <div class="card">
     <omegaup-markdown
       v-if="showSolution"
-      v-bind:markdown="solution.markdown"
-      v-bind:image-mapping="solution.images"
+      :markdown="solution.markdown"
+      :source-mapping="solution.sources"
+      :image-mapping="solution.images"
     ></omegaup-markdown>
-    <div class="interstitial" v-else>
-      <p v-html="statusMessage"></p>
-      <p
-        v-html="
+    <div v-else class="interstitial">
+      <omegaup-markdown :markdown="statusMessage"></omegaup-markdown>
+      <omegaup-markdown
+        v-show="allTokens !== null && availableTokens !== null"
+        :markdown="
           ui.formatString(T.solutionTokens, {
             available: availableTokens,
             total: allTokens,
           })
         "
-        v-show="allTokens !== null && availableTokens !== null"
-      ></p>
+      ></omegaup-markdown>
       <div class="text-center">
         <button
-          class="btn btn-primary btn-md"
           v-if="status === 'unlocked'"
-          v-on:click="$emit('get-solution')"
+          class="btn btn-primary btn-md"
+          @click="$emit('get-solution')"
         >
           {{ T.wordsSeeSolution }}
         </button>
         <button
-          class="btn btn-primary btn-md"
           v-else-if="
             status === 'locked' &&
             allTokens === null &&
             availableTokens === null
           "
-          v-on:click="$emit('get-tokens')"
+          class="btn btn-primary btn-md"
+          @click="$emit('get-tokens')"
         >
           {{ T.solutionViewCurrentTokens }}
         </button>
         <button
-          class="btn btn-primary btn-md"
           v-else-if="status === 'locked' && availableTokens &gt; 0"
-          v-on:click="$emit('unlock-solution')"
+          class="btn btn-primary btn-md"
+          @click="$emit('unlock-solution')"
         >
           {{ T.wordsUnlockSolution }}
         </button>
@@ -46,20 +47,6 @@
     </div>
   </div>
 </template>
-
-<style>
-.interstitial {
-  padding: 2em;
-}
-
-.solution {
-  padding: 2em 7em;
-}
-
-.solution-tokens {
-  font-size: 1.25em;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -103,3 +90,17 @@ export default class ProblemSolution extends Vue {
   }
 }
 </script>
+
+<style>
+.interstitial {
+  padding: 2em;
+}
+
+.solution {
+  padding: 2em 7em;
+}
+
+.solution-tokens {
+  font-size: 1.25em;
+}
+</style>

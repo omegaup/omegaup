@@ -4,28 +4,28 @@
       {{ title }}
       <template v-if="showVisibilityIndicators">
         <img
-          src="/media/quality-badge-sm.png"
-          v-bind:title="T.wordsHighQualityProblem"
           v-if="problem.quality_seal || problem.visibility === 3"
+          src="/media/quality-badge-sm.png"
+          :title="T.wordsHighQualityProblem"
         />
         <span
-          class="glyphicon glyphicon-warning-sign"
-          v-bind:title="T.wordsWarningProblem"
           v-if="problem.visibility === 1 || problem.visibility === -1"
+          class="glyphicon glyphicon-warning-sign"
+          :title="T.wordsWarningProblem"
         ></span>
         <span
-          class="glyphicon glyphicon-eye-close"
-          v-bind:title="T.wordsPrivate"
           v-if="problem.visibility === 0 || problem.visibility === -1"
+          class="glyphicon glyphicon-eye-close"
+          :title="T.wordsPrivate"
         ></span>
         <span
-          class="glyphicon glyphicon-ban-circle"
-          v-bind:title="T.wordsBannedProblem"
           v-if="problem.visibility <= -2"
+          class="glyphicon glyphicon-ban-circle"
+          :title="T.wordsBannedProblem"
         ></span>
       </template>
       <template v-if="showEditLink">
-        (<a v-bind:href="`/problem/${problem.alias}/edit/`">{{ T.wordsEdit }}</a
+        (<a :href="`/problem/${problem.alias}/edit/`">{{ T.wordsEdit }}</a
         >)
       </template>
     </h1>
@@ -54,35 +54,9 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-.panel {
-  .title {
-    text-align: center;
-    font-size: 1.5em;
-    margin: 1em;
-  }
-  table {
-    width: 30em;
-    margin: 10px auto;
-    td {
-      text-align: center;
-    }
-    th[scope='row'] {
-      font-weight: bold;
-    }
-    td,
-    th[scope='row'] {
-      border: 1px solid #000;
-      padding: 2px;
-    }
-  }
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as ui from '../../ui';
 import { types } from '../../api_types';
 
 @Component
@@ -130,3 +104,33 @@ export default class ProblemSettingsSummary extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+.panel {
+  .title {
+    text-align: center;
+    font-size: 1.5em;
+    margin: 1em;
+  }
+
+  table {
+    width: 30em;
+    margin: 10px auto;
+
+    td {
+      text-align: center;
+    }
+
+    th[scope='row'] {
+      font-weight: bold;
+    }
+
+    td,
+    th[scope='row'] {
+      border: 1px solid var(--arena-settings-summary-panel-th-border-color);
+      padding: 2px;
+    }
+  }
+}
+</style>

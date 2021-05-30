@@ -1,10 +1,8 @@
 import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
-import { types } from '../../api_types';
+import type { types } from '../../api_types';
 
 import course_ScheduledProblemLists from './ScheduledProblemList.vue';
 
@@ -12,9 +10,9 @@ describe('ScheduledProblemLists.vue', () => {
   it('Should handle empty assignments and problems', () => {
     const wrapper = shallowMount(course_ScheduledProblemLists, {
       propsData: {
-        assignments: <types.CourseAssignment[]>[],
-        assignmentProblems: <types.ProblemsetProblem[]>[],
-        selectedAssignment: <types.CourseAssignment>{
+        assignments: [] as types.CourseAssignment[],
+        assignmentProblems: [] as types.ProblemsetProblem[],
+        selectedAssignment: {
           problemset_id: 0,
           alias: '',
           description: '',
@@ -28,8 +26,8 @@ describe('ScheduledProblemLists.vue', () => {
           scoreboard_url: '',
           scoreboard_url_admin: '',
           assignment_type: 'homework',
-        },
-        taggedProblems: <omegaup.Problem[]>[],
+        } as types.CourseAssignment,
+        taggedProblems: [] as omegaup.Problem[],
       },
     });
 

@@ -3,11 +3,15 @@
     <!-- id-lint off -->
     <div id="ranking-chart"></div>
     <!-- id-lint on -->
-    <label v-if="this.showInvitedUsersFilter">
+    <highcharts
+      v-if="rankingChartOptions"
+      :options="rankingChartOptions"
+    ></highcharts>
+    <label v-if="showInvitedUsersFilter">
       <input
+        v-model="onlyShowExplicitlyInvited"
         class="toggle-contestants"
         type="checkbox"
-        v-model="onlyShowExplicitlyInvited"
       />
       {{ T.scoreboardShowOnlyInvitedIdentities }}</label
     >
@@ -17,66 +21,62 @@
           <th><!-- legend --></th>
           <th><!-- position --></th>
           <th>{{ T.wordsUser }}</th>
-          <th v-for="(problem, index) in problems">
-            <a
-              v-bind:href="'#problems/' + problem.alias"
-              v-bind:title="problem.alias"
-              >{{ ui.columnName(index) }}</a
-            >
+          <th v-for="(problem, index) in problems" :key="problem.alias">
+            <a :href="'#problems/' + problem.alias" :title="problem.alias">{{
+              ui.columnName(index)
+            }}</a>
           </th>
-          <th v-bind:colspan="2 + problems.length">{{ T.wordsTotal }}</th>
+          <th :colspan="2 + problems.length">{{ T.wordsTotal }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-bind:class="user.username"
-          v-for="(user, userIndex) in ranking"
-          v-if="showUser(user.is_invited)"
-        >
-          <td
-            class="legend"
-            v-bind:style="{ backgroundColor: legendColor(userIndex) }"
-          ></td>
-          <td class="position">{{ user.place || '—' }}</td>
-          <td class="user">
-            {{ ui.rankingUsername(user) }}
-            <img
-              alt=""
-              height="11"
-              v-bind:src="`/media/flags/${user.country.toLowerCase()}.png`"
-              v-bind:title="user.country"
-              v-if="user.country"
-              width="16"
-            />
-          </td>
-
-          <td
-            v-bind:class="problemClass(problem, problems[problemIndex].alias)"
-            v-for="(problem, problemIndex) in user.problems"
+        <template v-for="(user, userIndex) in ranking">
+          <tr
+            v-if="showUser(user.is_invited)"
+            :key="user.username"
+            :class="user.username"
           >
-            <template v-if="problem.runs &gt; 0">
+            <td class="legend" :class="legendClass(userIndex)"></td>
+            <td class="position">{{ user.place || '—' }}</td>
+            <td class="user">
+              {{ ui.rankingUsername(user) }}
+              <img
+                v-if="user.country"
+                alt=""
+                height="11"
+                :src="`/media/flags/${user.country.toLowerCase()}.png`"
+                :title="user.country"
+                width="16"
+              />
+            </td>
+
+            <td
+              v-for="(problem, problemIndex) in user.problems"
+              :key="problem.alias"
+              :class="problemClass(problem, problems[problemIndex].alias)"
+            >
+              <template v-if="problem.runs > 0">
+                <div class="points">
+                  {{ renderPoints(problem) }}
+                </div>
+                <div class="penalty">
+                  <span v-if="showPenalty">{{ problem.penalty }}</span> ({{
+                    problem.runs
+                  }})
+                </div>
+              </template>
+              <template v-else> - </template>
+            </td>
+            <td>
               <div class="points">
-                {{ renderPoints(problem) }}
+                {{ user.total.points.toFixed(digitsAfterDecimalPoint) }}
               </div>
               <div class="penalty">
-                <span v-if="showPenalty">{{ problem.penalty }}</span> ({{
-                  problem.runs
-                }})
+                {{ user.total.penalty }} ({{ totalRuns(user) }})
               </div>
-            </template>
-            <template v-else="">
-              -
-            </template>
-          </td>
-          <td>
-            <div class="points">
-              {{ user.total.points.toFixed(digitsAfterDecimalPoint) }}
-            </div>
-            <div class="penalty">
-              {{ user.total.penalty }} ({{ totalRuns(user) }})
-            </div>
-          </td>
-        </tr>
+            </td>
+          </tr>
+        </template>
       </tbody>
     </table>
     <div class="footer">
@@ -85,85 +85,27 @@
   </div>
 </template>
 
-<style>
-.omegaup-scoreboard {
-  max-width: 900px;
-  margin: 0 auto;
-}
-.omegaup-scoreboard a {
-  color: #5588dd;
-}
-.omegaup-scoreboard .footer {
-  padding: 1em;
-  text-align: right;
-  font-size: 70%;
-  color: grey;
-}
-
-.omegaup-scoreboard table {
-  border-collapse: collapse;
-  width: 100%;
-}
-.omegaup-scoreboard th {
-  padding: 0.2em;
-  text-align: center;
-}
-.omegaup-scoreboard td {
-  text-align: center;
-  vertical-align: middle;
-  border: 1px solid #000;
-  padding: 0.2em;
-}
-.omegaup-scoreboard td.accepted {
-  background: #dfd;
-}
-.omegaup-scoreboard td.pending {
-  background: #ddf;
-}
-.omegaup-scoreboard td.wrong {
-  background: #fdd;
-}
-.omegaup-scoreboard td.position.recent-event {
-  font-weight: bold;
-  background: #dfd;
-}
-.omegaup-scoreboard td.accepted.recent-event {
-  background: #8f8;
-}
-.omegaup-scoreboard td .points {
-  font-weight: bold;
-}
-.omegaup-scoreboard td .penalty {
-  font-size: 70%;
-}
-.omegaup-scoreboard td.position {
-  width: 3.5em;
-}
-.omegaup-scoreboard td.legend {
-  width: 0.5em;
-}
-.omegaup-scoreboard td[class$='points'] {
-  width: 3.5em;
-  border-right-style: dotted;
-}
-.omegaup-scoreboard td[class$='penalty'] {
-  border-left-width: 0;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
+import * as Highcharts from 'highcharts/highstock';
+import { Chart } from 'highcharts-vue';
 import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
+import * as time from '../../time';
 
-@Component
+@Component({
+  components: {
+    highcharts: Chart,
+  },
+})
 export default class ArenaScoreboard extends Vue {
-  @Prop() scoreboardColors!: string[];
+  @Prop({ default: 10 }) numberOfPositions!: number;
   @Prop() problems!: omegaup.Problem[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
+  @Prop() rankingChartOptions!: Highcharts.Options | null;
   @Prop() lastUpdated!: Date;
   @Prop({ default: true }) showInvitedUsersFilter!: boolean;
   @Prop({ default: true }) showPenalty!: boolean;
@@ -173,14 +115,15 @@ export default class ArenaScoreboard extends Vue {
   ui = ui;
   onlyShowExplicitlyInvited = true;
 
-  get lastUpdatedString(): string {
-    return !this.lastUpdated ? '' : this.lastUpdated.toString();
+  get lastUpdatedString(): null | string {
+    if (!this.lastUpdated) return null;
+    return ui.formatString(T.scoreboardLastUpdated, {
+      datetime: time.formatDateTime(this.lastUpdated),
+    });
   }
 
-  legendColor(idx: number): string {
-    return this.scoreboardColors && idx < this.scoreboardColors.length
-      ? this.scoreboardColors[idx]
-      : '';
+  legendClass(idx: number): string {
+    return idx < this.numberOfPositions ? `legend-${idx + 1}` : '';
   }
 
   renderPoints(p: types.ScoreboardRankingProblem): string {
@@ -216,3 +159,117 @@ export default class ArenaScoreboard extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+.omegaup-scoreboard {
+  max-width: 900px;
+  margin: 0 auto;
+
+  a {
+    color: var(--arena-scoreboard-a-font-color);
+  }
+
+  .footer {
+    padding: 1em;
+    text-align: right;
+    font-size: 70%;
+    color: var(--arena-scoreboard-footer-font-color);
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th {
+    padding: 0.2em;
+    text-align: center;
+  }
+
+  td {
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid var(--arena-scoreboard-td-border-color);
+    padding: 0.2em;
+
+    .points {
+      font-weight: bold;
+    }
+
+    .penalty {
+      font-size: 70%;
+    }
+  }
+
+  .accepted {
+    background: var(--arena-scoreboard-accepted-background-color);
+  }
+
+  .pending {
+    background: var(--arena-scoreboard-pending-background-color);
+  }
+
+  .wrong {
+    background: var(--arena-scoreboard-wrong-background-color);
+  }
+
+  .position.recent-event {
+    font-weight: bold;
+    background: var(--arena-scoreboard-position-recent-event-background-color);
+  }
+
+  .accepted.recent-event {
+    background: var(--arena-scoreboard-accepted-recent-event-background-color);
+  }
+
+  .position {
+    width: 3.5em;
+  }
+
+  .legend-1 {
+    background-color: var(--arena-scoreboard-legend-1-background-color);
+  }
+
+  .legend-2 {
+    background-color: var(--arena-scoreboard-legend-2-background-color);
+  }
+
+  .legend-3 {
+    background-color: var(--arena-scoreboard-legend-3-background-color);
+  }
+
+  .legend-4 {
+    background-color: var(--arena-scoreboard-legend-4-background-color);
+  }
+
+  .legend-5 {
+    background-color: var(--arena-scoreboard-legend-5-background-color);
+  }
+
+  .legend-6 {
+    background-color: var(--arena-scoreboard-legend-6-background-color);
+  }
+
+  .legend-7 {
+    background-color: var(--arena-scoreboard-legend-7-background-color);
+  }
+
+  .legend-8 {
+    background-color: var(--arena-scoreboard-legend-8-background-color);
+  }
+
+  .legend-9 {
+    background-color: var(--arena-scoreboard-legend-9-background-color);
+  }
+
+  .legend-10 {
+    background-color: var(--arena-scoreboard-legend-10-background-color);
+  }
+
+  .legend {
+    width: 0.5em;
+    opacity: 0.8;
+  }
+}
+</style>

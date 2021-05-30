@@ -9,60 +9,155 @@ namespace OmegaUp\DAO;
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Clarifications}.
  *
- * @psalm-type Clarification=array{answer: null|string, author: null|string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
+ * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  */
 class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
     /**
      * @return list<Clarification>
      */
-    final public static function GetProblemsetClarifications(
-        int $problemset_id,
+    final public static function getProblemsetClarifications(
+        ?\OmegaUp\DAO\VO\Contests $contest,
+        ?\OmegaUp\DAO\VO\Courses $course,
+        bool $isAdmin,
+        \OmegaUp\DAO\VO\Identities $currentIdentity,
+        ?int $offset,
+        int $rowcount
+    ): array {
+        $sql = '
+            SELECT
+                cl.clarification_id,
+                a.alias AS assignment_alias,
+                p.alias AS problem_alias,
+                i.username AS author,
+                r.username AS receiver,
+                cl.message,
+                cl.answer,
+                cl.`time`,
+                cl.public
+            FROM
+                Clarifications cl
+            INNER JOIN
+                Identities i ON i.identity_id = cl.author_id
+            LEFT JOIN
+                Identities r ON r.identity_id = cl.receiver_id
+            INNER JOIN
+                Problems p ON p.problem_id = cl.problem_id
+            INNER JOIN
+                Problemsets ps ON ps.problemset_id = cl.problemset_id
+            LEFT JOIN
+                Contests con ON (
+                    con.contest_id = ps.contest_id AND
+                    con.problemset_id = ps.problemset_id
+                )
+            LEFT JOIN
+                Assignments a ON a.problemset_id = cl.problemset_id
+            WHERE
+                (
+                    con.contest_id = ? OR
+                    a.course_id = ?
+                )';
+
+        $params = [
+            is_null($contest) ? null : $contest->contest_id,
+            is_null($course) ? null : $course->course_id,
+        ];
+
+        if (!$isAdmin) {
+            $sql .= '
+                AND (
+                    cl.public = 1
+                    OR cl.author_id = ?
+                    OR cl.receiver_id = ?
+                )';
+            $params[] = $currentIdentity->identity_id;
+            $params[] = $currentIdentity->identity_id;
+        }
+
+        $sql .= '
+            ORDER BY
+                cl.answer IS NULL DESC,
+                cl.clarification_id DESC
+            ';
+        if (!is_null($offset)) {
+            $sql .= 'LIMIT ?, ?';
+            $params[] = $offset;
+            $params[] = $rowcount;
+        }
+
+        /** @var list<array{answer: null|string, assignment_alias: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
+    }
+
+    /**
+     * @return list<Clarification>
+     */
+    final public static function getProblemInProblemsetClarifications(
+        \OmegaUp\DAO\VO\Problems $problem,
+        int $problemsetId,
         bool $admin,
-        int $identityId,
+        \OmegaUp\DAO\VO\Identities $currentIdentity,
         ?int $offset,
         int $rowcount
     ) {
-        $sql = 'SELECT
-                  c.clarification_id,
-                  con.alias `contest_alias`,
-                  p.alias `problem_alias`,
-                  i.username `author`,
-                  r.username `receiver`,
-                  c.message,
-                  c.answer,
-                  c.`time`,
-                  c.public
-                FROM
-                  `Clarifications` c
-                INNER JOIN
-                  `Identities` i ON i.identity_id = c.author_id
-                LEFT JOIN
-                  `Identities` r ON r.identity_id = c.receiver_id
-                INNER JOIN
-                  `Problems` p ON p.problem_id = c.problem_id
-                INNER JOIN
-                  `Problemsets` ps ON ps.problemset_id = c.problemset_id
-                LEFT JOIN
-                  `Contests` con ON con.contest_id = ps.contest_id
-                WHERE
-                  c.problemset_id = ? ';
-        $val = [$problemset_id];
+        $sql = '
+            SELECT
+                c.clarification_id,
+                p.alias AS problem_alias,
+                i.username AS author,
+                r.username AS receiver,
+                c.message,
+                c.answer,
+                c.`time`,
+                c.public
+            FROM
+                Clarifications c
+            INNER JOIN
+                Identities i ON i.identity_id = c.author_id
+            LEFT JOIN
+                Identities r ON r.identity_id = c.receiver_id
+            INNER JOIN
+                Problems p ON p.problem_id = c.problem_id
+            INNER JOIN
+                Problemsets ps ON ps.problemset_id = c.problemset_id
+            WHERE
+                c.problemset_id = ?
+                AND p.problem_id = ?
+        ';
+
+        $params = [
+            $problemsetId,
+            $problem->problem_id
+        ];
 
         if (!$admin) {
-            $sql .= 'AND (c.public = 1 OR c.author_id = ? OR c.receiver_id = ?) ';
-            $val[] = $identityId;
-            $val[] = $identityId;
+            $sql .= '
+                AND (
+                    c.public = 1 OR c.author_id = ? OR c.receiver_id = ?
+                )
+            ';
+            $params[] = $currentIdentity->identity_id;
+            $params[] = $currentIdentity->identity_id;
         }
 
-        $sql .= 'ORDER BY c.answer IS NULL DESC, c.clarification_id DESC ';
+        $sql .= '
+            ORDER BY c.answer IS NULL DESC,
+            c.clarification_id DESC
+        ';
+
         if (!is_null($offset)) {
             $sql .= 'LIMIT ?, ?';
-            $val[] = intval($offset);
-            $val[] = intval($rowcount);
+            $params[] = $offset;
+            $params[] = $rowcount;
         }
 
-        /** @var list<array{answer: null|string, author: string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
+        /** @var list<array{answer: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $params
+        );
     }
 
     /**

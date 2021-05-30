@@ -11,6 +11,7 @@ try_define('OMEGAUP_MD5_SALT', 'omegaup');
 try_define('OMEGAUP_URL', 'http://localhost');
 try_define('OMEGAUP_ENVIRONMENT', 'production');
 try_define('OMEGAUP_MAINTENANCE', null);
+try_define('OMEGAUP_SESSION_API_HOURLY_LIMIT', 1000);
 
 # ####################################
 # TEST CONFIG
@@ -71,14 +72,6 @@ try_define(
 try_define('OMEGAUP_GITSERVER_SECRET_TOKEN', '');
 try_define('OMEGAUP_GRADER_SECRET', 'secret');
 try_define(
-    'OMEGAUP_SSLCERT_URL',
-    sprintf('%s/omegaup.pem', strval(OMEGAUP_ROOT))
-);
-try_define(
-    'OMEGAUP_CACERT_URL',
-    sprintf('%s/omegaup.pem', strval(OMEGAUP_ROOT))
-);
-try_define(
     'IMAGES_PATH',
     sprintf('%s/www/img/', strval(OMEGAUP_ROOT))
 );
@@ -113,8 +106,11 @@ try_define('OMEGAUP_FB_SECRET', 'xxxxx');
 # ####################################
 # GOOGLE LOGIN CONFIG
 # ####################################
-try_define('OMEGAUP_GOOGLE_SECRET', 'xxxxx');
-try_define('OMEGAUP_GOOGLE_CLIENTID', '');
+try_define('OMEGAUP_GOOGLE_SECRET', 'acmtr0Y37vnTVJV4BwmdhOsK');
+try_define(
+    'OMEGAUP_GOOGLE_CLIENTID',
+    '982542692060-lf9htvij4ba13fiufpqeldic0qqqvird.apps.googleusercontent.com'
+);
 
 # ####################################
 # LINKEDIN LOGIN CONFIG

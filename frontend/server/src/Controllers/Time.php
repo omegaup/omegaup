@@ -6,8 +6,6 @@
  * TimeController
  *
  * Used by arena to sync time between client and server from time to time
- *
- * @author joemmanuel
  */
 class Time extends \OmegaUp\Controllers\Controller {
     /**

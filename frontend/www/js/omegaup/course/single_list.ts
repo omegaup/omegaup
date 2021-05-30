@@ -1,4 +1,4 @@
-import course_List from '../components/course/List.vue';
+import course_CardsList from '../components/course/CardsList.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
@@ -6,18 +6,20 @@ import Vue from 'vue';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseListPayload();
   const headerPayload = types.payloadParsers.CommonPayload();
-  const courseList = new Vue({
+
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-cards-list': course_CardsList,
+    },
     render: function (createElement) {
-      return createElement('omegaup-course-list', {
+      return createElement('omegaup-course-cards-list', {
         props: {
           courses: payload.courses,
+          type: payload.course_type,
           isMainUserIdentity: headerPayload?.isMainUserIdentity,
         },
       });
-    },
-    components: {
-      'omegaup-course-list': course_List,
     },
   });
 });

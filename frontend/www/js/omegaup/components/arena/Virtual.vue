@@ -4,7 +4,7 @@
       <div class="text-center">
         <h2>{{ ui.formatString(T.virtualTitle, { title: title }) }}</h2>
         <span>{{ time.formatDelta(finishTime - startTime) }}</span>
-        <form class="form" v-on:submit.prevent="onSubmit">
+        <form class="form" @submit.prevent="onSubmit">
           <div class="row">
             <div class="form-group col-md-4"></div>
             <div class="form-group col-md-4">

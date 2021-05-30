@@ -4,188 +4,220 @@
       <h1>
         {{
           ui.formatString(T.contestEditWithTitle, {
-            title: ui.contestTitle(contest),
+            title: ui.contestTitle(details),
           })
         }}
-        <small
-          ><a v-bind:href="`/arena/${contest.alias}/`">{{
-            T.contestDetailsGoToContest
-          }}</a></small
-        >
+        <small>
+          &ndash;
+          <a :href="`/arena/${details.alias}/`">
+            {{ T.contestDetailsGoToContest }}</a
+          >
+        </small>
       </h1>
     </div>
-    <ul class="nav nav-tabs nav-justified">
-      <li
-        v-bind:class="{ active: !virtual }"
-        v-if="!virtual"
-        v-on:click="showTab = 'new_form'"
-      >
-        <a data-toggle="tab">{{ T.contestEdit }}</a>
-      </li>
-      <li class="problems" v-if="!virtual" v-on:click="showTab = 'problems'">
-        <a data-toggle="tab">{{ T.wordsAddProblem }}</a>
-      </li>
-      <li
-        class="admission-mode"
-        v-if="!virtual"
-        v-on:click="showTab = 'publish'"
-      >
-        <a data-toggle="tab">{{ T.contestNewFormAdmissionMode }}</a>
-      </li>
-      <li
-        class="contestants"
-        v-bind:class="{ active: virtual }"
-        v-on:click="showTab = 'contestants'"
-      >
-        <a data-toggle="tab">{{ T.contestAdduserAddContestant }}</a>
-      </li>
-      <li v-on:click="showTab = 'admins'">
-        <a data-toggle="tab">{{ T.omegaupTitleContestAddAdmin }}</a>
-      </li>
-      <li v-if="!virtual" v-on:click="showTab = 'links'">
-        <a data-toggle="tab">{{ T.showLinks }}</a>
-      </li>
-      <li v-if="!virtual" v-on:click="showTab = 'clone'">
-        <a data-toggle="tab">{{ T.courseEditClone }}</a>
+
+    <ul class="nav nav-pills my-3">
+      <li class="nav-item dropdown">
+        <a
+          href="#"
+          data-toggle="dropdown"
+          role="button"
+          data-nav-contest-edit
+          class="nav-link active dropdown-toggle"
+          aria-haspopup="true"
+          aria-expanded="false"
+          >{{ activeTab }}</a
+        >
+        <div class="dropdown-menu">
+          <a
+            v-if="!virtual"
+            href="#"
+            data-toggle="tab"
+            class="dropdown-item"
+            :class="{ active: showTab === 'new_form' }"
+            @click="showTab = 'new_form'"
+            >{{ T.contestEdit }}</a
+          >
+          <a
+            v-if="!virtual"
+            href="#"
+            data-toggle="tab"
+            class="dropdown-item problems"
+            :class="{ active: showTab === 'problems' }"
+            @click="showTab = 'problems'"
+            >{{ T.wordsAddProblem }}</a
+          >
+          <a
+            v-if="!virtual"
+            href="#"
+            data-toggle="tab"
+            class="dropdown-item admission-mode"
+            :class="{ active: showTab === 'publish' }"
+            @click="showTab = 'publish'"
+            >{{ T.contestNewFormAdmissionMode }}</a
+          >
+          <a
+            href="#"
+            data-toggle="tab"
+            data-nav-contestant
+            class="dropdown-item contestants"
+            :class="{ active: showTab === 'contestants' }"
+            @click="showTab = 'contestants'"
+            >{{ T.contestAdduserAddContestant }}</a
+          >
+          <a
+            href="#"
+            data-toggle="tab"
+            class="dropdown-item"
+            :class="{ active: showTab === 'admins' }"
+            @click="showTab = 'admins'"
+            >{{ T.omegaupTitleContestAddAdmin }}</a
+          >
+          <a
+            href="#"
+            data-toggle="tab"
+            class="dropdown-item"
+            :class="{ active: showTab === 'links' }"
+            @click="showTab = 'links'"
+            >{{ T.showLinks }}</a
+          >
+          <a
+            href="#"
+            data-toggle="tab"
+            class="dropdown-item"
+            :class="{ active: showTab === 'clone' }"
+            @click="showTab = 'clone'"
+            >{{ T.courseEditClone }}</a
+          >
+          <a
+            href="#"
+            data-toggle="tab"
+            class="dropdown-item"
+            :class="{ active: showTab === 'archive' }"
+            @click="showTab = 'archive'"
+            >{{ T.contestEditArchive }}</a
+          >
+        </div>
       </li>
     </ul>
+
     <div class="tab-content">
-      <div class="tab-pane active" v-if="showTab === 'new_form'">
+      <div v-if="showTab === 'new_form'" class="tab-pane active">
         <omegaup-contest-new-form
-          v-bind:initial-alias="contest.alias"
-          v-bind:initial-title="contest.title"
-          v-bind:initial-description="contest.description"
-          v-bind:initial-start-time="contest.start_time"
-          v-bind:initial-finish-time="contest.finish_time"
-          v-bind:initial-window-length="contest.window_length"
-          v-bind:initial-points-decay-factor="contest.points_decay_factor"
-          v-bind:initial-submissions-gap="contest.submissions_gap"
-          v-bind:initial-languages="contest.languages"
-          v-bind:initial-feedback="contest.feedback"
-          v-bind:initial-penalty="contest.penalty"
-          v-bind:initial-scoreboard="contest.scoreboard"
-          v-bind:initial-penalty-type="contest.penalty_type"
-          v-bind:initial-show-scoreboard-after="contest.show_scoreboard_after"
-          v-bind:initial-partial-score="contest.partial_score"
-          v-bind:initial-needs-basic-information="
-            contest.needs_basic_information
-          "
-          v-bind:initial-requests-user-information="
-            contest.requests_user_information
-          "
-          v-bind:all-languages="contest.available_languages"
-          v-bind:update="true"
-          v-on:emit-update-contest="
-            (newFormComponent) => $emit('update-contest', newFormComponent)
-          "
+          :initial-alias="details.alias"
+          :initial-title="details.title"
+          :initial-description="details.description"
+          :initial-start-time="details.start_time"
+          :initial-finish-time="details.finish_time"
+          :initial-window-length="details.window_length"
+          :initial-points-decay-factor="details.points_decay_factor"
+          :initial-submissions-gap="details.submissions_gap"
+          :initial-languages="details.languages"
+          :initial-feedback="details.feedback"
+          :initial-penalty="details.penalty"
+          :initial-scoreboard="details.scoreboard"
+          :initial-penalty-type="details.penalty_type"
+          :initial-show-scoreboard-after="details.show_scoreboard_after"
+          :initial-partial-score="details.partial_score"
+          :initial-needs-basic-information="details.needs_basic_information"
+          :initial-requests-user-information="details.requests_user_information"
+          :all-languages="details.available_languages"
+          :update="true"
+          @update-contest="(contest) => $emit('update-contest', contest)"
         ></omegaup-contest-new-form>
       </div>
-      <div class="tab-pane active problems" v-if="showTab === 'problems'">
+      <div v-if="showTab === 'problems'" class="tab-pane active">
         <omegaup-contest-add-problem
-          v-bind:contest-alias="contest.alias"
-          v-bind:initialPoints="contest.partial_score ? 100 : 1"
-          v-bind:data="problems"
-          v-on:emit-add-problem="
-            (addProblemComponent) => $emit('add-problem', addProblemComponent)
+          :contest-alias="details.alias"
+          :initial-points="details.partial_score ? 100 : 1"
+          :initial-problems="problems"
+          :search-result-problems="searchResultProblems"
+          @add-problem="(request) => $emit('add-problem', request)"
+          @update-search-result-problems="
+            (query) => $emit('update-search-result-problems', query)
           "
-          v-on:emit-change-alias="
-            (addProblemComponent, newProblemAlias) =>
-              $emit('get-versions', newProblemAlias, addProblemComponent)
+          @get-versions="(request) => $emit('get-versions', request)"
+          @remove-problem="
+            (problemAlias) => $emit('remove-problem', problemAlias)
           "
-          v-on:emit-remove-problem="
-            (addProblemComponent) =>
-              $emit('remove-problem', addProblemComponent)
-          "
-          v-on:emit-runs-diff="
-            (addProblemComponent, versions, selectedCommit) =>
-              $emit('runs-diff', addProblemComponent, versions, selectedCommit)
+          @runs-diff="
+            (problemAlias, versions, selectedCommit) =>
+              $emit('runs-diff', problemAlias, versions, selectedCommit)
           "
         >
         </omegaup-contest-add-problem>
       </div>
-      <div class="tab-pane active" v-if="showTab === 'publish'">
+      <div v-if="showTab === 'publish'" class="tab-pane active">
         <omegaup-common-publish
-          v-bind:initialAdmissionMode="contest.admission_mode"
-          v-bind:shouldShowPublicOption="true"
-          v-bind:admissionModeDescription="
-            T.contestNewFormAdmissionModeDescription
-          "
-          v-on:emit-update-admission-mode="
-            (publishComponent) =>
-              $emit('update-admission-mode', publishComponent)
+          :initial-admission-mode="details.admission_mode"
+          :should-show-public-option="true"
+          :admission-mode-description="T.contestAdmissionModeDescription"
+          @emit-update-admission-mode="
+            (admissionMode) => $emit('update-admission-mode', admissionMode)
           "
         ></omegaup-common-publish>
       </div>
-      <div class="tab-pane active contestants" v-if="showTab === 'contestants'">
-        <omegaup-contest-contestant
-          v-bind:contest="contest"
-          v-bind:data="users"
-          v-on:emit-add-user="
-            (contestantComponent) => $emit('add-user', contestantComponent)
+      <div v-if="showTab === 'contestants'" class="tab-pane active contestants">
+        <omegaup-contest-add-contestant
+          :contest="details"
+          :users="users"
+          :search-result-users="searchResultUsers"
+          @add-user="(contestants) => $emit('add-user', contestants)"
+          @update-search-result-users="
+            (query) => $emit('update-search-result-users', query)
           "
-          v-on:emit-remove-user="
-            (contestantComponent) => $emit('remove-user', contestantComponent)
-          "
-          v-on:emit-save-end-time="
-            (selected) => $emit('save-end-time', selected)
-          "
-        ></omegaup-contest-contestant>
+          @remove-user="(contestant) => $emit('remove-user', contestant)"
+          @save-end-time="(user) => $emit('save-end-time', user)"
+        ></omegaup-contest-add-contestant>
         <omegaup-common-requests
-          v-bind:data="requests"
-          v-bind:text-add-participant="T.contestAdduserAddContestant"
-          v-on:emit-accept-request="
-            (requestsComponent, username) =>
-              $emit('accept-request', requestsComponent, username)
-          "
-          v-on:emit-deny-request="
-            (requestsComponent, username) =>
-              $emit('deny-request', requestsComponent, username)
-          "
+          :data="requests"
+          :text-add-participant="T.contestAdduserAddContestant"
+          @accept-request="(request) => $emit('accept-request', request)"
+          @deny-request="(request) => $emit('deny-request', request)"
         ></omegaup-common-requests>
         <omegaup-contest-groups
-          v-bind:data="groups"
-          v-if="isIdentitiesExperimentEnabled"
-          v-on:emit-add-group="
-            (groupsComponent) => $emit('add-group', groupsComponent)
-          "
-          v-on:emit-remove-group="
-            (groupsComponent) => $emit('remove-group', groupsComponent)
-          "
+          :groups="groups"
+          @emit-add-group="(groupAlias) => $emit('add-group', groupAlias)"
+          @emit-remove-group="(groupAlias) => $emit('remove-group', groupAlias)"
         ></omegaup-contest-groups>
       </div>
-      <div class="tab-pane active" v-if="showTab === 'admins'">
+      <div v-if="showTab === 'admins'" class="tab-pane active">
         <omegaup-contest-admins
-          v-bind:initial-admins="admins"
-          v-bind:has-parent-component="true"
-          v-on:emit-add-admin="
-            (addAdminComponent) => $emit('add-admin', addAdminComponent)
-          "
-          v-on:emit-remove-admin="
-            (addAdminComponent) => $emit('remove-admin', addAdminComponent)
-          "
+          :admins="admins"
+          @add-admin="(username) => $emit('add-admin', username)"
+          @remove-admin="(username) => $emit('remove-admin', username)"
         ></omegaup-contest-admins>
+        <div class="mt-2"></div>
         <omegaup-contest-group-admins
-          v-bind:initial-groups="groupAdmins"
-          v-bind:has-parent-component="true"
-          v-on:emit-add-group-admin="
-            (groupAdminsComponent) =>
-              $emit('add-group-admin', groupAdminsComponent)
+          :group-admins="groupAdmins"
+          @add-group-admin="
+            (groupAlias) => $emit('add-group-admin', groupAlias)
           "
-          v-on:emit-remove-group-admin="
-            (groupAdminsComponent) =>
-              $emit('remove-group-admin', groupAdminsComponent)
+          @remove-group-admin="
+            (groupAlias) => $emit('remove-group-admin', groupAlias)
           "
         ></omegaup-contest-group-admins>
       </div>
-      <div class="tab-pane active" v-if="showTab === 'links'">
-        <omegaup-contest-links v-bind:data="contest"></omegaup-contest-links>
+      <div v-if="showTab === 'links'" class="tab-pane active">
+        <omegaup-contest-links :data="details"></omegaup-contest-links>
       </div>
-      <div class="tab-pane active" v-if="showTab === 'clone'">
+      <div v-if="showTab === 'clone'" class="tab-pane active">
         <omegaup-contest-clone
-          v-on:emit-clone="
-            (cloneComponent) => $emit('clone-contest', cloneComponent)
+          @clone="
+            ({ title, alias, description, startTime }) =>
+              $emit('clone-contest', title, alias, description, startTime)
           "
         ></omegaup-contest-clone>
+      </div>
+      <div v-if="showTab === 'archive'" class="tab-pane active">
+        <omegaup-common-archive
+          :already-archived="alreadyArchived"
+          :archive-button-description="archiveButtonDescription"
+          :archive-confirm-text="T.contestEditArchiveConfirmText"
+          :archive-header-title="T.contestEditArchiveContest"
+          :archive-help-text="archiveUnarchiveDescription"
+          @archive="onArchiveContest"
+        ></omegaup-common-archive>
       </div>
     </div>
   </div>
@@ -193,61 +225,96 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup, OmegaUp } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+
 import contest_AddProblem from './AddProblem.vue';
-import contest_Admins from '../common/Admins.vue';
+import contest_AddContestant from './AddContestant.vue';
 import contest_Clone from './Clone.vue';
-import contest_Contestant from './Contestant.vue';
+import contest_Admins from '../common/Adminsv2.vue';
+import common_Archive from '../common/Archive.vue';
 import common_Requests from '../common/Requests.vue';
+import contest_GroupAdmins from '../common/GroupAdminsv2.vue';
 import contest_Groups from './Groups.vue';
-import contest_GroupAdmins from '../common/GroupAdmins.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
-import common_Publish from '../common/Publish.vue';
-
-interface ContestEdit {
-  admins: omegaup.UserRole[];
-  contest: omegaup.Contest;
-  groupAdmins: omegaup.ContestGroupAdmin[];
-  problems: omegaup.Problem[];
-  requests: types.IdentityRequest[];
-  users: omegaup.IdentityContest[];
-  groups: omegaup.ContestGroup[];
-}
+import common_Publish from '../common/Publishv2.vue';
+import omegaup_Markdown from '../Markdown.vue';
 
 @Component({
   components: {
     'omegaup-contest-add-problem': contest_AddProblem,
     'omegaup-contest-admins': contest_Admins,
     'omegaup-contest-clone': contest_Clone,
-    'omegaup-contest-contestant': contest_Contestant,
+    'omegaup-contest-add-contestant': contest_AddContestant,
+    'omegaup-common-archive': common_Archive,
     'omegaup-common-requests': common_Requests,
     'omegaup-contest-groups': contest_Groups,
     'omegaup-contest-group-admins': contest_GroupAdmins,
     'omegaup-contest-links': contest_Links,
     'omegaup-contest-new-form': contest_NewForm,
     'omegaup-common-publish': common_Publish,
+    'omegaup-markdown': omegaup_Markdown,
   },
 })
 export default class Edit extends Vue {
-  @Prop() data!: ContestEdit;
+  @Prop() admins!: types.ContestAdmin[];
+  @Prop() details!: types.ContestAdminDetails;
+  @Prop() groups!: types.ContestGroup[];
+  @Prop() groupAdmins!: types.ContestGroupAdmin[];
+  @Prop() problems!: types.ProblemsetProblemWithVersions[];
+  @Prop() requests!: types.ContestRequest[];
+  @Prop() users!: types.ContestUser[];
+  @Prop() searchResultProblems!: types.ListItem[];
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   ui = ui;
-  showTab = ui.isVirtual(this.data.contest) ? 'contestants' : 'new_form';
-  virtual = ui.isVirtual(this.data.contest);
-  contest = this.data.contest;
-  problems = this.data.problems;
-  users = this.data.users;
-  groups = this.data.groups;
-  requests = this.data.requests;
-  admins = this.data.admins;
-  groupAdmins = this.data.groupAdmins;
+  showTab = ui.isVirtual(this.details) ? 'contestants' : 'new_form';
+  virtual = ui.isVirtual(this.details);
+  alreadyArchived = this.details.archived;
 
-  isIdentitiesExperimentEnabled =
-    OmegaUp.experiments && OmegaUp.experiments.isEnabled('identities');
+  get activeTab(): string {
+    switch (this.showTab) {
+      case 'new_form':
+        return T.contestEdit;
+      case 'problems':
+        return T.wordsAddProblem;
+      case 'publish':
+        return T.contestNewFormAdmissionMode;
+      case 'contestants':
+        return T.contestAdduserAddContestant;
+      case 'admins':
+        return T.omegaupTitleContestAddAdmin;
+      case 'links':
+        return T.showLinks;
+      case 'clone':
+        return T.courseEditClone;
+      case 'archive':
+        return T.contestEditArchive;
+      default:
+        return T.contestEdit;
+    }
+  }
+
+  get archiveButtonDescription(): string {
+    if (this.alreadyArchived) {
+      return T.contestEditUnarchiveContest;
+    }
+    return T.contestEditArchiveContest;
+  }
+
+  get archiveUnarchiveDescription(): string {
+    if (this.alreadyArchived) {
+      return T.contestEditUnarchiveHelpText;
+    }
+    return T.contestEditArchiveHelpText;
+  }
+
+  onArchiveContest(archive: boolean): void {
+    this.$emit('archive-contest', this.details.alias, archive);
+    this.alreadyArchived = archive;
+  }
 }
 </script>

@@ -1,8 +1,6 @@
 <?php
 /**
  * Class ProblemListCourse
- *
- * @author juan.pablo
  */
 class ProblemListCourseTest extends \OmegaUp\Test\ControllerTestCase {
     public function testSolvedAndUnsolvedProblemByUsersOfACourse() {

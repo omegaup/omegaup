@@ -1,55 +1,51 @@
-import { shallowMount } from '@vue/test-utils';
-import expect from 'expect';
-import Vue from 'vue';
+import { shallowMount, mount } from '@vue/test-utils';
+import { types } from '../../api_types';
 
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
 
 import arena_ClarificationList from './ClarificationList.vue';
 
 describe('ClarificationList.vue', () => {
-  const clarifications = [
+  const clarifications: types.Clarification[] = [
     {
-      answer: null,
+      answer: undefined,
+      assignment_alias: 'Tarea de prueba',
       author: 'omegaUp',
       clarification_id: 1,
-      contest_alias: 'Concurso de prueba',
       message: 'Clarificación de prueba 1',
       problem_alias: 'Problema de prueba',
       public: true,
-      receiver: null,
+      receiver: undefined,
       time: new Date(),
     },
     {
       answer: 'Ok',
+      assignment_alias: 'Tarea de prueba',
       author: 'omegaUp',
       clarification_id: 2,
-      contest_alias: null,
       message: 'Clarificación de prueba 2',
       problem_alias: 'Problema de prueba',
       public: false,
-      receiver: null,
+      receiver: undefined,
       time: new Date(),
     },
   ];
 
-  it('Should handle problem clarifications', async () => {
+  it('Should handle contest clarifications', async () => {
     const wrapper = shallowMount(arena_ClarificationList, {
       propsData: {
-        inContest: false,
         clarifications,
       },
     });
     expect(wrapper.find('th').text()).toBe(T.wordsProblem);
   });
 
-  it('Should handle contest clarifications', async () => {
-    const wrapper = shallowMount(arena_ClarificationList, {
+  it('Should handle course clarifications', async () => {
+    const wrapper = mount(arena_ClarificationList, {
       propsData: {
-        inContest: true,
         clarifications,
       },
     });
-    expect(wrapper.find('th').text()).toBe(T.wordsContest);
+    expect(wrapper.text()).toContain(clarifications[0].assignment_alias);
   });
 });

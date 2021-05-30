@@ -52,6 +52,12 @@ class ProblemParams {
 
     /**
      * @readonly
+     * @var bool
+     */
+    public $qualitySeal;
+
+    /**
+     * @readonly
      * @var string
      */
     public $problemLevel;
@@ -69,7 +75,7 @@ class ProblemParams {
     public $validator;
 
     /**
-     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, selected_tags?: string, validator?: string} $params
+     * @param array{allow_user_add_tags?: bool, quality_seal?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, selected_tags?: string, validator?: string} $params
      */
     public function __construct($params = []) {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
@@ -79,6 +85,7 @@ class ProblemParams {
         $this->showDiff = $params['show_diff'] ?? 'none';
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
         $this->problemLevel = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
+        $this->qualitySeal = $params['quality_seal'] ?? false;
         $this->selectedTags = $params['selected_tags'] ?? $params['selected_tags'] ?? json_encode([
             [
                 'tagname' => 'problemLevelBasicIntroductionToProgramming',
@@ -141,7 +148,7 @@ class Problem {
                     str_replace(' ', '-', $params->title)
                 ),
                 0,
-                32
+                \OmegaUp\Validators::ALIAS_MAX_LENGTH
             ),
             'author_username' => $params->author->username,
             'validator' => $params->validator,
@@ -158,6 +165,7 @@ class Problem {
             'languages' => $params->languages,
             'show_diff' => $params->showDiff,
             'allow_user_add_tags' => $params->allowUserAddTags,
+            'quality_seal' => $params->qualitySeal,
             'problem_level' => $params->problemLevel,
             'selected_tags' => $params->selectedTags,
         ]);
@@ -193,7 +201,7 @@ class Problem {
     public static function createProblem(
         ?\OmegaUp\Test\Factories\ProblemParams $params = null,
         \OmegaUp\Test\ScopedLoginToken $login = null
-    ) {
+    ): array {
         if (is_null($params)) {
             $params = new \OmegaUp\Test\Factories\ProblemParams();
         }
@@ -255,6 +263,10 @@ class Problem {
                     $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PROMOTED;
                     break;
             }
+            \OmegaUp\DAO\Problems::update($problem);
+        }
+        if ($params->qualitySeal) {
+            $problem->quality_seal = true;
             \OmegaUp\DAO\Problems::update($problem);
         }
 

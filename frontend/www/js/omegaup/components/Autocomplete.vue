@@ -1,22 +1,14 @@
 <template>
   <input
-    class="typeahead form-control"
     ref="input"
+    class="typeahead form-control"
     autocomplete="off"
-    v-on:change="onUpdateInput"
-    v-bind:placeholder="placeholder"
-    v-bind:name="name"
-    v-bind:value="value"
+    :placeholder="placeholder"
+    :name="name"
+    :value="value"
+    @change="onUpdateInput"
   />
 </template>
-
-<style lang="scss">
-.tt-dataset {
-  background: white;
-  padding: 10px;
-  border: 1px solid gray;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop, Emit, Ref } from 'vue-property-decorator';
@@ -27,10 +19,11 @@ export default class Autocomplete extends Vue {
   @Prop() value!: string;
   @Prop() placeholder!: string;
   @Prop() name!: string;
+  // eslint-disable-next-line no-undef -- This is defined in TypeScript.
   @Prop() init!: (el: JQuery<HTMLElement>) => void;
 
   mounted() {
-    this.init($(<HTMLElement>this.$refs.input));
+    this.init($(this.$refs.input as HTMLElement));
   }
 
   @Emit('input')
@@ -43,8 +36,16 @@ export default class Autocomplete extends Vue {
   }
 
   @Watch('value')
-  onPropertyChanged(newValue: string, oldValue: string) {
+  onPropertyChanged(newValue: string) {
     this.input.value = newValue;
   }
 }
 </script>
+
+<style lang="scss">
+.tt-dataset {
+  background: white;
+  padding: 10px;
+  border: 1px solid gray;
+}
+</style>
