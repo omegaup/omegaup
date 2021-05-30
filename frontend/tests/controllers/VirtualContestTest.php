@@ -2,8 +2,6 @@
 
 /**
  * VirtualContestTest
- *
- * @author SpaceWhite
  */
 
 class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {

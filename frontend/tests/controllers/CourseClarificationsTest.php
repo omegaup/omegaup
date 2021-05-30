@@ -2,8 +2,6 @@
 
 /**
  * Tests for course clarifications
- *
- * @author carlosabcs
  */
 class CourseClarificationsTest extends \OmegaUp\Test\ControllerTestCase {
     public function setUp(): void {

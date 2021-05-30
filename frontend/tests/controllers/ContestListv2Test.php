@@ -2,8 +2,6 @@
 
 /**
  * Description of Contest List v2
- *
- * @author Michael Serrato
  */
 
 class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {

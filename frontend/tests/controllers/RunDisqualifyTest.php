@@ -2,8 +2,6 @@
 
 /**
  * Unittest for disqualifying run
- *
- * @author SpaceWhite
  */
 class RunDisqualifyTest extends \OmegaUp\Test\ControllerTestCase {
     public function testDisqualifyByAdmin() {

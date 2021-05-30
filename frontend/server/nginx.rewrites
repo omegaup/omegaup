@@ -12,7 +12,7 @@ location /preguntas/ {
 	}
 }
 
-rewrite ^/admin/user/([a-zA-Z0-9_-]+)/?$ /admin/user.php?username=$1 last;
+rewrite ^/admin/user/([a-zA-Z0-9_+.-]+)/?$ /admin/user.php?username=$1 last;
 rewrite ^/admin/support/?$ /admin/support.php last;
 rewrite ^/arena/?$ /arena/index.php last;
 rewrite ^/arena/admin/?$ /arena/admin.php last;
