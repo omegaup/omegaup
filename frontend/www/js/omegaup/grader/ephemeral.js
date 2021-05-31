@@ -70,18 +70,19 @@ const sourceTemplates = {
 #include <stdint.h>
 
 int main() {
-  int64_t a, b;
-  scanf("%" SCNd64 " %" SCNd64, &a, &b);
-  printf("%" PRId64 "\\n", a + b);
+  // TODO: fixme.
+
+  return 0;
 }`,
   cpp: `#include <iostream>
 
 int main() {
   std::cin.tie(nullptr);
   std::ios_base::sync_with_stdio(false);
-  int64_t a, b;
-  std::cin >> a >> b;
-  std::cout << a + b << '\\n';
+
+  // TODO: fixme.
+
+  return 0;
 }`,
   cs: `using System.Collections.Generic;
 using System.Linq;
@@ -91,45 +92,33 @@ class Program
 {
   static void Main(string[] args)
   {
-    List<long> l = new List<long>();
-    foreach (String token in Console.ReadLine().Trim().Split(' ')) {
-      l.Add(Int64.Parse(token));
-    }
-    Console.WriteLine(l.Sum(x => x));
+    // TODO: fixme.
   }
 }`,
   java: `import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
 
 public class Main {
   public static void main(String[] args) throws IOException {
     BufferedReader br = new BufferedReader(
                           new InputStreamReader(System.in));
-
-    StringTokenizer st = new StringTokenizer(br.readLine());
-    long a = Long.parseLong(st.nextToken());
-    long b = Long.parseLong(st.nextToken());
-    System.out.println(a + b);
+    // TODO: fixme.
   }
 }`,
-  lua: `a = io.read("*n");
-b = io.read("*n");
-io.write(a + b);`,
+  lua: `-- TODO: fixme.`,
   py: `#!/usr/bin/python3
 
 def _main() -> None:
-  a, b = (int(num) for num in input().strip().split())
-  print(a + b)
+  # TODO: fixme.
+  pass
 
 if __name__ == '__main__':
   _main()`,
-  rb: `a, b = gets.chomp.split(' ').map!{ |num| num.to_i }
-print a + b`,
+  rb: `# TODO: fixme.`,
 };
 
-const interactiveTemplates = {
+const originalInteractiveTemplates = {
   c: `#include "sumas.h"
 
 long long sumas(long long a, long long b) {
@@ -179,10 +168,13 @@ def sumas(a: int, b: int) -> int:
     return 0`,
   rb: '# not supported',
 };
+const interactiveTemplates = { ...originalInteractiveTemplates };
 
 Vue.use(Vuex);
 let store = new Vuex.Store({
   state: {
+    alias: null,
+    localStorageSources: null,
     request: {
       input: {
         limits: {},
@@ -198,6 +190,12 @@ let store = new Vuex.Store({
     compilerOutput: '',
   },
   getters: {
+    alias(state) {
+      return state.alias;
+    },
+    localStorageSources(state) {
+      return state.localStorageSources;
+    },
     moduleName(state) {
       if (state.request.input.interactive) {
         return state.request.input.interactive.module_name;
@@ -280,6 +278,9 @@ let store = new Vuex.Store({
       });
       return result;
     },
+    'request.source'(state) {
+      return state.request.source;
+    },
     'request.language'(state) {
       return state.request.language;
     },
@@ -313,6 +314,42 @@ let store = new Vuex.Store({
     },
   },
   mutations: {
+    alias(state, value) {
+      if (state.alias) {
+        persistToLocalStorage(state.alias).flush();
+      }
+      state.alias = value;
+      const itemString = localStorage.getItem(
+        `ephemeral-sources-${state.alias}`,
+      );
+      state.localStorageSources = null;
+      if (itemString) {
+        state.localStorageSources = JSON.parse(itemString);
+      }
+      if (!state.localStorageSources) {
+        if (state.request.input.interactive) {
+          state.localStorageSources = {
+            language: 'cpp17-gcc',
+            sources: {
+              ...interactiveTemplates,
+            },
+          };
+        } else {
+          state.localStorageSources = {
+            language: 'cpp17-gcc',
+            sources: {
+              ...sourceTemplates,
+            },
+          };
+        }
+      }
+      state.request.language = state.localStorageSources.language;
+      state.request.source =
+        state.localStorageSources.sources[
+          Util.languageExtensionMapping[state.localStorageSources.language]
+        ];
+      document.getElementById('language').value = state.request.language;
+    },
     currentCase(state, value) {
       state.currentCase = value;
     },
@@ -326,11 +363,58 @@ let store = new Vuex.Store({
       Vue.set(state, 'request', value);
     },
     'request.language'(state, value) {
+      if (state.request.language == value) {
+        return;
+      }
       state.request.language = value;
+      if (
+        Object.prototype.hasOwnProperty.call(
+          Util.languageExtensionMapping,
+          value,
+        )
+      ) {
+        const language = Util.languageExtensionMapping[value];
+        if (state.localStorageSources) {
+          if (
+            Object.prototype.hasOwnProperty.call(
+              state.localStorageSources.sources,
+              language,
+            )
+          ) {
+            state.request.source = state.localStorageSources.sources[language];
+          }
+        } else if (store.getters.isInteractive) {
+          if (
+            Object.prototype.hasOwnProperty.call(interactiveTemplates, language)
+          ) {
+            state.request.source = interactiveTemplates[language];
+          }
+        } else {
+          if (Object.prototype.hasOwnProperty.call(sourceTemplates, language)) {
+            request.source = sourceTemplates[language];
+          }
+        }
+        if (state.localStorageSources && !state.updatingSettings) {
+          state.localStorageSources.language = value;
+          persistToLocalStorage(state.alias)({
+            alias: state.alias,
+            contents: state.localStorageSources,
+          });
+        }
+      }
       state.dirty = true;
     },
     'request.source'(state, value) {
       state.request.source = value;
+      if (!state.updatingSettings && state.localStorageSources) {
+        state.localStorageSources.sources[
+          Util.languageExtensionMapping[state.localStorageSources.language]
+        ] = value;
+        persistToLocalStorage(state.alias)({
+          alias: state.alias,
+          contents: state.localStorageSources,
+        });
+      }
       state.dirty = true;
     },
     inputIn(state, value) {
@@ -838,6 +922,10 @@ RegisterVueComponent(
   componentMapping,
 );
 
+const persistToLocalStorage = Util.throttle(({ alias, contents }) => {
+  localStorage.setItem(`ephemeral-sources-${alias}`, JSON.stringify(contents));
+}, 10000);
+
 function initialize() {
   layout.init();
 
@@ -937,24 +1025,6 @@ onResized();
 
 document.getElementById('language').addEventListener('change', function () {
   store.commit('request.language', this.value);
-  document.getElementById('language').value = this.value;
-  if (
-    !Object.prototype.hasOwnProperty.call(
-      Util.languageExtensionMapping,
-      this.value,
-    )
-  )
-    return;
-  let language = Util.languageExtensionMapping[this.value];
-  if (store.getters.isInteractive) {
-    if (!Object.prototype.hasOwnProperty.call(interactiveTemplates, language))
-      return;
-    store.commit('request.source', interactiveTemplates[language]);
-  } else {
-    if (!Object.prototype.hasOwnProperty.call(sourceTemplates, language))
-      return;
-    store.commit('request.source', sourceTemplates[language]);
-  }
 });
 
 function onDetailsJsonReady(results) {
@@ -1354,9 +1424,29 @@ document.getElementsByTagName('form')[0].addEventListener('submit', (e) => {
     .catch(Util.asyncError);
 });
 
-function setSettings(settings) {
-  store.commit('reset');
+function setSettings({ alias, settings }) {
+  if (!settings) {
+    return;
+  }
+  if (settings.interactive) {
+    for (let language in settings.interactive.templates) {
+      if (
+        Object.prototype.hasOwnProperty.call(
+          settings.interactive.templates,
+          language,
+        )
+      ) {
+        interactiveTemplates[language] =
+          settings.interactive.templates[language];
+      } else {
+        interactiveTemplates[language] = originalInteractiveTemplates[language];
+      }
+    }
+  }
   store.commit('updatingSettings', true);
+  store.commit('reset');
+  store.commit('Interactive', !!settings.interactive);
+  store.commit('alias', alias);
   store.commit('removeCase', 'long');
   store.commit('MemoryLimit', settings.limits.MemoryLimit * 1024);
   store.commit('OutputLimit', settings.limits.OutputLimit);
@@ -1367,19 +1457,7 @@ function setSettings(settings) {
   store.commit('Validator', settings.validator.name);
   store.commit('Tolerance', settings.validator.tolerance);
 
-  store.commit('Interactive', !!settings.interactive);
   if (settings.interactive) {
-    for (let language in settings.interactive.templates) {
-      if (
-        !Object.prototype.hasOwnProperty.call(
-          settings.interactive.templates,
-          language,
-        )
-      )
-        continue;
-      interactiveTemplates[language] = settings.interactive.templates[language];
-    }
-    store.commit('request.source', interactiveTemplates.cpp);
     store.commit('InteractiveLanguage', settings.interactive.language);
     store.commit('InteractiveModuleName', settings.interactive.module_name);
     store.commit('request.input.interactive.idl', settings.interactive.idl);
@@ -1399,6 +1477,7 @@ function setSettings(settings) {
     store.commit('inputIn', caseData['in']);
     store.commit('inputOut', caseData.out);
   }
+
   // Given that the current case will change several times, schedule the
   // flag to avoid swapping into the cases view for the next tick.
   //

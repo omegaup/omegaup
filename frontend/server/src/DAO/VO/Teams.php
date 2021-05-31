@@ -17,6 +17,7 @@ namespace OmegaUp\DAO\VO;
 class Teams extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'team_id' => true,
+        'team_group_id' => true,
         'identity_id' => true,
     ];
 
@@ -35,6 +36,11 @@ class Teams extends \OmegaUp\DAO\VO\VO {
                 $data['team_id']
             );
         }
+        if (isset($data['team_group_id'])) {
+            $this->team_group_id = intval(
+                $data['team_group_id']
+            );
+        }
         if (isset($data['identity_id'])) {
             $this->identity_id = intval(
                 $data['identity_id']
@@ -50,6 +56,13 @@ class Teams extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $team_id = 0;
+
+    /**
+     * Id del grupo de equipos
+     *
+     * @var int|null
+     */
+    public $team_group_id = null;
 
     /**
      * La identidad asociada al equipo
