@@ -2,6 +2,7 @@ import * as api from '../api';
 import { Arena, GetOptionsFromLocation } from './arena';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
+import * as time from '../time';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseDetailsPayload();
@@ -20,6 +21,7 @@ OmegaUp.on('ready', () => {
     course: arenaInstance.options.courseAlias,
     assignment: arenaInstance.options.assignmentAlias,
   })
+    .then(time.remoteTimeAdapter)
     .then((results) => arenaInstance.problemsetLoaded(results))
     .catch((e) => arenaInstance.problemsetLoadedError(e));
 

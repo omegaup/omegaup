@@ -790,6 +790,7 @@ export class Arena {
           setTimeout(problemsetCallback, 1000);
         } else {
           api.Problemset.details({ problemset_id: problemsetId })
+            .then(time.remoteTimeAdapter)
             .then((result) => this.problemsetLoaded(result))
             .catch((e) => this.problemsetLoadedError(e));
         }
@@ -923,19 +924,15 @@ export class Arena {
   }
 
   updateClock(): void {
-    const finishTime = this.finishTime
-      ? time.remoteDate(this.finishTime)
-      : null;
-    const countdownTime = this.submissionDeadline || finishTime;
+    const countdownTime = this.submissionDeadline || this.finishTime;
     if (this.startTime === null || countdownTime === null || !OmegaUp.ready) {
       return;
     }
 
     const now = Date.now();
-    const startTime = time.remoteDate(this.startTime);
     let clock = '';
-    if (now < startTime.getTime()) {
-      clock = `-${time.formatDelta(startTime.getTime() - now)}`;
+    if (now < this.startTime.getTime()) {
+      clock = `-${time.formatDelta(this.startTime.getTime() - now)}`;
     } else if (now > countdownTime.getTime()) {
       // Contest for this user is over
       clock = '00:00:00';
@@ -945,7 +942,7 @@ export class Arena {
       }
 
       // Show go-to-practice-mode messages on contest end
-      if (finishTime && now > finishTime.getTime()) {
+      if (this.finishTime && now > this.finishTime.getTime()) {
         if (this.options.contestAlias) {
           ui.warning(
             `<a href="/arena/${this.options.contestAlias}/practice/">${T.arenaContestEndedUsePractice}</a>`,
@@ -1721,6 +1718,7 @@ export class Arena {
                 this.problemsetAdmin && !this.myRunsList.isProblemsetOpened,
             }),
           )
+            .then(time.remoteTimeAdapter)
             .then((problem_ext) => {
               problem.source = problem_ext.source;
               problem.problemsetter = problem_ext.problemsetter;
@@ -2010,19 +2008,15 @@ export class Arena {
     const problem = this.problems[this.currentProblem.alias];
     if (typeof problem !== 'undefined') {
       if (typeof problem.nextSubmissionTimestamp !== 'undefined') {
-        nextSubmissionTimestamp = new Date(
-          time.remoteTime(problem.nextSubmissionTimestamp.getTime()),
-        );
+        nextSubmissionTimestamp = new Date(problem.nextSubmissionTimestamp);
       } else if (
         typeof problem.runs !== 'undefined' &&
         typeof this.currentProblemset?.submissions_gap !== 'undefined' &&
         problem.runs.length > 0
       ) {
         nextSubmissionTimestamp = new Date(
-          time.remoteTime(
-            problem.runs[problem.runs.length - 1].time.getTime() +
-              this.currentProblemset.submissions_gap * 1000,
-          ),
+          problem.runs[problem.runs.length - 1].time.getTime() +
+            this.currentProblemset.submissions_gap * 1000,
         );
       }
     }
@@ -2051,6 +2045,7 @@ export class Arena {
         source: code,
       }),
     )
+      .then(time.remoteTimeAdapter)
       .then((response) => {
         ui.reportEvent('submission', 'submit');
         if (this.options.isLockdownMode && sessionStorage) {
