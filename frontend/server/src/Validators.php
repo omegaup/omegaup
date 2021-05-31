@@ -4,8 +4,6 @@ namespace OmegaUp;
 
 /**
  * Conjunto de validadores genéricos
- *
- * @author joemmanuel
  */
 class Validators {
     // The maximum length for aliases.

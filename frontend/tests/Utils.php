@@ -4,8 +4,6 @@ namespace OmegaUp\Test;
 
 /**
  * Test utils
- *
- * @author joemmanuel
  */
 class Utils {
     /** @var bool */

@@ -5,9 +5,10 @@ namespace OmegaUp\DAO;
 /**
  * Users Data Access Object (DAO).
  *
- * Esta clase contiene toda la manipulacion de bases de datos que se necesita para
- * almacenar de forma permanente y recuperar instancias de objetos {@link \OmegaUp\DAO\VO\Users}.
- * @author alanboy
+ * Esta clase contiene toda la manipulacion de bases de datos que se necesita
+ * para almacenar de forma permanente y recuperar instancias de objetos
+ * {@link \OmegaUp\DAO\VO\Users}.
+ *
  * @access public
  * @package docs
  */

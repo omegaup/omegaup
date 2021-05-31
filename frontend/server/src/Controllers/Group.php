@@ -9,13 +9,11 @@
  * @psalm-type GroupScoreboard=array{alias: string, create_time: string, description: null|string, name: string}
  * @psalm-type GroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, groupAlias: string, groupDescription: null|string, groupName: null|string, identities: list<Identity>, isOrganizer: bool, scoreboards: list<GroupScoreboard>}
  * @psalm-type TeamGroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<Identity>, isOrganizer: bool, teamGroup: array{alias: string, description: null|string, name: null|string}}
- * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ScoreboardContest=array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}
  * @psalm-type GroupScoreboardContestsPayload=array{availableContests: list<ContestListItem>, contests: list<ScoreboardContest>, scoreboardAlias: string, groupAlias: string}
  * @psalm-type Group=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
  * @psalm-type GroupListPayload=array{groups: list<Group>}
- *
- * @author joemmanuel
  */
 
 class Group extends \OmegaUp\Controllers\Controller {

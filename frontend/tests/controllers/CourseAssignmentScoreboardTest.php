@@ -1,10 +1,5 @@
 <?php
 
-/**
- *
- * @author @joemmanuel
- */
-
 class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Get score of a given assignment happy path

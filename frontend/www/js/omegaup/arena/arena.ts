@@ -1905,7 +1905,10 @@ export class Arena {
 
     this.updateAllowedLanguages(this.currentProblem.languages);
 
-    this.ephemeralGrader.send('setSettings', this.currentProblem.settings);
+    this.ephemeralGrader.send('setSettings', {
+      alias: this.currentProblem.alias,
+      settings: this.currentProblem.settings,
+    });
   }
 
   detectShowRun(): void {

@@ -5,8 +5,6 @@ namespace OmegaUp\Test;
 /**
  * Parent class of all controller test cases for omegaUp.
  * Implements common methods for setUp and asserts
- *
- * @author joemmanuel
  */
 class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     /** @var \Logger|null */

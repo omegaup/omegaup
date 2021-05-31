@@ -1,8 +1,6 @@
 <?php
 /**
  * Description of UpdateContest
- *
- * @author joemmanuel
  */
 class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**

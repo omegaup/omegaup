@@ -2,8 +2,6 @@
 
 /**
  * Test autogenerating privileges user
- *
- * @author juan.pablo
  */
 class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
     /*

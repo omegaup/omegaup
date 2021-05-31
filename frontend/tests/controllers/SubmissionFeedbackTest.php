@@ -2,8 +2,6 @@
 
 /**
  * Description of SubmissionFeedbackTest
- *
- * @author carlosabcs
  */
 
 class SubmissionFeedbackTest extends \OmegaUp\Test\ControllerTestCase {

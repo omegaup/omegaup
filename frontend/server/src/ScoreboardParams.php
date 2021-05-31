@@ -4,8 +4,6 @@ namespace OmegaUp;
 
 /**
  * ScoreboardParams
- *
- * @author joemmanuel
  */
 class ScoreboardParams {
     /** @var string */
