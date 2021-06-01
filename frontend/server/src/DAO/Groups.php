@@ -53,7 +53,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
      * Returns all groups that a user can manage.
      * @param int $userId
      * @param int $identityId
-     * @return list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}>
+     * @return list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string, type: string}>
      */
     final public static function getAllGroupsAdminedByUser(
         int $userId,
@@ -61,37 +61,55 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
     ): array {
         // group_id is only necessary to make ORDER BY work, because
         // ONLY_FULL_GROUP_BY mode is enabled.
-        $sql = '
-            SELECT
-                DISTINCT g.alias,
-                g.create_time,
-                g.description,
-                g.name,
-                g.group_id
-            FROM
-                `Groups_` AS g
-            INNER JOIN
-                ACLs AS a ON a.acl_id = g.acl_id
-            LEFT JOIN
-                User_Roles ur ON ur.acl_id = g.acl_id
-            LEFT JOIN
-                Group_Roles gr ON gr.acl_id = g.acl_id
-            LEFT JOIN
-                Groups_Identities gi ON gi.group_id = gr.group_id
-            WHERE
-                a.owner_id = ? OR
-                (ur.role_id = ? AND ur.user_id = ?) OR
-                (gr.role_id = ? AND gi.identity_id = ?)
+        $sql = '(
+                SELECT
+                    DISTINCT g.alias,
+                    \'normal\' AS type,
+                    g.create_time,
+                    g.description,
+                    g.name,
+                    g.group_id
+                FROM
+                    `Groups_` AS g
+                INNER JOIN
+                    ACLs AS a ON a.acl_id = g.acl_id
+                LEFT JOIN
+                    User_Roles ur ON ur.acl_id = g.acl_id
+                LEFT JOIN
+                    Group_Roles gr ON gr.acl_id = g.acl_id
+                LEFT JOIN
+                    Groups_Identities gi ON gi.group_id = gr.group_id
+                WHERE
+                    a.owner_id = ? OR
+                    (ur.role_id = ? AND ur.user_id = ?) OR
+                    (gr.role_id = ? AND gi.identity_id = ?)
+            ) UNION (
+                SELECT
+                    DISTINCT tg.alias,
+                    \'teams\' AS type,
+                    tg.create_time,
+                    tg.description,
+                    tg.name,
+                    tg.team_group_id AS group_id
+                FROM
+                    `Team_Groups` AS tg
+                INNER JOIN
+                    ACLs AS a ON a.acl_id = tg.acl_id
+                WHERE
+                    a.owner_id = ?
+            )
             ORDER BY
-                g.group_id DESC;';
+                type DESC,
+                group_id DESC;';
 
-        /** @var list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}> */
+        /** @var list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string, type: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [
             $userId,
             \OmegaUp\Authorization::ADMIN_ROLE,
             $userId,
             \OmegaUp\Authorization::ADMIN_ROLE,
             $identityId,
+            $userId,
         ]);
         foreach ($rs as &$row) {
             unset($row['group_id']);

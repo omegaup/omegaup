@@ -1088,6 +1088,10 @@ export const Group = {
   details: apiCall<messages.GroupDetailsRequest, messages.GroupDetailsResponse>(
     '/api/group/details/',
   ),
+  detailsForTeams: apiCall<
+    messages.GroupDetailsForTeamsRequest,
+    messages.GroupDetailsForTeamsResponse
+  >('/api/group/detailsForTeams/'),
   list: apiCall<messages.GroupListRequest, messages.GroupListResponse>(
     '/api/group/list/',
   ),

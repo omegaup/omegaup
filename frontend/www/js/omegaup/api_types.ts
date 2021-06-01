@@ -2324,6 +2324,7 @@ export namespace types {
     create_time: Date;
     description?: string;
     name: string;
+    type: string;
   }
 
   export interface GroupEditPayload {
@@ -3832,6 +3833,15 @@ export namespace messages {
     };
     scoreboards: types.GroupScoreboard[];
   };
+  export type GroupDetailsForTeamsRequest = { [key: string]: any };
+  export type GroupDetailsForTeamsResponse = {
+    team_group: {
+      alias?: string;
+      create_time: number;
+      description?: string;
+      name?: string;
+    };
+  };
   export type GroupListRequest = { [key: string]: any };
   export type GroupListResponse = { label: string; value: string }[];
   export type GroupMembersRequest = { [key: string]: any };
@@ -4706,6 +4716,9 @@ export namespace controllers {
     details: (
       params?: messages.GroupDetailsRequest,
     ) => Promise<messages.GroupDetailsResponse>;
+    detailsForTeams: (
+      params?: messages.GroupDetailsForTeamsRequest,
+    ) => Promise<messages.GroupDetailsForTeamsResponse>;
     list: (
       params?: messages.GroupListRequest,
     ) => Promise<messages.GroupListResponse>;

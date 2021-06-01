@@ -12,7 +12,7 @@
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ScoreboardContest=array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}
  * @psalm-type GroupScoreboardContestsPayload=array{availableContests: list<ContestListItem>, contests: list<ScoreboardContest>, scoreboardAlias: string, groupAlias: string}
- * @psalm-type Group=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
+ * @psalm-type Group=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string, type: string}
  * @psalm-type GroupListPayload=array{groups: list<Group>}
  */
 
@@ -367,6 +367,41 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Details of a team group
+     *
+     * @param \OmegaUp\Request $r
+     *
+     * @return array{team_group: array{create_time: int, alias: null|string, name: null|string, description: null|string}}
+     *
+     * @omegaup-request-param string $team_group_alias
+     */
+    public static function apiDetailsForTeams(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        $teamGroupAlias = $r->ensureString(
+            'team_group_alias',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
+        );
+        $teamGroup = self::validateTeamGroupAndOwner(
+            $teamGroupAlias,
+            $r->identity
+        );
+        if (is_null($teamGroup)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
+        }
+
+        /** @var array{create_time: int, alias: null|string, name: null|string, description: null|string} */
+        $filteredTeamGroup = $teamGroup->asFilteredArray([
+            'create_time',
+            'alias',
+            'name',
+            'description',
+        ]);
+        return [
+            'team_group' => $filteredTeamGroup,
+        ];
+    }
+
+    /**
      * Members of a group (usernames only).
      *
      * @param \OmegaUp\Request $r
@@ -441,6 +476,29 @@ class Group extends \OmegaUp\Controllers\Controller {
         self::$log->info("New scoreboard created {$groupScoreboardAlias}");
 
         return ['status' => 'ok'];
+    }
+
+    /**
+     * @return array{smartyProperties: array{title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @omegaup-request-param bool|null $for_teams
+     */
+    public static function getGroupNewDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ) {
+        // Authenticate user
+        $r->ensureMainUserIdentity();
+
+        $forTeams = $r->ensureOptionalBool('for_teams') ?? false;
+
+        return [
+            'smartyProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    $forTeams ? 'omegaupTitleTeamGroupsNew' : 'omegaupTitleGroupsNew'
+                ),
+            ],
+            'entrypoint' => $forTeams ? 'teams_group_new' : 'group_new',
+        ];
     }
 
     /**
