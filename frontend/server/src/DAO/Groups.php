@@ -99,8 +99,7 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
                     a.owner_id = ?
             )
             ORDER BY
-                type DESC,
-                group_id DESC;';
+                create_time DESC;';
 
         /** @var list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string, type: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [

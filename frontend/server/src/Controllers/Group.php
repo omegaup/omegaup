@@ -493,8 +493,10 @@ class Group extends \OmegaUp\Controllers\Controller {
 
         return [
             'smartyProperties' => [
-                'title' => new \OmegaUp\TranslationString(
-                    $forTeams ? 'omegaupTitleTeamGroupsNew' : 'omegaupTitleGroupsNew'
+                'title' => $forTeams ? new \OmegaUp\TranslationString(
+                    'omegaupTitleTeamGroupsNew'
+                ) : new \OmegaUp\TranslationString(
+                    'omegaupTitleGroupsNew'
                 ),
             ],
             'entrypoint' => $forTeams ? 'teams_group_new' : 'group_new',
