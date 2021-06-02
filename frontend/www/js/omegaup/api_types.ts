@@ -2324,7 +2324,6 @@ export namespace types {
     create_time: Date;
     description?: string;
     name: string;
-    type: string;
   }
 
   export interface GroupEditPayload {
@@ -3821,8 +3820,6 @@ export namespace messages {
   export type GroupCreateResponse = {};
   export type GroupCreateScoreboardRequest = { [key: string]: any };
   export type GroupCreateScoreboardResponse = {};
-  export type GroupCreateTeamGroupRequest = { [key: string]: any };
-  export type GroupCreateTeamGroupResponse = {};
   export type GroupDetailsRequest = { [key: string]: any };
   export type GroupDetailsResponse = {
     group: {
@@ -3832,15 +3829,6 @@ export namespace messages {
       name?: string;
     };
     scoreboards: types.GroupScoreboard[];
-  };
-  export type GroupDetailsForTeamsRequest = { [key: string]: any };
-  export type GroupDetailsForTeamsResponse = {
-    team_group: {
-      alias?: string;
-      create_time: number;
-      description?: string;
-      name?: string;
-    };
   };
   export type GroupListRequest = { [key: string]: any };
   export type GroupListResponse = { label: string; value: string }[];
@@ -4269,6 +4257,19 @@ export namespace messages {
   };
   export type TagListRequest = { [key: string]: any };
   export type TagListResponse = { name: string }[];
+
+  // TeamsGroup
+  export type TeamsGroupCreateRequest = { [key: string]: any };
+  export type TeamsGroupCreateResponse = {};
+  export type TeamsGroupDetailsRequest = { [key: string]: any };
+  export type TeamsGroupDetailsResponse = {
+    team_group: {
+      alias?: string;
+      create_time: number;
+      description?: string;
+      name?: string;
+    };
+  };
 
   // Time
   export type TimeGetRequest = { [key: string]: any };
@@ -4710,15 +4711,9 @@ export namespace controllers {
     createScoreboard: (
       params?: messages.GroupCreateScoreboardRequest,
     ) => Promise<messages.GroupCreateScoreboardResponse>;
-    createTeamGroup: (
-      params?: messages.GroupCreateTeamGroupRequest,
-    ) => Promise<messages.GroupCreateTeamGroupResponse>;
     details: (
       params?: messages.GroupDetailsRequest,
     ) => Promise<messages.GroupDetailsResponse>;
-    detailsForTeams: (
-      params?: messages.GroupDetailsForTeamsRequest,
-    ) => Promise<messages.GroupDetailsForTeamsResponse>;
     list: (
       params?: messages.GroupListRequest,
     ) => Promise<messages.GroupListResponse>;
@@ -5001,6 +4996,15 @@ export namespace controllers {
     list: (
       params?: messages.TagListRequest,
     ) => Promise<messages.TagListResponse>;
+  }
+
+  export interface TeamsGroup {
+    create: (
+      params?: messages.TeamsGroupCreateRequest,
+    ) => Promise<messages.TeamsGroupCreateResponse>;
+    details: (
+      params?: messages.TeamsGroupDetailsRequest,
+    ) => Promise<messages.TeamsGroupDetailsResponse>;
   }
 
   export interface Time {

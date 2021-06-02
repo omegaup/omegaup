@@ -14,7 +14,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
 
         $login = self::login($owner);
-        $response = \OmegaUp\Controllers\Group::getTeamGroupEditDetailsForTypeScript(
+        $response = \OmegaUp\Controllers\TeamsGroup::getTeamGroupEditDetailsForTypeScript(
             new \OmegaUp\Request([
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $login->auth_token,
@@ -40,7 +40,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($owner);
 
         // Owners can get all team group details
-        \OmegaUp\Controllers\Group::getTeamGroupEditDetailsForTypeScript(
+        \OmegaUp\Controllers\TeamsGroup::getTeamGroupEditDetailsForTypeScript(
             new \OmegaUp\Request([
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $login->auth_token,
@@ -51,7 +51,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         try {
-            \OmegaUp\Controllers\Group::getTeamGroupEditDetailsForTypeScript(
+            \OmegaUp\Controllers\TeamsGroup::getTeamGroupEditDetailsForTypeScript(
                 new \OmegaUp\Request([
                     'team_group_alias' => $teamGroup->alias,
                     'auth_token' => $login->auth_token,
@@ -73,7 +73,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $alias = \OmegaUp\Test\Utils::createRandomString();
 
         $login = self::login($identity);
-        \OmegaUp\Controllers\Group::apiCreateTeamGroup(
+        \OmegaUp\Controllers\TeamsGroup::apiCreate(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'name' => $name,
@@ -104,7 +104,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $alias = \OmegaUp\Test\Utils::createRandomString();
 
         $login = self::login($identity);
-        \OmegaUp\Controllers\Group::apiCreateTeamGroup(
+        \OmegaUp\Controllers\TeamsGroup::apiCreate(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'name' => $name,
@@ -129,7 +129,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $alias = \OmegaUp\Test\Utils::createRandomString();
 
         $login = self::login($identity);
-        \OmegaUp\Controllers\Group::apiCreateTeamGroup(
+        \OmegaUp\Controllers\TeamsGroup::apiCreate(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'name' => $name,
@@ -139,7 +139,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         try {
-            \OmegaUp\Controllers\Group::apiCreateTeamGroup(
+            \OmegaUp\Controllers\TeamsGroup::apiCreate(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                     'name' => $name,

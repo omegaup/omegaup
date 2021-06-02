@@ -104,9 +104,7 @@
   - [`/api/group/addUser/`](#apigroupadduser)
   - [`/api/group/create/`](#apigroupcreate)
   - [`/api/group/createScoreboard/`](#apigroupcreatescoreboard)
-  - [`/api/group/createTeamGroup/`](#apigroupcreateteamgroup)
   - [`/api/group/details/`](#apigroupdetails)
-  - [`/api/group/detailsForTeams/`](#apigroupdetailsforteams)
   - [`/api/group/list/`](#apigrouplist)
   - [`/api/group/members/`](#apigroupmembers)
   - [`/api/group/myList/`](#apigroupmylist)
@@ -201,6 +199,9 @@
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
+- [TeamsGroup](#teamsgroup)
+  - [`/api/teamsGroup/create/`](#apiteamsgroupcreate)
+  - [`/api/teamsGroup/details/`](#apiteamsgroupdetails)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
 - [User](#user)
@@ -2188,24 +2189,6 @@ Create a scoreboard set to a group
 
 _Nothing_
 
-## `/api/group/createTeamGroup/`
-
-### Description
-
-New team group
-
-### Parameters
-
-| Name          | Type     | Description |
-| ------------- | -------- | ----------- |
-| `alias`       | `string` |             |
-| `description` | `string` |             |
-| `name`        | `string` |             |
-
-### Returns
-
-_Nothing_
-
 ## `/api/group/details/`
 
 ### Description
@@ -2224,24 +2207,6 @@ Details of a group (scoreboards)
 | ------------- | ---------------------------------------------------------------------------- |
 | `group`       | `{ alias: string; create_time: number; description: string; name: string; }` |
 | `scoreboards` | `types.GroupScoreboard[]`                                                    |
-
-## `/api/group/detailsForTeams/`
-
-### Description
-
-Details of a team group
-
-### Parameters
-
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `team_group_alias` | `string` |             |
-
-### Returns
-
-| Name         | Type                                                                         |
-| ------------ | ---------------------------------------------------------------------------- |
-| `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
 
 ## `/api/group/list/`
 
@@ -3947,6 +3912,46 @@ Gets a list of tags
 }
 [];
 ```
+
+# TeamsGroup
+
+TeamsGroupController
+
+## `/api/teamsGroup/create/`
+
+### Description
+
+New team group
+
+### Parameters
+
+| Name          | Type     | Description |
+| ------------- | -------- | ----------- |
+| `alias`       | `string` |             |
+| `description` | `string` |             |
+| `name`        | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/teamsGroup/details/`
+
+### Description
+
+Details of a team group
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+
+### Returns
+
+| Name         | Type                                                                         |
+| ------------ | ---------------------------------------------------------------------------- |
+| `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
 
 # Time
 
