@@ -2,8 +2,6 @@ jest.mock('../../../third_party/js/diff_match_patch.js');
 
 import * as arena from './arena';
 import { OmegaUp } from '../omegaup';
-import * as api from '../api';
-import * as time from '../time';
 import { GetOptionsFromLocation } from './arena';
 import fetchMock from 'jest-fetch-mock';
 
@@ -57,7 +55,8 @@ describe('arena', () => {
     });
 
     it('should load problemset', () => {
-      const serverTime = (Date.now() - 3600) / 1000;
+      const now = Date.now();
+      const serverTime = now - 3600;
       fetchMock.enableMocks();
       fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
         if (req.url == '/api/session/currentSession/') {
@@ -77,8 +76,8 @@ describe('arena', () => {
             status: 200,
             body: JSON.stringify({
               status: 'ok',
-              start_time: Date.now() / 1000,
-              finish_time: (Date.now() + 3600) / 1000,
+              start_time: serverTime,
+              finish_time: serverTime + 3600,
             }),
           });
         }
@@ -87,8 +86,8 @@ describe('arena', () => {
             status: 200,
             body: JSON.stringify({
               status: 'ok',
-              start_time: Date.now() / 1000,
-              finish_time: (Date.now() + 3600) / 1000,
+              start_time: serverTime,
+              finish_time: serverTime + 3600,
             }),
           });
         }
@@ -111,7 +110,6 @@ describe('arena', () => {
         });
       });
 
-      const now = Date.now();
       let dateNowSpy: jest.SpyInstance<number, []> | null = null;
       dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
       jest.useFakeTimers();
@@ -120,14 +118,10 @@ describe('arena', () => {
           new window.URL('http://localhost:8001/arena/test/'),
         ),
       );
-      api.Contest.details({
-        contest_alias: arenaInstance.options.contestAlias,
-      })
-        .then(time.remoteTimeAdapter)
-        .then((result) => {
-          arenaInstance.problemsetLoaded(result);
-        })
-        .catch((e) => arenaInstance.problemsetLoadedError(e));
+      arenaInstance.problemsetLoaded({
+        start_time: new Date(serverTime),
+        finish_time: new Date(serverTime + 3600),
+      });
       jest.runOnlyPendingTimers();
       jest.useRealTimers();
       dateNowSpy.mockRestore();
