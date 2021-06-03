@@ -191,12 +191,12 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
         }
-        $response = \OmegaUp\Controllers\Group::getGroupListForTypeScript(
+        $response = \OmegaUp\Controllers\TeamsGroup::getGroupListForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
         )['smartyProperties']['payload'];
 
-        $this->assertCount($numberOfGroups, $response['teams_groups']);
+        $this->assertCount($numberOfGroups, $response['teamsGroups']);
     }
 }

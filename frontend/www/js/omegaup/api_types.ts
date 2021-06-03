@@ -1476,6 +1476,27 @@ export namespace types {
       );
     }
 
+    export function TeamsGroupListPayload(
+      elementId: string = 'payload',
+    ): types.TeamsGroupListPayload {
+      return ((x) => {
+        x.teamsGroups = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.create_time = ((x: number) => new Date(x * 1000))(x.create_time);
+            return x;
+          });
+        })(x.teamsGroups);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function UserProfileDetailsPayload(
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
@@ -3288,6 +3309,17 @@ export namespace types {
     identities: types.Identity[];
     isOrganizer: boolean;
     teamGroup: { alias: string; description?: string; name?: string };
+  }
+
+  export interface TeamsGroup {
+    alias: string;
+    create_time: Date;
+    description?: string;
+    name: string;
+  }
+
+  export interface TeamsGroupListPayload {
+    teamsGroups: types.TeamsGroup[];
   }
 
   export interface UserInfoForProblem {

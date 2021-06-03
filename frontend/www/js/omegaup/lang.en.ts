@@ -664,6 +664,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleSupportDashboard: "Support dashboard",
   omegaupTitleTeamsGroupEdit: "Edit teams group",
   omegaupTitleTeamsGroupNew: "New teams group",
+  omegaupTitleTeamsGroups: "Teams groups",
   omegaupTitleUpdatePrivileges: "Update privileges",
   omegaupTitleUsersRank: "User ranking",
   onlyDemotionsSupported: "Resolution only supported for demotions for now.",
