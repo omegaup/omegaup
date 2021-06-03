@@ -154,4 +154,49 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('aliasInUse', $e->getMessage());
         }
     }
+
+    public function testTeamsGroupDetails() {
+        [
+            'owner' => $owner,
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+
+        // Call API
+        $login = self::login($owner);
+        $response = \OmegaUp\Controllers\TeamsGroup::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'team_group_alias' => $teamGroup->alias,
+        ]));
+        $this->assertEquals(
+            $teamGroup->alias,
+            $response['team_group']['alias']
+        );
+    }
+
+    public function testTeamsGroupsList() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $numberOfGroups = 3;
+
+        $login = self::login($identity);
+        foreach (range(0, $numberOfGroups - 1) as $i) {
+            $name = \OmegaUp\Test\Utils::createRandomString();
+            $description = \OmegaUp\Test\Utils::createRandomString();
+            $alias = \OmegaUp\Test\Utils::createRandomString();
+            \OmegaUp\Controllers\TeamsGroup::apiCreate(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => $name,
+                    'alias' => $alias,
+                    'description' => $description
+                ])
+            );
+        }
+        $response = \OmegaUp\Controllers\Group::getGroupListForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertCount($numberOfGroups, $response['teams_groups']);
+    }
 }

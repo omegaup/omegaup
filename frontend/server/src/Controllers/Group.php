@@ -508,6 +508,9 @@ class Group extends \OmegaUp\Controllers\Controller {
                         $r->user->user_id,
                         $r->identity->identity_id
                     ),
+                    'teams_groups' => \OmegaUp\DAO\TeamGroups::getAllTeamsGroupsAdminedByUser(
+                        $r->user->user_id
+                    ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleGroups'
