@@ -2073,7 +2073,10 @@ export class Arena {
           language: language,
         };
         this.updateRun(run);
-        if (this.runSubmitView) {
+        if (
+          this.runSubmitView &&
+          Object.getOwnPropertyNames(this.runSubmitView?.$refs).length !== 0
+        ) {
           const component = this.runSubmitView.$refs
             .component as arena_RunSubmit;
           component.clearForm();

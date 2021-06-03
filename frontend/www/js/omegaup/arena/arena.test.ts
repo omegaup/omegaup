@@ -1,6 +1,7 @@
 jest.mock('../../../third_party/js/diff_match_patch.js');
 
 import * as arena from './arena';
+import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
 import { GetOptionsFromLocation } from './arena';
 import fetchMock from 'jest-fetch-mock';
@@ -54,7 +55,7 @@ describe('arena', () => {
       expect(arenaInstance.problemsetAdmin).toEqual(false);
     });
 
-    it('should load problemset', () => {
+    it('should load problemset', async () => {
       const now = Date.now();
       const serverTime = now - 3600;
       fetchMock.enableMocks();
@@ -96,6 +97,17 @@ describe('arena', () => {
             status: 200,
             body: JSON.stringify({
               status: 'ok',
+              start_time: serverTime,
+              finish_time: serverTime + 3600,
+            }),
+          });
+        }
+        if (req.url == '/api/run/create/') {
+          return Promise.resolve({
+            status: 200,
+            body: JSON.stringify({
+              status: 'ok',
+              nextSubmissionTimestamp: serverTime + 60,
             }),
           });
         }
@@ -118,10 +130,42 @@ describe('arena', () => {
           new window.URL('http://localhost:8001/arena/test/'),
         ),
       );
-      arenaInstance.problemsetLoaded({
-        start_time: new Date(serverTime),
-        finish_time: new Date(serverTime + 3600),
+      arenaInstance.problems = {
+        test: {
+          accepts_submissions: true,
+          alias: 'test',
+          commit: 'abcdef',
+          input_limit: 10240,
+          languages: ['py2', 'py3'],
+          points: 0,
+          quality_seal: true,
+          title: 'Test',
+          visibility: 2,
+        },
+      };
+      arenaInstance.currentProblem = {
+        accepts_submissions: true,
+        title: 'Test',
+        alias: 'test',
+        commit: 'abcdef',
+        source: 'omegaUp',
+        languages: ['py2', 'py3'],
+        points: 0,
+        input_limit: 10240,
+        quality_seal: true,
+        visibility: 2,
+      };
+      arenaInstance.runSubmitView = new Vue({
+        data: () => ({
+          languages: ['py2', 'py3'],
+          preferredLanguage: 'py3',
+          nextSubmissionTimestamp: serverTime,
+        }),
       });
+      await arenaInstance.submitRun('print(3)', 'py3');
+      expect(arenaInstance.runSubmitView.$data.nextSubmissionTimestamp).toEqual(
+        serverTime + 60,
+      );
       jest.runOnlyPendingTimers();
       jest.useRealTimers();
       dateNowSpy.mockRestore();
