@@ -10,8 +10,6 @@ namespace OmegaUp\DAO;
  * {@link \OmegaUp\DAO\VO\GroupsIdentities}.
  *
  * @access public
- *
- * @psalm-type Identity=array{classname?: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, password?: string, school: null|string, school_id: int|null, school_name?: string, state: null|string, state_id: null|string, username: string}
  */
 class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
     /**
