@@ -3878,8 +3878,6 @@ export namespace messages {
   };
   export type GroupRemoveUserRequest = { [key: string]: any };
   export type GroupRemoveUserResponse = {};
-  export type GroupTeamsRequest = { [key: string]: any };
-  export type GroupTeamsResponse = { identities: types.Identity[] };
   export type GroupUpdateRequest = { [key: string]: any };
   export type GroupUpdateResponse = {};
 
@@ -4292,6 +4290,8 @@ export namespace messages {
       name?: string;
     };
   };
+  export type TeamsGroupTeamsRequest = { [key: string]: any };
+  export type TeamsGroupTeamsResponse = { identities: types.Identity[] };
 
   // Time
   export type TimeGetRequest = { [key: string]: any };
@@ -4748,9 +4748,6 @@ export namespace controllers {
     removeUser: (
       params?: messages.GroupRemoveUserRequest,
     ) => Promise<messages.GroupRemoveUserResponse>;
-    teams: (
-      params?: messages.GroupTeamsRequest,
-    ) => Promise<messages.GroupTeamsResponse>;
     update: (
       params?: messages.GroupUpdateRequest,
     ) => Promise<messages.GroupUpdateResponse>;
@@ -5030,6 +5027,9 @@ export namespace controllers {
     details: (
       params?: messages.TeamsGroupDetailsRequest,
     ) => Promise<messages.TeamsGroupDetailsResponse>;
+    teams: (
+      params?: messages.TeamsGroupTeamsRequest,
+    ) => Promise<messages.TeamsGroupTeamsResponse>;
   }
 
   export interface Time {

@@ -109,7 +109,6 @@
   - [`/api/group/members/`](#apigroupmembers)
   - [`/api/group/myList/`](#apigroupmylist)
   - [`/api/group/removeUser/`](#apigroupremoveuser)
-  - [`/api/group/teams/`](#apigroupteams)
   - [`/api/group/update/`](#apigroupupdate)
 - [GroupScoreboard](#groupscoreboard)
   - [`/api/groupScoreboard/addContest/`](#apigroupscoreboardaddcontest)
@@ -203,6 +202,7 @@
 - [TeamsGroup](#teamsgroup)
   - [`/api/teamsGroup/create/`](#apiteamsgroupcreate)
   - [`/api/teamsGroup/details/`](#apiteamsgroupdetails)
+  - [`/api/teamsGroup/teams/`](#apiteamsgroupteams)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
 - [User](#user)
@@ -2279,24 +2279,6 @@ Remove user from group
 
 _Nothing_
 
-## `/api/group/teams/`
-
-### Description
-
-Teams of a teams group
-
-### Parameters
-
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `team_group_alias` | `string` |             |
-
-### Returns
-
-| Name         | Type               |
-| ------------ | ------------------ |
-| `identities` | `types.Identity[]` |
-
 ## `/api/group/update/`
 
 ### Description
@@ -3971,6 +3953,24 @@ Details of a team group
 | Name         | Type                                                                         |
 | ------------ | ---------------------------------------------------------------------------- |
 | `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
+
+## `/api/teamsGroup/teams/`
+
+### Description
+
+Teams of a teams group
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+
+### Returns
+
+| Name         | Type               |
+| ------------ | ------------------ |
+| `identities` | `types.Identity[]` |
 
 # Time
 
