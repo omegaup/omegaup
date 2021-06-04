@@ -307,7 +307,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             'team_group_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $teamGroup = \OmegaUp\Controllers\Group::validateTeamGroupAndOwner(
+        $teamGroup = \OmegaUp\Controllers\TeamsGroup::validateTeamGroupAndOwner(
             $teamGroupAlias,
             $r->identity
         );
