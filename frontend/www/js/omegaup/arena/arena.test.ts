@@ -111,6 +111,16 @@ describe('arena', () => {
             }),
           });
         }
+        if (req.url == '/api/run/status/') {
+          return Promise.resolve({
+            status: 200,
+            body: JSON.stringify({
+              status: 'ok',
+              start_time: serverTime,
+              finish_time: serverTime + 3600,
+            }),
+          });
+        }
         return Promise.resolve({
           ok: false,
           status: 404,
@@ -156,9 +166,18 @@ describe('arena', () => {
         visibility: 2,
       };
       await arenaInstance.submitRun('print(3)', 'py3');
-      expect(arenaInstance.currentProblem.nextSubmissionTimestamp).toEqual(
-        now + 60,
-      );
+      if (arenaInstance.currentProblem.nextSubmissionTimestamp) {
+        expect(
+          (arenaInstance.currentProblem.nextSubmissionTimestamp?.getTime() -
+            serverTime) /
+            1000,
+        ).toEqual(60);
+        expect(
+          (arenaInstance.currentProblem.nextSubmissionTimestamp?.getTime() -
+            now) /
+            1000,
+        ).toBeLessThan(60);
+      }
       jest.runOnlyPendingTimers();
       jest.useRealTimers();
       dateNowSpy.mockRestore();

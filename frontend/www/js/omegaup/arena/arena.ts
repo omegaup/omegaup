@@ -2035,66 +2035,68 @@ export class Arena {
     return {};
   }
 
-  submitRun(code: string, language: string): void {
+  submitRun(code: string, language: string): Promise<void> {
     const problemset = this.computeProblemsetArg();
 
-    api.Run.create(
-      Object.assign(problemset, {
-        problem_alias: this.currentProblem.alias,
-        language: language,
-        source: code,
-      }),
-    )
-      .then(time.remoteTimeAdapter)
-      .then((response) => {
-        ui.reportEvent('submission', 'submit');
-        if (this.options.isLockdownMode && sessionStorage) {
-          sessionStorage.setItem(`run:${response.guid}`, code);
-        }
-        this.currentProblem.lastSubmission = new Date();
-        this.currentProblem.nextSubmissionTimestamp =
-          response.nextSubmissionTimestamp;
-        const run = {
-          guid: response.guid,
-          submit_delay: response.submit_delay,
-          username: this.options.payload.currentUsername,
-          classname: this.options.payload.userClassname,
-          country: 'xx',
-          status: 'new',
-          alias: this.currentProblem.alias,
-          time: new Date(),
-          penalty: 0,
-          runtime: 0,
-          memory: 0,
-          verdict: 'JE',
-          score: 0,
+    return (
+      api.Run.create(
+        Object.assign(problemset, {
+          problem_alias: this.currentProblem.alias,
           language: language,
-        };
-        this.updateRun(run);
-        if (
-          this.runSubmitView &&
-          Object.getOwnPropertyNames(this.runSubmitView.$refs).length !== 0
-        ) {
-          const component = this.runSubmitView.$refs
-            .component as arena_RunSubmit;
-          component.clearForm();
-          // Wait until the code view has been cleared before hiding the
-          // overlay. Not doing so will sometimes cause the contents of the
-          // editor to still be visible when the overlay is shown again.
-          component.$nextTick(() => this.hideOverlay());
-        } else {
-          this.hideOverlay();
-        }
-        if (!this.options.courseAlias) {
-          this.initSubmissionCountdown();
-        }
-      })
-      .catch((run) => {
-        alert(run.error ?? run);
-        if (run.errorname) {
-          ui.reportEvent('submission', 'submit-fail', run.errorname);
-        }
-      });
+          source: code,
+        }),
+      )
+        //.then(time.remoteTimeAdapter)
+        .then((response) => {
+          ui.reportEvent('submission', 'submit');
+          if (this.options.isLockdownMode && sessionStorage) {
+            sessionStorage.setItem(`run:${response.guid}`, code);
+          }
+          this.currentProblem.lastSubmission = new Date();
+          this.currentProblem.nextSubmissionTimestamp =
+            response.nextSubmissionTimestamp;
+          const run = {
+            guid: response.guid,
+            submit_delay: response.submit_delay,
+            username: this.options.payload.currentUsername,
+            classname: this.options.payload.userClassname,
+            country: 'xx',
+            status: 'new',
+            alias: this.currentProblem.alias,
+            time: new Date(),
+            penalty: 0,
+            runtime: 0,
+            memory: 0,
+            verdict: 'JE',
+            score: 0,
+            language: language,
+          };
+          this.updateRun(run);
+          if (
+            this.runSubmitView &&
+            Object.getOwnPropertyNames(this.runSubmitView.$refs).length !== 0
+          ) {
+            const component = this.runSubmitView.$refs
+              .component as arena_RunSubmit;
+            component.clearForm();
+            // Wait until the code view has been cleared before hiding the
+            // overlay. Not doing so will sometimes cause the contents of the
+            // editor to still be visible when the overlay is shown again.
+            component.$nextTick(() => this.hideOverlay());
+          } else {
+            this.hideOverlay();
+          }
+          if (!this.options.courseAlias) {
+            this.initSubmissionCountdown();
+          }
+        })
+        .catch((run) => {
+          alert(run.error ?? run);
+          if (run.errorname) {
+            ui.reportEvent('submission', 'submit-fail', run.errorname);
+          }
+        })
+    );
   }
 
   updateSummary(contest: omegaup.Contest): void {
