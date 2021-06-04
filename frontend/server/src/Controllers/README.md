@@ -4004,6 +4004,7 @@ Adds the experiment to the user.
 | Name         | Type     | Description |
 | ------------ | -------- | ----------- |
 | `experiment` | `string` |             |
+| `username`   | `string` |             |
 
 ### Returns
 
@@ -4033,9 +4034,10 @@ Adds the role to the user.
 
 ### Parameters
 
-| Name   | Type     | Description |
-| ------ | -------- | ----------- |
-| `role` | `string` |             |
+| Name       | Type     | Description |
+| ---------- | -------- | ----------- |
+| `role`     | `string` |             |
+| `username` | `string` |             |
 
 ### Returns
 
@@ -4459,6 +4461,7 @@ Removes the experiment from the user.
 | Name         | Type     | Description |
 | ------------ | -------- | ----------- |
 | `experiment` | `string` |             |
+| `username`   | `string` |             |
 
 ### Returns
 
@@ -4488,9 +4491,10 @@ Removes the role from the user.
 
 ### Parameters
 
-| Name   | Type     | Description |
-| ------ | -------- | ----------- |
-| `role` | `string` |             |
+| Name       | Type     | Description |
+| ---------- | -------- | ----------- |
+| `role`     | `string` |             |
+| `username` | `string` |             |
 
 ### Returns
 

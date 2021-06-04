@@ -1206,6 +1206,7 @@
 	"updateProblemLevel": "Update problem level",
 	"updateStatementsCommitMessage": "Updated statements",
 	"userAlreadyAcceptedPrivacyPolicy": "User has already accepted the privacy policy",
+	"userAlreadyHasSelectedRole": "User has already the selected role",
 	"userBirthDate": "Birth date: %(birthDate)",
 	"userDoesNotHaveAnyPasswordChangeRequest": "User does not have any password change request in the last 24 hours.",
 	"userEditAddPassword": "Add password",

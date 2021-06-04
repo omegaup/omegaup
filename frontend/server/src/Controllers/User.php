@@ -34,6 +34,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type LoginDetailsPayload=array{facebookUrl: string, linkedinUrl: string, statusError?: string, validateRecaptcha: bool}
+ * @psalm-type Experiment=array{config: bool, hash: string, name: string}
+ * @psalm-type UserRole=array{name: string}
+ * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -3089,19 +3092,40 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param string $role
+     * @omegaup-request-param string $username
      */
     public static function apiAddRole(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty($r['role'], 'role');
 
-        $role = self::validateAddRemoveRole($r->identity, $r['role']);
+        $role = $r->ensureString('role');
+        $role = self::validateAddRemoveRole($r->identity, $role);
+        $username = $r->ensureString(
+            'username',
+            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
+        );
+        $user = self::resolveTargetUser($r);
+        if (is_null($user) || is_null($user->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
 
-        \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
-            'user_id' => $r->user->user_id,
-            'role_id' => $role->role_id,
-            'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
-        ]));
+        try {
+            \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
+                'user_id' => $user->user_id,
+                'role_id' => $role->role_id,
+                'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
+            ]));
+        } catch (\Exception $e) {
+            if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'userAlreadyHasSelectedRole',
+                    $e
+                );
+            }
+            throw $e;
+        }
 
         return [
             'status' => 'ok',
@@ -3114,16 +3138,27 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param string $role
+     * @omegaup-request-param string $username
      */
     public static function apiRemoveRole(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty($r['role'], 'role');
 
-        $role = self::validateAddRemoveRole($r->identity, $r['role']);
+        $role = $r->ensureString('role');
+        $role = self::validateAddRemoveRole($r->identity, $role);
+        $username = $r->ensureString(
+            'username',
+            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
+        );
+        $user = self::resolveTargetUser($r);
+        if (is_null($user) || is_null($user->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
 
         \OmegaUp\DAO\UserRoles::delete(new \OmegaUp\DAO\VO\UserRoles([
-            'user_id' => $r->user->user_id,
+            'user_id' => $user->user_id,
             'role_id' => $role->role_id,
             'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
@@ -3190,6 +3225,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * Adds the experiment to the user.
      *
      * @omegaup-request-param string $experiment
+     * @omegaup-request-param string $username
      *
      * @return array{status: string}
      */
@@ -3200,8 +3236,19 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        $username = $r->ensureString(
+            'username',
+            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
+        );
+        $user = self::resolveTargetUser($r);
+        if (is_null($user) || is_null($user->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
         \OmegaUp\DAO\UsersExperiments::create(new \OmegaUp\DAO\VO\UsersExperiments([
-            'user_id' => $r->user->user_id,
+            'user_id' => $user->user_id,
             'experiment' => $r->ensureEnum(
                 'experiment',
                 \OmegaUp\Experiments::getInstance()->getAllKnownExperiments()
@@ -3215,6 +3262,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * Removes the experiment from the user.
      *
      * @omegaup-request-param string $experiment
+     * @omegaup-request-param string $username
      *
      * @return array{status: string}
      */
@@ -3225,8 +3273,19 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
+        $username = $r->ensureString(
+            'username',
+            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
+        );
+        $user = self::resolveTargetUser($r);
+        if (is_null($user) || is_null($user->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
         \OmegaUp\DAO\UsersExperiments::delete(
-            $r->user->user_id,
+            $user->user_id,
             $r->ensureEnum(
                 'experiment',
                 \OmegaUp\Experiments::getInstance()->getAllKnownExperiments()
@@ -3874,6 +3933,90 @@ class User extends \OmegaUp\Controllers\Controller {
             ],
         ];
         return $response;
+    }
+
+    /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: UserDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $username
+     */
+    public static function getUserDetailsForTypeScript(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+        $username = $r->ensureString(
+            'username',
+            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
+        );
+
+        $user = self::resolveTargetUser($r);
+        if (is_null($user) || is_null($user->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        $emails = \OmegaUp\DAO\Emails::getByUserId($user->user_id);
+        $emailsList = [];
+        foreach ($emails as $email) {
+            if (is_null($email->email)) {
+                continue;
+            }
+            $emailsList[] = $email->email;
+        }
+
+        $userExperiments = \OmegaUp\DAO\UsersExperiments::getByUserId(
+            $user->user_id
+        );
+        $userExperimentsList = [];
+        foreach ($userExperiments as $userExperiment) {
+            if (is_null($userExperiment->experiment)) {
+                continue;
+            }
+            $userExperimentsList[] = $userExperiment->experiment;
+        }
+
+        // TODO: Also support GroupRoles.
+        $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
+
+        $roles = \OmegaUp\DAO\Roles::getAll();
+        $rolesList = [];
+        foreach ($roles as $role) {
+            if (is_null($role->name)) {
+                continue;
+            }
+            $rolesList[] = ['name' => $role->name];
+        }
+
+        $systemExperiments = [];
+        /** @var array<string, mixed> */
+        $defines = get_defined_constants(true)['user'];
+        foreach (\OmegaUp\Experiments::getInstance()->getAllKnownExperiments() as $experiment) {
+            $systemExperiments[] = [
+                'name' => $experiment,
+                'hash' => \OmegaUp\Experiments::getExperimentHash($experiment),
+                'config' => \OmegaUp\Experiments::getInstance()->isEnabledByConfig(
+                    $experiment,
+                    $defines
+                ),
+            ];
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'emails' => $emailsList,
+                    'experiments' => $userExperimentsList,
+                    'roleNames' => $rolesList,
+                    'systemExperiments' => $systemExperiments,
+                    'systemRoles' => $systemRoles,
+                    'username' => $username,
+                    'verified' => $user->verified != 0,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleAdminUsers'
+                ),
+            ],
+            'entrypoint' => 'admin_user',
+        ];
     }
 
     /**
