@@ -4,8 +4,6 @@
 
 /**
  *  GroupScoreboardController
- *
- * @author joemmanuel
  */
 
 class GroupScoreboard extends \OmegaUp\Controllers\Controller {

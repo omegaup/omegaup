@@ -3,8 +3,6 @@
 /**
  * Any admin can accept / reject participant requests for a public contest with
  * registration
- *
- * @author juan.pablo@omegaup.com
  */
 class ContestRequestsTest extends \OmegaUp\Test\ControllerTestCase {
     private function preparePublicContestWithRegistration(): array {

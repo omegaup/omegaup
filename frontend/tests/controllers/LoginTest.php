@@ -2,8 +2,6 @@
 
 /**
  * SessionControllerTest
- *
- * @author joemmanuel
  */
 class LoginTest extends \OmegaUp\Test\ControllerTestCase {
     /**

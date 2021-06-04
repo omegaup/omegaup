@@ -2,8 +2,6 @@
 
 /**
  * Tests for ProblemForfeitedController
- *
- * @author carlosabcs
  */
 
 class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {

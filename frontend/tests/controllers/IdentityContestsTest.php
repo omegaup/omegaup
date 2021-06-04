@@ -2,8 +2,6 @@
 
 /**
  * Testing identity can access to contest and resolve any problem
- *
- * @author juan.pablo
  */
 class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
     /**

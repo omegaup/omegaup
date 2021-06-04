@@ -2,8 +2,6 @@
 
 /**
  * Testing delete problems feature
- *
- * @author juan.pablo@omegaup.com
  */
 
 class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {

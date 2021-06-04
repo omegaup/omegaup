@@ -2,8 +2,6 @@
 
 /**
  * Test to ensure that all the badges are in the correct format.
- *
- * @author carlosabcs
  */
 class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
     private static function getSortedExpectedResults(array $expected): array {
