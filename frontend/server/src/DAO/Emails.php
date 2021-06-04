@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class Emails extends \OmegaUp\DAO\Base\Emails {
     /**
-     * @return \OmegaUp\DAO\VO\Emails[]
+     * @return list<\OmegaUp\DAO\VO\Emails>
      */
     final public static function getByUserId(int $userId): array {
         $sql = 'SELECT
@@ -23,6 +23,7 @@ class Emails extends \OmegaUp\DAO\Base\Emails {
                 WHERE
                     user_id = ?';
 
+        /** @var list<array{email: null|string, email_id: int, user_id: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]);
 
         $emails = [];
