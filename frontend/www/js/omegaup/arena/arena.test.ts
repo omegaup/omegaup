@@ -1,7 +1,6 @@
 jest.mock('../../../third_party/js/diff_match_patch.js');
 
 import * as arena from './arena';
-import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
 import { GetOptionsFromLocation } from './arena';
 import fetchMock from 'jest-fetch-mock';
@@ -107,7 +106,8 @@ describe('arena', () => {
             status: 200,
             body: JSON.stringify({
               status: 'ok',
-              nextSubmissionTimestamp: serverTime + 60,
+              nextSubmissionTimestamp: serverTime / 1000 + 60,
+              submission_deadline: serverTime / 1000 + 3600,
             }),
           });
         }
@@ -155,16 +155,9 @@ describe('arena', () => {
         quality_seal: true,
         visibility: 2,
       };
-      arenaInstance.runSubmitView = new Vue({
-        data: () => ({
-          languages: ['py2', 'py3'],
-          preferredLanguage: 'py3',
-          nextSubmissionTimestamp: serverTime,
-        }),
-      });
       await arenaInstance.submitRun('print(3)', 'py3');
-      expect(arenaInstance.runSubmitView.$data.nextSubmissionTimestamp).toEqual(
-        serverTime + 60,
+      expect(arenaInstance.currentProblem.nextSubmissionTimestamp).toEqual(
+        now + 60,
       );
       jest.runOnlyPendingTimers();
       jest.useRealTimers();

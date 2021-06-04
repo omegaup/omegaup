@@ -2051,10 +2051,8 @@ export class Arena {
         if (this.options.isLockdownMode && sessionStorage) {
           sessionStorage.setItem(`run:${response.guid}`, code);
         }
-
-        const currentProblem = this.problems[this.currentProblem.alias];
-        currentProblem.lastSubmission = new Date();
-        currentProblem.nextSubmissionTimestamp =
+        this.currentProblem.lastSubmission = new Date();
+        this.currentProblem.nextSubmissionTimestamp =
           response.nextSubmissionTimestamp;
         const run = {
           guid: response.guid,
@@ -2075,7 +2073,7 @@ export class Arena {
         this.updateRun(run);
         if (
           this.runSubmitView &&
-          Object.getOwnPropertyNames(this.runSubmitView?.$refs).length !== 0
+          Object.getOwnPropertyNames(this.runSubmitView.$refs).length !== 0
         ) {
           const component = this.runSubmitView.$refs
             .component as arena_RunSubmit;
