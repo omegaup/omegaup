@@ -1,10 +1,5 @@
 <?php
 
-/**
- *
- * @author @joemmanuel
- */
-
 class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic apiStudentList test

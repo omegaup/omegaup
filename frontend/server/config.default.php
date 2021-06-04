@@ -5,7 +5,6 @@ require_once dirname(__DIR__) . '/server/try_define.php';
 # GLOBAL CONFIG
 # ###################################
 try_define('OMEGAUP_LOCKDOWN_DOMAIN', 'localhost-lockdown');
-try_define('OMEGAUP_COOKIE_DOMAIN', '');
 try_define('OMEGAUP_AUTH_TOKEN_COOKIE_NAME', 'ouat');
 try_define('OMEGAUP_MD5_SALT', 'omegaup');
 try_define('OMEGAUP_URL', 'http://localhost');

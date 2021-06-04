@@ -1081,10 +1081,6 @@ export const Group = {
     messages.GroupCreateScoreboardRequest,
     messages.GroupCreateScoreboardResponse
   >('/api/group/createScoreboard/'),
-  createTeamGroup: apiCall<
-    messages.GroupCreateTeamGroupRequest,
-    messages.GroupCreateTeamGroupResponse
-  >('/api/group/createTeamGroup/'),
   details: apiCall<messages.GroupDetailsRequest, messages.GroupDetailsResponse>(
     '/api/group/details/',
   ),
@@ -1716,6 +1712,17 @@ export const Tag = {
   list: apiCall<messages.TagListRequest, messages.TagListResponse>(
     '/api/tag/list/',
   ),
+};
+
+export const TeamsGroup = {
+  create: apiCall<
+    messages.TeamsGroupCreateRequest,
+    messages.TeamsGroupCreateResponse
+  >('/api/teamsGroup/create/'),
+  details: apiCall<
+    messages.TeamsGroupDetailsRequest,
+    messages.TeamsGroupDetailsResponse
+  >('/api/teamsGroup/details/'),
 };
 
 export const Time = {

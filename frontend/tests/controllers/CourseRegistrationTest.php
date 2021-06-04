@@ -2,8 +2,6 @@
 
 /**
  * A course might require registration to participate on it.
- *
- * @author juan.pablo@omegaup.com
  */
 class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     private static $curator = null;

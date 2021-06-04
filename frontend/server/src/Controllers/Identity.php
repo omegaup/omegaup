@@ -4,8 +4,6 @@
 
 /**
  *  IdentityController
- *
- * @author juan.pablo
  */
 class Identity extends \OmegaUp\Controllers\Controller {
     /**
@@ -406,6 +404,61 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'identity_id' => $identity->identity_id,
             ])
         );
+    }
+
+    /**
+     * Save object Identities in DB, and add user into team group.
+     * This function is expected to be called inside a transaction.
+     */
+    private static function saveIdentityTeamInsideTransaction(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\TeamGroups $teamGroup
+    ): void {
+        if (is_null($identity->username)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotExist'
+            );
+        }
+        if (is_null($identity->country_id) && !is_null($identity->state_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidStateNeedsToBelongToCountry',
+                $identity->username
+            );
+        }
+        if (
+            !is_null($identity->country_id)
+            && !is_null($identity->state_id)
+        ) {
+            $countryStates = \OmegaUp\DAO\States::getByCountry(
+                $identity->country_id
+            );
+            $states = array_map(
+                /**
+                 * @param \OmegaUp\DAO\VO\States $state
+                 */
+                fn ($state) => $state->state_id,
+                $countryStates
+            );
+            if (!in_array($identity->state_id, $states)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalidStateDoesNotBelongToCountry',
+                    $identity->username
+                );
+            }
+        }
+        $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(
+            $identity->username
+        );
+        if (is_null($preexistingIdentity)) {
+            \OmegaUp\DAO\Identities::create($identity);
+        } else {
+            $identity->identity_id = $preexistingIdentity->identity_id;
+            $identity->user_id = $preexistingIdentity->user_id;
+        }
+        \OmegaUp\DAO\Teams::create(new \OmegaUp\DAO\VO\Teams([
+            'team_group_id' => $teamGroup->team_group_id,
+            'identity_id' => $identity->identity_id,
+        ]));
     }
 
     /**

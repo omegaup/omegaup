@@ -2,8 +2,6 @@
 
 /**
  * Description of ClarificationCreateTest
- *
- * @author joemmanuel
  */
 
 class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {

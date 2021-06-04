@@ -2,8 +2,6 @@
 
 /**
  * Description of DetailsContest
- *
- * @author joemmanuel
  */
 
 class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {

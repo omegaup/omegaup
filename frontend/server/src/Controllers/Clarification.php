@@ -5,8 +5,6 @@
 /**
  * Description of ClarificationController
  *
- * @author joemmanuel
- *
  * @psalm-type Clarification=array{answer: null|string, assignment_alias?: string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  */
 class Clarification extends \OmegaUp\Controllers\Controller {

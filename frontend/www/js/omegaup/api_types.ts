@@ -1468,6 +1468,35 @@ export namespace types {
       );
     }
 
+    export function TeamGroupEditPayload(
+      elementId: string = 'payload',
+    ): types.TeamGroupEditPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function TeamsGroupListPayload(
+      elementId: string = 'payload',
+    ): types.TeamsGroupListPayload {
+      return ((x) => {
+        x.teamsGroups = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.create_time = ((x: number) => new Date(x * 1000))(x.create_time);
+            return x;
+          });
+        })(x.teamsGroups);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function UserProfileDetailsPayload(
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
@@ -1976,10 +2005,14 @@ export namespace types {
     admission_mode: string;
     alias: string;
     contest_id: number;
+    contestants: number;
     description: string;
     finish_time: Date;
     last_updated: Date;
+    organizer: string;
     original_finish_time: Date;
+    partial_score: boolean;
+    participating: boolean;
     problemset_id: number;
     recommended: boolean;
     rerun_id: number;
@@ -3271,6 +3304,24 @@ export namespace types {
     problemCount: number;
   }
 
+  export interface TeamGroupEditPayload {
+    countries: dao.Countries[];
+    identities: types.Identity[];
+    isOrganizer: boolean;
+    teamGroup: { alias: string; description?: string; name?: string };
+  }
+
+  export interface TeamsGroup {
+    alias: string;
+    create_time: Date;
+    description?: string;
+    name: string;
+  }
+
+  export interface TeamsGroupListPayload {
+    teamsGroups: types.TeamsGroup[];
+  }
+
   export interface UserInfoForProblem {
     admin: boolean;
     loggedIn: boolean;
@@ -3801,8 +3852,6 @@ export namespace messages {
   export type GroupCreateResponse = {};
   export type GroupCreateScoreboardRequest = { [key: string]: any };
   export type GroupCreateScoreboardResponse = {};
-  export type GroupCreateTeamGroupRequest = { [key: string]: any };
-  export type GroupCreateTeamGroupResponse = {};
   export type GroupDetailsRequest = { [key: string]: any };
   export type GroupDetailsResponse = {
     group: {
@@ -4230,6 +4279,19 @@ export namespace messages {
   };
   export type TagListRequest = { [key: string]: any };
   export type TagListResponse = { name: string }[];
+
+  // TeamsGroup
+  export type TeamsGroupCreateRequest = { [key: string]: any };
+  export type TeamsGroupCreateResponse = {};
+  export type TeamsGroupDetailsRequest = { [key: string]: any };
+  export type TeamsGroupDetailsResponse = {
+    team_group: {
+      alias?: string;
+      create_time: number;
+      description?: string;
+      name?: string;
+    };
+  };
 
   // Time
   export type TimeGetRequest = { [key: string]: any };
@@ -4671,9 +4733,6 @@ export namespace controllers {
     createScoreboard: (
       params?: messages.GroupCreateScoreboardRequest,
     ) => Promise<messages.GroupCreateScoreboardResponse>;
-    createTeamGroup: (
-      params?: messages.GroupCreateTeamGroupRequest,
-    ) => Promise<messages.GroupCreateTeamGroupResponse>;
     details: (
       params?: messages.GroupDetailsRequest,
     ) => Promise<messages.GroupDetailsResponse>;
@@ -4962,6 +5021,15 @@ export namespace controllers {
     list: (
       params?: messages.TagListRequest,
     ) => Promise<messages.TagListResponse>;
+  }
+
+  export interface TeamsGroup {
+    create: (
+      params?: messages.TeamsGroupCreateRequest,
+    ) => Promise<messages.TeamsGroupCreateResponse>;
+    details: (
+      params?: messages.TeamsGroupDetailsRequest,
+    ) => Promise<messages.TeamsGroupDetailsResponse>;
   }
 
   export interface Time {
