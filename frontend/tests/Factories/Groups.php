@@ -91,7 +91,7 @@ class Groups {
             $login = \OmegaUp\Test\ControllerTestCase::login($owner);
         }
 
-        \OmegaUp\Controllers\Group::apiCreateTeamGroup(
+        \OmegaUp\Controllers\TeamsGroup::apiCreate(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'alias' => $alias,
