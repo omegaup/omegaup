@@ -117,6 +117,7 @@
   - [`/api/groupScoreboard/removeContest/`](#apigroupscoreboardremovecontest)
 - [Identity](#identity)
   - [`/api/identity/bulkCreate/`](#apiidentitybulkcreate)
+  - [`/api/identity/bulkCreateForTeams/`](#apiidentitybulkcreateforteams)
   - [`/api/identity/changePassword/`](#apiidentitychangepassword)
   - [`/api/identity/create/`](#apiidentitycreate)
   - [`/api/identity/selectIdentity/`](#apiidentityselectidentity)
@@ -2396,6 +2397,23 @@ Entry point for Create bulk Identities API
 | `group_alias` | `null\|string` |             |
 | `name`        | `mixed`        |             |
 | `username`    | `mixed`        |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/identity/bulkCreateForTeams/`
+
+### Description
+
+Entry point for Create bulk Identities for teams API
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+| `team_identities`  | `string` |             |
 
 ### Returns
 

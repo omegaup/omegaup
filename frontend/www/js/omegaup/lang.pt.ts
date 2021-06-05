@@ -1189,6 +1189,7 @@ const translations: { [key: string]: string; } = {
   tagSourceLevel: "Nivel",
   tagSourceOwner: "Etiqueta do autor",
   tagSourceVoted: "Etiqueta dos usu\u00e1rios",
+  teamNotExist: "Equipe n\u00e3o existe",
   teamsGroupEditTeams: "Equipes",
   teamsGroupEditTitleWithName: "Editar grupo de equipes %(name)",
   teamsGroupUploadIdentitiesAsTeams: "Subir equipes",
