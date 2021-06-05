@@ -3,8 +3,6 @@
 /**
  * Tests API/DAO functions for getting and selecting the
  * Schools of the Month.
- *
- * @author carlosabcs
  */
 class SchoolOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     /**

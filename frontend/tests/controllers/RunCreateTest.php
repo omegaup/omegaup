@@ -2,8 +2,6 @@
 
 /**
  * Description of CreateRun
- *
- * @author joemmanuel
  */
 
 class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {

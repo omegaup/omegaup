@@ -2,8 +2,6 @@
 
 /**
  * Description of RunDetailsTest
- *
- * @author juan.pablo
  */
 
 class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {

@@ -2,8 +2,6 @@
 
 /**
  * Description of ContestScoreboardTest
- *
- * @author joemmanuel
  */
 
 class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {

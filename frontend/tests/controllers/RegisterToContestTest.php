@@ -2,8 +2,6 @@
 
 /**
  * A contest might require registration to participate on it.
- *
- * @author alanboy@omegaup.com
  */
 class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
     // Intro is the page that you see just before joining a contest

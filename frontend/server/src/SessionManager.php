@@ -41,59 +41,46 @@ class SessionManager {
     ): void {
         // Expire all old cookies
         $httpCookie = \OmegaUp\Request::getServerVar('HTTP_COOKIE');
+        $secure = !empty(\OmegaUp\Request::getServerVar('HTTPS'));
+        $domain = OMEGAUP_COOKIE_DOMAIN;
         if (!empty($httpCookie)) {
             $cookies = explode(';', $httpCookie);
+            $oldExpire = \OmegaUp\Time::get() - 1000;
             foreach ($cookies as $cookie) {
                 $parts = explode('=', $cookie);
                 $oldName = trim($parts[0]);
-                setcookie($oldName, '', \OmegaUp\Time::get() - 1000);
-                setcookie($oldName, '', \OmegaUp\Time::get() - 1000, '/');
+                setcookie($oldName, '', $oldExpire);
+                setcookie($oldName, '', $oldExpire, '/');
+                // This should clear the cookies with the old pre-RFC 6265
+                // behavior.
+                setcookie(
+                    $oldName,
+                    '',
+                    [
+                        'expires' => $oldExpire,
+                        'path' => $path,
+                        'domain' => $domain,
+                        'secure' => $secure,
+                        'httponly' => true,
+                        'samesite' => 'Lax',
+                    ]
+                );
             }
         }
 
         // Set the new one
-        $domain = OMEGAUP_COOKIE_DOMAIN;
-        $secure = !empty(\OmegaUp\Request::getServerVar('HTTPS'));
         $_COOKIE[$name] = $value;
-        if (PHP_VERSION_ID < 70300) {
-            setcookie(
-                $name,
-                $value,
-                $expire,
-                "{$path}; SameSite=Lax",  // This hack only works for PHP < 7.3.
-                $domain,
-                /*secure=*/$secure,
-                /*httponly=*/true
-            );
-        } elseif (PHP_VERSION_ID < 70400) {
-            /**
-             * @psalm-suppress TooManyArguments this is needed to support
-             *                                  Same-Site cookies.
-             */
-            setcookie(
-                $name,
-                $value,
-                $expire,
-                $path,
-                $domain,
-                /*secure=*/$secure,
-                /*httponly=*/true,
-                /*samesite=*/'Lax'
-            );
-        } else {
-            setcookie(
-                $name,
-                $value,
-                [
-                    'expires' => $expire,
-                    'path' => $path,
-                    'domain' => $domain,
-                    'secure' => $secure,
-                    'httponly' => true,
-                    'samesite' => 'Lax',
-                ]
-            );
-        }
+        setcookie(
+            $name,
+            $value,
+            [
+                'expires' => $expire,
+                'path' => $path,
+                'secure' => $secure,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]
+        );
     }
 
     public function getCookie(string $name): ?string {

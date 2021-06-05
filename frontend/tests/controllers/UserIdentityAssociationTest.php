@@ -2,8 +2,6 @@
 
 /**
  * Testing synchronization between User and Identity
- *
- * @author juan.pablo
  */
 class UserIdentityAssociationTest extends \OmegaUp\Test\ControllerTestCase {
     private function assertUsernameInArray($username, array $identities) {

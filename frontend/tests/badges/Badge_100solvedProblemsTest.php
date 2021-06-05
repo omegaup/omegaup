@@ -2,8 +2,6 @@
 
 /**
  * Simple test for 100solvedProblems Badge
- *
- * @author carlosabcs
  */
 // phpcs:ignore Squiz.Classes.ValidClassName.NotCamelCaps
 class Badge_100solvedProblemsTest extends \OmegaUp\Test\BadgesTestCase {
