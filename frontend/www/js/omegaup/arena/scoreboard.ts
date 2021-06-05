@@ -3,6 +3,7 @@ import { types } from '../api_types';
 import { Arena, ArenaOptions } from './arena';
 import { OmegaUp } from '../omegaup';
 import * as ui from '../ui';
+import * as time from '../time';
 
 OmegaUp.on('ready', () => {
   const headerPayload = types.payloadParsers.CommonPayload('header-payload');
@@ -35,6 +36,7 @@ OmegaUp.on('ready', () => {
     contest_alias: arenaInstance.options.contestAlias,
     token: arenaInstance.options.scoreboardToken,
   })
+    .then(time.remoteTimeAdapter)
     .then((contest) => {
       arenaInstance.initProblemsetId(contest);
       arenaInstance.initProblems(contest);

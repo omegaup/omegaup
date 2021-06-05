@@ -159,6 +159,7 @@ OmegaUp.on('ready', () => {
               language: language,
               source: code,
             })
+              .then(time.remoteTimeAdapter)
               .then((response) => {
                 submitRun({
                   guid: response.guid,
