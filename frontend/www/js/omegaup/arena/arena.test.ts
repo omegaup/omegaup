@@ -1,6 +1,7 @@
 jest.mock('../../../third_party/js/diff_match_patch.js');
 
 import * as arena from './arena';
+import * as time from '../time';
 import { OmegaUp } from '../omegaup';
 import { GetOptionsFromLocation } from './arena';
 import fetchMock from 'jest-fetch-mock';
@@ -47,6 +48,10 @@ describe('arena', () => {
       OmegaUp.ready = true;
     });
 
+    afterEach(() => {
+      time._setRemoteDeltaTime(0);
+    });
+
     it('can be instantiated', () => {
       const options = arena.GetDefaultOptions();
 
@@ -56,7 +61,8 @@ describe('arena', () => {
 
     it('should load problemset', async () => {
       const now = Date.now();
-      const serverTime = now - 3600;
+      const serverTime = now - 3600 * 1000;
+      time._setRemoteDeltaTime(now - serverTime);
       fetchMock.enableMocks();
       fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
         if (req.url == '/api/session/currentSession/') {
@@ -67,7 +73,7 @@ describe('arena', () => {
               session: {
                 valid: false,
               },
-              time: serverTime,
+              time: serverTime / 1000,
             }),
           });
         }
@@ -76,8 +82,8 @@ describe('arena', () => {
             status: 200,
             body: JSON.stringify({
               status: 'ok',
-              start_time: serverTime,
-              finish_time: serverTime + 3600,
+              start_time: serverTime / 1000,
+              finish_time: serverTime / 1000 + 3600,
             }),
           });
         }
@@ -86,8 +92,8 @@ describe('arena', () => {
             status: 200,
             body: JSON.stringify({
               status: 'ok',
-              start_time: serverTime,
-              finish_time: serverTime + 3600,
+              start_time: serverTime / 1000,
+              finish_time: serverTime / 1000 + 3600,
             }),
           });
         }
@@ -96,8 +102,8 @@ describe('arena', () => {
             status: 200,
             body: JSON.stringify({
               status: 'ok',
-              start_time: serverTime,
-              finish_time: serverTime + 3600,
+              start_time: serverTime / 1000,
+              finish_time: serverTime / 1000 + 3600,
             }),
           });
         }
@@ -116,8 +122,6 @@ describe('arena', () => {
             status: 200,
             body: JSON.stringify({
               status: 'ok',
-              start_time: serverTime,
-              finish_time: serverTime + 3600,
             }),
           });
         }
@@ -169,13 +173,14 @@ describe('arena', () => {
       expect(arenaInstance.currentProblem.nextSubmissionTimestamp).toBeTruthy();
       const nextSubmissionTimestamp = arenaInstance.currentProblem
         .nextSubmissionTimestamp as Date;
-      expect((nextSubmissionTimestamp.getTime() - serverTime) / 1000).toEqual(
-        60,
-      );
-      expect((nextSubmissionTimestamp.getTime() - now) / 1000).toBeLessThan(60);
-      expect((nextSubmissionTimestamp.getTime() - now) / 1000).toBeGreaterThan(
-        55,
-      );
+      const serverDeltaSeconds =
+        (nextSubmissionTimestamp.getTime() - serverTime) / 1000;
+      const localDeltaSeconds =
+        (nextSubmissionTimestamp.getTime() - now) / 1000;
+      expect(serverDeltaSeconds).toBeLessThan(3665);
+      expect(serverDeltaSeconds).toBeGreaterThan(3655);
+      expect(localDeltaSeconds).toBeLessThan(65);
+      expect(localDeltaSeconds).toBeGreaterThan(55);
       jest.runOnlyPendingTimers();
       jest.useRealTimers();
       dateNowSpy.mockRestore();
