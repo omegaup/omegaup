@@ -45,12 +45,12 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
         $placeholders = array_fill(0, count($usernames), '?');
         $placeholders = join(',', $placeholders);
         $sql = "REPLACE INTO Team_Users (team_id, user_id)
-                SELECT {$teamId} AS team_id, user_id FROM Identities
+                SELECT ? AS team_id, user_id FROM Identities
                 WHERE username IN ($placeholders) AND user_id IS NOT NULL;";
 
         \OmegaUp\MySQLConnection::getInstance()->Execute(
             $sql,
-            $usernames
+            array_merge([$teamId], $usernames)
         );
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
