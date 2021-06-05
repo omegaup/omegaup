@@ -790,6 +790,7 @@ export class Arena {
           setTimeout(problemsetCallback, 1000);
         } else {
           api.Problemset.details({ problemset_id: problemsetId })
+            .then(time.remoteTimeAdapter)
             .then((result) => this.problemsetLoaded(result))
             .catch((e) => this.problemsetLoadedError(e));
         }
@@ -1717,6 +1718,7 @@ export class Arena {
                 this.problemsetAdmin && !this.myRunsList.isProblemsetOpened,
             }),
           )
+            .then(time.remoteTimeAdapter)
             .then((problem_ext) => {
               problem.source = problem_ext.source;
               problem.problemsetter = problem_ext.problemsetter;
@@ -2036,25 +2038,24 @@ export class Arena {
     return {};
   }
 
-  submitRun(code: string, language: string): void {
+  submitRun(code: string, language: string): Promise<void> {
     const problemset = this.computeProblemsetArg();
 
-    api.Run.create(
+    return api.Run.create(
       Object.assign(problemset, {
         problem_alias: this.currentProblem.alias,
         language: language,
         source: code,
       }),
     )
+      .then(time.remoteTimeAdapter)
       .then((response) => {
         ui.reportEvent('submission', 'submit');
         if (this.options.isLockdownMode && sessionStorage) {
           sessionStorage.setItem(`run:${response.guid}`, code);
         }
-
-        const currentProblem = this.problems[this.currentProblem.alias];
-        currentProblem.lastSubmission = new Date();
-        currentProblem.nextSubmissionTimestamp =
+        this.currentProblem.lastSubmission = new Date();
+        this.currentProblem.nextSubmissionTimestamp =
           response.nextSubmissionTimestamp;
         const run = {
           guid: response.guid,
@@ -2073,7 +2074,10 @@ export class Arena {
           language: language,
         };
         this.updateRun(run);
-        if (this.runSubmitView) {
+        if (
+          this.runSubmitView &&
+          Object.getOwnPropertyNames(this.runSubmitView.$refs).length !== 0
+        ) {
           const component = this.runSubmitView.$refs
             .component as arena_RunSubmit;
           component.clearForm();
