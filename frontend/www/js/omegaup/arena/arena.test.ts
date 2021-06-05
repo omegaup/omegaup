@@ -166,18 +166,16 @@ describe('arena', () => {
         visibility: 2,
       };
       await arenaInstance.submitRun('print(3)', 'py3');
-      if (arenaInstance.currentProblem.nextSubmissionTimestamp) {
-        expect(
-          (arenaInstance.currentProblem.nextSubmissionTimestamp?.getTime() -
-            serverTime) /
-            1000,
-        ).toEqual(60);
-        expect(
-          (arenaInstance.currentProblem.nextSubmissionTimestamp?.getTime() -
-            now) /
-            1000,
-        ).toBeLessThan(60);
-      }
+      expect(arenaInstance.currentProblem.nextSubmissionTimestamp).toBeTruthy();
+      const nextSubmissionTimestamp = arenaInstance.currentProblem
+        .nextSubmissionTimestamp as Date;
+      expect((nextSubmissionTimestamp.getTime() - serverTime) / 1000).toEqual(
+        60,
+      );
+      expect((nextSubmissionTimestamp.getTime() - now) / 1000).toBeLessThan(60);
+      expect((nextSubmissionTimestamp.getTime() - now) / 1000).toBeGreaterThan(
+        55,
+      );
       jest.runOnlyPendingTimers();
       jest.useRealTimers();
       dateNowSpy.mockRestore();
