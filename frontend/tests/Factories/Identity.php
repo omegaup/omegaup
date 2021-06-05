@@ -43,6 +43,35 @@ class Identity {
         return json_encode($identities);
     }
 
+    /**
+     * @return list<string>
+     */
+    public static function getUsernamesInCsvFile(string $file): array {
+        $row = 0;
+        $usernames = [];
+        $path_file = OMEGAUP_TEST_RESOURCES_ROOT . $file;
+        if (($handle = fopen($path_file, 'r')) == false) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'identities'
+            );
+        }
+        $headers = fgetcsv($handle, 1000, ',');
+        while (
+            ($data = fgetcsv(
+                $handle,
+                1000,
+                ','
+            )) !== false &&
+            !is_null($data)
+        ) {
+            array_push($usernames, $data[0]);
+        }
+        fclose($handle);
+
+        return $usernames;
+    }
+
     public static function createIdentitiesFromAGroup(
         \OmegaUp\DAO\VO\Groups $group,
         \OmegaUp\Test\ScopedLoginToken $adminLogin,

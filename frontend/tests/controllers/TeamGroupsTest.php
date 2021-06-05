@@ -183,8 +183,13 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
+        $teamUsernames = \OmegaUp\Test\Factories\Identity::getUsernamesInCsvFile(
+            'team_identities.csv',
+            $teamGroup->alias,
+        );
+
         // Call api using identity creator group member
-        $response = \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+        \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
             new \OmegaUp\Request([
                 'auth_token' => $creatorLogin->auth_token,
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
@@ -206,7 +211,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(5, $identities);
 
-        foreach ($identities as $identity) {
+        foreach ($identities as $index => $identity) {
             $dbIdentity = \OmegaUp\DAO\Identities::findByUsername(
                 $identity['username']
             );
@@ -216,8 +221,9 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $result = \OmegaUp\DAO\TeamUsers::getByTeamId($team->team_id);
             // All the teams have 2 associated users
             $this->assertCount(2, $result);
-            $this->assertStringContainsString(
-                $teamGroup->alias,
+            $teamUsername = $teamUsernames[$index];
+            $this->assertEquals(
+                "{$teamGroup->alias}:{$teamUsername}",
                 $identity['username']
             );
             $this->assertStringContainsString('Team', $identity['name']);

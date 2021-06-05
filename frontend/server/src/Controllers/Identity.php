@@ -589,19 +589,18 @@ class Identity extends \OmegaUp\Controllers\Controller {
             'team_group_id' => $teamGroup->team_group_id,
             'identity_id' => $identity->identity_id,
         ]);
+        if (is_null($team->team_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'teamNotExist'
+            );
+        }
 
         \OmegaUp\DAO\Teams::create($team);
 
-        $userIdsToAssociate = \OmegaUp\DAO\Identities::getUserIdsByUsername(
+        \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
+            $team->team_id,
             $identitiesUsernames
         );
-
-        foreach ($userIdsToAssociate as $userId) {
-            \OmegaUp\DAO\TeamUsers::create(new \OmegaUp\DAO\VO\TeamUsers([
-                'team_id' => $team->team_id,
-                'user_id' => $userId,
-            ]));
-        }
     }
 
     /**
