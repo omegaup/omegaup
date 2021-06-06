@@ -30,6 +30,7 @@ class Teams extends \OmegaUp\DAO\Base\Teams {
                     AND `t`.`identity_id` = ?
                 LIMIT 1;';
         $params = [$teamGroupId, $identityId];
+        /** @var array{identity_id: int, team_group_id: int, team_id: int}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
