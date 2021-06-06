@@ -95,7 +95,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($identity);
         // Call to API Add Role
-        $response = \OmegaUp\Controllers\User::apiAddRole(
+        \OmegaUp\Controllers\User::apiAddRole(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'username' => $username,
@@ -105,13 +105,14 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             // Trying to add the same role
-            $response = \OmegaUp\Controllers\User::apiAddRole(
+            \OmegaUp\Controllers\User::apiAddRole(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                     'username' => $username,
                     'role' => 'Admin'
                 ])
             );
+            $this->fail('should not have been able to add the same role');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             // Exception expected
             $this->assertEquals($e->getMessage(), 'userAlreadyHasSelectedRole');
