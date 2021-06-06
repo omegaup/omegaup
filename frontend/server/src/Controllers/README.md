@@ -203,6 +203,7 @@
 - [TeamsGroup](#teamsgroup)
   - [`/api/teamsGroup/create/`](#apiteamsgroupcreate)
   - [`/api/teamsGroup/details/`](#apiteamsgroupdetails)
+  - [`/api/teamsGroup/teams/`](#apiteamsgroupteams)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
 - [User](#user)
@@ -2246,9 +2247,9 @@ Members of a group (usernames only).
 
 ### Returns
 
-| Name         | Type                                                                                                                                                                       |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `identities` | `{ classname: string; country?: string; country_id?: string; name?: string; school?: string; school_id?: number; state?: string; state_id?: string; username: string; }[]` |
+| Name         | Type               |
+| ------------ | ------------------ |
+| `identities` | `types.Identity[]` |
 
 ## `/api/group/myList/`
 
@@ -3970,6 +3971,24 @@ Details of a team group
 | Name         | Type                                                                         |
 | ------------ | ---------------------------------------------------------------------------- |
 | `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
+
+## `/api/teamsGroup/teams/`
+
+### Description
+
+Teams of a teams group
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+
+### Returns
+
+| Name         | Type               |
+| ------------ | ------------------ |
+| `identities` | `types.Identity[]` |
 
 # Time
 
