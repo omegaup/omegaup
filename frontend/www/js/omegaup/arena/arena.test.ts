@@ -1,7 +1,10 @@
 jest.mock('../../../third_party/js/diff_match_patch.js');
 
 import * as arena from './arena';
+import * as time from '../time';
 import { OmegaUp } from '../omegaup';
+import { GetOptionsFromLocation } from './arena';
+import fetchMock from 'jest-fetch-mock';
 
 describe('arena', () => {
   describe('GetOptionsFromLocation', () => {
@@ -45,11 +48,142 @@ describe('arena', () => {
       OmegaUp.ready = true;
     });
 
+    afterEach(() => {
+      time._setRemoteDeltaTime(0);
+    });
+
     it('can be instantiated', () => {
       const options = arena.GetDefaultOptions();
 
       const arenaInstance = new arena.Arena(options);
       expect(arenaInstance.problemsetAdmin).toEqual(false);
+    });
+
+    it('should load problemset', async () => {
+      const now = Date.now();
+      const serverTime = now - 3600 * 1000;
+      time._setRemoteDeltaTime(now - serverTime);
+      fetchMock.enableMocks();
+      fetchMock.mockIf(/^\/api\/.*/, (req: Request) => {
+        if (req.url == '/api/session/currentSession/') {
+          return Promise.resolve({
+            status: 200,
+            body: JSON.stringify({
+              status: 'ok',
+              session: {
+                valid: false,
+              },
+              time: serverTime / 1000,
+            }),
+          });
+        }
+        if (req.url == '/api/contest/details/') {
+          return Promise.resolve({
+            status: 200,
+            body: JSON.stringify({
+              status: 'ok',
+              start_time: serverTime / 1000,
+              finish_time: serverTime / 1000 + 3600,
+            }),
+          });
+        }
+        if (req.url == '/api/problemset/scoreboard/') {
+          return Promise.resolve({
+            status: 200,
+            body: JSON.stringify({
+              status: 'ok',
+              start_time: serverTime / 1000,
+              finish_time: serverTime / 1000 + 3600,
+            }),
+          });
+        }
+        if (req.url == '/api/contest/clarifications/') {
+          return Promise.resolve({
+            status: 200,
+            body: JSON.stringify({
+              status: 'ok',
+              start_time: serverTime / 1000,
+              finish_time: serverTime / 1000 + 3600,
+            }),
+          });
+        }
+        if (req.url == '/api/run/create/') {
+          return Promise.resolve({
+            status: 200,
+            body: JSON.stringify({
+              status: 'ok',
+              nextSubmissionTimestamp: serverTime / 1000 + 60,
+              submission_deadline: serverTime / 1000 + 3600,
+            }),
+          });
+        }
+        if (req.url == '/api/run/status/') {
+          return Promise.resolve({
+            status: 200,
+            body: JSON.stringify({
+              status: 'ok',
+            }),
+          });
+        }
+        return Promise.resolve({
+          ok: false,
+          status: 404,
+          body: JSON.stringify({
+            status: 'error',
+            error: `Invalid call to "${req.url}" in test`,
+            errorcode: 403,
+          }),
+        });
+      });
+
+      let dateNowSpy: jest.SpyInstance<number, []> | null = null;
+      dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
+      jest.useFakeTimers();
+      const arenaInstance = new arena.Arena(
+        GetOptionsFromLocation(
+          new window.URL('http://localhost:8001/arena/test/'),
+        ),
+      );
+      arenaInstance.problems = {
+        test: {
+          accepts_submissions: true,
+          alias: 'test',
+          commit: 'abcdef',
+          input_limit: 10240,
+          languages: ['py2', 'py3'],
+          points: 0,
+          quality_seal: true,
+          title: 'Test',
+          visibility: 2,
+        },
+      };
+      arenaInstance.currentProblem = {
+        accepts_submissions: true,
+        title: 'Test',
+        alias: 'test',
+        commit: 'abcdef',
+        source: 'omegaUp',
+        languages: ['py2', 'py3'],
+        points: 0,
+        input_limit: 10240,
+        quality_seal: true,
+        visibility: 2,
+      };
+      await arenaInstance.submitRun('print(3)', 'py3');
+      expect(arenaInstance.currentProblem.nextSubmissionTimestamp).toBeTruthy();
+      const nextSubmissionTimestamp = arenaInstance.currentProblem
+        .nextSubmissionTimestamp as Date;
+      const serverDeltaSeconds =
+        (nextSubmissionTimestamp.getTime() - serverTime) / 1000;
+      const localDeltaSeconds =
+        (nextSubmissionTimestamp.getTime() - now) / 1000;
+      expect(serverDeltaSeconds).toBeLessThan(3665);
+      expect(serverDeltaSeconds).toBeGreaterThan(3655);
+      expect(localDeltaSeconds).toBeLessThan(65);
+      expect(localDeltaSeconds).toBeGreaterThan(55);
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
+      dateNowSpy.mockRestore();
     });
   });
 });

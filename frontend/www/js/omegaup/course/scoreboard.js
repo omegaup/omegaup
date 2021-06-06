@@ -2,6 +2,7 @@ import { Arena } from '../arena/arena';
 import { OmegaUp } from '../omegaup-legacy';
 import * as api from '../api';
 import * as ui from '../ui';
+import * as time from '../time';
 
 OmegaUp.on('ready', function () {
   const payload = JSON.parse(
@@ -27,6 +28,7 @@ OmegaUp.on('ready', function () {
     assignment: arena.options.assignmentAlias,
     token: arena.options.scoreboardToken,
   })
+    .then(time.remoteTimeAdapter)
     .then(function (course) {
       arena.initProblemsetId(course);
       arena.initProblems(course);
