@@ -1207,6 +1207,7 @@
 	"updateProblemLevel": "(Upda73 pr0b13m 13v31)",
 	"updateStatementsCommitMessage": "(Upda73d 57a73m3n75)",
 	"userAlreadyAcceptedPrivacyPolicy": "(U53r ha5 a1r3ady acc3p73d 7h3 privacy p01icy)",
+	"userAlreadyHasSelectedRole": "(U53r a1r3ady ha5 7h3 5313c73d r013)",
 	"userBirthDate": "(Bir7h da73: %(birthDate))",
 	"userDoesNotHaveAnyPasswordChangeRequest": "(U53r d035 n07 hav3 any pa55w0rd chang3 r3qu357 in 7h3 1a57 24 h0ur5.)",
 	"userEditAddPassword": "(Add pa55w0rd)",

@@ -1208,6 +1208,7 @@ const translations: { [key: string]: string; } = {
   updateProblemLevel: "Atualizar o n\u00edvel do problema",
   updateStatementsCommitMessage: "Atualizando elabora\u00e7\u00e3oes",
   userAlreadyAcceptedPrivacyPolicy: "O usu\u00e1rio j\u00e1 aceitou a pol\u00edtica de privacidade",
+  userAlreadyHasSelectedRole: "O usu\u00e1rio j\u00e1 tem a fun\u00e7\u00e3o selecionada",
   userBirthDate: "Data de nascimento: %(birthDate)",
   userDoesNotHaveAnyPasswordChangeRequest: "O usu\u00e1rio n\u00e3o possui nenhuma solicita\u00e7\u00e3o de mudan\u00e7a de senha nas \u00faltimas 24 horas.",
   userEditAddPassword: "Adicionar senha",
