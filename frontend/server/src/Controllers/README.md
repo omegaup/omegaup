@@ -203,6 +203,7 @@
 - [TeamsGroup](#teamsgroup)
   - [`/api/teamsGroup/create/`](#apiteamsgroupcreate)
   - [`/api/teamsGroup/details/`](#apiteamsgroupdetails)
+  - [`/api/teamsGroup/removeTeam/`](#apiteamsgroupremoveteam)
   - [`/api/teamsGroup/teams/`](#apiteamsgroupteams)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
@@ -3971,6 +3972,23 @@ Details of a team group
 | Name         | Type                                                                         |
 | ------------ | ---------------------------------------------------------------------------- |
 | `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
+
+## `/api/teamsGroup/removeTeam/`
+
+### Description
+
+Remove team from teams group
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+| `usernameOrEmail`  | `string` |             |
+
+### Returns
+
+_Nothing_
 
 ## `/api/teamsGroup/teams/`
 

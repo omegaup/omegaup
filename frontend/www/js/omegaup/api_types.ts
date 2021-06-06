@@ -4320,6 +4320,8 @@ export namespace messages {
       name?: string;
     };
   };
+  export type TeamsGroupRemoveTeamRequest = { [key: string]: any };
+  export type TeamsGroupRemoveTeamResponse = {};
   export type TeamsGroupTeamsRequest = { [key: string]: any };
   export type TeamsGroupTeamsResponse = { identities: types.Identity[] };
 
@@ -5060,6 +5062,9 @@ export namespace controllers {
     details: (
       params?: messages.TeamsGroupDetailsRequest,
     ) => Promise<messages.TeamsGroupDetailsResponse>;
+    removeTeam: (
+      params?: messages.TeamsGroupRemoveTeamRequest,
+    ) => Promise<messages.TeamsGroupRemoveTeamResponse>;
     teams: (
       params?: messages.TeamsGroupTeamsRequest,
     ) => Promise<messages.TeamsGroupTeamsResponse>;

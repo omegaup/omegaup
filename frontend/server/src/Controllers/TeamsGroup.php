@@ -246,4 +246,53 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             ),
         ];
     }
+
+    /**
+     * Remove team from teams group
+     *
+     * @param \OmegaUp\Request $r
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $team_group_alias
+     * @omegaup-request-param string $usernameOrEmail
+     */
+    public static function apiRemoveTeam(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+        $teamGroupAlias = $r->ensureString(
+            'team_group_alias',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
+        );
+        $teamGroup = self::validateTeamGroupAndOwner(
+            $teamGroupAlias,
+            $r->identity
+        );
+        if (is_null($teamGroup)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'team_group_alias'
+            );
+        }
+
+        $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $r->ensureString('usernameOrEmail')
+        );
+
+        // Check team is actually in group
+        $teams = \OmegaUp\DAO\Teams::getByTeamGroupIdAndIdentityId(
+            intval($teamGroup->team_group_id),
+            intval($resolvedIdentity->identity_id)
+        );
+        if (is_null($teams)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'User'
+            );
+        }
+
+        \OmegaUp\DAO\Teams::delete($teams);
+        self::$log->info("Removed {$resolvedIdentity->username}");
+
+        return ['status' => 'ok'];
+    }
 }

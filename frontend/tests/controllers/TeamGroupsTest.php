@@ -477,4 +477,73 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertStringContainsString('Team', $identity['name']);
         }
     }
+
+    public function testRemoveTeamsFromTeamsGroup() {
+        // Identity creator group member will upload csv file
+        [
+           'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $teamGroup = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        )['teamGroup'];
+
+        // Call api using identity creator group team
+        \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities.csv',
+                    $teamGroup->alias
+                ),
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        [
+            'identities' => $teamIdentities,
+        ] = \OmegaUp\Controllers\TeamsGroup::getTeamGroupEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'team_group_alias' => $teamGroup->alias,
+                'auth_token' => $creatorLogin->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertCount(5, $teamIdentities);
+
+        // Now, we are going to remove all teams from the teams group
+        foreach ($teamIdentities as $i => $teamIdentity) {
+            [
+                'identities' => $teamIdentities,
+            ] = \OmegaUp\Controllers\TeamsGroup::getTeamGroupEditDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'team_group_alias' => $teamGroup->alias,
+                    'auth_token' => $creatorLogin->auth_token,
+                ])
+            )['smartyProperties']['payload'];
+
+            $this->assertCount(5 - $i, $teamIdentities);
+
+            \OmegaUp\Controllers\TeamsGroup::apiRemoveTeam(new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'usernameOrEmail' => $teamIdentity['username'],
+                'team_group_alias' => $teamGroup->alias
+            ]));
+        }
+
+        [
+            'identities' => $teamIdentities,
+        ] = \OmegaUp\Controllers\TeamsGroup::getTeamGroupEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'team_group_alias' => $teamGroup->alias,
+                'auth_token' => $creatorLogin->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertEmpty($teamIdentities);
+    }
 }
