@@ -404,4 +404,77 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount($numberOfGroups, $response['teamsGroups']);
     }
+
+    public function testTeamsIntoTeamsGroup() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+        $numberOfUsers = 10;
+
+        // Users to associate
+        foreach (range(0, $numberOfUsers - 1) as $id) {
+            \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams([
+                    'username' => "user{$id}",
+                ])
+            );
+        }
+
+        $teamUsernames = \OmegaUp\Test\Factories\Identity::getUsernamesInCsvFile(
+            'team_identities.csv',
+            $teamGroup->alias,
+        );
+
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities.csv',
+                    $teamGroup->alias,
+                ),
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        [
+            'identities' => $teams,
+        ] = \OmegaUp\Controllers\TeamsGroup::apiTeams(
+            new \OmegaUp\Request([
+                'team_group_alias' => $teamGroup->alias,
+                'auth_token' => $creatorLogin->auth_token,
+            ])
+        );
+
+        $this->assertCount(5, $teams);
+
+        foreach ($teams as $index => $identity) {
+            $dbIdentity = \OmegaUp\DAO\Identities::findByUsername(
+                $identity['username']
+            );
+            $team = \OmegaUp\DAO\Teams::getByIdentityId(
+                $dbIdentity->identity_id
+            );
+            $result = \OmegaUp\DAO\TeamUsers::getByTeamId($team->team_id);
+            // All the teams have 2 associated users
+            $this->assertCount(2, $result);
+            $teamUsername = $teamUsernames[$index];
+            $this->assertEquals(
+                "{$teamGroup->alias}:{$teamUsername}",
+                $identity['username']
+            );
+            $this->assertStringContainsString('Team', $identity['name']);
+        }
+    }
 }
