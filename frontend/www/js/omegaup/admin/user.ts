@@ -1,15 +1,24 @@
 import admin_User from '../components/admin/User.vue';
-import { OmegaUp } from '../omegaup-legacy';
+import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
+import { types } from '../api_types';
 
-OmegaUp.on('ready', function () {
-  var payload = JSON.parse(document.getElementById('payload').innerText);
+OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.UserDetailsPayload();
 
-  var adminUser = new Vue({
-    el: '#admin-user',
+  const adminUser = new Vue({
+    el: '#main-container',
+    components: {
+      'omegaup-admin-user': admin_User,
+    },
+    data: () => ({
+      experiments: payload.experiments,
+      roles: payload.systemRoles,
+      verified: payload.verified,
+    }),
     render: function (createElement) {
       return createElement('omegaup-admin-user', {
         props: {
@@ -22,13 +31,16 @@ OmegaUp.on('ready', function () {
           verified: this.verified,
         },
         on: {
-          'change-experiment': function (experiment) {
+          'change-experiment': (experiment: {
+            selected: boolean;
+            value: types.Experiment;
+          }): void => {
             if (experiment.selected) {
               api.User.addExperiment({
                 username: payload.username,
                 experiment: experiment.value.name,
               })
-                .then(function () {
+                .then(() => {
                   ui.success(T.userEditSuccess);
                 })
                 .catch(ui.apiError);
@@ -37,19 +49,22 @@ OmegaUp.on('ready', function () {
                 username: payload.username,
                 experiment: experiment.value.name,
               })
-                .then(function () {
+                .then(() => {
                   ui.success(T.userEditSuccess);
                 })
                 .catch(ui.apiError);
             }
           },
-          'change-role': function (role) {
+          'change-role': (role: {
+            selected: boolean;
+            value: types.UserRole;
+          }): void => {
             if (role.selected) {
               api.User.addRole({
                 username: payload.username,
                 role: role.value.name,
               })
-                .then(function () {
+                .then(() => {
                   ui.success(T.userEditSuccess);
                 })
                 .catch(ui.apiError);
@@ -58,29 +73,21 @@ OmegaUp.on('ready', function () {
                 username: payload.username,
                 role: role.value.name,
               })
-                .then(function () {
+                .then(() => {
                   ui.success(T.userEditSuccess);
                 })
                 .catch(ui.apiError);
             }
           },
-          'verify-user': function () {
+          'verify-user': (): void => {
             api.User.verifyEmail({ usernameOrEmail: payload.username })
-              .then(function () {
+              .then(() => {
                 adminUser.verified = true;
               })
               .catch(ui.apiError);
           },
         },
       });
-    },
-    data: {
-      experiments: payload.experiments,
-      roles: payload.systemRoles,
-      verified: payload.verified,
-    },
-    components: {
-      'omegaup-admin-user': admin_User,
     },
   });
 });

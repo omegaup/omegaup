@@ -285,6 +285,133 @@ class Identity extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Entry point for Create bulk Identities for teams API
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $team_group_alias
+     * @omegaup-request-param string $team_identities
+     */
+    public static function apiBulkCreateForTeams(\OmegaUp\Request $r): array {
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(
+            \OmegaUp\Experiments::IDENTITIES
+        );
+
+        $r->ensureMainUserIdentity();
+        if (!\OmegaUp\Authorization::isGroupIdentityCreator($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+        $teamGroupAlias = $r->ensureString(
+            'team_group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $teamGroup = \OmegaUp\Controllers\TeamsGroup::validateTeamGroupAndOwner(
+            $teamGroupAlias,
+            $r->identity
+        );
+        if (is_null($teamGroup)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'groupNotFound'
+            );
+        }
+
+        if (is_null($teamGroup->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'groupNotFound'
+            );
+        }
+        $encodedTeamIdentities = $r->ensureString('team_identities');
+
+        /** @var list<array{country_id: string, gender: string, name: string, password: string, school_name: string, state_id: string, username: string, usernames: string}>|null $teamIdentities */
+        $teamIdentities = json_decode($encodedTeamIdentities, true);
+        if (!is_array($teamIdentities) || empty($teamIdentities)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'identities'
+            );
+        }
+        /** @var array<string, bool> $seenUsernames */
+        $seenUsernames = [];
+        foreach ($teamIdentities as $identity) {
+            if (isset($seenUsernames[$identity['username']])) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'aliasInUse'
+                );
+            }
+            $seenUsernames[$identity['username']] = true;
+        }
+
+        // Save objects into DB
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+
+            foreach ($teamIdentities as $teamIdentity) {
+                // Prepare DAOs
+                $countryId = empty(
+                    $teamIdentity['country_id']
+                ) ? null : strval(
+                    $teamIdentity['country_id']
+                );
+                $stateId = empty(
+                    $teamIdentity['state_id']
+                ) ? null : strval(
+                    $teamIdentity['state_id']
+                );
+                $newIdentity = self::createIdentity(
+                    $teamIdentity['username'],
+                    $teamIdentity['name'],
+                    $teamIdentity['password'],
+                    $countryId,
+                    $stateId,
+                    $teamIdentity['gender'],
+                    $teamGroup->alias
+                );
+
+                $state = null;
+                if (!is_null($countryId) && !is_null($stateId)) {
+                    $state = \OmegaUp\DAO\States::getByPK(
+                        $countryId,
+                        $stateId
+                    );
+                }
+                $schoolId = \OmegaUp\Controllers\School::createSchool(
+                    trim($teamIdentity['school_name']),
+                    $state
+                );
+
+                self::saveIdentityTeamInsideTransaction(
+                    $newIdentity,
+                    $teamGroup,
+                    explode(';', $teamIdentity['usernames'])
+                );
+
+                // Create IdentitySchool
+                $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
+                    'identity_id' => $newIdentity->identity_id,
+                    'school_id' => $schoolId,
+                ]);
+
+                \OmegaUp\DAO\IdentitiesSchools::create($identitySchool);
+
+                // Save current_identity_school_id on Identity
+                $newIdentity->current_identity_school_id = $identitySchool->identity_school_id;
+                \OmegaUp\DAO\Identities::update($newIdentity);
+            }
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
+
+        return [
+            'status' => 'ok'
+        ];
+    }
+
+    /**
      * @omegaup-request-param null|string $group_alias
      * @omegaup-request-param mixed $identities
      * @omegaup-request-param mixed $name
@@ -409,10 +536,13 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Save object Identities in DB, and add user into team group.
      * This function is expected to be called inside a transaction.
+     *
+     * @param list<string> $identitiesUsernames
      */
     private static function saveIdentityTeamInsideTransaction(
         \OmegaUp\DAO\VO\Identities $identity,
-        \OmegaUp\DAO\VO\TeamGroups $teamGroup
+        \OmegaUp\DAO\VO\TeamGroups $teamGroup,
+        array $identitiesUsernames
     ): void {
         if (is_null($identity->username)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -455,10 +585,22 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $identity->identity_id = $preexistingIdentity->identity_id;
             $identity->user_id = $preexistingIdentity->user_id;
         }
-        \OmegaUp\DAO\Teams::create(new \OmegaUp\DAO\VO\Teams([
+        $team = new \OmegaUp\DAO\VO\Teams([
             'team_group_id' => $teamGroup->team_group_id,
             'identity_id' => $identity->identity_id,
-        ]));
+        ]);
+        if (is_null($team->team_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'teamNotExist'
+            );
+        }
+
+        \OmegaUp\DAO\Teams::create($team);
+
+        \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
+            $team->team_id,
+            $identitiesUsernames
+        );
     }
 
     /**

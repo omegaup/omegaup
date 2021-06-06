@@ -117,6 +117,7 @@
   - [`/api/groupScoreboard/removeContest/`](#apigroupscoreboardremovecontest)
 - [Identity](#identity)
   - [`/api/identity/bulkCreate/`](#apiidentitybulkcreate)
+  - [`/api/identity/bulkCreateForTeams/`](#apiidentitybulkcreateforteams)
   - [`/api/identity/changePassword/`](#apiidentitychangepassword)
   - [`/api/identity/create/`](#apiidentitycreate)
   - [`/api/identity/selectIdentity/`](#apiidentityselectidentity)
@@ -2402,6 +2403,23 @@ Entry point for Create bulk Identities API
 
 _Nothing_
 
+## `/api/identity/bulkCreateForTeams/`
+
+### Description
+
+Entry point for Create bulk Identities for teams API
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+| `team_identities`  | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/identity/changePassword/`
 
 ### Description
@@ -4022,6 +4040,7 @@ Adds the experiment to the user.
 | Name         | Type     | Description |
 | ------------ | -------- | ----------- |
 | `experiment` | `string` |             |
+| `username`   | `string` |             |
 
 ### Returns
 
@@ -4051,9 +4070,10 @@ Adds the role to the user.
 
 ### Parameters
 
-| Name   | Type     | Description |
-| ------ | -------- | ----------- |
-| `role` | `string` |             |
+| Name       | Type     | Description |
+| ---------- | -------- | ----------- |
+| `role`     | `string` |             |
+| `username` | `string` |             |
 
 ### Returns
 
@@ -4477,6 +4497,7 @@ Removes the experiment from the user.
 | Name         | Type     | Description |
 | ------------ | -------- | ----------- |
 | `experiment` | `string` |             |
+| `username`   | `string` |             |
 
 ### Returns
 
@@ -4506,9 +4527,10 @@ Removes the role from the user.
 
 ### Parameters
 
-| Name   | Type     | Description |
-| ------ | -------- | ----------- |
-| `role` | `string` |             |
+| Name       | Type     | Description |
+| ---------- | -------- | ----------- |
+| `role`     | `string` |             |
+| `username` | `string` |             |
 
 ### Returns
 

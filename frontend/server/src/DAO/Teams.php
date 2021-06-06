@@ -37,6 +37,27 @@ class Teams extends \OmegaUp\DAO\Base\Teams {
         return new \OmegaUp\DAO\VO\Teams($row);
     }
 
+    public static function getByIdentityId(int $identityId): ?\OmegaUp\DAO\VO\Teams {
+        $sql = 'SELECT
+                    `team_id`,
+                    `team_group_id`,
+                    `identity_id`
+                FROM
+                    `Teams`
+                WHERE
+                    `identity_id` = ?
+                LIMIT 1;';
+        /** @var array{identity_id: int, team_group_id: int, team_id: int}|null */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identityId]
+        );
+        if (is_null($row)) {
+            return null;
+        }
+        return new \OmegaUp\DAO\VO\Teams($row);
+    }
+
     /**
      * @return list<Identity>
      */

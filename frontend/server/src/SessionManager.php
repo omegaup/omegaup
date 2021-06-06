@@ -41,18 +41,34 @@ class SessionManager {
     ): void {
         // Expire all old cookies
         $httpCookie = \OmegaUp\Request::getServerVar('HTTP_COOKIE');
+        $secure = !empty(\OmegaUp\Request::getServerVar('HTTPS'));
+        $domain = OMEGAUP_COOKIE_DOMAIN;
         if (!empty($httpCookie)) {
             $cookies = explode(';', $httpCookie);
+            $oldExpire = \OmegaUp\Time::get() - 1000;
             foreach ($cookies as $cookie) {
                 $parts = explode('=', $cookie);
                 $oldName = trim($parts[0]);
-                setcookie($oldName, '', \OmegaUp\Time::get() - 1000);
-                setcookie($oldName, '', \OmegaUp\Time::get() - 1000, '/');
+                setcookie($oldName, '', $oldExpire);
+                setcookie($oldName, '', $oldExpire, '/');
+                // This should clear the cookies with the old pre-RFC 6265
+                // behavior.
+                setcookie(
+                    $oldName,
+                    '',
+                    [
+                        'expires' => $oldExpire,
+                        'path' => $path,
+                        'domain' => $domain,
+                        'secure' => $secure,
+                        'httponly' => true,
+                        'samesite' => 'Lax',
+                    ]
+                );
             }
         }
 
         // Set the new one
-        $secure = !empty(\OmegaUp\Request::getServerVar('HTTPS'));
         $_COOKIE[$name] = $value;
         setcookie(
             $name,

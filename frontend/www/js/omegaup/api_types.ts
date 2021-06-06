@@ -1497,6 +1497,14 @@ export namespace types {
       );
     }
 
+    export function UserDetailsPayload(
+      elementId: string = 'payload',
+    ): types.UserDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function UserProfileDetailsPayload(
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
@@ -2301,6 +2309,12 @@ export namespace types {
     courseName?: string;
     name: string;
     problem?: string;
+  }
+
+  export interface Experiment {
+    config: boolean;
+    hash: string;
+    name: string;
   }
 
   export interface ExtraProfileDetails {
@@ -3322,6 +3336,16 @@ export namespace types {
     teamsGroups: types.TeamsGroup[];
   }
 
+  export interface UserDetailsPayload {
+    emails: string[];
+    experiments: string[];
+    roleNames: types.UserRole[];
+    systemExperiments: types.Experiment[];
+    systemRoles: string[];
+    username: string;
+    verified: boolean;
+  }
+
   export interface UserInfoForProblem {
     admin: boolean;
     loggedIn: boolean;
@@ -3432,6 +3456,10 @@ export namespace types {
     page: number;
     pagerItems: types.PageItem[];
     ranking: types.UserRank;
+  }
+
+  export interface UserRole {
+    name: string;
   }
 }
 
@@ -3958,6 +3986,8 @@ export namespace messages {
   // Identity
   export type IdentityBulkCreateRequest = { [key: string]: any };
   export type IdentityBulkCreateResponse = {};
+  export type IdentityBulkCreateForTeamsRequest = { [key: string]: any };
+  export type IdentityBulkCreateForTeamsResponse = {};
   export type IdentityChangePasswordRequest = { [key: string]: any };
   export type IdentityChangePasswordResponse = {};
   export type IdentityCreateRequest = { [key: string]: any };
@@ -4784,6 +4814,9 @@ export namespace controllers {
     bulkCreate: (
       params?: messages.IdentityBulkCreateRequest,
     ) => Promise<messages.IdentityBulkCreateResponse>;
+    bulkCreateForTeams: (
+      params?: messages.IdentityBulkCreateForTeamsRequest,
+    ) => Promise<messages.IdentityBulkCreateForTeamsResponse>;
     changePassword: (
       params?: messages.IdentityChangePasswordRequest,
     ) => Promise<messages.IdentityChangePasswordResponse>;
