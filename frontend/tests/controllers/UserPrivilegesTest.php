@@ -82,7 +82,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['smartyProperties']['payload'];
 
-        assertEqualsCanonicalizing(['Admin', 'Mentor'], $systemRoles);
+        $this->assertEqualsCanonicalizing(['Admin', 'Mentor'], $systemRoles);
     }
 
     public function testAddPreviouslyAddedRoles() {
