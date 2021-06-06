@@ -1728,6 +1728,10 @@ export const TeamsGroup = {
     messages.TeamsGroupRemoveTeamRequest,
     messages.TeamsGroupRemoveTeamResponse
   >('/api/teamsGroup/removeTeam/'),
+  teams: apiCall<
+    messages.TeamsGroupTeamsRequest,
+    messages.TeamsGroupTeamsResponse
+  >('/api/teamsGroup/teams/'),
 };
 
 export const Time = {

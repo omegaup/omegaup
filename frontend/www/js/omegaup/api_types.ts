@@ -3893,19 +3893,7 @@ export namespace messages {
   export type GroupListRequest = { [key: string]: any };
   export type GroupListResponse = { label: string; value: string }[];
   export type GroupMembersRequest = { [key: string]: any };
-  export type GroupMembersResponse = {
-    identities: {
-      classname: string;
-      country?: string;
-      country_id?: string;
-      name?: string;
-      school?: string;
-      school_id?: number;
-      state?: string;
-      state_id?: string;
-      username: string;
-    }[];
-  };
+  export type GroupMembersResponse = { identities: types.Identity[] };
   export type GroupMyListRequest = { [key: string]: any };
   export type _GroupMyListServerResponse = any;
   export type GroupMyListResponse = {
@@ -4334,6 +4322,8 @@ export namespace messages {
   };
   export type TeamsGroupRemoveTeamRequest = { [key: string]: any };
   export type TeamsGroupRemoveTeamResponse = {};
+  export type TeamsGroupTeamsRequest = { [key: string]: any };
+  export type TeamsGroupTeamsResponse = { identities: types.Identity[] };
 
   // Time
   export type TimeGetRequest = { [key: string]: any };
@@ -5075,6 +5065,9 @@ export namespace controllers {
     removeTeam: (
       params?: messages.TeamsGroupRemoveTeamRequest,
     ) => Promise<messages.TeamsGroupRemoveTeamResponse>;
+    teams: (
+      params?: messages.TeamsGroupTeamsRequest,
+    ) => Promise<messages.TeamsGroupTeamsResponse>;
   }
 
   export interface Time {
