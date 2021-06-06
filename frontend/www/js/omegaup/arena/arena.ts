@@ -1907,10 +1907,15 @@ export class Arena {
 
     this.updateAllowedLanguages(this.currentProblem.languages);
 
-    this.ephemeralGrader.send('setSettings', {
-      alias: this.currentProblem.alias,
-      settings: this.currentProblem.settings,
-    });
+    if (this.currentProblem.accepts_submissions) {
+      this.ephemeralGrader.show();
+      this.ephemeralGrader.send('setSettings', {
+        alias: this.currentProblem.alias,
+        settings: this.currentProblem.settings,
+      });
+    } else {
+      this.ephemeralGrader.hide();
+    }
   }
 
   detectShowRun(): void {
@@ -2444,6 +2449,20 @@ export class EphemeralGrader {
         this._sendInternal(message);
       });
     };
+  }
+
+  show(): void {
+    if (!this.ephemeralEmbeddedGraderElement) {
+      return;
+    }
+    this.ephemeralEmbeddedGraderElement.classList.remove('hidden');
+  }
+
+  hide(): void {
+    if (!this.ephemeralEmbeddedGraderElement) {
+      return;
+    }
+    this.ephemeralEmbeddedGraderElement.classList.add('hidden');
   }
 
   send(method: string, ...params: any[]): void {
