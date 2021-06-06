@@ -58,14 +58,14 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($identity);
         // Call to API Add Role
-        $response = \OmegaUp\Controllers\User::apiAddRole(
+        \OmegaUp\Controllers\User::apiAddRole(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'username' => $username,
                 'role' => 'Admin'
             ])
         );
-        $response = \OmegaUp\Controllers\User::apiAddRole(
+        \OmegaUp\Controllers\User::apiAddRole(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'username' => $username,
@@ -82,8 +82,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['smartyProperties']['payload'];
 
-        $this->assertContains('Admin', $systemRoles);
-        $this->assertContains('Mentor', $systemRoles);
+        assertEqualsCanonicalizing(['Admin', 'Mentor'], $systemRoles);
     }
 
     public function testAddPreviouslyAddedRoles() {
