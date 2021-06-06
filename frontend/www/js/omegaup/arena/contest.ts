@@ -1,6 +1,7 @@
 import * as api from '../api';
 import { Arena, GetOptionsFromLocation } from './arena';
 import { OmegaUp } from '../omegaup';
+import * as time from '../time';
 
 function getInputValue(itemSelector: string): string | undefined {
   const element: HTMLInputElement | null = document.querySelector(itemSelector);
@@ -15,6 +16,7 @@ OmegaUp.on('ready', () => {
   api.Contest.details({
     contest_alias: arenaInstance.options.contestAlias,
   })
+    .then(time.remoteTimeAdapter)
     .then((result) => arenaInstance.problemsetLoaded(result))
     .catch((e) => arenaInstance.problemsetLoadedError(e));
 

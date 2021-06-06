@@ -1,22 +1,26 @@
 <template>
-  <div class="omegaup-admin-user panel-primary panel">
-    <div class="panel-heading">
-      <h2 class="panel-title">
+  <div class="omegaup-admin-user card">
+    <div class="card-header">
+      <h2 class="card-title">
         {{ T.omegaupTitleAdminUsers }} — {{ username }}
       </h2>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <form class="form bottom-margin" @submit.prevent="onChangePassword">
         <div class="row">
           <div class="col-md-12">
             <button
-              class="btn btn-default btn-block"
+              class="btn"
+              :class="{ 'btn-primary': !verified, 'btn-light': verified }"
               type="button"
               :disabled="verified"
               @click.prevent="onVerifyUser"
             >
-              <span v-if="verified"
-                ><span aria-hidden="true" class="glyphicon glyphicon-ok"></span>
+              <span v-if="verified">
+                <font-awesome-icon
+                  icon="check-circle"
+                  :style="{ color: 'green' }"
+                />
                 {{ T.userVerified }}</span
               ><span v-else>{{ T.userVerify }}</span>
             </button>
@@ -25,12 +29,14 @@
       </form>
       <h4>{{ T.userEmails }}</h4>
       <ul class="list-group">
-        <li v-for="email in emails" class="list-group-item">{{ email }}</li>
+        <li v-for="email in emails" :key="email" class="list-group-item">
+          {{ email }}
+        </li>
       </ul>
       <h4>{{ T.userRoles }}</h4>
       <table class="table">
         <tbody>
-          <tr v-for="role in roleNames">
+          <tr v-for="role in roleNames" :key="role.name">
             <td>
               <input
                 type="checkbox"
@@ -47,7 +53,7 @@
       <h4>{{ T.wordsExperiments }}</h4>
       <table class="table">
         <tbody>
-          <tr v-for="experiment in systemExperiments">
+          <tr v-for="experiment in systemExperiments" :key="experiment.name">
             <td>
               <input
                 type="checkbox"
@@ -71,7 +77,22 @@ import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 
-@Component
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
+  },
+})
 export default class User extends Vue {
   @Prop() emails!: string[];
   @Prop() username!: string;

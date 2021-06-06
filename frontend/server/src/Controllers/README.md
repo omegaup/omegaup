@@ -104,7 +104,6 @@
   - [`/api/group/addUser/`](#apigroupadduser)
   - [`/api/group/create/`](#apigroupcreate)
   - [`/api/group/createScoreboard/`](#apigroupcreatescoreboard)
-  - [`/api/group/createTeamGroup/`](#apigroupcreateteamgroup)
   - [`/api/group/details/`](#apigroupdetails)
   - [`/api/group/list/`](#apigrouplist)
   - [`/api/group/members/`](#apigroupmembers)
@@ -118,6 +117,7 @@
   - [`/api/groupScoreboard/removeContest/`](#apigroupscoreboardremovecontest)
 - [Identity](#identity)
   - [`/api/identity/bulkCreate/`](#apiidentitybulkcreate)
+  - [`/api/identity/bulkCreateForTeams/`](#apiidentitybulkcreateforteams)
   - [`/api/identity/changePassword/`](#apiidentitychangepassword)
   - [`/api/identity/create/`](#apiidentitycreate)
   - [`/api/identity/selectIdentity/`](#apiidentityselectidentity)
@@ -200,6 +200,9 @@
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
+- [TeamsGroup](#teamsgroup)
+  - [`/api/teamsGroup/create/`](#apiteamsgroupcreate)
+  - [`/api/teamsGroup/details/`](#apiteamsgroupdetails)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
 - [User](#user)
@@ -2187,24 +2190,6 @@ Create a scoreboard set to a group
 
 _Nothing_
 
-## `/api/group/createTeamGroup/`
-
-### Description
-
-New team group
-
-### Parameters
-
-| Name          | Type     | Description |
-| ------------- | -------- | ----------- |
-| `alias`       | `string` |             |
-| `description` | `string` |             |
-| `name`        | `string` |             |
-
-### Returns
-
-_Nothing_
-
 ## `/api/group/details/`
 
 ### Description
@@ -2412,6 +2397,23 @@ Entry point for Create bulk Identities API
 | `group_alias` | `null\|string` |             |
 | `name`        | `mixed`        |             |
 | `username`    | `mixed`        |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/identity/bulkCreateForTeams/`
+
+### Description
+
+Entry point for Create bulk Identities for teams API
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+| `team_identities`  | `string` |             |
 
 ### Returns
 
@@ -3929,6 +3931,46 @@ Gets a list of tags
 [];
 ```
 
+# TeamsGroup
+
+TeamsGroupController
+
+## `/api/teamsGroup/create/`
+
+### Description
+
+New team group
+
+### Parameters
+
+| Name          | Type     | Description |
+| ------------- | -------- | ----------- |
+| `alias`       | `string` |             |
+| `description` | `string` |             |
+| `name`        | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/teamsGroup/details/`
+
+### Description
+
+Details of a team group
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+
+### Returns
+
+| Name         | Type                                                                         |
+| ------------ | ---------------------------------------------------------------------------- |
+| `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
+
 # Time
 
 TimeController
@@ -3980,6 +4022,7 @@ Adds the experiment to the user.
 | Name         | Type     | Description |
 | ------------ | -------- | ----------- |
 | `experiment` | `string` |             |
+| `username`   | `string` |             |
 
 ### Returns
 
@@ -4009,9 +4052,10 @@ Adds the role to the user.
 
 ### Parameters
 
-| Name   | Type     | Description |
-| ------ | -------- | ----------- |
-| `role` | `string` |             |
+| Name       | Type     | Description |
+| ---------- | -------- | ----------- |
+| `role`     | `string` |             |
+| `username` | `string` |             |
 
 ### Returns
 
@@ -4435,6 +4479,7 @@ Removes the experiment from the user.
 | Name         | Type     | Description |
 | ------------ | -------- | ----------- |
 | `experiment` | `string` |             |
+| `username`   | `string` |             |
 
 ### Returns
 
@@ -4464,9 +4509,10 @@ Removes the role from the user.
 
 ### Parameters
 
-| Name   | Type     | Description |
-| ------ | -------- | ----------- |
-| `role` | `string` |             |
+| Name       | Type     | Description |
+| ---------- | -------- | ----------- |
+| `role`     | `string` |             |
+| `username` | `string` |             |
 
 ### Returns
 

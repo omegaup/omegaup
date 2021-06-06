@@ -48,6 +48,77 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotContains('Mentor', $systemRoles);
     }
 
+    public function testPreviouslyAddedRoles() {
+        $username = 'testuserrole';
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => $username]
+            )
+        );
+
+        $login = self::login($identity);
+        // Call to API Add Role
+        \OmegaUp\Controllers\User::apiAddRole(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $username,
+                'role' => 'Admin'
+            ])
+        );
+        \OmegaUp\Controllers\User::apiAddRole(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $username,
+                'role' => 'Mentor'
+            ])
+        );
+
+        [
+            'systemRoles' => $systemRoles,
+        ] = \OmegaUp\Controllers\User::getUserDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $username,
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertEqualsCanonicalizing(['Admin', 'Mentor'], $systemRoles);
+    }
+
+    public function testAddPreviouslyAddedRoles() {
+        $username = 'testuserrole';
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => $username]
+            )
+        );
+
+        $login = self::login($identity);
+        // Call to API Add Role
+        \OmegaUp\Controllers\User::apiAddRole(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $username,
+                'role' => 'Admin'
+            ])
+        );
+
+        try {
+            // Trying to add the same role
+            \OmegaUp\Controllers\User::apiAddRole(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'username' => $username,
+                    'role' => 'Admin'
+                ])
+            );
+            $this->fail('should not have been able to add the same role');
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            // Exception expected
+            $this->assertEquals($e->getMessage(), 'userAlreadyHasSelectedRole');
+        }
+    }
+
     /*
      * Test for the function add/remove groups
      */
