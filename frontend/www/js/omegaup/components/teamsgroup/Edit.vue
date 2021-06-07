@@ -50,10 +50,9 @@
       >
         <omegaup-group-form
           :is-update="true"
-          :group-name="teamGroupName"
+          :group-name="teamsGroupName"
           :group-alias="teamsGroupAlias"
           :group-description="teamsGroupDescription"
-          :number-of-teams="teamsGroupNumber"
           @update-group="
             (name, description) =>
               $emit('update-teams-group', name, description)
