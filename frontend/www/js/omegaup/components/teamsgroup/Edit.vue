@@ -119,7 +119,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import group_Form from './Form.vue';
+import group_Form from '../group/Form.vue';
 // Include next two components
 // import group_UploadTeams from './UploadTeams.vue';
 // import group_Teams from './Teams.vue';
