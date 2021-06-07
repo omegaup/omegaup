@@ -349,7 +349,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{identities: list<array{classname: string, country?: null|string, country_id?: null|string, name?: null|string, school?: null|string, school_id?: int|null, state?: null|string, state_id?: null|string, username: string}>}
+     * @return array{identities: list<Identity>}
      *
      * @omegaup-request-param string $group_alias
      */
@@ -368,7 +368,7 @@ class Group extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'identities' => \OmegaUp\DAO\GroupsIdentities::GetMemberIdentities(
+            'identities' => \OmegaUp\DAO\GroupsIdentities::getMemberIdentities(
                 $group
             ),
         ];
