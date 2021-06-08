@@ -4,9 +4,9 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 
-import group_EditTeamsGroup, { AvailableTabs } from './EditTeamsGroup.vue';
+import teamsgroup_Edit, { AvailableTabs } from './Edit.vue';
 
-describe('EditTeamsGroup.vue', () => {
+describe('Edit.vue', () => {
   const propsData = {
     teamsGroupAlias: 'Hello',
     teamsGroupName: 'Hello omegaUp',
@@ -18,7 +18,7 @@ describe('EditTeamsGroup.vue', () => {
   };
 
   it('Should handle edit view with empty teams list', () => {
-    const wrapper = shallowMount(group_EditTeamsGroup, {
+    const wrapper = shallowMount(teamsgroup_Edit, {
       propsData,
     });
 
@@ -28,7 +28,7 @@ describe('EditTeamsGroup.vue', () => {
   });
 
   it('Should change a valid tab', async () => {
-    const wrapper = shallowMount(group_EditTeamsGroup, {
+    const wrapper = shallowMount(teamsgroup_Edit, {
       propsData,
     });
 
@@ -37,7 +37,7 @@ describe('EditTeamsGroup.vue', () => {
   });
 
   it('Should change an invalid tab', async () => {
-    const wrapper = shallowMount(group_EditTeamsGroup, {
+    const wrapper = shallowMount(teamsgroup_Edit, {
       propsData,
     });
 
@@ -46,7 +46,7 @@ describe('EditTeamsGroup.vue', () => {
   });
 
   it('Should change teams identities and team identities in csv lists', async () => {
-    const wrapper = shallowMount(group_EditTeamsGroup, {
+    const wrapper = shallowMount(teamsgroup_Edit, {
       propsData,
     });
     const identities: types.Identity[] = [
