@@ -1142,7 +1142,7 @@ const translations: { [key: string]: string; } = {
   schoolsOfTheMonthRank: "Las mejores 100 escuelas del mes pasado",
   schoolsStartUsingCourses: "Empieza a usar los cursos",
   scoreboardLastUpdated: "\u00daltima vez actualizado: %(datetime)",
-  scoreboardShowOnlyInvitedIdentities: "Mostrar s\u00f3lo los concursantes invitados",
+  scoreboardShowOnlyInvitedIdentities: "Mostrar s\u00f3lo concursantes invitados",
   searchUser: "Buscar usuario",
   selectProblemLevelDesc: "Para agregar el problema, debes elegir su nivel correspondiente",
   sendInvitesToCandidates: "Enviar correos",
