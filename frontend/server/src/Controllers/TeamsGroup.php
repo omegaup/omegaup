@@ -217,6 +217,44 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Update an existing teams group
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $alias
+     * @omegaup-request-param string $description
+     * @omegaup-request-param string $name
+     */
+    public static function apiUpdate(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+
+        $teamsGroupAlias = $r->ensureString(
+            'alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $teamsGroup = self::validateTeamGroupAndOwner(
+            $teamsGroupAlias,
+            $r->identity
+        );
+        if (is_null($teamsGroup)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'teams_group_alias'
+            );
+        }
+
+        $teamsGroup->name = $r->ensureString('name');
+        $teamsGroup->description = $r->ensureString('description');
+        \OmegaUp\DAO\TeamGroups::update($teamsGroup);
+        self::$log->info(
+            "Teams group {$teamsGroup->alias} updated succesfully."
+        );
+
+        return ['status' => 'ok'];
+    }
+
+    /**
      * Teams of a teams group
      *
      * @return array{identities: list<Identity>}

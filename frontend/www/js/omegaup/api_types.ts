@@ -4324,6 +4324,8 @@ export namespace messages {
   export type TeamsGroupRemoveTeamResponse = {};
   export type TeamsGroupTeamsRequest = { [key: string]: any };
   export type TeamsGroupTeamsResponse = { identities: types.Identity[] };
+  export type TeamsGroupUpdateRequest = { [key: string]: any };
+  export type TeamsGroupUpdateResponse = {};
 
   // Time
   export type TimeGetRequest = { [key: string]: any };
@@ -5068,6 +5070,9 @@ export namespace controllers {
     teams: (
       params?: messages.TeamsGroupTeamsRequest,
     ) => Promise<messages.TeamsGroupTeamsResponse>;
+    update: (
+      params?: messages.TeamsGroupUpdateRequest,
+    ) => Promise<messages.TeamsGroupUpdateResponse>;
   }
 
   export interface Time {

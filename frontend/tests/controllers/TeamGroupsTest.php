@@ -94,6 +94,47 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($description, $teamGroup->description);
     }
 
+    /**
+     * Basic update teams group test
+     */
+    public function testUpdateTeamsGroup() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $originalName = \OmegaUp\Test\Utils::createRandomString();
+        $originalDescription = \OmegaUp\Test\Utils::createRandomString();
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+
+        $login = self::login($identity);
+        \OmegaUp\Controllers\TeamsGroup::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => $originalName,
+                'alias' => $alias,
+                'description' => $originalDescription,
+            ])
+        );
+
+        $teamsGroup = \OmegaUp\DAO\TeamGroups::getByName($originalName);
+        $this->assertNotNull($teamsGroup);
+        $this->assertEquals($originalDescription, $teamsGroup->description);
+
+        $updatedName = \OmegaUp\Test\Utils::createRandomString();
+        $updatedDescription = \OmegaUp\Test\Utils::createRandomString();
+
+        \OmegaUp\Controllers\TeamsGroup::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => $updatedName,
+                'alias' => $alias,
+                'description' => $updatedDescription,
+            ])
+        );
+
+        $teamsGroup = \OmegaUp\DAO\TeamGroups::getByAlias($alias);
+        $this->assertNotNull($teamsGroup);
+        $this->assertEquals($updatedName, $teamsGroup->name);
+        $this->assertEquals($updatedDescription, $teamsGroup->description);
+    }
+
     public function testCreateTeamGroupWithCorrectOwnership() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         [
