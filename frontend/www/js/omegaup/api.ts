@@ -1732,6 +1732,10 @@ export const TeamsGroup = {
     messages.TeamsGroupTeamsRequest,
     messages.TeamsGroupTeamsResponse
   >('/api/teamsGroup/teams/'),
+  update: apiCall<
+    messages.TeamsGroupUpdateRequest,
+    messages.TeamsGroupUpdateResponse
+  >('/api/teamsGroup/update/'),
 };
 
 export const Time = {
