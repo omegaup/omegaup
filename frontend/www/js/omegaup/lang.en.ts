@@ -1193,6 +1193,7 @@ const translations: { [key: string]: string; } = {
   teamsGroupEditTeams: "Teams",
   teamsGroupEditTitleWithName: "Edit teams group %(name)",
   teamsGroupUploadIdentitiesAsTeams: "Upload teams",
+  teamsGroupsCreateNew: "Create new teams group",
   titleInUse: "Title already exists. Please choose a different title.",
   tokenDecodeCorrupted: "There was a problem decoding the token.",
   tokenDecodeExpired: "The token has already expired.",

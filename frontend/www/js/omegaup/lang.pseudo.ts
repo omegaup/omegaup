@@ -1193,6 +1193,7 @@ const translations: { [key: string]: string; } = {
   teamsGroupEditTeams: "(T3am5)",
   teamsGroupEditTitleWithName: "(Edi7 73am5 gr0up %(name))",
   teamsGroupUploadIdentitiesAsTeams: "(Up10ad 73am5)",
+  teamsGroupsCreateNew: "(Cr3a73 n3w 73am5 gr0up)",
   titleInUse: "(Ti713 a1r3ady 3xi575. P13a53 ch0053 a diff3r3n7 7i713.)",
   tokenDecodeCorrupted: "(Th3r3 wa5 a pr0b13m d3c0ding 7h3 70k3n.)",
   tokenDecodeExpired: "(Th3 70k3n ha5 a1r3ady 3xpir3d.)",
