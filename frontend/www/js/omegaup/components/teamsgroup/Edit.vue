@@ -48,16 +48,14 @@
         class="tab-pane active"
         role="tabpanel"
       >
-        <omegaup-group-form
-          :is-update="true"
-          :group-name="teamsGroupName"
-          :group-alias="teamsGroupAlias"
-          :group-description="teamsGroupDescription"
-          @update-group="
-            (name, description) =>
-              $emit('update-teams-group', name, description)
+        <omegaup-teams-group-form
+          :teams-group-name="teamsGroupName"
+          :teams-group-alias="teamsGroupAlias"
+          :teams-group-description="teamsGroupDescription"
+          @update-teams-group="
+            (request) => $emit('update-teams-group', request)
           "
-        ></omegaup-group-form>
+        ></omegaup-teams-group-form>
       </div>
 
       <div
@@ -102,15 +100,20 @@
         class="tab-pane active"
         role="tabpanel"
       >
-        <!--
-        <omegaup-group-upload-teams
+        <omegaup-teams-group-upload
           :teams-group-alias="teamsGroupAlias"
           :team-error-row="teamErrorRow"
-          @bulk-teams="(teams) => $emit('bulk-teams', teams)"
+          :search-result-users="searchResultUsers"
+          @bulk-identities="
+            (identities) => $emit('bulk-identities', identities)
+          "
           @download-teams="(teams) => $emit('download-teams', teams)"
           @read-csv="(source) => $emit('read-csv', source)"
           @invalid-file="$emit('invalid-file')"
-        ></omegaup-group-upload-teams>-->
+          @update-search-result-users="
+            (query) => $emit('update-search-result-users', query)
+          "
+        ></omegaup-teams-group-upload>
       </div>
     </div>
   </div>
@@ -118,9 +121,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import group_Form from '../group/Form.vue';
+import teamsgroup_FormUpdate from '../teamsgroup/FormUpdate.vue';
 // Include next two components
-// import group_UploadTeams from './UploadTeams.vue';
+import teamsgroup_Upload from './Upload.vue';
 // import group_Teams from './Teams.vue';
 import T from '../../lang';
 import { dao, types } from '../../api_types';
@@ -134,8 +137,8 @@ export enum AvailableTabs {
 
 @Component({
   components: {
-    'omegaup-group-form': group_Form,
-    // 'omegaup-group-upload-teams': group_UploadTeams,
+    'omegaup-teams-group-form': teamsgroup_FormUpdate,
+    'omegaup-teams-group-upload': teamsgroup_Upload,
     // 'omegaup-group-teams': group_Teams,
   },
 })
@@ -146,9 +149,10 @@ export default class TeamsGroupEdit extends Vue {
   @Prop() countries!: dao.Countries[];
   @Prop() isOrganizer!: boolean;
   @Prop() tab!: AvailableTabs;
-  @Prop() teamsIdentities!: types.Identity[];
-  @Prop() teamsIdentitiesCsv!: types.Identity[];
+  @Prop({ default: () => [] }) teamsIdentities!: types.Identity[];
+  @Prop({ default: () => [] }) teamsIdentitiesCsv!: types.Identity[];
   @Prop() teamErrorRow!: null | string;
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   ui = ui;
