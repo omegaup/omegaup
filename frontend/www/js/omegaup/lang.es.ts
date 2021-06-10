@@ -1193,7 +1193,6 @@ const translations: { [key: string]: string; } = {
   teamsGroupAddUsersDone: "Listo",
   teamsGroupAddUsersToTeam: "Agregar usuarios",
   teamsGroupCreateIdentitiesAsTeams: "Crear identidades como equipos",
-  teamsGroupEditGroupUpdated: "El grupo de equipos se actualiz\u00f3 correctamente.",
   teamsGroupEditTeams: "Equipos",
   teamsGroupEditTitleWithName: "Editar grupo de equipos %(name)",
   teamsGroupTeamName: "Nombre de equipo",
