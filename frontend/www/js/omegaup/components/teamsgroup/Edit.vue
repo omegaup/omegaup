@@ -103,12 +103,16 @@
         <omegaup-teams-group-upload
           :teams-group-alias="teamsGroupAlias"
           :team-error-row="teamErrorRow"
+          :search-result-users="searchResultUsers"
           @bulk-identities="
             (identities) => $emit('bulk-identities', identities)
           "
           @download-teams="(teams) => $emit('download-teams', teams)"
           @read-csv="(source) => $emit('read-csv', source)"
           @invalid-file="$emit('invalid-file')"
+          @update-search-result-users="
+            (query) => $emit('update-search-result-users', query)
+          "
         ></omegaup-teams-group-upload>
       </div>
     </div>
@@ -147,6 +151,7 @@ export default class TeamsGroupEdit extends Vue {
   @Prop({ default: () => [] }) teamsIdentities!: types.Identity[];
   @Prop({ default: () => [] }) teamsIdentitiesCsv!: types.Identity[];
   @Prop() teamErrorRow!: null | string;
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   ui = ui;

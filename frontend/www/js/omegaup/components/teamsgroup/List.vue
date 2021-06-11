@@ -12,7 +12,7 @@
       <table class="table" data-table-teams-groups>
         <thead>
           <tr>
-            <th>{{ T.wordsTitle }}</th>
+            <th>{{ T.teamsGroupTeamsGroupName }}</th>
             <th></th>
           </tr>
         </thead>

@@ -1,7 +1,6 @@
 import teamsgroup_Edit, {
   AvailableTabs,
 } from '../components/teamsgroup/Edit.vue';
-import teamsgroup_Teams from '../components/teamsgroup/Teams.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
@@ -23,6 +22,7 @@ OmegaUp.on('ready', () => {
         : AvailableTabs.Teams,
       teamsIdentities: payload.identities,
       userErrorRow: null,
+      searchResultUsers: [] as types.ListItem[],
     }),
     methods: {
       refreshTeamsList: (): void => {
@@ -44,38 +44,67 @@ OmegaUp.on('ready', () => {
           tab: this.tab,
           teamsIdentities: this.teamsIdentities,
           userErrorRow: this.userErrorRow,
+          searchResultUsers: this.searchResultUsers,
         },
         on: {
-          'update-teams-group': ({
-            name,
-            description,
-          }: {
+          'update-teams-group': (request: {
             name: string;
             description: string;
           }) => {
             api.TeamsGroup.update({
               alias: payload.teamGroup.alias,
-              name,
-              description,
+              name: request.name,
+              description: request.description,
             })
               .then(() => {
                 ui.success(T.teamsGroupEditGroupUpdated);
               })
               .catch(ui.apiError);
           },
-          'edit-identity-member': (
-            originalUsername: string,
-            user: types.Identity,
-          ) => {
-            const request = Object.assign({}, user, {
-              group_alias: payload.teamGroup.alias,
-              original_username: originalUsername,
-              school_name: user.school,
-            });
-            api.Identity.update(request)
+          'edit-identity-team': ({
+            originalUsername,
+            identity,
+          }: {
+            originalUsername: string;
+            identity: types.Identity;
+          }) => {
+            api.Identity.update({
+              ...identity,
+              ...{
+                group_alias: payload.teamGroup.alias,
+                original_username: originalUsername,
+                school_name: identity.school,
+              },
+            })
               .then(() => {
+                ui.success(T.teamsGroupEditTeamsUpdated);
                 ui.success(T.groupEditMemberUpdated);
                 this.refreshTeamsList();
+              })
+              .catch(ui.apiError);
+          },
+          'change-password-identity-team': ({
+            username,
+            newPassword,
+            newPasswordRepeat,
+          }: {
+            username: string;
+            newPassword: string;
+            newPasswordRepeat: string;
+          }) => {
+            if (newPassword !== newPasswordRepeat) {
+              ui.error(T.userPasswordMustBeSame);
+              return;
+            }
+
+            api.Identity.changePassword({
+              group_alias: payload.teamGroup.alias,
+              password: newPassword,
+              username: username,
+            })
+              .then(() => {
+                this.refreshTeamsList();
+                ui.success(T.teamsGroupEditTeamsPasswordUpdated);
               })
               .catch(ui.apiError);
           },
@@ -86,18 +115,48 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 this.refreshTeamsList();
-                ui.success(T.groupEditMemberRemoved);
+                ui.success(T.teamsGroupEditTeamsRemoved);
               })
               .catch(ui.apiError);
           },
-          cancel: (source: teamsgroup_Teams) => {
-            this.refreshTeamsList();
-            source.$el.scrollIntoView();
+          'update-search-result-users': (query: string) => {
+            api.User.list({ query })
+              .then((data) => {
+                // Users previously invited to the contest should not be shown
+                // in the dropdown
+                //const addedUsers = new Set(
+                //  this.users.map((user) => user.username),
+                //);
+
+                this.searchResultUsers = data
+                  //.filter((user) => !addedUsers.has(user.label))
+                  .map((user) => ({
+                    key: user.label,
+                    value: `${ui.escape(user.label)} (<strong>${ui.escape(
+                      user.value,
+                    )}</strong>)`,
+                  }));
+              })
+              .catch(ui.apiError);
           },
-          'bulk-identities': (identities: types.Identity[]) => {
-            console.log(identities);
+          'bulk-identities': ({
+            identities,
+            identitiesTeams,
+          }: {
+            identities: types.Identity[];
+            identitiesTeams: { [team: string]: string[] };
+          }) => {
             api.Identity.bulkCreateForTeams({
-              team_identities: JSON.stringify(identities),
+              team_identities: JSON.stringify(
+                identities.map((identity) => {
+                  return {
+                    ...identity,
+                    ...{
+                      usernames: identitiesTeams[identity.username].join(';'),
+                    },
+                  };
+                }),
+              ),
               team_group_alias: payload.teamGroup.alias,
             })
               .then(() => {
@@ -147,10 +206,12 @@ OmegaUp.on('ready', () => {
             hiddenElement.click();
           },
           'read-csv': ({
+            identitiesTeams,
             identities,
             file,
             humanReadable,
           }: {
+            identitiesTeams: { [team: string]: string[] };
             identities: types.Identity[];
             file: File;
             humanReadable: boolean;
@@ -177,7 +238,11 @@ OmegaUp.on('ready', () => {
                     country_id,
                     state_id,
                     school_name,
+                    gender: 'decline',
                   });
+                  identitiesTeams[
+                    `${payload.teamGroup.alias}:${username}`
+                  ] = [];
                 }
                 ui.dismissNotifications();
                 this.userErrorRow = null;
