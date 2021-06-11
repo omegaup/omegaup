@@ -93,7 +93,10 @@
               Facebook
             </a>
             |
-            <a class="text-nowrap" href="https://discord.com/channels/832682734115094638">
+            <a
+              class="text-nowrap"
+              href="https://discord.com/channels/832682734115094638"
+            >
               <font-awesome-icon :icon="['fab', 'discord']" />
               Discord
             </a>
@@ -135,7 +138,11 @@ import { reportAnIssueURL } from '../../errors';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faFacebook, faGithub, faDiscord } from '@fortawesome/free-brands-svg-icons';
+import {
+  faFacebook,
+  faGithub,
+  faDiscord,
+} from '@fortawesome/free-brands-svg-icons';
 library.add(faFacebook, faGithub, faDiscord);
 
 @Component({
