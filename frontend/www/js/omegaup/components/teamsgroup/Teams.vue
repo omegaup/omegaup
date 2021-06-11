@@ -4,7 +4,7 @@
       <thead>
         <tr>
           <th>{{ T.teamsGroupTeamName }}</th>
-          <th>{{ T.wordsName }}</th>
+          <th>{{ T.profileName }}</th>
           <th>{{ T.profileCountry }}</th>
           <th>{{ T.profileState }}</th>
           <th>{{ T.profileSchool }}</th>
@@ -27,6 +27,7 @@
           <td>
             <button
               class="btn btn-link"
+              :data-edit-identity="identity.username"
               :title="T.groupEditMembersEdit"
               @click="onEdit(identity)"
             >
@@ -34,6 +35,7 @@
             </button>
             <button
               class="btn btn-link"
+              :data-change-password-identity="identity.username"
               :title="T.groupEditMembersChangePassword"
               @click="onChangePass(identity.username)"
             >
@@ -41,6 +43,7 @@
             </button>
             <button
               class="btn btn-link"
+              :data-remove-identity="identity.username"
               :title="T.groupEditMembersRemove"
               @click="$emit('remove', identity.username)"
             >

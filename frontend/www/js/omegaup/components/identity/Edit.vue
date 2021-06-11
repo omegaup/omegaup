@@ -84,7 +84,9 @@
           </div>
         </div>
         <div class="form-group float-right">
-          <button class="btn btn-primary">{{ T.wordsSaveChanges }}</button>
+          <button class="btn btn-primary" data-update-identity>
+            {{ T.wordsSaveChanges }}
+          </button>
           <button
             class="btn btn-secondary ml-2"
             type="reset"

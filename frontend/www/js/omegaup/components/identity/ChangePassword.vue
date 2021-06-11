@@ -43,7 +43,11 @@
           </div>
         </div>
         <div class="form-group float-right">
-          <button class="btn btn-primary" type="submit">
+          <button
+            class="btn btn-primary"
+            type="submit"
+            data-change-password-identity
+          >
             {{ T.wordsSaveChanges }}
           </button>
           <button
