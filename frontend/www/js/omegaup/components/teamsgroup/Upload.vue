@@ -88,7 +88,9 @@
           <button
             class="btn btn-primary d-inline-block mb-2"
             name="create-identities"
-            @click.prevent="$emit('bulk-identities', identities)"
+            @click.prevent="
+              $emit('bulk-identities', { identities, identitiesTeams })
+            "
           >
             {{ T.teamsGroupCreateIdentitiesAsTeams }}
           </button>
