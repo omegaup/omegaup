@@ -1,0 +1,104 @@
+FROM ubuntu:focal AS build
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y \
+        git ca-certificates gnupg2 curl php7.4-cli php7.4-curl php7.4-zip \
+        php7.4-mbstring php7.4-json php7.4-xml && \
+    /usr/sbin/update-ca-certificates && \
+    apt-get autoremove -y && \
+    apt-get clean
+
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
+
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y nginx yarn nodejs && \
+    apt-get autoremove -y && \
+    apt-get clean
+
+RUN curl -sL https://getcomposer.org/download/1.10.10/composer.phar -o /usr/bin/composer && \
+    chmod +x /usr/bin/composer
+
+RUN useradd --create-home --shell=/bin/bash ubuntu
+RUN mkdir /opt/omegaup && chown -R ubuntu /opt/omegaup
+USER ubuntu
+WORKDIR /opt/omegaup
+ARG BRANCH=release
+ENV BRANCH=$BRANCH
+RUN git clone --branch=${BRANCH} --depth=1 --recurse-submodules --shallow-submodules https://github.com/omegaup/omegaup .
+RUN yarn install && yarn build
+RUN composer install --no-dev
+
+FROM alpine:latest AS frontend
+RUN apk add rsync
+COPY --from=build /opt/omegaup /opt/omegaup
+
+FROM ubuntu:focal AS nginx
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y nginx ca-certificates && \
+    /usr/sbin/update-ca-certificates && \
+    apt-get autoremove -y && \
+    apt-get clean
+
+RUN useradd --create-home --shell=/bin/bash ubuntu
+
+RUN mkdir -p /etc/omegaup/frontend
+RUN mkdir -p /var/log/omegaup && chown -R ubuntu /var/log/omegaup
+
+RUN mkdir /opt/omegaup && chown -R ubuntu /opt/omegaup
+USER ubuntu
+WORKDIR /opt/omegaup
+
+EXPOSE 8001
+
+CMD ["/usr/sbin/nginx"]
+
+FROM ubuntu:focal AS php
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y \
+        php7.4-fpm php7.4-curl php7.4-mysql php7.4-sqlite3 php7.4-zip \
+        php7.4-mbstring php7.4-json php7.4-opcache php7.4-xml php-apcu && \
+    apt-get autoremove -y && \
+    apt-get clean
+
+RUN useradd --create-home --shell=/bin/bash ubuntu && \
+    mkdir -p /etc/omegaup/frontend && \
+    mkdir -p /var/log/omegaup && chown -R ubuntu /var/log/omegaup && \
+    mkdir /opt/omegaup && \
+    chown -R ubuntu /opt/omegaup
+
+RUN rm -rf /etc/php/7.4/fpm/pool.d/
+
+USER ubuntu
+WORKDIR /opt/omegaup
+
+# Override stop signal to stop process gracefully
+# # https://github.com/php/php-src/blob/17baa87faddc2550def3ae7314236826bc1b1398/sapi/fpm/php-fpm.8.in#L163
+STOPSIGNAL SIGQUIT
+EXPOSE 9001
+
+CMD ["php-fpm7.4", "--nodaemonize", "--force-stderr"]
+
+FROM ubuntu:focal as frontend-dev-sidecar
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y \
+        curl git ca-certificates python3-jinja2 python3-requests \
+        python3-mysqldb python3-pyparsing mysql-client-core-8.0 && \
+    apt-get autoremove -y && \
+    apt-get clean
+
+RUN useradd --create-home --shell=/bin/bash ubuntu && \
+    mkdir -p /etc/omegaup/frontend && \
+    mkdir -p /var/log/omegaup && chown -R ubuntu /var/log/omegaup && \
+    mkdir /opt/omegaup && \
+    chown -R ubuntu /opt/omegaup
+
+USER ubuntu
+WORKDIR /opt/omegaup
