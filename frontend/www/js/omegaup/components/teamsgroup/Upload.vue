@@ -130,7 +130,6 @@ library.add(faDownload);
   },
 })
 export default class Identities extends Vue {
-  @Prop() groupAlias!: string;
   @Prop() userErrorRow!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
 

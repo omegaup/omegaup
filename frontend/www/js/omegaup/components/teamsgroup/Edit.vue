@@ -2,11 +2,7 @@
   <div data-teams-group-edit>
     <div class="page-header">
       <h2>
-        {{
-          ui.formatString(T.teamsGroupEditTitleWithName, {
-            name: teamsGroupName,
-          })
-        }}
+        {{ ui.formatString(T.teamsGroupEditTitleWithName, { name }) }}
       </h2>
     </div>
     <ul class="nav nav-pills mt-4">
@@ -48,16 +44,14 @@
         class="tab-pane active"
         role="tabpanel"
       >
-        <omegaup-group-form
-          :is-update="true"
-          :group-name="teamsGroupName"
-          :group-alias="teamsGroupAlias"
-          :group-description="teamsGroupDescription"
-          @update-group="
-            (name, description) =>
-              $emit('update-teams-group', name, description)
+        <omegaup-teams-group-form
+          :name="name"
+          :alias="alias"
+          :description="description"
+          @update-teams-group="
+            (request) => $emit('update-teams-group', request)
           "
-        ></omegaup-group-form>
+        ></omegaup-teams-group-form>
       </div>
 
       <div
@@ -67,7 +61,7 @@
       >
         <omegaup-teams-group-teams
           :teams="currentTeamsIdentities"
-          :teams-group-alias="teamsGroupAlias"
+          :alias="alias"
           :countries="countries"
           @edit-identity-team="
             (request) => $emit('edit-identity-team', request)
@@ -86,7 +80,6 @@
         role="tabpanel"
       >
         <omegaup-teams-group-upload
-          :teams-group-alias="teamsGroupAlias"
           :team-error-row="teamErrorRow"
           :search-result-users="searchResultUsers"
           @bulk-identities="
@@ -106,7 +99,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import group_Form from '../group/Form.vue';
+import teamsgroup_FormUpdate from '../teamsgroup/FormUpdate.vue';
 import teamsgroup_Upload from './Upload.vue';
 import teamsgroup_Teams from './Teams.vue';
 import T from '../../lang';
@@ -121,15 +114,15 @@ export enum AvailableTabs {
 
 @Component({
   components: {
-    'omegaup-group-form': group_Form,
+    'omegaup-teams-group-form': teamsgroup_FormUpdate,
     'omegaup-teams-group-upload': teamsgroup_Upload,
     'omegaup-teams-group-teams': teamsgroup_Teams,
   },
 })
 export default class TeamsGroupEdit extends Vue {
-  @Prop() teamsGroupAlias!: string;
-  @Prop() teamsGroupName!: string;
-  @Prop() teamsGroupDescription!: string;
+  @Prop() alias!: string;
+  @Prop() name!: string;
+  @Prop() description!: string;
   @Prop() countries!: dao.Countries[];
   @Prop() isOrganizer!: boolean;
   @Prop() tab!: AvailableTabs;

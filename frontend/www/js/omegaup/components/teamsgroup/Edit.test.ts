@@ -8,8 +8,8 @@ import teamsgroup_Edit, { AvailableTabs } from './Edit.vue';
 
 describe('Edit.vue', () => {
   const propsData = {
-    teamsGroupAlias: 'Hello',
-    teamsGroupName: 'Hello omegaUp',
+    alias: 'Hello',
+    name: 'Hello omegaUp',
     countries: [{ country_id: 'MX', name: 'Mexico' }],
     isOrganizer: true,
     tab: AvailableTabs.Teams,
