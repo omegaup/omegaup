@@ -88,7 +88,9 @@
           <button
             class="btn btn-primary d-inline-block mb-2"
             name="create-identities"
-            @click.prevent="$emit('bulk-identities', identities)"
+            @click.prevent="
+              $emit('bulk-identities', { identities, identitiesTeams })
+            "
           >
             {{ T.teamsGroupCreateIdentitiesAsTeams }}
           </button>
@@ -128,7 +130,6 @@ library.add(faDownload);
   },
 })
 export default class Identities extends Vue {
-  @Prop() groupAlias!: string;
   @Prop() userErrorRow!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
 

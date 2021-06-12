@@ -1,4 +1,4 @@
-import teamsgroup_New from '../components/teamsgroup/Form.vue';
+import teamsgroup_Create from '../components/teamsgroup/FormCreate.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import * as ui from '../ui';
@@ -9,13 +9,10 @@ OmegaUp.on('ready', () => {
   new Vue({
     el: '#main-container',
     components: {
-      'omegaup-teams-group-new': teamsgroup_New,
+      'omegaup-teams-group-create': teamsgroup_Create,
     },
     render: function (createElement) {
-      return createElement('omegaup-teams-group-new', {
-        props: {
-          T: T,
-        },
+      return createElement('omegaup-teams-group-create', {
         on: {
           'validate-unused-alias': (alias: string): void => {
             if (!alias) {

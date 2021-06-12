@@ -84,7 +84,9 @@
           </div>
         </div>
         <div class="form-group float-right">
-          <button class="btn btn-primary">{{ T.wordsSaveChanges }}</button>
+          <button class="btn btn-primary" data-update-identity>
+            {{ T.wordsSaveChanges }}
+          </button>
           <button
             class="btn btn-secondary ml-2"
             type="reset"
@@ -99,7 +101,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import type { types } from '../../api_types';
 import T from '../../lang';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
@@ -154,6 +156,11 @@ export default class IdentityEdit extends Vue {
       this.identity?.username,
       this.selectedIdentity,
     );
+  }
+
+  @Watch('identity')
+  onIdentityChanged(newValue: types.Identity): void {
+    this.selectedIdentity = newValue;
   }
 }
 </script>

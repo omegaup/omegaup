@@ -1,0 +1,31 @@
+version: '3.4'
+
+services:
+
+  frontend:
+    build:
+      dockerfile: ./Dockerfile.frontend
+      context: ./stuff/docker/
+      target: frontend
+    image: omegaup/frontend:${TAG:-latest}
+
+  php:
+    build:
+      dockerfile: ./Dockerfile.frontend
+      context: ./stuff/docker/
+      target: php
+    image: omegaup/php:${TAG:-latest}
+
+  nginx:
+    build:
+      dockerfile: ./Dockerfile.frontend
+      context: ./stuff/docker/
+      target: nginx
+    image: omegaup/nginx:${TAG:-latest}
+
+  frontend-dev-sidecar:
+    build:
+      dockerfile: ./Dockerfile.frontend
+      context: ./stuff/docker/
+      target: frontend-dev-sidecar
+    image: omegaup/frontend-dev-sidecar:${TAG:-latest}
