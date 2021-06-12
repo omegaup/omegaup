@@ -18,9 +18,9 @@ describe('FormBase.vue', () => {
   });
 
   const propsData = {
-    teamsGroupAlias: 'Hello',
-    teamsGroupName: 'Hello omegaUp',
-    teamsGroupDescription: 'Hello omegaUp Description',
+    alias: 'Hello',
+    name: 'Hello omegaUp',
+    description: 'Hello omegaUp Description',
   };
 
   it('Should handle form base', async () => {

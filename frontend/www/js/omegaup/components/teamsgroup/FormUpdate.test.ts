@@ -22,9 +22,9 @@ describe('FormUpdate.vue', () => {
     const wrapper = mount(teamsgroup_FormUpdate, {
       attachTo: '#root',
       propsData: {
-        teamsGroupAlias: 'Hello',
-        teamsGroupName: 'Hello omegaUp',
-        teamsGroupDescription: 'Hello omegaUp Description',
+        alias: 'Hello',
+        name: 'Hello omegaUp',
+        description: 'Hello omegaUp Description',
       },
     });
 
@@ -34,13 +34,13 @@ describe('FormUpdate.vue', () => {
 
     const formBase = wrapper.findComponent(teamsgroup_FormBase);
     formBase.setData({
-      name: 'some updated name',
+      currentName: 'some updated name',
     });
 
     await formBase.find('button[type="submit"]').trigger('click');
 
     // In edit mode, alias can not change its value
-    expect(wrapper.vm.$props.teamsGroupAlias).toBe('Hello');
+    expect(wrapper.vm.$props.alias).toBe('Hello');
     expect(wrapper.emitted('validate-unused-alias')).toBeFalsy();
     expect(wrapper.emitted('update-teams-group')).toEqual([
       [

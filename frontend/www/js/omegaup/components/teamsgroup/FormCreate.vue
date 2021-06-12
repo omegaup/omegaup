@@ -1,8 +1,8 @@
 <template>
   <omegaup-teams-group-form
-    :teams-group-alias.sync="alias"
-    :teams-group-description.sync="description"
-    :teams-group-name.sync="name"
+    :alias.sync="alias"
+    :description.sync="description"
+    :name.sync="name"
     @submit="
       (request) => $emit('create-teams-group', { ...request, ...{ alias } })
     "
@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import teamsgroup_FormBase from './FormBase.vue';
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { Vue, Component, Watch, Emit } from 'vue-property-decorator';
 import T from '../../lang';
 import latinize from 'latinize';
 
@@ -36,18 +36,20 @@ export default class TeamsGroupFormCreate extends Vue {
 
   generateAlias(name: string): string {
     // Remove accents
-    let generatedAlias = latinize(name);
-    // Replace whitespace
-    generatedAlias = generatedAlias.replace(/\s+/g, '-');
-    // Remove invalid characters
-    generatedAlias = generatedAlias.replace(/[^a-zA-Z0-9_-]/g, '');
-    generatedAlias = generatedAlias.substring(0, 32);
-    return generatedAlias;
+    return (
+      latinize(name)
+        // Replace whitespace
+        .replace(/\s+/g, '-')
+        // Remove invalid characters
+        .replace(/[^a-zA-Z0-9_-]/g, '')
+        .substring(0, 32)
+    );
   }
 
   @Watch('alias')
-  onAliasChanged(newValue: string): void {
-    this.$emit('validate-unused-alias', newValue);
+  @Emit('validate-unused-alias')
+  onAliasChanged(newValue: string): string {
+    return newValue;
   }
 
   @Watch('name')

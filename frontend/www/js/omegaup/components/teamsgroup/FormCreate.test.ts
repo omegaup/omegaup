@@ -29,8 +29,8 @@ describe('FormCreate.vue', () => {
 
     const formBase = wrapper.findComponent(teamsgroup_FormBase);
     formBase.setData({
-      name: 'Hello omegaUp',
-      description: 'Hello omegaUp Description',
+      currentName: 'Hello omegaUp',
+      currentDescription: 'Hello omegaUp Description',
     });
     await formBase.find('button[type="submit"]').trigger('click');
     expect(wrapper.emitted('create-teams-group')).toEqual([
@@ -51,13 +51,13 @@ describe('FormCreate.vue', () => {
 
     const formBase = wrapper.findComponent(teamsgroup_FormBase);
     formBase.setData({
-      name: 'some new name',
+      currentName: 'some new name',
     });
 
     await formBase.find('button[type="submit"]').trigger('click');
 
     expect(wrapper.emitted('validate-unused-alias')).toEqual([
-      ['some-new-name'],
+      ['some-new-name', 'some-new-name', null],
     ]);
     expect(wrapper.vm.$data.alias).toBe('some-new-name');
   });

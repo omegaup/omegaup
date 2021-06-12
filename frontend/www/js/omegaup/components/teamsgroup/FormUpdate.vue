@@ -1,8 +1,8 @@
 <template>
   <omegaup-teams-group-form
-    :teams-group-alias="teamsGroupAlias"
-    :teams-group-description.sync="description"
-    :teams-group-name.sync="name"
+    :alias="alias"
+    :description.sync="currentDescription"
+    :name.sync="currentName"
     @submit="(request) => $emit('update-teams-group', request)"
   >
     <template #teams-group-submit-button>
@@ -22,12 +22,12 @@ import T from '../../lang';
   },
 })
 export default class TeamsGroupForm extends Vue {
-  @Prop({ default: null }) teamsGroupAlias!: null | string;
-  @Prop({ default: null }) teamsGroupDescription!: null | string;
-  @Prop({ default: null }) teamsGroupName!: null | string;
+  @Prop({ default: null }) alias!: null | string;
+  @Prop({ default: null }) description!: null | string;
+  @Prop({ default: null }) name!: null | string;
 
   T = T;
-  description: null | string = this.teamsGroupDescription;
-  name: null | string = this.teamsGroupName;
+  currentDescription: null | string = this.description;
+  currentName: null | string = this.name;
 }
 </script>

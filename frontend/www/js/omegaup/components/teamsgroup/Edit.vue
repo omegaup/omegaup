@@ -2,11 +2,7 @@
   <div data-teams-group-edit>
     <div class="page-header">
       <h2>
-        {{
-          ui.formatString(T.teamsGroupEditTitleWithName, {
-            name: teamsGroupName,
-          })
-        }}
+        {{ ui.formatString(T.teamsGroupEditTitleWithName, { name }) }}
       </h2>
     </div>
     <ul class="nav nav-pills mt-4">
@@ -49,9 +45,9 @@
         role="tabpanel"
       >
         <omegaup-teams-group-form
-          :teams-group-name="teamsGroupName"
-          :teams-group-alias="teamsGroupAlias"
-          :teams-group-description="teamsGroupDescription"
+          :name="name"
+          :alias="alias"
+          :description="description"
           @update-teams-group="
             (request) => $emit('update-teams-group', request)
           "
@@ -67,7 +63,7 @@
         <omegaup-group-teams
           :teams="currentTeamsIdentities"
           :teams-csv="currentTeamsIdentitiesCsv"
-          :teams-group-alias="teamsGroupAlias"
+          :alias="alias"
           :countries="countries"
           @edit-identity-team="
             (
@@ -101,7 +97,6 @@
         role="tabpanel"
       >
         <omegaup-teams-group-upload
-          :teams-group-alias="teamsGroupAlias"
           :team-error-row="teamErrorRow"
           :search-result-users="searchResultUsers"
           @bulk-identities="
@@ -143,9 +138,9 @@ export enum AvailableTabs {
   },
 })
 export default class TeamsGroupEdit extends Vue {
-  @Prop() teamsGroupAlias!: string;
-  @Prop() teamsGroupName!: string;
-  @Prop() teamsGroupDescription!: string;
+  @Prop() alias!: string;
+  @Prop() name!: string;
+  @Prop() description!: string;
   @Prop() countries!: dao.Countries[];
   @Prop() isOrganizer!: boolean;
   @Prop() tab!: AvailableTabs;

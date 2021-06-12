@@ -5,14 +5,19 @@
       <form
         class="needs-validation"
         data-teams-group
-        @submit.prevent="$emit('submit', { name, description })"
+        @submit.prevent="
+          $emit('submit', {
+            name: currentName,
+            description: currentDescription,
+          })
+        "
       >
         <div class="row">
           <div class="form-group col-md-6">
             <label class="control-label w-100">
               {{ T.wordsName }}
               <input
-                v-model="name"
+                v-model="currentName"
                 name="title"
                 required
                 type="text"
@@ -25,7 +30,7 @@
             <label class="control-label w-100">
               {{ T.contestNewFormShortTitleAlias }}
               <input
-                v-model="teamsGroupAlias"
+                v-model="alias"
                 name="alias"
                 required
                 type="text"
@@ -42,7 +47,7 @@
             <label class="control-label w-100">
               {{ T.teamsGroupNewFormDescription }}
               <textarea
-                v-model="description"
+                v-model="currentDescription"
                 required
                 name="description"
                 cols="30"
@@ -71,29 +76,29 @@ import T from '../../lang';
 
 @Component
 export default class TeamsGroupFormBase extends Vue {
-  @Prop() teamsGroupAlias!: null | string;
-  @Prop() teamsGroupDescription!: null | string;
-  @Prop() teamsGroupName!: null | string;
+  @Prop() alias!: null | string;
+  @Prop() description!: null | string;
+  @Prop() name!: null | string;
 
   T = T;
-  alias: null | string = this.teamsGroupAlias;
-  description: null | string = this.teamsGroupDescription;
-  name: null | string = this.teamsGroupName;
+  currentAlias: null | string = this.alias;
+  currentDescription: null | string = this.description;
+  currentName: null | string = this.name;
 
-  @Watch('alias')
-  @Emit('update:teamsGroupAlias')
+  @Watch('currentAlias')
+  @Emit('update:alias')
   onAliasUpdated(newValue: string): string {
     return newValue;
   }
 
-  @Watch('description')
-  @Emit('update:teamsGroupDescription')
+  @Watch('currentDescription')
+  @Emit('update:description')
   onDescriptionUpdated(newValue: string): string {
     return newValue;
   }
 
-  @Watch('name')
-  @Emit('update:teamsGroupName')
+  @Watch('currentName')
+  @Emit('update:name')
   onNameUpdated(newValue: string): string {
     return newValue;
   }
