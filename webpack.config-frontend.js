@@ -104,6 +104,7 @@ module.exports = {
     schools_rank: './frontend/www/js/omegaup/schools/rank.ts',
     submissions_list: './frontend/www/js/omegaup/submissions/list.ts',
     teams_group_new: './frontend/www/js/omegaup/teamsgroup/new.ts',
+    teams_group_list: './frontend/www/js/omegaup/teamsgroup/list.ts',
     user_basic_edit: './frontend/www/js/omegaup/user/basicedit.js',
     user_edit_email_form: './frontend/www/js/omegaup/user/emailedit.js',
     user_manage_identities:
