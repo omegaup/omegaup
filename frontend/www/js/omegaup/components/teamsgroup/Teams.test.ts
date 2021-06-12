@@ -20,14 +20,17 @@ describe('Members.vue', () => {
     }
   });
 
-  const propsData = {
+  const propsData: {
+    teams: types.Identity[];
+    countries: dao.Countries[];
+  } = {
     teams: [
       {
         username: 'omegaUp:user',
         name: 'user',
       },
-    ] as types.Identity[],
-    countries: [{ country_id: 'mx', name: 'Mexico' }] as dao.Countries[],
+    ],
+    countries: [{ country_id: 'mx', name: 'Mexico' }],
   };
 
   it('Should handle an empty list of members and identities', () => {
