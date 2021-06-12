@@ -65,36 +65,19 @@
         class="tab-pane active"
         role="tabpanel"
       >
-        <!--
-        <omegaup-group-teams
+        <omegaup-teams-group-teams
           :teams="currentTeamsIdentities"
-          :teams-csv="currentTeamsIdentitiesCsv"
           :teams-group-alias="teamsGroupAlias"
           :countries="countries"
           @edit-identity-team="
-            (
-              teamComponent,
-              originalName,
-              name,
-              country,
-              state,
-              school,
-              schoolId,
-            ) =>
-              $emit(
-                'edit-identity-team',
-                teamComponent,
-                originalName,
-                name,
-                country,
-                state,
-                school,
-                schoolId,
-              )
+            (request) => $emit('edit-identity-team', request)
+          "
+          @change-password-identity-team="
+            (request) => $emit('change-password-identity-team', request)
           "
           @remove="(name) => $emit('remove', name)"
           @cancel="(teamComponent) => $emit('cancel', teamComponent)"
-        ></omegaup-group-teams>-->
+        ></omegaup-teams-group-teams>
       </div>
 
       <div
@@ -124,9 +107,8 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import group_Form from '../group/Form.vue';
-// Include next two components
 import teamsgroup_Upload from './Upload.vue';
-// import group_Teams from './Teams.vue';
+import teamsgroup_Teams from './Teams.vue';
 import T from '../../lang';
 import { dao, types } from '../../api_types';
 import * as ui from '../../ui';
@@ -141,7 +123,7 @@ export enum AvailableTabs {
   components: {
     'omegaup-group-form': group_Form,
     'omegaup-teams-group-upload': teamsgroup_Upload,
-    // 'omegaup-group-teams': group_Teams,
+    'omegaup-teams-group-teams': teamsgroup_Teams,
   },
 })
 export default class TeamsGroupEdit extends Vue {
