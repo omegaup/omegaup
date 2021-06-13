@@ -2,11 +2,7 @@
   <div data-teams-group-edit>
     <div class="page-header">
       <h2>
-        {{
-          ui.formatString(T.teamsGroupEditTitleWithName, {
-            name: teamsGroupName,
-          })
-        }}
+        {{ ui.formatString(T.teamsGroupEditTitleWithName, { name }) }}
       </h2>
     </div>
     <ul class="nav nav-pills mt-4">
@@ -48,17 +44,14 @@
         class="tab-pane active"
         role="tabpanel"
       >
-        <omegaup-group-form
-          :is-update="true"
-          :group-name="teamGroupName"
-          :group-alias="teamsGroupAlias"
-          :group-description="teamsGroupDescription"
-          :number-of-teams="teamsGroupNumber"
-          @update-group="
-            (name, description) =>
-              $emit('update-teams-group', name, description)
+        <omegaup-teams-group-form
+          :name="name"
+          :alias="alias"
+          :description="description"
+          @update-teams-group="
+            (request) => $emit('update-teams-group', request)
           "
-        ></omegaup-group-form>
+        ></omegaup-teams-group-form>
       </div>
 
       <div
@@ -66,36 +59,19 @@
         class="tab-pane active"
         role="tabpanel"
       >
-        <!--
-        <omegaup-group-teams
+        <omegaup-teams-group-teams
           :teams="currentTeamsIdentities"
-          :teams-csv="currentTeamsIdentitiesCsv"
-          :teams-group-alias="teamsGroupAlias"
+          :alias="alias"
           :countries="countries"
           @edit-identity-team="
-            (
-              teamComponent,
-              originalName,
-              name,
-              country,
-              state,
-              school,
-              schoolId,
-            ) =>
-              $emit(
-                'edit-identity-team',
-                teamComponent,
-                originalName,
-                name,
-                country,
-                state,
-                school,
-                schoolId,
-              )
+            (request) => $emit('edit-identity-team', request)
+          "
+          @change-password-identity-team="
+            (request) => $emit('change-password-identity-team', request)
           "
           @remove="(name) => $emit('remove', name)"
           @cancel="(teamComponent) => $emit('cancel', teamComponent)"
-        ></omegaup-group-teams>-->
+        ></omegaup-teams-group-teams>
       </div>
 
       <div
@@ -103,15 +79,19 @@
         class="tab-pane active"
         role="tabpanel"
       >
-        <!--
-        <omegaup-group-upload-teams
-          :teams-group-alias="teamsGroupAlias"
+        <omegaup-teams-group-upload
           :team-error-row="teamErrorRow"
-          @bulk-teams="(teams) => $emit('bulk-teams', teams)"
+          :search-result-users="searchResultUsers"
+          @bulk-identities="
+            (identities) => $emit('bulk-identities', identities)
+          "
           @download-teams="(teams) => $emit('download-teams', teams)"
           @read-csv="(source) => $emit('read-csv', source)"
           @invalid-file="$emit('invalid-file')"
-        ></omegaup-group-upload-teams>-->
+          @update-search-result-users="
+            (query) => $emit('update-search-result-users', query)
+          "
+        ></omegaup-teams-group-upload>
       </div>
     </div>
   </div>
@@ -119,10 +99,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import group_Form from './Form.vue';
-// Include next two components
-// import group_UploadTeams from './UploadTeams.vue';
-// import group_Teams from './Teams.vue';
+import teamsgroup_FormUpdate from '../teamsgroup/FormUpdate.vue';
+import teamsgroup_Upload from './Upload.vue';
+import teamsgroup_Teams from './Teams.vue';
 import T from '../../lang';
 import { dao, types } from '../../api_types';
 import * as ui from '../../ui';
@@ -135,21 +114,22 @@ export enum AvailableTabs {
 
 @Component({
   components: {
-    'omegaup-group-form': group_Form,
-    // 'omegaup-group-upload-teams': group_UploadTeams,
-    // 'omegaup-group-teams': group_Teams,
+    'omegaup-teams-group-form': teamsgroup_FormUpdate,
+    'omegaup-teams-group-upload': teamsgroup_Upload,
+    'omegaup-teams-group-teams': teamsgroup_Teams,
   },
 })
 export default class TeamsGroupEdit extends Vue {
-  @Prop() teamsGroupAlias!: string;
-  @Prop() teamsGroupName!: string;
-  @Prop() teamsGroupDescription!: string;
+  @Prop() alias!: string;
+  @Prop() name!: string;
+  @Prop() description!: string;
   @Prop() countries!: dao.Countries[];
   @Prop() isOrganizer!: boolean;
   @Prop() tab!: AvailableTabs;
-  @Prop() teamsIdentities!: types.Identity[];
-  @Prop() teamsIdentitiesCsv!: types.Identity[];
+  @Prop({ default: () => [] }) teamsIdentities!: types.Identity[];
+  @Prop({ default: () => [] }) teamsIdentitiesCsv!: types.Identity[];
   @Prop() teamErrorRow!: null | string;
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   ui = ui;
