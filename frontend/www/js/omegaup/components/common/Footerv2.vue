@@ -93,10 +93,7 @@
               Facebook
             </a>
             |
-            <a
-              class="text-nowrap"
-              href="https://discord.gg/K3JFd9d3wk"
-            >
+            <a class="text-nowrap" href="https://discord.gg/K3JFd9d3wk">
               <font-awesome-icon :icon="['fab', 'discord']" />
               Discord
             </a>
