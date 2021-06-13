@@ -1,6 +1,4 @@
 #!/usr/bin/python3
-# type: ignore
-
 """
 Decodes JavaScript stack traces.
 
@@ -18,6 +16,8 @@ import re
 import urllib.parse
 import urllib.request
 
+from typing import Any, Dict, List, Mapping, Optional, Tuple, Union
+
 _BLINK_STACK_FRAME_RE = re.compile(r'^(.*?) \((.*):(\d+):(\d+)\)$')
 _GECKO_STACK_FRAME_RE = re.compile(r'^(.*?)@(.*):(\d+):(\d+)$')
 _SOURCE_MAPPING_RE = re.compile(r'^//[@#] sourceMappingURL\s*=\s*(.*)$')
@@ -25,11 +25,11 @@ _BASE64_MAPPING = \
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
 
 
-def _mangle_url(url):
+def _mangle_url(url: str) -> str:
     return hashlib.sha1(url.encode('utf-8')).hexdigest()
 
 
-def _download(url):
+def _download(url: str) -> str:
     if url.startswith('/'):
         return url
     filename = os.path.join('.sources', _mangle_url(url))
@@ -40,9 +40,9 @@ def _download(url):
     return filename
 
 
-def _parse_b64vlq(s):
+def _parse_b64vlq(s: str) -> Tuple[List[int], int]:
     """Parses a Base64 Variable Length Quantity."""
-    result = []
+    result: List[int] = []
     value = 0
     idx = 0
     shift = 0
@@ -67,9 +67,9 @@ def _parse_b64vlq(s):
     return result, idx
 
 
-def _get_mapping(mapping_filename):
+def _get_mapping(mapping_filename: str) -> Mapping[str, Any]:
     with open(mapping_filename, 'r') as f:
-        mapping_obj = json.load(f)
+        mapping_obj: Dict[str, Any] = json.load(f)
     encoded_mappings = mapping_obj['mappings']
     i = 0
     generated_line = 1
@@ -79,7 +79,9 @@ def _get_mapping(mapping_filename):
     original_column = 1
     name_index = 0
 
-    mappings = []
+    mappings: List[Tuple[Tuple[int, int], Union[Tuple[int, int, int],
+                                                Tuple[int, int, int,
+                                                      int]]]] = []
 
     while i < len(encoded_mappings):
         if encoded_mappings[i] == ';':
@@ -103,9 +105,9 @@ def _get_mapping(mapping_filename):
             original_column += result[3]
         if len(result) >= 5:
             name_index += result[4]
-            mappings.append(((generated_line, generated_column),
-                             (source_index, original_line, original_column,
-                              name_index)))
+            mappings.append(
+                ((generated_line, generated_column),
+                 (source_index, original_line, original_column, name_index)))
         else:
             mappings.append(((generated_line, generated_column),
                              (source_index, original_line, original_column)))
@@ -113,13 +115,13 @@ def _get_mapping(mapping_filename):
     return mapping_obj
 
 
-def _map_source(url, lineno, colno):
+def _map_source(url: str, lineno: str, colno: str) -> str:
     if not os.path.isdir('.sources'):
         os.mkdir('.sources')
     source_filename = _download(url)
-    mapping_filename = None
-    parsed = None
-    path = None
+    mapping_filename: Optional[str] = None
+    parsed: Optional[urllib.parse.ParseResult] = None
+    path: Optional[str] = None
     try:
         parsed = urllib.parse.urlparse(url)
         path = 'frontend/www%s' % parsed.path
@@ -150,7 +152,7 @@ def _map_source(url, lineno, colno):
     return '%s:%s:%s' % (path, lineno, colno)
 
 
-def _main():
+def _main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('stack', type=argparse.FileType('r'))
     args = parser.parse_args()
@@ -160,8 +162,8 @@ def _main():
             for regex in (_BLINK_STACK_FRAME_RE, _GECKO_STACK_FRAME_RE):
                 match = regex.match(line)
                 if match:
-                    print('%s (%s)' % (match.group(1),
-                                       _map_source(*match.groups()[1:])))
+                    print('%s (%s)' %
+                          (match.group(1), _map_source(*match.groups()[1:])))
                     break
             else:
                 print(line.rstrip('\n'))
