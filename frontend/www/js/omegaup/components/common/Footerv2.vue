@@ -95,7 +95,7 @@
             |
             <a
               class="text-nowrap"
-              href="https://discord.com/channels/832682734115094638"
+              href="https://discord.gg/K3JFd9d3wk"
             >
               <font-awesome-icon :icon="['fab', 'discord']" />
               Discord
