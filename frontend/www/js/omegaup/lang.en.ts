@@ -1204,7 +1204,6 @@ const translations: { [key: string]: string; } = {
   teamsGroupFormCreate: "Create teams group",
   teamsGroupFormUpdate: "Update teams group",
   teamsGroupNewFormDescription: "Teams group description",
-  teamsGroupTeam: "Team",
   teamsGroupTeamName: "Team name",
   teamsGroupTeamsGroupName: "Teams group name",
   teamsGroupUploadIdentitiesAsTeams: "Upload teams",

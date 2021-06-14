@@ -42,12 +42,10 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
 library.add(faEdit);
-
 @Component({
   components: {
     FontAwesomeIcon,
@@ -55,13 +53,10 @@ library.add(faEdit);
 })
 export default class TeamsGroupList extends Vue {
   @Prop() teamsGroups!: types.TeamsGroup[];
-
   T = T;
-
   teamsGroupUrl(teamsGroup: types.TeamsGroup): string {
     return `/teamsgroup/${teamsGroup.alias}/edit/#teams`;
   }
-
   teamsGroupEditUrl(teamsGroup: types.TeamsGroup): string {
     return `/teamsgroup/${teamsGroup.alias}/edit/#edit`;
   }

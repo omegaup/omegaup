@@ -148,9 +148,7 @@ export default class Identities extends Vue {
     if (!file || file.name === '') {
       return;
     }
-
     const regex = /.*\.(?:csv|txt)$/;
-
     if (!regex.test(file.name.toLowerCase())) {
       this.$emit('invalid-file');
       return;
