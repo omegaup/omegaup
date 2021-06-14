@@ -1,6 +1,4 @@
 #!/usr/bin/python3
-# type: ignore
-
 '''Replays a contest.'''
 
 import argparse
@@ -8,20 +6,26 @@ import getpass
 import hashlib
 import sys
 import time
-import urllib
+import urllib.parse
+import urllib.request
 
 import MySQLdb
+import MySQLdb.cursors
 
 
-def main():
+def _main() -> None:
     '''Main entrypoint.'''
     # pylint: disable=too-many-locals,too-many-statements
 
     parser = argparse.ArgumentParser(description='Replay a contest')
 
-    parser.add_argument('--user', type=str, help='MySQL username',
+    parser.add_argument('--user',
+                        type=str,
+                        help='MySQL username',
                         required=True)
-    parser.add_argument('--database', type=str, help='MySQL database',
+    parser.add_argument('--database',
+                        type=str,
+                        help='MySQL database',
                         required=True)
     parser.add_argument('--password', type=str, help='MySQL password')
     parser.add_argument('contest', type=str, help='Contest alias')
@@ -31,12 +35,10 @@ def main():
     if not password:
         password = getpass.getpass()
 
-    db = MySQLdb.connect(
-        host='localhost',
-        user=args.user,
-        passwd=password,
-        db=args.database
-    )
+    db = MySQLdb.connect(host='localhost',
+                         user=args.user,
+                         passwd=password,
+                         db=args.database)
     cur = db.cursor()
 
     # Get contest ID
@@ -50,9 +52,9 @@ def main():
 
     # Create new contest
     start_time = int(time.time())
-    new_alias = "%s_%d" % (contest_alias, start_time)
+    new_alias = f'{contest_alias}_{start_time}'
     scoreboard_token = hashlib.md5(
-        '%s_scoreboard_admin' % new_alias).hexdigest()[:30]
+        f'{new_alias}_scoreboard_admin'.encode('utf-8')).hexdigest()[:30]
     cur.execute(
         '''
         INSERT INTO Contests(
@@ -62,13 +64,13 @@ def main():
         ) VALUES (
             %s, %s, %s, %s, 1, 0, %s, "yes", "none", "sum", %s, %s
         );
-        ''',
-        (new_alias, "Replay of %s" % contest_alias,
-         time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(start_time)),
-         time.strftime('%Y-%m-%d %H:%M:%S',
-                       time.gmtime(start_time + 3600 * 5)),
-         new_alias, hashlib.md5(new_alias + '_scoreboard').hexdigest()[:30],
-         scoreboard_token))
+        ''', (new_alias, "Replay of %s" % contest_alias,
+              time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(start_time)),
+              time.strftime('%Y-%m-%d %H:%M:%S',
+                            time.gmtime(start_time + 3600 * 5)), new_alias,
+              hashlib.md5(
+                  f'{new_alias}_scoreboard'.encode('utf-8')).hexdigest()[:30],
+              scoreboard_token))
     new_id = cur.lastrowid
 
     # Add old problems
@@ -82,21 +84,19 @@ def main():
             Contest_Problems
         WHERE
             contest_id = %s;
-        ''',
-        (new_id, contest_id)
-    )
+        ''', (new_id, contest_id))
     db.commit()
 
     # Allow user to open the contest to see the shiny display
     print('http://localhost:8001/arena/%s/scoreboard/%s?ws=on' %
-          (new_alias, scoreboard_token), file=sys.stderr)
+          (new_alias, scoreboard_token),
+          file=sys.stderr)
     print('Press Enter to continue...', end=' ', file=sys.stderr)
     input()
 
     # Replay all runs, one after the other
-    num_rows = cur.execute(
-        'SELECT * FROM Runs WHERE contest_id = %s;',
-        (contest_id))
+    num_rows = cur.execute('SELECT * FROM Runs WHERE contest_id = %s;',
+                           (contest_id))
     idx = 0
     times = []
     relevant_users = {}
@@ -109,9 +109,7 @@ def main():
                 '''
                 INSERT INTO Contests_Users (user_id, contest_id)
                 VALUES (%s, %s);
-                ''',
-                (row[1], new_id)
-            )
+                ''', (row[1], new_id))
 
         # Add run
         cur.execute(
@@ -126,9 +124,8 @@ def main():
             );
             ''',
             ((row[1], row[2], new_id,
-              hashlib.md5(new_alias + row[4]).hexdigest())
-             + row[5:13] + row[14:]
-             + (time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()),)))
+              hashlib.md5(new_alias + row[4]).hexdigest()) + row[5:13] +
+             row[14:] + (time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime()), )))
 
         run_id = cur.lastrowid
         db.commit()
@@ -139,9 +136,11 @@ def main():
         t0 = time.time()
         response = urllib.request.urlopen(
             'http://localhost:8001/api/scoreboard/refresh/',
-            urllib.parse.urlencode({'token': 'secret', 'alias': new_alias,
-                                    'run': str(run_id)})
-        ).read()
+            data=urllib.parse.urlencode({
+                'token': 'secret',
+                'alias': new_alias,
+                'run': str(run_id),
+            }).encode('utf-8')).read()
         t1 = time.time()
         assert '"status":"ok"' in response, response
         times.append(t1 - t0)
@@ -157,6 +156,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    _main()
 
 # vim: expandtab shiftwidth=4 tabstop=4
