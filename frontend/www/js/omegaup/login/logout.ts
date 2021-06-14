@@ -13,17 +13,17 @@ OmegaUp.on('ready', () => {
   const clientId = document.querySelector(
     'meta[name="google-signin-client_id"]',
   );
-  if (!clientId) {
+  if (!clientId || !window.gapi) {
     redirect();
     return;
   }
 
   // All possible paths need to end with redirect().
-  gapi.load('auth2', () => {
+  window.gapi.load('auth2', () => {
     // ['then'] is used instead of .then(), since these are not real ES6
     // Promise objects, therefore they don't have an .else() or .finally().
     // That trips up the linter.
-    gapi.auth2.init({})['then'](
+    window.gapi.auth2.init({})['then'](
       (auth: gapi.auth2.GoogleAuth) => {
         auth.signOut()['then'](
           () => redirect(),
