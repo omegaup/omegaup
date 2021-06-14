@@ -24,7 +24,7 @@ describe('groups_utils', () => {
       const records = cleanRecords([
         ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', null],
         ['username-2', null, 'MX', 'QUE', 'male', 'Best School'],
-      ]) as string[][];
+      ]);
 
       expect(records).toEqual([
         ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', undefined],
