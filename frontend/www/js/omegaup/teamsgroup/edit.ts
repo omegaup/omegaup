@@ -15,14 +15,6 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-teams-group-edit': teamsgroup_Edit,
     },
-    data: () => ({
-      tab: window.location.hash
-        ? window.location.hash.substr(1)
-        : AvailableTabs.Teams,
-      teamsIdentities: payload.identities,
-      userErrorRow: null,
-      searchResultUsers: [] as types.ListItem[],
-    }),
     render: function (createElement) {
       return createElement('omegaup-teams-group-edit', {
         props: {
@@ -31,10 +23,12 @@ OmegaUp.on('ready', () => {
           description: payload.teamGroup.description,
           countries: payload.countries,
           isOrganizer: payload.isOrganizer,
-          tab: this.tab,
-          teamsIdentities: this.teamsIdentities,
-          userErrorRow: this.userErrorRow,
-          searchResultUsers: this.searchResultUsers,
+          tab: window.location.hash
+            ? window.location.hash.substr(1)
+            : AvailableTabs.Teams,
+          teamsIdentities: payload.identities,
+          userErrorRow: null,
+          searchResultUsers: [] as types.ListItem[],
         },
         on: {
           'update-teams-group': (request: {
