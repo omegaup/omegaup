@@ -533,8 +533,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             self::$log->error('Call to \OmegaUp\Grader::grade() failed', $e);
             throw $e;
         }
-        $userId = null;
-        if (!is_null($r->loginIdentity)) {
+        $userId = $r->identity->user_id;
+        if (is_null($userId) && !is_null($r->loginIdentity)) {
             $userId = $r->loginIdentity->user_id;
         }
 

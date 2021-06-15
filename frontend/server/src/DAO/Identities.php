@@ -141,12 +141,8 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                         Team_Users tu
                     ON
                         tu.team_id = t.team_id
-                    INNER JOIN
-                        Users u
-                    ON
-                        tu.user_id = u.user_id
                     WHERE
-                        u.user_id = ?
+                        tu.user_id = ?
                         AND i.username = ?
                 )
                 LIMIT 1;';
