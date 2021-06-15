@@ -533,9 +533,13 @@ class Run extends \OmegaUp\Controllers\Controller {
             self::$log->error('Call to \OmegaUp\Grader::grade() failed', $e);
             throw $e;
         }
+        $userId = null;
+        if (!is_null($r->loginIdentity)) {
+            $userId = $r->loginIdentity->user_id;
+        }
 
         \OmegaUp\DAO\SubmissionLog::create(new \OmegaUp\DAO\VO\SubmissionLog([
-            'user_id' => $r->loginIdentity->user_id,
+            'user_id' => $userId,
             'identity_id' => $r->identity->identity_id,
             'submission_id' => $submission->submission_id,
             'problemset_id' => $submission->problemset_id,
