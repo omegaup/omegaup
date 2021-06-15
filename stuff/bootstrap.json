@@ -1,7 +1,6 @@
 [
 	{
-		"username": "omegaup",
-		"password": "omegaup",
+		"token": "92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6",
 		"requests": [
 			{
 				"api": "/problem/create/",

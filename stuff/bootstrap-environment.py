@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# type: ignore
 # pylint: disable=invalid-name
 # This program is intended to be invoked from the console, not to be used as a
 # module.
@@ -17,6 +16,8 @@ import shutil
 import subprocess
 import time
 
+from typing import Any, BinaryIO, Dict, Mapping, ItemsView, Optional
+
 import requests
 
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
@@ -29,20 +30,19 @@ class ScopedFiles:
     creates a mapping from POST names to Python file objects, which are closed
     on exit.
     '''
-
-    def __init__(self, files):
+    def __init__(self, files: Optional[Mapping[str, str]]):
         self.__files = files
-        self.files = None
+        self.files: Optional[Dict[str, BinaryIO]] = None
 
-    def __enter__(self):
+    def __enter__(self) -> 'ScopedFiles':
         if self.__files:
             self.files = {}
             for name, filename in self.__files.items():
-                self.files[name] = open(
-                    os.path.join(OMEGAUP_ROOT, filename), 'rb')
+                self.files[name] = open(os.path.join(OMEGAUP_ROOT, filename),
+                                        'rb')
         return self
 
-    def __exit__(self, exception_type, exception_value, traceback):
+    def __exit__(self, *exc_info: Any) -> None:
         if self.files:
             for _, f in self.files.items():
                 f.close()
@@ -54,46 +54,66 @@ class Session:
 
     Within the context, API requests can be performed as the user.
     '''
-
-    def __init__(self, args, username, password):
+    def __init__(
+            self,
+            args: argparse.Namespace,
+            username: Optional[str],
+            password: Optional[str],
+            token: Optional[str],
+    ):
         # This is a false positive.
         # pylint: disable=abstract-class-instantiated
         self.jar = requests.cookies.RequestsCookieJar()
         self.url = args.root_url.rstrip('/')
-        request = {
-            'api': '/user/login',
-            'params': {
-                'usernameOrEmail': username,
-                'password': password
+        if token is not None:
+            self.token: Optional[str] = token
+        else:
+            self.token = None
+            request: Dict[str, Any] = {
+                'api': '/user/login',
+                'params': {
+                    'usernameOrEmail': username,
+                    'password': password,
+                }
             }
-        }
-        result = self.request(request['api'], request['params'])
-        assert result['status'] == 'ok', (request, result)
+            result = self.request(request['api'], request['params'])
+            assert result and result['status'] == 'ok', (request, result)
 
-    def __enter__(self):
+    def __enter__(self) -> 'Session':
         return self
 
-    def __exit__(self, exception_type, exception_value, traceback):
+    def __exit__(self, *exc_info: Any) -> None:
         pass
 
-    def request(self, api, data=None, files=None):
+    def request(
+            self,
+            api: str,
+            data: Optional[Dict[str, str]] = None,
+            files: Optional[Mapping[str, str]] = None,
+    ) -> Optional[Dict[str, Any]]:
         '''Performs an API request.'''
         logging.debug('Requesting %s: %s', api, data)
+        headers = {}
+        if self.token is not None:
+            headers['Authorization'] = f'token {self.token}'
         if data:
             with ScopedFiles(files) as f:
-                req = requests.post(
-                    self.url + '/api' + api,
-                    files=f.files,
-                    data=data,
-                    cookies=self.jar)
+                req = requests.post(f'{self.url}/api{api}',
+                                    files=f.files,
+                                    data=data,
+                                    cookies=self.jar,
+                                    headers=headers)
         else:
-            req = requests.get(self.url + '/api' + api, cookies=self.jar)
-        for name, value in req.cookies.items():
+            req = requests.get(f'{self.url}/api{api}',
+                               cookies=self.jar,
+                               headers=headers)
+        cookies: ItemsView[str, str] = req.cookies.items()  # type: ignore
+        for name, value in cookies:
             self.jar[name] = value
         if req.status_code == 404:
             return None
         try:
-            result = req.json()
+            result: Dict[str, Any] = req.json()
         except:  # noqa: bare-except
             logging.exception('Failed to parse json: %s', req.text)
             raise
@@ -101,7 +121,7 @@ class Session:
         return result
 
 
-def _does_resource_exist(s, request):
+def _does_resource_exist(s: Session, request: Mapping[str, Any]) -> bool:
     '''Returns whether a resource already exist.'''
     api_endpoint = request['api'].lower()
     if not api_endpoint.endswith('/'):
@@ -142,7 +162,8 @@ def _does_resource_exist(s, request):
     return False
 
 
-def _process_one_request(s, request, now):
+def _process_one_request(s: Session, request: Mapping[str, Any],
+                         now: float) -> None:
     '''Invokes a single request specified in |request|.'''
     if _does_resource_exist(s, request):
         return
@@ -174,14 +195,17 @@ def _process_one_request(s, request, now):
             assert status == 'ok', (request, result)
 
 
-def _run_script(path, args, now):
+def _run_script(path: str, args: argparse.Namespace, now: float) -> None:
     '''Runs a single script specified in |path|'''
     with open(path, 'r') as f:
         script = json.load(f)
 
     for session in script:
         logging.info('running one session...')
-        with Session(args, session['username'], session['password']) as s:
+        with Session(args,
+                     session.get('username'),
+                     session.get('password'),
+                     token=session.get('token')) as s:
             for request in session['requests']:
                 _process_one_request(s, request, now)
 
@@ -205,11 +229,10 @@ def _purge_old_problems() -> None:
         if can_delete:
             shutil.rmtree(path)
         else:
-            subprocess.check_call(
-                ['/usr/bin/sudo', '/bin/rm', '-rf', path])
+            subprocess.check_call(['/usr/bin/sudo', '/bin/rm', '-rf', path])
 
 
-def _purge_old_submissions():
+def _purge_old_submissions() -> None:
     logging.info('Purging old submissions')
     # Removing directories requires the user to be in the 'www-data' group.
     can_delete = 'www-data' in (grp.getgrgid(grid).gr_name
@@ -226,7 +249,7 @@ def _purge_old_submissions():
                     ['/usr/bin/sudo', '/usr/bin/unlink', path])
 
 
-def main():
+def _main() -> None:
     '''Main entrypoint.'''
 
     parser = argparse.ArgumentParser()
@@ -234,14 +257,12 @@ def main():
                         type=str,
                         default='http://localhost:8001/')
     parser.add_argument('--verbose', action='store_true')
-    parser.add_argument(
-        '--purge',
-        action='store_true',
-        help='Also purges and re-creates the database')
-    parser.add_argument(
-        '--mysql-config-file',
-        default=None,
-        help='.my.cnf file that stores credentials')
+    parser.add_argument('--purge',
+                        action='store_true',
+                        help='Also purges and re-creates the database')
+    parser.add_argument('--mysql-config-file',
+                        default=None,
+                        help='.my.cnf file that stores credentials')
     parser.add_argument('--username', default=None, help='MySQL username')
     parser.add_argument('--password', default=None, help='MySQL password')
     parser.add_argument(
@@ -285,4 +306,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    _main()
