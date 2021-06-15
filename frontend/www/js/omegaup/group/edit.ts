@@ -12,7 +12,7 @@ import {
   cleanRecords,
   generateHumanReadablePassword,
   generatePassword,
-} from '../groups_utils';
+} from '../groups';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.GroupEditPayload();
