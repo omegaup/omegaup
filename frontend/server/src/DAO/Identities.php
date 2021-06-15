@@ -114,19 +114,49 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         if (is_null($currentIdentity->user_id)) {
             return null;
         }
-        $sql = 'SELECT
-                    i.*
-                FROM
-                    Identities i
-                INNER JOIN
-                    Emails e
-                ON
-                    e.user_id = i.user_id
-                WHERE
-                    i.user_id = ?
-                    AND (i.username = ? OR e.email = ?)
+        $sql = '(
+                    SELECT
+                        i.*
+                    FROM
+                        Identities i
+                    INNER JOIN
+                        Emails e
+                    ON
+                        e.user_id = i.user_id
+                    WHERE
+                        i.user_id = ?
+                        AND (i.username = ? OR e.email = ?)
+                )
+                UNION
+                (
+                    SELECT
+                        i.*
+                    FROM
+                        Identities i
+                    INNER JOIN
+                        Teams t
+                    ON
+                        i.identity_id = t.identity_id
+                    INNER JOIN
+                        Team_Users tu
+                    ON
+                        tu.team_id = t.team_id
+                    INNER JOIN
+                        Users u
+                    ON
+                        tu.user_id = u.user_id
+                    WHERE
+                        u.user_id = ?
+                        AND i.username = ?
+                )
                 LIMIT 1;';
-        $args = [$currentIdentity->user_id, $usernameOrEmail, $usernameOrEmail];
+        $args = [
+            $currentIdentity->user_id,
+            $usernameOrEmail,
+            $usernameOrEmail,
+            $currentIdentity->user_id,
+            $usernameOrEmail,
+        ];
 
         /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
@@ -383,12 +413,33 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 i.user_id = u.user_id
             WHERE
                 i.user_id = ?
+            UNION
+            SELECT
+                i.username,
+                i.identity_id,
+                u.main_identity_id
+            FROM
+                Identities i
+            INNER JOIN
+                Teams t
+            ON
+                i.identity_id = t.identity_id
+            INNER JOIN
+                Team_Users tu
+            ON
+                tu.team_id = t.team_id
+            INNER JOIN
+                Users u
+            ON
+                tu.user_id = u.user_id
+            WHERE
+                u.user_id = ?
                 ';
 
         /** @var list<array{identity_id: int, main_identity_id: int|null, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$identity->user_id]
+            [$identity->user_id, $identity->user_id]
         );
         $result = [];
         foreach ($rs as $identity) {

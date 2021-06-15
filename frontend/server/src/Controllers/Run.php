@@ -535,7 +535,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         \OmegaUp\DAO\SubmissionLog::create(new \OmegaUp\DAO\VO\SubmissionLog([
-            'user_id' => $r->identity->user_id,
+            'user_id' => $r->loginIdentity->user_id,
             'identity_id' => $r->identity->identity_id,
             'submission_id' => $submission->submission_id,
             'problemset_id' => $submission->problemset_id,
