@@ -36,9 +36,9 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-teams-group-edit', {
         props: {
-          teamsGroupAlias: payload.teamGroup.alias,
-          teamsGroupName: payload.teamGroup.name,
-          teamsGroupDescription: payload.teamGroup.description,
+          alias: payload.teamGroup.alias,
+          name: payload.teamGroup.name,
+          description: payload.teamGroup.description,
           countries: payload.countries,
           isOrganizer: payload.isOrganizer,
           tab: this.tab,
@@ -68,7 +68,7 @@ OmegaUp.on('ready', () => {
             originalUsername: string;
             identity: types.Identity;
           }) => {
-            api.Identity.update({
+            api.Identity.updateIdentityTeam({
               ...identity,
               ...{
                 group_alias: payload.teamGroup.alias,
@@ -78,7 +78,6 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.teamsGroupEditTeamsUpdated);
-                ui.success(T.groupEditMemberUpdated);
                 this.refreshTeamsList();
               })
               .catch(ui.apiError);
@@ -230,7 +229,7 @@ OmegaUp.on('ready', () => {
                   school_name,
                 ] of cleanRecords(dataset.records)) {
                   identities.push({
-                    username: `${payload.teamGroup.alias}:${username}`,
+                    username: `teams:${payload.teamGroup.alias}:${username}`,
                     name,
                     password: humanReadable
                       ? generateHumanReadablePassword()
@@ -241,7 +240,7 @@ OmegaUp.on('ready', () => {
                     gender: 'decline',
                   });
                   identitiesTeams[
-                    `${payload.teamGroup.alias}:${username}`
+                    `teams:${payload.teamGroup.alias}:${username}`
                   ] = [];
                 }
                 ui.dismissNotifications();

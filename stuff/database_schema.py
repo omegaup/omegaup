@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# type: ignore
 # -*- coding: utf-8 -*-
 
 '''Tool to validate schema.sql.'''
@@ -38,7 +37,7 @@ def _expected_database_schema(*,
     if hostname is not None:
         args.extend(['--hostname', hostname])
     args.append('schema')
-    stderr = subprocess.DEVNULL
+    stderr: Optional[int] = subprocess.DEVNULL
     if verbose:
         stderr = None
     schema = subprocess.check_output(args, stderr=stderr)
@@ -51,7 +50,7 @@ def strip_mysql_extensions(sql: bytes) -> bytes:
                   flags=re.MULTILINE | re.DOTALL)
 
 
-def main():
+def main() -> None:
     '''Runs the linters against the chosen files.'''
 
     args = git_tools.parse_arguments(
