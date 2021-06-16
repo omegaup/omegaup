@@ -304,6 +304,43 @@ class Validators {
     }
 
     /**
+     * Enforces username identity team requirements
+     *
+     * @param mixed $parameter
+     * @param string $parameterName
+     * @psalm-assert string $parameter
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateValidUsernameIdentityTeam(
+        $parameter,
+        string $parameterName
+    ): void {
+        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+            return;
+        }
+        self::validateStringOfLengthInRange(
+            $parameter,
+            $parameterName,
+            /*$minLength=*/ 2,
+            /*$maxLength=*/ null,
+            /*required=*/true
+        );
+
+        /** @psalm-suppress RedundantConditionGivenDocblockType not sure why Psalm is complaining here. */
+        if (
+            !preg_match(
+                '/^teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/',
+                $parameter
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
+        }
+    }
+
+    /**
      * @param mixed $parameter
      * @param string $parameterName
      * @psalm-assert string $parameter
