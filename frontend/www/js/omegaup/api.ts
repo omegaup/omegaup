@@ -1172,6 +1172,10 @@ export const Identity = {
     messages.IdentityUpdateRequest,
     messages.IdentityUpdateResponse
   >('/api/identity/update/'),
+  updateIdentityTeam: apiCall<
+    messages.IdentityUpdateIdentityTeamRequest,
+    messages.IdentityUpdateIdentityTeamResponse
+  >('/api/identity/updateIdentityTeam/'),
 };
 
 export const Interview = {

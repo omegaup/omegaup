@@ -264,7 +264,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertCount(2, $result);
             $teamUsername = $teamUsernames[$index];
             $this->assertEquals(
-                "{$teamGroup->alias}:{$teamUsername}",
+                "teams:{$teamGroup->alias}:{$teamUsername}",
                 $identity['username']
             );
             $this->assertStringContainsString('Team', $identity['name']);
@@ -512,10 +512,86 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertCount(2, $result);
             $teamUsername = $teamUsernames[$index];
             $this->assertEquals(
-                "{$teamGroup->alias}:{$teamUsername}",
+                "teams:{$teamGroup->alias}:{$teamUsername}",
                 $identity['username']
             );
             $this->assertStringContainsString('Team', $identity['name']);
+        }
+    }
+
+    public function testUpdateTeamsFromTeamsGroup() {
+        // Identity creator group member will upload csv file
+        [
+           'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $teamGroup = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        )['teamGroup'];
+
+        // Call api using identity creator group team
+        \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities.csv',
+                    $teamGroup->alias
+                ),
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        [
+            'identities' => $teamIdentities,
+        ] = \OmegaUp\Controllers\TeamsGroup::getTeamGroupEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'team_group_alias' => $teamGroup->alias,
+                'auth_token' => $creatorLogin->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertCount(5, $teamIdentities);
+
+        // Now, we are going to update all teams from the teams group
+        foreach ($teamIdentities as $i => $teamIdentity) {
+            [
+                'identities' => $teamIdentities,
+            ] = \OmegaUp\Controllers\TeamsGroup::getTeamGroupEditDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'team_group_alias' => $teamGroup->alias,
+                    'auth_token' => $creatorLogin->auth_token,
+                ])
+            )['smartyProperties']['payload'];
+
+            $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+                $teamIdentity['username']
+            );
+            $newIdentityName = substr(
+                \OmegaUp\Test\Utils::createRandomString(),
+                - 10
+            );
+            \OmegaUp\Controllers\Identity::apiUpdateIdentityTeam(
+                new \OmegaUp\Request([
+                    'auth_token' => $creatorLogin->auth_token,
+                    'username' => $teamIdentity['username'],
+                    'name' => $newIdentityName,
+                    'country_id' => 'US',
+                    'state_id' => 'CA',
+                    'gender' => 'other',
+                    'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+                    'group_alias' => $teamGroup->alias,
+                    'original_username' => $identity->username,
+                ])
+            );
+
+            $updatedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+                $teamIdentity['username']
+            );
+            $this->assertEquals($updatedIdentity->name, $newIdentityName);
         }
     }
 

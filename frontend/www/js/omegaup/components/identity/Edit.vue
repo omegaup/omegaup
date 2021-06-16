@@ -6,7 +6,7 @@
     <div class="card-body">
       <form role="form" @submit.prevent="onEditMember">
         <div class="form-row">
-          <div class="form-group col-lg-4 col-md-6 col-sm-6">
+          <div class="form-group col-lg-5 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.username }}
               <div class="input-group">
@@ -17,7 +17,7 @@
               </div>
             </label>
           </div>
-          <div class="form-group col-lg-4 col-md-6 col-sm-6">
+          <div class="form-group col-lg-3 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.profile }}
               <input v-model="selectedIdentity.name" class="form-control" />
@@ -134,13 +134,25 @@ export default class IdentityEdit extends Vue {
   );
 
   get groupName(): string {
-    return this.selectedIdentity.username.split(':')[0];
+    const teamUsername = this.selectedIdentity.username.split(':');
+    if (teamUsername.length === 2) {
+      return teamUsername[0];
+    }
+    return `${teamUsername[0]}:${teamUsername[1]}`;
   }
 
   get identityName(): string {
-    return this.selectedIdentity.username.split(':')[1];
+    const teamUsername = this.selectedIdentity.username.split(':');
+    if (teamUsername.length === 2) {
+      return teamUsername[1];
+    }
+    return teamUsername[2];
   }
   set identityName(username: string) {
+    const teamUsername = this.selectedIdentity.username.split(':');
+    if (teamUsername.length === 2) {
+      this.selectedIdentity.username = `${this.groupName}:${username}`;
+    }
     this.selectedIdentity.username = `${this.groupName}:${username}`;
   }
 

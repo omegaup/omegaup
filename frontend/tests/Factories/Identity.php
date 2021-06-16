@@ -28,7 +28,7 @@ class Identity {
             !is_null($data)
         ) {
             array_push($identities, [
-                'username' => "{$group_alias}:{$data[0]}",
+                'username' => "teams:{$group_alias}:{$data[0]}",
                 'name' => strval($data[1]),
                 'country_id' => strval($data[2]),
                 'state_id' => strval($data[3]),

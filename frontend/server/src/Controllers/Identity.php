@@ -359,7 +359,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 ) ? null : strval(
                     $teamIdentity['state_id']
                 );
-                $newIdentity = self::createIdentity(
+                $newIdentity = self::createIdentityTeam(
                     $teamIdentity['username'],
                     $teamIdentity['name'],
                     $teamIdentity['password'],
@@ -408,6 +408,196 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
         return [
             'status' => 'ok'
+        ];
+    }
+
+    public static function validateIdentityTeam(
+        ?string $username,
+        ?string &$name,
+        ?string &$gender,
+        string $groupAlias
+    ): void {
+        // Validate request
+        \OmegaUp\Validators::validateValidUsernameIdentityTeam(
+            $username,
+            'username'
+        );
+
+        // Check group is present
+        $identityUsername = explode(':', $username);
+        if (count($identityUsername) !== 3) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'username'
+            );
+        }
+        $namespace = $identityUsername[0];
+        $identityGroupAlias = $identityUsername[1];
+        if ($identityGroupAlias !== $groupAlias || $namespace !== 'teams') {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'teams_group_alias'
+            );
+        }
+
+        if (!is_null($name)) {
+            /** @var null|string $name */
+            $name = trim($name);
+            \OmegaUp\Validators::validateStringOfLengthInRange(
+                $name,
+                'name',
+                1,
+                50
+            );
+        }
+
+        if (!is_null($gender)) {
+            $gender = trim($gender);
+        }
+        if (!empty($gender)) {
+            \OmegaUp\Validators::validateInEnum(
+                $gender,
+                'gender',
+                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS
+            );
+        }
+    }
+
+    private static function createIdentityTeam(
+        ?string $username,
+        ?string $name,
+        string $password,
+        ?string $countryId,
+        ?string $stateId,
+        ?string $gender,
+        string $aliasGroup
+    ): \OmegaUp\DAO\VO\Identities {
+        self::validateIdentityTeam($username, $name, $gender, $aliasGroup);
+
+        // Check password
+        \OmegaUp\SecurityTools::testStrongPassword($password);
+        $hashedPassword = \OmegaUp\SecurityTools::hashString($password);
+
+        return new \OmegaUp\DAO\VO\Identities([
+            'username' => $username,
+            'name' => $name,
+            'password' => $hashedPassword,
+            'country_id' => $countryId,
+            'state_id' => $stateId,
+            'gender' => $gender,
+        ]);
+    }
+
+    private static function updateIdentityTeam(
+        ?string $username,
+        ?string $name,
+        ?\OmegaUp\DAO\VO\States $state,
+        ?string $gender,
+        string $aliasGroup,
+        \OmegaUp\DAO\VO\Identities $originalIdentity
+    ): \OmegaUp\DAO\VO\Identities {
+        self::validateIdentityTeam($username, $name, $gender, $aliasGroup);
+
+        return new \OmegaUp\DAO\VO\Identities([
+            'username' => $username,
+            'name' => $name ?? $originalIdentity->name,
+            'country_id' => !is_null(
+                $state
+            ) ? $state->country_id : $originalIdentity->country_id,
+            'state_id' => !is_null(
+                $state
+            ) ? $state->state_id : $originalIdentity->state_id,
+            'gender' => $gender ?? $originalIdentity->gender,
+            'current_identity_school_id' => $originalIdentity->current_identity_school_id,
+            'password' => $originalIdentity->password,
+            'user_id' => $originalIdentity->user_id,
+        ]);
+    }
+
+    /**
+     * Entry point for Update an Identity team API
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param null|string $country_id
+     * @omegaup-request-param string $gender
+     * @omegaup-request-param string $group_alias
+     * @omegaup-request-param mixed $identities
+     * @omegaup-request-param string $name
+     * @omegaup-request-param string $original_username
+     * @omegaup-request-param string $school_name
+     * @omegaup-request-param null|string $state_id
+     * @omegaup-request-param string $username
+     */
+    public static function apiUpdateIdentityTeam(\OmegaUp\Request $r): array {
+        \OmegaUp\Experiments::getInstance()->ensureEnabled(
+            \OmegaUp\Experiments::IDENTITIES
+        );
+        self::validateUpdateRequest($r);
+        $originalUsername = $r->ensureString('original_username');
+        $username = $r->ensureString('username');
+        $name = $r->ensureString('name');
+        $gender = $r->ensureString('gender');
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $schoolName = $r->ensureString('school_name');
+
+        $originalIdentity = self::resolveIdentity($originalUsername);
+
+        $originalSchoolId = null;
+        if (!is_null($originalIdentity->current_identity_school_id)) {
+            $originalIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
+                $originalIdentity->current_identity_school_id
+            );
+            $originalSchoolId = !is_null(
+                $originalIdentitySchool
+            ) ? $originalIdentitySchool->school_id : null;
+        }
+
+        // Prepare DAOs
+        $state = null;
+        $countryId = $r->ensureOptionalString('country_id');
+        $stateId = $r->ensureOptionalString('state_id');
+        if (!is_null($countryId) && !is_null($stateId)) {
+            $state = \OmegaUp\DAO\States::getByPK($countryId, $stateId);
+        }
+        $identity = self::updateIdentityTeam(
+            $username,
+            $name,
+            $state,
+            $gender,
+            $groupAlias,
+            $originalIdentity
+        );
+
+        $identity->identity_id = $originalIdentity->identity_id;
+
+        $schoolId = \OmegaUp\Controllers\School::createSchool(
+            trim($schoolName),
+            $state
+        );
+
+        if ($originalSchoolId !== $schoolId) {
+            $newIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
+                $identity,
+                $schoolId, /* new school_id */
+                null /* graduation_date */
+            );
+            $identity->current_identity_school_id = $newIdentitySchool->identity_school_id;
+        }
+
+        // Save in DB
+        \OmegaUp\DAO\Identities::update($identity);
+
+        \OmegaUp\Cache::deleteFromCache(
+            \OmegaUp\Cache::USER_PROFILE,
+            strval($identity->username)
+        );
+
+        return [
+            'status' => 'ok',
         ];
     }
 
