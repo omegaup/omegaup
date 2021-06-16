@@ -603,7 +603,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             $creatorLogin
         );
-        $numberOfUsers = 10;
+        $numberOfUsers = 2;
 
         $usernameAndPasswordIdentities = [];
         foreach (range(0, $numberOfUsers - 1) as $id) {
