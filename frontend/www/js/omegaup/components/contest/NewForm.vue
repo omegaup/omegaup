@@ -185,7 +185,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-6">
             <label>{{ T.wordsFeedback }}</label>
             <select v-model="feedback" class="form-control">
               <option value="none">
@@ -202,7 +202,34 @@
               {{ T.contestNewFormImmediateFeedbackDesc }}
             </p>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-6">
+            <label>{{ T.contestNewFormForTeams }}</label>
+            <div class="checkbox">
+              <label>
+                <input
+                  v-model="currentContestForTeams"
+                  type="checkbox"
+                  :disabled="update"
+                />
+                {{ T.wordsEnable }}
+              </label>
+            </div>
+
+            <omegaup-common-typeahead
+              v-if="currentContestForTeams && !hasSubmissions"
+              :existing-options="searchResultTeamsGroups"
+              :value.sync="teamsGroupAlias"
+              @update-existing-options="
+                (query) => $emit('update-search-result-teams-groups', query)
+              "
+            >
+            </omegaup-common-typeahead>
+            <input v-else class="form-control" disabled :value="teamsGroupAlias" />
+            <p class="help-block">{{ T.contestNewFormForTeamsDesc }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-md-6">
             <label>{{ T.contestNewFormScoreboardAtEnd }}</label>
             <select v-model="showScoreboardAfter" class="form-control">
               <option :value="true">
@@ -214,7 +241,7 @@
             </select>
             <p class="help-block">{{ T.contestNewFormScoreboardAtEndDesc }}</p>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-6">
             <label>{{ T.contestNewFormPartialScore }}</label>
             <select v-model="partialScore" class="form-control">
               <option :value="true">
@@ -309,11 +336,14 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import common_Typeahead from '../common/Typeahead.vue';
 import DateTimePicker from '../DateTimePicker.vue';
 import Multiselect from 'vue-multiselect';
+import { types } from '../../api_types';
 
 @Component({
   components: {
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-datetimepicker': DateTimePicker,
     Multiselect,
   },
@@ -339,6 +369,10 @@ export default class NewForm extends Vue {
   @Prop({ default: '' }) initialTitle!: string;
   @Prop({ default: null }) initialWindowLength!: null | number;
   @Prop({ default: null }) invalidParameterName!: null | string;
+  @Prop() initialTeamsGroupAlias!: null | string;
+  @Prop({ default: false }) contestForTeams!: boolean;
+  @Prop({ default: false }) hasSubmissions!: boolean;
+  @Prop() searchResultTeamsGroups!: types.ListItem[];
 
   T = T;
   alias = this.initialAlias;
@@ -361,6 +395,8 @@ export default class NewForm extends Vue {
   title = this.initialTitle;
   windowLength = this.initialWindowLength;
   windowLengthEnabled = this.initialWindowLength !== null;
+  currentContestForTeams = this.contestForTeams;
+  teamsGroupAlias = this.initialTeamsGroupAlias;
   titlePlaceHolder = '';
 
   @Watch('windowLengthEnabled')
@@ -456,12 +492,14 @@ export default class NewForm extends Vue {
       partial_score: this.partialScore,
       needs_basic_information: this.needsBasicInformation,
       requests_user_information: this.requestsUserInformation,
+      contest_for_teams: this.currentContestForTeams,
     };
+    const request = { contest, teamsGroupAlias: this.teamsGroupAlias };
     if (this.update) {
-      this.$emit('update-contest', contest);
+      this.$emit('update-contest', request);
       return;
     }
-    this.$emit('create-contest', contest);
+    this.$emit('create-contest', request);
   }
 }
 </script>

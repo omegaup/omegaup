@@ -232,6 +232,8 @@ const translations: { [key: string]: string; } = {
   contestNewFormDifferentStartsDesc: "Si est\u00e1 activo, indica el tiempo en minutos que tiene el usuario para concursar y enviar soluciones a partir de que entra al concurso en la arena (estilo USACO/Preselectivo IOI). Si Inicios Diferentes est\u00e1 desactivado, entonces el concursante tendr\u00e1 todo el tiempo entre la hora de inicio y la hora de fin para concursar. El valor debe ser menor a la diferencia en minutos de la duraci\u00f3n del concurso.",
   contestNewFormEndDate: "Fecha de Fin",
   contestNewFormEndDateDesc: "La hora (en hora local) en la que termina el concurso.",
+  contestNewFormForTeams: "Concurso para equipos",
+  contestNewFormForTeamsDesc: "Si est\u00e1 activado, solo pueden acceder los equipos en lugar de los usuarios o las identidades. Los equipos deben agregarse a un grupo de equipos. Para m\u00e1s informaci\u00f3n haga clic aqu\u00ed.",
   contestNewFormICPCStyle: "Estilo ICPC",
   contestNewFormImmediateFeedbackDesc: "Despu\u00e9s de evaluar cada env\u00edo, se mostrar\u00e1 el veredicto.",
   contestNewFormImmediateSummaryFeedbackDesc: "Despu\u00e9s de evaluar cada env\u00edo, se mostrar\u00e1 el resumen de puntajes y veredictos para cada grupo de casos.",

@@ -24,6 +24,7 @@ OmegaUp.on('ready', () => {
       users: payload.users,
       searchResultProblems: [] as types.ListItem[],
       searchResultUsers: [] as types.ListItem[],
+      searchResultTeamsGroups: [] as types.ListItem[],
     }),
     methods: {
       arbitrateRequest: (username: string, resolution: boolean): void => {
@@ -120,6 +121,8 @@ OmegaUp.on('ready', () => {
           users: this.users,
           searchResultProblems: this.searchResultProblems,
           searchResultUsers: this.searchResultUsers,
+          searchResultTeamsGroups: this.searchResultTeamsGroups,
+          teamsGroup: payload.teams_group,
         },
         on: {
           'update-search-result-problems': (query: string) => {
@@ -163,13 +166,37 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'update-contest': function (contest: omegaup.Contest) {
-            api.Contest.update(
-              Object.assign({}, contest, {
+          'update-search-result-teams-groups': (query: string) => {
+            api.TeamsGroup.list({
+              query,
+            })
+              .then((data) => {
+                this.searchResultTeamsGroups = data.results.map(
+                  ({ key, value }: { key: string; value: string }) => ({
+                    key,
+                    value: `${ui.escape(value)} (<strong>${ui.escape(
+                      key,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'update-contest': ({
+            contest,
+            teamsGroupAlias,
+          }: {
+            contest: omegaup.Contest;
+            teamsGroupAlias?: string;
+          }): void => {
+            api.Contest.update({
+              ...contest,
+              ...{
                 contest_alias: contest.alias,
                 alias: null,
-              }),
-            )
+                teams_group_alias: teamsGroupAlias,
+              },
+            })
               .then(() => {
                 ui.success(`
                   ${T.contestEditContestEdited} <a href="/arena/${contest.alias}/">${T.contestEditGoToContest}</a>

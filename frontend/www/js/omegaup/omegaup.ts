@@ -155,6 +155,7 @@ export namespace omegaup {
     finish_time?: Date;
     admission_mode?: AdmissionMode;
     contestant_must_register?: boolean;
+    contest_for_teams?: boolean;
     admin?: boolean;
     available_languages?: omegaup.Languages;
     description?: string;
