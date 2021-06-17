@@ -587,4 +587,104 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEmpty($teamIdentities);
     }
+
+    public function testSwitchBetweenAssociatedIdentities() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+        $numberOfUsers = 2;
+
+        $usernameAndPasswordIdentities = [];
+        foreach (range(0, $numberOfUsers - 1) as $id) {
+            $usernameAndPasswordIdentities[] = [
+                'username' => "user{$id}",
+                'password' => "user_password_{$id}",
+            ];
+        }
+
+        // Users to associate
+        foreach ($usernameAndPasswordIdentities as $id => $usernameIdentity) {
+            [
+                'identity' => $identities[$id],
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams($usernameIdentity)
+            );
+        }
+
+        $teamUsernames = \OmegaUp\Test\Factories\Identity::getUsernamesInCsvFile(
+            'team_identities.csv',
+            $teamGroup->alias,
+        );
+
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities.csv',
+                    $teamGroup->alias,
+                ),
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        [
+            'identities' => $teams,
+        ] = \OmegaUp\Controllers\TeamsGroup::apiTeams(
+            new \OmegaUp\Request([
+                'team_group_alias' => $teamGroup->alias,
+                'auth_token' => $creatorLogin->auth_token,
+            ])
+        );
+
+        foreach ($identities as $index => $identity) {
+            $identity->password = $usernameAndPasswordIdentities[$index]['password'];
+            $login = self::login($identity);
+
+            [
+                'identities' => $associatedIdentities,
+            ] = \OmegaUp\Controllers\User::apiListAssociatedIdentities(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                ])
+            );
+
+            // All users have two associated identities
+            $this->assertCount(2, $associatedIdentities);
+            $this->assertStringContainsString(
+                "{$teamGroup->alias}:",
+                $associatedIdentities[1]['username']
+            );
+
+            // User switch the account
+            $response = \OmegaUp\Controllers\Identity::apiSelectIdentity(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'usernameOrEmail' => $associatedIdentities[1]['username'],
+                ])
+            );
+
+            // Identity can not access to apiListAssociatedIdentities
+            try {
+                \OmegaUp\Controllers\User::apiListAssociatedIdentities(
+                    new \OmegaUp\Request([
+                        'auth_token' => $login->auth_token,
+                    ])
+                );
+            } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+                $this->assertEquals('userNotAllowed', $e->getMessage());
+            }
+        }
+    }
 }

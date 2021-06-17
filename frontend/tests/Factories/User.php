@@ -257,9 +257,11 @@ class User {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
-        \OmegaUp\DAO\GroupsIdentities::create(new \OmegaUp\DAO\VO\GroupsIdentities([
-            'identity_id' => $identity->identity_id,
-            'group_id' => $groupIdentityCreator->group_id,
+        $role = \OmegaUp\DAO\Roles::getByName('GroupIdentityCreator');
+        \OmegaUp\DAO\UserRoles::create(new \OmegaUp\DAO\VO\UserRoles([
+            'user_id' => $identity->user_id,
+            'role_id' => $role->role_id,
+            'acl_id' => \OmegaUp\Authorization::SYSTEM_ACL,
         ]));
     }
 

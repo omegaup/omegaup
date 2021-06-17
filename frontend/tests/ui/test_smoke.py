@@ -157,7 +157,7 @@ def test_create_problem(driver):
             '//table[contains(concat(" ", normalize-space(@class), " "), " '
             'global ")]/tbody/tr/td[@data-run-status]/span')
 
-        assert global_run.text == 'rejudging'
+        assert global_run.text in ('rejudging', 'AC')
 
 
 @util.annotate
