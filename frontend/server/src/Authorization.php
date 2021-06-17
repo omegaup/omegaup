@@ -422,9 +422,16 @@ class Authorization {
                 return false;
             }
         }
+        if (is_null(self::$_groupIdentityCreator->acl_id)) {
+            return false;
+        }
         return self::isGroupMember(
             $identity,
             self::$_groupIdentityCreator
+        ) || self::hasRole(
+            $identity,
+            self::$_groupIdentityCreator->acl_id,
+            self::IDENTITY_CREATOR_ROLE
         );
     }
 
