@@ -224,7 +224,12 @@
               "
             >
             </omegaup-common-typeahead>
-            <input v-else class="form-control" disabled :value="teamsGroupAlias" />
+            <input
+              v-else
+              class="form-control"
+              disabled
+              :value="teamsGroupAlias"
+            />
             <p class="help-block">{{ T.contestNewFormForTeamsDesc }}</p>
           </div>
         </div>
