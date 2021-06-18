@@ -208,6 +208,21 @@ class Validators {
     }
 
     /**
+     * Returns whether the username or email is valid.
+     *
+     * @param string $usernameOrEmail
+     * @return boolean
+     */
+    public static function usernameOrTeamUsernameOrEmail(string $usernameOrEmail): bool {
+        return (
+            self::email($usernameOrEmail)
+            || self::normalUsername($usernameOrEmail)
+            || self::identityUsername($usernameOrEmail)
+            || self::identityTeamUsername($usernameOrEmail)
+        );
+    }
+
+    /**
      * Returns whether the username is valid.
      *
      * @param string $username
@@ -227,6 +242,21 @@ class Validators {
         return (
             preg_match(
                 '/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/',
+                $username
+            ) !== 0
+        );
+    }
+
+    /**
+     * Returns whether the username of an identity team is valid.
+     *
+     * @param string $username
+     * @return boolean
+     */
+    public static function identityTeamUsername(string $username): bool {
+        return (
+            preg_match(
+                '/^teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/',
                 $username
             ) !== 0
         );

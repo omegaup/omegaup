@@ -203,6 +203,7 @@
 - [TeamsGroup](#teamsgroup)
   - [`/api/teamsGroup/create/`](#apiteamsgroupcreate)
   - [`/api/teamsGroup/details/`](#apiteamsgroupdetails)
+  - [`/api/teamsGroup/list/`](#apiteamsgrouplist)
   - [`/api/teamsGroup/removeTeam/`](#apiteamsgroupremoveteam)
   - [`/api/teamsGroup/teams/`](#apiteamsgroupteams)
   - [`/api/teamsGroup/update/`](#apiteamsgroupupdate)
@@ -731,6 +732,7 @@ Creates a new contest
 | --------------------------- | -------------- | ----------- |
 | `admission_mode`            | `mixed`        |             |
 | `alias`                     | `mixed`        |             |
+| `contest_for_teams`         | `bool\|null`   |             |
 | `description`               | `mixed`        |             |
 | `feedback`                  | `mixed`        |             |
 | `finish_time`               | `mixed`        |             |
@@ -747,6 +749,7 @@ Creates a new contest
 | `show_scoreboard_after`     | `mixed`        |             |
 | `start_time`                | `mixed`        |             |
 | `submissions_gap`           | `mixed`        |             |
+| `teams_group_alias`         | `null\|string` |             |
 | `title`                     | `mixed`        |             |
 | `window_length`             | `int\|null`    |             |
 
@@ -1277,6 +1280,7 @@ Update a Contest
 | `window_length`             | `int`                     |             |
 | `admission_mode`            | `mixed`                   |             |
 | `alias`                     | `null\|string`            |             |
+| `contest_for_teams`         | `bool\|null`              |             |
 | `description`               | `null\|string`            |             |
 | `feedback`                  | `mixed`                   |             |
 | `languages`                 | `mixed`                   |             |
@@ -1291,6 +1295,7 @@ Update a Contest
 | `scoreboard`                | `float\|null`             |             |
 | `show_scoreboard_after`     | `bool\|null`              |             |
 | `start_time`                | `OmegaUp\Timestamp\|null` |             |
+| `teams_group_alias`         | `null\|string`            |             |
 | `title`                     | `null\|string`            |             |
 
 ### Returns
@@ -3973,6 +3978,25 @@ Details of a team group
 | Name         | Type                                                                         |
 | ------------ | ---------------------------------------------------------------------------- |
 | `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
+
+## `/api/teamsGroup/list/`
+
+### Description
+
+Gets a list of teams groups. This returns an array instead of an object
+since it is used by typeahead.
+
+### Parameters
+
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+
+### Returns
+
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/teamsGroup/removeTeam/`
 

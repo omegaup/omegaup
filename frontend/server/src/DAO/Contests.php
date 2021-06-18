@@ -114,7 +114,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
-     * @return array{acl_id: int, admission_mode: string, alias: string, archived: bool, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null
+     * @return array{acl_id: int, admission_mode: string, alias: string, archived: bool, contest_for_teams: bool, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null
      */
     final public static function getByAliasWithExtraInformation(string $alias): ?array {
         $sql = '
@@ -457,6 +457,21 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         Groups_Identities gi
                     ON
                         gi.group_id = gr.group_id
+                    UNION DISTINCT
+                    SELECT
+                        t.identity_id,
+                        p.problemset_id
+                    FROM
+                        Problemsets p
+                    INNER JOIN
+                        Teams_Group_Roles tgr
+                    ON
+                        tgr.acl_id = p.acl_id AND
+                        tgr.role_id = ?
+                    INNER JOIN
+                        Teams t
+                    ON
+                        t.team_group_id = tgr.team_group_id
                 ) pi
             ON
                 pi.problemset_id = p.problemset_id AND
@@ -481,6 +496,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             GROUP BY Contests.contest_id, organizer.identity_id
         ";
         $params = [
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
             \OmegaUp\Authorization::CONTESTANT_ROLE,
             $identityId,
         ];

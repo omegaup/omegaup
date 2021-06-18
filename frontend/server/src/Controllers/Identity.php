@@ -766,7 +766,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
         $usernameOrEmail = $r->ensureString(
             'usernameOrEmail',
-            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+            fn (string $username) => \OmegaUp\Validators::usernameOrTeamUsernameOrEmail(
                 $username
             )
         );

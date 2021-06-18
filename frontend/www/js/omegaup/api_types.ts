@@ -1896,6 +1896,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     available_languages: { [key: string]: string };
+    contest_for_teams: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -1981,6 +1982,7 @@ export namespace types {
     groups: types.ContestGroup[];
     problems: types.ProblemsetProblemWithVersions[];
     requests: types.ContestRequest[];
+    teams_group?: types.ContestGroup;
     users: types.ContestUser[];
   }
 
@@ -4320,6 +4322,8 @@ export namespace messages {
       name?: string;
     };
   };
+  export type TeamsGroupListRequest = { [key: string]: any };
+  export type TeamsGroupListResponse = { results: types.ListItem[] };
   export type TeamsGroupRemoveTeamRequest = { [key: string]: any };
   export type TeamsGroupRemoveTeamResponse = {};
   export type TeamsGroupTeamsRequest = { [key: string]: any };
@@ -5064,6 +5068,9 @@ export namespace controllers {
     details: (
       params?: messages.TeamsGroupDetailsRequest,
     ) => Promise<messages.TeamsGroupDetailsResponse>;
+    list: (
+      params?: messages.TeamsGroupListRequest,
+    ) => Promise<messages.TeamsGroupListResponse>;
     removeTeam: (
       params?: messages.TeamsGroupRemoveTeamRequest,
     ) => Promise<messages.TeamsGroupRemoveTeamResponse>;

@@ -1724,6 +1724,10 @@ export const TeamsGroup = {
     messages.TeamsGroupDetailsRequest,
     messages.TeamsGroupDetailsResponse
   >('/api/teamsGroup/details/'),
+  list: apiCall<
+    messages.TeamsGroupListRequest,
+    messages.TeamsGroupListResponse
+  >('/api/teamsGroup/list/'),
   removeTeam: apiCall<
     messages.TeamsGroupRemoveTeamRequest,
     messages.TeamsGroupRemoveTeamResponse

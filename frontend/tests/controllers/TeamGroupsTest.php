@@ -2,8 +2,6 @@
 
 /**
  * TeamGroupsTest
- *
- * @author juan.pablo
  */
 
 class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
