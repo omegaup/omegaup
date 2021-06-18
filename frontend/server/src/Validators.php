@@ -113,6 +113,20 @@ class Validators {
             );
         }
 
+        self::validateLengthInRange(
+            $parameter,
+            $parameterName,
+            $minLength,
+            $maxLength
+        );
+    }
+
+    public static function validateLengthInRange(
+        string $parameter,
+        string $parameterName,
+        ?int $minLength,
+        ?int $maxLength
+    ): void {
         if (!is_null($minLength) && strlen($parameter) < $minLength) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterStringTooShort',

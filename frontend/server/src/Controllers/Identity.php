@@ -416,9 +416,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
         ?string &$gender
     ): void {
         if (!is_null($name)) {
-            /** @var null|string $name */
             $name = trim($name);
-            \OmegaUp\Validators::validateStringOfLengthInRange(
+            \OmegaUp\Validators::validateLengthInRange(
                 $name,
                 'name',
                 1,
