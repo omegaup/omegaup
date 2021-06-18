@@ -13,7 +13,11 @@
                 <div class="input-group-prepend">
                   <div class="input-group-text">{{ groupName }}:</div>
                 </div>
-                <input v-model="identityName" class="form-control" />
+                <input
+                  v-model="identityName"
+                  class="form-control"
+                  data-identity-name
+                />
               </div>
             </label>
           </div>
@@ -150,9 +154,6 @@ export default class IdentityEdit extends Vue {
   }
   set identityName(username: string) {
     const teamUsername = this.selectedIdentity.username.split(':');
-    if (teamUsername.length === 2) {
-      this.selectedIdentity.username = `${this.groupName}:${username}`;
-    }
     this.selectedIdentity.username = `${this.groupName}:${username}`;
   }
 
