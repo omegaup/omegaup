@@ -153,7 +153,6 @@ export default class IdentityEdit extends Vue {
     return teamUsername[2];
   }
   set identityName(username: string) {
-    const teamUsername = this.selectedIdentity.username.split(':');
     this.selectedIdentity.username = `${this.groupName}:${username}`;
   }
 
