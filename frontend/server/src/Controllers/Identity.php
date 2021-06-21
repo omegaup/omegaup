@@ -359,7 +359,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 ) ? null : strval(
                     $teamIdentity['state_id']
                 );
-                $newIdentity = self::createIdentity(
+                $newIdentity = self::createIdentityTeam(
                     $teamIdentity['username'],
                     $teamIdentity['name'],
                     $teamIdentity['password'],
@@ -409,6 +409,89 @@ class Identity extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok'
         ];
+    }
+
+    private static function validateNameAndGenderIdentity(
+        ?string &$name,
+        ?string &$gender
+    ): void {
+        if (!is_null($name)) {
+            $name = trim($name);
+            \OmegaUp\Validators::validateLengthInRange(
+                $name,
+                'name',
+                1,
+                50
+            );
+        }
+
+        if (!is_null($gender)) {
+            $gender = trim($gender);
+        }
+        if (!empty($gender)) {
+            \OmegaUp\Validators::validateInEnum(
+                $gender,
+                'gender',
+                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS
+            );
+        }
+    }
+
+    public static function validateIdentityTeam(
+        ?string $username,
+        ?string &$name,
+        ?string &$gender,
+        string $groupAlias
+    ): void {
+        // Validate request
+        \OmegaUp\Validators::validateValidUsernameIdentityTeam(
+            $username,
+            'username'
+        );
+
+        // Check group is present
+        $identityUsername = explode(':', $username);
+        if (count($identityUsername) !== 3) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'username'
+            );
+        }
+        $namespace = $identityUsername[0];
+        $identityGroupAlias = $identityUsername[1];
+        if ($identityGroupAlias !== $groupAlias || $namespace !== 'teams') {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'teams_group_alias'
+            );
+        }
+
+        self::validateNameAndGenderIdentity($name, $gender);
+    }
+
+    private static function createIdentityTeam(
+        ?string $username,
+        ?string $name,
+        string $password,
+        ?string $countryId,
+        ?string $stateId,
+        ?string $gender,
+        string $aliasGroup
+    ): \OmegaUp\DAO\VO\Identities {
+        self::validateIdentityTeam($username, $name, $gender, $aliasGroup);
+
+        // Check password
+        \OmegaUp\SecurityTools::testStrongPassword($password);
+        $hashedPassword = \OmegaUp\SecurityTools::hashString($password);
+
+        return new \OmegaUp\DAO\VO\Identities([
+            'username' => $username,
+            'name' => $name,
+            'password' => $hashedPassword,
+            'country_id' => $countryId,
+            'state_id' => $stateId,
+            'gender' => $gender,
+        ]);
     }
 
     /**
@@ -766,7 +849,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
         $usernameOrEmail = $r->ensureString(
             'usernameOrEmail',
-            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+            fn (string $username) => \OmegaUp\Validators::usernameOrTeamUsernameOrEmail(
                 $username
             )
         );
@@ -850,27 +933,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        if (!is_null($name)) {
-            /** @var null|string $name */
-            $name = trim($name);
-            \OmegaUp\Validators::validateStringOfLengthInRange(
-                $name,
-                'name',
-                1,
-                50
-            );
-        }
-
-        if (!is_null($gender)) {
-            $gender = trim($gender);
-        }
-        if (!empty($gender)) {
-            \OmegaUp\Validators::validateInEnum(
-                $gender,
-                'gender',
-                \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS
-            );
-        }
+        self::validateNameAndGenderIdentity($name, $gender);
     }
 
     private static function createIdentity(

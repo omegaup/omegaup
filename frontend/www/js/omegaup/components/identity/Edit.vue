@@ -153,10 +153,7 @@ export default class IdentityEdit extends Vue {
     return teamUsername[2];
   }
   set identityName(username: string) {
-    const teamUsername = this.selectedIdentity.username.split(':');
-    if (teamUsername.length === 2) {
-      this.selectedIdentity.username = `${this.groupName}:${username}`;
-    }
+    this.selectedIdentity.username = `${this.groupName}:${username}`;
   }
 
   get countryStates(): iso3166.Subdivisions {
