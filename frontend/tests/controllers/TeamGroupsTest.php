@@ -454,6 +454,67 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount($numberOfGroups, $response['teamsGroups']);
     }
 
+    /**
+     * A PHPUnit data provider for tests to search teams group.
+     *
+     * @return list<list<array{0: string, 1: bool, 2: bbol, 3: bool}>>
+     */
+    public function teamsGroupQueryProvider(): array {
+        return [
+            // query to search, number of matches
+            ['teamsGroup', 2],
+            ['s_Group', 3],
+            ['Group', 10],
+            ['teams', 5],
+            ['teams-Group-', 1],
+            ['unmatched_string', 0],
+            ['_', 10],
+        ];
+    }
+
+    /**
+     * @dataProvider teamsGroupQueryProvider
+     */
+    public function testTeamsGroupsListForTypeahead(
+        string $query,
+        int $numberOfMatches
+    ) {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $string = substr(\OmegaUp\Test\Utils::createRandomString(), 0, 6);
+        $teamsGroupsMapping = [
+            "teamsGroup_{$string}",
+            "teamGroup_{$string}",
+            "teamsGroup{$string}",
+            "teamGroup{$string}",
+            "teams_Group_{$string}",
+            "team_Group_{$string}",
+            "teams-Group_{$string}",
+            "team-Group_{$string}",
+            "teams-Group-{$string}",
+            "team-Group-{$string}",
+        ];
+
+        $login = self::login($identity);
+        foreach ($teamsGroupsMapping as $teamsGroup) {
+            \OmegaUp\Controllers\TeamsGroup::apiCreate(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => \OmegaUp\Test\Utils::createRandomString(),
+                    'alias' => $teamsGroup,
+                    'description' => \OmegaUp\Test\Utils::createRandomString()
+                ])
+            );
+        }
+        $response = \OmegaUp\Controllers\TeamsGroup::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'query' => $query,
+            ])
+        )['results'];
+
+        $this->assertCount($numberOfMatches, $response);
+    }
+
     public function testTeamsIntoTeamsGroup() {
         // Identity creator group member will upload csv file
         [
