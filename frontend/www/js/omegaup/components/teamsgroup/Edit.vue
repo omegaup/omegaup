@@ -127,7 +127,6 @@ export default class TeamsGroupEdit extends Vue {
   @Prop() isOrganizer!: boolean;
   @Prop() tab!: AvailableTabs;
   @Prop({ default: () => [] }) teamsIdentities!: types.Identity[];
-  @Prop({ default: () => [] }) teamsIdentitiesCsv!: types.Identity[];
   @Prop() teamErrorRow!: null | string;
   @Prop() searchResultUsers!: types.ListItem[];
 
@@ -136,7 +135,6 @@ export default class TeamsGroupEdit extends Vue {
   AvailableTabs = AvailableTabs;
   selectedTab: AvailableTabs = this.tab;
   currentTeamsIdentities = this.teamsIdentities;
-  currentTeamsIdentitiesCsv = this.teamsIdentitiesCsv;
 
   @Watch('tab')
   onTabChanged(newValue: AvailableTabs): void {
@@ -150,11 +148,6 @@ export default class TeamsGroupEdit extends Vue {
   @Watch('teamsIdentities')
   onTeamsIdentitiesChanged(newValue: types.Identity[]): void {
     this.currentTeamsIdentities = newValue;
-  }
-
-  @Watch('teamsIdentitiesCsv')
-  onTeamsIdentitiesCsvChanged(newValue: types.Identity[]): void {
-    this.currentTeamsIdentitiesCsv = newValue;
   }
 }
 </script>
