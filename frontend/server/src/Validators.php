@@ -213,21 +213,6 @@ class Validators {
      * @param string $usernameOrEmail
      * @return boolean
      */
-    public static function usernameOrTeamUsernameOrEmail(string $usernameOrEmail): bool {
-        return (
-            self::email($usernameOrEmail)
-            || self::normalUsername($usernameOrEmail)
-            || self::identityUsername($usernameOrEmail)
-            || self::identityTeamUsername($usernameOrEmail)
-        );
-    }
-
-    /**
-     * Returns whether the username or email is valid.
-     *
-     * @param string $usernameOrEmail
-     * @return boolean
-     */
     public static function usernameOrEmail(string $usernameOrEmail): bool {
         return (
             self::email($usernameOrEmail)

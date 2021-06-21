@@ -1896,11 +1896,11 @@ export namespace types {
     alias: string;
     archived: boolean;
     available_languages: { [key: string]: string };
-    contest_for_teams: boolean;
     description: string;
     director: string;
     feedback: string;
     finish_time: Date;
+    has_submissions: boolean;
     languages: string[];
     needs_basic_information: boolean;
     opened: boolean;
