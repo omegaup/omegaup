@@ -213,11 +213,12 @@ class Validators {
      * @param string $usernameOrEmail
      * @return boolean
      */
-    public static function usernameOrEmail(string $usernameOrEmail): bool {
+    public static function usernameOrTeamUsernameOrEmail(string $usernameOrEmail): bool {
         return (
             self::email($usernameOrEmail)
             || self::normalUsername($usernameOrEmail)
             || self::identityUsername($usernameOrEmail)
+            || self::identityTeamUsername($usernameOrEmail)
         );
     }
 
@@ -227,12 +228,11 @@ class Validators {
      * @param string $usernameOrEmail
      * @return boolean
      */
-    public static function usernameOrTeamUsernameOrEmail(string $usernameOrEmail): bool {
+    public static function usernameOrEmail(string $usernameOrEmail): bool {
         return (
             self::email($usernameOrEmail)
             || self::normalUsername($usernameOrEmail)
             || self::identityUsername($usernameOrEmail)
-            || self::identityTeamUsername($usernameOrEmail)
         );
     }
 
