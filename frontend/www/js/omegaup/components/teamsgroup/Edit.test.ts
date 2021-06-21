@@ -14,7 +14,6 @@ describe('Edit.vue', () => {
     isOrganizer: true,
     tab: AvailableTabs.Teams,
     teamsIdentities: [] as types.Identity[],
-    teamsIdentitiesCsv: [] as types.Identity[],
   };
 
   it('Should handle edit view with empty teams list', () => {
@@ -45,25 +44,21 @@ describe('Edit.vue', () => {
     expect(wrapper.vm.selectedTab).toBe(AvailableTabs.Teams);
   });
 
-  it('Should change teams identities and team identities in csv lists', async () => {
+  it('Should change teams identities list', async () => {
     const wrapper = shallowMount(teamsgroup_Edit, {
       propsData,
     });
-    const identities: types.Identity[] = [
+    const teamsIdentities: types.Identity[] = [
       {
-        username: 'group:team 1',
-        name: 'group:team 1',
+        username: 'group:team-1',
+        name: 'team 1',
         country_id: 'MX',
         school_name: 'First school',
         state_id: 'AGU',
       },
     ];
 
-    await wrapper.setProps({
-      teamsIdentities: identities,
-      teamsIdentitiesCsv: identities,
-    });
-    expect(wrapper.vm.currentTeamsIdentities).toBe(identities);
-    expect(wrapper.vm.currentTeamsIdentitiesCsv).toBe(identities);
+    await wrapper.setProps({ teamsIdentities });
+    expect(wrapper.vm.currentTeamsIdentities).toBe(teamsIdentities);
   });
 });

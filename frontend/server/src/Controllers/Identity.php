@@ -359,7 +359,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 ) ? null : strval(
                     $teamIdentity['state_id']
                 );
-                $newIdentity = self::createIdentity(
+                $newIdentity = self::createIdentityTeam(
                     $teamIdentity['username'],
                     $teamIdentity['name'],
                     $teamIdentity['password'],
@@ -555,6 +555,31 @@ class Identity extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
         ];
+    }
+
+    private static function createIdentityTeam(
+        ?string $username,
+        ?string $name,
+        string $password,
+        ?string $countryId,
+        ?string $stateId,
+        ?string $gender,
+        string $aliasGroup
+    ): \OmegaUp\DAO\VO\Identities {
+        self::validateIdentityTeam($username, $name, $gender, $aliasGroup);
+
+        // Check password
+        \OmegaUp\SecurityTools::testStrongPassword($password);
+        $hashedPassword = \OmegaUp\SecurityTools::hashString($password);
+
+        return new \OmegaUp\DAO\VO\Identities([
+            'username' => $username,
+            'name' => $name,
+            'password' => $hashedPassword,
+            'country_id' => $countryId,
+            'state_id' => $stateId,
+            'gender' => $gender,
+        ]);
     }
 
     /**
@@ -899,7 +924,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
         $usernameOrEmail = $r->ensureString(
             'usernameOrEmail',
-            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+            fn (string $username) => \OmegaUp\Validators::usernameOrTeamUsernameOrEmail(
                 $username
             )
         );

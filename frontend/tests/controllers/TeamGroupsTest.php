@@ -2,8 +2,6 @@
 
 /**
  * TeamGroupsTest
- *
- * @author juan.pablo
  */
 
 class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
@@ -236,6 +234,8 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
+                    /*$password=*/ '',
+                    /*$forTeams=*/ true
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -264,7 +264,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertCount(2, $result);
             $teamUsername = $teamUsernames[$index];
             $this->assertEquals(
-                "{$teamGroup->alias}:{$teamUsername}",
+                "teams:{$teamGroup->alias}:{$teamUsername}",
                 $identity['username']
             );
             $this->assertStringContainsString('Team', $identity['name']);
@@ -296,6 +296,8 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                         'team_identities.csv',
                         $teamGroup->alias,
+                        /*$password=*/ '',
+                        /*$forTeams=*/ true
                     ),
                     'team_group_alias' => $teamGroup->alias,
                 ])
@@ -328,6 +330,8 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                         'team_identities.csv',
                         $teamGroup->alias,
+                        /*$password=*/ '',
+                        /*$forTeams=*/ true
                     ),
                     'team_group_alias' => 'fake_alias',
                 ])
@@ -360,6 +364,8 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                         'malformed_team_identities.csv',
                         $teamGroup->alias,
+                        /*$password=*/ '',
+                        /*$forTeams=*/ true
                     ),
                     'team_group_alias' => $teamGroup->alias,
                 ])
@@ -392,6 +398,8 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                         'duplicated_team_identities.csv',
                         $teamGroup->alias,
+                        /*$password=*/ '',
+                        /*$forTeams=*/ true
                     ),
                     'team_group_alias' => $teamGroup->alias,
                 ])
@@ -484,6 +492,8 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
+                    /*$password=*/ '',
+                    /*$forTeams=*/ true
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -512,7 +522,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertCount(2, $result);
             $teamUsername = $teamUsernames[$index];
             $this->assertEquals(
-                "{$teamGroup->alias}:{$teamUsername}",
+                "teams:{$teamGroup->alias}:{$teamUsername}",
                 $identity['username']
             );
             $this->assertStringContainsString('Team', $identity['name']);
@@ -539,7 +549,9 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $creatorLogin->auth_token,
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
-                    $teamGroup->alias
+                    $teamGroup->alias,
+                    /*$password=*/ '',
+                    /*$forTeams=*/ true
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
@@ -634,6 +646,8 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
+                    /*$password=*/ '',
+                    /*$forTeams=*/ true
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])
