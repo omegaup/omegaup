@@ -67,6 +67,30 @@ const carouselConfig: {
       href: '/course/introduccion_a_cpp/',
     },
   },
+  {
+    image: '/media/homepage/carousel_slide_3.svg',
+    title: {
+      en: 'Solve a new problem every week',
+      es: 'Resuelve un problema nuevo cada semana',
+      pt: 'Resolva um novo problema a cada semana?',
+    },
+    description: {
+      en:
+        'Enroll in the "Solving problems in omegaUp" course, learn tips about programming contests and earn prizes.',
+      es:
+        'Únete al curso "Resolviendo problemas en omegaUp", aprende tips sobre concursos de programación y gana premios.',
+      pt:
+        'Inscreva-se no curso "Resolvendo problemas no omegaUp", aprenda dicas sobre concursos de programação e ganhe prêmios.',
+    },
+    button: {
+      text: {
+        en: 'Enter here',
+        es: 'Ingresa aquí',
+        pt: 'Entre aqui',
+      },
+      href: 'https://omegaup.com/course/ResolviendoProblemas2021/',
+    },
+  },
 ];
 
 export default carouselConfig;
