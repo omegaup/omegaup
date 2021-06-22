@@ -72,7 +72,7 @@ const carouselConfig: {
     title: {
       en: 'Solve a new problem every week',
       es: 'Resuelve un problema nuevo cada semana',
-      pt: 'Resolva um novo problema a cada semana?',
+      pt: 'Resolva um novo problema a cada semana',
     },
     description: {
       en:
