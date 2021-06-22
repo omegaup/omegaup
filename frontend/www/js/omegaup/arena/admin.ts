@@ -2,7 +2,7 @@ import * as api from '../api';
 import T from '../lang';
 import { Arena, GetOptionsFromLocation } from './arena';
 import ArenaAdmin from './admin_arena';
-import { omegaup, OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup';
 import * as ui from '../ui';
 import * as time from '../time';
 
@@ -42,7 +42,7 @@ OmegaUp.on('ready', () => {
         }
 
         $('#title .contest-title').text(ui.contestTitle(contest));
-        arenaInstance.updateSummary(contest as omegaup.Contest);
+        arenaInstance.updateSummary(contest);
 
         arenaInstance.submissionGap = contest.submissions_gap;
         if (!(arenaInstance.submissionGap > 0)) arenaInstance.submissionGap = 0;
@@ -50,33 +50,37 @@ OmegaUp.on('ready', () => {
         arenaInstance.initProblemsetId(contest);
         arenaInstance.initProblems(contest);
         arenaInstance.initClock(contest.start_time, contest.finish_time, null);
-        for (const idx in contest.problems) {
-          const problem = contest.problems[idx];
-          const problemName = `${problem.letter}. ${ui.escape(problem.title)}`;
+        if (contest.problems) {
+          for (const idx in contest.problems) {
+            const problem = contest.problems[idx];
+            const problemName = `${problem.letter}. ${ui.escape(
+              problem.title,
+            )}`;
 
-          arenaInstance.problems[problem.alias] = {
-            ...problem,
-            languages: problem.languages
-              .split(',')
-              .filter((language) => language !== ''),
-          };
-          if (arenaInstance.navbarProblems) {
-            arenaInstance.navbarProblems.problems.push({
-              alias: problem.alias,
-              acceptsSubmissions: true,
-              text: problemName,
-              bestScore: 0,
-              maxScore: 0,
-              hasRuns: false,
-            });
+            arenaInstance.problems[problem.alias] = {
+              ...problem,
+              languages: problem.languages
+                .split(',')
+                .filter((language) => language !== ''),
+            };
+            if (arenaInstance.navbarProblems) {
+              arenaInstance.navbarProblems.problems.push({
+                alias: problem.alias,
+                acceptsSubmissions: true,
+                text: problemName,
+                bestScore: 0,
+                maxScore: 0,
+                hasRuns: false,
+              });
+            }
+
+            $('#clarification select[name=problem]').append(
+              `<option value="${problem.alias}">${problemName}</option>`,
+            );
+            $('select.runsproblem').append(
+              `<option value="${problem.alias}">${problemName}</option>`,
+            );
           }
-
-          $('#clarification select[name=problem]').append(
-            `<option value="${problem.alias}">${problemName}</option>`,
-          );
-          $('select.runsproblem').append(
-            `<option value="${problem.alias}">${problemName}</option>`,
-          );
         }
 
         api.Contest.users({

@@ -1,4 +1,4 @@
-import { omegaup, OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
 import contest_NewForm from '../components/contest/NewForm.vue';
@@ -28,7 +28,7 @@ OmegaUp.on('ready', () => {
           invalidParameterName: this.invalidParameterName,
         },
         on: {
-          'create-contest': (contest: omegaup.Contest): void => {
+          'create-contest': (contest: types.ContestAdminDetails): void => {
             api.Contest.create(contest)
               .then(() => {
                 this.invalidParameterName = null;

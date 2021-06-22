@@ -1,6 +1,14 @@
-import { omegaup } from './omegaup';
 import { Optional } from 'typescript-optional';
 import { types } from './api_types';
+
+export interface DataContestResult {
+  data: {
+    alias: string;
+    title: string;
+  };
+  length?: string;
+  place: number;
+}
 
 export interface LinkableResource {
   toString(): string;
@@ -13,7 +21,7 @@ export class ContestResult implements LinkableResource {
   title: string = '';
   place: number = 0;
 
-  constructor(contestResult: omegaup.ContestResult) {
+  constructor(contestResult: DataContestResult) {
     this.alias = contestResult.data.alias;
     this.title = contestResult.data.title;
     this.place = contestResult.place;
