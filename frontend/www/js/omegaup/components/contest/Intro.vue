@@ -138,7 +138,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -152,7 +151,7 @@ import omegaup_Markdown from '../Markdown.vue';
   },
 })
 export default class ContestIntro extends Vue {
-  @Prop() contest!: omegaup.Contest;
+  @Prop() contest!: types.ContestAdminDetails;
   @Prop() isLoggedIn!: boolean;
   @Prop() requestsUserInformation!: string;
   @Prop() needsBasicInformation!: boolean;
