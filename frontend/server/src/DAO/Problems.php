@@ -919,13 +919,14 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
-     * @return null|array{name: string, email: string}
+     * @return null|array{name: string, email: string, user_id: int}
      */
     public static function getAdminUser(\OmegaUp\DAO\VO\Problems $problem): ?array {
         $sql = '
             SELECT DISTINCT
                 e.email,
-                i.name
+                i.name,
+                u.user_id
             FROM
                 ACLs a
             INNER JOIN
@@ -946,7 +947,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                1;
         ';
         $params = [$problem->acl_id];
-        /** @var array{email: null|string, name: null|string}|null */
+        /** @var array{email: null|string, name: null|string, user_id: int}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
@@ -955,6 +956,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         return [
             'name' => strval($row['name']),
             'email' => strval($row['email']),
+            'user_id' => intval($row['user_id']),
         ];
     }
 

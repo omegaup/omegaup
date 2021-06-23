@@ -855,18 +855,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
         [
             'email' => $email,
-            'name' => $username,
+            'name' => $name,
+            'user_id' => $userId,
         ] = $adminUser;
-        $user = \OmegaUp\DAO\Identities::findByEmail($email);
-
-        if (is_null($user)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-        }
 
         $emailParams = [
             'reason' => htmlspecialchars($rationale),
             'problem_name' => htmlspecialchars(strval($problem->title)),
-            'user_name' => $username,
+            'user_name' => $name,
         ];
 
         if ($status == 'banned') {
@@ -911,7 +907,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\DAO\Base\Notifications::create(
             new \OmegaUp\DAO\VO\Notifications([
-                'user_id' => $user->user_id,
+                'user_id' => $userId,
                 'contents' =>  json_encode(
                     [
                         'type' => \OmegaUp\DAO\Notifications::DEMOTION,
