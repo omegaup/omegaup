@@ -349,8 +349,6 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
 
         $query = $r->ensureString('query');
 
-        return [
-            'results' => \OmegaUp\DAO\TeamGroups::findByNameOrAlias($query),
-        ];
+        return \OmegaUp\DAO\TeamGroups::findByNameOrAlias($query);
     }
 }
