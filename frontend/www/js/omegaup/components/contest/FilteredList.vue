@@ -89,14 +89,14 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
+import { types } from '../../api_types';
 
 @Component
 export default class FilteredList extends Vue {
-  @Prop() contests!: omegaup.Contest[];
+  @Prop() contests!: types.ContestAdminDetails[];
   @Prop() showTimes!: boolean;
   @Prop() showPractice!: boolean;
   @Prop() showVirtual!: boolean;
@@ -113,7 +113,7 @@ export default class FilteredList extends Vue {
     return Math.ceil(this.contests.length / this.pageSize);
   }
 
-  get page(): omegaup.Contest[] {
+  get page(): types.ContestAdminDetails[] {
     let first = (this.pageNumber - 1) * this.pageSize;
     return this.contests.slice(first, first + this.pageSize);
   }

@@ -1,4 +1,4 @@
-import { omegaup, OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
 import contest_NewForm from '../components/contest/NewForm.vue';
@@ -34,7 +34,7 @@ OmegaUp.on('ready', () => {
             contest,
             teamsGroupAlias,
           }: {
-            contest: omegaup.Contest;
+            contest: types.ContestAdminDetails;
             teamsGroupAlias?: string;
           }): void => {
             api.Contest.create({
