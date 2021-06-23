@@ -390,135 +390,30 @@ export namespace types {
     ): types.ContestListPayload {
       return ((x) => {
         x.contests = ((x) => {
-          x.current = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              x.finish_time = ((x: number) => new Date(x * 1000))(
-                x.finish_time,
-              );
-              x.last_updated = ((x: number) => new Date(x * 1000))(
-                x.last_updated,
-              );
-              x.original_finish_time = ((x: number) => new Date(x * 1000))(
-                x.original_finish_time,
-              );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.current);
-          x.future = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              x.finish_time = ((x: number) => new Date(x * 1000))(
-                x.finish_time,
-              );
-              x.last_updated = ((x: number) => new Date(x * 1000))(
-                x.last_updated,
-              );
-              x.original_finish_time = ((x: number) => new Date(x * 1000))(
-                x.original_finish_time,
-              );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.future);
-          if (x.participating)
-            x.participating = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                x.finish_time = ((x: number) => new Date(x * 1000))(
-                  x.finish_time,
-                );
-                x.last_updated = ((x: number) => new Date(x * 1000))(
-                  x.last_updated,
-                );
-                x.original_finish_time = ((x: number) => new Date(x * 1000))(
-                  x.original_finish_time,
-                );
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
-                );
-                return x;
-              });
-            })(x.participating);
-          x.past = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              x.finish_time = ((x: number) => new Date(x * 1000))(
-                x.finish_time,
-              );
-              x.last_updated = ((x: number) => new Date(x * 1000))(
-                x.last_updated,
-              );
-              x.original_finish_time = ((x: number) => new Date(x * 1000))(
-                x.original_finish_time,
-              );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.past);
-          x.public = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              x.finish_time = ((x: number) => new Date(x * 1000))(
-                x.finish_time,
-              );
-              x.last_updated = ((x: number) => new Date(x * 1000))(
-                x.last_updated,
-              );
-              x.original_finish_time = ((x: number) => new Date(x * 1000))(
-                x.original_finish_time,
-              );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.public);
-          x.recommended_current = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              x.finish_time = ((x: number) => new Date(x * 1000))(
-                x.finish_time,
-              );
-              x.last_updated = ((x: number) => new Date(x * 1000))(
-                x.last_updated,
-              );
-              x.original_finish_time = ((x: number) => new Date(x * 1000))(
-                x.original_finish_time,
-              );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.recommended_current);
-          x.recommended_past = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              x.finish_time = ((x: number) => new Date(x * 1000))(
-                x.finish_time,
-              );
-              x.last_updated = ((x: number) => new Date(x * 1000))(
-                x.last_updated,
-              );
-              x.original_finish_time = ((x: number) => new Date(x * 1000))(
-                x.original_finish_time,
-              );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.recommended_past);
+          if (x instanceof Object) {
+            Object.keys(x).forEach(
+              (y) =>
+                (x[y] = ((x) => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map((x) => {
+                    x.finish_time = ((x: number) => new Date(x * 1000))(
+                      x.finish_time,
+                    );
+                    x.last_updated = ((x: number) => new Date(x * 1000))(
+                      x.last_updated,
+                    );
+                    x.original_finish_time = ((x: number) =>
+                      new Date(x * 1000))(x.original_finish_time);
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x[y])),
+            );
+          }
           return x;
         })(x.contests);
         return x;
@@ -1624,6 +1519,16 @@ export namespace types {
     start_time: Date;
   }
 
+  export interface ArenaContest {
+    alias: string;
+    director: string;
+    finish_time?: Date;
+    rerun_id?: number;
+    start_time?: Date;
+    title: string;
+    window_length?: number;
+  }
+
   export interface ArenaProblemDetails {
     accepts_submissions: boolean;
     alias: string;
@@ -1641,6 +1546,28 @@ export namespace types {
     statement?: types.ProblemStatement;
     title: string;
     visibility: number;
+  }
+
+  export interface ArenaProblemset {
+    admin?: boolean;
+    admission_mode?: string;
+    alias?: string;
+    courseAssignments?: types.CourseAssignment[];
+    director?: string;
+    feedback?: string;
+    finish_time?: Date;
+    name?: string;
+    opened?: boolean;
+    original_contest_alias?: string;
+    original_problemset_id?: number;
+    problems?: types.ProblemsetProblem[];
+    problemset_id?: number;
+    requests_user_information?: string;
+    show_penalty?: boolean;
+    start_time?: Date;
+    submission_deadline?: Date;
+    submissions_gap?: number;
+    title?: string;
   }
 
   export interface AssignmentDetailsPayload {
@@ -1911,7 +1838,7 @@ export namespace types {
     penalty_calc_policy: string;
     penalty_type: string;
     points_decay_factor: number;
-    problems: types.ProblemsetProblem[];
+    problems?: types.ProblemsetProblem[];
     problemset_id: number;
     requests_user_information: string;
     rerun_id?: number;
@@ -1932,6 +1859,7 @@ export namespace types {
     admission_mode: string;
     alias: string;
     archived: boolean;
+    contest_for_teams: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -2037,15 +1965,7 @@ export namespace types {
   }
 
   export interface ContestListPayload {
-    contests: {
-      current: types.ContestListItem[];
-      future: types.ContestListItem[];
-      participating?: types.ContestListItem[];
-      past: types.ContestListItem[];
-      public: types.ContestListItem[];
-      recommended_current: types.ContestListItem[];
-      recommended_past: types.ContestListItem[];
-    };
+    contests: types.TimeTypeContests;
     isLogged: boolean;
     query: string;
   }
@@ -2887,27 +2807,15 @@ export namespace types {
     admin?: boolean;
     admission_mode?: string;
     alias?: string;
+    archived?: boolean;
     assignment_type?: string;
     contest_alias?: string;
-    courseAssignments?: {
-      alias: string;
-      assignment_type: string;
-      description: string;
-      finish_time?: Date;
-      has_runs: boolean;
-      max_points: number;
-      name: string;
-      order: number;
-      problemset_id: number;
-      publish_time_delay?: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-      start_time: Date;
-    }[];
+    courseAssignments?: types.CourseAssignment[];
     description?: string;
     director?: string;
     feedback?: string;
     finish_time?: Date;
+    has_submissions?: boolean;
     languages?: string[];
     name?: string;
     needs_basic_information?: boolean;
@@ -2922,7 +2830,10 @@ export namespace types {
     problems?: types.ProblemsetProblem[];
     problemset_id?: number;
     requests_user_information?: string;
+    rerun_id?: number;
     scoreboard?: number;
+    scoreboard_url?: string;
+    scoreboard_url_admin?: string;
     show_penalty?: boolean;
     show_scoreboard_after?: boolean;
     start_time?: Date;
@@ -3336,6 +3247,10 @@ export namespace types {
 
   export interface TeamsGroupListPayload {
     teamsGroups: types.TeamsGroup[];
+  }
+
+  export interface TimeTypeContests {
+    [key: string]: types.ContestListItem[];
   }
 
   export interface UserDetailsPayload {
