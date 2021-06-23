@@ -4321,7 +4321,7 @@ export namespace messages {
     };
   };
   export type TeamsGroupListRequest = { [key: string]: any };
-  export type TeamsGroupListResponse = { results: types.ListItem[] };
+  export type TeamsGroupListResponse = types.ListItem[];
   export type TeamsGroupRemoveTeamRequest = { [key: string]: any };
   export type TeamsGroupRemoveTeamResponse = {};
   export type TeamsGroupTeamsRequest = { [key: string]: any };

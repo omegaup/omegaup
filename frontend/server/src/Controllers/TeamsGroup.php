@@ -341,7 +341,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $query
      *
-     * @return array{results: list<ListItem>}
+     * @return list<ListItem>
      */
     public static function apiList(\OmegaUp\Request $r): array {
         // Authenticate user

@@ -3990,9 +3990,9 @@ since it is used by typeahead.
 
 ### Returns
 
-| Name      | Type               |
-| --------- | ------------------ |
-| `results` | `types.ListItem[]` |
+```typescript
+types.ListItem[]
+```
 
 ## `/api/teamsGroup/removeTeam/`
 
