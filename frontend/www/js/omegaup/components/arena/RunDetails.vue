@@ -1,7 +1,9 @@
 <template>
   <form data-run-details-view>
     <div v-if="data">
-      <button class="close">❌</button>
+      <div class="close-container">
+        <button class="close">❌</button>
+      </div>
       <div v-if="inCourse">
         <h3>{{ T.feedbackTitle }}</h3>
         <pre>{{
@@ -299,6 +301,10 @@ export default class ArenaRunDetails extends Vue {
     flex-direction: column;
 
     .close-container {
+      position: sticky;
+      position: -webkit-sticky;
+      top: 0;
+      z-index: 100;
       width: 100%;
 
       .close {

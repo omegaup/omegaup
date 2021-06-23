@@ -36,6 +36,11 @@ div[data-overlay-popup] {
   z-index: -1;
 
   .close-container {
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    z-index: 100;
+
     .close {
       background-color: transparent;
       border: none;

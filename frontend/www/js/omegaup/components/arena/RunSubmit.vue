@@ -268,6 +268,10 @@ form[data-run-submit] {
   z-index: -1;
 
   .close-container {
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    z-index: 100;
     width: 100%;
 
     .close {
