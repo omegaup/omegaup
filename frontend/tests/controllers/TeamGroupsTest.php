@@ -510,7 +510,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'query' => $query,
             ])
-        )['results'];
+        );
 
         $this->assertCount($numberOfMatches, $response);
     }
