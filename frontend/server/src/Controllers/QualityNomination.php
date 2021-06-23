@@ -685,24 +685,19 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     public static function apiResolve(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
-        $status = $r->ensureEnum(
-            'status',
-            ['open', 'resolved', 'banned', 'warning']
-        );
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['rationale'],
-            'rationale'
-        );
         // Validate request
         $r->ensureMainUserIdentity();
         self::validateMemberOfReviewerGroup($r);
 
-        \OmegaUp\Validators::validateNumber(
-            $r['qualitynomination_id'],
-            'qualitynomination_id'
+        $status = $r->ensureEnum(
+            'status',
+            ['open', 'resolved', 'banned', 'warning']
         );
+        $rationale = $r->ensureString('rationale');
+
+        $qualityNominationId = $r->ensureInt('qualitynomination_id');
         $qualitynomination = \OmegaUp\DAO\QualityNominations::getByPK(
-            intval($r['qualitynomination_id'])
+            $qualityNominationId
         );
         if (is_null($qualitynomination)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -805,14 +800,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                         'qualitynomination_id' => $nomination->qualitynomination_id,
                         'from_status' => $nomination->status,
                         'to_status' => $status,
-                        'rationale' => $r['rationale']
+                        'rationale' => $rationale
                     ])
                 );
                 /**
                 * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
                 */
                 $contents = json_decode($nomination->contents ?? '{}', true);
-                $contents['rationale'] = $r['rationale'];
+                $contents['rationale'] = $rationale;
                 $nomination->contents = json_encode($contents);
                 $nomination->status = $status;
                 \OmegaUp\DAO\QualityNominations::update($nomination);
@@ -821,7 +816,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 self::sendNotificationEmail(
                     $problem,
                     $qualitynomination,
-                    $r['rationale'] ?? '',
+                    $rationale,
                     $status
                 );
             }
@@ -862,7 +857,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'email' => $email,
             'name' => $username,
         ] = $adminUser;
-        $user = \OmegaUp\DAO\Identities::findByUsername($username);
+        $user = \OmegaUp\DAO\Identities::findByEmail($email);
+
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
@@ -1157,11 +1153,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         // Validate request
         $r->ensureMainUserIdentity();
 
-        $r->ensureInt('qualitynomination_id');
-        return self::getDetails(
-            $r->identity,
-            intval($r['qualitynomination_id'])
-        );
+        $qualityNominationId = $r->ensureInt('qualitynomination_id');
+        return self::getDetails($r->identity, $qualityNominationId);
     }
 
     /**
@@ -1258,9 +1251,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
-        $r->ensureInt('qualitynomination_id');
-
-        $qualityNominationId = intval($r['qualitynomination_id']);
+        $qualityNominationId = $r->ensureInt('qualitynomination_id');
 
         return [
             'smartyProperties' => [
