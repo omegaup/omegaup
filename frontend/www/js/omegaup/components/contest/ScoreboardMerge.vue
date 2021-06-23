@@ -9,7 +9,11 @@
           multiple="multiple"
           size="10"
         >
-          <option v-for="contest in availableContests" :value="contest.alias">
+          <option
+            v-for="contest in availableContests"
+            :key="contest.alias"
+            :value="contest.alias"
+          >
             {{ ui.contestTitle(contest) }}
           </option>
         </select>
@@ -25,14 +29,14 @@
           <td>
             <strong>{{ T.username }}</strong>
           </td>
-          <td v-for="alias in aliases" colspan="2">
+          <td v-for="alias in aliases" :key="alias" colspan="2">
             <strong>{{ alias }}</strong>
           </td>
           <td colspan="2">
             <strong>{{ T.wordsTotal }}</strong>
           </td>
         </tr>
-        <tr v-for="rank in scoreboard">
+        <tr v-for="rank in scoreboard" :key="rank.username">
           <td>
             <strong>{{ rank.place }}</strong>
           </td>
@@ -44,7 +48,7 @@
               {{ rank.username != rank.name ? rank.name : ' ' }}
             </div>
           </td>
-          <td v-for="alias in aliases" class="numeric" colspan="2">
+          <td v-for="alias in aliases" :key="alias" class="numeric" colspan="2">
             {{ rank.contests[alias].points
             }}<span v-if="showPenalty" class="scoreboard-penalty"
               >({{ rank.contests[alias].penalty }})</span
@@ -76,14 +80,22 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
+import { types } from '../../api_types';
+
+interface Scoreboard {
+  contests: types.ContestAdminDetails[];
+  name: string;
+  place: number;
+  totalPenalty: number;
+  totalPoints: number;
+}
 
 @Component
 export default class ScoreboardMerge extends Vue {
-  @Prop() availableContests!: omegaup.Contest[];
-  @Prop() scoreboard!: omegaup.Scoreboard[];
+  @Prop() availableContests!: types.ContestAdminDetails[];
+  @Prop() scoreboard!: Scoreboard[];
   @Prop() showPenalty!: boolean;
   @Prop() aliases!: Array<string>;
 

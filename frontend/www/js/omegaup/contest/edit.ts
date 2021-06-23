@@ -1,4 +1,4 @@
-import { omegaup, OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
 import T from '../lang';
@@ -163,7 +163,7 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'update-contest': function (contest: omegaup.Contest) {
+          'update-contest': function (contest: types.ContestAdminDetails) {
             api.Contest.update(
               Object.assign({}, contest, {
                 contest_alias: contest.alias,

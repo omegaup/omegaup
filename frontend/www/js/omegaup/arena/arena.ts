@@ -143,7 +143,7 @@ export class Arena {
   };
 
   // The current problemset.
-  currentProblemset: types.Problemset | null = null;
+  currentProblemset: types.ArenaProblemset | null = null;
 
   // The interval for clock updates.
   clockInterval: ReturnType<typeof setTimeout> | null = null;
@@ -295,7 +295,7 @@ export class Arena {
       })
     | null = null;
 
-  summaryView: Vue & { contest: omegaup.Contest };
+  summaryView: Vue & { contest: types.ArenaContest };
 
   rankingChart: Highcharts.StockChart | null = null;
 
@@ -744,7 +744,7 @@ export class Arena {
     }
   }
 
-  initProblemsetId(problemset: types.Problemset): void {
+  initProblemsetId(problemset: types.ArenaProblemset): void {
     if (!problemset.problemset_id) {
       return;
     }
@@ -803,7 +803,7 @@ export class Arena {
     }
   }
 
-  problemsetLoaded(problemset: types.Problemset): void {
+  problemsetLoaded(problemset: types.ArenaProblemset): void {
     if (typeof problemset.problemset_id !== 'undefined') {
       this.options.problemsetId = problemset.problemset_id;
     }
@@ -819,13 +819,10 @@ export class Arena {
     $('#title .contest-title').text(problemset.title ?? problemset.name ?? '');
     this.updateSummary({
       ...problemset,
-      alias: problemset.alias as string,
-      title: problemset.title as string,
-      start_time: problemset.start_time as Date,
-      admission_mode: problemset.admission_mode as
-        | omegaup.AdmissionMode
-        | undefined,
-      requests_user_information: problemset.requests_user_information,
+      alias: problemset.alias ?? '',
+      title: problemset.title ?? '',
+      start_time: problemset.start_time,
+      director: problemset.director ?? '',
     });
     this.submissionGap = Math.max(0, problemset.submissions_gap ?? 60);
 
@@ -901,7 +898,7 @@ export class Arena {
     }
   }
 
-  initProblems(problemset: types.Problemset): void {
+  initProblems(problemset: types.ArenaProblemset): void {
     this.currentProblemset = problemset;
     this.problemsetAdmin = problemset.admin ?? false;
     this.myRunsList.isProblemsetOpened =
@@ -2105,7 +2102,7 @@ export class Arena {
       });
   }
 
-  updateSummary(contest: omegaup.Contest): void {
+  updateSummary(contest: types.ArenaContest): void {
     this.summaryView.contest = contest;
   }
 
@@ -2331,7 +2328,7 @@ export function GetOptionsFromLocation(
   if (document.getElementById('payload')) {
     const payload = types.payloadParsers.CommonPayload() as types.CommonPayload & {
       shouldShowFirstAssociatedIdentityRunWarning?: boolean;
-      contest?: omegaup.Contest;
+      contest?: types.ContestAdminDetails;
       preferred_language?: string;
     };
     if (payload !== null) {

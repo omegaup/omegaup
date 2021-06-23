@@ -55,7 +55,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="contest in contests">
+        <tr v-for="contest in contests" :key="contest.alias">
           <td v-if="isAdmin">
             <input
               :id="contest.alias"
@@ -172,13 +172,13 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
+import { types } from '../../api_types';
 
 @Component
 export default class List extends Vue {
-  @Prop() contests!: omegaup.Contest[];
+  @Prop() contests!: types.ContestAdminDetails[];
   @Prop() isAdmin!: boolean;
   @Prop() title!: string;
 
