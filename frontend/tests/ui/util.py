@@ -100,6 +100,29 @@ def add_students(driver, users, *, tab_xpath,
                  '%s//a[text()="%s"]' % (container_xpath, user))))
 
 
+def add_students_to_contest(driver, users, *, tab_xpath, container_xpath,
+                            parent_selector, submit_locator):
+    '''Add students to a recently created contest.'''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, tab_xpath))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH, container_xpath)))
+
+    for user in users:
+        driver.typeahead_helper_v2(parent_selector, user)
+
+        with dismiss_status(driver):
+            driver.wait.until(
+                EC.element_to_be_clickable(submit_locator)).click()
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '%s//a[text()="%s"]' % (container_xpath, user))))
+
+
 @contextlib.contextmanager
 def dismiss_status(driver, *, message_class='', already_opened=False):
     '''Closes the status bar and waits for it to disappear.'''
@@ -509,3 +532,43 @@ def add_identities_group(driver, group_alias):
                 identity.username, uploaded_identities[i]))
 
     return identities
+
+
+def show_run_details(driver, *, table_classname: str, dropdown_classname: str,
+                     code: str, has_been_migrated: bool) -> None:
+    '''It shows details popup for a certain submission.'''
+
+    driver.wait.until(EC.element_to_be_clickable(
+        (By.XPATH, ('//a[contains(@href, "#runs")]')))).click()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             '//table[contains(concat(" ", normalize-space(@class), " "), "'
+             ' %s ")]/tbody/tr/td/div[contains(concat(" ", '
+             'normalize-space(@class), " "), " dropdown ")]/button'
+             % table_classname))).click()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             '//table[contains(concat(" ", normalize-space(@class), " "), '
+             '" %s ")]/tbody/tr/td/div[contains(concat(" ", '
+             'normalize-space(@class), " "), " %s ")]/ul/li['
+             '@data-actions-details]/button'
+             % (table_classname, dropdown_classname)))).click()
+
+    assert (('show-run:') in
+            driver.browser.current_url), driver.browser.current_url
+
+    # It should be removed when everything is migrated
+    if has_been_migrated:
+        selector = '.show form[data-run-details-view] .CodeMirror-code'
+    else:
+        selector = 'form[data-run-details-view] .CodeMirror-code'
+
+    code_element = driver.wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, selector)))
+    code_text = code_element.get_attribute('innerText')
+
+    assert ((code) in code_text), code_text

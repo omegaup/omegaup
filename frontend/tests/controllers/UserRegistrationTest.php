@@ -2,8 +2,6 @@
 
 /**
  * Testing new user special cases
- *
- * @author alanboy@omegaup.com
  */
 class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     /**

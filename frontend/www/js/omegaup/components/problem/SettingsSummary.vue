@@ -106,24 +106,29 @@ export default class ProblemSettingsSummary extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .panel {
   .title {
     text-align: center;
     font-size: 1.5em;
     margin: 1em;
   }
+
   table {
     width: 30em;
     margin: 10px auto;
+
     td {
       text-align: center;
     }
+
     th[scope='row'] {
       font-weight: bold;
     }
+
     td,
     th[scope='row'] {
-      border: 1px solid #000;
+      border: 1px solid var(--arena-settings-summary-panel-th-border-color);
       padding: 2px;
     }
   }

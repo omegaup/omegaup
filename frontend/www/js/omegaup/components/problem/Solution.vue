@@ -3,6 +3,7 @@
     <omegaup-markdown
       v-if="showSolution"
       :markdown="solution.markdown"
+      :source-mapping="solution.sources"
       :image-mapping="solution.images"
     ></omegaup-markdown>
     <div v-else class="interstitial">

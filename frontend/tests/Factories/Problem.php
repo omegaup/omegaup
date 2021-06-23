@@ -148,7 +148,7 @@ class Problem {
                     str_replace(' ', '-', $params->title)
                 ),
                 0,
-                32
+                \OmegaUp\Validators::ALIAS_MAX_LENGTH
             ),
             'author_username' => $params->author->username,
             'validator' => $params->validator,
@@ -201,7 +201,7 @@ class Problem {
     public static function createProblem(
         ?\OmegaUp\Test\Factories\ProblemParams $params = null,
         \OmegaUp\Test\ScopedLoginToken $login = null
-    ) {
+    ): array {
         if (is_null($params)) {
             $params = new \OmegaUp\Test\Factories\ProblemParams();
         }

@@ -4,8 +4,6 @@ namespace OmegaUp\Controllers;
 
 /**
  * Controllers parent class
- *
- * @author joemmanuel
  */
 class Controller {
     /** @var \Logger */

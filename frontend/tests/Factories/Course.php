@@ -90,7 +90,7 @@ class Course {
         ?int $assignmentDuration = 120,
         ?string $courseAlias = null,
         ?bool $needsBasicInformation = false
-    ) {
+    ): array {
         if (is_null($admin)) {
             ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
             $adminLogin = \OmegaUp\Test\ControllerTestCase::login($admin);

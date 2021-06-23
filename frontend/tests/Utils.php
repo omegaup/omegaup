@@ -4,8 +4,6 @@ namespace OmegaUp\Test;
 
 /**
  * Test utils
- *
- * @author joemmanuel
  */
 class Utils {
     /** @var bool */
@@ -202,6 +200,7 @@ class Utils {
             'ACLs',
             'Assignments',
             'Auth_Tokens',
+            'API_Tokens',
             'Clarifications',
             'Coder_Of_The_Month',
             'Contest_Log',
@@ -242,6 +241,8 @@ class Utils {
             'School_Of_The_Month',
             'Submissions',
             'Submission_Log',
+            'Team_Groups',
+            'Teams',
             'User_Roles',
             'User_Rank',
             'Users',

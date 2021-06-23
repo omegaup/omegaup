@@ -4,6 +4,7 @@ import { Arena, GetOptionsFromLocation } from './arena';
 import ArenaAdmin from './admin_arena';
 import { omegaup, OmegaUp } from '../omegaup';
 import * as ui from '../ui';
+import * as time from '../time';
 
 OmegaUp.on('ready', () => {
   const arenaInstance = new Arena(GetOptionsFromLocation(window.location));
@@ -27,6 +28,7 @@ OmegaUp.on('ready', () => {
     api.Contest.adminDetails({
       contest_alias: arenaInstance.options.contestAlias,
     })
+      .then(time.remoteTimeAdapter)
       .then((contest) => {
         if (!contest.admin) {
           if (!OmegaUp.loggedIn) {

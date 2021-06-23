@@ -1,34 +1,34 @@
 # -*- coding: utf-8 -*-
-# type: ignore
 '''A tool that helps update the DAOs.'''
 
 from __future__ import print_function
 
 import datetime
 import os
-from typing import NamedTuple, Text, Sequence
+from typing import (Any, Generator, List, Mapping, NamedTuple, Optional as Opt,
+                    Sequence)
 
 import jinja2
-from pyparsing import (CaselessKeyword, Optional, ParseException, Regex,
-                       Suppress, Word, ZeroOrMore, alphanums, delimitedList)
+from pyparsing import (  # type: ignore
+    CaselessKeyword, Optional, ParseException, Regex, Suppress, Word,
+    ZeroOrMore, alphanums, delimitedList)
 
 
-# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes,too-few-public-methods
 class Column:
     '''Represents a MySQL column definition.'''
-
-    def __init__(self, tokens):
-        self.name = tokens['col_name']
-        self.type = tuple(tokens['col_type'])
-        self.primary_key = False
-        self.auto_increment = (tokens.get('auto_increment',
-                                          '').upper() == 'AUTO_INCREMENT')
-        self.not_null = ('nullability' in tokens
-                         and tokens['nullability'].upper() == 'NOT NULL')
-        self.default = tokens.get('default', None)
+    def __init__(self, tokens: Mapping[str, Any]):
+        self.name: str = tokens['col_name']
+        self.type: Sequence[str] = tuple(tokens['col_type'])
+        self.primary_key: bool = False
+        self.auto_increment: bool = (tokens.get(
+            'auto_increment', '').upper() == 'AUTO_INCREMENT')
+        self.not_null: bool = ('nullability' in tokens
+                               and tokens['nullability'].upper() == 'NOT NULL')
+        self.default: Opt[str] = tokens.get('default', None)
         if self.default == 'NULL':
             self.default = None
-        self.comment = tokens.get('comment', None)
+        self.comment: Opt[str] = tokens.get('comment', None)
         if 'tinyint' in self.type:
             self.php_primitive_type = 'bool'
         elif 'timestamp' in self.type or 'datetime' in self.type:
@@ -39,33 +39,32 @@ class Column:
             self.php_primitive_type = 'float'
         else:
             self.php_primitive_type = 'string'
-        self.php_type = (('' if self.default or self.auto_increment else '?') +
-                         self.php_primitive_type)
+        self.php_type: str = (
+            ('' if self.default or self.auto_increment else '?') +
+            self.php_primitive_type)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'Column<name={}, type={}>'.format(self.name, self.type)
 
 
 class Constraint:
     '''Represents a MySQL column constraint.'''
+    def __init__(self, tokens: Mapping[str, Any]):
+        self.type: str = tokens['type']
+        self.columns: Sequence[str] = tokens.get('key_part', ())
 
-    def __init__(self, tokens):
-        self.type = tokens['type']
-        self.columns = tokens.get('key_part')
-
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'Constraint<type={}, columns={}>'.format(
             self.type, self.columns)
 
 
 class Table:
     '''Represents a MySQL table.'''
-
-    def __init__(self, tokens):
-        self.name = tokens['tbl_name']
-        self.class_name = tokens['tbl_name'].replace('_', '')
-        self.columns = tokens['column']
-        self.constraints = tokens.get('constraint', [])
+    def __init__(self, tokens: Mapping[str, Any]):
+        self.name: str = tokens['tbl_name']
+        self.class_name: str = tokens['tbl_name'].replace('_', '')
+        self.columns: Sequence[Column] = tokens['column']
+        self.constraints: Sequence[Constraint] = tokens.get('constraint', ())
         for constraint in self.constraints:
             if constraint.type == 'PRIMARY KEY':
                 primary_key_columns = set(
@@ -76,17 +75,19 @@ class Table:
                     column.primary_key = True
 
     @property
-    def fieldnames(self):
+    def fieldnames(self) -> List[str]:
         '''A quoted list of fields.'''
 
-        return ["`{}`.`{}`".format(self.name, column.name)
-                for column in self.columns]
+        return [
+            "`{}`.`{}`".format(self.name, column.name)
+            for column in self.columns
+        ]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'Table<name={}, columns={}>'.format(self.name, self.columns)
 
 
-def _parse(text: Text):
+def _parse(text: str) -> Sequence[Table]:
     comment = Suppress('/*' + Regex(r'([^*]|[*][^/])*') + '*/')
 
     identifier = (Suppress('`') + Regex(r'[^`]+') +
@@ -102,9 +103,9 @@ def _parse(text: Text):
                         | CaselessKeyword('SET DEFAULT'))
 
     reference_definition = (
-        Suppress(
-            CaselessKeyword('REFERENCES')) + identifier('reference_tbl_name') +
-        '(' + delimitedList(identifier)('tbl_column') + ')' +
+        Suppress(CaselessKeyword('REFERENCES')) +
+        identifier('reference_tbl_name') + '(' +
+        delimitedList(identifier)('tbl_column') + ')' +
         ZeroOrMore((Suppress(CaselessKeyword('ON DELETE')) +
                     reference_option('on_delete'))
                    | (Suppress(CaselessKeyword('ON UPDATE')) +
@@ -115,10 +116,10 @@ def _parse(text: Text):
           ((CaselessKeyword('FULLTEXT KEY') | CaselessKeyword('UNIQUE KEY')
             | CaselessKeyword('KEY'))('type') + identifier('index_name'))) +
          '(' + delimitedList(identifier('key_part*')) + ')') |
-        (Suppress(CaselessKeyword('CONSTRAINT')) + identifier('symbol') + (
-            (CaselessKeyword('FOREIGN KEY')('type') + '(' + delimitedList(
-                identifier('key_part*')) + ')' + reference_definition)
-            | (CaselessKeyword('CHECK')('type') + Regex('[^,\n]+'))))
+        (Suppress(CaselessKeyword('CONSTRAINT')) + identifier('symbol') +
+         ((CaselessKeyword('FOREIGN KEY')('type') + '(' +
+           delimitedList(identifier('key_part*')) + ')' + reference_definition)
+          | (CaselessKeyword('CHECK')('type') + Regex('[^,\n]+'))))
     ).setParseAction(Constraint)
 
     column_type = (Word(alphanums) + Optional('(' + Regex('[^)]+') + ')') +
@@ -145,18 +146,18 @@ def _parse(text: Text):
     create_table_statement = (
         Suppress(CaselessKeyword('CREATE') + CaselessKeyword('TABLE')) +
         identifier('tbl_name') + Suppress('(') +
-        delimitedList(create_definition) + Suppress(')') + Suppress(
-            Regex('[^;]*'))).setParseAction(Table)
+        delimitedList(create_definition) + Suppress(')') +
+        Suppress(Regex('[^;]*'))).setParseAction(Table)
 
-    parser = delimitedList(
-        comment | create_table_statement('table*'), delim=';') + Suppress(
-            Optional(';'))
+    parser = delimitedList(comment | create_table_statement('table*'),
+                           delim=';') + Suppress(Optional(';'))
 
-    return parser.parseString(text, parseAll=True)['table']
+    table: Sequence[Table] = parser.parseString(text, parseAll=True)['table']
+    return table
 
 
 # pylint: disable=redefined-builtin
-def _listformat(value, format: Text = '', **kwargs):
+def _listformat(value: Any, format: str = '', **kwargs: Any) -> Sequence[str]:
     return [format.format(element, **kwargs) for element in value]
 
 
@@ -166,11 +167,11 @@ def _parse_date(value: str) -> int:
             tzinfo=datetime.timezone.utc).timestamp())
 
 
-File = NamedTuple('File', [('filename', Text), ('file_type', Text),
-                           ('contents', Text)])
+File = NamedTuple('File', [('filename', str), ('file_type', str),
+                           ('contents', str)])
 
 
-def generate_dao(script: Text) -> Sequence[File]:
+def generate_dao(script: str) -> Generator[File, None, None]:
     '''Generate all the DAO files.'''
 
     try:
@@ -180,10 +181,9 @@ def generate_dao(script: Text) -> Sequence[File]:
         print('{:5d}: {}'.format(ex.lineno, ex.line))
         print('{}^'.format(' ' * (ex.col + 6)))
         raise ex
-    env = jinja2.Environment(
-        loader=jinja2.FileSystemLoader(
-            os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), 'dao_templates')))
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                     'dao_templates')))
     env.filters['listformat'] = _listformat
     env.filters['strtotime'] = _parse_date
     vo_template = env.get_template('vo.php')

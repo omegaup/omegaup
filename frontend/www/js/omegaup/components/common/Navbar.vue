@@ -180,7 +180,7 @@
         <ul v-else class="nav navbar-nav navbar-right">
           <omegaup-notifications-clarifications
             v-if="inContest"
-            :initial-clarifications="initialClarifications"
+            :clarifications="notificationsClarifications"
             :is-admin="isAdmin"
           ></omegaup-notifications-clarifications>
           <li
@@ -315,7 +315,8 @@ export default class Navbar extends Vue {
   @Prop() isReviewer!: boolean;
   @Prop() gravatarURL51!: string;
   @Prop() gravatarURL128!: string;
-  @Prop() associatedIdentities!: types.AssociatedIdentity[];
+  @Prop({ default: () => [] })
+  associatedIdentities!: types.AssociatedIdentity[];
   @Prop() currentEmail!: string;
   @Prop() currentName!: string;
   @Prop() currentUsername!: string;
@@ -326,10 +327,10 @@ export default class Navbar extends Vue {
   @Prop() graderInfo!: types.GraderStatus | null;
   @Prop() graderQueueLength!: number;
   @Prop() errorMessage!: string | null;
-  @Prop() initialClarifications!: types.Clarification[];
+  @Prop({ default: () => [] })
+  notificationsClarifications!: types.Clarification[];
 
   notifications: types.Notification[] = [];
-  clarifications: types.Clarification[] = this.initialClarifications;
   T = T;
 
   get formattedLoginURL(): string {
@@ -351,17 +352,16 @@ export default class Navbar extends Vue {
   border-color: transparent;
   margin: 0;
   border-bottom-width: 0;
-
-  background-color: $header-primary-color;
+  background-color: var(--header-primary-color);
 
   & .caret {
-    border-top-color: $white;
-    border-bottom-color: $white;
+    border-top-color: var(--header-caret-border-color);
+    border-bottom-color: var(--header-caret-border-color);
   }
 
   & .active {
     > a {
-      background-color: $header-active-color;
+      background-color: var(--header-active-color);
     }
   }
 
@@ -373,7 +373,7 @@ export default class Navbar extends Vue {
     }
 
     .navbar-brand {
-      background-color: #f2f2f2;
+      background-color: var(--header-navbar-brand-background-color);
     }
   }
 
@@ -402,17 +402,18 @@ export default class Navbar extends Vue {
   }
 
   & .navbar-text {
-    color: $header-font-primary-color;
+    color: var(--header-font-primary-color);
   }
 
   & .navbar-nav {
     margin: 0;
+
     li {
       a {
-        color: $header-font-primary-color;
+        color: var(--header-font-primary-color);
 
         &:hover {
-          background-color: $header-accent-color;
+          background-color: var(--header-accent-color);
         }
       }
     }
@@ -422,11 +423,11 @@ export default class Navbar extends Vue {
     li {
       a {
         &:hover {
-          background-color: $header-accent-color;
+          background-color: var(--header-accent-color);
         }
 
         &:focus {
-          background-color: $header-accent-color;
+          background-color: var(--header-accent-color);
         }
       }
     }
@@ -434,10 +435,10 @@ export default class Navbar extends Vue {
     .dropdown-menu {
       li {
         a {
-          color: $header-font-secondary-color;
+          color: var(--header-font-secondary-color);
 
           &:hover {
-            background-color: $header-dropdown-active-item;
+            background-color: var(--header-dropdown-active-item);
           }
         }
       }
@@ -451,37 +452,41 @@ export default class Navbar extends Vue {
   }
 
   & .navbar-right {
-    background-color: $header-primary-color;
+    background-color: var(--header-primary-color);
 
     & .caret {
-      border-top-color: $black;
-      border-bottom-color: $black;
+      border-top-color: var(--header-navbar-right-caret-border-color);
+      border-bottom-color: var(--header-navbar-right-caret-border-color);
     }
 
     a {
-      color: $black;
+      color: var(--header-navbar-right-a-font-color);
 
       & .grader-error {
-        color: $status-error;
+        color: var(--status-error-color);
         background-image: linear-gradient(
-          rgb(242, 222, 222) 0px,
-          rgb(231, 195, 195) 100%
+          var(--badges-grader-error-gradient-from-background-color),
+          var(--badges-grader-error-gradient-to-background-color)
         );
       }
 
       & .grader-ok {
-        color: $status-success;
+        color: var(--status-success-color);
         background-image: linear-gradient(
-          rgb(223, 240, 216) 0px,
-          rgb(200, 229, 188) 100%
+          var(--badges-grader-ok-gradient-from-background-color),
+          var(--badges-grader-ok-gradient-to-background-color)
         );
-        background-color: rgb(223, 240, 216);
+        background-color: var(--badges-grader-ok-background-color);
       }
 
       & .grader-warning {
-        color: $status-warning;
-        background-image: linear-gradient(to bottom, #fcf8e3 0, #f8efc0 100%);
-        border-color: #f5e79e;
+        color: var(--status-warning-color);
+        background-image: linear-gradient(
+          to bottom,
+          var(--badges-grader-warning-from-font-color) 0,
+          var(--badges-grader-warning-to-font-color) 100%
+        );
+        border-color: var(--badges-grader-warning-border-color);
       }
     }
   }

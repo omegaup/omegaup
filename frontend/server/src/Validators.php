@@ -4,10 +4,11 @@ namespace OmegaUp;
 
 /**
  * Conjunto de validadores genéricos
- *
- * @author joemmanuel
  */
 class Validators {
+    // The maximum length for aliases.
+    const ALIAS_MAX_LENGTH = 32;
+
     /**
      * Check if email is valid
      */
@@ -112,6 +113,20 @@ class Validators {
             );
         }
 
+        self::validateLengthInRange(
+            $parameter,
+            $parameterName,
+            $minLength,
+            $maxLength
+        );
+    }
+
+    public static function validateLengthInRange(
+        string $parameter,
+        string $parameterName,
+        ?int $minLength,
+        ?int $maxLength
+    ): void {
         if (!is_null($minLength) && strlen($parameter) < $minLength) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterStringTooShort',
@@ -172,20 +187,38 @@ class Validators {
         return (
             preg_match('/^(?:[a-zA-Z0-9_-]+:)?[a-zA-Z0-9_-]+$/', $alias) === 1
             && !self::isRestrictedAlias($alias)
-            && strlen($alias) <= 32
+            && strlen($alias) <= Validators::ALIAS_MAX_LENGTH
         );
     }
 
     /**
      * Returns whether the alias is valid.
      *
-     * @param string $alias
      * @return boolean
      */
-    public static function alias(string $alias): bool {
+    public static function alias(
+        string $alias,
+        int $maxLength = Validators::ALIAS_MAX_LENGTH
+    ): bool {
         return (
             preg_match('/^[a-zA-Z0-9_-]+$/', $alias) === 1
             && !self::isRestrictedAlias($alias)
+            && strlen($alias) <= $maxLength
+        );
+    }
+
+    /**
+     * Returns whether the username or email is valid.
+     *
+     * @param string $usernameOrEmail
+     * @return boolean
+     */
+    public static function usernameOrTeamUsernameOrEmail(string $usernameOrEmail): bool {
+        return (
+            self::email($usernameOrEmail)
+            || self::normalUsername($usernameOrEmail)
+            || self::identityUsername($usernameOrEmail)
+            || self::identityTeamUsername($usernameOrEmail)
         );
     }
 
@@ -223,6 +256,21 @@ class Validators {
         return (
             preg_match(
                 '/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/',
+                $username
+            ) !== 0
+        );
+    }
+
+    /**
+     * Returns whether the username of an identity team is valid.
+     *
+     * @param string $username
+     * @return boolean
+     */
+    public static function identityTeamUsername(string $username): bool {
+        return (
+            preg_match(
+                '/^teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/',
                 $username
             ) !== 0
         );
@@ -292,6 +340,43 @@ class Validators {
 
         /** @psalm-suppress RedundantConditionGivenDocblockType not sure why Psalm is complaining here. */
         if (!preg_match('/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/', $parameter)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
+        }
+    }
+
+    /**
+     * Enforces username identity team requirements
+     *
+     * @param mixed $parameter
+     * @param string $parameterName
+     * @psalm-assert string $parameter
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateValidUsernameIdentityTeam(
+        $parameter,
+        string $parameterName
+    ): void {
+        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
+            return;
+        }
+        self::validateStringOfLengthInRange(
+            $parameter,
+            $parameterName,
+            /*$minLength=*/ 2,
+            /*$maxLength=*/ null,
+            /*required=*/true
+        );
+
+        /** @psalm-suppress RedundantConditionGivenDocblockType not sure why Psalm is complaining here. */
+        if (
+            !preg_match(
+                '/^teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/',
+                $parameter
+            )
+        ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalidAlias',
                 $parameterName

@@ -2,8 +2,6 @@
 
 /**
  * Test getting general user Info methods
- *
- * @author Alberto
  */
 class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     /**

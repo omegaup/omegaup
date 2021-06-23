@@ -20,14 +20,17 @@ module.exports = {
     activity_feed: './frontend/www/js/omegaup/activity/feed.ts',
     admin_roles: './frontend/www/js/omegaup/admin/roles.js',
     admin_support: './frontend/www/js/omegaup/admin/support.ts',
-    admin_user: './frontend/www/js/omegaup/admin/user.js',
+    admin_user: './frontend/www/js/omegaup/admin/user.ts',
     arena: './frontend/www/js/omegaup/arena/arena.ts',
     arena_admin: './frontend/www/js/omegaup/arena/admin.ts',
     arena_assignment: './frontend/www/js/omegaup/arena/assignment.ts',
     arena_assignment_admin:
       './frontend/www/js/omegaup/arena/assignment_admin.ts',
     arena_contest: './frontend/www/js/omegaup/arena/contest.ts',
+    arena_contest_contestant:
+      './frontend/www/js/omegaup/arena/contest_contestant.ts',
     arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
+    arena_contest_listv2: './frontend/www/js/omegaup/arena/contest_listv2.ts',
     arena_contest_practice:
       './frontend/www/js/omegaup/arena/contest_practice.ts',
     arena_course: './frontend/www/js/omegaup/arena/course.ts',
@@ -100,6 +103,9 @@ module.exports = {
     school_profile: './frontend/www/js/omegaup/schools/profile.ts',
     schools_rank: './frontend/www/js/omegaup/schools/rank.ts',
     submissions_list: './frontend/www/js/omegaup/submissions/list.ts',
+    teams_group_edit: './frontend/www/js/omegaup/teamsgroup/edit.ts',
+    teams_group_list: './frontend/www/js/omegaup/teamsgroup/list.ts',
+    teams_group_new: './frontend/www/js/omegaup/teamsgroup/new.ts',
     user_basic_edit: './frontend/www/js/omegaup/user/basicedit.js',
     user_edit_email_form: './frontend/www/js/omegaup/user/emailedit.js',
     user_manage_identities:

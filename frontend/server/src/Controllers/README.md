@@ -23,6 +23,7 @@
   - [`/api/contest/adminList/`](#apicontestadminlist)
   - [`/api/contest/admins/`](#apicontestadmins)
   - [`/api/contest/arbitrateRequest/`](#apicontestarbitraterequest)
+  - [`/api/contest/archive/`](#apicontestarchive)
   - [`/api/contest/clarifications/`](#apicontestclarifications)
   - [`/api/contest/clone/`](#apicontestclone)
   - [`/api/contest/contestants/`](#apicontestcontestants)
@@ -33,6 +34,7 @@
   - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
   - [`/api/contest/myList/`](#apicontestmylist)
   - [`/api/contest/open/`](#apicontestopen)
+  - [`/api/contest/problemClarifications/`](#apicontestproblemclarifications)
   - [`/api/contest/problems/`](#apicontestproblems)
   - [`/api/contest/publicDetails/`](#apicontestpublicdetails)
   - [`/api/contest/registerForContest/`](#apicontestregisterforcontest)
@@ -68,6 +70,7 @@
   - [`/api/course/assignmentDetails/`](#apicourseassignmentdetails)
   - [`/api/course/assignmentScoreboard/`](#apicourseassignmentscoreboard)
   - [`/api/course/assignmentScoreboardEvents/`](#apicourseassignmentscoreboardevents)
+  - [`/api/course/clarifications/`](#apicourseclarifications)
   - [`/api/course/clone/`](#apicourseclone)
   - [`/api/course/create/`](#apicoursecreate)
   - [`/api/course/createAssignment/`](#apicoursecreateassignment)
@@ -81,6 +84,7 @@
   - [`/api/course/listStudents/`](#apicourseliststudents)
   - [`/api/course/listUnsolvedProblems/`](#apicourselistunsolvedproblems)
   - [`/api/course/myProgress/`](#apicoursemyprogress)
+  - [`/api/course/problemClarifications/`](#apicourseproblemclarifications)
   - [`/api/course/registerForCourse/`](#apicourseregisterforcourse)
   - [`/api/course/removeAdmin/`](#apicourseremoveadmin)
   - [`/api/course/removeAssignment/`](#apicourseremoveassignment)
@@ -113,6 +117,7 @@
   - [`/api/groupScoreboard/removeContest/`](#apigroupscoreboardremovecontest)
 - [Identity](#identity)
   - [`/api/identity/bulkCreate/`](#apiidentitybulkcreate)
+  - [`/api/identity/bulkCreateForTeams/`](#apiidentitybulkcreateforteams)
   - [`/api/identity/changePassword/`](#apiidentitychangepassword)
   - [`/api/identity/create/`](#apiidentitycreate)
   - [`/api/identity/selectIdentity/`](#apiidentityselectidentity)
@@ -190,9 +195,17 @@
 - [Session](#session)
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
   - [`/api/session/googleLogin/`](#apisessiongooglelogin)
+- [Submission](#submission)
+  - [`/api/submission/setFeedback/`](#apisubmissionsetfeedback)
 - [Tag](#tag)
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
+- [TeamsGroup](#teamsgroup)
+  - [`/api/teamsGroup/create/`](#apiteamsgroupcreate)
+  - [`/api/teamsGroup/details/`](#apiteamsgroupdetails)
+  - [`/api/teamsGroup/removeTeam/`](#apiteamsgroupremoveteam)
+  - [`/api/teamsGroup/teams/`](#apiteamsgroupteams)
+  - [`/api/teamsGroup/update/`](#apiteamsgroupupdate)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
 - [User](#user)
@@ -206,12 +219,14 @@
   - [`/api/user/coderOfTheMonthList/`](#apiusercoderofthemonthlist)
   - [`/api/user/contestStats/`](#apiuserconteststats)
   - [`/api/user/create/`](#apiusercreate)
+  - [`/api/user/createAPIToken/`](#apiusercreateapitoken)
   - [`/api/user/extraInformation/`](#apiuserextrainformation)
   - [`/api/user/generateGitToken/`](#apiusergenerategittoken)
   - [`/api/user/generateOmiUsers/`](#apiusergenerateomiusers)
   - [`/api/user/interviewStats/`](#apiuserinterviewstats)
   - [`/api/user/lastPrivacyPolicyAccepted/`](#apiuserlastprivacypolicyaccepted)
   - [`/api/user/list/`](#apiuserlist)
+  - [`/api/user/listAPITokens/`](#apiuserlistapitokens)
   - [`/api/user/listAssociatedIdentities/`](#apiuserlistassociatedidentities)
   - [`/api/user/listUnsolvedProblems/`](#apiuserlistunsolvedproblems)
   - [`/api/user/login/`](#apiuserlogin)
@@ -222,6 +237,7 @@
   - [`/api/user/removeExperiment/`](#apiuserremoveexperiment)
   - [`/api/user/removeGroup/`](#apiuserremovegroup)
   - [`/api/user/removeRole/`](#apiuserremoverole)
+  - [`/api/user/revokeAPIToken/`](#apiuserrevokeapitoken)
   - [`/api/user/selectCoderOfTheMonth/`](#apiuserselectcoderofthemonth)
   - [`/api/user/stats/`](#apiuserstats)
   - [`/api/user/statusVerified/`](#apiuserstatusverified)
@@ -369,22 +385,24 @@ Description of ClarificationController
 
 ### Description
 
-Creates a Clarification
+Creates a Clarification for a contest or an assignment of a course
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `message`       | `string`       |             |
-| `problem_alias` | `string`       |             |
-| `username`      | `null\|string` |             |
+| Name               | Type           | Description |
+| ------------------ | -------------- | ----------- |
+| `message`          | `string`       |             |
+| `problem_alias`    | `string`       |             |
+| `assignment_alias` | `string\|null` |             |
+| `contest_alias`    | `string\|null` |             |
+| `course_alias`     | `string\|null` |             |
+| `username`         | `null\|string` |             |
 
 ### Returns
 
-| Name               | Type     |
-| ------------------ | -------- |
-| `clarification_id` | `number` |
+```typescript
+types.Clarification;
+```
 
 ## `/api/clarification/details/`
 
@@ -406,7 +424,7 @@ API for getting a clarification
 | `message`       | `string` |
 | `problem_id`    | `number` |
 | `problemset_id` | `number` |
-| `time`          | `number` |
+| `time`          | `Date`   |
 
 ## `/api/clarification/update/`
 
@@ -573,10 +591,11 @@ the director).
 
 ### Parameters
 
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `page`      | `int` |             |
-| `page_size` | `int` |             |
+| Name            | Type         | Description |
+| --------------- | ------------ | ----------- |
+| `page`          | `int\|null`  |             |
+| `page_size`     | `int\|null`  |             |
+| `show_archived` | `bool\|null` |             |
 
 ### Returns
 
@@ -615,6 +634,23 @@ Returns all contest administrators
 | `username`      | `string`       |             |
 | `note`          | `null\|string` |             |
 | `resolution`    | `mixed`        |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/contest/archive/`
+
+### Description
+
+Archives or Unarchives a contest if user is the creator
+
+### Parameters
+
+| Name            | Type         | Description |
+| --------------- | ------------ | ----------- |
+| `contest_alias` | `string`     |             |
+| `archive`       | `bool\|null` |             |
 
 ### Returns
 
@@ -789,11 +825,12 @@ Returns a list of contests where current user is participating in
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `page`      | `int`    |             |
-| `page_size` | `int`    |             |
-| `query`     | `string` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `page`          | `int\|null`    |             |
+| `page_size`     | `int\|null`    |             |
+| `query`         | `null\|string` |             |
+| `show_archived` | `bool\|null`   |             |
 
 ### Returns
 
@@ -809,11 +846,12 @@ Returns a list of contests where current user is the director
 
 ### Parameters
 
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `page`      | `int`    |             |
-| `page_size` | `int`    |             |
-| `query`     | `string` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `page`          | `int\|null`    |             |
+| `page_size`     | `int\|null`    |             |
+| `query`         | `null\|string` |             |
+| `show_archived` | `bool\|null`   |             |
 
 ### Returns
 
@@ -841,6 +879,27 @@ Joins a contest - explicitly adds a identity to a contest.
 
 _Nothing_
 
+## `/api/contest/problemClarifications/`
+
+### Description
+
+Get clarifications of problem in a contest
+
+### Parameters
+
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `contest_alias` | `string` |             |
+| `offset`        | `int`    |             |
+| `problem_alias` | `string` |             |
+| `rowcount`      | `int`    |             |
+
+### Returns
+
+| Name             | Type                    |
+| ---------------- | ----------------------- |
+| `clarifications` | `types.Clarification[]` |
+
 ## `/api/contest/problems/`
 
 ### Description
@@ -855,9 +914,9 @@ Gets the problems from a contest
 
 ### Returns
 
-| Name       | Type                     |
-| ---------- | ------------------------ |
-| `problems` | `types.ContestProblem[]` |
+| Name       | Type                                    |
+| ---------- | --------------------------------------- |
+| `problems` | `types.ProblemsetProblemWithVersions[]` |
 
 ## `/api/contest/publicDetails/`
 
@@ -1520,6 +1579,26 @@ Returns the Scoreboard events
 | -------- | ------------------------- |
 | `events` | `types.ScoreboardEvent[]` |
 
+## `/api/course/clarifications/`
+
+### Description
+
+Gets the clarifications of all assignments in a course
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+| `offset`       | `int`    |             |
+| `rowcount`     | `int`    |             |
+
+### Returns
+
+| Name             | Type                    |
+| ---------------- | ----------------------- |
+| `clarifications` | `types.Clarification[]` |
+
 ## `/api/course/clone/`
 
 ### Description
@@ -1776,6 +1855,28 @@ Returns details of a given course
 | Name          | Type                       |
 | ------------- | -------------------------- |
 | `assignments` | `types.AssignmentProgress` |
+
+## `/api/course/problemClarifications/`
+
+### Description
+
+Get clarifications of problem in a contest
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `offset`           | `int`    |             |
+| `problem_alias`    | `string` |             |
+| `rowcount`         | `int`    |             |
+
+### Returns
+
+| Name             | Type                    |
+| ---------------- | ----------------------- |
+| `clarifications` | `types.Clarification[]` |
 
 ## `/api/course/registerForCourse/`
 
@@ -2063,11 +2164,11 @@ New group
 
 ### Parameters
 
-| Name          | Type           | Description |
-| ------------- | -------------- | ----------- |
-| `description` | `string`       |             |
-| `name`        | `string`       |             |
-| `alias`       | `null\|string` |             |
+| Name          | Type     | Description |
+| ------------- | -------- | ----------- |
+| `alias`       | `string` |             |
+| `description` | `string` |             |
+| `name`        | `string` |             |
 
 ### Returns
 
@@ -2148,9 +2249,9 @@ Members of a group (usernames only).
 
 ### Returns
 
-| Name         | Type                                                                                                                                                                       |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `identities` | `{ classname: string; country?: string; country_id?: string; name?: string; school?: string; school_id?: number; state?: string; state_id?: string; username: string; }[]` |
+| Name         | Type               |
+| ------------ | ------------------ |
+| `identities` | `types.Identity[]` |
 
 ## `/api/group/myList/`
 
@@ -2299,6 +2400,23 @@ Entry point for Create bulk Identities API
 | `group_alias` | `null\|string` |             |
 | `name`        | `mixed`        |             |
 | `username`    | `mixed`        |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/identity/bulkCreateForTeams/`
+
+### Description
+
+Entry point for Create bulk Identities for teams API
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+| `team_identities`  | `string` |             |
 
 ### Returns
 
@@ -2690,7 +2808,7 @@ Entry point for Problem Details API
 | `contest_alias`           | `null\|string` |             |
 | `lang`                    | `null\|string` |             |
 | `prevent_problemset_open` | `bool\|null`   |             |
-| `problemset_id`           | `mixed`        |             |
+| `problemset_id`           | `int\|null`    |             |
 | `show_solvers`            | `bool\|null`   |             |
 | `statement_type`          | `null\|string` |             |
 
@@ -3110,6 +3228,7 @@ Entry point for Problem Versions API
 | Name            | Type           | Description |
 | --------------- | -------------- | ----------- |
 | `problem_alias` | `null\|string` |             |
+| `problemset_id` | `int\|null`    |             |
 
 ### Returns
 
@@ -3747,6 +3866,29 @@ contestant's machine and the server.
 | ------------------- | --------- |
 | `isAccountCreation` | `boolean` |
 
+# Submission
+
+SubmissionController
+
+## `/api/submission/setFeedback/`
+
+### Description
+
+Updates the admin feedback for a submission
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `string` |             |
+| `course_alias`     | `string` |             |
+| `feedback`         | `string` |             |
+| `guid`             | `string` |             |
+
+### Returns
+
+_Nothing_
+
 # Tag
 
 TagController
@@ -3791,6 +3933,99 @@ Gets a list of tags
 }
 [];
 ```
+
+# TeamsGroup
+
+TeamsGroupController
+
+## `/api/teamsGroup/create/`
+
+### Description
+
+New team group
+
+### Parameters
+
+| Name          | Type     | Description |
+| ------------- | -------- | ----------- |
+| `alias`       | `string` |             |
+| `description` | `string` |             |
+| `name`        | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/teamsGroup/details/`
+
+### Description
+
+Details of a team group
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+
+### Returns
+
+| Name         | Type                                                                         |
+| ------------ | ---------------------------------------------------------------------------- |
+| `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
+
+## `/api/teamsGroup/removeTeam/`
+
+### Description
+
+Remove team from teams group
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+| `usernameOrEmail`  | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/teamsGroup/teams/`
+
+### Description
+
+Teams of a teams group
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+
+### Returns
+
+| Name         | Type               |
+| ------------ | ------------------ |
+| `identities` | `types.Identity[]` |
+
+## `/api/teamsGroup/update/`
+
+### Description
+
+Update an existing teams group
+
+### Parameters
+
+| Name          | Type     | Description |
+| ------------- | -------- | ----------- |
+| `alias`       | `string` |             |
+| `description` | `string` |             |
+| `name`        | `string` |             |
+
+### Returns
+
+_Nothing_
 
 # Time
 
@@ -3843,6 +4078,7 @@ Adds the experiment to the user.
 | Name         | Type     | Description |
 | ------------ | -------- | ----------- |
 | `experiment` | `string` |             |
+| `username`   | `string` |             |
 
 ### Returns
 
@@ -3872,9 +4108,10 @@ Adds the role to the user.
 
 ### Parameters
 
-| Name   | Type     | Description |
-| ------ | -------- | ----------- |
-| `role` | `string` |             |
+| Name       | Type     | Description |
+| ---------- | -------- | ----------- |
+| `role`     | `string` |             |
+| `username` | `string` |             |
 
 ### Returns
 
@@ -3970,9 +4207,9 @@ Get Contests which a certain user has participated in
 
 ### Returns
 
-| Name       | Type                                                                       |
-| ---------- | -------------------------------------------------------------------------- |
-| `contests` | `{ [key: string]: { data: types.ContestParticipated; place?: number; }; }` |
+| Name       | Type                        |
+| ---------- | --------------------------- |
+| `contests` | `types.UserProfileContests` |
 
 ## `/api/user/create/`
 
@@ -3985,6 +4222,50 @@ Entry point for Create a User API
 | Name       | Type     |
 | ---------- | -------- |
 | `username` | `string` |
+
+## `/api/user/createAPIToken/`
+
+### Description
+
+Creates a new API token associated with the user.
+
+This token can be used to authenticate against the API in other calls
+through the [HTTP `Authorization`
+header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization)
+in the request:
+
+```
+Authorization: token 92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6
+```
+
+The following alternative syntax allows to specify an associated
+identity:
+
+```
+Authorization: token Credential=92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6,Username=groupname:username
+```
+
+There is a limit of 1000 requests that can be done every hour, after
+which point all requests will fail with [HTTP 429 Too Many
+Requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429).
+The `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and
+`X-RateLimit-Reset` response headers will be set whenever an API token
+is used and will contain useful information about the limit to the
+caller.
+
+There is a limit of 5 API tokens that each user can have.
+
+### Parameters
+
+| Name   | Type     | Description                                                          |
+| ------ | -------- | -------------------------------------------------------------------- |
+| `name` | `string` | A non-empty alphanumeric string. May contain underscores and dashes. |
+
+### Returns
+
+| Name    | Type     |
+| ------- | -------- |
+| `token` | `string` |
 
 ## `/api/user/extraInformation/`
 
@@ -4100,16 +4381,28 @@ it is used by typeahead.
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `query` | `mixed` |             |
-| `term`  | `mixed` |             |
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+| `term`  | `null\|string` |             |
 
 ### Returns
 
 ```typescript
 types.UserListItem[]
 ```
+
+## `/api/user/listAPITokens/`
+
+### Description
+
+Returns a list of all the API tokens associated with the user.
+
+### Returns
+
+| Name     | Type                                                                                                                    |
+| -------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `tokens` | `{ last_used: Date; name: string; rate_limit: { limit: number; remaining: number; reset: Date; }; timestamp: Date; }[]` |
 
 ## `/api/user/listAssociatedIdentities/`
 
@@ -4242,6 +4535,7 @@ Removes the experiment from the user.
 | Name         | Type     | Description |
 | ------------ | -------- | ----------- |
 | `experiment` | `string` |             |
+| `username`   | `string` |             |
 
 ### Returns
 
@@ -4271,9 +4565,26 @@ Removes the role from the user.
 
 ### Parameters
 
-| Name   | Type     | Description |
-| ------ | -------- | ----------- |
-| `role` | `string` |             |
+| Name       | Type     | Description |
+| ---------- | -------- | ----------- |
+| `role`     | `string` |             |
+| `username` | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/user/revokeAPIToken/`
+
+### Description
+
+Revokes an API token associated with the user.
+
+### Parameters
+
+| Name   | Type     | Description                                                          |
+| ------ | -------- | -------------------------------------------------------------------- |
+| `name` | `string` | A non-empty alphanumeric string. May contain underscores and dashes. |
 
 ### Returns
 

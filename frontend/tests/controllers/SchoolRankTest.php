@@ -1,10 +1,5 @@
 <?php
 
-/**
- *
- * @author joemmanuel
- */
-
 class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
     public function testGetMonthlySolvedProblemsCount() {
         $schoolData = \OmegaUp\Test\Factories\Schools::createSchool();

@@ -5,6 +5,7 @@ import * as api from '../api';
 import T from '../lang';
 import { omegaup, OmegaUp } from '../omegaup';
 import { types, messages } from '../api_types';
+import clarificationsStore from './clarificationsStore';
 import { myRunsStore, runsStore } from './runsStore';
 import * as time from '../time';
 import * as ui from '../ui';
@@ -23,7 +24,6 @@ import common_Navbar from '../components/common/Navbar.vue';
 import omegaup_Markdown from '../components/Markdown.vue';
 import problem_SettingsSummary from '../components/problem/SettingsSummary.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
-import { ActiveProblem } from '../components/arena/ContestPractice.vue';
 
 import ArenaAdmin from './admin_arena';
 
@@ -222,7 +222,7 @@ export class Arena {
     socketStatus: HTMLElement | null;
   };
 
-  initialClarifications: types.Clarification[] = [];
+  notificationsClarifications: types.Clarification[] = [];
 
   navbarAssignments: Vue | null = null;
 
@@ -256,7 +256,7 @@ export class Arena {
 
   commonNavbar:
     | (Vue & {
-        initialClarifications: types.Clarification[];
+        notificationsClarifications: types.Clarification[];
         graderInfo: types.GraderStatus | null;
         errorMessage: string | null;
         graderQueueLength: number;
@@ -297,7 +297,7 @@ export class Arena {
 
   summaryView: Vue & { contest: omegaup.Contest };
 
-  rankingChart: Highcharts.Chart | null = null;
+  rankingChart: Highcharts.StockChart | null = null;
 
   constructor(options: ArenaOptions) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -347,7 +347,7 @@ export class Arena {
           graderInfo: null,
           graderQueueLength: -1,
           errorMessage: null,
-          initialClarifications: [],
+          notificationsClarifications: [],
           notifications: [],
         }),
         render: function (createElement) {
@@ -367,7 +367,7 @@ export class Arena {
               graderInfo: this.graderInfo,
               graderQueueLength: this.graderQueueLength,
               errorMessage: this.errorMessage,
-              initialClarifications: this.initialClarifications,
+              notificationsClarifications: this.notificationsClarifications,
             },
           });
         },
@@ -433,8 +433,10 @@ export class Arena {
               currentAssignment: self.currentProblemset,
             },
             on: {
-              'navigate-to-problem': (request: ActiveProblem) => {
-                window.location.hash = `#problems/${request.problem.alias}`;
+              'navigate-to-problem': (
+                problem: types.NavbarProblemsetProblem,
+              ) => {
+                window.location.hash = `#problems/${problem.alias}`;
               },
             },
           });
@@ -487,7 +489,6 @@ export class Arena {
         render: function (createElement) {
           return createElement('omegaup-arena-scoreboard', {
             props: {
-              scoreboardColors: scoreboardColors,
               problems: this.problems,
               ranking: this.ranking,
               lastUpdated: this.lastUpdated,
@@ -502,7 +503,9 @@ export class Arena {
 
     // Setup run details view, if available.
     if (document.getElementById('run-details') != null) {
-      this.runDetailsView = new Vue({
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      const self = this;
+      self.runDetailsView = new Vue({
         el: '#run-details',
         components: {
           'omegaup-arena-rundetails': arena_RunDetails,
@@ -514,6 +517,34 @@ export class Arena {
           return createElement('omegaup-arena-rundetails', {
             props: {
               data: this.data,
+              inCourse: self.options.courseAlias !== null,
+            },
+            on: {
+              'set-feedback': ({
+                guid,
+                feedback,
+                isUpdate,
+              }: {
+                guid: string;
+                feedback: string;
+                isUpdate: boolean;
+              }) => {
+                api.Submission.setFeedback({
+                  guid,
+                  course_alias: self.options.courseAlias,
+                  assignment_alias: self.options.assignmentAlias,
+                  feedback,
+                })
+                  .then(() => {
+                    ui.success(
+                      isUpdate
+                        ? T.feedbackSuccesfullyUpdated
+                        : T.feedbackSuccesfullyAdded,
+                    );
+                    self.hideOverlay();
+                  })
+                  .catch(ui.error);
+              },
             },
           });
         },
@@ -655,43 +686,34 @@ export class Arena {
     );
   }
 
-  connectSocket(): boolean {
+  connectSocket() {
     if (this.options.disableSockets || this.options.contestAlias == 'admin') {
       this.updateSocketStatus('✗', '#800');
-      return false;
+      return;
     }
 
-    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    const uris = [];
-    // Backendv2 uri
-    uris.push(
-      `${protocol}${window.location.host}/events/?filter=/problemset/${this.options.problemsetId}` +
-        (this.options.scoreboardToken
-          ? `/${this.options.scoreboardToken}`
-          : ''),
-    );
-
-    const connect = (uris: string[], index: number) => {
-      this.socket = new EventsSocket(uris[index], this);
-      this.socket.connect().catch((e) => {
-        console.log(e);
-        // Try the next uri.
-        index++;
-        if (index < uris.length) {
-          connect(uris, index);
-        } else {
-          // Out of options. Falling back to polls.
-          this.socket = null;
-          setTimeout(() => {
-            this.setupPolls();
-          }, Math.random() * 15000);
-        }
-      });
-    };
+    const uri =
+      `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${
+        window.location.host
+      }/events/?filter=/problemset/${this.options.problemsetId}` +
+      (this.options.scoreboardToken ? `/${this.options.scoreboardToken}` : '');
 
     this.updateSocketStatus('↻', '#888');
-    connect(uris, 0);
-    return false;
+    ui.reportEvent('events-socket', 'attempt');
+    this.socket = new EventsSocket(uri, this);
+    this.socket
+      .connect()
+      .then(() => {
+        ui.reportEvent('events-socket', 'connected');
+      })
+      .catch((e) => {
+        ui.reportEvent('events-socket', 'fallback');
+        console.log(e);
+        this.socket = null;
+        setTimeout(() => {
+          this.setupPolls();
+        }, Math.random() * 15000);
+      });
   }
 
   updateSocketStatus(status: string, color: string): void {
@@ -768,6 +790,7 @@ export class Arena {
           setTimeout(problemsetCallback, 1000);
         } else {
           api.Problemset.details({ problemset_id: problemsetId })
+            .then(time.remoteTimeAdapter)
             .then((result) => this.problemsetLoaded(result))
             .catch((e) => this.problemsetLoadedError(e));
         }
@@ -1330,7 +1353,7 @@ export class Arena {
         navigator: {
           series: {
             type: 'line',
-            step: true,
+            step: 'right',
             lineWidth: 3,
             lineColor: '#333',
             data: navigatorSeries,
@@ -1340,7 +1363,7 @@ export class Arena {
         rangeSelector: { enabled: false },
 
         series: series,
-      } as Highcharts.Options,
+      },
     );
   }
 
@@ -1359,16 +1382,17 @@ export class Arena {
     let r: HTMLElement | null = null;
     const anchor = `clarifications/clarification-${clarification.clarification_id}`;
     const clarifications =
-      this.commonNavbar?.initialClarifications ?? this.initialClarifications;
+      this.commonNavbar?.notificationsClarifications ??
+      this.notificationsClarifications;
     if (this.clarifications[clarification.clarification_id]) {
       r = this.clarifications[clarification.clarification_id];
       if (this.problemsetAdmin) {
-        this.initialClarifications = clarifications.filter(
+        this.notificationsClarifications = clarifications.filter(
           (notification) =>
             notification.clarification_id !== clarification.clarification_id,
         );
         if (this.commonNavbar !== null) {
-          this.commonNavbar.initialClarifications = this.initialClarifications;
+          this.commonNavbar.notificationsClarifications = this.notificationsClarifications;
         }
       } else {
         clarifications.push(clarification);
@@ -1498,8 +1522,10 @@ export class Arena {
       this.updateClarification(clarifications[i]);
     }
 
+    this.selectRowTable();
+
     if (this.commonNavbar !== null) {
-      this.commonNavbar.initialClarifications = clarifications
+      this.commonNavbar.notificationsClarifications = clarifications
         .filter((clarification) =>
           // Removing all unsolved clarifications.
           this.problemsetAdmin
@@ -1512,7 +1538,7 @@ export class Arena {
         )
         .reverse();
     } else {
-      this.initialClarifications = clarifications
+      this.notificationsClarifications = clarifications
         .filter((clarification) =>
           // Removing all unsolved clarifications.
           this.problemsetAdmin
@@ -1692,6 +1718,7 @@ export class Arena {
                 this.problemsetAdmin && !this.myRunsList.isProblemsetOpened,
             }),
           )
+            .then(time.remoteTimeAdapter)
             .then((problem_ext) => {
               problem.source = problem_ext.source;
               problem.problemsetter = problem_ext.problemsetter;
@@ -1723,6 +1750,12 @@ export class Arena {
         this.navbarProblems.activeProblem = null;
       }
     } else if (this.activeTab == 'clarifications') {
+      const match = /#(?<tab>\w+)\/(?<name>\w+)-(?<id>\d+)/g.exec(
+        window.location.hash,
+      );
+      const clarificationId = parseInt(match?.groups?.id ?? '');
+      clarificationsStore.commit('selectClarificationId', clarificationId);
+      this.selectRowTable();
       if (window.location.hash == '#clarifications/new') {
         $('#overlay form').hide();
         $('#overlay, #clarification').show();
@@ -1743,6 +1776,19 @@ export class Arena {
       } else if (this.activeTab == 'clarifications') {
         $('#clarifications-count').css('font-weight', 'normal');
       }
+    }
+  }
+
+  selectRowTable(): void {
+    const r = document.querySelector(
+      '#clarifications .clarification-list .selected',
+    ) as HTMLElement | null;
+    if (r) {
+      r.classList.remove('selected');
+    }
+    const id = clarificationsStore.state.selectedClarificationId ?? null;
+    if (id && this.clarifications[id]) {
+      this.clarifications[id].classList.add('selected');
     }
   }
 
@@ -1861,7 +1907,15 @@ export class Arena {
 
     this.updateAllowedLanguages(this.currentProblem.languages);
 
-    this.ephemeralGrader.send('setSettings', this.currentProblem.settings);
+    if (this.currentProblem.accepts_submissions) {
+      this.ephemeralGrader.show();
+      this.ephemeralGrader.send('setSettings', {
+        alias: this.currentProblem.alias,
+        settings: this.currentProblem.settings,
+      });
+    } else {
+      this.ephemeralGrader.hide();
+    }
   }
 
   detectShowRun(): void {
@@ -1989,25 +2043,24 @@ export class Arena {
     return {};
   }
 
-  submitRun(code: string, language: string): void {
+  submitRun(code: string, language: string): Promise<void> {
     const problemset = this.computeProblemsetArg();
 
-    api.Run.create(
+    return api.Run.create(
       Object.assign(problemset, {
         problem_alias: this.currentProblem.alias,
         language: language,
         source: code,
       }),
     )
+      .then(time.remoteTimeAdapter)
       .then((response) => {
         ui.reportEvent('submission', 'submit');
         if (this.options.isLockdownMode && sessionStorage) {
           sessionStorage.setItem(`run:${response.guid}`, code);
         }
-
-        const currentProblem = this.problems[this.currentProblem.alias];
-        currentProblem.lastSubmission = new Date();
-        currentProblem.nextSubmissionTimestamp =
+        this.currentProblem.lastSubmission = new Date();
+        this.currentProblem.nextSubmissionTimestamp =
           response.nextSubmissionTimestamp;
         const run = {
           guid: response.guid,
@@ -2026,7 +2079,10 @@ export class Arena {
           language: language,
         };
         this.updateRun(run);
-        if (this.runSubmitView) {
+        if (
+          this.runSubmitView &&
+          Object.getOwnPropertyNames(this.runSubmitView.$refs).length !== 0
+        ) {
           const component = this.runSubmitView.$refs
             .component as arena_RunSubmit;
           component.clearForm();
@@ -2120,7 +2176,7 @@ export class Arena {
           !this.options.contestAlias || this.options.contestAlias === 'admin'
             ? data.show_diff
             : 'none',
-        feedback: ((this.options.contestAlias &&
+        submissionFeedback: ((this.options.contestAlias &&
           this.currentProblemset?.feedback) ||
           'detailed') as omegaup.SubmissionFeedback,
       });
@@ -2393,6 +2449,20 @@ export class EphemeralGrader {
         this._sendInternal(message);
       });
     };
+  }
+
+  show(): void {
+    if (!this.ephemeralEmbeddedGraderElement) {
+      return;
+    }
+    this.ephemeralEmbeddedGraderElement.classList.remove('hidden');
+  }
+
+  hide(): void {
+    if (!this.ephemeralEmbeddedGraderElement) {
+      return;
+    }
+    this.ephemeralEmbeddedGraderElement.classList.add('hidden');
   }
 
   send(method: string, ...params: any[]): void {

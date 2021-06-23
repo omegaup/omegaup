@@ -11,6 +11,7 @@ try_define('OMEGAUP_MD5_SALT', 'omegaup');
 try_define('OMEGAUP_URL', 'http://localhost');
 try_define('OMEGAUP_ENVIRONMENT', 'production');
 try_define('OMEGAUP_MAINTENANCE', null);
+try_define('OMEGAUP_SESSION_API_HOURLY_LIMIT', 1000);
 
 # ####################################
 # TEST CONFIG

@@ -31,9 +31,9 @@
         </div>
         <div
           v-if="problem.acceptsSubmissions"
-          class="col-xs-7 solved text-right w-50 pr-4"
+          class="col-xs-7 solved text-right w-50 pr-3"
         >
-          <span
+          <span class="mr-1"
             >({{
               parseFloat(problem.bestScore).toFixed(digitsAfterDecimalPoint)
             }}
@@ -110,12 +110,13 @@ export default class ArenaNavbarProblems extends Vue {
   }
 
   onNavigateToProblem(problem: types.NavbarProblemsetProblem) {
-    this.$emit('navigate-to-problem', { problem, runs: [] });
+    this.$emit('navigate-to-problem', problem);
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .problem-list .breadcrumbs-link {
   display: inherit;
 }
@@ -124,14 +125,14 @@ export default class ArenaNavbarProblems extends Vue {
   width: 19em;
   margin-bottom: 0.5em;
   padding-top: 0.2em;
-  background: #ddd;
-  border: solid 1px #ccc;
+  background: var(--arena-contest-navbar-problem-list-background-color);
+  border: solid 1px var(--arena-contest-navbar-problem-list-border-color);
   border-width: 1px 0 1px 1px;
   position: relative;
 }
 
 .problem-list > div a {
-  color: #5588dd;
+  color: var(--arena-contest-navbar-problem-list-a-font-color);
   display: block;
   padding: 0.5em;
   width: 100%;
@@ -153,7 +154,7 @@ export default class ArenaNavbarProblems extends Vue {
 
 .problem-list .problem-type {
   font-size: 13px;
-  color: #9a9a9a;
+  color: var(--arena-contest-navbar-problem-type-font-color);
   font-weight: bold;
 }
 </style>

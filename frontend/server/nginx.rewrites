@@ -12,10 +12,11 @@ location /preguntas/ {
 	}
 }
 
-rewrite ^/admin/user/([a-zA-Z0-9_-]+)/?$ /admin/user.php?username=$1 last;
+rewrite ^/admin/user/([a-zA-Z0-9_+.-]+)/?$ /admin/user.php?username=$1 last;
 rewrite ^/admin/support/?$ /admin/support.php last;
 rewrite ^/arena/?$ /arena/index.php last;
 rewrite ^/arena/admin/?$ /arena/admin.php last;
+rewrite ^/arenav2/?$ /arena/indexv2.php last;
 rewrite ^/arena/problem/([a-zA-Z0-9_+-]+)/?$ /arena/problem.php?problem_alias=$1 last;
 rewrite ^/arena/problem/([a-zA-Z0-9_+-]+)/print/?$ /arena/problemprint.php?problem_alias=$1 last;
 rewrite ^/arena/([a-zA-Z0-9_+-]+)/virtual/?$ /arena/virtual.php?contest_alias=$1  last;
@@ -98,6 +99,9 @@ rewrite ^/schools/profile/([0-9]+)/?$ /schools/profile.php?school_id=$1 last;
 rewrite ^/scoreboardmerge/?$ /contests/scoreboardmerge.php last;
 rewrite ^/submissions/?$ /submissions/list.php last;
 rewrite ^/submissions/([a-zA-Z0-9_+.-]+)/?$ /submissions/user_list.php?username=$1 last;
+rewrite ^/teamsgroup/new/?$ /teamsgroup/new.php last;
+rewrite ^/teamsgroup/([a-zA-Z0-9_+:-]+)/edit/?$ /teamsgroup/edit.php?team_group_alias=$1 last;
+rewrite ^/teamsgroup/?$ /teamsgroup/list.php last;
 rewrite ^/user/emailedit/([a-zA-Z0-9_]+)/?$ /users/emailedit.php?username=$1 last;
 rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/redirecttointerview/([a-zA-Z0-9_+-]+)/?$ /userverifyemail.php?id=$1&redirecttointerview=$2 last;
 rewrite ^/user/verifyemail/([a-zA-Z0-9_]+)/?$ /userverifyemail.php?id=$1 last;

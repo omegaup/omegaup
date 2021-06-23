@@ -3,6 +3,10 @@
     <!-- id-lint off -->
     <div id="ranking-chart"></div>
     <!-- id-lint on -->
+    <highcharts
+      v-if="rankingChartOptions"
+      :options="rankingChartOptions"
+    ></highcharts>
     <label v-if="showInvitedUsersFilter">
       <input
         v-model="onlyShowExplicitlyInvited"
@@ -32,10 +36,7 @@
             :key="user.username"
             :class="user.username"
           >
-            <td
-              class="legend"
-              :style="{ backgroundColor: legendColor(userIndex) }"
-            ></td>
+            <td class="legend" :class="legendClass(userIndex)"></td>
             <td class="position">{{ user.place || '—' }}</td>
             <td class="user">
               {{ ui.rankingUsername(user) }}
@@ -87,16 +88,24 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
+import * as Highcharts from 'highcharts/highstock';
+import { Chart } from 'highcharts-vue';
 import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
+import * as time from '../../time';
 
-@Component
+@Component({
+  components: {
+    highcharts: Chart,
+  },
+})
 export default class ArenaScoreboard extends Vue {
-  @Prop() scoreboardColors!: string[];
+  @Prop({ default: 10 }) numberOfPositions!: number;
   @Prop() problems!: omegaup.Problem[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
+  @Prop() rankingChartOptions!: Highcharts.Options | null;
   @Prop() lastUpdated!: Date;
   @Prop({ default: true }) showInvitedUsersFilter!: boolean;
   @Prop({ default: true }) showPenalty!: boolean;
@@ -106,14 +115,15 @@ export default class ArenaScoreboard extends Vue {
   ui = ui;
   onlyShowExplicitlyInvited = true;
 
-  get lastUpdatedString(): string {
-    return !this.lastUpdated ? '' : this.lastUpdated.toString();
+  get lastUpdatedString(): null | string {
+    if (!this.lastUpdated) return null;
+    return ui.formatString(T.scoreboardLastUpdated, {
+      datetime: time.formatDateTime(this.lastUpdated),
+    });
   }
 
-  legendColor(idx: number): string {
-    return this.scoreboardColors && idx < this.scoreboardColors.length
-      ? this.scoreboardColors[idx]
-      : '';
+  legendClass(idx: number): string {
+    return idx < this.numberOfPositions ? `legend-${idx + 1}` : '';
   }
 
   renderPoints(p: types.ScoreboardRankingProblem): string {
@@ -151,59 +161,115 @@ export default class ArenaScoreboard extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .omegaup-scoreboard {
   max-width: 900px;
   margin: 0 auto;
+
   a {
-    color: #5588dd;
+    color: var(--arena-scoreboard-a-font-color);
   }
+
   .footer {
     padding: 1em;
     text-align: right;
     font-size: 70%;
-    color: grey;
+    color: var(--arena-scoreboard-footer-font-color);
   }
+
   table {
     border-collapse: collapse;
     width: 100%;
   }
+
   th {
     padding: 0.2em;
     text-align: center;
   }
+
   td {
     text-align: center;
     vertical-align: middle;
-    border: 1px solid #000;
+    border: 1px solid var(--arena-scoreboard-td-border-color);
     padding: 0.2em;
+
     .points {
       font-weight: bold;
     }
+
     .penalty {
       font-size: 70%;
     }
   }
+
   .accepted {
-    background: #dfd;
+    background: var(--arena-scoreboard-accepted-background-color);
   }
+
   .pending {
-    background: #ddf;
+    background: var(--arena-scoreboard-pending-background-color);
   }
+
   .wrong {
-    background: #fdd;
+    background: var(--arena-scoreboard-wrong-background-color);
   }
+
   .position.recent-event {
     font-weight: bold;
-    background: #dfd;
+    background: var(--arena-scoreboard-position-recent-event-background-color);
   }
+
   .accepted.recent-event {
-    background: #8f8;
+    background: var(--arena-scoreboard-accepted-recent-event-background-color);
   }
+
   .position {
     width: 3.5em;
   }
+
+  .legend-1 {
+    background-color: var(--arena-scoreboard-legend-1-background-color);
+  }
+
+  .legend-2 {
+    background-color: var(--arena-scoreboard-legend-2-background-color);
+  }
+
+  .legend-3 {
+    background-color: var(--arena-scoreboard-legend-3-background-color);
+  }
+
+  .legend-4 {
+    background-color: var(--arena-scoreboard-legend-4-background-color);
+  }
+
+  .legend-5 {
+    background-color: var(--arena-scoreboard-legend-5-background-color);
+  }
+
+  .legend-6 {
+    background-color: var(--arena-scoreboard-legend-6-background-color);
+  }
+
+  .legend-7 {
+    background-color: var(--arena-scoreboard-legend-7-background-color);
+  }
+
+  .legend-8 {
+    background-color: var(--arena-scoreboard-legend-8-background-color);
+  }
+
+  .legend-9 {
+    background-color: var(--arena-scoreboard-legend-9-background-color);
+  }
+
+  .legend-10 {
+    background-color: var(--arena-scoreboard-legend-10-background-color);
+  }
+
   .legend {
     width: 0.5em;
+    opacity: 0.8;
   }
 }
 </style>

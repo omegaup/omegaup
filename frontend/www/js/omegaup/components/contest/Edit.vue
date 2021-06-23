@@ -89,6 +89,14 @@
             @click="showTab = 'clone'"
             >{{ T.courseEditClone }}</a
           >
+          <a
+            href="#"
+            data-toggle="tab"
+            class="dropdown-item"
+            :class="{ active: showTab === 'archive' }"
+            @click="showTab = 'archive'"
+            >{{ T.contestEditArchive }}</a
+          >
         </div>
       </li>
     </ul>
@@ -123,11 +131,12 @@
           :contest-alias="details.alias"
           :initial-points="details.partial_score ? 100 : 1"
           :initial-problems="problems"
-          @add-problem="(problem) => $emit('add-problem', problem)"
-          @get-versions="
-            (problemAlias, addProblemComponent) =>
-              $emit('get-versions', problemAlias, addProblemComponent)
+          :search-result-problems="searchResultProblems"
+          @add-problem="(request) => $emit('add-problem', request)"
+          @update-search-result-problems="
+            (query) => $emit('update-search-result-problems', query)
           "
+          @get-versions="(request) => $emit('get-versions', request)"
           @remove-problem="
             (problemAlias) => $emit('remove-problem', problemAlias)
           "
@@ -151,19 +160,20 @@
       <div v-if="showTab === 'contestants'" class="tab-pane active contestants">
         <omegaup-contest-add-contestant
           :contest="details"
-          :initial-users="users"
-          @emit-add-user="
-            (contestants, contestant) =>
-              $emit('add-user', contestants, contestant)
+          :users="users"
+          :search-result-users="searchResultUsers"
+          @add-user="(contestants) => $emit('add-user', contestants)"
+          @update-search-result-users="
+            (query) => $emit('update-search-result-users', query)
           "
-          @emit-remove-user="(contestant) => $emit('remove-user', contestant)"
-          @emit-save-end-time="(user) => $emit('save-end-time', user)"
+          @remove-user="(contestant) => $emit('remove-user', contestant)"
+          @save-end-time="(user) => $emit('save-end-time', user)"
         ></omegaup-contest-add-contestant>
         <omegaup-common-requests
           :data="requests"
           :text-add-participant="T.contestAdduserAddContestant"
-          @emit-accept-request="(username) => $emit('accept-request', username)"
-          @emit-deny-request="(username) => $emit('deny-request', username)"
+          @accept-request="(request) => $emit('accept-request', request)"
+          @deny-request="(request) => $emit('deny-request', request)"
         ></omegaup-common-requests>
         <omegaup-contest-groups
           :groups="groups"
@@ -199,6 +209,16 @@
           "
         ></omegaup-contest-clone>
       </div>
+      <div v-if="showTab === 'archive'" class="tab-pane active">
+        <omegaup-common-archive
+          :already-archived="alreadyArchived"
+          :archive-button-description="archiveButtonDescription"
+          :archive-confirm-text="T.contestEditArchiveConfirmText"
+          :archive-header-title="T.contestEditArchiveContest"
+          :archive-help-text="archiveUnarchiveDescription"
+          @archive="onArchiveContest"
+        ></omegaup-common-archive>
+      </div>
     </div>
   </div>
 </template>
@@ -213,12 +233,14 @@ import contest_AddProblem from './AddProblem.vue';
 import contest_AddContestant from './AddContestant.vue';
 import contest_Clone from './Clone.vue';
 import contest_Admins from '../common/Adminsv2.vue';
-import common_Requests from '../common/Requestsv2.vue';
+import common_Archive from '../common/Archive.vue';
+import common_Requests from '../common/Requests.vue';
 import contest_GroupAdmins from '../common/GroupAdminsv2.vue';
 import contest_Groups from './Groups.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
 import common_Publish from '../common/Publishv2.vue';
+import omegaup_Markdown from '../Markdown.vue';
 
 @Component({
   components: {
@@ -226,12 +248,14 @@ import common_Publish from '../common/Publishv2.vue';
     'omegaup-contest-admins': contest_Admins,
     'omegaup-contest-clone': contest_Clone,
     'omegaup-contest-add-contestant': contest_AddContestant,
+    'omegaup-common-archive': common_Archive,
     'omegaup-common-requests': common_Requests,
     'omegaup-contest-groups': contest_Groups,
     'omegaup-contest-group-admins': contest_GroupAdmins,
     'omegaup-contest-links': contest_Links,
     'omegaup-contest-new-form': contest_NewForm,
     'omegaup-common-publish': common_Publish,
+    'omegaup-markdown': omegaup_Markdown,
   },
 })
 export default class Edit extends Vue {
@@ -239,14 +263,17 @@ export default class Edit extends Vue {
   @Prop() details!: types.ContestAdminDetails;
   @Prop() groups!: types.ContestGroup[];
   @Prop() groupAdmins!: types.ContestGroupAdmin[];
-  @Prop() problems!: types.ContestProblem[];
+  @Prop() problems!: types.ProblemsetProblemWithVersions[];
   @Prop() requests!: types.ContestRequest[];
   @Prop() users!: types.ContestUser[];
+  @Prop() searchResultProblems!: types.ListItem[];
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   ui = ui;
   showTab = ui.isVirtual(this.details) ? 'contestants' : 'new_form';
   virtual = ui.isVirtual(this.details);
+  alreadyArchived = this.details.archived;
 
   get activeTab(): string {
     switch (this.showTab) {
@@ -264,9 +291,30 @@ export default class Edit extends Vue {
         return T.showLinks;
       case 'clone':
         return T.courseEditClone;
+      case 'archive':
+        return T.contestEditArchive;
       default:
         return T.contestEdit;
     }
+  }
+
+  get archiveButtonDescription(): string {
+    if (this.alreadyArchived) {
+      return T.contestEditUnarchiveContest;
+    }
+    return T.contestEditArchiveContest;
+  }
+
+  get archiveUnarchiveDescription(): string {
+    if (this.alreadyArchived) {
+      return T.contestEditUnarchiveHelpText;
+    }
+    return T.contestEditArchiveHelpText;
+  }
+
+  onArchiveContest(archive: boolean): void {
+    this.$emit('archive-contest', this.details.alias, archive);
+    this.alreadyArchived = archive;
   }
 }
 </script>

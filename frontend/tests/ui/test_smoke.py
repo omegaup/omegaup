@@ -121,27 +121,11 @@ def test_create_problem(driver):
 
     with driver.login_admin():
         prepare_run(driver, problem_alias)
-        driver.wait.until(EC.element_to_be_clickable(
-            (By.XPATH, ('//a[contains(@href, "#runs")]')))).click()
-
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//table[contains(concat(" ", normalize-space(@class), " "), '
-                 '" global ")]/tbody/tr/td/div[contains(concat(" ", '
-                 'normalize-space(@class), " "), " dropdown ")]/'
-                 'button'))).click()
-
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//table[contains(concat(" ", normalize-space(@class), " "), '
-                 '" global ")]/tbody/tr/td/div[contains(concat(" ", '
-                 'normalize-space(@class), " "), " show ")]/ul/li['
-                 '@data-actions-details]/button'))).click()
-
-        assert (('show-run:') in
-                driver.browser.current_url), driver.browser.current_url
+        util.show_run_details(driver,
+                              table_classname='global',
+                              dropdown_classname='show',
+                              code='java.util.Scanner',
+                              has_been_migrated=True)
 
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -173,7 +157,7 @@ def test_create_problem(driver):
             '//table[contains(concat(" ", normalize-space(@class), " "), " '
             'global ")]/tbody/tr/td[@data-run-status]/span')
 
-        assert global_run.text == 'rejudging'
+        assert global_run.text in ('rejudging', 'AC')
 
 
 @util.annotate

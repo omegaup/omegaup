@@ -15,7 +15,7 @@ describe('Navbar.vue', () => {
         gravatarURL51:
           'https://secure.gravatar.com/avatar/568c0ec2147500d7cd09cc8bbc8e5ec4?s=51',
         inContest: true,
-        initialClarifications: [],
+        clarifications: [],
         isAdmin: false,
         isLoggedIn: true,
         isMainUserIdentity: true,
@@ -43,7 +43,7 @@ describe('Navbar.vue', () => {
         gravatarURL51:
           'https://secure.gravatar.com/avatar/568c0ec2147500d7cd09cc8bbc8e5ec4?s=51',
         inContest: false,
-        initialClarifications: [],
+        clarifications: [],
         isAdmin: false,
         isLoggedIn: true,
         isMainUserIdentity: true,
@@ -71,7 +71,7 @@ describe('Navbar.vue', () => {
         gravatarURL51:
           'https://secure.gravatar.com/avatar/568c0ec2147500d7cd09cc8bbc8e5ec4?s=51',
         inContest: false,
-        initialClarifications: [],
+        clarifications: [],
         isAdmin: false,
         isLoggedIn: false,
         isMainUserIdentity: true,

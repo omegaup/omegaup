@@ -54,7 +54,11 @@ abstract class Contests {
                 `show_scoreboard_after` = ?,
                 `urgent` = ?,
                 `languages` = ?,
-                `recommended` = ?
+                `recommended` = ?,
+                `archived` = ?,
+                `certificate_cutoff` = ?,
+                `certificates_status` = ?,
+                `contest_for_teams` = ?
             WHERE
                 (
                     `contest_id` = ?
@@ -105,6 +109,14 @@ abstract class Contests {
             intval($Contests->urgent),
             $Contests->languages,
             intval($Contests->recommended),
+            intval($Contests->archived),
+            (
+                is_null($Contests->certificate_cutoff) ?
+                null :
+                intval($Contests->certificate_cutoff)
+            ),
+            $Contests->certificates_status,
+            intval($Contests->contest_for_teams),
             intval($Contests->contest_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -149,7 +161,11 @@ abstract class Contests {
                 `Contests`.`show_scoreboard_after`,
                 `Contests`.`urgent`,
                 `Contests`.`languages`,
-                `Contests`.`recommended`
+                `Contests`.`recommended`,
+                `Contests`.`archived`,
+                `Contests`.`certificate_cutoff`,
+                `Contests`.`certificates_status`,
+                `Contests`.`contest_for_teams`
             FROM
                 `Contests`
             WHERE
@@ -254,7 +270,11 @@ abstract class Contests {
                 `Contests`.`show_scoreboard_after`,
                 `Contests`.`urgent`,
                 `Contests`.`languages`,
-                `Contests`.`recommended`
+                `Contests`.`recommended`,
+                `Contests`.`archived`,
+                `Contests`.`certificate_cutoff`,
+                `Contests`.`certificates_status`,
+                `Contests`.`contest_for_teams`
             FROM
                 `Contests`
         ';
@@ -327,8 +347,16 @@ abstract class Contests {
                     `show_scoreboard_after`,
                     `urgent`,
                     `languages`,
-                    `recommended`
+                    `recommended`,
+                    `archived`,
+                    `certificate_cutoff`,
+                    `certificates_status`,
+                    `contest_for_teams`
                 ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -399,6 +427,14 @@ abstract class Contests {
             intval($Contests->urgent),
             $Contests->languages,
             intval($Contests->recommended),
+            intval($Contests->archived),
+            (
+                is_null($Contests->certificate_cutoff) ?
+                null :
+                intval($Contests->certificate_cutoff)
+            ),
+            $Contests->certificates_status,
+            intval($Contests->contest_for_teams),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

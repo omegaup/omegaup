@@ -12,21 +12,25 @@
       role="button"
       ><span class="glyphicon glyphicon-bell"></span>
       <span
-        v-if="clarifications && clarifications.length > 0"
+        v-if="unreadClarifications && unreadClarifications.length > 0"
         class="notification-counter label"
-        :class="{ 'label-danger': clarifications.length > 0 }"
-        >{{ clarifications.length }}</span
+        :class="{ 'label-danger': unreadClarifications.length > 0 }"
+        >{{ unreadClarifications.length }}</span
       ></a
     >
     <ul class="dropdown-menu">
-      <li v-if="!clarifications || clarifications.length === 0" class="empty">
+      <li
+        v-if="!unreadClarifications || unreadClarifications.length === 0"
+        class="empty"
+      >
         {{ T.notificationsNoNewNotifications }}
       </li>
       <li v-else>
         <ul class="notification-drawer">
           <li
-            v-for="clarification in clarifications"
+            v-for="clarification in unreadClarifications"
             :key="clarification.clarification_id"
+            :data-clarification="clarification.clarification_id"
           >
             <button
               :aria-label="T.wordsClose"
@@ -48,9 +52,9 @@
           </li>
         </ul>
       </li>
-      <template v-if="clarifications && clarifications.length > 1">
+      <template v-if="unreadClarifications && unreadClarifications.length > 1">
         <li class="divider" role="separator"></li>
-        <li>
+        <li data-mark-all-as-read-button>
           <a href="#" @click.prevent="onMarkAllAsRead"
             ><span class="glyphicon glyphicon-align-right"></span>
             {{ T.notificationsMarkAllAsRead }}</a
@@ -68,23 +72,23 @@ import T from '../../lang';
 
 @Component
 export default class Clarifications extends Vue {
-  @Prop() initialClarifications!: types.Clarification[];
+  @Prop({ default: () => [] }) clarifications!: types.Clarification[];
+
   @Prop() isAdmin!: boolean;
   T = T;
 
   flashInterval: number = 0;
-  clarifications: types.Clarification[] = this.initialClarifications;
-
-  @Watch('initialClarifications')
-  onPropertyChanged(newValue: types.Clarification[]): void {
-    this.clarifications = newValue;
-    const audio = this.$refs.notificationAudio as HTMLMediaElement;
-    if (audio !== null) {
-      audio.play();
-    }
-  }
+  unreadClarifications = this.clarifications;
 
   @Watch('clarifications')
+  onPropertyChanged(newValue: types.Clarification[]): void {
+    this.unreadClarifications = newValue;
+    const audio = this.$refs['notification-audio'] as HTMLMediaElement;
+    if (!audio) return;
+    audio.play();
+  }
+
+  @Watch('unreadClarifications')
   onPropertyChange(newValue: types.Clarification[]): void {
     if (newValue.length > 0) {
       if (this.flashInterval) return;
@@ -113,23 +117,24 @@ export default class Clarifications extends Vue {
 
   onCloseClicked(clarification: types.Clarification): void {
     const id = `clarification-${clarification.clarification_id}`;
-    this.clarifications = this.clarifications.filter(
+    this.unreadClarifications = this.unreadClarifications.filter(
       (element) => element.clarification_id !== clarification.clarification_id,
     );
     localStorage.setItem(id, Date.now().toString());
   }
 
   onMarkAllAsRead(): void {
-    for (const clarification of this.clarifications) {
+    for (const clarification of this.unreadClarifications) {
       const id = `clarification-${clarification.clarification_id}`;
       localStorage.setItem(id, Date.now().toString());
     }
-    this.clarifications = [];
+    this.unreadClarifications = [];
   }
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
 .notification-button {
   padding-top: 6px !important;
   padding-bottom: 20px !important;
@@ -143,23 +148,29 @@ export default class Clarifications extends Vue {
   font-size: 16px;
   padding: 2px 4px;
   bottom: 4px;
-  right: 0px;
+  right: 0;
 }
 
 .notification-drawer::-webkit-scrollbar-track {
   border-radius: 10px;
-  background-color: #f5f5f5;
+  background-color: var(
+    --notifications-clarifications-scrollbar-track-background-color
+  );
 }
 
 .notification-drawer::-webkit-scrollbar {
   width: 8px;
   height: 8px;
-  background-color: #f5f5f5;
+  background-color: var(
+    --notifications-clarifications-scrollbar-background-color
+  );
 }
 
 .notification-drawer::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: #7f7f7f;
+  background-color: var(
+    --notifications-clarifications-scrollbar-thumb-background-color
+  );
 }
 
 .notification-drawer {
@@ -171,11 +182,13 @@ export default class Clarifications extends Vue {
 
 .notification-drawer li {
   padding: 3px 20px;
-  border-top: 1px solid #f1f1f1;
+  list-style: none;
+  border-top: 1px solid
+    var(--notifications-clarifications-drawer-li-border-top-color);
 }
 
 .notification-drawer li a {
-  color: #333;
+  color: var(--notifications-clarifications-drawer-li-a-font-color);
   text-decoration: none;
 }
 
@@ -190,14 +203,16 @@ export default class Clarifications extends Vue {
 .notification-drawer li:focus,
 .notification-drawer li:active {
   cursor: pointer;
-  background-color: #678dd7;
+  background-color: var(
+    --notifications-clarifications-drawer-li-background-color--active
+  );
   text-decoration: none;
 }
 
 .notification-drawer li:hover > a,
 .notification-drawer li:focus > a,
 .notification-drawer li:active > a {
-  color: #fff;
+  color: var(--notifications-clarifications-drawer-li-font-color--active);
 }
 
 .notification-drawer li a > h4,

@@ -16,6 +16,23 @@ CREATE TABLE `ACLs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `API_Tokens` (
+  `apitoken_id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Momento de creación del token',
+  `name` varchar(100) NOT NULL COMMENT 'Nombre que el usuario le asigna al token',
+  `token` char(40) NOT NULL COMMENT 'Contenido del token',
+  `last_used` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Momento de último uso del token, redondeado a la última hora',
+  `use_count` int NOT NULL DEFAULT '0' COMMENT 'Número de usos desde la última hora',
+  PRIMARY KEY (`apitoken_id`),
+  UNIQUE KEY `token` (`token`),
+  UNIQUE KEY `user_name` (`user_id`,`name`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `fk_atu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tokens para el API';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Announcement` (
   `announcement_id` int NOT NULL AUTO_INCREMENT COMMENT 'Identificador del aviso',
   `user_id` int NOT NULL COMMENT 'UserID del autor de este aviso',
@@ -66,6 +83,26 @@ CREATE TABLE `Auth_Tokens` (
   CONSTRAINT `fk_ati_acting_identity_id` FOREIGN KEY (`acting_identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_ati_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tokens de autorización para los logins.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Certificates` (
+  `certificate_id` int NOT NULL AUTO_INCREMENT,
+  `identity_id` int NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora del otorgamiento del diploma',
+  `certificate_type` enum('course','contest','coder_of_the_month','coder_of_the_month_female') NOT NULL COMMENT 'Tipo de diploma',
+  `course_id` int DEFAULT NULL,
+  `contest_id` int DEFAULT NULL,
+  `verification_code` varchar(10) NOT NULL COMMENT 'Código de verificación del diploma',
+  PRIMARY KEY (`certificate_id`),
+  UNIQUE KEY `verification_code` (`verification_code`),
+  KEY `identity_id` (`identity_id`),
+  KEY `course_id` (`course_id`),
+  KEY `contest_id` (`contest_id`),
+  CONSTRAINT `fk_cc_contest_id` FOREIGN KEY (`contest_id`) REFERENCES `Contests` (`contest_id`),
+  CONSTRAINT `fk_cc_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`),
+  CONSTRAINT `fk_ci_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Diplomas';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -158,6 +195,10 @@ CREATE TABLE `Contests` (
   `urgent` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el concurso es de alta prioridad y requiere mejor QoS.',
   `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar en un concurso',
   `recommended` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Mostrar el concurso en la lista de recomendados.',
+  `archived` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el concurso ha sido archivado por el administrador.',
+  `certificate_cutoff` int DEFAULT NULL COMMENT 'Número de concursantes a premiar con diplomas que mencionan su lugar en el ranking',
+  `certificates_status` enum('uninitiated','queued','generated','retryable_error','fatal_error') NOT NULL DEFAULT 'uninitiated' COMMENT 'Estado de la petición de generar diplomas',
+  `contest_for_teams` tinyint(1) DEFAULT '0' COMMENT 'Bandera que indica si el concurso es para equipos.',
   PRIMARY KEY (`contest_id`),
   UNIQUE KEY `contests_alias` (`alias`),
   KEY `rerun_id` (`contest_id`),
@@ -246,6 +287,7 @@ CREATE TABLE `Courses` (
   `show_scoreboard` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Los estudiantes pueden visualizar el scoreboard de un curso.',
   `languages` set('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') DEFAULT NULL COMMENT 'Un filtro (opcional) de qué lenguajes se pueden usar en un curso',
   `archived` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el curso ha sido archivado por el administrador.',
+  `minimum_progress_for_certificate` int DEFAULT NULL COMMENT 'Progreso mínimo que debe cumplir el estudiante para que se le otorgue el diploma del curso. NULL indica que el curso no da diplomas.',
   PRIMARY KEY (`course_id`),
   UNIQUE KEY `course_alias` (`alias`),
   KEY `fk_ca_acl_id` (`acl_id`),
@@ -648,7 +690,7 @@ CREATE TABLE `Problemset_Identity_Request` (
   KEY `identity_id` (`identity_id`),
   CONSTRAINT `fk_piri_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_purp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Used when admission_mode = registration';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Used when admission_mode = registration';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -664,7 +706,7 @@ CREATE TABLE `Problemset_Identity_Request_History` (
   KEY `identity_problemset_hist` (`identity_id`,`problemset_id`),
   CONSTRAINT `fk_pirhi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_purhp_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -904,6 +946,21 @@ CREATE TABLE `States` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Submission_Feedback` (
+  `submission_feedback_id` int NOT NULL AUTO_INCREMENT,
+  `identity_id` int NOT NULL COMMENT 'Identidad de quien envió el feedback',
+  `submission_id` int NOT NULL COMMENT 'Identificador del envío asociado',
+  `feedback` text NOT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Hora en la que se envió el feedback',
+  PRIMARY KEY (`submission_feedback_id`),
+  UNIQUE KEY `submission_id` (`submission_id`),
+  KEY `fk_sfi_identity_id` (`identity_id`),
+  CONSTRAINT `fk_sfi_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
+  CONSTRAINT `fk_sfs_submission_id` FOREIGN KEY (`submission_id`) REFERENCES `Submissions` (`submission_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Almacena el feedback dejado por los profesores para los envíos de los estudiantes.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Submission_Log` (
   `problemset_id` int DEFAULT NULL,
   `submission_id` int NOT NULL,
@@ -957,6 +1014,61 @@ CREATE TABLE `Tags` (
   PRIMARY KEY (`tag_id`),
   UNIQUE KEY `tag_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tags privados para los problemas.';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Team_Groups` (
+  `team_group_id` int NOT NULL AUTO_INCREMENT,
+  `acl_id` int NOT NULL,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `alias` varchar(50) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `description` varchar(256) DEFAULT NULL,
+  PRIMARY KEY (`team_group_id`),
+  UNIQUE KEY `team_group_alias` (`alias`),
+  KEY `acl_id` (`acl_id`),
+  CONSTRAINT `fk_tg_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Team_Users` (
+  `team_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`team_id`,`user_id`),
+  KEY `team_id` (`team_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `fk_tut_team_id` FOREIGN KEY (`team_id`) REFERENCES `Teams` (`team_id`),
+  CONSTRAINT `fk_tuu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Teams` (
+  `team_id` int NOT NULL AUTO_INCREMENT,
+  `team_group_id` int NOT NULL COMMENT 'Id del grupo de equipos',
+  `identity_id` int NOT NULL COMMENT 'La identidad asociada al equipo',
+  PRIMARY KEY (`team_id`),
+  KEY `identity_id` (`identity_id`),
+  KEY `team_group_id` (`team_group_id`),
+  CONSTRAINT `fk_ti_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
+  CONSTRAINT `fk_ttg_team_group_id` FOREIGN KEY (`team_group_id`) REFERENCES `Team_Groups` (`team_group_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Teams_Group_Roles` (
+  `team_group_id` int NOT NULL,
+  `role_id` int NOT NULL,
+  `acl_id` int NOT NULL,
+  PRIMARY KEY (`team_group_id`,`role_id`,`acl_id`),
+  KEY `team_group_id` (`team_group_id`),
+  KEY `role_id` (`role_id`),
+  KEY `acl_id` (`acl_id`),
+  CONSTRAINT `fk_tgra_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
+  CONSTRAINT `fk_tgrg_team_group_id` FOREIGN KEY (`team_group_id`) REFERENCES `Team_Groups` (`team_group_id`),
+  CONSTRAINT `fk_tgrr_role_id` FOREIGN KEY (`role_id`) REFERENCES `Roles` (`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Establece los roles que se pueden dar a los grupos de equipos.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;

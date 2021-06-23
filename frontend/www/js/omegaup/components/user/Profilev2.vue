@@ -157,7 +157,7 @@
                 ></omegaup-grid-paginator>
               </div>
               <div
-                v-if="selectedTab == 'contests'"
+                v-show="selectedTab == 'contests'"
                 class="tab-pane fade show active"
                 role="tab"
                 aria-labelledby="nav-contests-tab"
@@ -293,9 +293,11 @@ export default class UserProfile extends Vue {
 a:hover {
   cursor: pointer;
 }
+
 th.numericColumn {
   text-align: right;
 }
+
 [data-user-profile-root] {
   font-size: 1rem;
 }

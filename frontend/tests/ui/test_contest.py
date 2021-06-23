@@ -487,12 +487,12 @@ def add_students_contest(driver, users):
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH, '//a[@data-nav-contestant]')))
-    util.add_students(
+    util.add_students_to_contest(
         driver, users,
         tab_xpath='//a[@data-nav-contestant]',
         container_xpath='//div[contains(@class, "contestants-input-area")]',
-        parent_xpath='div[contains(@class, "contestants")]',
-        submit_locator=(By.CLASS_NAME, 'user-add-single'))
+        parent_selector='.contestants',
+        submit_locator=(By.CLASS_NAME, 'user-add-typeahead'))
 
 
 @util.annotate
@@ -541,8 +541,7 @@ def add_problem_to_contest(driver, problem):
             (By.CSS_SELECTOR,
              'a.problems'))).click()
 
-    driver.typeahead_helper('*[contains(@class, "problems-container")]',
-                            problem)
+    driver.typeahead_helper_v2('.problems-container', problem)
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH,
@@ -556,7 +555,7 @@ def add_problem_to_contest(driver, problem):
         EC.visibility_of_element_located(
             (By.XPATH,
              '//*[contains(concat(" ", normalize-space(@class), " "), " table'
-             ' ")]//a[text()="%s"]' % problem)))
+             ' ")]//a[@href="/arena/problem/%s/"]' % problem)))
 
 
 @util.annotate

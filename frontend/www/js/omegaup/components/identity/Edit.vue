@@ -6,18 +6,22 @@
     <div class="card-body">
       <form role="form" @submit.prevent="onEditMember">
         <div class="form-row">
-          <div class="form-group col-lg-4 col-md-6 col-sm-6">
+          <div class="form-group col-lg-5 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.username }}
               <div class="input-group">
                 <div class="input-group-prepend">
                   <div class="input-group-text">{{ groupName }}:</div>
                 </div>
-                <input v-model="identityName" class="form-control" />
+                <input
+                  v-model="identityName"
+                  class="form-control"
+                  data-identity-name
+                />
               </div>
             </label>
           </div>
-          <div class="form-group col-lg-4 col-md-6 col-sm-6">
+          <div class="form-group col-lg-3 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.profile }}
               <input v-model="selectedIdentity.name" class="form-control" />
@@ -84,7 +88,9 @@
           </div>
         </div>
         <div class="form-group float-right">
-          <button class="btn btn-primary">{{ T.wordsSaveChanges }}</button>
+          <button class="btn btn-primary" data-update-identity>
+            {{ T.wordsSaveChanges }}
+          </button>
           <button
             class="btn btn-secondary ml-2"
             type="reset"
@@ -99,7 +105,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import type { types } from '../../api_types';
 import T from '../../lang';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
@@ -132,11 +138,19 @@ export default class IdentityEdit extends Vue {
   );
 
   get groupName(): string {
-    return this.selectedIdentity.username.split(':')[0];
+    const teamUsername = this.selectedIdentity.username.split(':');
+    if (teamUsername.length === 2) {
+      return teamUsername[0];
+    }
+    return `${teamUsername[0]}:${teamUsername[1]}`;
   }
 
   get identityName(): string {
-    return this.selectedIdentity.username.split(':')[1];
+    const teamUsername = this.selectedIdentity.username.split(':');
+    if (teamUsername.length === 2) {
+      return teamUsername[1];
+    }
+    return teamUsername[2];
   }
   set identityName(username: string) {
     this.selectedIdentity.username = `${this.groupName}:${username}`;
@@ -154,6 +168,11 @@ export default class IdentityEdit extends Vue {
       this.identity?.username,
       this.selectedIdentity,
     );
+  }
+
+  @Watch('identity')
+  onIdentityChanged(newValue: types.Identity): void {
+    this.selectedIdentity = newValue;
   }
 }
 </script>

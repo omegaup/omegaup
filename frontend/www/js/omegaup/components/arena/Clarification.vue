@@ -3,11 +3,22 @@
     :class="{
       resolved: clarification.answer,
       'direct-message': isDirectMessage,
+      'border border-primary': selected,
     }"
   >
+    <td
+      v-if="
+        'assignment_alias' in clarification && clarification.assignment_alias
+      "
+      class="text-center align-middle"
+    >
+      {{ clarification.assignment_alias }}
+    </td>
     <td class="text-center align-middle">
       {{
-        !inContest ? clarification.contest_alias : clarification.problem_alias
+        'contest_alias' in clarification && clarification.contest_alias
+          ? clarification.contest_alias
+          : clarification.problem_alias
       }}
     </td>
     <td class="text-center align-middle">{{ clarification.author }}</td>
@@ -84,10 +95,10 @@ import { types } from '../../api_types';
 import * as time from '../../time';
 
 @Component
-export default class ArenaClarificationForm extends Vue {
+export default class ArenaClarification extends Vue {
   @Prop() clarification!: types.Clarification;
-  @Prop() inContest!: boolean;
   @Prop({ default: false }) isAdmin!: boolean;
+  @Prop({ default: false }) selected!: boolean;
 
   T = T;
   time = time;
@@ -136,33 +147,42 @@ export default class ArenaClarificationForm extends Vue {
   }
 
   sendClarificationResponse(): void {
-    this.$emit(
-      'clarification-response',
-      this.clarification.clarification_id,
-      this.responseText,
-      this.isPublic,
-    );
+    const response: types.Clarification = {
+      clarification_id: this.clarification.clarification_id,
+      answer: this.responseText,
+      public: this.isPublic,
+      message: this.message,
+      problem_alias: this.clarification.problem_alias,
+      time: new Date(),
+    };
     this.showUpdateAnswer = false;
+    this.$emit('clarification-response', response);
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .resolved {
-  color: rgb(70, 136, 71);
+  color: var(--clarification-resolved-font-color);
   background-image: linear-gradient(
-    rgb(223, 240, 216) 0px,
-    rgb(200, 229, 188) 100%
+    var(--clarification-resolved-gradient-from-background-color),
+    var(--clarification-resolved-gradient-to-background-color)
   );
-  background-color: rgb(223, 240, 216);
+  background-color: var(--clarification-resolved-background-color);
 }
 
 .direct-message {
-  color: rgb(125, 117, 18);
+  color: var(--clarification-direct-message-font-color);
   background-image: linear-gradient(
-    rgb(253, 245, 154) 0px,
-    rgba(255, 249, 181, 0.5) 100%
+    var(--clarification-direct-message-gradient-from-background-color),
+    rgba(var(--clarification-direct-message-gradient-to-background-color), 0.5)
   );
-  background-color: rgb(223, 240, 216);
+  background-color: var(--clarification-direct-message-background-color);
+}
+
+.border {
+  border-width: 3px !important;
 }
 </style>

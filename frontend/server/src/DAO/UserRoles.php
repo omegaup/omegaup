@@ -8,12 +8,35 @@ namespace OmegaUp\DAO;
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\UserRoles}.
- *
- * @author alanboy
  * @access public
  * @package docs
  */
 class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
+    /**
+     * Gets the username of the owner of an ACL
+     *
+     * @return null|string
+     */
+    public static function getOwner(int $aclId): ?string {
+        $sql = '
+            SELECT
+                i.username
+            FROM
+                ACLs a
+            INNER JOIN
+                Users u ON u.user_id = a.owner_id
+            INNER JOIN
+                Identities i ON u.main_identity_id = i.identity_id
+            WHERE
+                a.acl_id = ?;';
+
+        /** @var string|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [ $aclId ]
+        );
+    }
+
     /**
      * @return list<array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string}>
      */

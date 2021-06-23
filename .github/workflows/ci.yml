@@ -4,7 +4,7 @@ on:
   pull_request: {}
   push:
     branches:
-      - master
+      - main
 
 jobs:
   php:
@@ -12,7 +12,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:8.0
+        image: mysql:8.0.23
         ports:
           - 3306:3306
         env:
@@ -34,6 +34,8 @@ jobs:
       - name: Use PHP 7.4
         run: |
           sudo update-alternatives --install /usr/bin/php php /usr/bin/php7.4 100
+          # Enable coverage for XDebug so that codecov can do its magic.
+          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/7.4/cli/conf.d/20-xdebug.ini >/dev/null
 
       - name: Download gitserver
         run: |
@@ -98,7 +100,14 @@ jobs:
             --show-info=false
 
       - name: Upload code coverage
-        run: bash <(curl -s https://codecov.io/bash) -cF php
+        run: |
+          curl -s https://codecov.io/bash > codecov
+          VERSION=$(grep 'VERSION=\".*\"' codecov | cut -d'"' -f2)
+          for i in 1 256 512
+          do
+            shasum -a $i -c --ignore-missing <(curl -s https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM)
+          done
+          bash codecov -cF php
 
       - name: Upload artifacts
         if: ${{ always() }}
@@ -123,7 +132,13 @@ jobs:
 
       - name: Upload code coverage
         run: |
-          bash <(curl -s https://codecov.io/bash) -cF javascript
+          curl -s https://codecov.io/bash > codecov
+          VERSION=$(grep 'VERSION=\".*\"' codecov | cut -d'"' -f2)
+          for i in 1 256 512
+          do
+            shasum -a $i -c --ignore-missing <(curl -s https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM)
+          done
+          bash codecov -cF javascript
 
   lint:
     runs-on: ubuntu-20.04
@@ -164,48 +179,31 @@ jobs:
   selenium:
     runs-on: ubuntu-20.04
 
-    services:
-      mysql:
-        image: mysql:8.0
-        ports:
-          - 3306:3306
-        env:
-          MYSQL_ROOT_PASSWORD:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_USER: omegaup
-          MYSQL_PASSWORD: omegaup
-          MYSQL_DATABASE: omegaup
-
-      frontend:
-        image: omegaup/dev-php:20201122
-        ports:
-          - 8001:8001
-        volumes:
-          - ${{ github.workspace }}:/opt/omegaup
-          - omegaupdata:/var/lib/omegaup
-        env:
-          CI: true
-
-      gitserver:
-        image: omegaup/dev-gitserver:20200930
-        volumes:
-          - omegaupdata:/var/lib/omegaup
-
-      broadcaster:
-        image: omegaup/dev-broadcaster:20201118
-
-      grader:
-        image: omegaup/dev-grader:20201118
-        volumes:
-          - omegaupdata:/var/lib/omegaup
-
-      runner:
-        image: omegaup/dev-runner:20201118
-
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
+
+      - name: Install wait-for-it
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y wait-for-it
+
+      - name: Download the Docker containers
+        run: |
+          docker-compose pull
+
+      - name: Start the Docker containers
+        run: |
+          docker-compose up --no-build --detach
+
+          # Add the container names as aliases to localhost
+          cat << EOF | sudo tee --append /etc/hosts
+          127.0.0.1 mysql grader runner gitserver broadcaster
+          EOF
+
+          # Wait for some of the containers
+          wait-for-it -t 30 mysql:13306
+          wait-for-it -t 30 gitserver:33861
 
       - name: Create default configuration files
         run: |
@@ -228,11 +226,11 @@ jobs:
 
           cat > ~/.my.cnf << EOF
           [client]
-          port=3306
-          host=127.0.0.1
+          port=13306
+          host=mysql
           protocol=tcp
           user=root
-          password=
+          password=omegaup
           EOF
 
       - name: Install Python dependencies
@@ -264,6 +262,10 @@ jobs:
 
       - name: Build webpack resources
         run: yarn build
+
+      - name: Wait for dependencies
+        run: |
+          wait-for-it -t 30 grader:21680
 
       - name: Run Selenium tests
         run: |

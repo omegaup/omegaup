@@ -70,7 +70,9 @@
 		{/if}
 {/if}
 {if isset($headerPayload) && $headerPayload.bootstrap4}
-	{include file='common.navbar.tpl' headerPayload=$headerPayload inline}
+	<script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
+	<div id="common-navbar"></div>
+	{js_include entrypoint="common_navbar"}
 	<main role="main">
 		{if (!isset($inArena) || !$inArena) && isset($ERROR_MESSAGE)}
 			<div class="alert alert-danger">
@@ -81,12 +83,14 @@
 	</main>
 {else}
 	<div id="root">
+	<div id="common-navbar"></div>
 	{if isset($headerPayload)}
-		{include file='common.navbar.tpl' headerPayload=$headerPayload inline}
+		<script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
 	{else}
-		{include file='common.navbar.tpl' headerPayload=[] inline}
+		<script type="text/json" id="header-payload">{[]}</script>
 	{/if}
 	{if (!isset($inArena) || !$inArena)}
+	  	{js_include entrypoint="common_navbar"}
 		<div id="content">
 		{if isset($ERROR_MESSAGE)}
 		<div class="alert alert-danger">

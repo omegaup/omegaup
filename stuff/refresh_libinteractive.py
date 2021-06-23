@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# type: ignore
 
 '''Refreshes all libinteractive template packages.'''
 
@@ -15,7 +14,7 @@ _LIBINTERACTIVE_PATH = '/usr/share/java/libinteractive.jar'
 _LS_TREE_RE = re.compile(br'(\d+) (\w+) ([0-9a-f]+)\t([^\x00]*)\x00')
 
 
-def generate(alias):
+def generate(alias: str) -> None:
     '''Generate libinteractive templates for one problem.'''
 
     tree = subprocess.check_output(['/usr/bin/git', 'ls-tree', '-r', '-z',
@@ -25,10 +24,10 @@ def generate(alias):
     with tempfile.TemporaryDirectory(
             prefix='refresh_libinteractive_') as dirname:
         for match in _LS_TREE_RE.finditer(tree):
-            _, objtype, _, filename = match.groups()
+            _, objtype, _, raw_filename = match.groups()
             if objtype != b'blob':
                 continue
-            filename = str(filename, encoding='utf-8')
+            filename = raw_filename.decode('utf-8')
             if filename.endswith('.idl'):
                 idlname = filename
             elif (not filename.startswith('Main.')
@@ -38,7 +37,7 @@ def generate(alias):
             os.makedirs(os.path.dirname(outpath), exist_ok=True)
             with open(outpath, 'wb') as outfile:
                 subprocess.check_call(['/usr/bin/git', 'cat-file', 'blob',
-                                       'HEAD:interactive/%s' % filename],
+                                       f'HEAD:interactive/{filename}'],
                                       cwd=os.path.join(_PROBLEMS_GIT_DIR,
                                                        alias),
                                       stdout=outfile)
@@ -56,7 +55,7 @@ def generate(alias):
             logging.exception('Failed to generate the packages for %s', alias)
 
 
-def main():
+def _main() -> None:
     '''Main entrypoint.'''
 
     for alias in os.listdir(_TEMPLATES_DIR):
@@ -66,4 +65,4 @@ def main():
 
 if __name__ == '__main__':
     logging.getLogger().setLevel('INFO')
-    main()
+    _main()

@@ -83,14 +83,19 @@
             </li>
           </ul>
           <div class="social-icons my-0 mx-auto">
-            <a href="https://github.com/omegaup/omegaup/">
+            <a class="text-nowrap" href="https://github.com/omegaup/omegaup/">
               <font-awesome-icon :icon="['fab', 'github']" />
               GitHub
             </a>
             |
-            <a href="https://www.facebook.com/omegaup/">
+            <a class="text-nowrap" href="https://www.facebook.com/omegaup/">
               <font-awesome-icon :icon="['fab', 'facebook']" />
               Facebook
+            </a>
+            |
+            <a class="text-nowrap" href="https://discord.gg/K3JFd9d3wk">
+              <font-awesome-icon :icon="['fab', 'discord']" />
+              Discord
             </a>
           </div>
         </div>
@@ -130,8 +135,12 @@ import { reportAnIssueURL } from '../../errors';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faFacebook, faGithub } from '@fortawesome/free-brands-svg-icons';
-library.add(faFacebook, faGithub);
+import {
+  faFacebook,
+  faGithub,
+  faDiscord,
+} from '@fortawesome/free-brands-svg-icons';
+library.add(faFacebook, faGithub, faDiscord);
 
 @Component({
   components: {
@@ -157,6 +166,7 @@ export default class Footer extends Vue {
   .footer-navigation {
     .footer-brand {
       max-width: 200px;
+
       @media only screen and (max-width: 767px) {
         max-width: 100%;
       }
@@ -182,12 +192,15 @@ export default class Footer extends Vue {
         padding: 0;
         margin: 0 auto;
         text-align: center;
+
         li {
           margin-top: 8px;
           padding: 0;
+
           a {
             text-decoration: none;
             color: white;
+
             &:hover {
               color: gray;
             }

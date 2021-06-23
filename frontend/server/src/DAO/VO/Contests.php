@@ -40,6 +40,10 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         'urgent' => true,
         'languages' => true,
         'recommended' => true,
+        'archived' => true,
+        'certificate_cutoff' => true,
+        'certificates_status' => true,
+        'contest_for_teams' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -200,6 +204,26 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         if (isset($data['recommended'])) {
             $this->recommended = boolval(
                 $data['recommended']
+            );
+        }
+        if (isset($data['archived'])) {
+            $this->archived = boolval(
+                $data['archived']
+            );
+        }
+        if (isset($data['certificate_cutoff'])) {
+            $this->certificate_cutoff = intval(
+                $data['certificate_cutoff']
+            );
+        }
+        if (isset($data['certificates_status'])) {
+            $this->certificates_status = is_scalar(
+                $data['certificates_status']
+            ) ? strval($data['certificates_status']) : '';
+        }
+        if (isset($data['contest_for_teams'])) {
+            $this->contest_for_teams = boolval(
+                $data['contest_for_teams']
             );
         }
     }
@@ -373,4 +397,32 @@ class Contests extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $recommended = false;
+
+    /**
+     * Indica si el concurso ha sido archivado por el administrador.
+     *
+     * @var bool
+     */
+    public $archived = false;
+
+    /**
+     * Número de concursantes a premiar con diplomas que mencionan su lugar en el ranking
+     *
+     * @var int|null
+     */
+    public $certificate_cutoff = null;
+
+    /**
+     * Estado de la petición de generar diplomas
+     *
+     * @var string
+     */
+    public $certificates_status = 'uninitiated';
+
+    /**
+     * Bandera que indica si el concurso es para equipos.
+     *
+     * @var bool
+     */
+    public $contest_for_teams = false;
 }

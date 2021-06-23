@@ -2,8 +2,6 @@
 
 /**
  * Description of UserProblemsTest
- *
- * @author joemmanuel
  */
 class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testEditableProblems() {

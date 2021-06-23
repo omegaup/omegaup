@@ -14,6 +14,7 @@ describe('CloneWithToken.vue', () => {
           alias: 'test-course',
           archived: false,
           assignments: [],
+          clarifications: [],
           needs_basic_information: false,
           description: '# Test',
           finish_time: new Date(),

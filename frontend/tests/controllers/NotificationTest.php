@@ -2,8 +2,6 @@
 
 /**
  * Tests for NotificationController
- *
- * @author carlosabcs
  */
 
 class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
