@@ -1,8 +1,6 @@
 <template>
   <div data-overlay-popup>
-    <div class="close-container">
-      <button type="button" class="close" @click="$emit('dismiss')">❌</button>
-    </div>
+    <button type="button" class="close" @click="$emit('dismiss')">❌</button>
     <slot></slot>
   </div>
 </template>
@@ -35,20 +33,17 @@ div[data-overlay-popup] {
   right: 0;
   z-index: -1;
 
-  .close-container {
+  button.close {
     position: sticky;
     position: -webkit-sticky;
     top: 0;
     z-index: 100;
+    background-color: transparent;
+    border: none;
+    font-size: 110%;
 
-    .close {
-      background-color: transparent;
-      border: none;
-      font-size: 110%;
-
-      &:hover {
-        background-color: var(--overlay-popup-close-background-color--hover);
-      }
+    &:hover {
+      background-color: var(--overlay-popup-close-background-color--hover);
     }
   }
 }
