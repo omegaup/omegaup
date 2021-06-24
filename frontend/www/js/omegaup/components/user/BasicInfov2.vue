@@ -14,7 +14,7 @@
           >/
         </div>
       </div>
-      <div v-if="profile.email" class="form-group row padding-field">
+      <div v-if="!profile.is_private" class="form-group row padding-field">
         <div class="col-sm-3">
           <strong>{{ T.profile }}</strong>
         </div>
@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <div v-if="profile.email">
+      <div v-if="!profile.is_private">
         <div class="form-group row padding-field">
           <div class="col-sm-3">
             <strong>{{ T.profileEmail }}</strong>
@@ -113,7 +113,6 @@ export default class UserBasicInfo extends Vue {
   @Prop() profile!: types.UserProfile;
   @Prop() rank!: string;
   T = T;
-  privateProfile = !this.profile.email && this.profile.is_private;
 }
 </script>
 
