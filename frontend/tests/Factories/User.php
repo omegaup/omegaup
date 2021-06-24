@@ -44,7 +44,7 @@ class UserParams {
      */
     public function __construct(array $params = []) {
         $this->username = $params['username'] ?? \OmegaUp\Test\Utils::CreateRandomString();
-        $this->name = $params['name'] ?? $this->username;
+        $this->name = $params['name'] ?? \OmegaUp\Test\Utils::CreateRandomString();
         $this->password = $params['password'] ?? \OmegaUp\Test\Utils::CreateRandomString();
         $this->email = $params['email'] ?? \OmegaUp\Test\Utils::CreateRandomString() . '@mail.com';
         $this->isPrivate = $params['isPrivate'] ?? false;

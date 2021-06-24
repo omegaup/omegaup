@@ -6,7 +6,8 @@ class Identity {
     public static function getCsvData(
         string $file,
         string $group_alias,
-        string $password = ''
+        string $password = '',
+        bool $forTeams = false
     ): string {
         $row = 0;
         /** @var list<array{username: string, name: string, country_id: string, state_id: string, gender: string, school_name: string, password: string, usernames: string}> */
@@ -27,8 +28,9 @@ class Identity {
             )) !== false &&
             !is_null($data)
         ) {
+            $username = $forTeams ? "teams:{$group_alias}:{$data[0]}" : "{$group_alias}:{$data[0]}";
             array_push($identities, [
-                'username' => "{$group_alias}:{$data[0]}",
+                'username' => $username,
                 'name' => strval($data[1]),
                 'country_id' => strval($data[2]),
                 'state_id' => strval($data[3]),
