@@ -3899,6 +3899,8 @@ export namespace messages {
   export type IdentitySelectIdentityResponse = {};
   export type IdentityUpdateRequest = { [key: string]: any };
   export type IdentityUpdateResponse = {};
+  export type IdentityUpdateIdentityTeamRequest = { [key: string]: any };
+  export type IdentityUpdateIdentityTeamResponse = {};
 
   // Interview
   export type InterviewAddUsersRequest = { [key: string]: any };
@@ -4736,6 +4738,9 @@ export namespace controllers {
     update: (
       params?: messages.IdentityUpdateRequest,
     ) => Promise<messages.IdentityUpdateResponse>;
+    updateIdentityTeam: (
+      params?: messages.IdentityUpdateIdentityTeamRequest,
+    ) => Promise<messages.IdentityUpdateIdentityTeamResponse>;
   }
 
   export interface Interview {
