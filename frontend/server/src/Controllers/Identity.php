@@ -337,7 +337,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         foreach ($teamIdentities as $identity) {
             if (isset($seenUsernames[$identity['username']])) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'aliasInUse'
+                    'teamAliasInUse'
                 );
             }
             $seenUsernames[$identity['username']] = true;
@@ -347,7 +347,18 @@ class Identity extends \OmegaUp\Controllers\Controller {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
+            $seenMemberUsernames = [];
             foreach ($teamIdentities as $teamIdentity) {
+                $identitiesUsernames = explode(';', $teamIdentity['usernames']);
+                foreach ($identitiesUsernames as $identityMemberUsername) {
+                    if (isset($seenMemberUsernames[$identityMemberUsername])) {
+                        throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                            'teamMemberUsernameInUse'
+                        );
+                    }
+                    $seenMemberUsernames[$identityMemberUsername] = true;
+                }
+
                 // Prepare DAOs
                 $countryId = empty(
                     $teamIdentity['country_id']
@@ -384,7 +395,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 self::saveIdentityTeamInsideTransaction(
                     $newIdentity,
                     $teamGroup,
-                    explode(';', $teamIdentity['usernames'])
+                    $identitiesUsernames
                 );
 
                 // Create IdentitySchool
