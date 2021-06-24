@@ -1,31 +1,31 @@
 <template>
   <div class="container-fluid p-0 mt-0" data-user-profile-root>
-    <h1 v-if="this.profile.is_private">
+    <h1 v-if="profile.is_private">
       {{ ui.info(T.userProfileIsPrivate) }}
     </h1>
     <div class="row">
       <div class="col-md-2">
         <div class="card">
           <omegaup-countryflag
-            v-if="this.profile.country_id"
+            v-if="profile.country_id"
             class="m-1"
-            :country="this.profile.country_id"
+            :country="profile.country_id"
           />
           <div class="card-body">
             <div class="img-thumbnail rounded-circle bottom-margin">
-              <img class="rounded-circle" :src="this.profile.gravatar_92" />
+              <img class="rounded-circle" :src="profile.gravatar_92" />
             </div>
           </div>
           <div class="card-title text-center">
             <div class="mb-3">
               <omegaup-user-username
-                :classname="this.profile.classname"
-                :username="this.profile.username"
+                :classname="profile.classname"
+                :username="profile.username"
               ></omegaup-user-username>
             </div>
             <div class="mb-3">
-              <h4 v-if="this.profile.rankinfo.rank > 0" class="m-0">
-                {{ `#${this.profile.rankinfo.rank}` }}
+              <h4 v-if="profile.rankinfo.rank > 0" class="m-0">
+                {{ `#${profile.rankinfo.rank}` }}
               </h4>
               <small v-else>
                 <strong> {{ rank }} </strong>
@@ -36,7 +36,7 @@
                 </small>
               </p>
             </div>
-            <div v-if="!this.profile.is_private" class="mb-3">
+            <div v-if="!profile.is_private" class="mb-3">
               <h4 class="m-0">
                 {{ Object.keys(solvedProblems).length }}
               </h4>
@@ -45,13 +45,13 @@
               </p>
             </div>
             <div
-              v-if="this.profile.preferred_language && !this.profile.is_private"
+              v-if="profile.preferred_language && !profile.is_private"
               class="mb-3"
             >
               <h5 class="m-0">
                 {{
-                  this.profile.programming_languages[
-                    this.profile.preferred_language
+                  profile.programming_languages[
+                    profile.preferred_language
                   ].split(' ')[0]
                 }}
               </h5>
@@ -60,7 +60,7 @@
               </p>
             </div>
           </div>
-          <div v-if="!this.profile.is_private" class="mb-3 text-center">
+          <div v-if="profile.email" class="mb-3 text-center">
             <a class="btn btn-primary btn-sm" href="/profile/edit/">{{
               T.profileEdit
             }}</a>
@@ -72,7 +72,7 @@
           <div class="card-header">
             <nav class="nav nav-tabs" role="tablist">
               <a
-                v-if="!this.profile.is_private"
+                v-if="!profile.is_private"
                 class="nav-item nav-link active"
                 data-toggle="tab"
                 @click="selectedTab = 'badges'"
@@ -83,14 +83,14 @@
                 </span>
               </a>
               <a
-                v-if="!this.profile.is_private"
+                v-if="!profile.is_private"
                 class="nav-item nav-link"
                 data-toggle="tab"
                 @click="selectedTab = 'problems'"
                 >{{ T.wordsProblems }}</a
               >
               <a
-                v-if="!this.profile.is_private"
+                v-if="!profile.is_private"
                 class="nav-item nav-link"
                 data-toggle="tab"
                 @click="selectedTab = 'contests'"
@@ -102,13 +102,13 @@
               </a>
               <a
                 class="nav-item nav-link"
-                :class="[!this.profile.is_private ? '' : 'active']"
+                :class="[!profile.is_private ? '' : 'active']"
                 data-toggle="tab"
                 @click="selectedTab = 'data'"
                 >{{ T.profilePersonalData }}</a
               >
               <a
-                v-if="!this.profile.is_private"
+                v-if="!profile.is_private"
                 class="nav-item nav-link"
                 data-toggle="tab"
                 @click="selectedTab = 'charts'"
@@ -186,7 +186,7 @@
                 aria-labelledby="nav-user-info-tab"
               >
                 <omegaup-user-basicinfo
-                  :profile="this.profile"
+                  :profile="profile"
                   :rank="rank"
                 ></omegaup-user-basicinfo>
               </div>
@@ -199,7 +199,7 @@
                 <omegaup-user-charts
                   v-if="charts"
                   :data="charts"
-                  :username="this.username"
+                  :username="profile.username"
                 ></omegaup-user-charts>
               </div>
             </div>
