@@ -217,9 +217,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import contest_FilteredList from '../contest/FilteredList.vue';
+import { types } from '../../api_types';
 
 @Component({
   components: {
@@ -228,7 +228,7 @@ import contest_FilteredList from '../contest/FilteredList.vue';
 })
 export default class ArenaContestList extends Vue {
   @Prop() initialQuery!: string;
-  @Prop() contests!: omegaup.ArenaContests;
+  @Prop() contests!: types.TimeTypeContests;
   @Prop() isLogged!: boolean;
 
   T = T;

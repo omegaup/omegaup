@@ -67,11 +67,11 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import * as time from '../../time';
 
 import omegaup_Markdown from '../Markdown.vue';
+import { types } from '../../api_types';
 
 @Component({
   components: {
@@ -79,7 +79,7 @@ import omegaup_Markdown from '../Markdown.vue';
   },
 })
 export default class ContestSummary extends Vue {
-  @Prop() contest!: omegaup.Contest;
+  @Prop() contest!: types.ContestAdminDetails;
   @Prop({ default: true }) showDeadlines!: boolean;
   @Prop({ default: true }) showRanking!: boolean;
 

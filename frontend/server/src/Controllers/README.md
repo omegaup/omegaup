@@ -122,6 +122,7 @@
   - [`/api/identity/create/`](#apiidentitycreate)
   - [`/api/identity/selectIdentity/`](#apiidentityselectidentity)
   - [`/api/identity/update/`](#apiidentityupdate)
+  - [`/api/identity/updateIdentityTeam/`](#apiidentityupdateidentityteam)
 - [Interview](#interview)
   - [`/api/interview/addUsers/`](#apiinterviewaddusers)
   - [`/api/interview/create/`](#apiinterviewcreate)
@@ -2491,6 +2492,30 @@ _Nothing_
 ### Description
 
 Entry point for Update an Identity API
+
+### Parameters
+
+| Name                | Type           | Description |
+| ------------------- | -------------- | ----------- |
+| `gender`            | `string`       |             |
+| `group_alias`       | `string`       |             |
+| `name`              | `string`       |             |
+| `original_username` | `string`       |             |
+| `school_name`       | `string`       |             |
+| `username`          | `string`       |             |
+| `country_id`        | `null\|string` |             |
+| `identities`        | `mixed`        |             |
+| `state_id`          | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/identity/updateIdentityTeam/`
+
+### Description
+
+Entry point for Update an Identity team API
 
 ### Parameters
 
