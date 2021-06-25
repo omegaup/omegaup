@@ -36,6 +36,59 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
     }
 
     /**
+     * @return list<array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}>
+     */
+    public static function getByTeamGroupId(int $teamsGroupId): array {
+        $sql = 'SELECT
+                    i.username,
+                    i.name,
+                    it.username AS team_alias,
+                    it.name AS team_name,
+                    IFNULL(
+                        (
+                            SELECT urc.classname FROM
+                                User_Rank_Cutoffs urc
+                            WHERE
+                                urc.score <= (
+                                        SELECT
+                                            ur.score
+                                        FROM
+                                            User_Rank ur
+                                        WHERE
+                                            ur.user_id = tu.user_id
+                                    )
+                            ORDER BY
+                                urc.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        \'user-rank-unranked\'
+                    ) AS classname
+                FROM
+                    Team_Users tu
+                INNER JOIN
+                    Teams t
+                ON
+                    t.team_id = tu.team_id
+                INNER JOIN
+                    Identities i
+                ON
+                    i.user_id = tu.user_id
+                INNER JOIN
+                    Identities it
+                ON
+                    it.identity_id = t.identity_id
+                WHERE
+                    team_group_id = ?
+                LIMIT 100;';
+        /** @var list<array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$teamsGroupId]
+        );
+    }
+
+    /**
      * @param list<string> $usernames
      */
     public static function createTeamUsersBulk(

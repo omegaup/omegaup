@@ -71,4 +71,31 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
         /** @var list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]);
     }
+
+    /**
+     * @return array{alias: string, team_id: int}|null
+     */
+    public static function getByTeamUsername(string $teamUsername) {
+        $sql = 'SELECT
+                    `tg`.`alias`,
+                    `t`.`team_id`
+                FROM
+                    `Team_Groups` `tg`
+                INNER JOIN
+                    `Teams` `t`
+                ON
+                    `t`.`team_group_id` = `tg`.`team_group_id`
+                INNER JOIN
+                    `Identities` `i`
+                ON
+                    `t`.`identity_id` = `i`.`identity_id`
+                WHERE
+                    `i`.`username` = ?
+                LIMIT 1;';
+        /** @var array{alias: string, team_id: int}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$teamUsername]
+        );
+    }
 }

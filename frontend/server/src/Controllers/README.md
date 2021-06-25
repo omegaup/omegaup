@@ -202,10 +202,13 @@
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
 - [TeamsGroup](#teamsgroup)
+  - [`/api/teamsGroup/addMembers/`](#apiteamsgroupaddmembers)
   - [`/api/teamsGroup/create/`](#apiteamsgroupcreate)
   - [`/api/teamsGroup/details/`](#apiteamsgroupdetails)
+  - [`/api/teamsGroup/removeMember/`](#apiteamsgroupremovemember)
   - [`/api/teamsGroup/removeTeam/`](#apiteamsgroupremoveteam)
   - [`/api/teamsGroup/teams/`](#apiteamsgroupteams)
+  - [`/api/teamsGroup/teamsMembers/`](#apiteamsgroupteamsmembers)
   - [`/api/teamsGroup/update/`](#apiteamsgroupupdate)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
@@ -3963,6 +3966,23 @@ Gets a list of tags
 
 TeamsGroupController
 
+## `/api/teamsGroup/addMembers/`
+
+### Description
+
+Add one or more users to a given team
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+| `usernames`        | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/teamsGroup/create/`
 
 ### Description
@@ -3999,6 +4019,23 @@ Details of a team group
 | ------------ | ---------------------------------------------------------------------------- |
 | `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
 
+## `/api/teamsGroup/removeMember/`
+
+### Description
+
+Remove an existing team member of a teams group
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+| `username`         | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/teamsGroup/removeTeam/`
 
 ### Description
@@ -4033,6 +4070,24 @@ Teams of a teams group
 | Name         | Type               |
 | ------------ | ------------------ |
 | `identities` | `types.Identity[]` |
+
+## `/api/teamsGroup/teamsMembers/`
+
+### Description
+
+Get a list of team members of a teams group
+
+### Parameters
+
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `team_group_alias` | `string` |             |
+
+### Returns
+
+```typescript
+types.TeamMember[]
+```
 
 ## `/api/teamsGroup/update/`
 

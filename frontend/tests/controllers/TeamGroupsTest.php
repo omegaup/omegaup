@@ -779,4 +779,112 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             }
         }
     }
+
+    /**
+     * Basic test for uploading csv file with identities as teams
+     */
+    public function testAddRemoveMembersToTeam() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        // Users to associate
+        foreach (range(0, 11) as $id) {
+            \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams([
+                    'username' => "user{$id}",
+                ])
+            );
+        }
+
+        $teamUsernames = \OmegaUp\Test\Factories\Identity::getUsernamesInCsvFile(
+            'team_identities.csv',
+            $teamGroup->alias,
+        );
+
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities.csv',
+                    $teamGroup->alias,
+                    /*$password=*/ '',
+                    /*$forTeams=*/ true
+                ),
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        $teamsMembers = \OmegaUp\Controllers\TeamsGroup::apiTeamsMembers(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        foreach ($teamUsernames as $teamUsername) {
+            $membersByTeam = array_filter(
+                $teamsMembers,
+                fn ($teamMember) => $teamMember['team_alias'] === "teams:{$teamGroup->alias}:{$teamUsername}"
+            );
+            $this->assertCount(2, $membersByTeam);
+        }
+
+        // Add member to the first team
+        $teamAlias = "teams:{$teamGroup->alias}:{$teamUsernames[0]}";
+        \OmegaUp\Controllers\TeamsGroup::apiAddMembers(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_group_alias' => $teamAlias,
+                'usernames' => 'user10,user11',
+            ])
+        );
+
+        $teamsMembers = \OmegaUp\Controllers\TeamsGroup::apiTeamsMembers(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+        $membersByTeam1 = array_filter(
+            $teamsMembers,
+            fn ($teamMember) => $teamMember['team_alias'] === $teamAlias
+        );
+        $this->assertCount(4, $membersByTeam1);
+
+        // Now, let's remove all team members
+        foreach ($membersByTeam1 as $member) {
+            \OmegaUp\Controllers\TeamsGroup::apiRemoveMember(
+                new \OmegaUp\Request([
+                    'auth_token' => $creatorLogin->auth_token,
+                    'team_group_alias' => $teamAlias,
+                    'username' => $member['username'],
+                ])
+            );
+        }
+
+        $teamsMembers = \OmegaUp\Controllers\TeamsGroup::apiTeamsMembers(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+        $membersByTeam1 = array_filter(
+            $teamsMembers,
+            fn ($teamMember) => $teamMember['team_alias'] === $teamAlias
+        );
+        $this->assertEmpty($membersByTeam1);
+    }
 }
