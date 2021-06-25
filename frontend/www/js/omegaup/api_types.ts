@@ -3901,6 +3901,8 @@ export namespace messages {
   export type IdentitySelectIdentityResponse = {};
   export type IdentityUpdateRequest = { [key: string]: any };
   export type IdentityUpdateResponse = {};
+  export type IdentityUpdateIdentityTeamRequest = { [key: string]: any };
+  export type IdentityUpdateIdentityTeamResponse = {};
 
   // Interview
   export type InterviewAddUsersRequest = { [key: string]: any };
@@ -4237,6 +4239,8 @@ export namespace messages {
       name?: string;
     };
   };
+  export type TeamsGroupListRequest = { [key: string]: any };
+  export type TeamsGroupListResponse = types.ListItem[];
   export type TeamsGroupRemoveTeamRequest = { [key: string]: any };
   export type TeamsGroupRemoveTeamResponse = {};
   export type TeamsGroupTeamsRequest = { [key: string]: any };
@@ -4738,6 +4742,9 @@ export namespace controllers {
     update: (
       params?: messages.IdentityUpdateRequest,
     ) => Promise<messages.IdentityUpdateResponse>;
+    updateIdentityTeam: (
+      params?: messages.IdentityUpdateIdentityTeamRequest,
+    ) => Promise<messages.IdentityUpdateIdentityTeamResponse>;
   }
 
   export interface Interview {
@@ -4981,6 +4988,9 @@ export namespace controllers {
     details: (
       params?: messages.TeamsGroupDetailsRequest,
     ) => Promise<messages.TeamsGroupDetailsResponse>;
+    list: (
+      params?: messages.TeamsGroupListRequest,
+    ) => Promise<messages.TeamsGroupListResponse>;
     removeTeam: (
       params?: messages.TeamsGroupRemoveTeamRequest,
     ) => Promise<messages.TeamsGroupRemoveTeamResponse>;
