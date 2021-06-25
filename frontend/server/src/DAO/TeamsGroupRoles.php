@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class TeamsGroupRoles extends \OmegaUp\DAO\Base\TeamsGroupRoles {
-    public static function deleteAllTeamGroupsForContest(int $aclId): int {
+    public static function deleteAllTeamGroupsForAclId(int $aclId): int {
         $sql = '
             DELETE FROM
                 `Teams_Group_Roles`

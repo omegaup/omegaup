@@ -1193,6 +1193,7 @@ teamMemberUsernameInUse = "Existe al menos un nombre de usuario duplicado en los
 teamNotExist = "El equipo no existe"
 teamsGroupAddUsersDone = "Listo"
 teamsGroupAddUsersToTeam = "Agregar usuarios"
+teamsGroupAliasMustBeRequired = "En un concurso para equipos, el alias debe ser requerido."
 teamsGroupCreateIdentitiesAsTeams = "Crear identidades como equipos"
 teamsGroupEditGroupUpdated = "El grupo de equipos se actualizó correctamente."
 teamsGroupEditTeams = "Equipos"

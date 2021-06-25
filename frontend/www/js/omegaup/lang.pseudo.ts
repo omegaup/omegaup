@@ -1195,6 +1195,7 @@ const translations: { [key: string]: string; } = {
   teamNotExist: "(T3am d035 n07 3xi57)",
   teamsGroupAddUsersDone: "(D0n3)",
   teamsGroupAddUsersToTeam: "(Add u53r5)",
+  teamsGroupAliasMustBeRequired: "(In a c0n7357 f0r 73am5, a1ia5 mu57 b3 r3quir3d)",
   teamsGroupCreateIdentitiesAsTeams: "(Cr3a73 id3n7i7i35 a5 73am5)",
   teamsGroupEditGroupUpdated: "(Th3 73am5 gr0up ha5 b33n 5ucc355fu11y upda73d.)",
   teamsGroupEditTeams: "(T3am5)",

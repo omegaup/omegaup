@@ -1195,6 +1195,7 @@ const translations: { [key: string]: string; } = {
   teamNotExist: "Team does not exist",
   teamsGroupAddUsersDone: "Done",
   teamsGroupAddUsersToTeam: "Add users",
+  teamsGroupAliasMustBeRequired: "In a contest for teams, alias must be required",
   teamsGroupCreateIdentitiesAsTeams: "Create identities as teams",
   teamsGroupEditGroupUpdated: "The teams group has been successfully updated.",
   teamsGroupEditTeams: "Teams",

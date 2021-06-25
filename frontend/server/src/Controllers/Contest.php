@@ -2308,7 +2308,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             join(',', $r['languages'])
         );
         $forTeams = $r->ensureOptionalBool('contest_for_teams') ?? false;
-        $teamsGroupsAlias = $r->ensureOptionalString('teams_group_alias');
+        $teamsGroupsAlias = $forTeams ? $r->ensureString(
+            'teams_group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias(
+                $alias
+            )
+        ) : null;
         $contest = new \OmegaUp\DAO\VO\Contests([
             'admission_mode' => 'private',
             'title' => $r['title'],
@@ -2335,7 +2340,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $contest,
             $r->user->user_id,
             /*$originalProblemsetId=*/ null,
-            $forTeams ? $teamsGroupsAlias : null,
+            $teamsGroupsAlias,
         );
 
         return ['status' => 'ok'];
@@ -2573,7 +2578,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $forTeams = $r->ensureOptionalBool('contest_for_teams') ?? false;
         if ($forTeams) {
-            \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            \OmegaUp\Validators::validateAlias(
                 $r['teams_group_alias'],
                 'teams_group_alias'
             );
@@ -4325,11 +4330,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'teams_group_alias'
                 );
 
-                if (
-                    $originalContest->contest_for_teams && !is_null(
-                        $teamsGroupAlias
-                    )
-                ) {
+                if ($originalContest->contest_for_teams) {
+                    if (is_null($teamsGroupAlias)) {
+                        throw new \OmegaUp\Exceptions\InvalidParameterException(
+                            'teamsGroupAliasMustBeRequired'
+                        );
+                    }
                     $teamsGroup = \OmegaUp\DAO\TeamGroups::getByAlias(
                         $teamsGroupAlias
                     );
@@ -4340,7 +4346,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                         );
                     }
 
-                    \OmegaUp\DAO\TeamsGroupRoles::deleteAllTeamGroupsForContest(
+                    \OmegaUp\DAO\TeamsGroupRoles::deleteAllTeamGroupsForAclId(
                         $problemset->acl_id
                     );
 
