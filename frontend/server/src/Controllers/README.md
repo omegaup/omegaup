@@ -204,6 +204,7 @@
 - [TeamsGroup](#teamsgroup)
   - [`/api/teamsGroup/create/`](#apiteamsgroupcreate)
   - [`/api/teamsGroup/details/`](#apiteamsgroupdetails)
+  - [`/api/teamsGroup/list/`](#apiteamsgrouplist)
   - [`/api/teamsGroup/removeTeam/`](#apiteamsgroupremoveteam)
   - [`/api/teamsGroup/teams/`](#apiteamsgroupteams)
   - [`/api/teamsGroup/update/`](#apiteamsgroupupdate)
@@ -3998,6 +3999,25 @@ Details of a team group
 | Name         | Type                                                                         |
 | ------------ | ---------------------------------------------------------------------------- |
 | `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
+
+## `/api/teamsGroup/list/`
+
+### Description
+
+Gets a list of teams groups. This returns an array instead of an object
+since it is used by typeahead.
+
+### Parameters
+
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+
+### Returns
+
+```typescript
+types.ListItem[]
+```
 
 ## `/api/teamsGroup/removeTeam/`
 
