@@ -1190,6 +1190,8 @@ const translations: { [key: string]: string; } = {
   tagSourceLevel: "Level",
   tagSourceOwner: "Author's tag",
   tagSourceVoted: "User's tag",
+  teamAliasInUse: "There is at least one duplicate team alias. Please check the CSV file to fix the information.",
+  teamMemberUsernameInUse: "There is at least one duplicate username in the teams of the group. Please fix the information.",
   teamNotExist: "Team does not exist",
   teamsGroupAddUsersDone: "Done",
   teamsGroupAddUsersToTeam: "Add users",

@@ -405,7 +405,41 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('aliasInUse', $e->getMessage());
+            $this->assertEquals('teamAliasInUse', $e->getMessage());
+        }
+    }
+
+    public function testUploadCsvFileWithDuplicatedMemberUsername() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        try {
+            \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+                new \OmegaUp\Request([
+                    'auth_token' => $creatorLogin->auth_token,
+                    'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                        'duplicated_member_identities.csv',
+                        $teamGroup->alias,
+                        /*$password=*/ '',
+                        /*$forTeams=*/ true
+                    ),
+                    'team_group_alias' => $teamGroup->alias,
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
+            $this->assertEquals('teamMemberUsernameInUse', $e->getMessage());
         }
     }
 
