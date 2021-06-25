@@ -10,6 +10,7 @@
  * @psalm-type TeamGroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<Identity>, isOrganizer: bool, teamGroup: array{alias: string, description: null|string, name: null|string}, teamsMembers: list<TeamMember>}
  * @psalm-type TeamsGroup=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
  * @psalm-type TeamsGroupListPayload=array{teamsGroups: list<TeamsGroup>}
+ * @psalm-type ListItem=array{key: string, value: string}
  */
 
 class TeamsGroup extends \OmegaUp\Controllers\Controller {
@@ -477,5 +478,22 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\DAO\TeamUsers::getByTeamGroupId(
             $teamGroup->team_group_id
         );
+    }
+
+    /**
+     * Gets a list of teams groups. This returns an array instead of an object
+     * since it is used by typeahead.
+     *
+     * @omegaup-request-param null|string $query
+     *
+     * @return list<ListItem>
+     */
+    public static function apiList(\OmegaUp\Request $r): array {
+        // Authenticate user
+        $r->ensureMainUserIdentity();
+
+        $query = $r->ensureString('query');
+
+        return \OmegaUp\DAO\TeamGroups::findByNameOrAlias($query);
     }
 }

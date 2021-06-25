@@ -98,4 +98,25 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
             [$teamUsername]
         );
     }
+
+    /**
+     * @return list<array{key: string, value: string}>
+     */
+    public static function findByNameOrAlias(string $aliasOrName) {
+        $sql = "SELECT DISTINCT
+                    tg.alias AS `key`,
+                    tg.name AS `value`
+                FROM
+                    Team_Groups tg
+                WHERE
+                    tg.alias LIKE CONCAT('%', ?, '%') OR
+                    tg.name LIKE CONCAT('%', ?, '%')
+                LIMIT 100;";
+
+        /** @var list<array{key: string, value: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$aliasOrName, $aliasOrName]
+        );
+    }
 }
