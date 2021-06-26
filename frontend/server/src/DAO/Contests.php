@@ -457,6 +457,21 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         Groups_Identities gi
                     ON
                         gi.group_id = gr.group_id
+                    UNION DISTINCT
+                    SELECT
+                        t.identity_id,
+                        p.problemset_id
+                    FROM
+                        Problemsets p
+                    INNER JOIN
+                        Teams_Group_Roles tgr
+                    ON
+                        tgr.acl_id = p.acl_id AND
+                        tgr.role_id = ?
+                    INNER JOIN
+                        Teams t
+                    ON
+                        t.team_group_id = tgr.team_group_id
                 ) pi
             ON
                 pi.problemset_id = p.problemset_id AND
@@ -481,6 +496,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             GROUP BY Contests.contest_id, organizer.identity_id
         ";
         $params = [
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
             \OmegaUp\Authorization::CONTESTANT_ROLE,
             $identityId,
         ];
