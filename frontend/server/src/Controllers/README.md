@@ -733,6 +733,7 @@ Creates a new contest
 | --------------------------- | -------------- | ----------- |
 | `admission_mode`            | `mixed`        |             |
 | `alias`                     | `mixed`        |             |
+| `contest_for_teams`         | `bool\|null`   |             |
 | `description`               | `mixed`        |             |
 | `feedback`                  | `mixed`        |             |
 | `finish_time`               | `mixed`        |             |
@@ -749,6 +750,7 @@ Creates a new contest
 | `show_scoreboard_after`     | `mixed`        |             |
 | `start_time`                | `mixed`        |             |
 | `submissions_gap`           | `mixed`        |             |
+| `teams_group_alias`         | `null\|string` |             |
 | `title`                     | `mixed`        |             |
 | `window_length`             | `int\|null`    |             |
 
@@ -1279,6 +1281,7 @@ Update a Contest
 | `window_length`             | `int`                     |             |
 | `admission_mode`            | `mixed`                   |             |
 | `alias`                     | `null\|string`            |             |
+| `contest_for_teams`         | `bool\|null`              |             |
 | `description`               | `null\|string`            |             |
 | `feedback`                  | `mixed`                   |             |
 | `languages`                 | `mixed`                   |             |
@@ -1293,6 +1296,7 @@ Update a Contest
 | `scoreboard`                | `float\|null`             |             |
 | `show_scoreboard_after`     | `bool\|null`              |             |
 | `start_time`                | `OmegaUp\Timestamp\|null` |             |
+| `teams_group_alias`         | `null\|string`            |             |
 | `title`                     | `null\|string`            |             |
 
 ### Returns

@@ -1194,6 +1194,7 @@
 	"teamNotExist": "Equipe n\u00e3o existe",
 	"teamsGroupAddUsersDone": "Feito",
 	"teamsGroupAddUsersToTeam": "Adicionar usu\u00e1rios",
+	"teamsGroupAliasMustBeRequired": "Em um concurso para equipes, o alias deve ser exigido",
 	"teamsGroupCreateIdentitiesAsTeams": "Criar identidades como equipes",
 	"teamsGroupEditGroupUpdated": "O grupo de equipes foi atualizado com sucesso.",
 	"teamsGroupEditTeams": "Equipes",

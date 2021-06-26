@@ -1859,6 +1859,7 @@ export namespace types {
     admission_mode: string;
     alias: string;
     archived: boolean;
+    contest_for_teams: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -1909,6 +1910,7 @@ export namespace types {
     groups: types.ContestGroup[];
     problems: types.ProblemsetProblemWithVersions[];
     requests: types.ContestRequest[];
+    teams_group?: types.ContestGroup;
     users: types.ContestUser[];
   }
 
