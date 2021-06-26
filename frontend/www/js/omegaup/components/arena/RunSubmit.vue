@@ -1,8 +1,6 @@
 <template>
   <form data-run-submit @submit.prevent="onSubmit">
-    <div class="close-container">
-      <button type="button" class="close" @click="$emit('dismiss')">❌</button>
-    </div>
+    <button type="button" class="close" @click="$emit('dismiss')">❌</button>
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">
         {{ T.wordsLanguage }}
@@ -267,23 +265,21 @@ form[data-run-submit] {
   flex-direction: column;
   z-index: -1;
 
-  .close-container {
-    width: 100%;
+  button.close {
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    z-index: 100;
+    right: 0;
+    background-color: var(--arena-form-close-background-color);
+    border: 1px solid var(--arena-form-close-border-color);
+    border-width: 0 0 1px 1px;
+    font-size: 110%;
+    width: 25px;
+    height: 25px;
 
-    .close {
-      position: absolute;
-      top: 0;
-      right: 0;
-      background-color: var(--arena-form-close-background-color);
-      border: 1px solid var(--arena-form-close-border-color);
-      border-width: 0 0 1px 1px;
-      font-size: 110%;
-      width: 25px;
-      height: 25px;
-
-      &:hover {
-        background-color: var(--arena-form-close-background-color--hover);
-      }
+    &:hover {
+      background-color: var(--arena-form-close-background-color--hover);
     }
   }
 
