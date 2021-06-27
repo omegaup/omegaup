@@ -179,7 +179,7 @@ module.exports = {
           priority: 20,
         },
         vendor: {
-          name: module => {
+          name: (module) => {
             const packageName = module.context.match(
               /\/node_modules\/([^@/]+)/,
             )[1];
@@ -232,6 +232,7 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         options: {
+          presets: ['@babel/env'],
           cacheDirectory: true,
         },
         exclude: /node_modules/,
