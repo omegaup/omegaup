@@ -307,10 +307,10 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import DateTimePicker from '../DateTimePicker.vue';
 import Multiselect from 'vue-multiselect';
+import { types } from '../../api_types';
 
 @Component({
   components: {
@@ -334,6 +334,7 @@ export default class NewForm extends Vue {
   @Prop({ default: 100 }) initialScoreboard!: number;
   @Prop({ default: true }) initialShowScoreboardAfter!: boolean;
   @Prop({ default: true }) initialPartialScore!: boolean;
+  @Prop({ default: false }) hasSubmissions!: boolean;
   @Prop() initialStartTime!: Date;
   @Prop() initialSubmissionsGap!: number;
   @Prop({ default: '' }) initialTitle!: string;
@@ -438,13 +439,22 @@ export default class NewForm extends Vue {
   }
 
   onSubmit() {
-    const contest: omegaup.Contest = {
+    const contest: types.ContestAdminDetails = {
+      admin: true,
+      admission_mode: 'private',
       alias: this.alias,
+      archived: false,
+      available_languages: {},
+      director: '',
+      opened: false,
+      penalty_calc_policy: 'sum',
+      problemset_id: 0,
+      show_penalty: true,
       title: this.title,
       description: this.description,
+      has_submissions: this.hasSubmissions,
       start_time: this.startTime,
       finish_time: this.finishTime,
-      window_length: !this.windowLengthEnabled ? null : this.windowLength,
       points_decay_factor: this.pointsDecayFactor,
       submissions_gap: (this.submissionsGap || 1) * 60,
       languages: this.languages,
@@ -457,6 +467,9 @@ export default class NewForm extends Vue {
       needs_basic_information: this.needsBasicInformation,
       requests_user_information: this.requestsUserInformation,
     };
+    if (this.windowLengthEnabled && this.windowLength) {
+      contest.window_length = this.windowLength;
+    }
     if (this.update) {
       this.$emit('update-contest', contest);
       return;

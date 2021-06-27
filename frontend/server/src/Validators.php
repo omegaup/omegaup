@@ -316,6 +316,32 @@ class Validators {
     }
 
     /**
+     * Enforces username requirements
+     *
+     * @param mixed $parameter
+     * @param string $parameterName
+     * @psalm-assert string $parameter
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function validateAlias(
+        $parameter,
+        string $parameterName
+    ): void {
+        if (!is_string($parameter)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
+        }
+        if (!self::alias($parameter)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                $parameterName
+            );
+        }
+    }
+
+    /**
      * Enforces username identity requirements
      *
      * @param mixed $parameter
