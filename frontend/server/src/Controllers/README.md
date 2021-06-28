@@ -205,6 +205,7 @@
   - [`/api/teamsGroup/create/`](#apiteamsgroupcreate)
   - [`/api/teamsGroup/details/`](#apiteamsgroupdetails)
   - [`/api/teamsGroup/list/`](#apiteamsgrouplist)
+  - [`/api/teamsGroup/removeMember/`](#apiteamsgroupremovemember)
   - [`/api/teamsGroup/removeTeam/`](#apiteamsgroupremoveteam)
   - [`/api/teamsGroup/teams/`](#apiteamsgroupteams)
   - [`/api/teamsGroup/update/`](#apiteamsgroupupdate)
@@ -4022,6 +4023,23 @@ since it is used by typeahead.
 ```typescript
 types.ListItem[]
 ```
+
+## `/api/teamsGroup/removeMember/`
+
+### Description
+
+Remove an existing team member of a teams group
+
+### Parameters
+
+| Name               | Type     | Description                    |
+| ------------------ | -------- | ------------------------------ |
+| `team_group_alias` | `string` | The username of the team       |
+| `username`         | `string` | The username of user to remove |
+
+### Returns
+
+_Nothing_
 
 ## `/api/teamsGroup/removeTeam/`
 

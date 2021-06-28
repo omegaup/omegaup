@@ -351,4 +351,62 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
 
         return \OmegaUp\DAO\TeamGroups::findByNameOrAlias($query);
     }
+
+    /**
+     * Remove an existing team member of a teams group
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $team_group_alias The username of the team
+     * @omegaup-request-param string $username The username of user to remove
+     */
+    public static function apiRemoveMember(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+
+        $teamUsername = $r->ensureString(
+            'team_group_alias',
+            fn (string $alias) => \OmegaUp\Validators::usernameOrTeamUsernameOrEmail(
+                $alias
+            )
+        );
+        $team = \OmegaUp\DAO\TeamGroups::getByTeamUsername($teamUsername);
+        if (is_null($team)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'teams_group_alias'
+            );
+        }
+
+        $teamsGroup = self::validateTeamGroupAndOwner(
+            $team['alias'],
+            $r->identity
+        );
+        if (is_null($teamsGroup) || is_null($teamsGroup->team_group_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'teams_group_alias'
+            );
+        }
+
+        $user = \OmegaUp\DAO\Users::FindByUsername(
+            $r->ensureString(
+                'username'
+            )
+        );
+        if (is_null($user) || is_null($user->user_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'user_id'
+            );
+        }
+
+        \OmegaUp\DAO\TeamUsers::delete(
+            new \OmegaUp\DAO\VO\TeamUsers([
+                'team_id' => $team['team_id'],
+                'user_id' => $user->user_id,
+            ])
+        );
+
+        return ['status' => 'ok'];
+    }
 }
