@@ -225,7 +225,7 @@ OmegaUp.on('ready', () => {
                   dataset.records,
                 );
                 for (const {
-                  username,
+                  alias,
                   name,
                   country_id,
                   state_id,
@@ -233,7 +233,7 @@ OmegaUp.on('ready', () => {
                   school_name,
                 } of cleanRecords(records)) {
                   identities.push({
-                    username: `teams:${payload.teamGroup.alias}:${username}`,
+                    username: `teams:${payload.teamGroup.alias}:${alias}`,
                     name,
                     password: humanReadable
                       ? generateHumanReadablePassword()
@@ -244,7 +244,7 @@ OmegaUp.on('ready', () => {
                     gender: typeof gender === 'undefined' ? 'decline' : gender,
                   });
                   identitiesTeams[
-                    `teams:${payload.teamGroup.alias}:${username}`
+                    `teams:${payload.teamGroup.alias}:${alias}`
                   ] = [];
                 }
                 ui.dismissNotifications();

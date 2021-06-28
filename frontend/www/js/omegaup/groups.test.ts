@@ -145,10 +145,10 @@ describe('groups_utils', () => {
     it('Should match fields list', () => {
       expect(
         fieldsMatch(fields, [
+          'alias',
           'name',
           'country_id',
           'state_id',
-          'alias',
           'gender',
           'school_name',
         ]),

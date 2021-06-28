@@ -234,7 +234,7 @@ OmegaUp.on('ready', () => {
             CSV.fetch({ file })
               .done((dataset: CSV.Dataset) => {
                 const expectedFields = [
-                  'alias',
+                  'username',
                   'name',
                   'country_id',
                   'state_id',

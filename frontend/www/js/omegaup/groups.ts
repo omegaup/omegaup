@@ -53,8 +53,6 @@ export function getFieldsObject(
 }
 
 export function fieldsMatch(a: string[], b: string[]) {
-  a.sort();
-  b.sort();
   return a.length === b.length && a.every((val, index) => val === b[index]);
 }
 
