@@ -10,8 +10,11 @@ import Vue from 'vue';
 import * as CSV from '@/third_party/js/csv.js/csv.js';
 import {
   cleanRecords,
+  downloadCsvFile,
+  fieldsMatch,
   generateHumanReadablePassword,
   generatePassword,
+  getFieldsObject,
 } from '../groups';
 
 OmegaUp.on('ready', () => {
@@ -73,9 +76,7 @@ OmegaUp.on('ready', () => {
             originalUsername: string;
             identity: types.Identity;
           }) => {
-            // TODO: change next line with api.Identity.updateIdentityTeam({
-            // PR #5485 is merged
-            api.Identity.update({
+            api.Identity.updateIdentityTeam({
               ...identity,
               ...{
                 group_alias: payload.teamGroup.alias,
@@ -156,14 +157,12 @@ OmegaUp.on('ready', () => {
           }) => {
             api.Identity.bulkCreateForTeams({
               team_identities: JSON.stringify(
-                identities.map((identity) => {
-                  return {
-                    ...identity,
-                    ...{
-                      usernames: identitiesTeams[identity.username].join(';'),
-                    },
-                  };
-                }),
+                identities.map((identity) => ({
+                  ...identity,
+                  ...{
+                    usernames: identitiesTeams[identity.username].join(';'),
+                  },
+                })),
               ),
               team_group_alias: payload.teamGroup.alias,
             })
@@ -178,40 +177,20 @@ OmegaUp.on('ready', () => {
                 this.userErrorRow = data.parameter;
               });
           },
-          'download-identities': (identities: types.Identity[]) => {
-            const dialect = {
-              dialect: {
-                csvddfVersion: 1.2,
-                delimiter: ',',
-                doubleQuote: true,
-                lineTerminator: '\r\n',
-                quoteChar: '"',
-                skipInitialSpace: true,
-                header: true,
-                commentChar: '#',
-              },
-            };
-            const csv = CSV.serialize(
-              {
-                fields: [
-                  { id: 'username' },
-                  { id: 'name' },
-                  { id: 'password' },
-                  { id: 'country_id' },
-                  { id: 'state_id' },
-                  { id: 'school_name' },
-                ],
-                records: identities,
-              },
-              dialect,
-            );
-            const hiddenElement = document.createElement('a');
-            hiddenElement.href = `data:text/csv;charset=utf-8,${window.encodeURIComponent(
-              csv,
-            )}`;
-            hiddenElement.target = '_blank';
-            hiddenElement.download = 'identities.csv';
-            hiddenElement.click();
+          'download-teams': (identities: types.Identity[]) => {
+            downloadCsvFile({
+              fileName: `team_identities_${payload.teamGroup.alias}.csv`,
+              columns: [
+                'username',
+                'name',
+                'password',
+                'country_id',
+                'state_id',
+                'gender',
+                'school_name',
+              ],
+              records: identities,
+            });
           },
           'read-csv': ({
             identitiesTeams,
@@ -226,17 +205,33 @@ OmegaUp.on('ready', () => {
           }) => {
             CSV.fetch({ file })
               .done((dataset: CSV.Dataset) => {
-                if (!dataset.fields || dataset.fields.length != 5) {
+                const expectedFields = [
+                  'alias',
+                  'name',
+                  'country_id',
+                  'state_id',
+                  'gender',
+                  'school_name',
+                ];
+                if (
+                  !dataset.fields ||
+                  !fieldsMatch(dataset.fields, expectedFields)
+                ) {
                   ui.error(T.groupsInvalidCsv);
                   return;
                 }
-                for (const [
+                const records = getFieldsObject(
+                  dataset.fields,
+                  dataset.records,
+                );
+                for (const {
                   username,
                   name,
                   country_id,
                   state_id,
+                  gender,
                   school_name,
-                ] of cleanRecords(dataset.records)) {
+                } of cleanRecords(records)) {
                   identities.push({
                     username: `teams:${payload.teamGroup.alias}:${username}`,
                     name,
@@ -246,7 +241,7 @@ OmegaUp.on('ready', () => {
                     country_id,
                     state_id,
                     school_name,
-                    gender: 'decline',
+                    gender: typeof gender === 'undefined' ? 'decline' : gender,
                   });
                   identitiesTeams[
                     `teams:${payload.teamGroup.alias}:${username}`

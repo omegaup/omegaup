@@ -85,7 +85,7 @@
           @bulk-identities="
             (identities) => $emit('bulk-identities', identities)
           "
-          @download-teams="(teams) => $emit('download-teams', teams)"
+          @download-teams="(identities) => $emit('download-teams', identities)"
           @read-csv="(source) => $emit('read-csv', source)"
           @invalid-file="$emit('invalid-file')"
           @update-search-result-users="

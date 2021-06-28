@@ -1209,7 +1209,7 @@
 	"teamsGroupUploadIdentitiesAsTeams": "Subir equipes",
 	"teamsGroupUsernames": "Usu\u00e1rios",
 	"teamsGroupsCreateNew": "Criar novo grupo de equipes",
-	"teamsGroupsCsvHelp": "## Adicione rapidamente v\u00e1rias identidades como equipes a este grupo. As identidades n\u00e3o s\u00e3o usu\u00e1rios reais e n\u00e3o precisam ter um email ou validar sua conta.\n\n## As identidades devem estar em um arquivo <code>.csv</code> com o seguinte formato:\n<samp><pre>alias,name,country_id,state_id,school_name\nteam-1,Team 1,MX,AGU,Best School\nteam-2,Teams 2,MX,AGU,Best School</pre></samp>",
+	"teamsGroupsCsvHelp": "## Adicione rapidamente v\u00e1rias identidades como equipes a este grupo. As identidades n\u00e3o s\u00e3o usu\u00e1rios reais e n\u00e3o precisam ter um email ou validar sua conta.\n\n## As identidades devem estar em um arquivo <code>.csv</code> com o seguinte formato:\n<samp><pre>alias,name,country_id,state_id,gender,school_name\nteam-1,Team 1,MX,AGU,decline,Best School\nteam-2,Teams 2,MX,AGU,other,Best School</pre></samp>",
 	"titleInUse": "T\u00edtulo j\u00e1 existe. Por favor, escolha um t\u00edtulo diferente. ",
 	"tokenDecodeCorrupted": "Ocorreu um problema ao decodificar o token.",
 	"tokenDecodeExpired": "O token que voc\u00ea est\u00e1 tentando usar j\u00e1 expirou.",

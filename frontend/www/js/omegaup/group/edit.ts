@@ -10,8 +10,11 @@ import Vue from 'vue';
 import * as CSV from '@/third_party/js/csv.js/csv.js';
 import {
   cleanRecords,
+  downloadCsvFile,
+  fieldsMatch,
   generateHumanReadablePassword,
   generatePassword,
+  getFieldsObject,
 } from '../groups';
 
 OmegaUp.on('ready', () => {
@@ -205,40 +208,19 @@ OmegaUp.on('ready', () => {
               });
           },
           'download-identities': (identities: types.Identity[]) => {
-            const dialect = {
-              dialect: {
-                csvddfVersion: 1.2,
-                delimiter: ',',
-                doubleQuote: true,
-                lineTerminator: '\r\n',
-                quoteChar: '"',
-                skipInitialSpace: true,
-                header: true,
-                commentChar: '#',
-              },
-            };
-            const csv = CSV.serialize(
-              {
-                fields: [
-                  { id: 'username' },
-                  { id: 'name' },
-                  { id: 'password' },
-                  { id: 'country_id' },
-                  { id: 'state_id' },
-                  { id: 'gender' },
-                  { id: 'school_name' },
-                ],
-                records: identities,
-              },
-              dialect,
-            );
-            const hiddenElement = document.createElement('a');
-            hiddenElement.href = `data:text/csv;charset=utf-8,${window.encodeURIComponent(
-              csv,
-            )}`;
-            hiddenElement.target = '_blank';
-            hiddenElement.download = 'identities.csv';
-            hiddenElement.click();
+            downloadCsvFile({
+              fileName: `identities_${payload.groupAlias}.csv`,
+              columns: [
+                'username',
+                'name',
+                'password',
+                'country_id',
+                'state_id',
+                'gender',
+                'school_name',
+              ],
+              records: identities,
+            });
           },
           'read-csv': ({
             identities,
@@ -251,18 +233,33 @@ OmegaUp.on('ready', () => {
           }) => {
             CSV.fetch({ file })
               .done((dataset: CSV.Dataset) => {
-                if (!dataset.fields || dataset.fields.length != 6) {
+                const expectedFields = [
+                  'alias',
+                  'name',
+                  'country_id',
+                  'state_id',
+                  'gender',
+                  'school_name',
+                ];
+                if (
+                  !dataset.fields ||
+                  !fieldsMatch(dataset.fields, expectedFields)
+                ) {
                   ui.error(T.groupsInvalidCsv);
                   return;
                 }
-                for (const [
+                const records = getFieldsObject(
+                  dataset.fields,
+                  dataset.records,
+                );
+                for (const {
                   username,
                   name,
                   country_id,
                   state_id,
                   gender,
                   school_name,
-                ] of cleanRecords(dataset.records)) {
+                } of cleanRecords(records)) {
                   identities.push({
                     username: `${payload.groupAlias}:${username}`,
                     name,

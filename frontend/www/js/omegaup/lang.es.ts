@@ -1210,7 +1210,7 @@ const translations: { [key: string]: string; } = {
   teamsGroupUploadIdentitiesAsTeams: "Cargar equipos",
   teamsGroupUsernames: "Usuarios",
   teamsGroupsCreateNew: "Crear nuevo grupo de equipos",
-  teamsGroupsCsvHelp: "## Agrega r\u00e1pidamente m\u00faltiples identidades como equipo a este grupo. Las identidades no son usuarios reales y no necesitan tener un correo electr\u00f3nico o validar su cuenta.\n\n## Las identidades deben estar en un archivo <code>.csv</code> con el siguiente formato:\n<samp><pre>alias,name,country_id,state_id,school_name\nteam-1,Team 1,MX,AGU,Best School\nteam-2,Teams 2,MX,AGU,Best School</pre></samp>",
+  teamsGroupsCsvHelp: "## Agrega r\u00e1pidamente m\u00faltiples identidades como equipo a este grupo. Las identidades no son usuarios reales y no necesitan tener un correo electr\u00f3nico o validar su cuenta.\n\n## Las identidades deben estar en un archivo <code>.csv</code> con el siguiente formato:\n<samp><pre>alias,name,country_id,state_id,gender,school_name\nteam-1,Team 1,MX,AGU,decline,Best School\nteam-2,Teams 2,MX,AGU,other,Best School</pre></samp>",
   titleInUse: "El t\u00edtulo ya est\u00e1 siendo usado. Por favor elige un t\u00edtulo distinto.",
   tokenDecodeCorrupted: "Hubo un problema al decodificar el token.",
   tokenDecodeExpired: "El token que intentas utilizar ha expirado.",
