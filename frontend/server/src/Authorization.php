@@ -543,6 +543,10 @@ class Authorization {
             \OmegaUp\DAO\GroupRoles::isContestant(
                 intval($identity->identity_id),
                 $problemset->acl_id
+            ) ||
+            \OmegaUp\DAO\TeamsGroupRoles::isContestant(
+                intval($identity->identity_id),
+                $problemset->acl_id
             );
     }
 

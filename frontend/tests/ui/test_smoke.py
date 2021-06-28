@@ -133,7 +133,7 @@ def test_create_problem(driver):
                  '//div[contains(concat(" ", normalize-space(@class), " "), '
                  '" tab-content ")]/div[contains(concat(" ", '
                  'normalize-space(@class), " "), " show ")]/div[@data-overlay]'
-                 '/div[@data-overlay-popup]/div/button'))).click()
+                 '/div[@data-overlay-popup]/button'))).click()
 
         assert driver.browser.current_url.endswith('#runs')
 
