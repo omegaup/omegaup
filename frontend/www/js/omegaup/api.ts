@@ -1740,6 +1740,10 @@ export const TeamsGroup = {
     messages.TeamsGroupTeamsRequest,
     messages.TeamsGroupTeamsResponse
   >('/api/teamsGroup/teams/'),
+  teamsMembers: apiCall<
+    messages.TeamsGroupTeamsMembersRequest,
+    messages.TeamsGroupTeamsMembersResponse
+  >('/api/teamsGroup/teamsMembers/'),
   update: apiCall<
     messages.TeamsGroupUpdateRequest,
     messages.TeamsGroupUpdateResponse
