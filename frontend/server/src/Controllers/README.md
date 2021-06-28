@@ -3979,10 +3979,10 @@ Add one or more users to a given team
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `team_group_alias` | `string` |             |
-| `usernames`        | `string` |             |
+| Name               | Type     | Description                    |
+| ------------------ | -------- | ------------------------------ |
+| `team_group_alias` | `string` | The username of the team.      |
+| `usernames`        | `string` | Username of all members to add |
 
 ### Returns
 

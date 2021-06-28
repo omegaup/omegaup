@@ -344,8 +344,8 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param string $team_group_alias
-     * @omegaup-request-param string $usernames
+     * @omegaup-request-param string $team_group_alias The username of the team.
+     * @omegaup-request-param string $usernames Username of all members to add
      */
     public static function apiAddMembers(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
@@ -377,14 +377,10 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
 
         $identitiesUsernames = explode(',', $r->ensureString('usernames'));
 
-        try {
-            \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
-                $team['team_id'],
-                $identitiesUsernames
-            );
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
+            $team['team_id'],
+            $identitiesUsernames
+        );
 
         return ['status' => 'ok'];
     }
@@ -437,16 +433,12 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        try {
-            \OmegaUp\DAO\TeamUsers::delete(
-                new \OmegaUp\DAO\VO\TeamUsers([
-                    'team_id' => $team['team_id'],
-                    'user_id' => $user->user_id,
-                ])
-            );
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        \OmegaUp\DAO\TeamUsers::delete(
+            new \OmegaUp\DAO\VO\TeamUsers([
+                'team_id' => $team['team_id'],
+                'user_id' => $user->user_id,
+            ])
+        );
 
         return ['status' => 'ok'];
     }

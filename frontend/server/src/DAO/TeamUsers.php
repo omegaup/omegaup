@@ -37,7 +37,13 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
     /**
      * @return list<array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}>
      */
-    public static function getByTeamGroupId(int $teamsGroupId): array {
+    public static function getByTeamGroupId(
+        int $teamsGroupId,
+        int $page = 1,
+        int $rowsPerPage = 100
+    ): array {
+        $offset = ($page - 1) * $rowsPerPage;
+
         $sql = 'SELECT
                     i.username,
                     i.name,
@@ -79,11 +85,11 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
                     it.identity_id = t.identity_id
                 WHERE
                     team_group_id = ?
-                LIMIT 100;';
+                LIMIT ?, ?;';
         /** @var list<array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$teamsGroupId]
+            [$teamsGroupId, $offset, $rowsPerPage]
         );
     }
 
