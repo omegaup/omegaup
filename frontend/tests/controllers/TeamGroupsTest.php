@@ -875,10 +875,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    /**
-     * Basic test for uploading csv file with identities as teams
-     */
-    public function testAddRemoveMembersToTeam() {
+    public function testAddMembersToTeam() {
         // Identity creator group member will upload csv file
         [
             'identity' => $creatorIdentity,
@@ -958,28 +955,5 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             fn ($teamMember) => $teamMember['team_alias'] === $teamAlias
         );
         $this->assertCount(4, $membersByTeam1);
-
-        // Now, let's remove all team members
-        foreach ($membersByTeam1 as $member) {
-            \OmegaUp\Controllers\TeamsGroup::apiRemoveMember(
-                new \OmegaUp\Request([
-                    'auth_token' => $creatorLogin->auth_token,
-                    'team_group_alias' => $teamAlias,
-                    'username' => $member['username'],
-                ])
-            );
-        }
-
-        $teamsMembers = \OmegaUp\Controllers\TeamsGroup::apiTeamsMembers(
-            new \OmegaUp\Request([
-                'auth_token' => $creatorLogin->auth_token,
-                'team_group_alias' => $teamGroup->alias,
-            ])
-        );
-        $membersByTeam1 = array_filter(
-            $teamsMembers,
-            fn ($teamMember) => $teamMember['team_alias'] === $teamAlias
-        );
-        $this->assertEmpty($membersByTeam1);
     }
 }
