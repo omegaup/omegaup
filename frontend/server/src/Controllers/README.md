@@ -4067,9 +4067,9 @@ Get a list of team members of a teams group
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `team_group_alias` | `string` |             |
+| Name               | Type     | Description               |
+| ------------------ | -------- | ------------------------- |
+| `team_group_alias` | `string` | The username of the team. |
 
 ### Returns
 

@@ -358,7 +358,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
      *
      * @return list<TeamMember>
      *
-     * @omegaup-request-param string $team_group_alias
+     * @omegaup-request-param string $team_group_alias The username of the team.
      */
     public static function apiTeamsMembers(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
