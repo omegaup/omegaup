@@ -1,19 +1,81 @@
+import { types } from './api_types';
 import T from './lang';
+import * as CSV from '@/third_party/js/csv.js/csv.js';
+
+export function downloadCsvFile({
+  fileName,
+  columns,
+  records,
+}: {
+  fileName: string;
+  columns: string[];
+  records: types.Identity[];
+}): void {
+  const dialect = {
+    dialect: {
+      csvddfVersion: 1.2,
+      delimiter: ',',
+      doubleQuote: true,
+      lineTerminator: '\r\n',
+      quoteChar: '"',
+      skipInitialSpace: true,
+      header: true,
+      commentChar: '#',
+    },
+  };
+  const fields: { id: string }[] = [];
+  for (const column of columns) {
+    fields.push({ id: column });
+  }
+  const csv = CSV.serialize({ fields, records }, dialect);
+  const hiddenElement = document.createElement('a');
+  hiddenElement.href = `data:text/csv;charset=utf-8,${window.encodeURIComponent(
+    csv,
+  )}`;
+  hiddenElement.target = '_blank';
+  hiddenElement.download = fileName;
+  hiddenElement.click();
+}
+
+export function getFieldsObject(
+  fields: string[],
+  records: (null | number | string)[][],
+): { [key: string]: null | number | string }[] {
+  const result: { [key: string]: null | number | string }[] = [];
+  for (const record in records) {
+    const row: { [key: string]: null | number | string } = {};
+    for (const field in fields) {
+      row[fields[field]] = records[record][field];
+    }
+    result.push(row);
+  }
+  return result;
+}
+
+export function fieldsMatch(a: string[], b: string[]) {
+  return a.length === b.length && a.every((val, index) => val === b[index]);
+}
 
 export function cleanRecords(
-  records: (null | number | string)[][],
-): (undefined | string)[][] {
-  return records.map((row) =>
-    row.map((cell) => {
+  records: { [key: string]: null | number | string }[],
+): { [key: string]: undefined | string }[] {
+  const cleanRecords: { [key: string]: undefined | string }[] = [];
+  records.forEach((record) => {
+    const cleanRecord: { [key: string]: undefined | string } = {};
+    for (const [index, cell] of Object.entries(record)) {
       if (cell === null) {
-        return undefined;
+        cleanRecord[index] = undefined;
+        continue;
       }
       if (typeof cell !== 'string') {
-        return String(cell);
+        cleanRecord[index] = String(cell);
+        continue;
       }
-      return cell;
-    }),
-  );
+      cleanRecord[index] = cell;
+    }
+    cleanRecords.push(cleanRecord);
+  });
+  return cleanRecords;
 }
 
 export function generatePassword(): string {

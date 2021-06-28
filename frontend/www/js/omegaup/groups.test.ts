@@ -2,6 +2,8 @@ import {
   generatePassword,
   generateHumanReadablePassword,
   cleanRecords,
+  getFieldsObject,
+  fieldsMatch,
 } from './groups';
 import T from './lang';
 
@@ -73,28 +75,97 @@ describe('groups_utils', () => {
   });
 
   describe('cleanRecords', () => {
+    const fields = [
+      'alias',
+      'name',
+      'country_id',
+      'state_id',
+      'gender',
+      'school_name',
+    ];
+
     it('Should clean all null cells', () => {
-      const records = cleanRecords([
+      const records = [
         ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', null],
         ['username-2', null, 'MX', 'QUE', 'male', 'Best School'],
-      ]);
+      ];
 
-      expect(records).toEqual([
-        ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', undefined],
-        ['username-2', undefined, 'MX', 'QUE', 'male', 'Best School'],
+      const fieldsRecords = getFieldsObject(fields, records);
+      const formattedRecords = cleanRecords(fieldsRecords);
+
+      expect(formattedRecords).toEqual([
+        {
+          alias: 'username-1',
+          name: 'Developer Diana',
+          country_id: 'MX',
+          state_id: 'AGU',
+          gender: 'female',
+          school_name: undefined,
+        },
+        {
+          alias: 'username-2',
+          name: undefined,
+          country_id: 'MX',
+          state_id: 'QUE',
+          gender: 'male',
+          school_name: 'Best School',
+        },
       ]);
     });
 
     it('Should parse all the cells to string', () => {
-      const records = cleanRecords([
+      const records = [
         ['username-1', 'Developer Diana', 4, 'AGU', 'female', 'Best School'],
         [2, 'Dev Diane', 'MX', 'QUE', 'male', 'Best School'],
-      ]);
+      ];
 
-      expect(records).toEqual([
-        ['username-1', 'Developer Diana', '4', 'AGU', 'female', 'Best School'],
-        ['2', 'Dev Diane', 'MX', 'QUE', 'male', 'Best School'],
+      const fieldsRecords = getFieldsObject(fields, records);
+      const formattedRecords = cleanRecords(fieldsRecords);
+
+      expect(formattedRecords).toEqual([
+        {
+          alias: 'username-1',
+          name: 'Developer Diana',
+          country_id: '4',
+          state_id: 'AGU',
+          gender: 'female',
+          school_name: 'Best School',
+        },
+        {
+          alias: '2',
+          name: 'Dev Diane',
+          country_id: 'MX',
+          state_id: 'QUE',
+          gender: 'male',
+          school_name: 'Best School',
+        },
       ]);
+    });
+
+    it('Should match fields list', () => {
+      expect(
+        fieldsMatch(fields, [
+          'alias',
+          'name',
+          'country_id',
+          'state_id',
+          'gender',
+          'school_name',
+        ]),
+      ).toBe(true);
+    });
+
+    it('Should not match fields list', () => {
+      expect(
+        fieldsMatch(fields, [
+          'alias',
+          'name',
+          'country',
+          'state_id',
+          'gender',
+          'school_name',
+        ]),
+      ).toBe(false);
     });
   });
 });
