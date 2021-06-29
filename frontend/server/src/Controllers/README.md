@@ -4069,13 +4069,17 @@ Get a list of team members of a teams group
 
 | Name               | Type     | Description               |
 | ------------------ | -------- | ------------------------- |
+| `page`             | `int`    |                           |
+| `page_size`        | `int`    |                           |
 | `team_group_alias` | `string` | The username of the team. |
 
 ### Returns
 
-```typescript
-types.TeamMember[]
-```
+| Name         | Type                 |
+| ------------ | -------------------- |
+| `pageNumber` | `number`             |
+| `teamsUsers` | `types.TeamMember[]` |
+| `totalRows`  | `number`             |
 
 ## `/api/teamsGroup/update/`
 

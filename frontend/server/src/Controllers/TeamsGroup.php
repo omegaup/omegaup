@@ -356,12 +356,17 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
     /**
      * Get a list of team members of a teams group
      *
-     * @return list<TeamMember>
+     * @return array{pageNumber: int, teamsUsers: list<TeamMember>, totalRows: int}
      *
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
      * @omegaup-request-param string $team_group_alias The username of the team.
      */
     public static function apiTeamsMembers(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
+
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 100;
         $teamGroupAlias = $r->ensureString(
             'team_group_alias',
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
@@ -378,7 +383,9 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         }
 
         return \OmegaUp\DAO\TeamUsers::getByTeamGroupId(
-            $teamGroup->team_group_id
+            $teamGroup->team_group_id,
+            $page,
+            $pageSize
         );
     }
 }

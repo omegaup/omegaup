@@ -55,14 +55,14 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
     }
 
     /**
-     * @return list<array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}>
+     * @return array{pageNumber: int, teamsUsers: list<array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}>, totalRows: int}
      */
     public static function getByTeamGroupId(
         int $teamsGroupId,
         int $page = 1,
-        int $rowsPerPage = 100
+        int $pageSize = 100
     ): array {
-        $offset = ($page - 1) * $rowsPerPage;
+        $offset = ($page - 1) * $pageSize;
 
         $sql = 'SELECT
                     i.username,
@@ -105,11 +105,32 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
                     it.identity_id = t.identity_id
                 WHERE
                     team_group_id = ?
-                LIMIT ?, ?;';
-        /** @var list<array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [$teamsGroupId, $offset, $rowsPerPage]
+                ';
+
+        $sqlCount = "
+        SELECT
+            COUNT(*)
+        FROM
+            ({$sql}) AS total";
+
+        $sqlLimit = 'LIMIT ?, ?;';
+
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlCount,
+            [$teamsGroupId]
         );
+
+        /** @var list<array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}> $teamsUsers */
+        $teamsUsers = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql . $sqlLimit,
+            [$teamsGroupId, $offset, $pageSize]
+        );
+
+        return [
+            'pageNumber' => $page,
+            'teamsUsers' => $teamsUsers,
+            'totalRows' => $totalRows,
+        ];
     }
 }
