@@ -1208,7 +1208,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             [$contestId]
         );
 
-        return $requestsUsersInfo === 'yes' || $requestsUsersInfo === 'optional';
+        return $requestsUsersInfo === 'yes' || $requestsUsersInfo ===  'optional';
     }
 
     /**
