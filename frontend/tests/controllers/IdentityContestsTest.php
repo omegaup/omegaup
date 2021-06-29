@@ -355,4 +355,98 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
     }
+
+    public function testAddUsersToContestForTeams() {
+        // Get a problem
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Create the user to associate
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestForTeams' => true,
+                'teamsGroupAlias' => $teamGroup->alias,
+            ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contestData
+        );
+
+        $login = self::login($contestData['director']);
+
+        // Add users to contest for teams is not allowed
+        try {
+            \OmegaUp\Controllers\Contest::apiAddUser(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'usernameOrEmail' => $identity->username,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'usersCanNotBeAddedInContestForTeams',
+                $e->getMessage()
+            );
+        }
+    }
+
+    public function testAddGroupsToContestForTeams() {
+        // Get a problem
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Create the user to associate
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestForTeams' => true,
+                'teamsGroupAlias' => $teamGroup->alias,
+            ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contestData
+        );
+
+        $login = self::login($contestData['director']);
+
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
+            /*$owner=*/            null,
+            /*$name=*/null,
+            /*$description=*/null,
+            /*$alias=*/null,
+            $login
+        );
+
+        // Add users to contest for teams is not allowed
+        try {
+            \OmegaUp\Controllers\Contest::apiAddGroup(
+                new \OmegaUp\Request([
+                    'contest_alias' => strval($contestData['request']['alias']),
+                    'group' => $groupData['group']->alias,
+                    'auth_token' => $login->auth_token,
+                ])
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'groupsCanNotBeAddedInContestForTeams',
+                $e->getMessage()
+            );
+        }
+    }
 }

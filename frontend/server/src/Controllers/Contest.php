@@ -3103,6 +3103,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r['usernameOrEmail'],
             $r->identity
         );
+        if ($contest->contest_for_teams) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'usersCanNotBeAddedInContestForTeams'
+            );
+        }
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'userNotExist'
@@ -3259,6 +3264,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         if (is_null($problemset)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+        if ($contest->contest_for_teams) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'groupsCanNotBeAddedInContestForTeams'
+            );
         }
         \OmegaUp\DAO\GroupRoles::create(
             new \OmegaUp\DAO\VO\GroupRoles([
@@ -4167,6 +4177,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'problemsetNotFound'
             );
         }
+        if ($contest->contest_for_teams) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestPublicForTeamsNotSupported'
+            );
+        }
         // Check that contest has some problems at least 1 problem
         $problemsInProblemset = \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
             $problemset
@@ -4183,7 +4198,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $admission_mode
+     * @omegaup-request-param null|string $admission_mode
      * @omegaup-request-param null|string $alias
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param null|string $description
@@ -4218,6 +4233,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $contest = self::validateUpdate($r, $r->identity, $contestAlias);
+        $contestForTeams = $r->ensureOptionalBool('contest_for_teams');
+        if (
+            !is_null(
+                $contestForTeams
+            ) && $contest->contest_for_teams !== $contestForTeams
+        ) {
+            if ($contest->contest_for_teams) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'contestForTeamsCanNotChangeToContest'
+                );
+            }
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestCanNotChangeToContestForTeams'
+            );
+        }
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['requests_user_information'],
             'requests_user_information',
