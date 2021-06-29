@@ -214,7 +214,6 @@ const translations: { [key: string]: string; } = {
   contestListShowAdminContests: "(A150 5h0w c0n73575 I manag3)",
   contestListSubmissions: "(Submi55i0n5)",
   contestMustBeCreatedInPrivateMode: "(C0n7357 mu57 b3 cr3a73d in priva73 m0d3)",
-  contestMyActiveContests: "(C0n73575 I am par7icipa7ing in)",
   contestNew: "(N3w c0n7357)",
   contestNewForm: "(IOI S7y13)",
   contestNewFormAdmissionMode: "(Admi55i0n m0d3)",
