@@ -1,9 +1,8 @@
+import { CSVDatasetRecord } from './group/edit';
 import {
   generatePassword,
   generateHumanReadablePassword,
-  cleanRecords,
-  getFieldsObject,
-  fieldsMatch,
+  getCSVRecords,
 } from './groups';
 import T from './lang';
 
@@ -84,14 +83,26 @@ describe('groups_utils', () => {
       'school_name',
     ];
 
+    const expectedFields = [
+      'alias',
+      'name',
+      'country_id',
+      'state_id',
+      'gender',
+      'school_name',
+    ];
+
     it('Should clean all null cells', () => {
       const records = [
         ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', null],
         ['username-2', null, 'MX', 'QUE', 'male', 'Best School'],
       ];
 
-      const fieldsRecords = getFieldsObject(fields, records);
-      const formattedRecords = cleanRecords(fieldsRecords);
+      const formattedRecords = getCSVRecords<CSVDatasetRecord>(
+        fields,
+        records,
+        expectedFields,
+      );
 
       expect(formattedRecords).toEqual([
         {
@@ -119,8 +130,11 @@ describe('groups_utils', () => {
         [2, 'Dev Diane', 'MX', 'QUE', 'male', 'Best School'],
       ];
 
-      const fieldsRecords = getFieldsObject(fields, records);
-      const formattedRecords = cleanRecords(fieldsRecords);
+      const formattedRecords = getCSVRecords<CSVDatasetRecord>(
+        fields,
+        records,
+        expectedFields,
+      );
 
       expect(formattedRecords).toEqual([
         {
@@ -140,32 +154,6 @@ describe('groups_utils', () => {
           school_name: 'Best School',
         },
       ]);
-    });
-
-    it('Should match fields list', () => {
-      expect(
-        fieldsMatch(fields, [
-          'alias',
-          'name',
-          'country_id',
-          'state_id',
-          'gender',
-          'school_name',
-        ]),
-      ).toBe(true);
-    });
-
-    it('Should not match fields list', () => {
-      expect(
-        fieldsMatch(fields, [
-          'alias',
-          'name',
-          'country',
-          'state_id',
-          'gender',
-          'school_name',
-        ]),
-      ).toBe(false);
     });
   });
 });

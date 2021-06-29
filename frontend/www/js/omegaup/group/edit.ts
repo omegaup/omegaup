@@ -9,13 +9,20 @@ import T from '../lang';
 import Vue from 'vue';
 import * as CSV from '@/third_party/js/csv.js/csv.js';
 import {
-  cleanRecords,
   downloadCsvFile,
-  fieldsMatch,
   generateHumanReadablePassword,
-  getFieldsObject,
   generatePassword,
+  getCSVRecords,
 } from '../groups';
+
+export type CSVDatasetRecord = {
+  username: string;
+  name: string;
+  country_id: string;
+  state_id: string;
+  gender: string;
+  school_name: string;
+};
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.GroupEditPayload();
@@ -241,16 +248,14 @@ OmegaUp.on('ready', () => {
                   'gender',
                   'school_name',
                 ];
-                if (
-                  !dataset.fields ||
-                  !fieldsMatch(dataset.fields, expectedFields)
-                ) {
+                if (!dataset.fields) {
                   ui.error(T.groupsInvalidCsv);
                   return;
                 }
-                const records = getFieldsObject(
+                const records = getCSVRecords<CSVDatasetRecord>(
                   dataset.fields,
                   dataset.records,
+                  expectedFields,
                 );
                 for (const {
                   username,
@@ -259,7 +264,7 @@ OmegaUp.on('ready', () => {
                   state_id,
                   gender,
                   school_name,
-                } of cleanRecords(records)) {
+                } of records) {
                   identities.push({
                     username: `${payload.groupAlias}:${username}`,
                     name,

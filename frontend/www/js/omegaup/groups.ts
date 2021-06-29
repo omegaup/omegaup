@@ -23,10 +23,7 @@ export function downloadCsvFile({
       commentChar: '#',
     },
   };
-  const fields: { id: string }[] = [];
-  for (const column of columns) {
-    fields.push({ id: column });
-  }
+  const fields = columns.map((column) => ({ id: column }));
   const csv = CSV.serialize({ fields, records }, dialect);
   const hiddenElement = document.createElement('a');
   hiddenElement.href = `data:text/csv;charset=utf-8,${window.encodeURIComponent(
@@ -37,45 +34,25 @@ export function downloadCsvFile({
   hiddenElement.click();
 }
 
-export function getFieldsObject(
+export function getCSVRecords<T>(
   fields: string[],
   records: (null | number | string)[][],
-): { [key: string]: null | number | string }[] {
-  const result: { [key: string]: null | number | string }[] = [];
+  expectedFields: string[],
+): Array<T> {
+  const result: T[] = [];
   for (const record in records) {
-    const row: { [key: string]: null | number | string } = {};
-    for (const field in fields) {
-      row[fields[field]] = records[record][field];
+    const row: T = {};
+    for (const [i, field] of fields.entries()) {
+      if (records[record][i] === null) {
+        continue;
+      }
+      if (expectedFields.includes(field)) {
+        row[field] = String(records[record][i]);
+      }
     }
     result.push(row);
   }
   return result;
-}
-
-export function fieldsMatch(a: string[], b: string[]) {
-  return a.length === b.length && a.every((val, index) => val === b[index]);
-}
-
-export function cleanRecords(
-  records: { [key: string]: null | number | string }[],
-): { [key: string]: undefined | string }[] {
-  const cleanRecords: { [key: string]: undefined | string }[] = [];
-  records.forEach((record) => {
-    const cleanRecord: { [key: string]: undefined | string } = {};
-    for (const [index, cell] of Object.entries(record)) {
-      if (cell === null) {
-        cleanRecord[index] = undefined;
-        continue;
-      }
-      if (typeof cell !== 'string') {
-        cleanRecord[index] = String(cell);
-        continue;
-      }
-      cleanRecord[index] = cell;
-    }
-    cleanRecords.push(cleanRecord);
-  });
-  return cleanRecords;
 }
 
 export function generatePassword(): string {
