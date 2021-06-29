@@ -7,15 +7,6 @@ import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
-import * as CSV from '@/third_party/js/csv.js/csv.js';
-import {
-  cleanRecords,
-  downloadCsvFile,
-  fieldsMatch,
-  generateHumanReadablePassword,
-  generatePassword,
-  getFieldsObject,
-} from '../groups';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.TeamGroupEditPayload();
@@ -175,83 +166,6 @@ OmegaUp.on('ready', () => {
               .catch((data) => {
                 ui.error(data.error);
                 this.userErrorRow = data.parameter;
-              });
-          },
-          'download-teams': (identities: types.Identity[]) => {
-            downloadCsvFile({
-              fileName: `team_identities_${payload.teamGroup.alias}.csv`,
-              columns: [
-                'username',
-                'name',
-                'password',
-                'country_id',
-                'state_id',
-                'gender',
-                'school_name',
-              ],
-              records: identities,
-            });
-          },
-          'read-csv': ({
-            identitiesTeams,
-            identities,
-            file,
-            humanReadable,
-          }: {
-            identitiesTeams: { [team: string]: string[] };
-            identities: types.Identity[];
-            file: File;
-            humanReadable: boolean;
-          }) => {
-            CSV.fetch({ file })
-              .done((dataset: CSV.Dataset) => {
-                const expectedFields = [
-                  'alias',
-                  'name',
-                  'country_id',
-                  'state_id',
-                  'gender',
-                  'school_name',
-                ];
-                if (
-                  !dataset.fields ||
-                  !fieldsMatch(dataset.fields, expectedFields)
-                ) {
-                  ui.error(T.groupsInvalidCsv);
-                  return;
-                }
-                const records = getFieldsObject(
-                  dataset.fields,
-                  dataset.records,
-                );
-                for (const {
-                  alias,
-                  name,
-                  country_id,
-                  state_id,
-                  gender,
-                  school_name,
-                } of cleanRecords(records)) {
-                  identities.push({
-                    username: `teams:${payload.teamGroup.alias}:${alias}`,
-                    name,
-                    password: humanReadable
-                      ? generateHumanReadablePassword()
-                      : generatePassword(),
-                    country_id,
-                    state_id,
-                    school_name,
-                    gender: typeof gender === 'undefined' ? 'decline' : gender,
-                  });
-                  identitiesTeams[
-                    `teams:${payload.teamGroup.alias}:${alias}`
-                  ] = [];
-                }
-                ui.dismissNotifications();
-                this.userErrorRow = null;
-              })
-              .fail((data) => {
-                ui.error(data.error);
               });
           },
           'invalid-file': () => {

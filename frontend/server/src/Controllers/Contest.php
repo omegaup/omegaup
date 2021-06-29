@@ -46,7 +46,6 @@ namespace OmegaUp\Controllers;
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
- * @psalm-type Contestant=array{name: null|string, username: string, email: null|string, gender: null|string, state: null|string, country: null|string, school: null|string}
  */
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
@@ -5062,7 +5061,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{contestants: list<Contestant>}
+     * @return array{contestants: list<array{name: null|string, username: string, email: null|string, state: null|string, country: null|string, school: null|string}>}
      *
      * @omegaup-request-param string $contest_alias
      */

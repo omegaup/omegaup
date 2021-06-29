@@ -717,9 +717,9 @@ previously agreed to share their information.
 
 ### Returns
 
-| Name          | Type                 |
-| ------------- | -------------------- |
-| `contestants` | `types.Contestant[]` |
+| Name          | Type                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------ |
+| `contestants` | `{ country: string; email: string; name: string; school: string; state: string; username: string; }[]` |
 
 ## `/api/contest/create/`
 
