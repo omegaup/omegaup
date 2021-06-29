@@ -214,7 +214,6 @@ const translations: { [key: string]: string; } = {
   contestListShowAdminContests: "Tamb\u00e9m mostrar concursos que eu gerencio",
   contestListSubmissions: "Solu\u00e7\u00f5es",
   contestMustBeCreatedInPrivateMode: "O concurso deve ser criado no modo privado",
-  contestMyActiveContests: "Concursos em que estou paricipando",
   contestNew: "Novo concurso",
   contestNewForm: "Estilo Preseletivo IOI",
   contestNewFormAdmissionMode: "Modo de acesso",
