@@ -3241,6 +3241,7 @@ export namespace types {
     identities: types.Identity[];
     isOrganizer: boolean;
     teamGroup: { alias: string; description?: string; name?: string };
+    teamsMembers: types.TeamMember[];
   }
 
   export interface TeamMember {
@@ -4241,6 +4242,8 @@ export namespace messages {
   export type TagListResponse = { name: string }[];
 
   // TeamsGroup
+  export type TeamsGroupAddMembersRequest = { [key: string]: any };
+  export type TeamsGroupAddMembersResponse = {};
   export type TeamsGroupCreateRequest = { [key: string]: any };
   export type TeamsGroupCreateResponse = {};
   export type TeamsGroupDetailsRequest = { [key: string]: any };
@@ -5003,6 +5006,9 @@ export namespace controllers {
   }
 
   export interface TeamsGroup {
+    addMembers: (
+      params?: messages.TeamsGroupAddMembersRequest,
+    ) => Promise<messages.TeamsGroupAddMembersResponse>;
     create: (
       params?: messages.TeamsGroupCreateRequest,
     ) => Promise<messages.TeamsGroupCreateResponse>;

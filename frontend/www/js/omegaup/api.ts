@@ -1720,6 +1720,10 @@ export const Tag = {
 };
 
 export const TeamsGroup = {
+  addMembers: apiCall<
+    messages.TeamsGroupAddMembersRequest,
+    messages.TeamsGroupAddMembersResponse
+  >('/api/teamsGroup/addMembers/'),
   create: apiCall<
     messages.TeamsGroupCreateRequest,
     messages.TeamsGroupCreateResponse
