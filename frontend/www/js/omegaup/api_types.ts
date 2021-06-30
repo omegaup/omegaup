@@ -4252,6 +4252,8 @@ export namespace messages {
   };
   export type TeamsGroupListRequest = { [key: string]: any };
   export type TeamsGroupListResponse = types.ListItem[];
+  export type TeamsGroupRemoveMemberRequest = { [key: string]: any };
+  export type TeamsGroupRemoveMemberResponse = {};
   export type TeamsGroupRemoveTeamRequest = { [key: string]: any };
   export type TeamsGroupRemoveTeamResponse = {};
   export type TeamsGroupTeamsRequest = { [key: string]: any };
@@ -5011,6 +5013,9 @@ export namespace controllers {
     list: (
       params?: messages.TeamsGroupListRequest,
     ) => Promise<messages.TeamsGroupListResponse>;
+    removeMember: (
+      params?: messages.TeamsGroupRemoveMemberRequest,
+    ) => Promise<messages.TeamsGroupRemoveMemberResponse>;
     removeTeam: (
       params?: messages.TeamsGroupRemoveTeamRequest,
     ) => Promise<messages.TeamsGroupRemoveTeamResponse>;

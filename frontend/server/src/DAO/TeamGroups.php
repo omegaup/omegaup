@@ -72,6 +72,27 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
     }
 
     /**
+     * @return list<array{key: string, value: string}>
+     */
+    public static function findByNameOrAlias(string $aliasOrName) {
+        $sql = "SELECT DISTINCT
+                    tg.alias AS `key`,
+                    tg.name AS `value`
+                FROM
+                    Team_Groups tg
+                WHERE
+                    tg.alias LIKE CONCAT('%', ?, '%') OR
+                    tg.name LIKE CONCAT('%', ?, '%')
+                LIMIT 100;";
+
+        /** @var list<array{key: string, value: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$aliasOrName, $aliasOrName]
+        );
+    }
+
+    /**
      * @return array{alias: string, team_id: int}|null
      */
     public static function getByTeamUsername(string $teamUsername) {
@@ -95,27 +116,6 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$teamUsername]
-        );
-    }
-
-    /**
-     * @return list<array{key: string, value: string}>
-     */
-    public static function findByNameOrAlias(string $aliasOrName) {
-        $sql = "SELECT DISTINCT
-                    tg.alias AS `key`,
-                    tg.name AS `value`
-                FROM
-                    Team_Groups tg
-                WHERE
-                    tg.alias LIKE CONCAT('%', ?, '%') OR
-                    tg.name LIKE CONCAT('%', ?, '%')
-                LIMIT 100;";
-
-        /** @var list<array{key: string, value: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [$aliasOrName, $aliasOrName]
         );
     }
 }
