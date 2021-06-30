@@ -136,7 +136,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
                     ),
                     'teamsMembers' => \OmegaUp\DAO\TeamUsers::getByTeamGroupId(
                         $teamGroup->team_group_id
-                    ),
+                    )['teamsUsers'],
                     'isOrganizer' => \OmegaUp\Experiments::getInstance()->isEnabled(
                         \OmegaUp\Experiments::IDENTITIES
                     ) && \OmegaUp\Authorization::canCreateGroupIdentities(
@@ -386,14 +386,36 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Gets a list of teams groups. This returns an array instead of an object
+     * since it is used by typeahead.
+     *
+     * @omegaup-request-param null|string $query
+     *
+     * @return list<ListItem>
+     */
+    public static function apiList(\OmegaUp\Request $r): array {
+        // Authenticate user
+        $r->ensureMainUserIdentity();
+
+        $query = $r->ensureString('query');
+
+        return \OmegaUp\DAO\TeamGroups::findByNameOrAlias($query);
+    }
+
+    /**
      * Get a list of team members of a teams group
      *
-     * @return list<TeamMember>
+     * @return array{pageNumber: int, teamsUsers: list<TeamMember>, totalRows: int}
      *
-     * @omegaup-request-param string $team_group_alias
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     * @omegaup-request-param string $team_group_alias The username of the team.
      */
     public static function apiTeamsMembers(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
+
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 100;
         $teamGroupAlias = $r->ensureString(
             'team_group_alias',
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
@@ -410,24 +432,9 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         }
 
         return \OmegaUp\DAO\TeamUsers::getByTeamGroupId(
-            $teamGroup->team_group_id
+            $teamGroup->team_group_id,
+            $page,
+            $pageSize
         );
-    }
-
-    /**
-     * Gets a list of teams groups. This returns an array instead of an object
-     * since it is used by typeahead.
-     *
-     * @omegaup-request-param null|string $query
-     *
-     * @return list<ListItem>
-     */
-    public static function apiList(\OmegaUp\Request $r): array {
-        // Authenticate user
-        $r->ensureMainUserIdentity();
-
-        $query = $r->ensureString('query');
-
-        return \OmegaUp\DAO\TeamGroups::findByNameOrAlias($query);
     }
 }

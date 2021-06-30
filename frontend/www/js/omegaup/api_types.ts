@@ -4257,7 +4257,11 @@ export namespace messages {
   export type TeamsGroupTeamsRequest = { [key: string]: any };
   export type TeamsGroupTeamsResponse = { identities: types.Identity[] };
   export type TeamsGroupTeamsMembersRequest = { [key: string]: any };
-  export type TeamsGroupTeamsMembersResponse = types.TeamMember[];
+  export type TeamsGroupTeamsMembersResponse = {
+    pageNumber: number;
+    teamsUsers: types.TeamMember[];
+    totalRows: number;
+  };
   export type TeamsGroupUpdateRequest = { [key: string]: any };
   export type TeamsGroupUpdateResponse = {};
 

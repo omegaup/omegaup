@@ -49,9 +49,6 @@ module.exports = {
     common_stats: './frontend/www/js/omegaup/common/stats.ts',
     contest_edit: './frontend/www/js/omegaup/contest/edit.ts',
     contest_intro: './frontend/www/js/omegaup/contest/intro.ts',
-    contest_list: './frontend/www/js/omegaup/contest/list.js',
-    contest_list_participant:
-      './frontend/www/js/omegaup/contest/list_participant.js',
     contest_mine: './frontend/www/js/omegaup/contest/mine.ts',
     contest_new: './frontend/www/js/omegaup/contest/new.ts',
     contest_print: './frontend/www/js/omegaup/contest/print.ts',
