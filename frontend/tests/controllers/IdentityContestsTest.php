@@ -374,12 +374,6 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        // Add the problem to the contest
-        \OmegaUp\Test\Factories\Contest::addProblemToContest(
-            $problem,
-            $contestData
-        );
-
         $login = self::login($contestData['director']);
 
         // Add users to contest for teams is not allowed
@@ -416,12 +410,6 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        // Add the problem to the contest
-        \OmegaUp\Test\Factories\Contest::addProblemToContest(
-            $problem,
-            $contestData
-        );
-
         $login = self::login($contestData['director']);
 
         $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
@@ -432,7 +420,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             $login
         );
 
-        // Add goups to contest for teams is not allowed
+        // Add groups to contest for teams is not allowed
         try {
             \OmegaUp\Controllers\Contest::apiAddGroup(
                 new \OmegaUp\Request([

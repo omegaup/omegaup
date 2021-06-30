@@ -1228,12 +1228,6 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        // Add the problem to the contest
-        \OmegaUp\Test\Factories\Contest::addProblemToContest(
-            $problem,
-            $contestData
-        );
-
         $login = self::login($contestData['director']);
 
         // Update contest for teams to normal contest is not allowed

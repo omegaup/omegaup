@@ -4178,6 +4178,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
         if ($contest->contest_for_teams) {
+            // TODO: Make contest for teams able to be public, define the rules
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'contestPublicForTeamsNotSupported'
             );
