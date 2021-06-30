@@ -3238,6 +3238,14 @@ export namespace types {
     teamGroup: { alias: string; description?: string; name?: string };
   }
 
+  export interface TeamMember {
+    classname: string;
+    name?: string;
+    team_alias: string;
+    team_name?: string;
+    username: string;
+  }
+
   export interface TeamsGroup {
     alias: string;
     create_time: Date;
@@ -4247,6 +4255,12 @@ export namespace messages {
   export type TeamsGroupRemoveTeamResponse = {};
   export type TeamsGroupTeamsRequest = { [key: string]: any };
   export type TeamsGroupTeamsResponse = { identities: types.Identity[] };
+  export type TeamsGroupTeamsMembersRequest = { [key: string]: any };
+  export type TeamsGroupTeamsMembersResponse = {
+    pageNumber: number;
+    teamsUsers: types.TeamMember[];
+    totalRows: number;
+  };
   export type TeamsGroupUpdateRequest = { [key: string]: any };
   export type TeamsGroupUpdateResponse = {};
 
@@ -5002,6 +5016,9 @@ export namespace controllers {
     teams: (
       params?: messages.TeamsGroupTeamsRequest,
     ) => Promise<messages.TeamsGroupTeamsResponse>;
+    teamsMembers: (
+      params?: messages.TeamsGroupTeamsMembersRequest,
+    ) => Promise<messages.TeamsGroupTeamsMembersResponse>;
     update: (
       params?: messages.TeamsGroupUpdateRequest,
     ) => Promise<messages.TeamsGroupUpdateResponse>;

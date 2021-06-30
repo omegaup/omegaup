@@ -75,7 +75,7 @@
     "pako": "^1.0.7",
     "popper.js": "^1.16.1",
     "prettier": "^2.1.2",
-    "prismjs": "^1.23.0",
+    "prismjs": "^1.24.0",
     "remove-source-webpack-plugin": "^0.1.1",
     "sass-loader": "^10.0",
     "sortablejs": "^1.7.0",
