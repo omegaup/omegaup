@@ -1,13 +1,20 @@
 <template>
   <div class="card mt-3">
     <div class="card-body">
-      <form class="form" @submit.prevent="$emit('emit-add-group', groupName)">
+      <form
+        class="form"
+        @submit.prevent="$emit('emit-add-group', typeaheadGroup)"
+      >
         <div class="form-group">
           <label>{{ T.wordsGroup }}</label>
-          <omegaup-autocomplete
-            v-model="groupName"
-            :init="(el) => typeahead.groupTypeahead(el)"
-          ></omegaup-autocomplete>
+          <omegaup-common-typeahead
+            :existing-options="searchResultGroups"
+            :value.sync="typeaheadGroup"
+            @update-existing-options="
+              (query) => $emit('update-search-result-groups', query)
+            "
+          >
+          </omegaup-common-typeahead>
         </div>
         <button class="btn btn-primary" type="submit">
           {{ T.contestAddgroupAddGroup }}
@@ -47,25 +54,24 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
   },
 })
 export default class Groups extends Vue {
   @Prop() groups!: types.ContestGroup[];
+  @Prop() searchResultGroups!: types.ListItem[];
 
   T = T;
-  typeahead = typeahead;
-  groupName = '';
+  typeaheadGroup: null | string = null;
   selected: types.ContestGroup | null = null;
 
   @Watch('groups')
   onGroupsChange(): void {
-    this.groupName = '';
+    this.typeaheadGroup = null;
     this.selected = null;
   }
 }

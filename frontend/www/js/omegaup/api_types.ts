@@ -2293,6 +2293,11 @@ export namespace types {
     scoreboards: types.GroupScoreboard[];
   }
 
+  export interface GroupListItem {
+    label: string;
+    value: string;
+  }
+
   export interface GroupListPayload {
     groups: types.Group[];
   }
@@ -3817,7 +3822,7 @@ export namespace messages {
     scoreboards: types.GroupScoreboard[];
   };
   export type GroupListRequest = { [key: string]: any };
-  export type GroupListResponse = { label: string; value: string }[];
+  export type GroupListResponse = types.GroupListItem[];
   export type GroupMembersRequest = { [key: string]: any };
   export type GroupMembersResponse = { identities: types.Identity[] };
   export type GroupMyListRequest = { [key: string]: any };
