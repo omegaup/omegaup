@@ -207,6 +207,7 @@
   - [`/api/teamsGroup/list/`](#apiteamsgrouplist)
   - [`/api/teamsGroup/removeTeam/`](#apiteamsgroupremoveteam)
   - [`/api/teamsGroup/teams/`](#apiteamsgroupteams)
+  - [`/api/teamsGroup/teamsMembers/`](#apiteamsgroupteamsmembers)
   - [`/api/teamsGroup/update/`](#apiteamsgroupupdate)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
@@ -4057,6 +4058,28 @@ Teams of a teams group
 | Name         | Type               |
 | ------------ | ------------------ |
 | `identities` | `types.Identity[]` |
+
+## `/api/teamsGroup/teamsMembers/`
+
+### Description
+
+Get a list of team members of a teams group
+
+### Parameters
+
+| Name               | Type     | Description               |
+| ------------------ | -------- | ------------------------- |
+| `page`             | `int`    |                           |
+| `page_size`        | `int`    |                           |
+| `team_group_alias` | `string` | The username of the team. |
+
+### Returns
+
+| Name         | Type                 |
+| ------------ | -------------------- |
+| `pageNumber` | `number`             |
+| `teamsUsers` | `types.TeamMember[]` |
+| `totalRows`  | `number`             |
 
 ## `/api/teamsGroup/update/`
 
