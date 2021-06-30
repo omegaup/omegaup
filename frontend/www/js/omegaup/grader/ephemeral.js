@@ -1499,7 +1499,10 @@ window.addEventListener(
 
     switch (e.data.method) {
       case 'setSettings':
-        setSettings(...e.data.params);
+        setSettings({
+          alias: e.data.params.alias,
+          settings: e.data.params.settings,
+        });
         break;
     }
   },

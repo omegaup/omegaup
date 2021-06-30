@@ -13,6 +13,7 @@
  * @psalm-type GroupScoreboardContestsPayload=array{availableContests: list<ContestListItem>, contests: list<ScoreboardContest>, scoreboardAlias: string, groupAlias: string}
  * @psalm-type Group=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
  * @psalm-type GroupListPayload=array{groups: list<Group>}
+ * @psalm-type GroupListItem=array{label: string, value: string}
  */
 
 class Group extends \OmegaUp\Controllers\Controller {
@@ -271,7 +272,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return list<array{label: string, value: string}>
+     * @return list<GroupListItem>
      *
      * @omegaup-request-param null|string $query
      */

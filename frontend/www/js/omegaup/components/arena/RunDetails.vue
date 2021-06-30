@@ -298,23 +298,21 @@ export default class ArenaRunDetails extends Vue {
     display: flex;
     flex-direction: column;
 
-    .close-container {
-      width: 100%;
+    button.close {
+      position: sticky;
+      position: -webkit-sticky;
+      top: 0;
+      z-index: 100;
+      right: 0;
+      background-color: var(--arena-form-close-background-color);
+      border: 1px solid var(--arena-form-close-border-color);
+      border-width: 0 0 1px 1px;
+      font-size: 110%;
+      width: 25px;
+      height: 25px;
 
-      .close {
-        position: absolute;
-        top: 0;
-        right: 0;
-        background-color: var(--arena-form-close-background-color);
-        border: 1px solid var(--arena-form-close-border-color);
-        border-width: 0 0 1px 1px;
-        font-size: 110%;
-        width: 25px;
-        height: 25px;
-
-        &:hover {
-          background-color: var(--arena-form-close-background-color--hover);
-        }
+      &:hover {
+        background-color: var(--arena-form-close-background-color--hover);
       }
     }
 

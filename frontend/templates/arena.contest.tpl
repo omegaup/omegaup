@@ -61,9 +61,7 @@
 					<div id="qualitynomination">
 						<div id="qualitynomination-popup"></div>
 					</div>
-{if !empty($ENABLED_EXPERIMENTS) && in_array('ephemeral', $ENABLED_EXPERIMENTS)}
 					<iframe id="ephemeral-embedded-grader" src="/grader/ephemeral/?embedded"></iframe>
-{/if}
 					<table class="runs"></table>
 				</div>
 			</div>
