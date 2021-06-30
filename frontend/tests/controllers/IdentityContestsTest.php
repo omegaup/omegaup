@@ -432,7 +432,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             $login
         );
 
-        // Add users to contest for teams is not allowed
+        // Add goups to contest for teams is not allowed
         try {
             \OmegaUp\Controllers\Contest::apiAddGroup(
                 new \OmegaUp\Request([
