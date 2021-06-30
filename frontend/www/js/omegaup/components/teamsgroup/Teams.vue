@@ -102,8 +102,13 @@ import identity_ChangePassword from '../identity/ChangePassword.vue';
 import identity_Members from '../identity/Members.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faEdit, faLock, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-library.add(faEdit, faLock, faTrashAlt);
+import {
+  faEdit,
+  faLock,
+  faTrashAlt,
+  faUser,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faEdit, faLock, faTrashAlt, faUser);
 
 export enum AvailableForms {
   None,
