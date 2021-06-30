@@ -1,4 +1,4 @@
-import { CSVDatasetRecord } from './group/edit';
+import { GroupCSVDatasetRecord } from './group/edit';
 import {
   generatePassword,
   generateHumanReadablePassword,
@@ -83,14 +83,14 @@ describe('groups_utils', () => {
       'school_name',
     ];
 
-    const expectedFields = [
+    const requiredFields = new Set([
       'alias',
       'name',
       'country_id',
       'state_id',
       'gender',
       'school_name',
-    ];
+    ]);
 
     it('Should clean all null cells', () => {
       const records = [
@@ -98,11 +98,11 @@ describe('groups_utils', () => {
         ['username-2', null, 'MX', 'QUE', 'male', 'Best School'],
       ];
 
-      const formattedRecords = getCSVRecords<CSVDatasetRecord>(
+      const formattedRecords = getCSVRecords<GroupCSVDatasetRecord>({
         fields,
         records,
-        expectedFields,
-      );
+        requiredFields,
+      });
 
       expect(formattedRecords).toEqual([
         {
@@ -130,11 +130,11 @@ describe('groups_utils', () => {
         [2, 'Dev Diane', 'MX', 'QUE', 'male', 'Best School'],
       ];
 
-      const formattedRecords = getCSVRecords<CSVDatasetRecord>(
+      const formattedRecords = getCSVRecords<GroupCSVDatasetRecord>({
         fields,
         records,
-        expectedFields,
-      );
+        requiredFields,
+      });
 
       expect(formattedRecords).toEqual([
         {

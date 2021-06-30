@@ -34,25 +34,43 @@ export function downloadCsvFile({
   hiddenElement.click();
 }
 
-export function getCSVRecords<T>(
-  fields: string[],
-  records: (null | number | string)[][],
-  expectedFields: string[],
-): Array<T> {
-  const result: T[] = [];
-  for (const record in records) {
-    const row: T = {};
-    for (const [i, field] of fields.entries()) {
-      if (records[record][i] === null) {
-        continue;
-      }
-      if (expectedFields.includes(field)) {
-        row[field] = String(records[record][i]);
-      }
+export function getCSVRecords<T extends Record<string, string | undefined>>({
+  fields,
+  records,
+  requiredFields,
+  optionalFields,
+}: {
+  fields: string[];
+  records: (null | number | string)[][];
+  requiredFields: Set<string>;
+  optionalFields?: Set<string>;
+}): Array<T> {
+  // Ensure that all required fields are present.
+  const fieldNames = new Set(fields);
+  for (const field of requiredFields) {
+    if (!fieldNames.has(field)) {
+      throw new Error(T.teamsGroupsErrorFieldIsNotPresentInCsv);
     }
-    result.push(row);
   }
-  return result;
+
+  return records.map(
+    (record): T => {
+      // This is not type-safe, but TypeScript has no way of converting a type
+      // into a runtime object. This means that we can't validate that the fields
+      // match the keys of `T`.
+      const row: Record<string, string> = {};
+      for (const [i, field] of fields.entries()) {
+        if (record[i] === null) {
+          continue;
+        }
+        if (!requiredFields.has(field) && !optionalFields?.has(field)) {
+          continue;
+        }
+        row[field] = String(record[i]);
+      }
+      return row as T;
+    },
+  );
 }
 
 export function generatePassword(): string {

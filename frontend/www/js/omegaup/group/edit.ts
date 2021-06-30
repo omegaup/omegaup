@@ -15,7 +15,7 @@ import {
   getCSVRecords,
 } from '../groups';
 
-export type CSVDatasetRecord = {
+export type GroupCSVDatasetRecord = {
   username: string;
   name: string;
   country_id: string;
@@ -240,23 +240,22 @@ OmegaUp.on('ready', () => {
           }) => {
             CSV.fetch({ file })
               .done((dataset: CSV.Dataset) => {
-                const expectedFields = [
-                  'username',
-                  'name',
-                  'country_id',
-                  'state_id',
-                  'gender',
-                  'school_name',
-                ];
                 if (!dataset.fields) {
                   ui.error(T.groupsInvalidCsv);
                   return;
                 }
-                const records = getCSVRecords<CSVDatasetRecord>(
-                  dataset.fields,
-                  dataset.records,
-                  expectedFields,
-                );
+                const records = getCSVRecords<GroupCSVDatasetRecord>({
+                  fields: dataset.fields,
+                  records: dataset.records,
+                  requiredFields: new Set([
+                    'username',
+                    'name',
+                    'country_id',
+                    'state_id',
+                    'gender',
+                    'school_name',
+                  ]),
+                });
                 for (const {
                   username,
                   name,
