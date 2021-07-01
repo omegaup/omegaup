@@ -2303,6 +2303,11 @@ export namespace types {
     scoreboards: types.GroupScoreboard[];
   }
 
+  export interface GroupListItem {
+    label: string;
+    value: string;
+  }
+
   export interface GroupListPayload {
     groups: types.Group[];
   }
@@ -3246,6 +3251,15 @@ export namespace types {
     identities: types.Identity[];
     isOrganizer: boolean;
     teamGroup: { alias: string; description?: string; name?: string };
+    teamsMembers: types.TeamMember[];
+  }
+
+  export interface TeamMember {
+    classname: string;
+    name?: string;
+    team_alias: string;
+    team_name?: string;
+    username: string;
   }
 
   export interface TeamsGroup {
@@ -3809,7 +3823,7 @@ export namespace messages {
     scoreboards: types.GroupScoreboard[];
   };
   export type GroupListRequest = { [key: string]: any };
-  export type GroupListResponse = { label: string; value: string }[];
+  export type GroupListResponse = types.GroupListItem[];
   export type GroupMembersRequest = { [key: string]: any };
   export type GroupMembersResponse = { identities: types.Identity[] };
   export type GroupMyListRequest = { [key: string]: any };
@@ -4229,6 +4243,8 @@ export namespace messages {
   export type TagListResponse = { name: string }[];
 
   // TeamsGroup
+  export type TeamsGroupAddMembersRequest = { [key: string]: any };
+  export type TeamsGroupAddMembersResponse = {};
   export type TeamsGroupCreateRequest = { [key: string]: any };
   export type TeamsGroupCreateResponse = {};
   export type TeamsGroupDetailsRequest = { [key: string]: any };
@@ -4242,10 +4258,18 @@ export namespace messages {
   };
   export type TeamsGroupListRequest = { [key: string]: any };
   export type TeamsGroupListResponse = types.ListItem[];
+  export type TeamsGroupRemoveMemberRequest = { [key: string]: any };
+  export type TeamsGroupRemoveMemberResponse = {};
   export type TeamsGroupRemoveTeamRequest = { [key: string]: any };
   export type TeamsGroupRemoveTeamResponse = {};
   export type TeamsGroupTeamsRequest = { [key: string]: any };
   export type TeamsGroupTeamsResponse = { identities: types.Identity[] };
+  export type TeamsGroupTeamsMembersRequest = { [key: string]: any };
+  export type TeamsGroupTeamsMembersResponse = {
+    pageNumber: number;
+    teamsUsers: types.TeamMember[];
+    totalRows: number;
+  };
   export type TeamsGroupUpdateRequest = { [key: string]: any };
   export type TeamsGroupUpdateResponse = {};
 
@@ -4983,6 +5007,9 @@ export namespace controllers {
   }
 
   export interface TeamsGroup {
+    addMembers: (
+      params?: messages.TeamsGroupAddMembersRequest,
+    ) => Promise<messages.TeamsGroupAddMembersResponse>;
     create: (
       params?: messages.TeamsGroupCreateRequest,
     ) => Promise<messages.TeamsGroupCreateResponse>;
@@ -4992,12 +5019,18 @@ export namespace controllers {
     list: (
       params?: messages.TeamsGroupListRequest,
     ) => Promise<messages.TeamsGroupListResponse>;
+    removeMember: (
+      params?: messages.TeamsGroupRemoveMemberRequest,
+    ) => Promise<messages.TeamsGroupRemoveMemberResponse>;
     removeTeam: (
       params?: messages.TeamsGroupRemoveTeamRequest,
     ) => Promise<messages.TeamsGroupRemoveTeamResponse>;
     teams: (
       params?: messages.TeamsGroupTeamsRequest,
     ) => Promise<messages.TeamsGroupTeamsResponse>;
+    teamsMembers: (
+      params?: messages.TeamsGroupTeamsMembersRequest,
+    ) => Promise<messages.TeamsGroupTeamsMembersResponse>;
     update: (
       params?: messages.TeamsGroupUpdateRequest,
     ) => Promise<messages.TeamsGroupUpdateResponse>;

@@ -202,11 +202,14 @@
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
 - [TeamsGroup](#teamsgroup)
+  - [`/api/teamsGroup/addMembers/`](#apiteamsgroupaddmembers)
   - [`/api/teamsGroup/create/`](#apiteamsgroupcreate)
   - [`/api/teamsGroup/details/`](#apiteamsgroupdetails)
   - [`/api/teamsGroup/list/`](#apiteamsgrouplist)
+  - [`/api/teamsGroup/removeMember/`](#apiteamsgroupremovemember)
   - [`/api/teamsGroup/removeTeam/`](#apiteamsgroupremoveteam)
   - [`/api/teamsGroup/teams/`](#apiteamsgroupteams)
+  - [`/api/teamsGroup/teamsMembers/`](#apiteamsgroupteamsmembers)
   - [`/api/teamsGroup/update/`](#apiteamsgroupupdate)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
@@ -2234,11 +2237,7 @@ array instead of an object since it is used by typeahead.
 ### Returns
 
 ```typescript
-{
-  label: string;
-  value: string;
-}
-[];
+types.GroupListItem[]
 ```
 
 ## `/api/group/members/`
@@ -3968,6 +3967,23 @@ Gets a list of tags
 
 TeamsGroupController
 
+## `/api/teamsGroup/addMembers/`
+
+### Description
+
+Add one or more users to a given team
+
+### Parameters
+
+| Name               | Type     | Description                    |
+| ------------------ | -------- | ------------------------------ |
+| `team_group_alias` | `string` | The username of the team.      |
+| `usernames`        | `string` | Username of all members to add |
+
+### Returns
+
+_Nothing_
+
 ## `/api/teamsGroup/create/`
 
 ### Description
@@ -4023,6 +4039,23 @@ since it is used by typeahead.
 types.ListItem[]
 ```
 
+## `/api/teamsGroup/removeMember/`
+
+### Description
+
+Remove an existing team member of a teams group
+
+### Parameters
+
+| Name               | Type     | Description                    |
+| ------------------ | -------- | ------------------------------ |
+| `team_group_alias` | `string` | The username of the team       |
+| `username`         | `string` | The username of user to remove |
+
+### Returns
+
+_Nothing_
+
 ## `/api/teamsGroup/removeTeam/`
 
 ### Description
@@ -4057,6 +4090,28 @@ Teams of a teams group
 | Name         | Type               |
 | ------------ | ------------------ |
 | `identities` | `types.Identity[]` |
+
+## `/api/teamsGroup/teamsMembers/`
+
+### Description
+
+Get a list of team members of a teams group
+
+### Parameters
+
+| Name               | Type     | Description               |
+| ------------------ | -------- | ------------------------- |
+| `page`             | `int`    |                           |
+| `page_size`        | `int`    |                           |
+| `team_group_alias` | `string` | The username of the team. |
+
+### Returns
+
+| Name         | Type                 |
+| ------------ | -------------------- |
+| `pageNumber` | `number`             |
+| `teamsUsers` | `types.TeamMember[]` |
+| `totalRows`  | `number`             |
 
 ## `/api/teamsGroup/update/`
 
