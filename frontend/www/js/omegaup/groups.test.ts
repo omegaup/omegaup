@@ -88,18 +88,16 @@ describe('groups_utils', () => {
       ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', null],
       ['username-2', null, 'MX', 'QUE', 'male', 'Best School'],
     ];
-    const expectedFormattedRecords: GroupCSVDatasetRecord[] = [
+    const expectedFormattedRecords: { [key: string]: string }[] = [
       {
         username: 'username-1',
         name: 'Developer Diana',
         country_id: 'MX',
         state_id: 'AGU',
         gender: 'female',
-        school_name: undefined,
       },
       {
         username: 'username-2',
-        name: undefined,
         country_id: 'MX',
         state_id: 'QUE',
         gender: 'male',
