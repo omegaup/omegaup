@@ -16,12 +16,12 @@ import {
 } from '../groups';
 
 export type GroupCSVDatasetRecord = {
-  username: string;
-  name: string;
-  country_id: string;
-  state_id: string;
-  gender: string;
-  school_name: string;
+  username: string | undefined;
+  name: string | undefined;
+  country_id: string | undefined;
+  state_id: string | undefined;
+  gender: string | undefined;
+  school_name: string | undefined;
 };
 
 OmegaUp.on('ready', () => {

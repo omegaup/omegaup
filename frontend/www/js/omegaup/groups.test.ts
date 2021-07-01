@@ -76,60 +76,56 @@ describe('groups_utils', () => {
 
   describe('getCSVRecords', () => {
     const fields = [
-      'alias',
+      'username',
       'name',
       'country_id',
       'state_id',
       'gender',
       'school_name',
     ];
-
-    const requiredFields = new Set([
-      'alias',
-      'name',
-      'country_id',
-      'state_id',
-      'gender',
-      'school_name',
-    ]);
+    const requiredFields = new Set(fields);
+    const records: (null | string | number)[][] = [
+      ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', null],
+      ['username-2', null, 'MX', 'QUE', 'male', 'Best School'],
+    ];
+    const expectedFormattedRecords: GroupCSVDatasetRecord[] = [
+      {
+        username: 'username-1',
+        name: 'Developer Diana',
+        country_id: 'MX',
+        state_id: 'AGU',
+        gender: 'female',
+        school_name: undefined,
+      },
+      {
+        username: 'username-2',
+        name: undefined,
+        country_id: 'MX',
+        state_id: 'QUE',
+        gender: 'male',
+        school_name: 'Best School',
+      },
+    ];
 
     it('Should clean all null cells', () => {
-      const records = [
-        ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', null],
-        ['username-2', null, 'MX', 'QUE', 'male', 'Best School'],
-      ];
-
       const formattedRecords = getCSVRecords<GroupCSVDatasetRecord>({
         fields,
         records,
         requiredFields,
       });
 
-      expect(formattedRecords).toEqual([
-        {
-          alias: 'username-1',
-          name: 'Developer Diana',
-          country_id: 'MX',
-          state_id: 'AGU',
-          gender: 'female',
-          school_name: undefined,
-        },
-        {
-          alias: 'username-2',
-          name: undefined,
-          country_id: 'MX',
-          state_id: 'QUE',
-          gender: 'male',
-          school_name: 'Best School',
-        },
-      ]);
+      expect(formattedRecords).toEqual(expectedFormattedRecords);
     });
 
     it('Should parse all the cells to string', () => {
-      const records = [
-        ['username-1', 'Developer Diana', 4, 'AGU', 'female', 'Best School'],
-        [2, 'Dev Diane', 'MX', 'QUE', 'male', 'Best School'],
-      ];
+      records[0][2] = 4;
+      records[0][5] = 'Best School';
+      records[1][0] = 2;
+      records[1][1] = 'Dev Diane';
+      expectedFormattedRecords[0].country_id = '4';
+      expectedFormattedRecords[0].school_name = 'Best School';
+      expectedFormattedRecords[1].username = '2';
+      expectedFormattedRecords[1].name = 'Dev Diane';
 
       const formattedRecords = getCSVRecords<GroupCSVDatasetRecord>({
         fields,
@@ -137,37 +133,24 @@ describe('groups_utils', () => {
         requiredFields,
       });
 
-      expect(formattedRecords).toEqual([
-        {
-          alias: 'username-1',
-          name: 'Developer Diana',
-          country_id: '4',
-          state_id: 'AGU',
-          gender: 'female',
-          school_name: 'Best School',
-        },
-        {
-          alias: '2',
-          name: 'Dev Diane',
-          country_id: 'MX',
-          state_id: 'QUE',
-          gender: 'male',
-          school_name: 'Best School',
-        },
-      ]);
+      expect(formattedRecords).toEqual(expectedFormattedRecords);
+    });
+
+    it('Should ignore extra fields that are not required nor optional', () => {
+      const formattedRecords = getCSVRecords<GroupCSVDatasetRecord>({
+        fields: fields.concat(['birthday']),
+        records,
+        requiredFields,
+      });
+
+      expect(formattedRecords).toEqual(formattedRecords);
     });
 
     it('Should throw an error when required fields are missing', () => {
-      const missingFields = ['alias', 'name', 'gender', 'school_name'];
-
-      const records = [
-        ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', null],
-        ['username-2', null, 'MX', 'QUE', 'male', 'Best School'],
-      ];
-
+      fields.splice(2, 2);
       expect(() =>
         getCSVRecords<GroupCSVDatasetRecord>({
-          fields: missingFields,
+          fields,
           records,
           requiredFields,
         }),
@@ -176,46 +159,6 @@ describe('groups_utils', () => {
           missingFields: 'country_id,state_id',
         }),
       );
-    });
-
-    it('Should ignore extra fields that are not required nor optional', () => {
-      const extraFields = [
-        'alias',
-        'name',
-        'country_id',
-        'state_id',
-        'gender',
-        'school_name',
-        'birthday',
-      ];
-
-      const records = [
-        ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', null],
-        ['username-2', null, 'MX', 'QUE', 'male', 'Best School'],
-      ];
-
-      const formattedRecords = getCSVRecords<GroupCSVDatasetRecord>({
-        fields: extraFields,
-        records,
-        requiredFields,
-      });
-
-      expect(formattedRecords).toEqual([
-        {
-          alias: 'username-1',
-          name: 'Developer Diana',
-          country_id: 'MX',
-          state_id: 'AGU',
-          gender: 'female',
-        },
-        {
-          alias: 'username-2',
-          country_id: 'MX',
-          state_id: 'QUE',
-          gender: 'male',
-          school_name: 'Best School',
-        },
-      ]);
     });
   });
 });
