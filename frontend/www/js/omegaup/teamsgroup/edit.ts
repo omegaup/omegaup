@@ -20,6 +20,7 @@ OmegaUp.on('ready', () => {
         ? window.location.hash.substr(1)
         : AvailableTabs.Teams,
       teamsIdentities: payload.identities,
+      teamsMembers: payload.teamsMembers,
       userErrorRow: null,
       searchResultUsers: [] as types.ListItem[],
     }),
@@ -28,6 +29,15 @@ OmegaUp.on('ready', () => {
         api.TeamsGroup.teams({ team_group_alias: payload.teamGroup.alias })
           .then((data) => {
             teamsGroupEdit.teamsIdentities = data.identities;
+          })
+          .catch(ui.apiError);
+      },
+      refreshTeamsMembersList: (): void => {
+        api.TeamsGroup.teamsMembers({
+          team_group_alias: payload.teamGroup.alias,
+        })
+          .then((data) => {
+            teamsGroupEdit.teamsMembers = data.teamsUsers;
           })
           .catch(ui.apiError);
       },
@@ -42,6 +52,7 @@ OmegaUp.on('ready', () => {
           isOrganizer: payload.isOrganizer,
           tab: this.tab,
           teamsIdentities: this.teamsIdentities,
+          teamsMembers: this.teamsMembers,
           userErrorRow: this.userErrorRow,
           searchResultUsers: this.searchResultUsers,
         },
@@ -123,13 +134,12 @@ OmegaUp.on('ready', () => {
                 // Users previously invited to any team in the current teams
                 // group can not be added to another, so they should not be
                 // shown in the dropdown
-                // TODO: Define how to ignore users previosly mentioned
-                // const addedUsers = new Set(
-                //   this.users.map((user) => user.username),
-                // );
+                const addedUsers = new Set(
+                  this.teamsMembers.map((user) => user.username),
+                );
 
                 this.searchResultUsers = data
-                  //.filter((user) => !addedUsers.has(user.label))
+                  .filter((user) => !addedUsers.has(user.label))
                   .map((user) => ({
                     key: user.label,
                     value: `${ui.escape(user.label)} (<strong>${ui.escape(
@@ -170,6 +180,40 @@ OmegaUp.on('ready', () => {
           },
           'invalid-file': () => {
             ui.error(T.groupsInvalidCsv);
+          },
+          'add-members': ({
+            teamUsername,
+            usersToAdd,
+          }: {
+            teamUsername: string;
+            usersToAdd: string[];
+          }) => {
+            api.TeamsGroup.addMembers({
+              team_group_alias: teamUsername,
+              usernames: usersToAdd,
+            })
+              .then(() => {
+                ui.success(T.groupEditMemberAdded);
+                this.refreshTeamsMembersList();
+              })
+              .catch(ui.apiError);
+          },
+          'remove-member': ({
+            teamUsername,
+            username,
+          }: {
+            teamUsername: string;
+            username: string;
+          }) => {
+            api.TeamsGroup.removeMember({
+              team_group_alias: teamUsername,
+              username,
+            })
+              .then(() => {
+                ui.success(T.groupEditMemberRemoved);
+                this.refreshTeamsMembersList();
+              })
+              .catch(ui.apiError);
           },
         },
       });
