@@ -5,6 +5,7 @@ import {
   getCSVRecords,
 } from './groups';
 import T from './lang';
+import * as ui from './ui';
 
 describe('groups_utils', () => {
   describe('generatePassword', () => {
@@ -170,7 +171,11 @@ describe('groups_utils', () => {
           records,
           requiredFields,
         }),
-      ).toThrow(T.teamsGroupsErrorFieldIsNotPresentInCsv);
+      ).toThrow(
+        ui.formatString(T.teamsGroupsErrorFieldIsNotPresentInCsv, {
+          missingFields: 'country_id,state_id',
+        }),
+      );
     });
 
     it('Should ignore extra fields that are not required nor optional', () => {

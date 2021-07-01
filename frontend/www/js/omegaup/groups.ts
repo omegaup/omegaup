@@ -1,5 +1,6 @@
 import { types } from './api_types';
 import T from './lang';
+import * as ui from './ui';
 import * as CSV from '@/third_party/js/csv.js/csv.js';
 
 export function downloadCsvFile({
@@ -47,10 +48,18 @@ export function getCSVRecords<T extends Record<string, string | undefined>>({
 }): Array<T> {
   // Ensure that all required fields are present.
   const fieldNames = new Set(fields);
+  const missingFields: string[] = [];
   for (const field of requiredFields) {
     if (!fieldNames.has(field)) {
-      throw new Error(T.teamsGroupsErrorFieldIsNotPresentInCsv);
+      missingFields.push(field);
     }
+  }
+  if (missingFields.length) {
+    throw new Error(
+      ui.formatString(T.teamsGroupsErrorFieldIsNotPresentInCsv, {
+        missingFields: missingFields.join(','),
+      }),
+    );
   }
 
   return records.map(
