@@ -9,7 +9,6 @@ namespace OmegaUp\DAO;
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\TeamGroups}.
  *
- * @author juan.pablo
  * @access public
  * @package docs
  */
@@ -90,6 +89,33 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$aliasOrName, $aliasOrName]
+        );
+    }
+
+    /**
+     * @return array{alias: string, team_id: int}|null
+     */
+    public static function getByTeamUsername(string $teamUsername) {
+        $sql = 'SELECT
+                    `tg`.`alias`,
+                    `t`.`team_id`
+                FROM
+                    `Team_Groups` `tg`
+                INNER JOIN
+                    `Teams` `t`
+                ON
+                    `t`.`team_group_id` = `tg`.`team_group_id`
+                INNER JOIN
+                    `Identities` `i`
+                ON
+                    `t`.`identity_id` = `i`.`identity_id`
+                WHERE
+                    `i`.`username` = ?
+                LIMIT 1;';
+        /** @var array{alias: string, team_id: int}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$teamUsername]
         );
     }
 }
