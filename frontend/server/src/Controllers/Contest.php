@@ -3219,7 +3219,69 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Adds an group to a contest
+     * Adds a teams group to a contest
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $contest_alias The alias of the contest
+     * @omegaup-request-param string $teams_group_alias The alias of the teams group
+     */
+    public static function apiAddTeamsGroup(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        // Authenticate logged user
+        $r->ensureIdentity();
+
+        // Check contest_alias
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $teamsGroupAlias = $r->ensureString(
+            'teams_group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $teamsGroup = \OmegaUp\DAO\TeamGroups::getByAlias($teamsGroupAlias);
+        if (is_null($teamsGroup)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
+        }
+
+        $contest = self::validateContestAdmin(
+            $contestAlias,
+            $r->identity
+        );
+        if (!$contest->contest_for_teams) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'teamsGroupsCanNotBeAddedInNormalContest'
+            );
+        }
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            intval($contest->problemset_id)
+        );
+        if (is_null($problemset) || is_null($problemset->acl_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+        \OmegaUp\DAO\TeamsGroupRoles::deleteAllTeamGroupsForAclId(
+            $problemset->acl_id
+        );
+
+        \OmegaUp\DAO\TeamsGroupRoles::create(
+            new \OmegaUp\DAO\VO\TeamsGroupRoles([
+                'acl_id' => $problemset->acl_id,
+                'team_group_id' => $teamsGroup->team_group_id,
+                'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
+            ])
+        );
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Adds a group to a contest
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -3411,7 +3473,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Adds an group admin to a contest
+     * Adds a group admin to a contest
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *

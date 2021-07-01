@@ -3468,6 +3468,8 @@ export namespace messages {
   export type ContestAddGroupAdminResponse = {};
   export type ContestAddProblemRequest = { [key: string]: any };
   export type ContestAddProblemResponse = {};
+  export type ContestAddTeamsGroupRequest = { [key: string]: any };
+  export type ContestAddTeamsGroupResponse = {};
   export type ContestAddUserRequest = { [key: string]: any };
   export type ContestAddUserResponse = {};
   export type ContestAdminDetailsRequest = { [key: string]: any };
@@ -4454,6 +4456,9 @@ export namespace controllers {
     addProblem: (
       params?: messages.ContestAddProblemRequest,
     ) => Promise<messages.ContestAddProblemResponse>;
+    addTeamsGroup: (
+      params?: messages.ContestAddTeamsGroupRequest,
+    ) => Promise<messages.ContestAddTeamsGroupResponse>;
     addUser: (
       params?: messages.ContestAddUserRequest,
     ) => Promise<messages.ContestAddUserResponse>;

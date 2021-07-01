@@ -923,4 +923,82 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
     }
+
+    public function testUpdateTeamsGroupInContestForTeamsViaApi() {
+        // Create two teams groups
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+        [
+            'teamGroup' => $otherTeamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestForTeams' => true,
+                'teamsGroupAlias' => $teamGroup->alias,
+            ])
+        );
+
+        $login = self::login($contestData['director']);
+
+        $response = \OmegaUp\Controllers\Contest::getContestEditForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertEquals([
+            'alias' => $teamGroup->alias,
+            'name' =>  $teamGroup->name,
+        ], $response['teams_group']);
+
+        \OmegaUp\Controllers\Contest::apiAddTeamsGroup(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'teams_group_alias' => $otherTeamGroup->alias,
+            ])
+        );
+
+        $response = \OmegaUp\Controllers\Contest::getContestEditForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertEquals([
+            'alias' => $otherTeamGroup->alias,
+            'name' =>  $otherTeamGroup->name,
+        ], $response['teams_group']);
+    }
+
+    public function testUpdateTeamsGroupInContestViaApi() {
+        // Get a teams group
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        $login = self::login($contestData['director']);
+
+        try {
+            \OmegaUp\Controllers\Contest::apiAddTeamsGroup(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                    'teams_group_alias' => $teamGroup->alias,
+                ])
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'teamsGroupsCanNotBeAddedInNormalContest',
+                $e->getMessage()
+            );
+        }
+    }
 }

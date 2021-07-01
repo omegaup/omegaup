@@ -18,6 +18,7 @@
   - [`/api/contest/addGroup/`](#apicontestaddgroup)
   - [`/api/contest/addGroupAdmin/`](#apicontestaddgroupadmin)
   - [`/api/contest/addProblem/`](#apicontestaddproblem)
+  - [`/api/contest/addTeamsGroup/`](#apicontestaddteamsgroup)
   - [`/api/contest/addUser/`](#apicontestadduser)
   - [`/api/contest/adminDetails/`](#apicontestadmindetails)
   - [`/api/contest/adminList/`](#apicontestadminlist)
@@ -497,7 +498,7 @@ _Nothing_
 
 ### Description
 
-Adds an group to a contest
+Adds a group to a contest
 
 ### Parameters
 
@@ -514,7 +515,7 @@ _Nothing_
 
 ### Description
 
-Adds an group admin to a contest
+Adds a group admin to a contest
 
 ### Parameters
 
@@ -542,6 +543,23 @@ Adds a problem to a contest
 | `points`           | `float`        |             |
 | `problem_alias`    | `string`       |             |
 | `commit`           | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/contest/addTeamsGroup/`
+
+### Description
+
+Adds a teams group to a contest
+
+### Parameters
+
+| Name                | Type     | Description                  |
+| ------------------- | -------- | ---------------------------- |
+| `contest_alias`     | `string` | The alias of the contest     |
+| `teams_group_alias` | `string` | The alias of the teams group |
 
 ### Returns
 

@@ -238,6 +238,10 @@ export const Contest = {
     messages.ContestAddProblemRequest,
     messages.ContestAddProblemResponse
   >('/api/contest/addProblem/'),
+  addTeamsGroup: apiCall<
+    messages.ContestAddTeamsGroupRequest,
+    messages.ContestAddTeamsGroupResponse
+  >('/api/contest/addTeamsGroup/'),
   addUser: apiCall<
     messages.ContestAddUserRequest,
     messages.ContestAddUserResponse
