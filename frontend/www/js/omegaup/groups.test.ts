@@ -73,7 +73,7 @@ describe('groups_utils', () => {
     });
   });
 
-  describe('cleanRecords', () => {
+  describe('getCSVRecords', () => {
     const fields = [
       'alias',
       'name',
@@ -148,6 +148,63 @@ describe('groups_utils', () => {
         {
           alias: '2',
           name: 'Dev Diane',
+          country_id: 'MX',
+          state_id: 'QUE',
+          gender: 'male',
+          school_name: 'Best School',
+        },
+      ]);
+    });
+
+    it('Should throw an error when required fields are missing', () => {
+      const missingFields = ['alias', 'name', 'gender', 'school_name'];
+
+      const records = [
+        ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', null],
+        ['username-2', null, 'MX', 'QUE', 'male', 'Best School'],
+      ];
+
+      expect(() =>
+        getCSVRecords<GroupCSVDatasetRecord>({
+          fields: missingFields,
+          records,
+          requiredFields,
+        }),
+      ).toThrow(T.teamsGroupsErrorFieldIsNotPresentInCsv);
+    });
+
+    it('Should ignore extra fields that are not required nor optional', () => {
+      const extraFields = [
+        'alias',
+        'name',
+        'country_id',
+        'state_id',
+        'gender',
+        'school_name',
+        'birthday',
+      ];
+
+      const records = [
+        ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', null],
+        ['username-2', null, 'MX', 'QUE', 'male', 'Best School'],
+      ];
+
+      const formattedRecords = getCSVRecords<GroupCSVDatasetRecord>({
+        fields: extraFields,
+        records,
+        requiredFields,
+      });
+
+      expect(formattedRecords).toEqual([
+        {
+          alias: 'username-1',
+          name: 'Developer Diana',
+          country_id: 'MX',
+          state_id: 'AGU',
+          gender: 'female',
+        },
+        {
+          alias: 'username-2',
           country_id: 'MX',
           state_id: 'QUE',
           gender: 'male',
