@@ -3103,6 +3103,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r['usernameOrEmail'],
             $r->identity
         );
+        if ($contest->contest_for_teams) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'usersCanNotBeAddedInContestForTeams'
+            );
+        }
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'userNotExist'
@@ -3219,7 +3224,82 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Adds an group to a contest
+     * Replace the teams group assigned to a contest
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $contest_alias The alias of the contest
+     * @omegaup-request-param string $teams_group_alias The alias of the teams group
+     */
+    public static function apiReplaceTeamsGroup(\OmegaUp\Request $r): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        // Authenticate logged user
+        $r->ensureIdentity();
+
+        // Check contest_alias
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $teamsGroupAlias = $r->ensureString(
+            'teams_group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $teamsGroup = \OmegaUp\DAO\TeamGroups::getByAlias($teamsGroupAlias);
+        if (is_null($teamsGroup)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'invalidParameters'
+            );
+        }
+
+        $contest = self::validateContestAdmin(
+            $contestAlias,
+            $r->identity
+        );
+        if (!$contest->contest_for_teams) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'teamsGroupsCanNotBeAddedInNormalContest'
+            );
+        }
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            intval($contest->problemset_id)
+        );
+        if (is_null($problemset) || is_null($problemset->acl_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+
+        try {
+            // Begin a new transaction
+            \OmegaUp\DAO\DAO::transBegin();
+
+            \OmegaUp\DAO\TeamsGroupRoles::deleteAllTeamGroupsForAclId(
+                $problemset->acl_id
+            );
+
+            \OmegaUp\DAO\TeamsGroupRoles::create(
+                new \OmegaUp\DAO\VO\TeamsGroupRoles([
+                    'acl_id' => $problemset->acl_id,
+                    'team_group_id' => $teamsGroup->team_group_id,
+                    'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
+                ])
+            );
+            // End transaction
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            // Operation failed in the data layer, rollback transaction
+            \OmegaUp\DAO\DAO::transRollback();
+
+            throw $e;
+        }
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Adds a group to a contest
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -3259,6 +3339,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         if (is_null($problemset)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
+        if ($contest->contest_for_teams) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'groupsCanNotBeAddedInContestForTeams'
+            );
         }
         \OmegaUp\DAO\GroupRoles::create(
             new \OmegaUp\DAO\VO\GroupRoles([
@@ -3411,7 +3496,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Adds an group admin to a contest
+     * Adds a group admin to a contest
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -4167,6 +4252,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'problemsetNotFound'
             );
         }
+        if ($contest->contest_for_teams) {
+            // TODO: Make contest for teams able to be public, define the rules
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestPublicForTeamsNotSupported'
+            );
+        }
         // Check that contest has some problems at least 1 problem
         $problemsInProblemset = \OmegaUp\DAO\ProblemsetProblems::getRelevantProblems(
             $problemset
@@ -4183,7 +4274,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $admission_mode
+     * @omegaup-request-param null|string $admission_mode
      * @omegaup-request-param null|string $alias
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param null|string $description
@@ -4218,6 +4309,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $contest = self::validateUpdate($r, $r->identity, $contestAlias);
+        $contestForTeams = $r->ensureOptionalBool('contest_for_teams');
+        if (
+            !is_null(
+                $contestForTeams
+            ) && $contest->contest_for_teams !== $contestForTeams
+        ) {
+            if ($contest->contest_for_teams) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'contestForTeamsCanNotChangeToContest'
+                );
+            }
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'contestCanNotChangeToContestForTeams'
+            );
+        }
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['requests_user_information'],
             'requests_user_information',
