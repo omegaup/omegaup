@@ -35,7 +35,9 @@ export function downloadCsvFile({
   hiddenElement.click();
 }
 
-export function getCSVRecords<T extends Record<string, string | undefined>>({
+export function getCSVRecords<
+  T extends Record<string, string | number | undefined>
+>({
   fields,
   records,
   requiredFields,

@@ -15,14 +15,17 @@ import {
   getCSVRecords,
 } from '../groups';
 
-export type GroupCSVDatasetRecord = {
-  username: string;
-  name: string;
-  country_id: string;
-  state_id: string;
-  gender: string;
-  school_name: string;
-};
+export type GroupCSVDatasetRecord = types.Identity;
+
+export const requiredFieldsGroups = new Set(['username']);
+
+export const optionalFieldsGroups = new Set([
+  'name',
+  'country_id',
+  'state_id',
+  'gender',
+  'school_name',
+]);
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.GroupEditPayload();
@@ -247,14 +250,8 @@ OmegaUp.on('ready', () => {
                 const records = getCSVRecords<GroupCSVDatasetRecord>({
                   fields: dataset.fields,
                   records: dataset.records,
-                  requiredFields: new Set([
-                    'username',
-                    'name',
-                    'country_id',
-                    'state_id',
-                    'gender',
-                    'school_name',
-                  ]),
+                  requiredFields: requiredFieldsGroups,
+                  optionalFields: optionalFieldsGroups,
                 });
                 for (const {
                   username,

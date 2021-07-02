@@ -1,4 +1,8 @@
-import { GroupCSVDatasetRecord } from './group/edit';
+import {
+  GroupCSVDatasetRecord,
+  optionalFieldsGroups,
+  requiredFieldsGroups,
+} from './group/edit';
 import {
   generatePassword,
   generateHumanReadablePassword,
@@ -83,16 +87,6 @@ describe('groups_utils', () => {
       'gender',
       'school_name',
     ];
-    const requiredFields = [
-      'username',
-      'name',
-      'country_id',
-      'state_id',
-      'school_name',
-    ];
-    const requiredFieldsSet = new Set(requiredFields);
-    const optionalFields = ['gender'];
-    const optionalFieldsSet = new Set(optionalFields);
     const records: (null | string | number)[][] = [
       ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', 'Best School'],
       ['username-2', 'Dev Diane', 'MX', 'QUE', null, 'Best School'],
@@ -119,68 +113,78 @@ describe('groups_utils', () => {
       const formattedRecords = getCSVRecords<GroupCSVDatasetRecord>({
         fields,
         records,
-        requiredFields: requiredFieldsSet,
-        optionalFields: optionalFieldsSet,
+        requiredFields: requiredFieldsGroups,
+        optionalFields: optionalFieldsGroups,
       });
 
       expect(formattedRecords).toEqual(expectedFormattedRecords);
     });
 
+    it('Should parse all the cells to string', () => {
+      const localRecords = JSON.parse(JSON.stringify(records));
+      localRecords[0][1] = 2;
+      const localExpectedFormattedRecords = JSON.parse(
+        JSON.stringify(expectedFormattedRecords),
+      );
+      localExpectedFormattedRecords[0].name = '2';
+
+      const formattedRecords = getCSVRecords<GroupCSVDatasetRecord>({
+        fields,
+        records: localRecords,
+        requiredFields: requiredFieldsGroups,
+        optionalFields: optionalFieldsGroups,
+      });
+
+      expect(formattedRecords).toEqual(localExpectedFormattedRecords);
+    });
+
     it('Should throw error for null cells in required fields', () => {
-      records[0][1] = null;
-      delete expectedFormattedRecords[0].name;
+      const localRecords = JSON.parse(JSON.stringify(records));
+      localRecords[0][0] = null;
+      const localExpectedFormattedRecords = JSON.parse(
+        JSON.stringify(expectedFormattedRecords),
+      );
+      delete localExpectedFormattedRecords[0].username;
 
       expect(() =>
         getCSVRecords<GroupCSVDatasetRecord>({
           fields,
-          records,
-          requiredFields: requiredFieldsSet,
-          optionalFields: optionalFieldsSet,
+          records: localRecords,
+          requiredFields: requiredFieldsGroups,
+          optionalFields: optionalFieldsGroups,
         }),
       ).toThrow(
         ui.formatString(T.teamsGroupsErrorFieldIsRequired, {
-          field: 'name',
+          field: 'username',
         }),
       );
-    });
-
-    it('Should parse all the cells to string', () => {
-      records[0][1] = 2;
-      expectedFormattedRecords[0].name = '2';
-
-      const formattedRecords = getCSVRecords<GroupCSVDatasetRecord>({
-        fields,
-        records,
-        requiredFields: requiredFieldsSet,
-        optionalFields: optionalFieldsSet,
-      });
-
-      expect(formattedRecords).toEqual(expectedFormattedRecords);
     });
 
     it('Should ignore extra fields that are not required nor optional', () => {
       const formattedRecords = getCSVRecords<GroupCSVDatasetRecord>({
         fields: fields.concat(['birthday']),
         records,
-        requiredFields: requiredFieldsSet,
-        optionalFields: optionalFieldsSet,
+        requiredFields: requiredFieldsGroups,
+        optionalFields: optionalFieldsGroups,
       });
 
       expect(formattedRecords).toEqual(formattedRecords);
     });
 
     it('Should throw an error when required fields are missing', () => {
-      fields.splice(2, 2);
+      const localFields = JSON.parse(JSON.stringify(fields));
+      localFields.splice(0, 1);
+
       expect(() =>
         getCSVRecords<GroupCSVDatasetRecord>({
-          fields,
+          fields: localFields,
           records,
-          requiredFields: requiredFieldsSet,
-          optionalFields: optionalFieldsSet,
+          requiredFields: requiredFieldsGroups,
+          optionalFields: optionalFieldsGroups,
         }),
       ).toThrow(
         ui.formatString(T.teamsGroupsErrorFieldIsNotPresentInCsv, {
-          missingFields: 'country_id,state_id',
+          missingFields: 'username',
         }),
       );
     });
