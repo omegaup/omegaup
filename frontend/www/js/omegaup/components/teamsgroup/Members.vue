@@ -89,7 +89,7 @@ library.add(faEdit, faLock, faTrashAlt);
     'omegaup-user-username': user_Username,
   },
 })
-export default class AddMembers extends Vue {
+export default class Members extends Vue {
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop() teamUsername!: string;
   @Prop({ default: () => [] }) teamsMembers!: types.TeamMember[];
