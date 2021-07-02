@@ -70,6 +70,11 @@ export function getCSVRecords<T extends Record<string, string | undefined>>({
       const row: Record<string, string> = {};
       for (const [i, field] of fields.entries()) {
         if (record[i] === null) {
+          if (requiredFields.has(field)) {
+            throw new Error(
+              ui.formatString(T.teamsGroupsErrorFieldIsRequired, { field }),
+            );
+          }
           continue;
         }
         if (!requiredFields.has(field) && !optionalFields?.has(field)) {

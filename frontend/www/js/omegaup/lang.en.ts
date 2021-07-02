@@ -1209,6 +1209,7 @@ const translations: { [key: string]: string; } = {
   teamsGroupsCreateNew: "Create new teams group",
   teamsGroupsCsvHelp: "## Quickly add multiple identities as teams to this teams group. Identities are not real users, and don't need to have an email or validate their account.\n\n## Identities should be in a <code>.csv</code> file with the following format:\n<samp><pre>alias,name,country_id,state_id,gender,school_name\nteam-1,Team 1,MX,AGU,other,Best School\nteam-2,Teams 2,MX,AGU,decline,Best School</pre></samp>",
   teamsGroupsErrorFieldIsNotPresentInCsv: "Some required fields were not found in csv file: %(missingFields)",
+  teamsGroupsErrorFieldIsRequired: "The field %(field) is required.",
   titleInUse: "Title already exists. Please choose a different title.",
   tokenDecodeCorrupted: "There was a problem decoding the token.",
   tokenDecodeExpired: "The token has already expired.",
