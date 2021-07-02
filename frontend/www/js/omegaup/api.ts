@@ -484,6 +484,10 @@ export const Contest = {
     messages.ContestRemoveUserRequest,
     messages.ContestRemoveUserResponse
   >('/api/contest/removeUser/'),
+  replaceTeamsGroup: apiCall<
+    messages.ContestReplaceTeamsGroupRequest,
+    messages.ContestReplaceTeamsGroupResponse
+  >('/api/contest/replaceTeamsGroup/'),
   report: apiCall<
     messages.ContestReportRequest,
     messages._ContestReportServerResponse,

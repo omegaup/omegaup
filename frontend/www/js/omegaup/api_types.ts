@@ -3563,6 +3563,8 @@ export namespace messages {
   export type ContestRemoveProblemResponse = {};
   export type ContestRemoveUserRequest = { [key: string]: any };
   export type ContestRemoveUserResponse = {};
+  export type ContestReplaceTeamsGroupRequest = { [key: string]: any };
+  export type ContestReplaceTeamsGroupResponse = {};
   export type ContestReportRequest = { [key: string]: any };
   export type _ContestReportServerResponse = any;
   export type ContestReportResponse = {
@@ -4529,6 +4531,9 @@ export namespace controllers {
     removeUser: (
       params?: messages.ContestRemoveUserRequest,
     ) => Promise<messages.ContestRemoveUserResponse>;
+    replaceTeamsGroup: (
+      params?: messages.ContestReplaceTeamsGroupRequest,
+    ) => Promise<messages.ContestReplaceTeamsGroupResponse>;
     report: (
       params?: messages.ContestReportRequest,
     ) => Promise<messages.ContestReportResponse>;
