@@ -123,7 +123,7 @@ export enum AvailableForms {
     'omegaup-user-username': user_Username,
     'omegaup-identity-edit': identity_Edit,
     'omegaup-identity-change-password': identity_ChangePassword,
-    'omegaup-identity-members': identity_Members,
+    'omegaup-identity-members': teamsgroup_Members,
   },
 })
 export default class Teams extends Vue {

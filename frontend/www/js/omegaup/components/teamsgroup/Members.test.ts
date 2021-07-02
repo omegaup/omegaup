@@ -22,7 +22,7 @@ describe('Members.vue', () => {
 
   it('Should handle an empty list of members', async () => {
     const teamUsername = 'teams:group_alias:team_1';
-    const wrapper = shallowMount(identity_Members, {
+    const wrapper = shallowMount(teamsgroup_Members, {
       attachTo: '#root',
       propsData: {
         searchResultUsers: [] as types.ListItem[],
@@ -62,7 +62,7 @@ describe('Members.vue', () => {
 
   it('Should handle a list of members', async () => {
     const teamUsername = 'teams:group_alias:team_1';
-    const wrapper = mount(identity_Members, {
+    const wrapper = mount(teamsgroup_Members, {
       attachTo: '#root',
       propsData: {
         searchResultUsers: [] as types.ListItem[],
