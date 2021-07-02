@@ -924,7 +924,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    public function testUpdateTeamsGroupInContestForTeamsViaApi() {
+    public function testReplaceeTeamsGroupInContestForTeamsViaApi() {
         // Create two teams groups
         [
             'teamGroup' => $teamGroup,
@@ -954,7 +954,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'name' =>  $teamGroup->name,
         ], $response['teams_group']);
 
-        \OmegaUp\Controllers\Contest::apiAddTeamsGroup(
+        \OmegaUp\Controllers\Contest::apiReplaceTeamsGroup(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
@@ -975,7 +975,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         ], $response['teams_group']);
     }
 
-    public function testUpdateTeamsGroupInContestViaApi() {
+    public function testReplaceTeamsGroupInContestViaApi() {
         // Get a teams group
         [
             'teamGroup' => $teamGroup,
@@ -986,7 +986,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($contestData['director']);
 
         try {
-            \OmegaUp\Controllers\Contest::apiAddTeamsGroup(
+            \OmegaUp\Controllers\Contest::apiReplaceTeamsGroup(
                 new \OmegaUp\Request([
                     'auth_token' => $login->auth_token,
                     'contest_alias' => $contestData['request']['alias'],

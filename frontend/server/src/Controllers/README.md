@@ -18,7 +18,6 @@
   - [`/api/contest/addGroup/`](#apicontestaddgroup)
   - [`/api/contest/addGroupAdmin/`](#apicontestaddgroupadmin)
   - [`/api/contest/addProblem/`](#apicontestaddproblem)
-  - [`/api/contest/addTeamsGroup/`](#apicontestaddteamsgroup)
   - [`/api/contest/addUser/`](#apicontestadduser)
   - [`/api/contest/adminDetails/`](#apicontestadmindetails)
   - [`/api/contest/adminList/`](#apicontestadminlist)
@@ -44,6 +43,7 @@
   - [`/api/contest/removeGroupAdmin/`](#apicontestremovegroupadmin)
   - [`/api/contest/removeProblem/`](#apicontestremoveproblem)
   - [`/api/contest/removeUser/`](#apicontestremoveuser)
+  - [`/api/contest/replaceTeamsGroup/`](#apicontestreplaceteamsgroup)
   - [`/api/contest/report/`](#apicontestreport)
   - [`/api/contest/requests/`](#apicontestrequests)
   - [`/api/contest/role/`](#apicontestrole)
@@ -548,23 +548,6 @@ Adds a problem to a contest
 
 _Nothing_
 
-## `/api/contest/addTeamsGroup/`
-
-### Description
-
-Adds a teams group to a contest
-
-### Parameters
-
-| Name                | Type     | Description                  |
-| ------------------- | -------- | ---------------------------- |
-| `contest_alias`     | `string` | The alias of the contest     |
-| `teams_group_alias` | `string` | The alias of the teams group |
-
-### Returns
-
-_Nothing_
-
 ## `/api/contest/addUser/`
 
 ### Description
@@ -1053,6 +1036,23 @@ Remove a user from a private contest
 | ----------------- | -------- | ----------- |
 | `contest_alias`   | `string` |             |
 | `usernameOrEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/contest/replaceTeamsGroup/`
+
+### Description
+
+Replace the teams group assigned to a contest
+
+### Parameters
+
+| Name                | Type     | Description                  |
+| ------------------- | -------- | ---------------------------- |
+| `contest_alias`     | `string` | The alias of the contest     |
+| `teams_group_alias` | `string` | The alias of the teams group |
 
 ### Returns
 

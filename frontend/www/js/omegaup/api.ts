@@ -238,10 +238,6 @@ export const Contest = {
     messages.ContestAddProblemRequest,
     messages.ContestAddProblemResponse
   >('/api/contest/addProblem/'),
-  addTeamsGroup: apiCall<
-    messages.ContestAddTeamsGroupRequest,
-    messages.ContestAddTeamsGroupResponse
-  >('/api/contest/addTeamsGroup/'),
   addUser: apiCall<
     messages.ContestAddUserRequest,
     messages.ContestAddUserResponse
@@ -488,6 +484,10 @@ export const Contest = {
     messages.ContestRemoveUserRequest,
     messages.ContestRemoveUserResponse
   >('/api/contest/removeUser/'),
+  replaceTeamsGroup: apiCall<
+    messages.ContestReplaceTeamsGroupRequest,
+    messages.ContestReplaceTeamsGroupResponse
+  >('/api/contest/replaceTeamsGroup/'),
   report: apiCall<
     messages.ContestReportRequest,
     messages._ContestReportServerResponse,

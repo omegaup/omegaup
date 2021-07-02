@@ -3219,7 +3219,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Adds a teams group to a contest
+     * Replace the teams group assigned to a contest
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -3228,7 +3228,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $contest_alias The alias of the contest
      * @omegaup-request-param string $teams_group_alias The alias of the teams group
      */
-    public static function apiAddTeamsGroup(\OmegaUp\Request $r): array {
+    public static function apiReplaceTeamsGroup(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Authenticate logged user
         $r->ensureIdentity();
@@ -3265,17 +3265,30 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($problemset) || is_null($problemset->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
-        \OmegaUp\DAO\TeamsGroupRoles::deleteAllTeamGroupsForAclId(
-            $problemset->acl_id
-        );
 
-        \OmegaUp\DAO\TeamsGroupRoles::create(
-            new \OmegaUp\DAO\VO\TeamsGroupRoles([
-                'acl_id' => $problemset->acl_id,
-                'team_group_id' => $teamsGroup->team_group_id,
-                'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
-            ])
-        );
+        try {
+            // Begin a new transaction
+            \OmegaUp\DAO\DAO::transBegin();
+
+            \OmegaUp\DAO\TeamsGroupRoles::deleteAllTeamGroupsForAclId(
+                $problemset->acl_id
+            );
+
+            \OmegaUp\DAO\TeamsGroupRoles::create(
+                new \OmegaUp\DAO\VO\TeamsGroupRoles([
+                    'acl_id' => $problemset->acl_id,
+                    'team_group_id' => $teamsGroup->team_group_id,
+                    'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
+                ])
+            );
+            // End transaction
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            // Operation failed in the data layer, rollback transaction
+            \OmegaUp\DAO\DAO::transRollback();
+
+            throw $e;
+        }
 
         return ['status' => 'ok'];
     }
