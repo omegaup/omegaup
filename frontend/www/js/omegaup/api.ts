@@ -1720,6 +1720,10 @@ export const Tag = {
 };
 
 export const TeamsGroup = {
+  addMembers: apiCall<
+    messages.TeamsGroupAddMembersRequest,
+    messages.TeamsGroupAddMembersResponse
+  >('/api/teamsGroup/addMembers/'),
   create: apiCall<
     messages.TeamsGroupCreateRequest,
     messages.TeamsGroupCreateResponse
@@ -1732,6 +1736,10 @@ export const TeamsGroup = {
     messages.TeamsGroupListRequest,
     messages.TeamsGroupListResponse
   >('/api/teamsGroup/list/'),
+  removeMember: apiCall<
+    messages.TeamsGroupRemoveMemberRequest,
+    messages.TeamsGroupRemoveMemberResponse
+  >('/api/teamsGroup/removeMember/'),
   removeTeam: apiCall<
     messages.TeamsGroupRemoveTeamRequest,
     messages.TeamsGroupRemoveTeamResponse
@@ -1740,6 +1748,10 @@ export const TeamsGroup = {
     messages.TeamsGroupTeamsRequest,
     messages.TeamsGroupTeamsResponse
   >('/api/teamsGroup/teams/'),
+  teamsMembers: apiCall<
+    messages.TeamsGroupTeamsMembersRequest,
+    messages.TeamsGroupTeamsMembersResponse
+  >('/api/teamsGroup/teamsMembers/'),
   update: apiCall<
     messages.TeamsGroupUpdateRequest,
     messages.TeamsGroupUpdateResponse
