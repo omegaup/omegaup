@@ -1300,7 +1300,7 @@ Update a Contest
 | `finish_time`               | `int`                     |             |
 | `submissions_gap`           | `int`                     |             |
 | `window_length`             | `int`                     |             |
-| `admission_mode`            | `mixed`                   |             |
+| `admission_mode`            | `null\|string`            |             |
 | `alias`                     | `null\|string`            |             |
 | `contest_for_teams`         | `bool\|null`              |             |
 | `description`               | `null\|string`            |             |
