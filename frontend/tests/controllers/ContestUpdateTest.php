@@ -1214,9 +1214,6 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testUpdateContestForTeamsFromPrivateToPublic() {
-        // Get a problem
-        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
-
         [
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();

@@ -357,9 +357,6 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testAddUsersToContestForTeams() {
-        // Get a problem
-        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
-
         // Create the user to associate
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -393,9 +390,6 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testAddGroupsToContestForTeams() {
-        // Get a problem
-        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
-
         // Create the user to associate
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
