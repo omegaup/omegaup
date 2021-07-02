@@ -4,7 +4,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 
-import identity_Members from './Members.vue';
+import teamsgroup_Members from './Members.vue';
 
 describe('Members.vue', () => {
   beforeEach(() => {
