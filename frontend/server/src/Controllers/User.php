@@ -3478,9 +3478,6 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $username
      */
     public static function apiAssociateIdentity(\OmegaUp\Request $r): array {
-        \OmegaUp\Experiments::getInstance()->ensureEnabled(
-            \OmegaUp\Experiments::IDENTITIES
-        );
         $r->ensureMainUserIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
@@ -3538,9 +3535,6 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{identities: list<AssociatedIdentity>}
      */
     public static function apiListAssociatedIdentities(\OmegaUp\Request $r): array {
-        \OmegaUp\Experiments::getInstance()->ensureEnabled(
-            \OmegaUp\Experiments::IDENTITIES
-        );
         $r->ensureMainUserIdentity();
 
         return [

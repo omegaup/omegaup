@@ -80,9 +80,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $username
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
-        \OmegaUp\Experiments::getInstance()->ensureEnabled(
-            \OmegaUp\Experiments::IDENTITIES
-        );
         $group = self::validateGroupOwnership($r);
         if (is_null($group->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -182,9 +179,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $username
      */
     public static function apiBulkCreate(\OmegaUp\Request $r): array {
-        \OmegaUp\Experiments::getInstance()->ensureEnabled(
-            \OmegaUp\Experiments::IDENTITIES
-        );
         $group = self::validateGroupOwnership($r);
         if (is_null($group->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -293,10 +287,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $team_identities
      */
     public static function apiBulkCreateForTeams(\OmegaUp\Request $r): array {
-        \OmegaUp\Experiments::getInstance()->ensureEnabled(
-            \OmegaUp\Experiments::IDENTITIES
-        );
-
         $r->ensureMainUserIdentity();
         if (!\OmegaUp\Authorization::isGroupIdentityCreator($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
@@ -496,9 +486,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $username
      */
     public static function apiUpdateIdentityTeam(\OmegaUp\Request $r): array {
-        \OmegaUp\Experiments::getInstance()->ensureEnabled(
-            \OmegaUp\Experiments::IDENTITIES
-        );
         self::validateUpdateRequest($r);
         $originalUsername = $r->ensureString('original_username');
         $username = $r->ensureString('username');
@@ -799,9 +786,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $username
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
-        \OmegaUp\Experiments::getInstance()->ensureEnabled(
-            \OmegaUp\Experiments::IDENTITIES
-        );
         self::validateUpdateRequest($r);
         $originalUsername = $r->ensureString('original_username');
         $username = $r->ensureString('username');
@@ -888,9 +872,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $username
      */
     public static function apiChangePassword(\OmegaUp\Request $r): array {
-        \OmegaUp\Experiments::getInstance()->ensureEnabled(
-            \OmegaUp\Experiments::IDENTITIES
-        );
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['username'],
             'username'

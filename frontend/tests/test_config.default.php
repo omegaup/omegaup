@@ -9,7 +9,6 @@ $_testShard = intval(getenv('TEST_TOKEN') ?: '0');
 # ####################################
 # EXPERIMENTS
 # ####################################
-try_define('EXPERIMENT_IDENTITIES', true);
 
 # ####################################
 # DATABASE CONFIG
