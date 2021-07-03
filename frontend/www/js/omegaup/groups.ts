@@ -35,6 +35,9 @@ export function downloadCsvFile({
   hiddenElement.click();
 }
 
+// There's no other way to specify an arbitrary type that can be read from a CSV
+// as a string -> string mapping.
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function getCSVRecords<T extends object>({
   fields,
   records,
