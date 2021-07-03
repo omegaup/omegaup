@@ -269,6 +269,24 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->assertStringContainsString('Team', $identity['name']);
         }
+
+        // All created users are shown in apiList
+        $identities = \OmegaUp\Controllers\User::apiList(
+            new \OmegaUp\Request([
+                'query' => 'user',
+                'auth_token' => $creatorLogin->auth_token,
+            ])
+        );
+        $this->assertCount(10, $identities);
+
+        // And all the teams are hidden in apiList
+        $identities = \OmegaUp\Controllers\User::apiList(
+            new \OmegaUp\Request([
+                'query' => 'teams',
+                'auth_token' => $creatorLogin->auth_token,
+            ])
+        );
+        $this->assertEmpty($identities);
     }
 
     public function testUploadCsvFileWithNoPrivilegesUser() {

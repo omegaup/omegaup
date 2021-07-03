@@ -155,10 +155,8 @@
 				</form>
 			</div>
 		</div>
-{if !empty($ENABLED_EXPERIMENTS) && in_array('identities', $ENABLED_EXPERIMENTS)}
 		<div id="manage-identities"></div>
 		{js_include entrypoint="user_manage_identities"}
-{/if}
 		{block name="basic-content"}
 		<div class="panel panel-default">
 			<div class="panel-heading">
