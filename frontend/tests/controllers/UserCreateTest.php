@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * UserCreateTest
@@ -191,7 +192,8 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $_REQUEST['email'] = \OmegaUp\Test\Utils::createRandomString() . '@' . \OmegaUp\Test\Utils::createRandomString() . '.com';
         $_REQUEST['permission_key'] = \OmegaUp\Controllers\User::$permissionKey;
 
-        // Override session_start, phpunit doesn't like it, but we still validate that it is called once
+        // Override session_start, php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariableunit doesn't like it, but we still validate that it is called once
         $this->mockSessionManager();
 
         // Call api

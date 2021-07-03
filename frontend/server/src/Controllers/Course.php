@@ -154,7 +154,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'assignment_type',
             ['test', 'lesson', 'homework']
         );
-        $courseAlias = $r->ensureString(
+        $r->ensureString(
             'alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
@@ -683,7 +683,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $originalCourse
             );
 
-            foreach ($assignmentsProblems as $assignment => $assignmentProblems) {
+            foreach ($assignmentsProblems as $_assignmentAlias => $assignmentProblems) {
                 // Create and assign homeworks, lessons and tests to new course
                 $problemset = self::createAssignment(
                     $originalCourse,
@@ -2874,7 +2874,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'assignment_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $assignment = self::validateCourseAssignmentAlias(
+        self::validateCourseAssignmentAlias(
             $course,
             $assignmentAlias
         );
@@ -4141,7 +4141,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $course = self::validateCourseExists($courseAlias);
-        $group = self::resolveGroup($course);
+        self::resolveGroup($course);
 
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -4791,7 +4791,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             'requests_user_information',
             'admission_mode',
         ];
-        $originalAdmissionMode = $course->admission_mode;
         $importantChange = self::updateValueProperties(
             $r,
             $course,
@@ -4815,7 +4814,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             // It means column languages has been modified
             if ($importantChange) {
-                $assignment = \OmegaUp\DAO\Courses::updateLanguagesToAssignments(
+                \OmegaUp\DAO\Courses::updateLanguagesToAssignments(
                     $course,
                     $r->ensureString('languages')
                 );

@@ -28,7 +28,7 @@ class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {
         \OmegaUp\Time::setTimeForTesting(strtotime($date));
 
         ['user' => $user1, 'identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
-        ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
 
         self::addProblemRun($identity1);
         self::addProblemRun($identity2);
@@ -98,7 +98,7 @@ class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {
 
         $user1 = $problemData['authorUser'];
         $identity1 = $problemAuthor;
-        ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
         //Change date to today less one year
         $date = date_create($date);
         date_add(

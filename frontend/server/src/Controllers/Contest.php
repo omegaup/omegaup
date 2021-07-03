@@ -649,7 +649,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
 
         // Half-authenticate, in case there is no session in place.
-        $session = \OmegaUp\Controllers\Session::getCurrentSession($r);
+        \OmegaUp\Controllers\Session::getCurrentSession($r);
         $result = [
             'smartyProperties' => [
                 'payload' => [
@@ -1362,7 +1362,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         [
             'contestWithDirector' => $contestWithDirector,
         ] = self::validateContestWithDirector($contestAlias);
-        $contest = \OmegaUp\Controllers\Contest::validateContest($contestAlias);
+        \OmegaUp\Controllers\Contest::validateContest($contestAlias);
 
         return self::getPublicDetails($contestWithDirector, $r->identity);
     }
@@ -1541,7 +1541,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::CONTEST_INFO,
             strval($contest->alias),
             /** @return ContestDetails */
-            function () use ($contest, &$result) {
+            function () use ($contest) {
                 // Initialize response to be the contest information
                 /** @var array{admission_mode: string, alias: string, archived: bool, contest_for_teams: bool, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null} */
                 $result = $contest->asFilteredArray([
@@ -2004,8 +2004,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $originalContest->finish_time->time -
             $originalContest->start_time->time
         );
-
-        $auth_token = isset($r['auth_token']) ? $r['auth_token'] : null;
 
         $problemset = new \OmegaUp\DAO\VO\Problemsets([
             'needs_basic_information' => false,

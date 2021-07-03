@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * SessionControllerTest
@@ -136,7 +137,8 @@ class LoginTest extends \OmegaUp\Test\ControllerTestCase {
         // Turn on flag to return auth_token in response, just to validate it
         $_REQUEST['returnAuthToken'] = true;
 
-        // Override session_start, phpunit doesn't like it, but we still validate that it is called once
+        // Override session_start, php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariableunit doesn't like it, but we still validate that it is called once
         $this->mockSessionManager();
 
         // Call api

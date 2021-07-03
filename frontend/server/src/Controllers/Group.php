@@ -433,10 +433,6 @@ class Group extends \OmegaUp\Controllers\Controller {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
-        $isOrganizer = \OmegaUp\Authorization::canCreateGroupIdentities(
-            $r->identity
-        );
-
         $groupAlias = $r->ensureString(
             'group',
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)

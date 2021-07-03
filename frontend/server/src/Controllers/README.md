@@ -2909,12 +2909,10 @@ Gets a list of problems where current user is the owner
 
 ### Parameters
 
-| Name        | Type    | Description |
-| ----------- | ------- | ----------- |
-| `page`      | `int`   |             |
-| `page_size` | `int`   |             |
-| `offset`    | `mixed` |             |
-| `rowcount`  | `mixed` |             |
+| Name       | Type        | Description |
+| ---------- | ----------- | ----------- |
+| `page`     | `int`       |             |
+| `rowcount` | `int\|null` |             |
 
 ### Returns
 

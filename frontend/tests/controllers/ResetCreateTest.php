@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 class ResetCreateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testShouldRequireEmailParameter() {
         try {

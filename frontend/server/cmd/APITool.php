@@ -1166,7 +1166,7 @@ function listDir(string $path): Generator {
 $rootDirectory = dirname(__DIR__, 3);
 /** @psalm-suppress DeprecatedClass cannot yet upgrade to Composer 2 */
 define('PSALM_VERSION', \PackageVersions\Versions::getVersion('vimeo/psalm'));
-$projectAnalyzer = new \Psalm\Internal\Analyzer\ProjectAnalyzer(
+$_projectAnalyzer = new \Psalm\Internal\Analyzer\ProjectAnalyzer(
     \Psalm\Config::loadFromXMLFile(
         "{$rootDirectory}/psalm.xml",
         $rootDirectory

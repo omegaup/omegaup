@@ -78,7 +78,7 @@ class Request extends \ArrayObject {
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
         if (is_null($response) || !is_array($response)) {
-            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
+            throw new \OmegaUp\Exceptions\InternalServerErrorException(
                 'generalError',
                 new \Exception('API did not return an array.')
             );
