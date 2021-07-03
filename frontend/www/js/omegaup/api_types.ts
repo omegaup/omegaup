@@ -2030,6 +2030,16 @@ export namespace types {
     username: string;
   }
 
+  export interface Contestant {
+    country?: string;
+    email?: string;
+    gender?: string;
+    name?: string;
+    school?: string;
+    state?: string;
+    username: string;
+  }
+
   export interface CourseAdmin {
     role: string;
     username: string;
@@ -3493,16 +3503,7 @@ export namespace messages {
   export type ContestCloneRequest = { [key: string]: any };
   export type ContestCloneResponse = { alias: string };
   export type ContestContestantsRequest = { [key: string]: any };
-  export type ContestContestantsResponse = {
-    contestants: {
-      country?: string;
-      email?: string;
-      name?: string;
-      school?: string;
-      state?: string;
-      username: string;
-    }[];
-  };
+  export type ContestContestantsResponse = { contestants: types.Contestant[] };
   export type ContestCreateRequest = { [key: string]: any };
   export type ContestCreateResponse = {};
   export type ContestCreateVirtualRequest = { [key: string]: any };

@@ -4,8 +4,8 @@ import { types } from '../api_types';
 import T from '../lang';
 import * as api from '../api';
 import * as ui from '../ui';
-import * as CSV from '@/third_party/js/csv.js/csv.js';
 import contest_Mine from '../components/contest/Mine.vue';
+import { downloadCsvFile } from '../groups';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestListMinePayload();
@@ -66,39 +66,18 @@ OmegaUp.on('ready', () => {
                 if (!result.contestants) {
                   return;
                 }
-                const dataToSerialize = {
-                  fields: [
-                    { id: 'name' },
-                    { id: 'username' },
-                    { id: 'email' },
-                    { id: 'state' },
-                    { id: 'country' },
-                    { id: 'school' },
+                downloadCsvFile({
+                  fileName: `users_${contestAlias}.csv`,
+                  columns: [
+                    'name',
+                    'username',
+                    'email',
+                    'state',
+                    'country',
+                    'school',
                   ],
                   records: result.contestants,
-                };
-                const dialect = {
-                  dialect: {
-                    csvddfVersion: 1.2,
-                    delimiter: ',',
-                    doubleQuote: true,
-                    lineTerminator: '\r\n',
-                    quoteChar: '"',
-                    skipInitialSpace: true,
-                    header: true,
-                    commentChar: '#',
-                  },
-                };
-                const csvContent =
-                  'data:text/csv;charset=utf-8,' +
-                  CSV.serialize(dataToSerialize, dialect);
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement('a');
-                link.setAttribute('href', encodedUri);
-                link.setAttribute('download', `users_${contestAlias}.csv`);
-                document.body.appendChild(link); // Required for FF
-
-                link.click(); // This will download the data
+                });
               })
               .catch(ui.apiError);
           },
