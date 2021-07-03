@@ -92,7 +92,7 @@ class Course {
         ?bool $needsBasicInformation = false
     ): array {
         if (is_null($admin)) {
-            ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
+            ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
             $adminLogin = \OmegaUp\Test\ControllerTestCase::login($admin);
         }
 
@@ -135,7 +135,7 @@ class Course {
             'assignment_type' => 'homework',
             'course' => $course,
         ]);
-        $assignmentResult = \OmegaUp\Controllers\Course::apiCreateAssignment(
+        \OmegaUp\Controllers\Course::apiCreateAssignment(
             $r
         );
         $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
@@ -254,7 +254,7 @@ class Course {
         ?\OmegaUp\Test\ScopedLoginToken $login = null
     ): \OmegaUp\DAO\VO\Identities {
         if (is_null($student)) {
-            ['user' => $user, 'identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+            ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
         }
 
         $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);

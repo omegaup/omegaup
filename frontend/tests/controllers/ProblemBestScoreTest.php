@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class ProblemBestScoreTest extends \OmegaUp\Test\ControllerTestCase {
     /**

@@ -174,7 +174,6 @@ class School extends \OmegaUp\Controllers\Controller {
             'state_id' => !is_null($state) ? $state->state_id : null,
         ]);
 
-        $school_id = 0;
         $existing = \OmegaUp\DAO\Schools::findByName($name);
         if (!empty($existing)) {
             /** @var int $existing[0]->school_id */

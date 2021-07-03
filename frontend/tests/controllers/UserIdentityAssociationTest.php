@@ -1,4 +1,7 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+// php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariablecs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Testing synchronization between User and Identity

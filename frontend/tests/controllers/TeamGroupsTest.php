@@ -1,9 +1,9 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * TeamGroupsTest
  */
-
 class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testTeamGroupEditDetailsPayload() {
         [

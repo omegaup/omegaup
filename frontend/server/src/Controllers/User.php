@@ -1761,7 +1761,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         try {
             \OmegaUp\DAO\DAO::transBegin();
-            foreach ($users as $index => $user) {
+            foreach ($users as $_index => $user) {
                 $newCoderOfTheMonth = new \OmegaUp\DAO\VO\CoderOfTheMonth([
                     'coder_of_the_month_id' => $user['coder_of_the_month_id'],
                     'user_id' => $user['user_id'],
@@ -3100,7 +3100,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $role = $r->ensureString('role');
         $role = self::validateAddRemoveRole($r->identity, $role);
-        $username = $r->ensureString(
+        $r->ensureString(
             'username',
             fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
@@ -3146,7 +3146,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $role = $r->ensureString('role');
         $role = self::validateAddRemoveRole($r->identity, $role);
-        $username = $r->ensureString(
+        $r->ensureString(
             'username',
             fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
@@ -3236,7 +3236,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $username = $r->ensureString(
+        $r->ensureString(
             'username',
             fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
@@ -3273,7 +3273,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $username = $r->ensureString(
+        $r->ensureString(
             'username',
             fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
@@ -3708,7 +3708,6 @@ class User extends \OmegaUp\Controllers\Controller {
             'category',
             \OmegaUp\Controllers\User::ALLOWED_CODER_OF_THE_MONTH_CATEGORIES
         );
-        $category = $r['category'] ?? 'all';
 
         return [
             'smartyProperties' => [
@@ -4168,7 +4167,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 $userInfo->user_id
             );
             $hashEmail = md5($coder['email'] ?? '');
-            $avatar = 'https://secure.gravatar.com/avatar/{$hashEmail}?s=32';
+            $avatar = "https://secure.gravatar.com/avatar/{$hashEmail}?s=32";
             $response[] = [
                 'username' => $coder['username'],
                 'country_id' => $coder['country_id'],
