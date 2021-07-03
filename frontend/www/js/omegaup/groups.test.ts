@@ -1,8 +1,5 @@
-import {
-  GroupCSVDatasetRecord,
-  optionalFieldsGroups,
-  requiredFieldsGroups,
-} from './group/edit';
+import { types } from './api_types';
+import { groupOptionalFields, groupRequiredFields } from './group/edit';
 import {
   generatePassword,
   generateHumanReadablePassword,
@@ -91,7 +88,7 @@ describe('groups_utils', () => {
       ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', 'Best School'],
       ['username-2', 'Dev Diane', 'MX', 'QUE', null, 'Best School'],
     ];
-    const expectedFormattedRecords: { [key: string]: string }[] = [
+    const expectedFormattedRecords: types.Identity[] = [
       {
         username: 'username-1',
         name: 'Developer Diana',
@@ -110,11 +107,11 @@ describe('groups_utils', () => {
     ];
 
     it('Should clean all null cells for optional fields', () => {
-      const formattedRecords = getCSVRecords<GroupCSVDatasetRecord>({
+      const formattedRecords = getCSVRecords<types.Identity>({
         fields,
         records,
-        requiredFields: requiredFieldsGroups,
-        optionalFields: optionalFieldsGroups,
+        requiredFields: groupRequiredFields,
+        optionalFields: groupOptionalFields,
       });
 
       expect(formattedRecords).toEqual(expectedFormattedRecords);
@@ -128,11 +125,11 @@ describe('groups_utils', () => {
       );
       localExpectedFormattedRecords[0].name = '2';
 
-      const formattedRecords = getCSVRecords<GroupCSVDatasetRecord>({
+      const formattedRecords = getCSVRecords<types.Identity>({
         fields,
         records: localRecords,
-        requiredFields: requiredFieldsGroups,
-        optionalFields: optionalFieldsGroups,
+        requiredFields: groupRequiredFields,
+        optionalFields: groupOptionalFields,
       });
 
       expect(formattedRecords).toEqual(localExpectedFormattedRecords);
@@ -147,11 +144,11 @@ describe('groups_utils', () => {
       delete localExpectedFormattedRecords[0].username;
 
       expect(() =>
-        getCSVRecords<GroupCSVDatasetRecord>({
+        getCSVRecords<types.Identity>({
           fields,
           records: localRecords,
-          requiredFields: requiredFieldsGroups,
-          optionalFields: optionalFieldsGroups,
+          requiredFields: groupRequiredFields,
+          optionalFields: groupOptionalFields,
         }),
       ).toThrow(
         ui.formatString(T.teamsGroupsErrorFieldIsRequired, {
@@ -161,11 +158,11 @@ describe('groups_utils', () => {
     });
 
     it('Should ignore extra fields that are not required nor optional', () => {
-      const formattedRecords = getCSVRecords<GroupCSVDatasetRecord>({
+      const formattedRecords = getCSVRecords<types.Identity>({
         fields: fields.concat(['birthday']),
         records,
-        requiredFields: requiredFieldsGroups,
-        optionalFields: optionalFieldsGroups,
+        requiredFields: groupRequiredFields,
+        optionalFields: groupOptionalFields,
       });
 
       expect(formattedRecords).toEqual(formattedRecords);
@@ -176,11 +173,11 @@ describe('groups_utils', () => {
       localFields.splice(0, 1);
 
       expect(() =>
-        getCSVRecords<GroupCSVDatasetRecord>({
+        getCSVRecords<types.Identity>({
           fields: localFields,
           records,
-          requiredFields: requiredFieldsGroups,
-          optionalFields: optionalFieldsGroups,
+          requiredFields: groupRequiredFields,
+          optionalFields: groupOptionalFields,
         }),
       ).toThrow(
         ui.formatString(T.teamsGroupsErrorFieldIsNotPresentInCsv, {
