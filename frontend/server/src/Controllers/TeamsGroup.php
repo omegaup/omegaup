@@ -137,9 +137,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
                     'teamsMembers' => \OmegaUp\DAO\TeamUsers::getByTeamGroupId(
                         $teamGroup->team_group_id
                     )['teamsUsers'],
-                    'isOrganizer' => \OmegaUp\Experiments::getInstance()->isEnabled(
-                        \OmegaUp\Experiments::IDENTITIES
-                    ) && \OmegaUp\Authorization::canCreateGroupIdentities(
+                    'isOrganizer' => \OmegaUp\Authorization::canCreateGroupIdentities(
                         $r->identity
                     ),
                 ],

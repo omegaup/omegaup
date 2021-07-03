@@ -39,15 +39,9 @@ namespace OmegaUp;
  */
 class Experiments {
     /**
-     * Constant for identity management experiment.
-     */
-    const IDENTITIES = 'identities';
-
-    /**
      * An array with all the known experiments.
      */
     private const KNOWN_EXPERIMENTS = [
-        self::IDENTITIES,
     ];
 
     /**
