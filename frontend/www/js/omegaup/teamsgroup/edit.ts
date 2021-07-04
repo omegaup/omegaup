@@ -82,7 +82,7 @@ OmegaUp.on('ready', () => {
                 this.searchResultUsers = data
                   .filter((user) => !addedUsers.has(user.label))
                   .map((user) => ({
-                    key: user.label,
+                    key: user.value,
                     value: `${ui.escape(user.label)} (<strong>${ui.escape(
                       user.value,
                     )}</strong>)`,
@@ -182,7 +182,7 @@ OmegaUp.on('ready', () => {
                   country_id,
                   state_id,
                   school_name,
-                  gender: typeof gender === 'undefined' ? 'decline' : gender,
+                  gender: gender ?? 'decline',
                 });
                 identitiesTeams[
                   `teams:${payload.teamGroup.alias}:${username}`
