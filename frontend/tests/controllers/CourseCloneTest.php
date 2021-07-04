@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
     /**

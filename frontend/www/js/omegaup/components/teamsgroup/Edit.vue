@@ -63,12 +63,19 @@
           :teams="currentTeamsIdentities"
           :alias="alias"
           :countries="countries"
+          :search-result-users="searchResultUsers"
+          :teams-members="teamsMembers"
+          @update-search-result-users="
+            (query) => $emit('update-search-result-users', query)
+          "
           @edit-identity-team="
             (request) => $emit('edit-identity-team', request)
           "
           @change-password-identity-team="
             (request) => $emit('change-password-identity-team', request)
           "
+          @add-members="(request) => $emit('add-members', request)"
+          @remove-member="(request) => $emit('remove-member', request)"
           @remove="(name) => $emit('remove', name)"
           @cancel="(teamComponent) => $emit('cancel', teamComponent)"
         ></omegaup-teams-group-teams>
@@ -85,7 +92,7 @@
           @bulk-identities="
             (identities) => $emit('bulk-identities', identities)
           "
-          @download-teams="(teams) => $emit('download-teams', teams)"
+          @download-teams="(identities) => $emit('download-teams', identities)"
           @read-csv="(source) => $emit('read-csv', source)"
           @invalid-file="$emit('invalid-file')"
           @update-search-result-users="
@@ -127,6 +134,7 @@ export default class TeamsGroupEdit extends Vue {
   @Prop() isOrganizer!: boolean;
   @Prop() tab!: AvailableTabs;
   @Prop({ default: () => [] }) teamsIdentities!: types.Identity[];
+  @Prop({ default: () => [] }) teamsMembers!: types.TeamMember[];
   @Prop() teamErrorRow!: null | string;
   @Prop() searchResultUsers!: types.ListItem[];
 

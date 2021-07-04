@@ -25,6 +25,7 @@ OmegaUp.on('ready', () => {
       searchResultProblems: [] as types.ListItem[],
       searchResultUsers: [] as types.ListItem[],
       searchResultTeamsGroups: [] as types.ListItem[],
+      searchResultGroups: [] as types.ListItem[],
     }),
     methods: {
       arbitrateRequest: (username: string, resolution: boolean): void => {
@@ -123,6 +124,7 @@ OmegaUp.on('ready', () => {
           searchResultUsers: this.searchResultUsers,
           searchResultTeamsGroups: this.searchResultTeamsGroups,
           teamsGroup: payload.teams_group,
+          searchResultGroups: this.searchResultGroups,
         },
         on: {
           'update-search-result-problems': (query: string) => {
@@ -141,6 +143,27 @@ OmegaUp.on('ready', () => {
                     key: problem.alias,
                     value: `${ui.escape(problem.title)} (<strong>${ui.escape(
                       problem.alias,
+                    )}</strong>)`,
+                  }));
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-groups': (query: string) => {
+            api.Group.list({
+              query,
+            })
+              .then((data) => {
+                // Groups previously added into the contest should not be
+                // shown in the dropdown
+                const addedGroups = new Set(
+                  this.groups.map((problem) => problem.alias),
+                );
+                this.searchResultGroups = data
+                  .filter((group) => !addedGroups.has(group.value))
+                  .map((group) => ({
+                    key: group.value,
+                    value: `${ui.escape(group.label)} (<strong>${ui.escape(
+                      group.value,
                     )}</strong>)`,
                   }));
               })
@@ -171,7 +194,7 @@ OmegaUp.on('ready', () => {
               query,
             })
               .then((data) => {
-                this.searchResultTeamsGroups = data.results.map(
+                this.searchResultTeamsGroups = data.map(
                   ({ key, value }: { key: string; value: string }) => ({
                     key,
                     value: `${ui.escape(value)} (<strong>${ui.escape(
@@ -191,11 +214,9 @@ OmegaUp.on('ready', () => {
           }): void => {
             api.Contest.update({
               ...contest,
-              ...{
-                contest_alias: contest.alias,
-                alias: null,
-                teams_group_alias: teamsGroupAlias,
-              },
+              contest_alias: contest.alias,
+              alias: null,
+              teams_group_alias: teamsGroupAlias,
             })
               .then(() => {
                 ui.success(`

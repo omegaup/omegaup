@@ -39,7 +39,7 @@ OmegaUp.on('ready', () => {
           }): void => {
             api.Contest.create({
               ...contest,
-              ...{ teams_group_alias: teamsGroupAlias },
+              teams_group_alias: teamsGroupAlias,
             })
               .then(() => {
                 this.invalidParameterName = null;
@@ -57,7 +57,7 @@ OmegaUp.on('ready', () => {
               query,
             })
               .then((data) => {
-                this.searchResultTeamsGroups = data.results.map(
+                this.searchResultTeamsGroups = data.map(
                   ({ key, value }: { key: string; value: string }) => ({
                     key,
                     value: `${ui.escape(value)} (<strong>${ui.escape(

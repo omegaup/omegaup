@@ -32,6 +32,7 @@
                 <th>{{ T.loginPassword }}</th>
                 <th>{{ T.profileCountry }}</th>
                 <th>{{ T.profileState }}</th>
+                <th>{{ T.wordsGender }}</th>
                 <th>{{ T.profileSchool }}</th>
                 <th>{{ T.teamsGroupUsernames }}</th>
               </tr>
@@ -51,6 +52,7 @@
                 </td>
                 <td>{{ identity.country_id }}</td>
                 <td>{{ identity.state_id }}</td>
+                <td>{{ identity.gender }}</td>
                 <td>{{ identity.school_name }}</td>
                 <td>
                   <button
@@ -97,9 +99,7 @@
           <div>
             <button
               class="btn btn-warning d-inline-block"
-              @click.prevent="
-                $emit('download-identities', identities, humanReadable)
-              "
+              @click.prevent="$emit('download-teams', identities)"
             >
               <font-awesome-icon :icon="['fas', 'download']" />
             </button>

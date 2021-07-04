@@ -457,6 +457,21 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         Groups_Identities gi
                     ON
                         gi.group_id = gr.group_id
+                    UNION DISTINCT
+                    SELECT
+                        t.identity_id,
+                        p.problemset_id
+                    FROM
+                        Problemsets p
+                    INNER JOIN
+                        Teams_Group_Roles tgr
+                    ON
+                        tgr.acl_id = p.acl_id AND
+                        tgr.role_id = ?
+                    INNER JOIN
+                        Teams t
+                    ON
+                        t.team_group_id = tgr.team_group_id
                 ) pi
             ON
                 pi.problemset_id = p.problemset_id AND
@@ -481,6 +496,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             GROUP BY Contests.contest_id, organizer.identity_id
         ";
         $params = [
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
             \OmegaUp\Authorization::CONTESTANT_ROLE,
             $identityId,
         ];
@@ -1149,7 +1165,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
-     * @return list<array{name: null|string, username: string, email: null|string, state: null|string, country: null|string, school: null|string}>
+     * @return list<array{name: null|string, username: string, email: null|string, gender: null|string, state: null|string, country: null|string, school: null|string}>
      */
     public static function getContestantsInfo(
         int $contestId
@@ -1158,6 +1174,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             SELECT
                 i.name,
                 i.username,
+                i.gender,
                 IF(pi.share_user_information, e.email, NULL) AS email,
                 IF(pi.share_user_information, st.name, NULL) AS state,
                 IF(pi.share_user_information, cn.name, NULL) AS country,
@@ -1185,7 +1202,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 AND archived = 0;
         ';
 
-        /** @var list<array{country: null|string, email: null|string, name: null|string, school: null|string, state: null|string, username: string}> */
+        /** @var list<array{country: null|string, email: null|string, gender: null|string, name: null|string, school: null|string, state: null|string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$contestId]
@@ -1208,7 +1225,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             [$contestId]
         );
 
-        return $requestsUsersInfo === 'yes' || $requestsUsersInfo ===  'optional';
+        return $requestsUsersInfo === 'required' || $requestsUsersInfo ===  'optional';
     }
 
     /**

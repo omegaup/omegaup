@@ -87,7 +87,19 @@ class ContestParams {
     public $partialScore;
 
     /**
-     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, partialScore?: bool, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string} $params
+     * @readonly
+     * @var bool
+     */
+    public $contestForTeams;
+
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $teamsGroupAlias;
+
+    /**
+     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, contestForTeams?: bool, teamsGroupAlias?: string, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, partialScore?: bool, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string} $params
      */
     public function __construct($params = []) {
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
@@ -125,6 +137,8 @@ class ContestParams {
         $this->penaltyCalcPolicy = $params['penaltyCalcPolicy'] ?? 'sum';
         $this->feedback = $params['feedback'] ?? 'detailed';
         $this->partialScore = $params['partialScore'] ?? true;
+        $this->contestForTeams = $params['contestForTeams'] ?? false;
+        $this->teamsGroupAlias = $params['teamsGroupAlias'] ?? null;
     }
 }
 
@@ -174,7 +188,12 @@ class Contest {
             'needs_basic_information' => $params->basicInformation,
             'requests_user_information' => $params->requestsUserInformation,
             'penalty_calc_policy' => $params->penaltyCalcPolicy,
+            'contest_for_teams' => $params->contestForTeams,
         ]);
+
+        if (!is_null($params->teamsGroupAlias)) {
+            $r['teams_group_alias'] = $params->teamsGroupAlias;
+        }
 
         return [
             'request' => $r,
@@ -231,7 +250,7 @@ class Contest {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = \OmegaUp\Controllers\Contest::apiCreate(clone $r);
+        \OmegaUp\Controllers\Contest::apiCreate(clone $r);
         if ($params->admissionMode === 'public') {
             self::forcePublic($contestData, $params->lastUpdated);
             $r['admission_mode'] = 'public';

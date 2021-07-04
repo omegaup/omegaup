@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class AssignmentRemoveTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAssignmentRemove() {

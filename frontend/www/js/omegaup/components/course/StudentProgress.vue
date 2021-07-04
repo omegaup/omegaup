@@ -10,6 +10,14 @@
         ></omegaup-user-username>
       </a>
     </td>
+    <td data-global-score class="text-center font-weight-bold align-middle">
+      <span class="d-block">{{ globalScore }}%</span>
+      <span class="d-block">{{
+        ui.formatString(T.studentProgressDescriptionTotalPoints, {
+          points: globalPoints,
+        })
+      }}</span>
+    </td>
     <td
       v-for="assignment in assignments"
       :key="assignment.alias"
@@ -44,14 +52,6 @@
           ></div>
         </div>
       </div>
-    </td>
-    <td data-global-score class="text-center font-weight-bold align-middle">
-      <span class="d-block">{{ globalScore }}%</span>
-      <span class="d-block">{{
-        ui.formatString(T.studentProgressDescriptionTotalPoints, {
-          points: globalPoints,
-        })
-      }}</span>
     </td>
   </tr>
 </template>

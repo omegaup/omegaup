@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of ContestUpdateContest
@@ -1149,6 +1150,98 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $partialScore,
             $identity->username
         );
+    }
+
+    public function testUpdateContestForTeams() {
+        // Get a problem
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get two teams groups
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+        [
+            'teamGroup' => $otherTeamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestForTeams' => true,
+                'teamsGroupAlias' => $teamGroup->alias,
+            ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contestData
+        );
+
+        $login = self::login($contestData['director']);
+
+        $response = \OmegaUp\Controllers\Contest::getContestEditForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertTrue($response['details']['contest_for_teams']);
+        $this->assertEquals([
+            'alias' => $teamGroup->alias,
+            'name' =>  $teamGroup->name,
+        ], $response['teams_group']);
+
+        // Update teams group
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'contest_for_teams' => true,
+            'teams_group_alias' => $otherTeamGroup->alias,
+        ]));
+
+        $response = \OmegaUp\Controllers\Contest::getContestEditForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertTrue($response['details']['contest_for_teams']);
+        $this->assertEquals([
+            'alias' => $otherTeamGroup->alias,
+            'name' =>  $otherTeamGroup->name,
+        ], $response['teams_group']);
+    }
+
+    public function testUpdateContestForTeamsFromPrivateToPublic() {
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestForTeams' => true,
+                'teamsGroupAlias' => $teamGroup->alias,
+            ])
+        );
+
+        $login = self::login($contestData['director']);
+
+        // Update contest for teams to normal contest is not allowed
+        try {
+            \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'contest_for_teams' => false,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'contestForTeamsCanNotChangeToContest',
+                $e->getMessage()
+            );
+        }
     }
 
     private function assertAPIsShowCorrectContestScore(

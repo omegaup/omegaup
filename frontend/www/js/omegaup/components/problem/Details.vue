@@ -164,16 +164,22 @@
             ></omegaup-quality-nomination-reviewer-popup>
           </template>
         </omegaup-overlay>
-        <omegaup-arena-runs
-          :problem-alias="problem.alias"
-          :contest-alias="contestAlias"
-          :runs="runs"
-          :show-details="true"
-          :problemset-problems="[]"
-          :is-contest-finished="isContestFinished"
-          @details="(run) => onRunDetails(run.guid)"
-          @new-submission="onNewSubmission"
-        ></omegaup-arena-runs>
+        <template v-if="problem.accepts_submissions">
+          <omegaup-arena-ephemeral-grader
+            v-if="!problem.karel_problem"
+            :problem="problem"
+          ></omegaup-arena-ephemeral-grader>
+          <omegaup-arena-runs
+            :problem-alias="problem.alias"
+            :contest-alias="contestAlias"
+            :runs="runs"
+            :show-details="true"
+            :problemset-problems="[]"
+            :is-contest-finished="isContestFinished"
+            @details="(run) => onRunDetails(run.guid)"
+            @new-submission="onNewSubmission"
+          ></omegaup-arena-runs>
+        </template>
         <omegaup-problem-feedback
           :quality-histogram="parsedQualityHistogram"
           :difficulty-histogram="parsedDifficultyHistogram"
@@ -181,7 +187,10 @@
           :difficulty-score="histogramDifficulty"
         ></omegaup-problem-feedback>
         <slot name="best-solvers-list">
-          <omegaup-arena-solvers :solvers="solvers"></omegaup-arena-solvers>
+          <omegaup-arena-solvers
+            v-if="problem.accepts_submissions"
+            :solvers="solvers"
+          ></omegaup-arena-solvers>
         </slot>
       </div>
       <div
@@ -259,6 +268,7 @@ import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
+import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
 import arena_Runs from '../arena/Runs.vue';
 import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
@@ -308,6 +318,7 @@ export enum PopupDisplayed {
   components: {
     FontAwesomeIcon,
     'omegaup-arena-clarification-list': arena_ClarificationList,
+    'omegaup-arena-ephemeral-grader': arena_EphemeralGrader,
     'omegaup-arena-runs': arena_Runs,
     'omegaup-arena-runsubmit-popup': arena_RunSubmitPopup,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,

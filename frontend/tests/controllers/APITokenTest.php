@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class APITokenTest extends \OmegaUp\Test\ControllerTestCase {
     public function setUp(): void {

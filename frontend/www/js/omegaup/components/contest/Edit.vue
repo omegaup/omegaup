@@ -185,6 +185,10 @@
         ></omegaup-common-requests>
         <omegaup-contest-groups
           :groups="groups"
+          :search-result-groups="searchResultGroups"
+          @update-search-result-groups="
+            (query) => $emit('update-search-result-groups', query)
+          "
           @emit-add-group="(groupAlias) => $emit('add-group', groupAlias)"
           @emit-remove-group="(groupAlias) => $emit('remove-group', groupAlias)"
         ></omegaup-contest-groups>
@@ -278,6 +282,7 @@ export default class Edit extends Vue {
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop() teamsGroup!: types.ContestGroup | null;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
+  @Prop() searchResultGroups!: types.ListItem[];
 
   T = T;
   ui = ui;

@@ -39,21 +39,9 @@ namespace OmegaUp;
  */
 class Experiments {
     /**
-     * Constant for ephemeral grader experiment.
-     */
-    const EPHEMERAL = 'ephemeral';
-
-    /**
-     * Constant for identity management experiment.
-     */
-    const IDENTITIES = 'identities';
-
-    /**
      * An array with all the known experiments.
      */
     private const KNOWN_EXPERIMENTS = [
-        self::EPHEMERAL,
-        self::IDENTITIES,
     ];
 
     /**
