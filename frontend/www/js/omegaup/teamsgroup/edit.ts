@@ -39,6 +39,15 @@ OmegaUp.on('ready', () => {
           })
           .catch(ui.apiError);
       },
+      refreshTeamsMembersList: (): void => {
+        api.TeamsGroup.teamsMembers({
+          team_group_alias: payload.teamGroup.alias,
+        })
+          .then((data) => {
+            teamsGroupEdit.teamsMembers = data.teamsUsers;
+          })
+          .catch(ui.apiError);
+      },
     },
     render: function (createElement) {
       return createElement('omegaup-teams-group-edit', {
@@ -66,6 +75,61 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.teamsGroupEditGroupUpdated);
+              })
+              .catch(ui.apiError);
+          },
+          'edit-identity-team': ({
+            originalUsername,
+            identity,
+          }: {
+            originalUsername: string;
+            identity: types.Identity;
+          }) => {
+            api.Identity.updateIdentityTeam({
+              ...identity,
+              group_alias: payload.teamGroup.alias,
+              original_username: originalUsername,
+              school_name: identity.school,
+            })
+              .then(() => {
+                ui.success(T.teamsGroupEditTeamsUpdated);
+                this.refreshTeamsList();
+              })
+              .catch(ui.apiError);
+          },
+          'change-password-identity-team': ({
+            username,
+            newPassword,
+            newPasswordRepeat,
+          }: {
+            username: string;
+            newPassword: string;
+            newPasswordRepeat: string;
+          }) => {
+            if (newPassword !== newPasswordRepeat) {
+              ui.error(T.userPasswordMustBeSame);
+              return;
+            }
+
+            api.Identity.changePassword({
+              group_alias: payload.teamGroup.alias,
+              password: newPassword,
+              username: username,
+            })
+              .then(() => {
+                this.refreshTeamsList();
+                ui.success(T.teamsGroupEditTeamsPasswordUpdated);
+              })
+              .catch(ui.apiError);
+          },
+          remove: (username: string) => {
+            api.Group.removeUser({
+              group_alias: payload.teamGroup.alias,
+              usernameOrEmail: username,
+            })
+              .then(() => {
+                this.refreshTeamsList();
+                ui.success(T.teamsGroupEditTeamsRemoved);
               })
               .catch(ui.apiError);
           },
@@ -121,6 +185,40 @@ OmegaUp.on('ready', () => {
           },
           'invalid-file': () => {
             ui.error(T.groupsInvalidCsv);
+          },
+          'add-members': ({
+            teamUsername,
+            usersToAdd,
+          }: {
+            teamUsername: string;
+            usersToAdd: string[];
+          }) => {
+            api.TeamsGroup.addMembers({
+              team_group_alias: teamUsername,
+              usernames: usersToAdd,
+            })
+              .then(() => {
+                ui.success(T.groupEditMemberAdded);
+                this.refreshTeamsMembersList();
+              })
+              .catch(ui.apiError);
+          },
+          'remove-member': ({
+            teamUsername,
+            username,
+          }: {
+            teamUsername: string;
+            username: string;
+          }) => {
+            api.TeamsGroup.removeMember({
+              team_group_alias: teamUsername,
+              username,
+            })
+              .then(() => {
+                ui.success(T.groupEditMemberRemoved);
+                this.refreshTeamsMembersList();
+              })
+              .catch(ui.apiError);
           },
           'download-identities': (identities: types.Identity[]) => {
             downloadCsvFile({
