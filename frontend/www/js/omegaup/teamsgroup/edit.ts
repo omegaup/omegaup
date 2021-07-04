@@ -87,11 +87,9 @@ OmegaUp.on('ready', () => {
           }) => {
             api.Identity.updateIdentityTeam({
               ...identity,
-              ...{
-                group_alias: payload.teamGroup.alias,
-                original_username: originalUsername,
-                school_name: identity.school,
-              },
+              group_alias: payload.teamGroup.alias,
+              original_username: originalUsername,
+              school_name: identity.school,
             })
               .then(() => {
                 ui.success(T.teamsGroupEditTeamsUpdated);
