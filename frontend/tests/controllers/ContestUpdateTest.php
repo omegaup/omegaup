@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of ContestUpdateContest
@@ -1211,6 +1212,36 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'alias' => $otherTeamGroup->alias,
             'name' =>  $otherTeamGroup->name,
         ], $response['teams_group']);
+    }
+
+    public function testUpdateContestForTeamsFromPrivateToPublic() {
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestForTeams' => true,
+                'teamsGroupAlias' => $teamGroup->alias,
+            ])
+        );
+
+        $login = self::login($contestData['director']);
+
+        // Update contest for teams to normal contest is not allowed
+        try {
+            \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'contest_for_teams' => false,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'contestForTeamsCanNotChangeToContest',
+                $e->getMessage()
+            );
+        }
     }
 
     private function assertAPIsShowCorrectContestScore(

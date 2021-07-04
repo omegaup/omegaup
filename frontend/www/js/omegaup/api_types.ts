@@ -2030,6 +2030,16 @@ export namespace types {
     username: string;
   }
 
+  export interface Contestant {
+    country?: string;
+    email?: string;
+    gender?: string;
+    name?: string;
+    school?: string;
+    state?: string;
+    username: string;
+  }
+
   export interface CourseAdmin {
     role: string;
     username: string;
@@ -2291,6 +2301,11 @@ export namespace types {
     identities: types.Identity[];
     isOrganizer: boolean;
     scoreboards: types.GroupScoreboard[];
+  }
+
+  export interface GroupListItem {
+    label: string;
+    value: string;
   }
 
   export interface GroupListPayload {
@@ -3236,6 +3251,15 @@ export namespace types {
     identities: types.Identity[];
     isOrganizer: boolean;
     teamGroup: { alias: string; description?: string; name?: string };
+    teamsMembers: types.TeamMember[];
+  }
+
+  export interface TeamMember {
+    classname: string;
+    name?: string;
+    team_alias: string;
+    team_name?: string;
+    username: string;
   }
 
   export interface TeamsGroup {
@@ -3479,16 +3503,7 @@ export namespace messages {
   export type ContestCloneRequest = { [key: string]: any };
   export type ContestCloneResponse = { alias: string };
   export type ContestContestantsRequest = { [key: string]: any };
-  export type ContestContestantsResponse = {
-    contestants: {
-      country?: string;
-      email?: string;
-      name?: string;
-      school?: string;
-      state?: string;
-      username: string;
-    }[];
-  };
+  export type ContestContestantsResponse = { contestants: types.Contestant[] };
   export type ContestCreateRequest = { [key: string]: any };
   export type ContestCreateResponse = {};
   export type ContestCreateVirtualRequest = { [key: string]: any };
@@ -3549,6 +3564,8 @@ export namespace messages {
   export type ContestRemoveProblemResponse = {};
   export type ContestRemoveUserRequest = { [key: string]: any };
   export type ContestRemoveUserResponse = {};
+  export type ContestReplaceTeamsGroupRequest = { [key: string]: any };
+  export type ContestReplaceTeamsGroupResponse = {};
   export type ContestReportRequest = { [key: string]: any };
   export type _ContestReportServerResponse = any;
   export type ContestReportResponse = {
@@ -3808,7 +3825,7 @@ export namespace messages {
     scoreboards: types.GroupScoreboard[];
   };
   export type GroupListRequest = { [key: string]: any };
-  export type GroupListResponse = { label: string; value: string }[];
+  export type GroupListResponse = types.GroupListItem[];
   export type GroupMembersRequest = { [key: string]: any };
   export type GroupMembersResponse = { identities: types.Identity[] };
   export type GroupMyListRequest = { [key: string]: any };
@@ -4228,6 +4245,8 @@ export namespace messages {
   export type TagListResponse = { name: string }[];
 
   // TeamsGroup
+  export type TeamsGroupAddMembersRequest = { [key: string]: any };
+  export type TeamsGroupAddMembersResponse = {};
   export type TeamsGroupCreateRequest = { [key: string]: any };
   export type TeamsGroupCreateResponse = {};
   export type TeamsGroupDetailsRequest = { [key: string]: any };
@@ -4241,10 +4260,18 @@ export namespace messages {
   };
   export type TeamsGroupListRequest = { [key: string]: any };
   export type TeamsGroupListResponse = types.ListItem[];
+  export type TeamsGroupRemoveMemberRequest = { [key: string]: any };
+  export type TeamsGroupRemoveMemberResponse = {};
   export type TeamsGroupRemoveTeamRequest = { [key: string]: any };
   export type TeamsGroupRemoveTeamResponse = {};
   export type TeamsGroupTeamsRequest = { [key: string]: any };
   export type TeamsGroupTeamsResponse = { identities: types.Identity[] };
+  export type TeamsGroupTeamsMembersRequest = { [key: string]: any };
+  export type TeamsGroupTeamsMembersResponse = {
+    pageNumber: number;
+    teamsUsers: types.TeamMember[];
+    totalRows: number;
+  };
   export type TeamsGroupUpdateRequest = { [key: string]: any };
   export type TeamsGroupUpdateResponse = {};
 
@@ -4505,6 +4532,9 @@ export namespace controllers {
     removeUser: (
       params?: messages.ContestRemoveUserRequest,
     ) => Promise<messages.ContestRemoveUserResponse>;
+    replaceTeamsGroup: (
+      params?: messages.ContestReplaceTeamsGroupRequest,
+    ) => Promise<messages.ContestReplaceTeamsGroupResponse>;
     report: (
       params?: messages.ContestReportRequest,
     ) => Promise<messages.ContestReportResponse>;
@@ -4982,6 +5012,9 @@ export namespace controllers {
   }
 
   export interface TeamsGroup {
+    addMembers: (
+      params?: messages.TeamsGroupAddMembersRequest,
+    ) => Promise<messages.TeamsGroupAddMembersResponse>;
     create: (
       params?: messages.TeamsGroupCreateRequest,
     ) => Promise<messages.TeamsGroupCreateResponse>;
@@ -4991,12 +5024,18 @@ export namespace controllers {
     list: (
       params?: messages.TeamsGroupListRequest,
     ) => Promise<messages.TeamsGroupListResponse>;
+    removeMember: (
+      params?: messages.TeamsGroupRemoveMemberRequest,
+    ) => Promise<messages.TeamsGroupRemoveMemberResponse>;
     removeTeam: (
       params?: messages.TeamsGroupRemoveTeamRequest,
     ) => Promise<messages.TeamsGroupRemoveTeamResponse>;
     teams: (
       params?: messages.TeamsGroupTeamsRequest,
     ) => Promise<messages.TeamsGroupTeamsResponse>;
+    teamsMembers: (
+      params?: messages.TeamsGroupTeamsMembersRequest,
+    ) => Promise<messages.TeamsGroupTeamsMembersResponse>;
     update: (
       params?: messages.TeamsGroupUpdateRequest,
     ) => Promise<messages.TeamsGroupUpdateResponse>;

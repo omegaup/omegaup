@@ -305,7 +305,6 @@ class ProblemParams {
             /** @var null|callable(mixed):mixed */
             $transform = null;
             $important = false;
-            $fieldAlias = null;
             if (is_int($source)) {
                 $thisFieldName = $info;
                 $objectFieldName = $info;

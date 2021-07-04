@@ -529,7 +529,7 @@ class Scoreboard {
 
             $testOnly[$contestant['identity_id']] = true;
             $noRuns[$contestant['identity_id']] = true;
-            foreach ($problemMapping as $id => $problem) {
+            foreach ($problemMapping as $_id => $problem) {
                 $identityProblems[] = [
                     'alias' => $problem['alias'],
                     'points' => 0.0,

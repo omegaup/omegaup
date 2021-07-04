@@ -1492,7 +1492,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::RUN_COUNTS,
             '',
-            function () use ($r) {
+            function () {
                 $totals = [];
                 $totals['total'] = [];
                 $totals['ac'] = [];

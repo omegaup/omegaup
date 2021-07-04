@@ -43,6 +43,7 @@
   - [`/api/contest/removeGroupAdmin/`](#apicontestremovegroupadmin)
   - [`/api/contest/removeProblem/`](#apicontestremoveproblem)
   - [`/api/contest/removeUser/`](#apicontestremoveuser)
+  - [`/api/contest/replaceTeamsGroup/`](#apicontestreplaceteamsgroup)
   - [`/api/contest/report/`](#apicontestreport)
   - [`/api/contest/requests/`](#apicontestrequests)
   - [`/api/contest/role/`](#apicontestrole)
@@ -202,11 +203,14 @@
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
 - [TeamsGroup](#teamsgroup)
+  - [`/api/teamsGroup/addMembers/`](#apiteamsgroupaddmembers)
   - [`/api/teamsGroup/create/`](#apiteamsgroupcreate)
   - [`/api/teamsGroup/details/`](#apiteamsgroupdetails)
   - [`/api/teamsGroup/list/`](#apiteamsgrouplist)
+  - [`/api/teamsGroup/removeMember/`](#apiteamsgroupremovemember)
   - [`/api/teamsGroup/removeTeam/`](#apiteamsgroupremoveteam)
   - [`/api/teamsGroup/teams/`](#apiteamsgroupteams)
+  - [`/api/teamsGroup/teamsMembers/`](#apiteamsgroupteamsmembers)
   - [`/api/teamsGroup/update/`](#apiteamsgroupupdate)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
@@ -494,7 +498,7 @@ _Nothing_
 
 ### Description
 
-Adds an group to a contest
+Adds a group to a contest
 
 ### Parameters
 
@@ -511,7 +515,7 @@ _Nothing_
 
 ### Description
 
-Adds an group admin to a contest
+Adds a group admin to a contest
 
 ### Parameters
 
@@ -717,9 +721,9 @@ previously agreed to share their information.
 
 ### Returns
 
-| Name          | Type                                                                                                   |
-| ------------- | ------------------------------------------------------------------------------------------------------ |
-| `contestants` | `{ country: string; email: string; name: string; school: string; state: string; username: string; }[]` |
+| Name          | Type                 |
+| ------------- | -------------------- |
+| `contestants` | `types.Contestant[]` |
 
 ## `/api/contest/create/`
 
@@ -1037,6 +1041,23 @@ Remove a user from a private contest
 
 _Nothing_
 
+## `/api/contest/replaceTeamsGroup/`
+
+### Description
+
+Replace the teams group assigned to a contest
+
+### Parameters
+
+| Name                | Type     | Description                  |
+| ------------------- | -------- | ---------------------------- |
+| `contest_alias`     | `string` | The alias of the contest     |
+| `teams_group_alias` | `string` | The alias of the teams group |
+
+### Returns
+
+_Nothing_
+
 ## `/api/contest/report/`
 
 ### Description
@@ -1279,7 +1300,7 @@ Update a Contest
 | `finish_time`               | `int`                     |             |
 | `submissions_gap`           | `int`                     |             |
 | `window_length`             | `int`                     |             |
-| `admission_mode`            | `mixed`                   |             |
+| `admission_mode`            | `null\|string`            |             |
 | `alias`                     | `null\|string`            |             |
 | `contest_for_teams`         | `bool\|null`              |             |
 | `description`               | `null\|string`            |             |
@@ -2234,11 +2255,7 @@ array instead of an object since it is used by typeahead.
 ### Returns
 
 ```typescript
-{
-  label: string;
-  value: string;
-}
-[];
+types.GroupListItem[]
 ```
 
 ## `/api/group/members/`
@@ -2892,12 +2909,10 @@ Gets a list of problems where current user is the owner
 
 ### Parameters
 
-| Name        | Type    | Description |
-| ----------- | ------- | ----------- |
-| `page`      | `int`   |             |
-| `page_size` | `int`   |             |
-| `offset`    | `mixed` |             |
-| `rowcount`  | `mixed` |             |
+| Name       | Type        | Description |
+| ---------- | ----------- | ----------- |
+| `page`     | `int`       |             |
+| `rowcount` | `int\|null` |             |
 
 ### Returns
 
@@ -3968,6 +3983,23 @@ Gets a list of tags
 
 TeamsGroupController
 
+## `/api/teamsGroup/addMembers/`
+
+### Description
+
+Add one or more users to a given team
+
+### Parameters
+
+| Name               | Type     | Description                    |
+| ------------------ | -------- | ------------------------------ |
+| `team_group_alias` | `string` | The username of the team.      |
+| `usernames`        | `string` | Username of all members to add |
+
+### Returns
+
+_Nothing_
+
 ## `/api/teamsGroup/create/`
 
 ### Description
@@ -4023,6 +4055,23 @@ since it is used by typeahead.
 types.ListItem[]
 ```
 
+## `/api/teamsGroup/removeMember/`
+
+### Description
+
+Remove an existing team member of a teams group
+
+### Parameters
+
+| Name               | Type     | Description                    |
+| ------------------ | -------- | ------------------------------ |
+| `team_group_alias` | `string` | The username of the team       |
+| `username`         | `string` | The username of user to remove |
+
+### Returns
+
+_Nothing_
+
 ## `/api/teamsGroup/removeTeam/`
 
 ### Description
@@ -4057,6 +4106,28 @@ Teams of a teams group
 | Name         | Type               |
 | ------------ | ------------------ |
 | `identities` | `types.Identity[]` |
+
+## `/api/teamsGroup/teamsMembers/`
+
+### Description
+
+Get a list of team members of a teams group
+
+### Parameters
+
+| Name               | Type     | Description               |
+| ------------------ | -------- | ------------------------- |
+| `page`             | `int`    |                           |
+| `page_size`        | `int`    |                           |
+| `team_group_alias` | `string` | The username of the team. |
+
+### Returns
+
+| Name         | Type                 |
+| ------------ | -------------------- |
+| `pageNumber` | `number`             |
+| `teamsUsers` | `types.TeamMember[]` |
+| `totalRows`  | `number`             |
 
 ## `/api/teamsGroup/update/`
 

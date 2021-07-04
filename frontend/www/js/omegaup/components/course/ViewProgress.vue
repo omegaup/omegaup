@@ -20,6 +20,20 @@
                     ></omegaup-common-sort-controls>
                   </span>
                 </th>
+                <th class="text-center align-middle">
+                  <span>
+                    {{ T.courseProgressGlobalScore }}
+                    <span class="d-block">{{
+                      getTotalPointsByCourse(assignments)
+                    }}</span>
+                    <omegaup-common-sort-controls
+                      column="total"
+                      :sort-order="sortOrder"
+                      :column-name="columnName"
+                      @apply-filter="onApplyFilter"
+                    ></omegaup-common-sort-controls>
+                  </span>
+                </th>
                 <th
                   v-for="assignment in assignments"
                   :key="assignment.alias"
@@ -37,20 +51,6 @@
                         ><img src="/media/question.png"
                       /></a>
                     </span>
-                  </span>
-                </th>
-                <th class="text-center align-middle">
-                  <span>
-                    {{ T.courseProgressGlobalScore }}
-                    <span class="d-block">{{
-                      getTotalPointsByCourse(assignments)
-                    }}</span>
-                    <omegaup-common-sort-controls
-                      column="total"
-                      :sort-order="sortOrder"
-                      :column-name="columnName"
-                      @apply-filter="onApplyFilter"
-                    ></omegaup-common-sort-controls>
                   </span>
                 </th>
               </tr>
@@ -268,18 +268,17 @@ export default class CourseViewProgress extends Vue {
   get progressTable(): TableCell[][] {
     const table: TableCell[][] = [];
     const header = [T.profileUsername, T.wordsName];
+    header.push(T.courseProgressGlobalScore);
     for (const assignment of this.assignments) {
       header.push(assignment.name);
     }
-    header.push(T.courseProgressGlobalScore);
     table.push(header);
     for (const student of this.students) {
       const row: TableCell[] = [student.username, student.name || ''];
-
+      row.push(this.getGlobalScoreByStudent(student));
       for (const assignment of this.assignments) {
         row.push(this.score(student, assignment));
       }
-      row.push(this.getGlobalScoreByStudent(student));
 
       table.push(row);
     }

@@ -1,9 +1,12 @@
+import { types } from './api_types';
+import { groupOptionalFields, groupRequiredFields } from './group/edit';
 import {
   generatePassword,
   generateHumanReadablePassword,
-  cleanRecords,
+  getCSVRecords,
 } from './groups';
 import T from './lang';
+import * as ui from './ui';
 
 describe('groups_utils', () => {
   describe('generatePassword', () => {
@@ -72,29 +75,115 @@ describe('groups_utils', () => {
     });
   });
 
-  describe('cleanRecords', () => {
-    it('Should clean all null cells', () => {
-      const records = cleanRecords([
-        ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', null],
-        ['username-2', null, 'MX', 'QUE', 'male', 'Best School'],
-      ]);
+  describe('getCSVRecords', () => {
+    const fields = [
+      'username',
+      'name',
+      'country_id',
+      'state_id',
+      'gender',
+      'school_name',
+    ];
+    const records: (null | string | number)[][] = [
+      ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', 'Best School'],
+      ['username-2', 'Dev Diane', 'MX', 'QUE', null, 'Best School'],
+    ];
+    const expectedFormattedRecords: types.Identity[] = [
+      {
+        username: 'username-1',
+        name: 'Developer Diana',
+        country_id: 'MX',
+        state_id: 'AGU',
+        gender: 'female',
+        school_name: 'Best School',
+      },
+      {
+        username: 'username-2',
+        name: 'Dev Diane',
+        country_id: 'MX',
+        state_id: 'QUE',
+        school_name: 'Best School',
+      },
+    ];
 
-      expect(records).toEqual([
-        ['username-1', 'Developer Diana', 'MX', 'AGU', 'female', undefined],
-        ['username-2', undefined, 'MX', 'QUE', 'male', 'Best School'],
-      ]);
+    it('Should clean all null cells for optional fields', () => {
+      const formattedRecords = getCSVRecords<types.Identity>({
+        fields,
+        records,
+        requiredFields: groupRequiredFields,
+        optionalFields: groupOptionalFields,
+      });
+
+      expect(formattedRecords).toEqual(expectedFormattedRecords);
     });
 
     it('Should parse all the cells to string', () => {
-      const records = cleanRecords([
-        ['username-1', 'Developer Diana', 4, 'AGU', 'female', 'Best School'],
-        [2, 'Dev Diane', 'MX', 'QUE', 'male', 'Best School'],
-      ]);
+      const localRecords = JSON.parse(JSON.stringify(records));
+      localRecords[0][1] = 2;
+      const localExpectedFormattedRecords = JSON.parse(
+        JSON.stringify(expectedFormattedRecords),
+      );
+      localExpectedFormattedRecords[0].name = '2';
 
-      expect(records).toEqual([
-        ['username-1', 'Developer Diana', '4', 'AGU', 'female', 'Best School'],
-        ['2', 'Dev Diane', 'MX', 'QUE', 'male', 'Best School'],
-      ]);
+      const formattedRecords = getCSVRecords<types.Identity>({
+        fields,
+        records: localRecords,
+        requiredFields: groupRequiredFields,
+        optionalFields: groupOptionalFields,
+      });
+
+      expect(formattedRecords).toEqual(localExpectedFormattedRecords);
+    });
+
+    it('Should throw error for null cells in required fields', () => {
+      const localRecords = JSON.parse(JSON.stringify(records));
+      localRecords[0][0] = null;
+      const localExpectedFormattedRecords = JSON.parse(
+        JSON.stringify(expectedFormattedRecords),
+      );
+      delete localExpectedFormattedRecords[0].username;
+
+      expect(() =>
+        getCSVRecords<types.Identity>({
+          fields,
+          records: localRecords,
+          requiredFields: groupRequiredFields,
+          optionalFields: groupOptionalFields,
+        }),
+      ).toThrow(
+        ui.formatString(T.teamsGroupsErrorFieldIsRequired, {
+          field: 'username',
+        }),
+      );
+    });
+
+    it('Should ignore extra fields that are not required nor optional', () => {
+      const formattedRecords = getCSVRecords<types.Identity>({
+        fields: fields.concat(['birthday']),
+        records,
+        requiredFields: groupRequiredFields,
+        optionalFields: groupOptionalFields,
+      });
+
+      expect(formattedRecords).toEqual(formattedRecords);
+    });
+
+    it('Should throw an error when required fields are missing', () => {
+      const localFields = JSON.parse(JSON.stringify(fields));
+      localFields.splice(0, 1);
+
+      expect(() =>
+        getCSVRecords<types.Identity>({
+          fields: localFields,
+          records,
+          requiredFields: groupRequiredFields,
+          optionalFields: groupOptionalFields,
+        }),
+      ).toThrow(
+        ui.formatString(T.teamsGroupsErrorFieldIsNotPresentInCsv, {
+          missingFields: 'username',
+        }),
+      );
     });
   });
 });

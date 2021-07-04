@@ -13,6 +13,7 @@
  * @psalm-type GroupScoreboardContestsPayload=array{availableContests: list<ContestListItem>, contests: list<ScoreboardContest>, scoreboardAlias: string, groupAlias: string}
  * @psalm-type Group=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
  * @psalm-type GroupListPayload=array{groups: list<Group>}
+ * @psalm-type GroupListItem=array{label: string, value: string}
  */
 
 class Group extends \OmegaUp\Controllers\Controller {
@@ -271,7 +272,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return list<array{label: string, value: string}>
+     * @return list<GroupListItem>
      *
      * @omegaup-request-param null|string $query
      */
@@ -432,12 +433,6 @@ class Group extends \OmegaUp\Controllers\Controller {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
-        $isOrganizer = \OmegaUp\Experiments::getInstance()->isEnabled(
-            \OmegaUp\Experiments::IDENTITIES
-        ) && \OmegaUp\Authorization::canCreateGroupIdentities(
-            $r->identity
-        );
-
         $groupAlias = $r->ensureString(
             'group',
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
@@ -479,9 +474,7 @@ class Group extends \OmegaUp\Controllers\Controller {
                     'identities' => \OmegaUp\DAO\GroupsIdentities::getMemberIdentities(
                         $group
                     ),
-                    'isOrganizer' => \OmegaUp\Experiments::getInstance()->isEnabled(
-                        \OmegaUp\Experiments::IDENTITIES
-                    ) && \OmegaUp\Authorization::canCreateGroupIdentities(
+                    'isOrganizer' => \OmegaUp\Authorization::canCreateGroupIdentities(
                         $r->identity
                     ),
                     'scoreboards' => $scoreboards,
