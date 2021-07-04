@@ -3,9 +3,7 @@
     :alias.sync="alias"
     :description.sync="description"
     :name.sync="name"
-    @submit="
-      (request) => $emit('create-teams-group', { ...request, ...{ alias } })
-    "
+    @submit="(request) => $emit('create-teams-group', { ...request, alias })"
   >
     <template #teams-group-title>
       <div class="card-header">
