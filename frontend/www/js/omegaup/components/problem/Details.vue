@@ -166,6 +166,7 @@
         </omegaup-overlay>
         <template v-if="problem.accepts_submissions">
           <omegaup-arena-ephemeral-grader
+            v-if="!problem.karel_problem"
             :problem="problem"
           ></omegaup-arena-ephemeral-grader>
           <omegaup-arena-runs
