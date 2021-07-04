@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class ExperimentsTest extends \OmegaUp\Test\ControllerTestCase {
     const TEST = 'experiment_test';

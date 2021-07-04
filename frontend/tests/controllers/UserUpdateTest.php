@@ -8,7 +8,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUserUpdate() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         $locale = \OmegaUp\DAO\Languages::getByName('pt');
@@ -144,10 +144,6 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $user = \OmegaUp\DAO\Users::getByPK($user->user_id);
         $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
 
-        $profile = \OmegaUp\Controllers\User::getProfileImpl(
-            $user,
-            $identity
-        );
         $profileProgress = \OmegaUp\Controllers\User::getProfileProgress(
             $user
         );
@@ -159,7 +155,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      * on each user information update
      */
     public function testUpdateUserSchool() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         // On user creation, no IdentitySchool is created
@@ -265,8 +261,8 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      * Update profile username with existed username
      */
     public function testDuplicateUsernameUpdate() {
-        ['user' => $oldUser, 'identity' => $oldIdentity] = \OmegaUp\Test\Factories\User::createUser();
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $oldIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         try {
             \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
@@ -284,7 +280,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      * Request parameter name cannot be too long
      */
     public function testNameUpdateTooLong() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
 
@@ -305,7 +301,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      * Request parameter name cannot be empty
      */
     public function testEmptyNameUpdate() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
 
@@ -323,7 +319,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testFutureBirthday() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         try {
@@ -344,7 +340,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUpdateCountryWithNoStateData() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         try {
@@ -367,7 +363,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testGenderWithInvalidOption() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         try {
@@ -388,7 +384,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testGenderWithValidOption() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         $response = \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
@@ -404,7 +400,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testGenderWithNull() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         $response = \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
@@ -420,7 +416,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testGenderWithEmptyString() {
         // Create the user to edit
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
         try {

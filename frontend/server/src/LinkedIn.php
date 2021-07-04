@@ -46,6 +46,7 @@ class LinkedIn {
         {
             $scopedSession = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStart();
             $_SESSION['li-state'] = $this->_state['ct'];
+            unset($scopedSession);
         }
         return "https://www.linkedin.com/oauth/v2/authorization?$query_string";
     }
@@ -56,16 +57,17 @@ class LinkedIn {
         {
             $scopedSession = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStart();
         if (
-                !isset($_SESSION['li-state'])
-                || empty($stateArray)
-                || !isset($stateArray['ct'])
-                || $_SESSION['li-state'] != $stateArray['ct']
+                    !isset($_SESSION['li-state'])
+                    || empty($stateArray)
+                    || !isset($stateArray['ct'])
+                    || $_SESSION['li-state'] != $stateArray['ct']
         ) {
             throw new \OmegaUp\Exceptions\CSRFException('invalidCsrfToken');
         }
 
             // If we make it here, the CSRF token has been consumed
             unset($_SESSION['li-state']);
+            unset($scopedSession);
         }
 
         $curl = new \OmegaUp\CurlSession(

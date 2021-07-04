@@ -333,7 +333,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
      * @return T|null
      */
     public function findByPredicate($array, $predicate) {
-        foreach ($array as $key => $value) {
+        foreach ($array as $_key => $value) {
             if ($predicate($value)) {
                 return $value;
             }

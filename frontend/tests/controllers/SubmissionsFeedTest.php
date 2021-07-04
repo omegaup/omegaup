@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
     public function testSubmissionsFeed() {

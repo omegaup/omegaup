@@ -315,6 +315,7 @@ class Utils {
     private static function shellExec(string $command): void {
         $log = \Logger::getLogger('\\OmegaUp\\Test\\Utils::shellExec()');
         $log->info("========== Starting {$command}");
+        $pipes = [];
         /** @psalm-suppress ForbiddenCode this only runs in tests. */
         $proc = proc_open(
             $command,

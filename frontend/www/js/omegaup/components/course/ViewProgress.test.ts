@@ -91,21 +91,19 @@ describe('ViewProgress.vue', () => {
     expect(odsContent).toBe(`<table:table table:name="${courseName}">
 <table:table-column table:number-columns-repeated="4"/>
 <table:table-row>
-<table:table-cell office:value-type="string"><text:p>${T.profileUsername}\
-</text:p></table:table-cell><table:table-cell office:value-type="string">\
-<text:p>${T.wordsName}</text:p></table:table-cell><table:table-cell \
-office:value-type="string"><text:p>${assignment.name}</text:p>\
-</table:table-cell><table:table-cell office:value-type="string"><text:p>\
-${T.courseProgressGlobalScore}</text:p></table:table-cell></table:table-row>
+<table:table-cell office:value-type="string"><text:p>${T.profileUsername}</text:p>\
+</table:table-cell><table:table-cell office:value-type="string"><text:p>${T.wordsName}\
+</text:p></table:table-cell><table:table-cell office:value-type="string"><text:p>\
+${T.courseProgressGlobalScore}</text:p></table:table-cell><table:table-cell \
+office:value-type="string"><text:p>${assignment.name}</text:p></table:table-cell>\
+</table:table-row>
 <table:table-row>
-<table:table-cell office:value-type="string"><text:p>${student.username}\
-</text:p></table:table-cell><table:table-cell office:value-type="string">\
-<text:p>${student.name}</text:p></table:table-cell><table:table-cell \
-office:value-type="float" office:value="${score}"><text:p>${score}</text:p>\
-</table:table-cell>\
-<table:table-cell office:value-type="percentage" office:value="${globalScore.value}">\
-<text:p>${globalScore}</text:p>\
-</table:table-cell></table:table-row>
+<table:table-cell office:value-type="string"><text:p>${student.username}</text:p>\
+</table:table-cell><table:table-cell office:value-type="string"><text:p>${student.name}\
+</text:p></table:table-cell><table:table-cell office:value-type="percentage" \
+office:value="${globalScore.value}"><text:p>${globalScore}</text:p>\
+</table:table-cell><table:table-cell office:value-type="float" office:value="\
+${score}"><text:p>${score}</text:p></table:table-cell></table:table-row>
 </table:table>`);
   });
 
@@ -117,8 +115,8 @@ office:value-type="float" office:value="${score}"><text:p>${score}</text:p>\
 
     const csvContent = toCsv(wrapper.vm.progressTable);
     expect(csvContent).toBe(`${T.profileUsername},${T.wordsName},${
-      assignment.name
-    },${T.courseProgressGlobalScore}\r
-${student.username},${student.name},${score.toFixed(2)},${globalScore}`);
+      T.courseProgressGlobalScore
+    },${assignment.name}\r
+${student.username},${student.name},${globalScore},${score.toFixed(2)}`);
   });
 });

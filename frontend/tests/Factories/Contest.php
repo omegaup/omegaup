@@ -250,7 +250,7 @@ class Contest {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = \OmegaUp\Controllers\Contest::apiCreate(clone $r);
+        \OmegaUp\Controllers\Contest::apiCreate(clone $r);
         if ($params->admissionMode === 'public') {
             self::forcePublic($contestData, $params->lastUpdated);
             $r['admission_mode'] = 'public';

@@ -7,6 +7,13 @@ import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
+import * as CSV from '@/third_party/js/csv.js/csv.js';
+import {
+  downloadCsvFile,
+  generateHumanReadablePassword,
+  generatePassword,
+  getCSVRecords,
+} from '../groups';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.TeamGroupEditPayload();
@@ -141,7 +148,7 @@ OmegaUp.on('ready', () => {
                 this.searchResultUsers = data
                   .filter((user) => !addedUsers.has(user.label))
                   .map((user) => ({
-                    key: user.label,
+                    key: user.value,
                     value: `${ui.escape(user.label)} (<strong>${ui.escape(
                       user.value,
                     )}</strong>)`,
@@ -214,6 +221,76 @@ OmegaUp.on('ready', () => {
                 this.refreshTeamsMembersList();
               })
               .catch(ui.apiError);
+          },
+          'download-identities': (identities: types.Identity[]) => {
+            downloadCsvFile({
+              fileName: `identities_${payload.teamGroup.alias}.csv`,
+              columns: [
+                'username',
+                'name',
+                'password',
+                'country_id',
+                'state_id',
+                'gender',
+                'school_name',
+              ],
+              records: identities,
+            });
+          },
+          'read-csv': ({
+            identitiesTeams,
+            identities,
+            file,
+            humanReadable,
+          }: {
+            identitiesTeams: { [team: string]: string[] };
+            identities: types.Identity[];
+            file: File;
+            humanReadable: boolean;
+          }) => {
+            CSV.fetch({ file }).done((dataset: CSV.Dataset) => {
+              if (!dataset.fields) {
+                ui.error(T.groupsInvalidCsv);
+                return;
+              }
+              const records = getCSVRecords<types.Identity>({
+                fields: dataset.fields,
+                records: dataset.records,
+                requiredFields: new Set([
+                  'username',
+                  'name',
+                  'country_id',
+                  'state_id',
+                  'gender',
+                  'school_name',
+                ]),
+              });
+              for (const {
+                username,
+                name,
+                country_id,
+                state_id,
+                gender,
+                school_name,
+              } of records) {
+                identities.push({
+                  username: `teams:${payload.teamGroup.alias}:${username}`,
+                  name,
+                  password: humanReadable
+                    ? generateHumanReadablePassword()
+                    : generatePassword(),
+                  country_id,
+                  state_id,
+                  school_name,
+                  gender: gender ?? 'decline',
+                });
+                identitiesTeams[
+                  `teams:${payload.teamGroup.alias}:${username}`
+                ] = [];
+              }
+              ui.dismissNotifications();
+              this.userErrorRow = null;
+            });
           },
         },
       });

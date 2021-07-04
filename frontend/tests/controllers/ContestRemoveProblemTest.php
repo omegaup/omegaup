@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Tests of the \OmegaUp\Controllers\Contest::apiRemoveProblem

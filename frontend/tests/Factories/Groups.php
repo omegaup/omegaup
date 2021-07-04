@@ -16,7 +16,7 @@ class Groups {
         ?\OmegaUp\Test\ScopedLoginToken $login = null
     ) {
         if (is_null($owner)) {
-            ['user' => $user, 'identity' => $owner] = \OmegaUp\Test\Factories\User::createUser();
+            ['identity' => $owner] = \OmegaUp\Test\Factories\User::createUser();
         }
 
         if (is_null($name)) {

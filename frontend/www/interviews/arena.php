@@ -1,5 +1,7 @@
 <?php
 
+// Appease the linter
+$smarty = null;
 require_once('../../server/bootstrap_smarty.php');
 
 $show_intro = true;

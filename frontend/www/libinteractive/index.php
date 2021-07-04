@@ -23,7 +23,7 @@ function preferredLanguage(
     ) {
         /** @var list<string> $match */
         foreach ($matches as $match) {
-            list($a, $b) = explode('-', $match[1]) + ['', ''];
+            list($a, $_b) = explode('-', $match[1]) + ['', ''];
             $value = isset($match[2]) ? floatval($match[2]) : 1.0;
 
             if (isset($availableLanguages[$match[1]])) {

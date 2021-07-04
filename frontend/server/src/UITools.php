@@ -85,7 +85,6 @@ class UITools {
             'identity' => $identity,
             'user' => $user,
             'is_admin' => $isAdmin,
-            'associated_identities' => $associatedIdentities,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
         if (!is_null($identity) && !is_null($identity->username)) {
             $smarty->assign('LOGGED_IN', '1');
