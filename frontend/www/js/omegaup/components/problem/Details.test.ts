@@ -6,6 +6,7 @@ import T from '../../lang';
 import * as time from '../../time';
 
 import problem_Details from './Details.vue';
+import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
 
 describe('Details.vue', () => {
   const date = new Date();
@@ -320,18 +321,23 @@ Here we can add code.
   });
 
   it('Should handle a valid source filename with content', async () => {
-    problem.statement.sources = {
-      'sample.cpp': `#include <iostream>
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        initialTab: 'problems',
+        problem: {
+          ...problem,
+          statement: {
+            ...problem.statement,
+            sources: {
+              'sample.cpp': `#include <iostream>
 
 int main() {
   std::cout << "This is only an example";
   return 0;
 }`,
-    };
-    const wrapper = mount(problem_Details, {
-      propsData: {
-        initialTab: 'problems',
-        problem,
+            },
+          },
+        },
         runDetailsData,
         user,
         nominationStatus,
@@ -356,5 +362,55 @@ int main() {
     expect(wrapper.find('div[data-markdown-statement]').text()).toContain(
       'This is only an example',
     );
+  });
+
+  it('Should show the ephemeral grader for regular problems', async () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        initialTab: 'problems',
+        problem,
+        runDetailsData,
+        user,
+        nominationStatus,
+        activeTab: 'problems',
+        runs,
+        allRuns: runs,
+        clarifications: [] as types.Clarification[],
+        solutionStatus: 'not_found',
+        histogram,
+        showNewRunWindow: false,
+        publicTags: [],
+        shouldShowTabs: true,
+      },
+    });
+
+    expect(wrapper.findComponent(arena_EphemeralGrader).exists()).toBe(true);
+  });
+
+  it('Should hide the ephemeral grader for Karel problems', async () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        initialTab: 'problems',
+        problem: {
+          ...problem,
+          karel_problem: true,
+          languages: ['kp', 'kj'],
+        },
+        runDetailsData,
+        user,
+        nominationStatus,
+        activeTab: 'problems',
+        runs,
+        allRuns: runs,
+        clarifications: [] as types.Clarification[],
+        solutionStatus: 'not_found',
+        histogram,
+        showNewRunWindow: false,
+        publicTags: [],
+        shouldShowTabs: true,
+      },
+    });
+
+    expect(wrapper.findComponent(arena_EphemeralGrader).exists()).toBe(false);
   });
 });
