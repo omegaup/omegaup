@@ -930,29 +930,45 @@ function initialize() {
   layout.init();
 
   let sourceAndSettings = layout.root.getItemsById('source-and-settings')[0];
-  if (store.getters.isCustomValidator)
+  if (store.getters.isCustomValidator) {
+    const activeContentItem = sourceAndSettings.getActiveContentItem();
     sourceAndSettings.addChild(validatorSettings);
+    if (activeContentItem) {
+      sourceAndSettings.setActiveContentItem(activeContentItem);
+    }
+  }
   store.watch(
     Object.getOwnPropertyDescriptor(store.getters, 'isCustomValidator').get,
     function (value) {
-      if (value) sourceAndSettings.addChild(validatorSettings);
-      else layout.root.getItemsById(validatorSettings.id)[0].remove();
+      if (value) {
+        const activeContentItem = sourceAndSettings.getActiveContentItem();
+        sourceAndSettings.addChild(validatorSettings);
+        if (activeContentItem) {
+          sourceAndSettings.setActiveContentItem(activeContentItem);
+        }
+      } else {
+        layout.root.getItemsById(validatorSettings.id)[0].remove();
+      }
     },
   );
   if (store.getters.isInteractive) {
+    const activeContentItem = sourceAndSettings.getActiveContentItem();
     sourceAndSettings.addChild(interactiveIdlSettings);
     sourceAndSettings.addChild(interactiveMainSourceSettings);
-    let sourceItem = layout.root.getItemsById('source')[0];
-    sourceItem.parent.setActiveContentItem(sourceItem);
+    if (activeContentItem) {
+      sourceAndSettings.setActiveContentItem(activeContentItem);
+    }
   }
   store.watch(
     Object.getOwnPropertyDescriptor(store.getters, 'isInteractive').get,
     function (value) {
       if (value) {
+        const activeContentItem = sourceAndSettings.getActiveContentItem();
         sourceAndSettings.addChild(interactiveIdlSettings);
         sourceAndSettings.addChild(interactiveMainSourceSettings);
-        let sourceItem = layout.root.getItemsById('source')[0];
-        sourceItem.parent.setActiveContentItem(sourceItem);
+        if (activeContentItem) {
+          sourceAndSettings.setActiveContentItem(activeContentItem);
+        }
       } else {
         layout.root.getItemsById(interactiveIdlSettings.id)[0].remove();
         layout.root.getItemsById(interactiveMainSourceSettings.id)[0].remove();
