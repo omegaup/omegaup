@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: grader-metrics-deployment
+  labels:
+    app: grader-metrics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grader-metrics
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: grader-metrics
+    spec:
+      containers:
+      - name: grader-metrics
+        image: omegaup/grader_metrics:20210706
+        env:
+          - name: CONNECTION_STRING
+            valueFrom:
+              secretKeyRef:
+                name: grader-metrics-secret
+                key: CONNECTION_STRING
