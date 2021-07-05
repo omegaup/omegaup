@@ -340,23 +340,13 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $seenMemberUsernames = [];
             foreach ($teamIdentities as $teamIdentity) {
                 $identitiesUsernames = explode(';', $teamIdentity['usernames']);
-                if (
-                    count(
-                        $identitiesUsernames
-                    ) < 2 && $identitiesUsernames[0] != ''
-                ) {
-                    foreach ($identitiesUsernames as $identityMemberUsername) {
-                        if (
-                            isset(
-                                $seenMemberUsernames[$identityMemberUsername]
-                            )
-                        ) {
-                            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                                'teamMemberUsernameInUse'
-                            );
-                        }
-                        $seenMemberUsernames[$identityMemberUsername] = true;
+                foreach ($identitiesUsernames as $identityMemberUsername) {
+                    if (isset($seenMemberUsernames[$identityMemberUsername])) {
+                        throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                            'teamMemberUsernameInUse'
+                        );
                     }
+                    $seenMemberUsernames[$identityMemberUsername] = true;
                 }
 
                 // Prepare DAOs
