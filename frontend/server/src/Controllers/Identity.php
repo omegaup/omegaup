@@ -334,12 +334,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
             }
             $seenUsernames[$teamIdentity['username']] = true;
 
-            // When usernames are provided we need to avoid duplicated users in
-            // different teams.
             if ($teamIdentity['usernames'] == '') {
                 $teamIdentities[$username]['identityUsernames'] = null;
                 continue;
             }
+            // When usernames are provided we need to avoid duplicated users in
+            // different teams.
             $identitiesUsernames = explode(';', $teamIdentity['usernames']);
             foreach ($identitiesUsernames as $identityMemberUsername) {
                 if (isset($seenMemberUsernames[$identityMemberUsername])) {
