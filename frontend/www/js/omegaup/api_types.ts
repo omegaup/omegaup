@@ -1823,6 +1823,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     available_languages: { [key: string]: string };
+    contest_for_teams: boolean;
     description: string;
     director: string;
     feedback: string;
