@@ -337,8 +337,8 @@ export class Arena {
               contestAlias: string;
             }) => {
               api.Contest.searchUsers({ query, contest_alias: contestAlias })
-                .then((data) => {
-                  this.searchResultUsers = data.map(
+                .then(({ results }) => {
+                  this.searchResultUsers = results.map(
                     ({ key, value }: types.ListItem) => ({
                       key,
                       value: `${ui.escape(key)} (<strong>${ui.escape(

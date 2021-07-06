@@ -4177,7 +4177,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Search users in contest
      *
-     * @return list<ListItem>
+     * @return array{results: list<ListItem>}
      *
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param null|string $query
@@ -4203,7 +4203,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'value' => $user['name'] ?? $user['username'],
             ];
         }
-        return $response;
+        return [
+            'results' => $response,
+        ];
     }
 
     /**

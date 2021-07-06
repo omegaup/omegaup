@@ -42,8 +42,8 @@ OmegaUp.on('ready', () => {
         on: {
           'update-search-result-users': (query: string) => {
             api.User.list({ query })
-              .then((data) => {
-                this.searchResultUsers = data.map(
+              .then(({ results }) => {
+                this.searchResultUsers = results.map(
                   ({ key, value }: types.ListItem) => ({
                     key,
                     value: `${ui.escape(key)} (<strong>${ui.escape(

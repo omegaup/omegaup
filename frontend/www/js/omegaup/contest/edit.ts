@@ -168,14 +168,14 @@ OmegaUp.on('ready', () => {
           },
           'update-search-result-users': (query: string) => {
             api.User.list({ query })
-              .then((data) => {
+              .then(({ results }) => {
                 // Users previously invited to the contest should not be shown
                 // in the dropdown
                 const addedUsers = new Set(
                   this.users.map((user) => user.username),
                 );
 
-                this.searchResultUsers = data
+                this.searchResultUsers = results
                   .filter((user) => !addedUsers.has(user.key))
                   .map(({ key, value }: types.ListItem) => ({
                     key,

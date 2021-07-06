@@ -1235,9 +1235,9 @@ Search users in contest
 
 ### Returns
 
-```typescript
-types.ListItem[]
-```
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/contest/setRecommended/`
 
@@ -4492,8 +4492,7 @@ Gets the last privacy policy accepted by user
 
 ### Description
 
-Gets a list of users. This returns an array instead of an object since
-it is used by typeahead.
+Gets a list of users.
 
 ### Parameters
 
@@ -4504,9 +4503,9 @@ it is used by typeahead.
 
 ### Returns
 
-```typescript
-types.ListItem[]
-```
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/user/listAPITokens/`
 

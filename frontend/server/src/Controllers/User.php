@@ -2068,13 +2068,12 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Gets a list of users. This returns an array instead of an object since
-     * it is used by typeahead.
+     * Gets a list of users.
      *
      * @omegaup-request-param null|string $query
      * @omegaup-request-param null|string $term
      *
-     * @return list<ListItem>
+     * @return array{results: list<ListItem>}
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $term = $r->ensureOptionalString(
@@ -2110,7 +2109,9 @@ class User extends \OmegaUp\Controllers\Controller {
                 'value' => $identity->name ?: $username,
             ];
         }
-        return $response;
+        return [
+            'results' => $response,
+        ];
     }
 
     /**
