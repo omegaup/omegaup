@@ -2,6 +2,8 @@ import users_Rank from '../components/user/Rank.vue';
 import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
+import * as ui from '../ui';
+import * as api from '../api';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserRankTablePayload();
@@ -20,6 +22,9 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-user-rank': users_Rank,
     },
+    data: () => ({
+      searchResultUsers: [] as types.ListItem[],
+    }),
     render: function (createElement) {
       return createElement('omegaup-user-rank', {
         props: {
@@ -32,6 +37,23 @@ OmegaUp.on('ready', () => {
           ranking,
           resultTotal: payload.ranking.total,
           pagerItems: payload.pagerItems,
+          searchResultUsers: this.searchResultUsers,
+        },
+        on: {
+          'update-search-result-users': (query: string) => {
+            api.User.list({ query })
+              .then((data) => {
+                this.searchResultUsers = data.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
         },
       });
     },

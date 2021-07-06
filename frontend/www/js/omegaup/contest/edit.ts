@@ -176,11 +176,11 @@ OmegaUp.on('ready', () => {
                 );
 
                 this.searchResultUsers = data
-                  .filter((user) => !addedUsers.has(user.label))
-                  .map((user) => ({
-                    key: user.label,
-                    value: `${ui.escape(user.label)} (<strong>${ui.escape(
-                      user.value,
+                  .filter((user) => !addedUsers.has(user.key))
+                  .map(({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
                     )}</strong>)`,
                   }));
               })

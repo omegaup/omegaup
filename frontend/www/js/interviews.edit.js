@@ -190,8 +190,6 @@ omegaup.OmegaUp.on('ready', function () {
   omegaup.Typeahead.problemTypeahead($('#problems-dropdown'));
 
   // Edit users
-  omegaup.Typeahead.userTypeahead($('#username-admin'));
-  omegaup.Typeahead.userTypeahead($('#usernameOrEmail'));
   omegaup.Typeahead.groupTypeahead($('#groupalias-admin'));
 
   $('#add-admin-form').on('submit', function () {

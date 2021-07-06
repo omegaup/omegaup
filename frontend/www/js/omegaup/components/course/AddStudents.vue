@@ -17,10 +17,14 @@
             data-toggle="tooltip"
             :title="T.courseEditAddStudentsTooltip"
           ></span>
-          <omegaup-autocomplete
-            v-model="participant"
-            :init="(el) => typeahead.userTypeahead(el)"
-          ></omegaup-autocomplete>
+          <omegaup-common-typeahead
+            :existing-options="searchResultUsers"
+            :value.sync="participant"
+            :max-results="10"
+            @update-existing-options="
+              (query) => $emit('update-search-result-users', query)
+            "
+          />
         </div>
         <div class="form-group pull-right">
           <button class="btn btn-primary" type="submit">
@@ -88,13 +92,12 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 import common_Requests from '../common/Requests.vue';
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-requests': common_Requests,
   },
 })
@@ -102,11 +105,11 @@ export default class CourseAddStudents extends Vue {
   @Prop() courseAlias!: string;
   @Prop() students!: types.CourseStudent[];
   @Prop({ required: false }) identityRequests!: types.IdentityRequest[];
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
-  typeahead = typeahead;
   studentUsername = '';
-  participant = '';
+  participant: null | string = null;
   participants = '';
   requests: types.IdentityRequest[] = [];
 

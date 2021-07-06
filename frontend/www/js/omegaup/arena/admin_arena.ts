@@ -30,6 +30,9 @@ export default class ArenaAdmin {
       components: {
         'omegaup-arena-runs': globalRuns ? arena_Runsv2 : arena_Runs,
       },
+      data: () => ({
+        searchResultUsers: [] as types.ListItem[],
+      }),
       render: function (createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
@@ -44,6 +47,7 @@ export default class ArenaAdmin {
             showUser: true,
             problemsetProblems: Object.values(arena.problems),
             globalRuns: globalRuns,
+            searchResultUsers: this.searchResultUsers,
           },
           on: {
             details: (run: types.Run) => {
@@ -70,6 +74,40 @@ export default class ArenaAdmin {
                   self.arena.updateRunFallback(run.guid);
                 })
                 .catch(ui.ignoreError);
+            },
+            'update-search-result-users': ({ query }: { query: string }) => {
+              api.User.list({ query })
+                .then((data) => {
+                  this.searchResultUsers = data.map(
+                    ({ key, value }: types.ListItem) => ({
+                      key,
+                      value: `${ui.escape(key)} (<strong>${ui.escape(
+                        value,
+                      )}</strong>)`,
+                    }),
+                  );
+                })
+                .catch(ui.apiError);
+            },
+            'update-search-result-users-contest': ({
+              query,
+              contestAlias,
+            }: {
+              query: string;
+              contestAlias: string;
+            }) => {
+              api.Contest.searchUsers({ query, contest_alias: contestAlias })
+                .then((data) => {
+                  this.searchResultUsers = data.map(
+                    ({ key, value }: types.ListItem) => ({
+                      key,
+                      value: `${ui.escape(key)} (<strong>${ui.escape(
+                        value,
+                      )}</strong>)`,
+                    }),
+                  );
+                })
+                .catch(ui.apiError);
             },
           },
         });

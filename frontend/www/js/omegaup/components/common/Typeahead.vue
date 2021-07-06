@@ -55,6 +55,11 @@ export default class Typeahead extends Vue {
 
   @Watch('value')
   onValueChanged(newValue: null | string): void {
+    if (!newValue) {
+      this.selectedOptions = [];
+      return;
+    }
+    this.existingOptions.push({ value: newValue, key: newValue });
     this.selectedOptions = this.existingOptions.filter(
       (option) => option.key === newValue,
     );

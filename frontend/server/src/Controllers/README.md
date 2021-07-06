@@ -1228,19 +1228,15 @@ Search users in contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `query`         | `mixed`  |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `contest_alias` | `string`       |             |
+| `query`         | `null\|string` |             |
 
 ### Returns
 
 ```typescript
-{
-  label: string;
-  value: string;
-}
-[];
+types.ListItem[]
 ```
 
 ## `/api/contest/setRecommended/`
@@ -4509,7 +4505,7 @@ it is used by typeahead.
 ### Returns
 
 ```typescript
-types.UserListItem[]
+types.ListItem[]
 ```
 
 ## `/api/user/listAPITokens/`

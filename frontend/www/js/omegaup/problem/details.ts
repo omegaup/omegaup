@@ -57,6 +57,7 @@ OmegaUp.on('ready', () => {
           !payload.nominationStatus?.solved),
       guid: null as null | string,
       nextSubmissionTimestamp: payload.problem.nextSubmissionTimestamp,
+      searchResultUsers: [] as types.ListItem[],
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
@@ -88,6 +89,7 @@ OmegaUp.on('ready', () => {
           showVisibilityIndicators: true,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           shouldShowTabs: true,
+          searchResultUsers: this.searchResultUsers,
         },
         on: {
           'show-run': (request: SubmissionRequest) => {
@@ -332,6 +334,20 @@ OmegaUp.on('ready', () => {
                 updateRunFallback({ run });
               })
               .catch(ui.ignoreError);
+          },
+          'update-search-result-users': ({ query }: { query: string }) => {
+            api.User.list({ query })
+              .then((data) => {
+                this.searchResultUsers = data.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
           },
         },
       });

@@ -22,6 +22,7 @@ OmegaUp.on('ready', function () {
       nominations: [] as types.NominationListItem[],
       pagerItems: [] as types.PageItem[],
       pages: 1,
+      searchResultUsers: [] as types.ListItem[],
     }),
     render: function (createElement) {
       return createElement('omegaup-qualitynomination-list', {
@@ -32,6 +33,7 @@ OmegaUp.on('ready', function () {
           length: payload.length,
           myView: payload.myView,
           isAdmin: headerPayload.isAdmin,
+          searchResultUsers: this.searchResultUsers,
         },
         on: {
           'go-to-page': (
@@ -43,6 +45,20 @@ OmegaUp.on('ready', function () {
             if (pageNumber > 0) {
               showNominations(pageNumber, status, query, column);
             }
+          },
+          'update-search-result-users': (query: string) => {
+            api.User.list({ query })
+              .then((data) => {
+                this.searchResultUsers = data.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
           },
         },
       });

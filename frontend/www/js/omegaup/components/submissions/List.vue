@@ -23,13 +23,15 @@
         }}
       </h5>
       <div v-if="includeUser" class="card-body">
-        <label
-          ><omegaup-autocomplete
-            v-model="searchedUsername"
-            class="form-control"
-            :init="(el) => typeahead.userTypeahead(el)"
-          ></omegaup-autocomplete
-        ></label>
+        <label>
+          <omegaup-common-typeahead
+            :existing-options="searchResultUsers"
+            :value.sync="searchedUsername"
+            :max-results="10"
+            @update-existing-options="
+              (query) => $emit('update-search-result-users', query)
+            "
+        /></label>
         <a
           class="btn btn-primary"
           type="button"
@@ -134,15 +136,14 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
-import * as typeahead from '../../typeahead';
 import UserName from '../user/Username.vue';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 import common_Paginator from '../common/Paginatorv2.vue';
 
 @Component({
   components: {
     'omegaup-username': UserName,
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-paginator': common_Paginator,
   },
 })
@@ -153,12 +154,12 @@ export default class SubmissionsList extends Vue {
   @Prop() totalRows!: number;
   @Prop() submissions!: types.Submission[];
   @Prop() pagerItems!: types.PageItem[];
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   ui = ui;
   time = time;
-  typeahead = typeahead;
-  searchedUsername = '';
+  searchedUsername: null | string = null;
 
   get showNextPage(): boolean {
     return this.length * this.page < this.totalRows;

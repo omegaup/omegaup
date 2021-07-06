@@ -192,12 +192,16 @@
           :students="data.students"
           :course-alias="data.course.alias"
           :identity-requests="data.identityRequests"
+          :search-result-users="searchResultUsers"
           @emit-add-student="
             (participants) => $emit('add-student', participants)
           "
           @emit-remove-student="(student) => $emit('remove-student', student)"
           @accept-request="(request) => $emit('accept-request', request)"
           @deny-request="(request) => $emit('deny-request', request)"
+          @update-search-result-users="
+            (query) => $emit('update-search-result-users', query)
+          "
         ></omegaup-course-add-students>
       </div>
 
@@ -209,6 +213,7 @@
         <div class="col-md-6">
           <omegaup-common-admins
             :initial-admins="data.admins"
+            :search-result-users="searchResultUsers"
             :has-parent-component="true"
             @emit-add-admin="
               (addAdminComponent) =>
@@ -217,6 +222,9 @@
             @emit-remove-admin="
               (addAdminComponent) =>
                 $emit('remove-admin', addAdminComponent.selected.username)
+            "
+            @update-search-result-users="
+              (query) => $emit('update-search-result-users', query)
             "
           ></omegaup-common-admins>
         </div>
@@ -337,6 +345,7 @@ export default class CourseEdit extends Vue {
   @Prop() data!: types.CourseEditPayload;
   @Prop() invalidParameterName!: string;
   @Prop() initialTab!: string;
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   showTab = this.initialTab;

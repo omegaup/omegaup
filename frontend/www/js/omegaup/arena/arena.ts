@@ -311,6 +311,7 @@ export class Arena {
         isContestFinished: false,
         isProblemsetOpened: true,
         problemAlias: null,
+        searchResultUsers: [] as types.ListItem[],
       }),
       render: function (createElement) {
         return createElement('omegaup-arena-runs', {
@@ -322,10 +323,31 @@ export class Arena {
             runs: myRunsStore.state.runs,
             showDetails: true,
             showPoints: true,
+            searchResultUsers: this.searchResultUsers,
           },
           on: {
             details: (run: types.Run) => {
               window.location.hash += `/show-run:${run.guid}`;
+            },
+            'update-search-result-users-contest': ({
+              query,
+              contestAlias,
+            }: {
+              query: string;
+              contestAlias: string;
+            }) => {
+              api.Contest.searchUsers({ query, contest_alias: contestAlias })
+                .then((data) => {
+                  this.searchResultUsers = data.map(
+                    ({ key, value }: types.ListItem) => ({
+                      key,
+                      value: `${ui.escape(key)} (<strong>${ui.escape(
+                        value,
+                      )}</strong>)`,
+                    }),
+                  );
+                })
+                .catch(ui.apiError);
             },
           },
         });
