@@ -334,8 +334,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
             }
             $seenUsernames[$teamIdentity['username']] = true;
 
-            // When usernames index is provided we need to avoid duplicated
-            // users in different teams
+            // When usernames are provided we need to avoid duplicated users in
+            // different teams.
             if ($teamIdentity['usernames'] == '') {
                 $teamIdentities[$username]['identityUsernames'] = null;
                 continue;
@@ -390,11 +390,20 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $state
                 );
 
-                self::saveIdentityTeamInsideTransaction(
+                $team = self::saveIdentityTeamInsideTransaction(
                     $newIdentity,
-                    $teamGroup,
-                    $teamIdentity['identityUsernames']
+                    $teamGroup
                 );
+
+                if (
+                    !is_null($teamIdentity['identityUsernames'])
+                    && !is_null($team->team_id)
+                ) {
+                    \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
+                        $team->team_id,
+                        $teamIdentity['identityUsernames']
+                    );
+                }
 
                 // Create IdentitySchool
                 $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
@@ -711,14 +720,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Save object Identities in DB, and add user into team group.
      * This function is expected to be called inside a transaction.
-     *
-     * @param list<string>|null $identitiesUsernames
      */
     private static function saveIdentityTeamInsideTransaction(
         \OmegaUp\DAO\VO\Identities $identity,
-        \OmegaUp\DAO\VO\TeamGroups $teamGroup,
-        $identitiesUsernames
-    ): void {
+        \OmegaUp\DAO\VO\TeamGroups $teamGroup
+    ): \OmegaUp\DAO\VO\Teams {
         if (is_null($identity->username)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'userNotExist'
@@ -772,14 +778,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
         \OmegaUp\DAO\Teams::create($team);
 
-        if (is_null($identitiesUsernames)) {
-            return;
-        }
-
-        \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
-            $team->team_id,
-            $identitiesUsernames
-        );
+        return $team;
     }
 
     /**
