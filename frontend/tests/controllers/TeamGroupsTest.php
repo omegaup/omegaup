@@ -276,7 +276,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'query' => 'user',
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        );
+        )['results'];
         $this->assertCount(10, $identities);
 
         // And all the teams are hidden in apiList
@@ -285,7 +285,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'query' => 'teams',
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        );
+        )['results'];
         $this->assertEmpty($identities);
     }
 
