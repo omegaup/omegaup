@@ -9,8 +9,9 @@
           <omegaup-user-username
             :classname="profile.classname"
             :username="profile.username"
-            :prof="true"
-          ></omegaup-user-username>
+          >
+            <template #username-url>{{ urlUsername }}</template>
+          </omegaup-user-username>
         </div>
       </div>
       <div class="form-group row padding-field">
@@ -112,6 +113,10 @@ export default class UserBasicInfo extends Vue {
   @Prop() profile!: types.UserProfile;
   @Prop() rank!: string;
   T = T;
+
+  get urlUsername(): string {
+    return `https://omegaup.com/profile/${this.profile.username}/`;
+  }
 }
 </script>
 
