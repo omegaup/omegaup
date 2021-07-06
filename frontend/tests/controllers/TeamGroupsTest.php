@@ -292,7 +292,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
      * Test for uploading csv file with identities as teams, with no
      * associated members
      */
-    public function testUploadCsvFileWithOutMembers() {
+    public function testUploadCsvFileWithoutMembers() {
         // Identity creator group member will upload csv file
         [
             'identity' => $creatorIdentity,

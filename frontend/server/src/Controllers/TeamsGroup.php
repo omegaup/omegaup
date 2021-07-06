@@ -375,15 +375,17 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
 
         $identitiesUsernames = explode(',', $r->ensureString('usernames'));
 
-        $teamsUsers = array_map(
+        $teamUsers = \OmegaUp\DAO\TeamUsers::getByTeamGroupId(
+            $teamsGroup->team_group_id
+        )['teamsUsers'];
+
+        $teamsUsersUsernames = array_map(
             fn ($teamUser) => $teamUser['username'],
-            \OmegaUp\DAO\TeamUsers::getByTeamGroupId(
-                $teamsGroup->team_group_id
-            )['teamsUsers']
+            $teamUsers,
         );
 
         foreach ($identitiesUsernames as $identityUsername) {
-            if (in_array($identityUsername, $teamsUsers)) {
+            if (in_array($identityUsername, $teamsUsersUsernames)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                     'teamMemberUsernameInUse'
                 );
