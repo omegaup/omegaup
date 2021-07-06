@@ -6,12 +6,11 @@
           <strong>{{ T.profileUsername }}</strong>
         </div>
         <div class="col-sm-9 field-data">
-          https://omegaup.com/profile/<strong
-            ><omegaup-user-username
-              :classname="profile.classname"
-              :username="profile.username"
-            ></omegaup-user-username></strong
-          >/
+          <omegaup-user-username
+            :classname="profile.classname"
+            :username="profile.username"
+            :prof="true"
+          ></omegaup-user-username>
         </div>
       </div>
       <div class="form-group row padding-field">

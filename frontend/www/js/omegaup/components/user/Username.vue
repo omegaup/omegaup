@@ -22,6 +22,7 @@
         >{{ nameWithUsername }}</a
       >
     </template>
+    <template v-if="prof">{{ nameWithUsername2 }}</template>
     <template v-else> {{ nameWithUsername }}</template>
   </span>
 </template>
@@ -40,6 +41,7 @@ export default class Username extends Vue {
   @Prop({ default: null }) name!: string;
   @Prop() classname!: string;
   @Prop() linkify!: boolean;
+  @Prop() prof!: boolean;
   @Prop() country!: string;
   @Prop({ default: false }) emitClickEvent!: boolean;
 
@@ -48,6 +50,10 @@ export default class Username extends Vue {
       return `${this.name} (${this.username})`;
     }
     return this.username;
+  }
+
+  get nameWithUsername2(): string {
+    return `https://omegaup.com/profile/` + this.username + `/`;
   }
 }
 </script>
