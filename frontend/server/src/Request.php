@@ -100,16 +100,12 @@ class Request extends \ArrayObject {
     /**
      * @return bool whether a user has been logged with the main identity or not
      */
-    public function isLoggedAsMainIdentity(
-        \OmegaUp\DAO\VO\Identities $identity
-    ): bool {
-        if (is_null($this->loginIdentity)) {
-            return false;
-        }
+    public function isLoggedAsMainIdentity(): bool {
         return (
             !is_null($this->user)
+            && !is_null($this->loginIdentity)
             && $this->user->main_identity_id === $this->loginIdentity->identity_id
-        ) || $identity->identity_id === $this->loginIdentity->identity_id;
+        );
     }
 
     /**

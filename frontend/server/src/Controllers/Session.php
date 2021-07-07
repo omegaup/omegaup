@@ -313,15 +313,16 @@ class Session extends \OmegaUp\Controllers\Controller {
         $currentIdentity = new \OmegaUp\DAO\VO\Identities($currentIdentityExt);
         $loginIdentity = new \OmegaUp\DAO\VO\Identities($loginIdentityExt);
 
-        $associatedIdentities = [
-            [
-                'username' => strval($loginIdentity->username),
-                'default' => true,
-            ],
-        ];
+        $associatedIdentities = [];
         if (is_null($currentIdentity->user_id)) {
             $currentUser = null;
             $email = null;
+            $associatedIdentities = [
+                [
+                    'username' => strval($loginIdentity->username),
+                    'default' => true,
+                ],
+            ];
         } else {
             $currentUser = \OmegaUp\DAO\Users::getByPK(
                 $currentIdentity->user_id
@@ -762,12 +763,19 @@ class Session extends \OmegaUp\Controllers\Controller {
         string $usernameOrEmail,
         \OmegaUp\DAO\VO\Identities $loggedIdentity
     ): void {
-        // Only users that originally logged in from their main identities can
-        // select another identity.
-        $identityToResolve = \OmegaUp\Controllers\Identity::resolveIdentity(
+        // Only users that originally logged in from their main identities, or
+        // from an identity that matches the target identity can select another
+        // identity.
+        $targetIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $usernameOrEmail
         );
-        if (!$r->isLoggedAsMainIdentity($identityToResolve)) {
+        if (
+            !$r->isLoggedAsMainIdentity()
+            && (
+                is_null($r->loginIdentity)
+                || $targetIdentity->identity_id !== $r->loginIdentity->identity_id
+            )
+        ) {
             throw new \OmegaUp\Exceptions\UnauthorizedException(
                 'userNotAllowed'
             );
@@ -781,10 +789,15 @@ class Session extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $userId = $loggedIdentity->user_id ?? $targetIdentity->user_id;
+        if (is_null($userId)) {
+            throw new \OmegaUp\Exceptions\UnauthorizedException(
+                'userNotAllowed'
+            );
+        }
         $identity = \OmegaUp\DAO\Identities::resolveAssociatedIdentity(
             $usernameOrEmail,
-            $loggedIdentity,
-            $identityToResolve
+            $userId
         );
         if (is_null($identity) || is_null($identity->identity_id)) {
             self::$log->warn("Identity {$usernameOrEmail} not found.");

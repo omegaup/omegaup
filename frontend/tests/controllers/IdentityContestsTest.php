@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Testing identity can access to contest and resolve any problem
  */
@@ -117,7 +115,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             $contestant
         );
 
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+        new \OmegaUp\Test\ScopedGraderDetour();
 
         // Create valid run
         $contestantLogin = self::login($contestant);
@@ -181,7 +179,9 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Identity creator group member will upload csv file
-        ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
         $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
@@ -391,9 +391,6 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testAddGroupsToContestForTeams() {
-        // Create the user to associate
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-
         [
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
