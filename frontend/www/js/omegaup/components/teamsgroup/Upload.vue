@@ -23,21 +23,19 @@
       </div>
       <template v-if="identities.length > 0">
         <h3 class="card-header">{{ T.teamsGroupEditTeams }}</h3>
-        <div>
-          <b-table striped hover :items="items" :fields="columns">
-            <template #cell(usernames)="row">
-              <b-button
-                class="d-inline-block mb-2"
-                variant="primary"
-                @click="row.toggleDetails"
-              >
-                {{ T.teamsGroupAddUsersToTeam }}
-                <b-badge variant="light">{{
-                  row.item.usernames.length
-                }}</b-badge>
-              </b-button>
-            </template>
-            <template #row-details="row">
+        <b-table responsive striped hover :items="items" :fields="columns">
+          <template #cell(usernames)="row">
+            <b-button
+              class="d-inline-block mb-2"
+              variant="primary"
+              @click="row.toggleDetails"
+            >
+              {{ T.teamsGroupAddUsersToTeam }}
+              <b-badge variant="light">{{ row.item.usernames.length }}</b-badge>
+            </b-button>
+          </template>
+          <template #row-details="row">
+            <b-form @submit.prevent="onAddUsers(row)">
               <b-card>
                 <b-row class="mb-2">
                   <b-col sm="3" class="text-sm-right">
@@ -64,17 +62,17 @@
                   >
                   </omegaup-common-multi-typeahead>
                   <b-button
+                    type="submit"
                     variant="primary"
                     class="d-inline-block mb-2"
-                    @click="onAddUsers(row, row.item.username)"
                   >
                     {{ T.teamsGroupAddUsersDone }}
                   </b-button>
                 </b-row>
               </b-card>
-            </template>
-          </b-table>
-        </div>
+            </b-form>
+          </template>
+        </b-table>
         <div class="card-footer">
           <button
             class="btn btn-primary d-inline-block mb-2"
@@ -120,6 +118,7 @@ import {
   ButtonPlugin,
   BadgePlugin,
   CardPlugin,
+  BForm,
   BRow,
   BCol,
 } from 'bootstrap-vue';
@@ -134,6 +133,7 @@ library.add(faDownload);
     FontAwesomeIcon,
     'omegaup-common-multi-typeahead': common_MultiTypeahead,
     'omegaup-markdown': omegaup_Markdown,
+    BForm,
     BRow,
     BCol,
   },
@@ -148,7 +148,12 @@ export default class Upload extends Vue {
   humanReadable = false;
   typeaheadUsers: types.ListItem[] = [];
   columns = [
-    { key: 'username', label: T.teamsGroupTeamName },
+    {
+      key: 'username',
+      label: T.teamsGroupTeamName,
+      stickyColumn: true,
+      isRowHeader: true,
+    },
     { key: 'name', label: T.profile },
     { key: 'password', label: T.loginPassword },
     { key: 'country_id', label: T.profileCountry },
@@ -189,6 +194,7 @@ export default class Upload extends Vue {
       (user) => user.key,
     );
     Vue.set(row.item, 'usernames', this.identitiesTeams[row.item.username]);
+    row.toggleDetails();
   }
 }
 </script>
