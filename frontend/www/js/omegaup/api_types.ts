@@ -1823,6 +1823,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     available_languages: { [key: string]: string };
+    contest_for_teams: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -2027,6 +2028,16 @@ export namespace types {
     country_id?: string;
     end_time?: Date;
     is_owner?: number;
+    username: string;
+  }
+
+  export interface Contestant {
+    country?: string;
+    email?: string;
+    gender?: string;
+    name?: string;
+    school?: string;
+    state?: string;
     username: string;
   }
 
@@ -3493,16 +3504,7 @@ export namespace messages {
   export type ContestCloneRequest = { [key: string]: any };
   export type ContestCloneResponse = { alias: string };
   export type ContestContestantsRequest = { [key: string]: any };
-  export type ContestContestantsResponse = {
-    contestants: {
-      country?: string;
-      email?: string;
-      name?: string;
-      school?: string;
-      state?: string;
-      username: string;
-    }[];
-  };
+  export type ContestContestantsResponse = { contestants: types.Contestant[] };
   export type ContestCreateRequest = { [key: string]: any };
   export type ContestCreateResponse = {};
   export type ContestCreateVirtualRequest = { [key: string]: any };

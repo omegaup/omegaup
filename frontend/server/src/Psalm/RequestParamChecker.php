@@ -127,7 +127,7 @@ class RequestParamChecker implements
             return null;
         }
         $foundRequest = false;
-        foreach ($varType->getAtomicTypes() as $typeName => $type) {
+        foreach ($varType->getAtomicTypes() as $_typeName => $type) {
             if (
                 $type instanceof \Psalm\Type\Atomic\TNamedObject &&
                 $type->value == 'OmegaUp\\Request'
@@ -190,7 +190,7 @@ class RequestParamChecker implements
             return null;
         }
         $foundRequest = false;
-        foreach ($varType->getAtomicTypes() as $typeName => $type) {
+        foreach ($varType->getAtomicTypes() as $_typeName => $type) {
             if (
                 $type instanceof \Psalm\Type\Atomic\TNamedObject &&
                 $type->value == 'OmegaUp\\Request'

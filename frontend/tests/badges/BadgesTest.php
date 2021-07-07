@@ -240,7 +240,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
         // - User 1 will receive: Problem Setter badge
         // - User 2 will receive: Problem Setter and Contest Manager badges
         ['user' => $userOne, 'identity' => $identityOne] = \OmegaUp\Test\Factories\User::createUser();
-        ['user' => $userTwo, 'identity' => $identityTwo] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identityTwo] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identityOne);
         \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identityTwo);
         \OmegaUp\Test\Factories\Contest::createContest(
@@ -359,7 +359,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
     public function testBadgeDetails() {
         // Creates one owner for ContestManager Badge and no owner for
         // ContestManager, then checks badge details results.
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // For some reason, this method creates a new user also.
         \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identity);

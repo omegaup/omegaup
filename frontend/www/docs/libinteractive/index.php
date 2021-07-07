@@ -4,7 +4,7 @@
 function prefered_language(array $available_languages, $http_accept_language) {
     $available_languages = array_flip($available_languages);
 
-    $langs;
+    $langs = [];
     preg_match_all(
         '~([\w-]+)(?:[^,\d]+([\d.]+))?~',
         strtolower(
@@ -14,7 +14,7 @@ function prefered_language(array $available_languages, $http_accept_language) {
         PREG_SET_ORDER
     );
     foreach ($matches as $match) {
-        list($a, $b) = explode('-', $match[1]) + ['', ''];
+        list($a, $_b) = explode('-', $match[1]) + ['', ''];
         $value = isset($match[2]) ? floatval($match[2]) : 1.0;
 
         if (isset($available_languages[$match[1]])) {
@@ -26,7 +26,7 @@ function prefered_language(array $available_languages, $http_accept_language) {
             $langs[$a] = $value - 0.1;
         }
     }
-    if ($langs) {
+    if (!empty($langs)) {
         arsort($langs);
         return key($langs);
     } else {

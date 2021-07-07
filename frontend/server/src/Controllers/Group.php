@@ -433,12 +433,6 @@ class Group extends \OmegaUp\Controllers\Controller {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
-        $isOrganizer = \OmegaUp\Experiments::getInstance()->isEnabled(
-            \OmegaUp\Experiments::IDENTITIES
-        ) && \OmegaUp\Authorization::canCreateGroupIdentities(
-            $r->identity
-        );
-
         $groupAlias = $r->ensureString(
             'group',
             fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
@@ -480,9 +474,7 @@ class Group extends \OmegaUp\Controllers\Controller {
                     'identities' => \OmegaUp\DAO\GroupsIdentities::getMemberIdentities(
                         $group
                     ),
-                    'isOrganizer' => \OmegaUp\Experiments::getInstance()->isEnabled(
-                        \OmegaUp\Experiments::IDENTITIES
-                    ) && \OmegaUp\Authorization::canCreateGroupIdentities(
+                    'isOrganizer' => \OmegaUp\Authorization::canCreateGroupIdentities(
                         $r->identity
                     ),
                     'scoreboards' => $scoreboards,

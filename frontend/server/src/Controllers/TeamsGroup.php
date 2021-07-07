@@ -137,9 +137,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
                     'teamsMembers' => \OmegaUp\DAO\TeamUsers::getByTeamGroupId(
                         $teamGroup->team_group_id
                     )['teamsUsers'],
-                    'isOrganizer' => \OmegaUp\Experiments::getInstance()->isEnabled(
-                        \OmegaUp\Experiments::IDENTITIES
-                    ) && \OmegaUp\Authorization::canCreateGroupIdentities(
+                    'isOrganizer' => \OmegaUp\Authorization::canCreateGroupIdentities(
                         $r->identity
                     ),
                 ],
@@ -376,6 +374,23 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         }
 
         $identitiesUsernames = explode(',', $r->ensureString('usernames'));
+
+        $teamUsers = \OmegaUp\DAO\TeamUsers::getByTeamGroupId(
+            $teamsGroup->team_group_id
+        )['teamsUsers'];
+
+        $teamsUsersUsernames = array_map(
+            fn ($teamUser) => $teamUser['username'],
+            $teamUsers,
+        );
+
+        foreach ($identitiesUsernames as $identityUsername) {
+            if (in_array($identityUsername, $teamsUsersUsernames)) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'teamMemberUsernameInUse'
+                );
+            }
+        }
 
         \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
             $team['team_id'],

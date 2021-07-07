@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     private static $login = null;

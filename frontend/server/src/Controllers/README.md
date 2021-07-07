@@ -721,9 +721,9 @@ previously agreed to share their information.
 
 ### Returns
 
-| Name          | Type                                                                                                   |
-| ------------- | ------------------------------------------------------------------------------------------------------ |
-| `contestants` | `{ country: string; email: string; name: string; school: string; state: string; username: string; }[]` |
+| Name          | Type                 |
+| ------------- | -------------------- |
+| `contestants` | `types.Contestant[]` |
 
 ## `/api/contest/create/`
 
@@ -2909,12 +2909,10 @@ Gets a list of problems where current user is the owner
 
 ### Parameters
 
-| Name        | Type    | Description |
-| ----------- | ------- | ----------- |
-| `page`      | `int`   |             |
-| `page_size` | `int`   |             |
-| `offset`    | `mixed` |             |
-| `rowcount`  | `mixed` |             |
+| Name       | Type        | Description |
+| ---------- | ----------- | ----------- |
+| `page`     | `int`       |             |
+| `rowcount` | `int\|null` |             |
 
 ### Returns
 

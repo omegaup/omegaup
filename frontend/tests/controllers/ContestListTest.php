@@ -1,4 +1,6 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of ListContests
@@ -499,7 +501,9 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Turn recommended ON
-        // phpcbf does not like a block just for scoping purposes and
+        // php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariablecbf does not like a block just for scoping purposes and
         // messes up the alignment pretty badly.
         [
             'user' => $user,
