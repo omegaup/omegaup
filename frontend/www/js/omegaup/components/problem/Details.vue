@@ -177,6 +177,12 @@
             :problemset-problems="[]"
             :is-contest-finished="isContestFinished"
             @details="(run) => onRunDetails(run.guid)"
+            @update-search-result-users-contest="
+              (request) => $emit('update-search-result-users-contest', request)
+            "
+            @update-search-result-users="
+              (request) => $emit('update-search-result-users', request)
+            "
             @new-submission="onNewSubmission"
           ></omegaup-arena-runs>
         </template>
@@ -220,11 +226,18 @@
           :show-pager="true"
           :show-disqualify="true"
           :problemset-problems="[]"
+          :search-result-users="searchResultUsers"
           @details="(run) => onRunDetails(run.guid)"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
           @filter-changed="
             (filter, value) => $emit('apply-filter', filter, value)
+          "
+          @update-search-result-users-contest="
+            (request) => $emit('update-search-result-users-contest', request)
+          "
+          @update-search-result-users="
+            (request) => $emit('update-search-result-users', request)
           "
         ></omegaup-arena-runs>
         <omegaup-overlay
@@ -371,6 +384,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) shouldShowRunDetails!: boolean;
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
+  @Prop() searchResultUsers!: types.ListItem[];
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 

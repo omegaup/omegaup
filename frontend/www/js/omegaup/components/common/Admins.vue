@@ -9,11 +9,14 @@
               :title="T.courseEditAddAdminsTooltip"
               icon="info-circle"
             />
-            <omegaup-autocomplete
-              v-model="username"
-              class="form-control"
-              :init="(el) => typeahead.userTypeahead(el)"
-            ></omegaup-autocomplete>
+            <omegaup-common-typeahead
+              :existing-options="searchResultUsers"
+              :value.sync="username"
+              :max-results="10"
+              @update-existing-options="
+                (query) => $emit('update-search-result-users', query)
+              "
+            />
           </label>
         </div>
         <div class="row">
@@ -82,8 +85,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 import user_Username from '../user/Username.vue';
 
 import {
@@ -93,11 +95,12 @@ import {
 } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { types } from '../../api_types';
 library.add(fas);
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-user-username': user_Username,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
@@ -107,10 +110,10 @@ library.add(fas);
 export default class Admins extends Vue {
   @Prop() initialAdmins!: omegaup.UserRole[];
   @Prop({ default: false }) hasParentComponent!: boolean;
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
-  typeahead = typeahead;
-  username = '';
+  username: null | string = null;
   showSiteAdmins = false;
   selected = {};
   admins = this.initialAdmins;
@@ -123,9 +126,11 @@ export default class Admins extends Vue {
   onSubmit(): void {
     if (this.hasParentComponent) {
       this.$emit('emit-add-admin', this);
+      this.username = null;
       return;
     }
     this.$emit('add-admin', this.username);
+    this.username = null;
   }
 
   onRemove(admin: omegaup.UserRole): void {

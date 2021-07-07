@@ -47,6 +47,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
  * @psalm-type Contestant=array{name: null|string, username: string, email: null|string, gender: null|string, state: null|string, country: null|string, school: null|string}
+ * @psalm-type ListItem=array{key: string, value: string}
  */
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
@@ -4176,10 +4177,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Search users in contest
      *
-     * @return list<array{label: string, value: string}>
+     * @return array{results: list<ListItem>}
      *
      * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param mixed $query
+     * @omegaup-request-param null|string $query
      */
     public static function apiSearchUsers(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -4191,26 +4192,20 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $contest = self::validateContestAdmin($contestAlias, $r->identity);
 
-        if (!is_string($r['query'])) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterEmpty',
-                'query'
-            );
-        }
-        $param = $r['query'];
-
         $users = \OmegaUp\DAO\ProblemsetIdentities::searchUsers(
-            $param,
+            $r->ensureString('query'),
             intval($contest->problemset_id)
         );
         $response = [];
         foreach ($users as $user) {
             $response[] = [
-                'label' => $user['name'] ?? $user['username'],
-                'value' => $user['username'],
+                'key' => $user['username'],
+                'value' => $user['name'] ?? $user['username'],
             ];
         }
-        return $response;
+        return [
+            'results' => $response,
+        ];
     }
 
     /**

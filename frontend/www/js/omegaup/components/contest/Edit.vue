@@ -188,8 +188,12 @@
       <div v-if="showTab === 'admins'" class="tab-pane active">
         <omegaup-contest-admins
           :admins="admins"
+          :search-result-users="searchResultUsers"
           @add-admin="(username) => $emit('add-admin', username)"
           @remove-admin="(username) => $emit('remove-admin', username)"
+          @update-search-result-users="
+            (query) => $emit('update-search-result-users', query)
+          "
         ></omegaup-contest-admins>
         <div class="mt-2"></div>
         <omegaup-contest-group-admins

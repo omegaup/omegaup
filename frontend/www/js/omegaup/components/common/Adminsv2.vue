@@ -9,11 +9,14 @@
               :title="T.courseEditAddAdminsTooltip"
               icon="info-circle"
             />
-            <omegaup-autocomplete
-              v-model="username"
-              class="form-control"
-              :init="(el) => typeahead.userTypeahead(el)"
-            ></omegaup-autocomplete>
+            <omegaup-common-typeahead
+              :existing-options="searchResultUsers"
+              :value.sync="username"
+              :max-results="10"
+              @update-existing-options="
+                (query) => $emit('update-search-result-users', query)
+              "
+            />
           </label>
         </div>
         <div class="form-group mb-0">
@@ -80,9 +83,8 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
 
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 import user_Username from '../user/Username.vue';
 import {
   FontAwesomeIcon,
@@ -95,7 +97,7 @@ library.add(fas);
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-user-username': user_Username,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
@@ -104,15 +106,15 @@ library.add(fas);
 })
 export default class Admins extends Vue {
   @Prop() admins!: types.ContestAdmin[];
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
-  typeahead = typeahead;
-  username = '';
+  username: null | string = null;
   showSiteAdmins = false;
 
   @Watch('admins')
   onAdminsChange(): void {
-    this.username = '';
+    this.username = null;
   }
 }
 </script>
