@@ -313,7 +313,12 @@ class Session extends \OmegaUp\Controllers\Controller {
         $currentIdentity = new \OmegaUp\DAO\VO\Identities($currentIdentityExt);
         $loginIdentity = new \OmegaUp\DAO\VO\Identities($loginIdentityExt);
 
-        $associatedIdentities = [];
+        $associatedIdentities = [
+            [
+                'username' => strval($loginIdentity->username),
+                'default' => true,
+            ],
+        ];
         if (is_null($currentIdentity->user_id)) {
             $currentUser = null;
             $email = null;
@@ -759,7 +764,10 @@ class Session extends \OmegaUp\Controllers\Controller {
     ): void {
         // Only users that originally logged in from their main identities can
         // select another identity.
-        if (!$r->isLoggedAsMainIdentity()) {
+        $identityToResolve = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $usernameOrEmail
+        );
+        if (!$r->isLoggedAsMainIdentity($identityToResolve)) {
             throw new \OmegaUp\Exceptions\UnauthorizedException(
                 'userNotAllowed'
             );
@@ -775,7 +783,8 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         $identity = \OmegaUp\DAO\Identities::resolveAssociatedIdentity(
             $usernameOrEmail,
-            $loggedIdentity
+            $loggedIdentity,
+            $identityToResolve
         );
         if (is_null($identity) || is_null($identity->identity_id)) {
             self::$log->warn("Identity {$usernameOrEmail} not found.");

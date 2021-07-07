@@ -112,11 +112,19 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
 
     public static function resolveAssociatedIdentity(
         string $usernameOrEmail,
-        \OmegaUp\DAO\VO\Identities $currentIdentity
+        \OmegaUp\DAO\VO\Identities $currentIdentity,
+        \OmegaUp\DAO\VO\Identities $identityToResolve
     ): ?\OmegaUp\DAO\VO\Identities {
-        if (is_null($currentIdentity->user_id)) {
+        if (
+            is_null(
+                $currentIdentity->user_id
+            ) && is_null(
+                $identityToResolve->user_id
+            )
+        ) {
             return null;
         }
+        $userId = $currentIdentity->user_id ?? $identityToResolve->user_id;
         $sql = '(
                     SELECT
                         i.*
@@ -150,10 +158,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 )
                 LIMIT 1;';
         $args = [
-            $currentIdentity->user_id,
+            $userId,
             $usernameOrEmail,
             $usernameOrEmail,
-            $currentIdentity->user_id,
+            $userId,
             $usernameOrEmail,
         ];
 
