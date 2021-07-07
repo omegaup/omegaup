@@ -22,7 +22,11 @@
         >{{ nameWithUsername }}</a
       >
     </template>
-    <template v-else> {{ nameWithUsername }}</template>
+    <template v-else>
+      <slot name="username-url">
+        {{ nameWithUsername }}
+      </slot>
+    </template>
   </span>
 </template>
 
