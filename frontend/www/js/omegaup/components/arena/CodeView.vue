@@ -120,6 +120,8 @@ export default class CodeView extends Vue {
 
     .CodeMirror {
       height: 100%;
+      color: var(--common-code-mirror-font-color);
+      background-color: var(--common-code-mirror-background-color);
 
       .CodeMirror-scroll {
         max-height: 638px;

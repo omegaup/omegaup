@@ -42,7 +42,7 @@
   }
 
   table td {
-    border: 1px solid #000;
+    border: 1px solid var(--markdown-td-border-color);
     padding: 10px;
   }
 
@@ -55,8 +55,8 @@
     padding: 5px;
 
     tbody {
-      background: #eee;
-      border: 1px solid #000;
+      background: var(--markdown-sample-io-tbody-background-color);
+      border: 1px solid var(--markdown-sample-io-tbody-border-color);
     }
 
     th {
@@ -67,7 +67,7 @@
     td {
       vertical-align: top;
       padding: 10px;
-      border: 1px solid #000;
+      border: 1px solid var(--markdown-td-border-color);
     }
 
     pre {
