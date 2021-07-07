@@ -1,24 +1,49 @@
 import { mount, shallowMount } from '@vue/test-utils';
+import { types } from '../../api_types';
 
 import T from '../../lang';
 
 import teamsgroup_Upload from './Upload.vue';
 
 describe('Upload.vue', () => {
-  it('Should handle upload teams view', () => {
+  it('Should handle upload teams view with identities', async () => {
     const wrapper = shallowMount(teamsgroup_Upload, {
       propsData: {
-        groupAlias: 'Hello',
+        searchResultUsers: [] as types.ListItem[],
       },
     });
 
     expect(wrapper.text()).toContain(T.groupsUploadCsvFile);
+
+    const identities = [
+      {
+        username: 'team_user_1',
+        name: 'user 1',
+        country_id: 'MX',
+        state_id: 'QUE',
+        gender: 'decline',
+        school_name: 'First School',
+      },
+    ] as types.Identity[];
+    await wrapper.setData({ identities });
+    //expect(wrapper.text()).toContain('Hola crayola');
+    expect(wrapper.vm.items).toEqual([
+      {
+        username: 'team_user_1',
+        name: 'user 1',
+        country_id: 'MX',
+        state_id: 'QUE',
+        gender: 'decline',
+        school_name: 'First School',
+        usernames: [],
+      },
+    ]);
   });
 
   it('Should handle an invalid csv file', async () => {
     const wrapper = mount(teamsgroup_Upload, {
       propsData: {
-        groupAlias: 'Hello',
+        searchResultUsers: [] as types.ListItem[],
       },
     });
 
@@ -36,7 +61,7 @@ describe('Upload.vue', () => {
   it('Should handle a valid csv file', async () => {
     const wrapper = mount(teamsgroup_Upload, {
       propsData: {
-        groupAlias: 'Hello',
+        searchResultUsers: [] as types.ListItem[],
       },
     });
 

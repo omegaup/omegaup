@@ -139,7 +139,7 @@ library.add(faDownload);
   },
 })
 export default class Upload extends Vue {
-  @Prop() userErrorRow!: string | null;
+  @Prop({ default: null }) userErrorRow!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;

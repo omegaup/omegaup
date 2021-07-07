@@ -46,13 +46,6 @@ export default class MultiTypeahead extends Vue {
 
   @Watch('value')
   onValueChanged(newValue: null | types.ListItem[]): void {
-    if (!newValue) {
-      this.selectedOptions = [];
-      return;
-    }
-    for (const item of newValue) {
-      this.existingOptions.push(item);
-    }
     this.selectedOptions = this.existingOptions.filter((option) =>
       newValue?.some((opt) => option.key === opt['key']),
     );
