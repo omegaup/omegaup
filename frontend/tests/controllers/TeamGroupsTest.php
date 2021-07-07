@@ -362,7 +362,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'query' => 'user',
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        );
+        )['results'];
         $this->assertEmpty($identities);
     }
 
