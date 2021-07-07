@@ -340,6 +340,7 @@ export default class NewForm extends Vue {
   @Prop({ default: '' }) initialTitle!: string;
   @Prop({ default: null }) initialWindowLength!: null | number;
   @Prop({ default: null }) invalidParameterName!: null | string;
+  @Prop({ default: false }) contestForTeams!: boolean;
 
   T = T;
   alias = this.initialAlias;
@@ -362,6 +363,7 @@ export default class NewForm extends Vue {
   title = this.initialTitle;
   windowLength = this.initialWindowLength;
   windowLengthEnabled = this.initialWindowLength !== null;
+  currentContestForTeams = this.contestForTeams;
   titlePlaceHolder = '';
 
   @Watch('windowLengthEnabled')
@@ -466,6 +468,7 @@ export default class NewForm extends Vue {
       partial_score: this.partialScore,
       needs_basic_information: this.needsBasicInformation,
       requests_user_information: this.requestsUserInformation,
+      contest_for_teams: this.currentContestForTeams,
     };
     if (this.windowLengthEnabled && this.windowLength) {
       contest.window_length = this.windowLength;
