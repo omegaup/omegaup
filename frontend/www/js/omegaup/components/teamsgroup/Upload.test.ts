@@ -26,7 +26,6 @@ describe('Upload.vue', () => {
       },
     ] as types.Identity[];
     await wrapper.setData({ identities });
-    //expect(wrapper.text()).toContain('Hola crayola');
     expect(wrapper.vm.items).toEqual([
       {
         username: 'team_user_1',
