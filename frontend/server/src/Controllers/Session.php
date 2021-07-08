@@ -789,15 +789,11 @@ class Session extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $userId = $loggedIdentity->user_id ?? $targetIdentity->user_id;
-        if (is_null($userId)) {
-            throw new \OmegaUp\Exceptions\UnauthorizedException(
-                'userNotAllowed'
-            );
-        }
         $identity = \OmegaUp\DAO\Identities::resolveAssociatedIdentity(
             $usernameOrEmail,
-            $userId
+            /*$currentIdentity=*/ !is_null(
+                $loggedIdentity->user_id
+            ) ? $loggedIdentity : $targetIdentity
         );
         if (is_null($identity) || is_null($identity->identity_id)) {
             self::$log->warn("Identity {$usernameOrEmail} not found.");
