@@ -70,7 +70,11 @@ export default class TeamsGroup extends Vue {
     const name = this.searchResultTeamsGroups.find(
       (teamsGroup) => teamsGroup.key === this.typeaheadGroup,
     )?.value;
-    this.$emit('replace-teams-group', { alias: this.typeaheadGroup, name });
+    this.$emit('replace-teams-group', {
+      alias: this.typeaheadGroup,
+      name,
+      added: this.teamsGroup === null,
+    });
   }
 
   @Watch('teamsGroup')
