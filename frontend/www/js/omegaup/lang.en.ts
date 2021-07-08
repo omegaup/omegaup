@@ -192,8 +192,6 @@ const translations: { [key: string]: string; } = {
   contestEditRegisteredGroupAdminName: "Group",
   contestEditTagDelete: "Delete",
   contestEditTagName: "Tag name",
-  contestEditTeamsGroupAdd: "Add teams group",
-  contestEditTeamsGroupAdded: "Teams group added successfully",
   contestEditTeamsGroupReplace: "Replace teams group",
   contestEditTeamsGroupReplaced: "Teams group replaced successfully",
   contestEditUnarchiveContest: "Unarchive contest",

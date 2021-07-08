@@ -473,11 +473,9 @@ OmegaUp.on('ready', () => {
           'replace-teams-group': ({
             alias,
             name,
-            added,
           }: {
             alias: string;
             name: string;
-            added: boolean;
           }) => {
             api.Contest.replaceTeamsGroup({
               contest_alias: payload.details.alias,
@@ -485,10 +483,6 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 this.teamsGroup = { alias, name };
-                if (added) {
-                  ui.success(T.contestEditTeamsGroupAdded);
-                  return;
-                }
                 ui.success(T.contestEditTeamsGroupReplaced);
               })
               .catch(ui.apiError);

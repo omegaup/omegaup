@@ -14,11 +14,11 @@
           </omegaup-common-typeahead>
         </div>
         <button class="btn btn-primary" type="submit">
-          {{ replaceTeamsGroupButtonText }}
+          {{ T.contestEditTeamsGroupReplace }}
         </button>
       </form>
     </div>
-    <table v-if="teamsGroup" class="table table-striped mb-0">
+    <table class="table table-striped mb-0">
       <thead>
         <tr>
           <th class="text-center">
@@ -53,18 +53,11 @@ import omegaup_Markdown from '../Markdown.vue';
   },
 })
 export default class TeamsGroup extends Vue {
-  @Prop({ default: null }) teamsGroup!: null | types.ContestGroup;
+  @Prop() teamsGroup!: types.ContestGroup;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
 
   T = T;
   typeaheadGroup: null | string = null;
-
-  get replaceTeamsGroupButtonText(): string {
-    if (!this.teamsGroup) {
-      return T.contestEditTeamsGroupAdd;
-    }
-    return T.contestEditTeamsGroupReplace;
-  }
 
   onSubmit(): void {
     const name = this.searchResultTeamsGroups.find(
@@ -73,7 +66,6 @@ export default class TeamsGroup extends Vue {
     this.$emit('replace-teams-group', {
       alias: this.typeaheadGroup,
       name,
-      added: this.teamsGroup === null,
     });
   }
 

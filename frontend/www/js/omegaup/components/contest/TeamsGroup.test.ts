@@ -19,21 +19,23 @@ describe('TeamsGroup.vue', () => {
     }
   });
 
+  const teamsGroup: types.ContestGroup = { alias: 'alias', name: 'name' };
+
   it('Should handle empty teams groups', () => {
     const wrapper = shallowMount(contest_TeamsGroup, {
       propsData: {
-        teamsGroup: null,
+        teamsGroup,
       },
     });
 
-    expect(wrapper.text()).toContain(T.contestEditTeamsGroupAdd);
+    expect(wrapper.text()).toContain(T.contestEditTeamsGroupReplace);
   });
 
   it('Should submit a new teams group', async () => {
     const wrapper = mount(contest_TeamsGroup, {
       attachTo: '#root',
       propsData: {
-        teamsGroup: null,
+        teamsGroup,
         searchResultTeamsGroups: [
           { key: 'teams-group', value: 'teams group' },
         ] as types.ListItem[],
