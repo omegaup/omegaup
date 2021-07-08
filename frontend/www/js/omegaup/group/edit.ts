@@ -44,6 +44,7 @@ OmegaUp.on('ready', () => {
       ),
       scoreboards: payload.scoreboards,
       userErrorRow: null,
+      searchResultUsers: [] as types.ListItem[],
     }),
     methods: {
       refreshGroupScoreboards: (): void => {
@@ -79,6 +80,7 @@ OmegaUp.on('ready', () => {
           identitiesCsv: this.identitiesCsv,
           scoreboards: this.scoreboards,
           userErrorRow: this.userErrorRow,
+          searchResultUsers: this.searchResultUsers,
         },
         on: {
           'update-group': (name: string, description: string) => {
@@ -280,6 +282,20 @@ OmegaUp.on('ready', () => {
           },
           'invalid-file': () => {
             ui.error(T.groupsInvalidCsv);
+          },
+          'update-search-result-users': (query: string) => {
+            api.User.list({ query })
+              .then(({ results }) => {
+                this.searchResultUsers = results.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
           },
         },
       });

@@ -101,19 +101,13 @@
             <template v-if="showUser">
               <label
                 >{{ T.wordsUser }}:
-                <omegaup-autocomplete
-                  v-model="filterUsername"
-                  :init="initUserAutocomplete"
-                ></omegaup-autocomplete>
+                <omegaup-common-typeahead
+                  :existing-options="searchResultUsers"
+                  :value.sync="filterUsername"
+                  :max-results="10"
+                  @update-existing-options="updateSearchResultUsers"
+                />
               </label>
-              <button
-                type="button"
-                class="close"
-                style="float: none"
-                @click="filterUsername = ''"
-              >
-                &times;
-              </button>
             </template>
 
             <div class="row">
@@ -303,6 +297,7 @@ import { types } from '../../api_types';
 import * as time from '../../time';
 import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 
 import Autocomplete from '../Autocomplete.vue';
 
@@ -335,6 +330,7 @@ declare global {
     FontAwesomeIcon,
     'omegaup-autocomplete': Autocomplete,
     'omegaup-user-username': user_Username,
+    'omegaup-common-typeahead': common_Typeahead,
   },
 })
 export default class Runsv2 extends Vue {
@@ -355,6 +351,7 @@ export default class Runsv2 extends Vue {
   @Prop({ default: 100 }) rowCount!: number;
   @Prop() runs!: types.Run[];
   @Prop({ default: false }) globalRuns!: boolean;
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   time = time;
@@ -364,7 +361,7 @@ export default class Runsv2 extends Vue {
   filterOffset: number = 0;
   filterProblem: string = '';
   filterStatus: string = '';
-  filterUsername: string = '';
+  filterUsername: null | string = null;
   filterVerdict: string = '';
   filterContest: string = '';
   filters: { name: string; value: string }[] = [];
@@ -441,15 +438,6 @@ export default class Runsv2 extends Vue {
       );
     } else {
       typeahead.problemTypeahead(el);
-    }
-  }
-
-  // eslint-disable-next-line no-undef -- This is defined in TypeScript.
-  initUserAutocomplete(el: JQuery<HTMLElement>) {
-    if (this.problemsetProblems.length !== 0 && this.contestAlias) {
-      typeahead.userContestTypeahead(el, this.contestAlias);
-    } else {
-      typeahead.userTypeahead(el);
     }
   }
 
@@ -569,11 +557,7 @@ export default class Runsv2 extends Vue {
 
   @Watch('username')
   onUsernameChanged(newValue: string | null) {
-    if (!newValue) {
-      this.filterUsername = '';
-    } else {
-      this.filterUsername = newValue;
-    }
+    this.filterUsername = newValue;
   }
 
   @Watch('problemAlias')
@@ -639,7 +623,7 @@ export default class Runsv2 extends Vue {
       this.filterLanguage = '';
       this.filterProblem = '';
       this.filterStatus = '';
-      this.filterUsername = '';
+      this.filterUsername = null;
       this.filterVerdict = '';
       this.filterContest = '';
       this.filterOffset = 0;
@@ -658,7 +642,7 @@ export default class Runsv2 extends Vue {
         this.filterStatus = '';
         break;
       case 'username':
-        this.filterUsername = '';
+        this.filterUsername = null;
         break;
       case 'verdict':
         this.filterVerdict = '';
@@ -667,6 +651,17 @@ export default class Runsv2 extends Vue {
         this.filterContest = '';
     }
     this.filters = this.filters.filter((item) => item.name !== filter);
+  }
+
+  updateSearchResultUsers(query: string): void {
+    if (this.problemsetProblems.length !== 0 && this.contestAlias) {
+      this.$emit('update-search-result-users-contest', {
+        query,
+        contestAlias: this.contestAlias,
+      });
+      return;
+    }
+    this.$emit('update-search-result-users', { query });
   }
 }
 </script>

@@ -78,7 +78,7 @@ class StatusBarIsDismissed:
 
 # pylint: disable=too-many-arguments
 def add_students(driver, users, *, tab_xpath,
-                 container_xpath, parent_xpath, submit_locator):
+                 container_xpath, parent_selector, submit_locator):
     '''Add students to a recently :instance.'''
 
     driver.wait.until(
@@ -89,7 +89,7 @@ def add_students(driver, users, *, tab_xpath,
             (By.XPATH, container_xpath)))
 
     for user in users:
-        driver.typeahead_helper(parent_xpath, user)
+        driver.typeahead_helper_v2(parent_selector, user)
 
         with dismiss_status(driver):
             driver.wait.until(

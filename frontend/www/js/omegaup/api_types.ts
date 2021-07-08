@@ -3294,11 +3294,6 @@ export namespace types {
     reviewer: boolean;
   }
 
-  export interface UserListItem {
-    label: string;
-    value: string;
-  }
-
   export interface UserProfile {
     birth_date?: Date;
     classname: string;
@@ -3645,7 +3640,7 @@ export namespace messages {
     }[];
   };
   export type ContestSearchUsersRequest = { [key: string]: any };
-  export type ContestSearchUsersResponse = { label: string; value: string }[];
+  export type ContestSearchUsersResponse = { results: types.ListItem[] };
   export type ContestSetRecommendedRequest = { [key: string]: any };
   export type ContestSetRecommendedResponse = {};
   export type ContestStatsRequest = { [key: string]: any };
@@ -4333,7 +4328,7 @@ export namespace messages {
   export type UserLastPrivacyPolicyAcceptedRequest = { [key: string]: any };
   export type UserLastPrivacyPolicyAcceptedResponse = { hasAccepted: boolean };
   export type UserListRequest = { [key: string]: any };
-  export type UserListResponse = types.UserListItem[];
+  export type UserListResponse = { results: types.ListItem[] };
   export type UserListAPITokensRequest = { [key: string]: any };
   export type _UserListAPITokensServerResponse = any;
   export type UserListAPITokensResponse = {

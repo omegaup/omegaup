@@ -6,12 +6,12 @@
           <strong>{{ T.profileUsername }}</strong>
         </div>
         <div class="col-sm-9 field-data">
-          https://omegaup.com/profile/<strong
-            ><omegaup-user-username
-              :classname="profile.classname"
-              :username="profile.username"
-            ></omegaup-user-username></strong
-          >/
+          <omegaup-user-username
+            :classname="profile.classname"
+            :username="profile.username"
+          >
+            <template #username-url>{{ urlUsername }}</template>
+          </omegaup-user-username>
         </div>
       </div>
       <div class="form-group row padding-field">
@@ -113,6 +113,10 @@ export default class UserBasicInfo extends Vue {
   @Prop() profile!: types.UserProfile;
   @Prop() rank!: string;
   T = T;
+
+  get urlUsername(): string {
+    return `https://omegaup.com/profile/${this.profile.username}/`;
+  }
 }
 </script>
 

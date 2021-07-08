@@ -375,8 +375,8 @@ export default class NewForm extends Vue {
   @Prop({ default: null }) initialWindowLength!: null | number;
   @Prop({ default: null }) invalidParameterName!: null | string;
   @Prop({ default: null }) initialTeamsGroupAlias!: null | string;
-  @Prop({ default: false }) contestForTeams!: boolean;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
+  @Prop({ default: false }) contestForTeams!: boolean;
 
   T = T;
   alias = this.initialAlias;

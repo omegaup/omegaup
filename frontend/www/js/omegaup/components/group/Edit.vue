@@ -75,6 +75,7 @@
           :identities-csv="currentIdentitiesCsv"
           :group-alias="groupAlias"
           :countries="countries"
+          :search-result-users="searchResultUsers"
           @add-member="
             (memberComponent, username) =>
               $emit('add-member', memberComponent, username)
@@ -122,6 +123,9 @@
           "
           @remove="(username) => $emit('remove', username)"
           @cancel="(memberComponent) => $emit('cancel', memberComponent)"
+          @update-search-result-users="
+            (query) => $emit('update-search-result-users', query)
+          "
         ></omegaup-group-members>
       </div>
 
@@ -198,6 +202,7 @@ export default class GroupEdit extends Vue {
   @Prop() identitiesCsv!: types.Identity[];
   @Prop() scoreboards!: types.GroupScoreboard[];
   @Prop() userErrorRow!: null | string;
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   ui = ui;

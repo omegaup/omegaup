@@ -7,6 +7,7 @@
           <select v-model="selectColumn" name="column" class="form-control">
             <option
               v-for="(columnText, columnIndex) in columns"
+              :key="columnIndex"
               :value="columnIndex"
             >
               {{ columnText }}
@@ -21,16 +22,18 @@
             :placeholder="T.wordsKeyword"
             class="form-control"
           ></omegaup-autocomplete>
-          <omegaup-autocomplete
+          <omegaup-common-typeahead
             v-show="
               selectColumn == 'nominator_username' ||
               selectColumn == 'author_username'
             "
-            v-model="queryUsername"
-            :init="(el) => typeahead.userTypeahead(el)"
-            :placeholder="T.wordsKeyword"
-            class="form-control"
-          ></omegaup-autocomplete>
+            :existing-options="searchResultUsers"
+            :value.sync="queryUsername"
+            :max-results="10"
+            @update-existing-options="
+              (query) => $emit('update-search-result-users', query)
+            "
+          />
         </div>
       </div>
       <button
@@ -149,6 +152,7 @@ import * as ui from '../../ui';
 import common_Paginator from '../common/Paginatorv2.vue';
 import { types } from '../../api_types';
 import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 import * as typeahead from '../../typeahead';
 import common_SortControls from '../common/SortControls.vue';
 
@@ -156,6 +160,7 @@ import common_SortControls from '../common/SortControls.vue';
   components: {
     'omegaup-common-paginator': common_Paginator,
     'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-sort-controls': common_SortControls,
   },
 })
@@ -166,6 +171,7 @@ export default class QualityNominationList extends Vue {
   @Prop() nominations!: types.NominationListItem[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() isAdmin!: boolean;
+  @Prop() searchResultUsers!: types.ListItem[];
 
   showAll = true;
   T = T;
@@ -176,7 +182,7 @@ export default class QualityNominationList extends Vue {
   columnName = 'title';
 
   queryProblem = '';
-  queryUsername = '';
+  queryUsername: null | string = null;
   selectColumn = '';
   columns = {
     problem_alias: T.wordsProblem,
@@ -203,10 +209,10 @@ export default class QualityNominationList extends Vue {
   @Watch('selectColumn')
   onPropertyChanged() {
     this.queryProblem = '';
-    this.queryUsername = '';
+    this.queryUsername = null;
   }
 
-  getQuery(): string {
+  getQuery(): null | string {
     if (
       this.selectColumn == 'nominator_username' ||
       this.selectColumn == 'author_username'

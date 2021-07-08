@@ -135,7 +135,7 @@ OmegaUp.on('ready', () => {
           },
           'update-search-result-users': (query: string) => {
             api.User.list({ query })
-              .then((data) => {
+              .then(({ results }) => {
                 // Users previously invited to any team in the current teams
                 // group can not be added to another, so they should not be
                 // shown in the dropdown
@@ -143,12 +143,12 @@ OmegaUp.on('ready', () => {
                   this.teamsMembers.map((user) => user.username),
                 );
 
-                this.searchResultUsers = data
-                  .filter((user) => !addedUsers.has(user.label))
-                  .map((user) => ({
-                    key: user.value,
-                    value: `${ui.escape(user.label)} (<strong>${ui.escape(
-                      user.value,
+                this.searchResultUsers = results
+                  .filter((user) => !addedUsers.has(user.key))
+                  .map(({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
                     )}</strong>)`,
                   }));
               })

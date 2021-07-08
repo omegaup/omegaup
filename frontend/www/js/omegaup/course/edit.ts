@@ -31,6 +31,7 @@ OmegaUp.on('ready', () => {
         : 'course',
       invalidParameterName: '',
       token: '',
+      searchResultUsers: [] as types.ListItem[],
     }),
     methods: {
       refreshCourseAdminDetails: (): void => {
@@ -101,6 +102,7 @@ OmegaUp.on('ready', () => {
           initialTab: this.initialTab,
           invalidParameterName: this.invalidParameterName,
           token: this.token,
+          searchResultUsers: this.searchResultUsers,
         },
         on: {
           'submit-edit-course': (source: course_Form) => {
@@ -498,6 +500,20 @@ OmegaUp.on('ready', () => {
                   return;
                 }
                 ui.success(T.courseUnarchivedSuccess);
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-users': (query: string) => {
+            api.User.list({ query })
+              .then(({ results }) => {
+                this.searchResultUsers = results.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
               })
               .catch(ui.apiError);
           },
