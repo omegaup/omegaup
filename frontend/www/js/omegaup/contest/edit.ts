@@ -25,6 +25,7 @@ OmegaUp.on('ready', () => {
       searchResultProblems: [] as types.ListItem[],
       searchResultUsers: [] as types.ListItem[],
       searchResultGroups: [] as types.ListItem[],
+      teamsGroup: payload.teams_group,
     }),
     methods: {
       arbitrateRequest: (username: string, resolution: boolean): void => {
@@ -122,6 +123,7 @@ OmegaUp.on('ready', () => {
           searchResultProblems: this.searchResultProblems,
           searchResultUsers: this.searchResultUsers,
           searchResultGroups: this.searchResultGroups,
+          teamsGroup: this.teamsGroup,
         },
         on: {
           'update-search-result-problems': (query: string) => {
@@ -465,6 +467,23 @@ OmegaUp.on('ready', () => {
                   return;
                 }
                 ui.success(T.contestEditUnarchivedSuccess);
+              })
+              .catch(ui.apiError);
+          },
+          'replace-teams-group': ({
+            alias,
+            name,
+          }: {
+            alias: string;
+            name: string;
+          }) => {
+            api.Contest.replaceTeamsGroup({
+              contest_alias: payload.details.alias,
+              teams_group_alias: alias,
+            })
+              .then(() => {
+                ui.success(T.contestEditTeamsGroupAddedReplaced);
+                this.teamsGroup = { alias, name };
               })
               .catch(ui.apiError);
           },
