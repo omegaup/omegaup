@@ -15,26 +15,30 @@ describe('Upload.vue', () => {
 
     expect(wrapper.text()).toContain(T.groupsUploadCsvFile);
 
-    const identities = [
+    const identities: types.Identity[] = [
       {
-        username: 'team_user_1',
+        username: 'teams:group:team_1',
         name: 'user 1',
         country_id: 'MX',
         state_id: 'QUE',
         gender: 'decline',
         school_name: 'First School',
+        usernames: 'user_1;user_2',
       },
-    ] as types.Identity[];
-    await wrapper.setData({ identities });
+    ];
+    const identitiesTeams: { [team: string]: string[] } = {
+      'teams:group:team_1': ['user_1', 'user_2'],
+    };
+    await wrapper.setData({ identities, identitiesTeams });
     expect(wrapper.vm.items).toEqual([
       {
-        username: 'team_user_1',
+        username: 'teams:group:team_1',
         name: 'user 1',
         country_id: 'MX',
         state_id: 'QUE',
         gender: 'decline',
         school_name: 'First School',
-        usernames: [],
+        usernames: ['user_1', 'user_2'],
       },
     ]);
   });

@@ -1,9 +1,10 @@
 import { types } from './api_types';
-import { groupOptionalFields, groupRequiredFields } from './group/edit';
 import {
   generatePassword,
   generateHumanReadablePassword,
   getCSVRecords,
+  identityRequiredFields,
+  identityOptionalFields,
 } from './groups';
 import T from './lang';
 import * as ui from './ui';
@@ -110,8 +111,8 @@ describe('groups_utils', () => {
       const formattedRecords = getCSVRecords<types.Identity>({
         fields,
         records,
-        requiredFields: groupRequiredFields,
-        optionalFields: groupOptionalFields,
+        requiredFields: identityRequiredFields,
+        optionalFields: identityOptionalFields,
       });
 
       expect(formattedRecords).toEqual(expectedFormattedRecords);
@@ -128,8 +129,8 @@ describe('groups_utils', () => {
       const formattedRecords = getCSVRecords<types.Identity>({
         fields,
         records: localRecords,
-        requiredFields: groupRequiredFields,
-        optionalFields: groupOptionalFields,
+        requiredFields: identityRequiredFields,
+        optionalFields: identityOptionalFields,
       });
 
       expect(formattedRecords).toEqual(localExpectedFormattedRecords);
@@ -147,8 +148,8 @@ describe('groups_utils', () => {
         getCSVRecords<types.Identity>({
           fields,
           records: localRecords,
-          requiredFields: groupRequiredFields,
-          optionalFields: groupOptionalFields,
+          requiredFields: identityRequiredFields,
+          optionalFields: identityOptionalFields,
         }),
       ).toThrow(
         ui.formatString(T.teamsGroupsErrorFieldIsRequired, {
@@ -161,8 +162,8 @@ describe('groups_utils', () => {
       const formattedRecords = getCSVRecords<types.Identity>({
         fields: fields.concat(['birthday']),
         records,
-        requiredFields: groupRequiredFields,
-        optionalFields: groupOptionalFields,
+        requiredFields: identityRequiredFields,
+        optionalFields: identityOptionalFields,
       });
 
       expect(formattedRecords).toEqual(formattedRecords);
@@ -176,8 +177,8 @@ describe('groups_utils', () => {
         getCSVRecords<types.Identity>({
           fields: localFields,
           records,
-          requiredFields: groupRequiredFields,
-          optionalFields: groupOptionalFields,
+          requiredFields: identityRequiredFields,
+          optionalFields: identityOptionalFields,
         }),
       ).toThrow(
         ui.formatString(T.teamsGroupsErrorFieldIsNotPresentInCsv, {

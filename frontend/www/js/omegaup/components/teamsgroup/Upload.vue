@@ -26,11 +26,15 @@
         <b-table responsive striped hover :items="items" :fields="columns">
           <template #cell(usernames)="row">
             <b-button
+              :title="T.groupEditMembersAddMembers"
               class="d-inline-block mb-2"
               variant="primary"
               @click="row.toggleDetails"
             >
-              {{ T.teamsGroupAddUsersToTeam }}
+              <font-awesome-icon
+                :icon="['fas', 'user-plus']"
+                class="mr-2"
+              ></font-awesome-icon>
               <b-badge variant="light">{{ row.item.usernames.length }}</b-badge>
             </b-button>
           </template>
@@ -105,7 +109,7 @@ import T from '../../lang';
 import omegaup_Markdown from '../Markdown.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import common_MultiTypeahead from '../common/MultiTypeahead.vue';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
@@ -127,7 +131,7 @@ Vue.use(ButtonPlugin);
 Vue.use(BadgePlugin);
 Vue.use(CardPlugin);
 
-library.add(faDownload);
+library.add(faDownload, faUserPlus);
 @Component({
   components: {
     FontAwesomeIcon,
@@ -164,7 +168,10 @@ export default class Upload extends Vue {
   ];
 
   get items() {
-    return this.identities.map((identity) => ({ ...identity, usernames: [] }));
+    return this.identities.map((identity) => ({
+      ...identity,
+      usernames: this.identitiesTeams[identity.username],
+    }));
   }
 
   readFile(e: HTMLInputElement): File | null {
