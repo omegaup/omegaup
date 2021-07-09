@@ -16,6 +16,7 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       invalidParameterName: null as null | string,
+      searchResultTeamsGroups: [] as types.ListItem[],
     }),
     render: function (createElement) {
       return createElement('omegaup-contest-new', {
@@ -26,10 +27,20 @@ OmegaUp.on('ready', () => {
           initialStartTime: startTime,
           initialFinishTime: finishTime,
           invalidParameterName: this.invalidParameterName,
+          searchResultTeamsGroups: this.searchResultTeamsGroups,
         },
         on: {
-          'create-contest': (contest: types.ContestAdminDetails): void => {
-            api.Contest.create(contest)
+          'create-contest': ({
+            contest,
+            teamsGroupAlias,
+          }: {
+            contest: types.ContestAdminDetails;
+            teamsGroupAlias?: string;
+          }): void => {
+            api.Contest.create({
+              ...contest,
+              teams_group_alias: teamsGroupAlias,
+            })
               .then(() => {
                 this.invalidParameterName = null;
                 window.location.replace(
@@ -40,6 +51,22 @@ OmegaUp.on('ready', () => {
                 ui.apiError(error);
                 this.invalidParameterName = error.parameter || null;
               });
+          },
+          'update-search-result-teams-groups': (query: string) => {
+            api.TeamsGroup.list({
+              query,
+            })
+              .then((data) => {
+                this.searchResultTeamsGroups = data.map(
+                  ({ key, value }: { key: string; value: string }) => ({
+                    key,
+                    value: `${ui.escape(value)} (<strong>${ui.escape(
+                      key,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
           },
         },
       });

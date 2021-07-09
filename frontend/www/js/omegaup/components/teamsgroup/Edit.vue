@@ -106,7 +106,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import teamsgroup_FormUpdate from '../teamsgroup/FormUpdate.vue';
+import teamsgroup_FormUpdate from './FormUpdate.vue';
 import teamsgroup_Upload from './Upload.vue';
 import teamsgroup_Teams from './Teams.vue';
 import T from '../../lang';

@@ -49,7 +49,7 @@ OmegaUp.on('ready', () => {
               description: description,
             })
               .then(() => {
-                window.location.replace(`/teamsgroup/${alias}/edit/#teams`);
+                window.location.replace(`/teamsgroup/${alias}/edit/#upload`);
               })
               .catch(ui.apiError);
           },
