@@ -314,15 +314,17 @@ class Session extends \OmegaUp\Controllers\Controller {
         $loginIdentity = new \OmegaUp\DAO\VO\Identities($loginIdentityExt);
 
         $associatedIdentities = [];
+        $currentUser = null;
+        $email = null;
         if (is_null($currentIdentity->user_id)) {
-            $currentUser = null;
-            $email = null;
-            $associatedIdentities = [
-                [
-                    'username' => strval($loginIdentity->username),
-                    'default' => true,
-                ],
-            ];
+            if (\OmegaUp\DAO\Identities::isMainIdentity($loginIdentity)) {
+                $associatedIdentities = [
+                    [
+                        'username' => strval($loginIdentity->username),
+                        'default' => true,
+                    ],
+                ];
+            }
         } else {
             $currentUser = \OmegaUp\DAO\Users::getByPK(
                 $currentIdentity->user_id
