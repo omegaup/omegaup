@@ -61,11 +61,13 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount($n + 1, $response['users']);
 
         // Call search API
-        $response = \OmegaUp\Controllers\Contest::apiSearchUsers(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'query' => 'test_contest_user_'
-        ]));
+        $response = \OmegaUp\Controllers\Contest::apiSearchUsers(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'query' => 'test_contest_user_'
+            ])
+        )['results'];
         $this->assertCount(2, $response);
     }
 

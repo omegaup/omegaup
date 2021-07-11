@@ -238,60 +238,6 @@ export function tagTypeahead(
     .on('typeahead:autocomplete', cb);
 }
 
-export function userContestTypeahead(
-  elem: JQuery<HTMLElement>,
-  contestAlias: string,
-): void {
-  const cb = (event: Event, val: { label: string; value: string }) =>
-    $(event.target as EventTarget)
-      .attr('data-value', val.value)
-      .val(val.label);
-  elem
-    .typeahead<{ label: string; value: string }>(
-      {
-        minLength: 3,
-        highlight: false,
-      },
-      {
-        source: typeaheadWrapper(
-          (options: { query: string; contest_alias?: string }) =>
-            new Promise<{ label: string; value: string }[]>((resolve, reject) =>
-              api.Contest.searchUsers({
-                query: options.query,
-                contest_alias: contestAlias,
-              })
-                .then((data) => resolve(data))
-                .catch(reject),
-            ),
-        ),
-        async: true,
-        limit: 10,
-        display: 'label',
-        templates: {
-          suggestion: (val) =>
-            ui.formatString(
-              '<div data-value="%(value)"><strong>%(label)</strong> (%(value))</div>',
-              val,
-            ),
-        },
-      },
-    )
-    .on('typeahead:select', cb)
-    .on('typeahead:autocomplete', cb)
-    .trigger('change');
-}
-
-export function userTypeahead(
-  elem: JQuery<HTMLElement>,
-  cb?: CallbackType<types.UserListItem>,
-): void {
-  if (!cb) {
-    cb = (event: Event, val: types.UserListItem) =>
-      $(event.target as EventTarget).val(val.label);
-  }
-  typeahead<types.UserListItem>(elem, api.User.list, cb);
-}
-
 export function groupTypeahead(
   elem: JQuery<HTMLElement>,
   cb?: CallbackType<{ label: string; value: string }>,

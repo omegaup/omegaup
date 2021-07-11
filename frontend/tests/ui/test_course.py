@@ -394,7 +394,7 @@ def add_students_course(driver, users):
     util.add_students(
         driver, users, tab_xpath='//a[contains(@href, "#students")]',
         container_xpath='//div[@data-students-tab]',
-        parent_xpath='*[contains(@class, "omegaup-course-addstudent")]',
+        parent_selector='.omegaup-course-addstudent',
         submit_locator=(By.CSS_SELECTOR,
                         '.omegaup-course-addstudent form button[type=submit]'))
 

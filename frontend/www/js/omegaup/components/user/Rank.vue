@@ -13,17 +13,20 @@
       }}
     </h5>
     <div v-if="!isIndex" class="card-body">
-      <label
-        ><omegaup-autocomplete
-          v-model="searchedUsername"
-          class="form-control"
-          :init="(el) => typeahead.userTypeahead(el)"
-        ></omegaup-autocomplete
-      ></label>
+      <label>
+        <omegaup-common-typeahead
+          :existing-options="searchResultUsers"
+          :value.sync="searchedUsername"
+          :max-results="10"
+          @update-existing-options="
+            (query) => $emit('update-search-result-users', query)
+          "
+        />
+      </label>
       <button class="btn btn-primary" type="button" @click="onSubmit">
         {{ T.searchUser }}
       </button>
-      <template v-if="Object.keys(availableFilters).length &gt; 0">
+      <template v-if="Object.keys(availableFilters).length > 0">
         <select v-model="filter" class="filter" @change="onFilterChange">
           <option value="">
             {{ T.wordsSelectFilter }}
@@ -96,8 +99,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
 import common_Paginator from '../common/Paginatorv2.vue';
@@ -113,7 +115,7 @@ interface Rank {
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-countryflag': CountryFlag,
     'omegaup-user-username': user_Username,
     'omegaup-common-paginator': common_Paginator,
@@ -129,13 +131,14 @@ export default class UserRank extends Vue {
   @Prop() ranking!: Rank[];
   @Prop() resultTotal!: number;
   @Prop() pagerItems!: types.PageItem[];
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   ui = ui;
-  typeahead = typeahead;
-  searchedUsername = '';
+  searchedUsername: null | string = null;
 
   onSubmit(): void {
+    if (!this.searchedUsername) return;
     window.location.href = `/profile/${encodeURIComponent(
       this.searchedUsername,
     )}`;

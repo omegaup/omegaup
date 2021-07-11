@@ -1228,20 +1228,16 @@ Search users in contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `query`         | `mixed`  |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `contest_alias` | `string`       |             |
+| `query`         | `null\|string` |             |
 
 ### Returns
 
-```typescript
-{
-  label: string;
-  value: string;
-}
-[];
-```
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/contest/setRecommended/`
 
@@ -4496,8 +4492,7 @@ Gets the last privacy policy accepted by user
 
 ### Description
 
-Gets a list of users. This returns an array instead of an object since
-it is used by typeahead.
+Gets a list of users.
 
 ### Parameters
 
@@ -4508,9 +4503,9 @@ it is used by typeahead.
 
 ### Returns
 
-```typescript
-types.UserListItem[]
-```
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/user/listAPITokens/`
 
