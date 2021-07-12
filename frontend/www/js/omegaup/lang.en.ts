@@ -1199,7 +1199,6 @@ const translations: { [key: string]: string; } = {
   teamMemberUsernameInUse: "There is at least one duplicate username in the teams of the group. Please fix the information.",
   teamNotExist: "Team does not exist",
   teamsGroupAddUsersDone: "Done",
-  teamsGroupAddUsersToTeam: "Add users",
   teamsGroupAliasMustBeRequired: "In a contest for teams, alias must be required",
   teamsGroupCreateIdentitiesAsTeams: "Create identities as teams",
   teamsGroupEditGroupUpdated: "The teams group has been successfully updated.",

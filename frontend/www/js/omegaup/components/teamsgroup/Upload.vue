@@ -23,69 +23,60 @@
       </div>
       <template v-if="identities.length > 0">
         <h3 class="card-header">{{ T.teamsGroupEditTeams }}</h3>
-        <div class="table-responsive">
-          <table class="table" data-identities-as-team--table>
-            <thead>
-              <tr>
-                <th>{{ T.teamsGroupTeamName }}</th>
-                <th>{{ T.profile }}</th>
-                <th>{{ T.loginPassword }}</th>
-                <th>{{ T.profileCountry }}</th>
-                <th>{{ T.profileState }}</th>
-                <th>{{ T.wordsGender }}</th>
-                <th>{{ T.profileSchool }}</th>
-                <th>{{ T.teamsGroupUsernames }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="identity in identities"
-                :key="identity.username"
-                :class="{ 'alert-danger': userErrorRow === identity.username }"
-              >
-                <td class="username">
-                  <strong>{{ identity.username }}</strong>
-                </td>
-                <td>{{ identity.name }}</td>
-                <td class="password">
-                  {{ identity.password }}
-                </td>
-                <td>{{ identity.country_id }}</td>
-                <td>{{ identity.state_id }}</td>
-                <td>{{ identity.gender }}</td>
-                <td>{{ identity.school_name }}</td>
-                <td>
-                  <button
-                    v-if="teamToAddUsers !== identity.username"
-                    class="btn btn-primary d-inline-block mb-2"
-                    @click="teamToAddUsers = identity.username"
+        <b-table responsive striped hover :items="items" :fields="columns">
+          <template #cell(usernames)="row">
+            <b-button
+              :title="T.groupEditMembersAddMembers"
+              class="d-inline-block mb-2"
+              variant="primary"
+              @click="row.toggleDetails"
+            >
+              <font-awesome-icon
+                :icon="['fas', 'user-plus']"
+                class="mr-2"
+              ></font-awesome-icon>
+              <b-badge variant="light">{{ row.item.usernames.length }}</b-badge>
+            </b-button>
+          </template>
+          <template #row-details="row">
+            <b-form @submit.prevent="onAddUsers(row)">
+              <b-card>
+                <b-row class="mb-2">
+                  <b-col sm="3" class="text-sm-right">
+                    <b>{{ T.teamsGroupUsernames }}:</b>
+                  </b-col>
+                  <b-col>
+                    <b-badge
+                      v-for="username of row.item.usernames"
+                      :key="username"
+                      variant="primary"
+                      class="ml-2"
+                    >
+                      {{ username }}
+                    </b-badge>
+                  </b-col>
+                </b-row>
+                <b-row>
+                  <omegaup-common-multi-typeahead
+                    :existing-options="searchResultUsers"
+                    :value.sync="typeaheadUsers"
+                    @update-existing-options="
+                      (query) => $emit('update-search-result-users', query)
+                    "
                   >
-                    {{ T.teamsGroupAddUsersToTeam }}
-                    <span class="badge badge-light">
-                      {{ identitiesTeams[identity.username].length }}
-                    </span>
-                  </button>
-                  <template v-else>
-                    <omegaup-common-multi-typeahead
-                      :existing-options="searchResultUsers"
-                      :value.sync="typeaheadUsers"
-                      @update-existing-options="
-                        (query) => $emit('update-search-result-users', query)
-                      "
-                    >
-                    </omegaup-common-multi-typeahead>
-                    <button
-                      class="btn btn-primary d-inline-block mb-2"
-                      @click="onAddUsers(identity.username)"
-                    >
-                      {{ T.teamsGroupAddUsersDone }}
-                    </button>
-                  </template>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                  </omegaup-common-multi-typeahead>
+                  <b-button
+                    type="submit"
+                    variant="primary"
+                    class="d-inline-block mb-2"
+                  >
+                    {{ T.teamsGroupAddUsersDone }}
+                  </b-button>
+                </b-row>
+              </b-card>
+            </b-form>
+          </template>
+        </b-table>
         <div class="card-footer">
           <button
             class="btn btn-primary d-inline-block mb-2"
@@ -118,27 +109,70 @@ import T from '../../lang';
 import omegaup_Markdown from '../Markdown.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import common_MultiTypeahead from '../common/MultiTypeahead.vue';
 
-library.add(faDownload);
+// Import Bootstrap an BootstrapVue CSS files (order is important)
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
+
+// Import Only Required Plugins
+import {
+  TablePlugin,
+  ButtonPlugin,
+  BadgePlugin,
+  CardPlugin,
+  BForm,
+  BRow,
+  BCol,
+} from 'bootstrap-vue';
+Vue.use(TablePlugin);
+Vue.use(ButtonPlugin);
+Vue.use(BadgePlugin);
+Vue.use(CardPlugin);
+
+library.add(faDownload, faUserPlus);
 @Component({
   components: {
     FontAwesomeIcon,
     'omegaup-common-multi-typeahead': common_MultiTypeahead,
     'omegaup-markdown': omegaup_Markdown,
+    BForm,
+    BRow,
+    BCol,
   },
 })
-export default class Identities extends Vue {
-  @Prop() userErrorRow!: string | null;
+export default class Upload extends Vue {
+  @Prop({ default: null }) userErrorRow!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   identities: types.Identity[] = [];
   identitiesTeams: { [team: string]: string[] } = {};
   humanReadable = false;
-  teamToAddUsers = null;
   typeaheadUsers: types.ListItem[] = [];
+  columns = [
+    {
+      key: 'username',
+      label: T.teamsGroupTeamName,
+      stickyColumn: true,
+      isRowHeader: true,
+    },
+    { key: 'name', label: T.profile },
+    { key: 'password', label: T.loginPassword },
+    { key: 'country_id', label: T.profileCountry },
+    { key: 'state_id', label: T.profileState },
+    { key: 'gender', label: T.wordsGender },
+    { key: 'school_name', label: T.profileSchool },
+    { key: 'usernames', label: T.teamsGroupUsernames },
+  ];
+
+  get items() {
+    return this.identities.map((identity) => ({
+      ...identity,
+      usernames: this.identitiesTeams[identity.username],
+    }));
+  }
 
   readFile(e: HTMLInputElement): File | null {
     return (e.files && e.files[0]) || null;
@@ -162,11 +196,12 @@ export default class Identities extends Vue {
     });
   }
 
-  onAddUsers(username: string): void {
-    this.teamToAddUsers = null;
-    this.identitiesTeams[username] = this.typeaheadUsers.map(
+  onAddUsers(row: BRow): void {
+    this.identitiesTeams[row.item.username] = this.typeaheadUsers.map(
       (user) => user.key,
     );
+    Vue.set(row.item, 'usernames', this.identitiesTeams[row.item.username]);
+    row.toggleDetails();
   }
 }
 </script>

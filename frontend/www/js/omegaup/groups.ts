@@ -3,6 +3,17 @@ import T from './lang';
 import * as ui from './ui';
 import * as CSV from '@/third_party/js/csv.js/csv.js';
 
+export const identityRequiredFields = new Set(['username']);
+
+export const identityOptionalFields = new Set([
+  'name',
+  'country_id',
+  'state_id',
+  'gender',
+  'school_name',
+  'usernames',
+]);
+
 export function downloadCsvFile({
   fileName,
   columns,

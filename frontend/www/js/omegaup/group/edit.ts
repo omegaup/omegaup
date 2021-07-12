@@ -13,17 +13,9 @@ import {
   generateHumanReadablePassword,
   generatePassword,
   getCSVRecords,
+  identityOptionalFields,
+  identityRequiredFields,
 } from '../groups';
-
-export const groupRequiredFields = new Set(['username']);
-
-export const groupOptionalFields = new Set([
-  'name',
-  'country_id',
-  'state_id',
-  'gender',
-  'school_name',
-]);
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.GroupEditPayload();
@@ -250,8 +242,8 @@ OmegaUp.on('ready', () => {
                 const records = getCSVRecords<types.Identity>({
                   fields: dataset.fields,
                   records: dataset.records,
-                  requiredFields: groupRequiredFields,
-                  optionalFields: groupOptionalFields,
+                  requiredFields: identityRequiredFields,
+                  optionalFields: identityOptionalFields,
                 });
                 for (const {
                   username,

@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import VoerroTagsInput from '@voerro/vue-tagsinput';
 import '@voerro/vue-tagsinput/dist/style.css';
 import T from '../../lang';
@@ -30,10 +30,11 @@ import { types } from '../../api_types';
     'tags-input': VoerroTagsInput,
   },
 })
-export default class Typeahead extends Vue {
+export default class MultiTypeahead extends Vue {
   @Prop() existingOptions!: types.ListItem[];
   @Prop({ default: 3 }) activationThreshold!: number;
   @Prop({ default: 10 }) maxResults!: number;
+  @Prop({ default: null }) value!: null | types.ListItem[];
 
   T = T;
   selectedOptions: types.ListItem[] = [];
@@ -41,6 +42,13 @@ export default class Typeahead extends Vue {
   updateExistingOptions(query: string): void {
     if (query.length < this.activationThreshold) return;
     this.$emit('update-existing-options', query);
+  }
+
+  @Watch('value')
+  onValueChanged(newValue: null | types.ListItem[]): void {
+    this.selectedOptions = this.existingOptions.filter((option) =>
+      newValue?.some((opt) => option.key === opt['key']),
+    );
   }
 }
 </script>

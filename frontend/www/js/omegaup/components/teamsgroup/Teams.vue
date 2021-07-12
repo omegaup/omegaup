@@ -47,7 +47,7 @@
               :title="T.groupEditMembersAddMembers"
               @click="onAddMembers(identity.username)"
             >
-              <font-awesome-icon :icon="['fas', 'user']" />
+              <font-awesome-icon :icon="['fas', 'users']" />
             </button>
             <button
               class="btn btn-link"
@@ -106,9 +106,9 @@ import {
   faEdit,
   faLock,
   faTrashAlt,
-  faUser,
+  faUsers,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faEdit, faLock, faTrashAlt, faUser);
+library.add(faEdit, faLock, faTrashAlt, faUsers);
 
 export enum AvailableForms {
   None,
