@@ -192,6 +192,8 @@ const translations: { [key: string]: string; } = {
   contestEditRegisteredGroupAdminName: "Group",
   contestEditTagDelete: "Delete",
   contestEditTagName: "Tag name",
+  contestEditTeamsGroupReplace: "Replace teams group",
+  contestEditTeamsGroupReplaced: "Teams group replaced successfully",
   contestEditUnarchiveContest: "Unarchive contest",
   contestEditUnarchiveHelpText: "This contest is already archived, if you want to return it back to the unarchived contests list, click in the button",
   contestEditUnarchivedSuccess: "Contest unarchived succesfully",

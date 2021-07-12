@@ -192,6 +192,8 @@ const translations: { [key: string]: string; } = {
   contestEditRegisteredGroupAdminName: "Grupo",
   contestEditTagDelete: "Eliminar",
   contestEditTagName: "Nombre de la etiqueta",
+  contestEditTeamsGroupReplace: "Reemplazar grupo de equipos",
+  contestEditTeamsGroupReplaced: "Grupo de equipos reemplazado correctamente",
   contestEditUnarchiveContest: "Desarchivar concurso",
   contestEditUnarchiveHelpText: "Este concurso ya se encuentra archivado. Si quieres regresarlo al listado de concursos no archivados, da clic en el bot\u00f3n.",
   contestEditUnarchivedSuccess: "Concurso desarchivado exitosamente.",
