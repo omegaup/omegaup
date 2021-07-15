@@ -59,7 +59,7 @@
       </thead>
       <tbody>
         <tr v-for="(user, index) in ranking" :key="index">
-          <th scope="row">{{ user.rank }}</th>
+          <th scope="row">{{ (page - 1) * length + 1 + index }}</th>
           <td>
             <omegaup-countryflag :country="user.country"></omegaup-countryflag>
             <omegaup-user-username
