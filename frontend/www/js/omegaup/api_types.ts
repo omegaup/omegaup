@@ -2347,6 +2347,7 @@ export namespace types {
     state?: string;
     state_id?: string;
     username: string;
+    usernames?: string;
   }
 
   export interface IdentityExt {

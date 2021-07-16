@@ -1198,7 +1198,6 @@
 	"teamMemberUsernameInUse": "Existe al menos un nombre de usuario duplicado en los equipos del grupo. Por favor corrige la informaci\u00f3n.",
 	"teamNotExist": "El equipo no existe",
 	"teamsGroupAddUsersDone": "Listo",
-	"teamsGroupAddUsersToTeam": "Agregar usuarios",
 	"teamsGroupAliasMustBeRequired": "En un concurso para equipos, el alias debe ser requerido.",
 	"teamsGroupCreateIdentitiesAsTeams": "Crear identidades como equipos",
 	"teamsGroupEditGroupUpdated": "El grupo de equipos se actualiz\u00f3 correctamente.",
