@@ -67,6 +67,16 @@
             >{{ T.contestAdduserAddContestant }}</a
           >
           <a
+            v-if="details.contest_for_teams"
+            href="#"
+            data-toggle="tab"
+            data-nav-group
+            class="dropdown-item groups"
+            :class="{ active: showTab === 'groups' }"
+            @click="showTab = 'groups'"
+            >{{ T.contestAddgroupAddGroup }}</a
+          >
+          <a
             href="#"
             data-toggle="tab"
             class="dropdown-item"
@@ -193,6 +203,18 @@
           @emit-remove-group="(groupAlias) => $emit('remove-group', groupAlias)"
         ></omegaup-contest-groups>
       </div>
+      <div v-if="showTab === 'groups'" class="tab-pane active groups">
+        <omegaup-contest-teams-groups
+          :teams-group="teamsGroup"
+          :search-result-teams-groups="searchResultTeamsGroups"
+          @update-search-result-teams-groups="
+            (query) => $emit('update-search-result-teams-groups', query)
+          "
+          @replace-teams-group="
+            (request) => $emit('replace-teams-group', request)
+          "
+        ></omegaup-contest-teams-groups>
+      </div>
       <div v-if="showTab === 'admins'" class="tab-pane active">
         <omegaup-contest-admins
           :admins="admins"
@@ -253,10 +275,10 @@ import common_Archive from '../common/Archive.vue';
 import common_Requests from '../common/Requests.vue';
 import contest_GroupAdmins from '../common/GroupAdminsv2.vue';
 import contest_Groups from './Groups.vue';
+import contest_TeamsGroups from './TeamsGroup.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
 import common_Publish from '../common/Publishv2.vue';
-import omegaup_Markdown from '../Markdown.vue';
 
 @Component({
   components: {
@@ -267,11 +289,11 @@ import omegaup_Markdown from '../Markdown.vue';
     'omegaup-common-archive': common_Archive,
     'omegaup-common-requests': common_Requests,
     'omegaup-contest-groups': contest_Groups,
+    'omegaup-contest-teams-groups': contest_TeamsGroups,
     'omegaup-contest-group-admins': contest_GroupAdmins,
     'omegaup-contest-links': contest_Links,
     'omegaup-contest-new-form': contest_NewForm,
     'omegaup-common-publish': common_Publish,
-    'omegaup-markdown': omegaup_Markdown,
   },
 })
 export default class Edit extends Vue {
@@ -304,6 +326,8 @@ export default class Edit extends Vue {
         return T.contestNewFormAdmissionMode;
       case 'contestants':
         return T.contestAdduserAddContestant;
+      case 'groups':
+        return T.contestAddgroupAddGroup;
       case 'admins':
         return T.omegaupTitleContestAddAdmin;
       case 'links':

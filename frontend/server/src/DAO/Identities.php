@@ -497,11 +497,31 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 ill.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?)
             GROUP BY
                 gender;
-';
+            ';
         /** @var array{gender: string, users: int}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$startTimestamp, $endTimestamp, $startTimestamp, $endTimestamp]
         );
+    }
+
+    public static function isMainIdentity(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): bool {
+        $sql = 'SELECT
+                    COUNT(*) AS main_identity
+                FROM
+                    Users u
+                WHERE
+                    u.main_identity_id = ?
+                LIMIT 1;';
+
+        return (
+            /** @var array{main_identity: int} */
+            \OmegaUp\MySQLConnection::getInstance()->GetOne(
+                $sql,
+                [$identity->identity_id]
+            )
+        ) > 0;
     }
 }

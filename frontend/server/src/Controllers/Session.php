@@ -314,9 +314,17 @@ class Session extends \OmegaUp\Controllers\Controller {
         $loginIdentity = new \OmegaUp\DAO\VO\Identities($loginIdentityExt);
 
         $associatedIdentities = [];
+        $currentUser = null;
+        $email = null;
         if (is_null($currentIdentity->user_id)) {
-            $currentUser = null;
-            $email = null;
+            if (\OmegaUp\DAO\Identities::isMainIdentity($loginIdentity)) {
+                $associatedIdentities = [
+                    [
+                        'username' => strval($loginIdentity->username),
+                        'default' => true,
+                    ],
+                ];
+            }
         } else {
             $currentUser = \OmegaUp\DAO\Users::getByPK(
                 $currentIdentity->user_id
@@ -757,9 +765,19 @@ class Session extends \OmegaUp\Controllers\Controller {
         string $usernameOrEmail,
         \OmegaUp\DAO\VO\Identities $loggedIdentity
     ): void {
-        // Only users that originally logged in from their main identities can
-        // select another identity.
-        if (!$r->isLoggedAsMainIdentity()) {
+        // Only users that originally logged in from their main identities, or
+        // from an identity that matches the target identity can select another
+        // identity.
+        $targetIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $usernameOrEmail
+        );
+        if (
+            !$r->isLoggedAsMainIdentity()
+            && (
+                is_null($r->loginIdentity)
+                || $targetIdentity->identity_id !== $r->loginIdentity->identity_id
+            )
+        ) {
             throw new \OmegaUp\Exceptions\UnauthorizedException(
                 'userNotAllowed'
             );
@@ -775,7 +793,9 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         $identity = \OmegaUp\DAO\Identities::resolveAssociatedIdentity(
             $usernameOrEmail,
-            $loggedIdentity
+            /*$currentIdentity=*/ !is_null(
+                $loggedIdentity->user_id
+            ) ? $loggedIdentity : $targetIdentity
         );
         if (is_null($identity) || is_null($identity->identity_id)) {
             self::$log->warn("Identity {$usernameOrEmail} not found.");
