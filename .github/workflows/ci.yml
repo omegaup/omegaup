@@ -101,13 +101,10 @@ jobs:
 
       - name: Upload code coverage
         run: |
-          curl -s https://codecov.io/bash > codecov
-          VERSION=$(grep 'VERSION=\".*\"' codecov | cut -d'"' -f2)
-          for i in 1 256 512
-          do
-            shasum -a $i -c --ignore-missing <(curl -s https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM)
-          done
-          bash codecov -cF php
+          curl -Os https://uploader.codecov.io/v0.1.0_5313/linux/codecov
+          echo 'a229148bfbb9b802a95b4c78501b19630a17784696eb0b5182b40f0e1c0a4b6e  codecov' | shasum -a 256 -c
+          chmod +x codecov
+          ./codecov
 
       - name: Upload artifacts
         if: ${{ always() }}
@@ -132,13 +129,10 @@ jobs:
 
       - name: Upload code coverage
         run: |
-          curl -s https://codecov.io/bash > codecov
-          VERSION=$(grep 'VERSION=\".*\"' codecov | cut -d'"' -f2)
-          for i in 1 256 512
-          do
-            shasum -a $i -c --ignore-missing <(curl -s https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM)
-          done
-          bash codecov -cF javascript
+          curl -Os https://uploader.codecov.io/v0.1.0_5313/linux/codecov
+          echo 'a229148bfbb9b802a95b4c78501b19630a17784696eb0b5182b40f0e1c0a4b6e  codecov' | shasum -a 256 -c
+          chmod +x codecov
+          ./codecov
 
   lint:
     runs-on: ubuntu-20.04
