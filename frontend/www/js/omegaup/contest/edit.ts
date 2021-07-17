@@ -124,7 +124,6 @@ OmegaUp.on('ready', () => {
           searchResultProblems: this.searchResultProblems,
           searchResultUsers: this.searchResultUsers,
           searchResultTeamsGroups: this.searchResultTeamsGroups,
-          teamsGroup: payload.teams_group,
           searchResultGroups: this.searchResultGroups,
           teamsGroup: this.teamsGroup,
         },
