@@ -1318,7 +1318,9 @@ Update a Contest
 
 ### Returns
 
-_Nothing_
+| Name             | Type     |
+| ---------------- | -------- |
+| `teamsGroupName` | `string` |
 
 ## `/api/contest/updateEndTimeForIdentity/`
 

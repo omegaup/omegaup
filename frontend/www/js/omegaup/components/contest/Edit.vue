@@ -133,7 +133,7 @@
           :initial-needs-basic-information="details.needs_basic_information"
           :initial-requests-user-information="details.requests_user_information"
           :all-languages="details.available_languages"
-          :initial-teams-group-alias="teamsGroupAlias"
+          :teams-group-alias="teamsGroupAlias"
           :contest-for-teams="details.contest_for_teams"
           :has-submissions="details.has_submissions"
           :update="true"
@@ -207,6 +207,7 @@
         <omegaup-contest-teams-groups
           :teams-group="teamsGroup"
           :search-result-teams-groups="searchResultTeamsGroups"
+          :has-submissions="details.has_submissions"
           @update-search-result-teams-groups="
             (query) => $emit('update-search-result-teams-groups', query)
           "

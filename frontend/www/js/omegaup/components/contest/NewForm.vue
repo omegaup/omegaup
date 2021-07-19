@@ -218,7 +218,7 @@
             <omegaup-common-typeahead
               v-if="currentContestForTeams && !hasSubmissions"
               :existing-options="searchResultTeamsGroups"
-              :value.sync="teamsGroupAlias"
+              :value.sync="currentTeamsGroupAlias"
               @update-existing-options="
                 (query) => $emit('update-search-result-teams-groups', query)
               "
@@ -228,7 +228,7 @@
               v-else
               class="form-control"
               disabled
-              :value="teamsGroupAlias"
+              :value="currentTeamsGroupAlias"
             />
             <p class="help-block">{{ T.contestNewFormForTeamsDesc }}</p>
           </div>
@@ -374,7 +374,7 @@ export default class NewForm extends Vue {
   @Prop({ default: '' }) initialTitle!: string;
   @Prop({ default: null }) initialWindowLength!: null | number;
   @Prop({ default: null }) invalidParameterName!: null | string;
-  @Prop({ default: null }) initialTeamsGroupAlias!: null | string;
+  @Prop({ default: null }) teamsGroupAlias!: null | string;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop({ default: false }) contestForTeams!: boolean;
 
@@ -400,7 +400,7 @@ export default class NewForm extends Vue {
   windowLength = this.initialWindowLength;
   windowLengthEnabled = this.initialWindowLength !== null;
   currentContestForTeams = this.contestForTeams;
-  teamsGroupAlias = this.initialTeamsGroupAlias;
+  currentTeamsGroupAlias = this.teamsGroupAlias;
   titlePlaceHolder = '';
 
   @Watch('windowLengthEnabled')
@@ -510,7 +510,7 @@ export default class NewForm extends Vue {
     if (this.windowLengthEnabled && this.windowLength) {
       contest.window_length = this.windowLength;
     }
-    const request = { contest, teamsGroupAlias: this.teamsGroupAlias };
+    const request = { contest, teamsGroupAlias: this.currentTeamsGroupAlias };
     if (this.update) {
       this.$emit('update-contest', request);
       return;
