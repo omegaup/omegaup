@@ -20,6 +20,7 @@ import {
   trackClarifications,
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
+import { myRunsStore } from './runsStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -56,12 +57,14 @@ OmegaUp.on('ready', () => {
           problem: this.problem,
           problemAlias: this.problemAlias,
           problems: this.problems,
+          scoreboard: payload.scoreboard,
           showNewClarificationPopup: this.showNewClarificationPopup,
           showRanking: payload.showRanking,
           shouldShowFirstAssociatedIdentityRunWarning:
             payload.shouldShowFirstAssociatedIdentityRunWarning,
           activeTab,
           guid: this.guid,
+          runs: myRunsStore.state.runs,
         },
         on: {
           'navigate-to-problem': ({
