@@ -41,6 +41,62 @@ describe('Course.vue', () => {
     unlimited_duration: false,
   };
 
+  const scoreboard = {
+    finish_time: new Date(0),
+    problems: [
+      {
+        alias: 'problem_1',
+        order: 1,
+      },
+      {
+        alias: 'problem_2',
+        order: 2,
+      },
+      {
+        alias: 'problem_3',
+        order: 3,
+      },
+    ],
+    ranking: [
+      {
+        classname: 'user-rank-unranked',
+        country: 'MX',
+        is_invited: true,
+        problems: [
+          {
+            alias: 'problem_1',
+            penalty: 20,
+            percent: 1,
+            points: 100,
+            runs: 1,
+          },
+          {
+            alias: 'problem_2',
+            penalty: 10,
+            percent: 1,
+            points: 100,
+            runs: 4,
+          },
+          {
+            alias: 'problem_3',
+            penalty: 30,
+            percent: 1,
+            points: 100,
+            runs: 5,
+          },
+        ],
+        total: {
+          penalty: 20,
+          points: 100,
+        },
+        username: 'omegaUp',
+      },
+    ],
+    start_time: new Date(0),
+    time: new Date(0),
+    title: 'omegaUp',
+  };
+
   it('Should handle course in arena', async () => {
     const wrapper = mount(arena_Course, {
       propsData: {
@@ -56,6 +112,7 @@ describe('Course.vue', () => {
         showNewClarificationPopup: false,
         socketConnected: true,
         users: [],
+        scoreboard,
       },
     });
 
