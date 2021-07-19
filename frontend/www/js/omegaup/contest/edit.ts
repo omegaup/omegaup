@@ -221,7 +221,7 @@ OmegaUp.on('ready', () => {
               contest_for_teams: !!teamsGroupAlias,
             })
               .then((data) => {
-                if (teamsGroupAlias) {
+                if (teamsGroupAlias && data.teamsGroupName) {
                   this.teamsGroup = {
                     alias: teamsGroupAlias,
                     name: data.teamsGroupName,
