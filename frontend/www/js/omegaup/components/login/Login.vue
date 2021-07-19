@@ -18,11 +18,6 @@
                 <img src="/css/fb-oauth.png" height="45px" width="45px" />
               </a>
             </div>
-            <div class="col-xs-12 col-sm-4 text-center py-2">
-              <a :href="linkedinUrl" :title="T.loginWithLinkedIn">
-                <img src="/css/ln-oauth.png" height="45px" width="45px" />
-              </a>
-            </div>
           </div>
         </div>
 
