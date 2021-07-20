@@ -198,7 +198,6 @@ const translations: { [key: string]: string; } = {
   contestEditUnarchiveHelpText: "This contest is already archived, if you want to return it back to the unarchived contests list, click in the button",
   contestEditUnarchivedSuccess: "Contest unarchived succesfully",
   contestEditWithTitle: "Edit contest %(title)",
-  contestEditcannotReplaceTeamsGroupWithSubmissions: "You cannot replace the teams group in a contest that already has submissions",
   contestForTeamsCanNotChangeToContest: "A contest for teams cannot be changed to a normal contest",
   contestGroupAdded: "Group successfully added.",
   contestGroupRemoved: "Group successfully removed.",

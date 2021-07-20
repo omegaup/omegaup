@@ -3270,11 +3270,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($problemset) || is_null($problemset->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
-        if (\OmegaUp\DAO\Problemsets::hasSubmissions($problemset)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'contestEditcannotReplaceTeamsGroupWithSubmissions'
-            );
-        }
 
         try {
             // Begin a new transaction
@@ -4407,9 +4402,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'contestNotFound'
             );
         }
-        $result = [
-            'status' => 'ok',
-        ];
+
         // Push changes
         try {
             // Begin a new transaction
@@ -4464,9 +4457,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
                             'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
                         ])
                     );
-                    if (!is_null($teamsGroup->name)) {
-                        $result['teamsGroupName'] = $teamsGroup->name;
-                    }
                 }
             }
 
@@ -4532,7 +4522,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         self::$log->info("Contest updated (alias): {$contestAlias}");
 
-        return $result;
+        return [
+            'status' => 'ok',
+        ];
     }
 
     /**

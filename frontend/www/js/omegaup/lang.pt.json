@@ -197,7 +197,6 @@
 	"contestEditUnarchiveHelpText": "Este concurso j\u00e1 est\u00e1 arquivado, se desejar devolv\u00ea-lo \u00e0 lista de concursos desarquivados, clique no bot\u00e3o.",
 	"contestEditUnarchivedSuccess": "Concurso desarquivado com sucesso.",
 	"contestEditWithTitle": "Editar concurso %(title)",
-	"contestEditcannotReplaceTeamsGroupWithSubmissions": "Voc\u00ea n\u00e3o pode substituir o grupo de equipes em um concurso que j\u00e1 tenha solu\u00e7\u00f5es",
 	"contestForTeamsCanNotChangeToContest": "O concurso para equipes n\u00e3o pode ser alterado para o concurso normal",
 	"contestGroupAdded": "Grupo adicionado com sucesso",
 	"contestGroupRemoved": "Grupo removido com sucesso",
