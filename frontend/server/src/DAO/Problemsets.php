@@ -171,7 +171,7 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
                 LIMIT
                     1;';
 
-        /** @var int|null */
+        /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             [$problemset->problemset_id]
