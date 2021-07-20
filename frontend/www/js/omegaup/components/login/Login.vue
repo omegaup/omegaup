@@ -77,7 +77,6 @@ import T from '../../lang';
 @Component
 export default class Login extends Vue {
   @Prop() facebookUrl!: string;
-  @Prop() linkedinUrl!: string;
   usernameOrEmail: string = '';
   password: string = '';
   T = T;

@@ -113,12 +113,6 @@ try_define(
 );
 
 # ####################################
-# LINKEDIN LOGIN CONFIG
-# ####################################
-try_define('OMEGAUP_LINKEDIN_SECRET', 'xxxxx');
-try_define('OMEGAUP_LINKEDIN_CLIENTID', 'xxxxx');
-
-# ####################################
 # GOOGLE ANALYTICS
 # ####################################
 try_define('OMEGAUP_GA_TRACK', false);
