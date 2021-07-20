@@ -41,7 +41,7 @@ describe('Course.vue', () => {
     unlimited_duration: false,
   };
 
-  const scoreboard = {
+  const scoreboard: types.Scoreboard = {
     finish_time: new Date(0),
     problems: [
       {
