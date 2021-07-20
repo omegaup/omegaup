@@ -172,9 +172,10 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
                     1;';
 
         /** @var int */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+        $hasSubmissions = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             [$problemset->problemset_id]
-        ) != '0';
+        );
+        return boolval($hasSubmissions);
     }
 }
