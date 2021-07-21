@@ -167,15 +167,14 @@ OmegaUp.on('ready', () => {
               team_identities: JSON.stringify(
                 identities.map((identity) => ({
                   ...identity,
-                  ...{
-                    usernames: identitiesTeams[identity.username].join(';'),
-                  },
+                  usernames: identitiesTeams[identity.username].join(';'),
                 })),
               ),
               team_group_alias: payload.teamGroup.alias,
             })
               .then(() => {
                 this.refreshTeamsList();
+                this.refreshTeamsMembersList();
                 window.location.hash = `#${AvailableTabs.Teams}`;
                 this.tab = AvailableTabs.Teams;
                 ui.success(T.groupsIdentitiesSuccessfullyCreated);

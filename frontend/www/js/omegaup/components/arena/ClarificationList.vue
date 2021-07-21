@@ -51,7 +51,7 @@
             </option>
           </select>
         </label>
-        <label :class="{ 'ml-4': allowFilterByAssignment }">
+        <label :class="{ 'ml-md-4': allowFilterByAssignment }">
           {{ T.wordsFilterByProblem }}
           <select
             v-model="selectedProblem"
