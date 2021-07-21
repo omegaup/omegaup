@@ -3716,24 +3716,11 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // Get scoreboard;
         $scoreboard = new \OmegaUp\Scoreboard(
-            new \OmegaUp\ScoreboardParams([
-                'alias' => $assignment->alias,
-                'title' => $assignment->name,
-                'problemset_id' => $assignment->problemset_id,
-                'start_time' => $assignment->start_time,
-                'finish_time' => $assignment->finish_time,
-                'acl_id' => $assignment->acl_id,
-                'group_id' => $course->group_id,
-                'admin' => (
-                    \OmegaUp\Authorization::isCourseAdmin(
-                        $r->identity,
-                        $course
-                    ) ||
-                    \OmegaUp\Authorization::canCreatePublicCourse(
-                        $r->identity
-                    )
-                ),
-            ])
+            \OmegaUp\ScoreboardParams::fromAssignment(
+                $assignment,
+                intval($course->group_id),
+                /*showAllRuns*/true
+            )
         );
 
         return [
