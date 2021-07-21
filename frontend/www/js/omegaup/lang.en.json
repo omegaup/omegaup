@@ -616,7 +616,7 @@
 	"notificationCourseRegistrationManual": "You have been invited to join the course %(courseName).",
 	"notificationCourseRegistrationRejected": "Your registration request for course %(courseName) has been **rejected**.",
 	"notificationCourseRegistrationRequest": "The user **%(username)** has requested access to course %(courseName).",
-	"notificationCourseSubmissionFeedback": "The feedback about your submission for problem $(problemAlias) of the course %(courseName), has been submitted.",
+	"notificationCourseSubmissionFeedback": "The feedback about your submission for problem *%(problemAlias)* of the course %(courseName), has been submitted.",
 	"notificationNewBadge": "You have received a new badge: **%(badgeName)**.",
 	"notificationNotFound": "Notification not found",
 	"notificationsMarkAllAsRead": "Mark all as read",

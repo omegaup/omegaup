@@ -617,7 +617,7 @@ const translations: { [key: string]: string; } = {
   notificationCourseRegistrationManual: "Voc\u00ea foi convidado para participar do curso %(courseName).",
   notificationCourseRegistrationRejected: "Seu pedido de registro no curso %(courseName), tem sido **rejeitado**.",
   notificationCourseRegistrationRequest: "O usu\u00e1rio **%(username)** tem solicitado acceso ao curso %(courseName).",
-  notificationCourseSubmissionFeedback: "O feedback sobre sua submis\u00e3o para o problema $(problemAlias) no curso %(courseName), tem sido submetida.",
+  notificationCourseSubmissionFeedback: "O feedback sobre sua submis\u00e3o para o problema *%(problemAlias)* no curso %(courseName), tem sido submetida.",
   notificationNewBadge: "Voc\u00ea tem recebido um novo distintivo: **%(badgeName)**",
   notificationNotFound: "Notifica\u00e7\u00e3o n\u00e3o encontrada",
   notificationsMarkAllAsRead: "Marcar tudo como lido",

@@ -616,7 +616,7 @@
 	"notificationCourseRegistrationManual": "Has sido invitado a unirte al curso %(courseName).",
 	"notificationCourseRegistrationRejected": "Tu solicitud de registro en el curso %(courseName) ha sido **rechazada**.",
 	"notificationCourseRegistrationRequest": "El usuario **%(username)** ha solicitado acceso al curso %(courseName).",
-	"notificationCourseSubmissionFeedback": "Ha sido enviada la retroalimentaci\u00f3n sobre su env\u00edo para el problema $(problemAlias) en el curso %(courseName).",
+	"notificationCourseSubmissionFeedback": "Ha sido enviada la retroalimentaci\u00f3n sobre su env\u00edo para el problema *%(problemAlias)* en el curso %(courseName).",
 	"notificationNewBadge": "Has recibido una nueva insignia: **%(badgeName)**.",
 	"notificationNotFound": "No se encontr\u00f3 la notificaci\u00f3n",
 	"notificationsMarkAllAsRead": "Marcar todo como le\u00eddo",
