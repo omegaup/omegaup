@@ -4099,7 +4099,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     $identity,
                     /*$offset=*/ null,
                     /*$rowcount=*/ 100,
-                )
+                )['clarifications']
             ),
             'name' => strval($course->name),
             'description' => strval($course->description),
@@ -4922,9 +4922,54 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $r->identity,
                 $offset,
                 $rowcount
-            ),
+            )['clarifications'],
         ];
     }
+
+    // /**
+    //  * Gets the latest clarifications for course with pagination
+    //  *
+    //  * @return array{smartyProperties: array{payload: SubmissionsListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+    //  *
+    //  * @omegaup-request-param string $course_alias
+    //  * @omegaup-request-param int $offset
+    //  * @omegaup-request-param int $rowcount
+    //  */
+    // public static function getClarificationsForTypeScript(\OmegaUp\Request $r): array {
+    //     $clarifications = self::apiClarifications($r);
+
+    //     $page = is_null($r['page']) ? 1 : intval($r['page']);
+    //     $length = is_null($r['length']) ? 100 : intval($r['length']);
+
+    //     $latestSubmissions = \OmegaUp\DAO\Submissions::getLatestSubmissions(
+    //         $page,
+    //         $length,
+    //         null
+    //     );
+    //     return [
+    //         'smartyProperties' => [
+    //             'payload' => [
+    //                 'page' => $page,
+    //                 'length' => $length,
+    //                 'includeUser' => true,
+    //                 'submissions' => $latestSubmissions['submissions'],
+    //                 'totalRows' => $latestSubmissions['totalRows'],
+    //                 'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+    //                     $latestSubmissions['totalRows'],
+    //                     $length,
+    //                     $page,
+    //                     '/submissions/',
+    //                     2,
+    //                     []
+    //                 ),
+    //             ],
+    //             'title' => new \OmegaUp\TranslationString(
+    //                 'omegaupTitleLatestSubmissions'
+    //             ),
+    //         ],
+    //         'entrypoint' => 'submissions_list',
+    //     ];
+    // }
 
     /**
      * Get clarifications of problem in a contest

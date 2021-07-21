@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
     /**
-     * @return list<Clarification>
+     * @return array{clarifications: list<Clarification>, totalRows: int}
      */
     final public static function getProblemsetClarifications(
         ?\OmegaUp\DAO\VO\Contests $contest,
@@ -23,17 +23,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         ?int $offset,
         int $rowcount
     ): array {
-        $sql = '
-            SELECT
-                cl.clarification_id,
-                a.alias AS assignment_alias,
-                p.alias AS problem_alias,
-                i.username AS author,
-                r.username AS receiver,
-                cl.message,
-                cl.answer,
-                cl.`time`,
-                cl.public
+        $sqlFrom = '
             FROM
                 Clarifications cl
             INNER JOIN
@@ -63,7 +53,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         ];
 
         if (!$isAdmin) {
-            $sql .= '
+            $sqlFrom .= '
                 AND (
                     cl.public = 1
                     OR cl.author_id = ?
@@ -73,22 +63,119 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             $params[] = $currentIdentity->identity_id;
         }
 
-        $sql .= '
+        $sqlOrderBy = '
             ORDER BY
                 cl.answer IS NULL DESC,
                 cl.clarification_id DESC
-            ';
+        ';
+
+        $sqlCount = '
+            SELECT
+                COUNT(*)
+        ';
+
+        $sql = '
+            SELECT
+                cl.clarification_id,
+                a.alias AS assignment_alias,
+                p.alias AS problem_alias,
+                i.username AS author,
+                r.username AS receiver,
+                cl.message,
+                cl.answer,
+                cl.`time`,
+                cl.public
+        ';
+
+        // $sql = '
+        //     SELECT
+        //         cl.clarification_id,
+        //         a.alias AS assignment_alias,
+        //         p.alias AS problem_alias,
+        //         i.username AS author,
+        //         r.username AS receiver,
+        //         cl.message,
+        //         cl.answer,
+        //         cl.`time`,
+        //         cl.public
+        //     FROM
+        //         Clarifications cl
+        //     INNER JOIN
+        //         Identities i ON i.identity_id = cl.author_id
+        //     LEFT JOIN
+        //         Identities r ON r.identity_id = cl.receiver_id
+        //     INNER JOIN
+        //         Problems p ON p.problem_id = cl.problem_id
+        //     INNER JOIN
+        //         Problemsets ps ON ps.problemset_id = cl.problemset_id
+        //     LEFT JOIN
+        //         Contests con ON (
+        //             con.contest_id = ps.contest_id AND
+        //             con.problemset_id = ps.problemset_id
+        //         )
+        //     LEFT JOIN
+        //         Assignments a ON a.problemset_id = cl.problemset_id
+        //     WHERE
+        //         (
+        //             con.contest_id = ? OR
+        //             a.course_id = ?
+        //         )';
+
+        // $params = [
+        //     is_null($contest) ? null : $contest->contest_id,
+        //     is_null($course) ? null : $course->course_id,
+        // ];
+
+        // if (!$isAdmin) {
+        //     $sql .= '
+        //         AND (
+        //             cl.public = 1
+        //             OR cl.author_id = ?
+        //             OR cl.receiver_id = ?
+        //         )';
+        //     $params[] = $currentIdentity->identity_id;
+        //     $params[] = $currentIdentity->identity_id;
+        // }
+
+        // $sql .= '
+        //     ORDER BY
+        //         cl.answer IS NULL DESC,
+        //         cl.clarification_id DESC
+        //     ';
+        // if (!is_null($offset)) {
+        //     $sql .= 'LIMIT ?, ?';
+        //     $params[] = $offset;
+        //     $params[] = $rowcount;
+        // }
+
+        $query = $sql . $sqlFrom;
+        $countQuery = $sqlCount . $sqlFrom;
+
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $countQuery,
+            $params
+        ) ?? 0;
+
+        $sqlLimit = '';
         if (!is_null($offset)) {
-            $sql .= 'LIMIT ?, ?';
+            $sqlLimit = 'LIMIT ?, ?';
             $params[] = $offset;
             $params[] = $rowcount;
         }
 
+        $query .= $sqlOrderBy . $sqlLimit;
+
         /** @var list<array{answer: null|string, assignment_alias: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
+        $clarifications = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $query,
             $params
         );
+
+        return [
+            'totalRows' => $totalRows,
+            'clarifications' => $clarifications,
+        ];
     }
 
     /**
