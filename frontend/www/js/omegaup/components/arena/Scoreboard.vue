@@ -15,7 +15,7 @@
       />
       {{ T.scoreboardShowOnlyInvitedIdentities }}</label
     >
-    <table>
+    <table data-table-scoreboard>
       <thead>
         <tr>
           <th><!-- legend --></th>
