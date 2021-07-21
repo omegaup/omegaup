@@ -399,7 +399,7 @@ def create_clarification_user(driver, problem, question):
         '[data-new-clarification]').submit()
 
     clarifications = driver.browser.find_elements_by_css_selector(
-        '[data-tab-clarifications] table tr')
+        '[data-tab-clarifications] table tbody tr')
 
     assert len(clarifications) == 1, len(clarifications)
 
