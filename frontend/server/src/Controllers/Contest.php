@@ -723,10 +723,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $result['smartyProperties']['title'] = new \OmegaUp\TranslationString(
                 'omegaupTitleContest'
             );
-            // TODO: Replace next lines with: $result['entrypoint'] = 'arena_contest_contestant';
-            // when arena contest migration is over
-            $result['template'] = 'arena.contest.contestant.tpl';
-            unset($result['entrypoint']);
+            $result['entrypoint'] = 'arena_contest_contestant';
             return $result;
         }
         $result['smartyProperties']['payload']['needsBasicInformation'] = false;
