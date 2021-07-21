@@ -34,7 +34,7 @@ export default class MultiTypeahead extends Vue {
   @Prop() existingOptions!: types.ListItem[];
   @Prop({ default: 3 }) activationThreshold!: number;
   @Prop({ default: 10 }) maxResults!: number;
-  @Prop({ default: null }) value!: null | types.ListItem[];
+  @Prop({ default: () => [] }) value!: types.ListItem[];
 
   T = T;
   selectedOptions: types.ListItem[] = [];
@@ -45,7 +45,7 @@ export default class MultiTypeahead extends Vue {
   }
 
   @Watch('value')
-  onValueChanged(newValue: null | types.ListItem[]): void {
+  onValueChanged(newValue: types.ListItem[]): void {
     this.selectedOptions = this.existingOptions.filter((option) =>
       newValue?.some((opt) => option.key === opt['key']),
     );

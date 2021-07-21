@@ -4266,7 +4266,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Update a Contest
      *
-     * @return array{status: string}
+     * @return array{status: string, teamsGroupName?: string}
      *
      * @omegaup-request-param null|string $admission_mode
      * @omegaup-request-param null|string $alias

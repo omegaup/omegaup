@@ -7,13 +7,18 @@
           <omegaup-common-typeahead
             :existing-options="searchResultTeamsGroups"
             :value.sync="typeaheadGroup"
+            :disabled="hasSubmissions"
             @update-existing-options="
               (query) => $emit('update-search-result-teams-groups', query)
             "
           >
           </omegaup-common-typeahead>
         </div>
-        <button class="btn btn-primary" type="submit">
+        <button
+          class="btn btn-primary"
+          type="submit"
+          :disabled="hasSubmissions"
+        >
           {{ T.contestEditTeamsGroupReplace }}
         </button>
       </form>
@@ -55,6 +60,7 @@ import omegaup_Markdown from '../Markdown.vue';
 export default class TeamsGroup extends Vue {
   @Prop() teamsGroup!: types.ContestGroup;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
+  @Prop({ default: false }) hasSubmissions!: boolean;
 
   T = T;
   typeaheadGroup: null | string = null;
