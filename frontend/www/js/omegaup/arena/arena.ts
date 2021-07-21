@@ -36,7 +36,6 @@ export interface ArenaOptions {
   courseName: string | null;
   disableClarifications: boolean;
   disableSockets: boolean;
-  isInterview: boolean;
   isLockdownMode: boolean;
   originalContestAlias: string | null;
   originalProblemsetId?: number;
@@ -876,10 +875,6 @@ export class Arena {
           .text(problemName)
           .appendTo(problemSelect as Element);
       }
-    }
-
-    if (!this.options.isInterview) {
-      this.setupPolls();
     }
 
     // Trigger the event (useful on page load).
@@ -2284,7 +2279,6 @@ export class Arena {
 export function GetDefaultOptions(): ArenaOptions {
   return {
     isLockdownMode: false,
-    isInterview: false,
     disableClarifications: false,
     disableSockets: false,
     assignmentAlias: null,
