@@ -176,6 +176,6 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
             $sql,
             [$problemset->problemset_id]
         );
-        return boolval($hasSubmissions);
+        return $hasSubmissions > 0;
     }
 }
