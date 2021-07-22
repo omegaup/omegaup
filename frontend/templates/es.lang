@@ -181,6 +181,7 @@ contestEditArchiveConfirmText = "¿Estás seguro de que deseas realizar esta acc
 contestEditArchiveContest = "Archivar concurso"
 contestEditArchiveHelpText = "Al archivar un concurso, éste dejará de aparecer en todos los listados. La única forma de acceder al mismo, es a través de su URL o desde el listado de \"Mis concursos\", en la pestaña \"Concursos archivados\". Esta acción puede deshacerse."
 contestEditArchivedSuccess = "Concurso archivado exitosamente."
+contestEditCannotReplaceTeamsGroupWithSubmissions = "No puedes reemplazar un grupo de equipos en un concurso que ya tiene envíos"
 contestEditContestClonedSuccessfully = "El concurso se clonó exitosamente"
 contestEditContestEdited = "Tu concurso ha sido editado."
 contestEditGoToContest = "Ver Concurso"
