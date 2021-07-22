@@ -22,20 +22,25 @@ import {
   SubmissionRequest,
   submitRun,
   submitRunFailed,
+  trackRun,
+  updateRunFallback,
 } from './submissions';
 import { createChart, onRankingChanged, onRankingEvents } from './ranking';
 import { EventsSocket } from './events_socket';
 import rankingStore from './rankingStore';
 import socketStore from './socketStore';
-import { myRunsStore } from './runsStore';
+import { myRunsStore, runsStore } from './runsStore';
+import T from '../lang';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
-  const activeTab = window.location.hash
-    ? window.location.hash.substr(1).split('/')[0]
-    : 'problems';
+  const locationHash = window.location.hash.substr(1).split('/');
+  const activeTab = getSelectedValidTab(locationHash[0], payload.contestAdmin);
+  if (activeTab !== locationHash[0]) {
+    window.location.hash = activeTab;
+  }
   trackClarifications(payload.clarifications);
 
   let ranking: types.ScoreboardRankingEntry[];
@@ -91,6 +96,8 @@ OmegaUp.on('ready', () => {
       problemAlias: null as null | string,
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
+      searchResultUsers: [] as types.ListItem[],
+      runDetailsData: null as types.RunDetails | null,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
@@ -115,6 +122,9 @@ OmegaUp.on('ready', () => {
           showPenalty: this.showPenalty,
           socketStatus: socketStore.state.socketStatus,
           runs: myRunsStore.state.runs,
+          allRuns: runsStore.state.runs,
+          searchResultUsers: this.searchResultUsers,
+          runDetailsData: this.runDetailsData,
         },
         on: {
           'navigate-to-problem': ({
@@ -130,10 +140,41 @@ OmegaUp.on('ready', () => {
               contestAlias: payload.contest.alias,
             });
           },
+          'update-search-result-users-contest': ({
+            query,
+            contestAlias,
+          }: {
+            query: string;
+            contestAlias: string;
+          }) => {
+            api.Contest.searchUsers({ query, contest_alias: contestAlias })
+              .then(({ results }) => {
+                this.searchResultUsers = results.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
           'show-run': (request: SubmissionRequest) => {
             const hash = `#problems/${
               this.problemAlias ?? request.request.problemAlias
             }/show-run:${request.request.guid}/`;
+            api.Run.details({ run_alias: request.request.guid })
+              .then((runDetails) => {
+                showSubmission({ request, runDetails, hash });
+              })
+              .catch((error) => {
+                ui.apiError(error);
+                this.popupDisplayed = PopupDisplayed.None;
+              });
+          },
+          'show-run-all': (request: SubmissionRequest) => {
+            const hash = `#runs/show-run:${request.request.guid}/`;
             api.Run.details({ run_alias: request.request.guid })
               .then((runDetails) => {
                 showSubmission({ request, runDetails, hash });
@@ -228,6 +269,25 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          rejudge: (run: types.Run) => {
+            api.Run.rejudge({ run_alias: run.guid, debug: false })
+              .then(() => {
+                run.status = 'rejudging';
+                updateRunFallback({ run });
+              })
+              .catch(ui.ignoreError);
+          },
+          disqualify: (run: types.Run) => {
+            if (!window.confirm(T.runDisqualifyConfirm)) {
+              return;
+            }
+            api.Run.disqualify({ run_alias: run.guid })
+              .then(() => {
+                run.type = 'disqualified';
+                updateRunFallback({ run });
+              })
+              .catch(ui.ignoreError);
+          },
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
           },
@@ -261,6 +321,27 @@ OmegaUp.on('ready', () => {
     intervalInMilliseconds: 5 * 60 * 1000,
   });
   socket.connect();
+
+  function getSelectedValidTab(tab: string, isAdmin: boolean): string {
+    const validTabs = ['problems', 'ranking', 'runs', 'clarifications'];
+    const defaultTab = 'problems';
+    if (tab === 'runs' && !isAdmin) return defaultTab;
+    const isValidTab = validTabs.includes(tab);
+    return isValidTab ? tab : defaultTab;
+  }
+
+  if (payload.allRuns) {
+    for (const run of payload.allRuns) {
+      trackRun({ run });
+    }
+  }
+
+  if (locationHash[1] && locationHash[1].includes('show-run:')) {
+    const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
+    const showRunMatch = window.location.hash.match(showRunRegex);
+    contestContestant.guid = showRunMatch ? showRunMatch[1] : null;
+    contestContestant.popupDisplayed = PopupDisplayed.RunDetails;
+  }
 
   setInterval(() => {
     refreshContestClarifications({

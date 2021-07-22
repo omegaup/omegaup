@@ -42,7 +42,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
- * @psalm-type ContestDetailsPayload=array{clarifications: list<Clarification>, contest: ContestPublicDetails, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null, users: list<ContestUser>}
+ * @psalm-type ContestDetailsPayload=array{allRuns: list<Run>, clarifications: list<Clarification>, contest: ContestPublicDetails, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null, users: list<ContestUser>}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
@@ -692,11 +692,45 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 );
             }
 
+            $allRuns = [];
+
+            if ($contestAdmin) {
+                // Get our runs
+                $runs = \OmegaUp\DAO\Runs::getAllRuns(
+                    $problemset->problemset_id,
+                    /*$status=*/ null,
+                    /*$verdict=*/ null,
+                    /*$problem_id=*/ null,
+                    /*$language=*/ null,
+                    /*$identity_id=*/ null,
+                    /*$offset=*/ 0,
+                    /*$rowcount=*/ 100
+                );
+
+                foreach ($runs as $run) {
+                    unset($run['run_id']);
+                    if ($contest->partial_score || $run['score'] == 1) {
+                        $run['contest_score'] = round(
+                            floatval(
+                                $run['contest_score']
+                            ),
+                            2
+                        );
+                        $run['score'] = round(floatval($run['score']), 4);
+                    } else {
+                        $run['contest_score'] = 0;
+                        $run['score'] = 0;
+                    }
+                    $allRuns[] = $run;
+                }
+            }
+
             $result['smartyProperties']['payload'] = array_merge(
                 $result['smartyProperties']['payload'],
                 [
                     'shouldShowFirstAssociatedIdentityRunWarning' => $shouldShowFirstAssociatedIdentityRunWarning,
                     'contestAdmin' => $contestAdmin,
+                    'allRuns' => $allRuns,
                     'scoreboard' => self::getScoreboard(
                         $contest,
                         $problemset,

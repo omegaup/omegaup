@@ -2,8 +2,8 @@
   <omegaup-arena
     :active-tab="activeTab"
     :contest-title="contest.title"
-    :is-admin="isAdmin"
     :clarifications="currentClarifications"
+    :should-show-runs="contestAdmin"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #socket-status>
@@ -92,6 +92,45 @@
         :show-invited-users-filter="true"
       ></omegaup-arena-scoreboard>
     </template>
+    <template #arena-runs>
+      <omegaup-arena-runs
+        :contest-alias="contest.alias"
+        :runs="allRuns"
+        :show-contest="false"
+        :show-problem="true"
+        :show-details="true"
+        :show-disqualify="true"
+        :show-pager="true"
+        :show-rejudge="true"
+        :show-user="true"
+        :problemset-problems="Object.values(problems)"
+        :global-runs="false"
+        :is-contest-finished="isContestFinished"
+        :search-result-users="searchResultUsers"
+        @details="(run) => onRunDetails(run.guid)"
+        @rejudge="(run) => $emit('rejudge', run)"
+        @disqualify="(run) => $emit('disqualify', run)"
+        @update-search-result-users-contest="
+          (request) => $emit('update-search-result-users-contest', request)
+        "
+        @update-search-result-users="
+          (request) => $emit('update-search-result-users', request)
+        "
+      ></omegaup-arena-runs>
+      <omegaup-overlay
+        v-if="contestAdmin"
+        :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
+        @hide-overlay="onPopupDismissed"
+      >
+        <template #popup>
+          <omegaup-arena-rundetails-popup
+            v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
+            :data="currentRunDetailsData"
+            @dismiss="onPopupDismissed"
+          ></omegaup-arena-rundetails-popup>
+        </template>
+      </omegaup-overlay>
+    </template>
     <template #arena-clarifications>
       <omegaup-arena-clarification-list
         :problems="problems"
@@ -140,10 +179,13 @@ import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_NavbarMiniranking from './NavbarMiniranking.vue';
+import arena_Runs from './Runsv2.vue';
+import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import arena_Summary from './Summary.vue';
 import arena_Scoreboard from './Scoreboard.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_Markdown from '../Markdown.vue';
+import omegaup_Overlay from '../Overlay.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { omegaup } from '../../omegaup';
 import { ContestClarificationType } from '../../arena/clarifications';
@@ -153,12 +195,15 @@ import { SocketStatus } from '../../arena/events_socket';
   components: {
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena': arena_Arena,
+    'omegaup-arena-runs': arena_Runs,
     'omegaup-arena-summary': arena_Summary,
     'omegaup-arena-navbar-miniranking': arena_NavbarMiniranking,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
+    'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-arena-scoreboard': arena_Scoreboard,
     'omegaup-countdown': omegaup_Countdown,
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-overlay': omegaup_Overlay,
     'omegaup-problem-details': problem_Details,
   },
 })
@@ -171,12 +216,10 @@ export default class ArenaContest extends Vue {
   @Prop() problemInfo!: types.ProblemInfo;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop({ default: false }) isEphemeralExperimentEnabled!: boolean;
-  @Prop({ default: false }) admin!: boolean;
   @Prop({ default: true }) showNavigation!: boolean;
   @Prop({ default: false }) showRanking!: boolean;
   @Prop({ default: true }) showClarifications!: boolean;
   @Prop({ default: true }) showDeadlines!: boolean;
-  @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
@@ -191,15 +234,21 @@ export default class ArenaContest extends Vue {
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: true }) socketConnected!: boolean;
   @Prop({ default: () => [] }) runs!: types.Run[];
+  @Prop({ default: () => [] }) allRuns!: types.Run[];
+  @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
 
   T = T;
   ui = ui;
+  PopupDisplayed = PopupDisplayed;
   ContestClarificationType = ContestClarificationType;
   currentClarifications = this.clarifications;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
   shouldShowRunDetails = false;
   nextSubmissionTimestamp: Date | null = null;
   now = new Date();
+  currentRunDetailsData = this.runDetailsData;
+  currentPopupDisplayed = this.popupDisplayed;
 
   get socketClass(): string {
     if (this.socketStatus === SocketStatus.Connected) {
@@ -248,6 +297,18 @@ export default class ArenaContest extends Vue {
       problem: this.activeProblem,
       target: this,
     });
+  }
+
+  onRunDetails(guid: string): void {
+    this.$emit('show-run-all', {
+      request: { guid, isAdmin: this.contestAdmin },
+      target: this,
+    });
+    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+  }
+
+  onPopupDismissed(): void {
+    this.currentPopupDisplayed = PopupDisplayed.None;
   }
 
   @Watch('problem')
