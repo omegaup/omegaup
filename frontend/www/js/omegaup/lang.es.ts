@@ -641,6 +641,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleContestNew: "Nuevo concurso",
   omegaupTitleContestPractice: "Concurso (Modo pr\u00e1ctica)",
   omegaupTitleContestStats: "Estad\u00edsticas de concurso",
+  omegaupTitleCourseClarifications: "Clarificaciones del curso",
   omegaupTitleCourseDetails: "Detalles del curso",
   omegaupTitleCourseEdit: "Editar curso",
   omegaupTitleCourseIntro: "Entrar al curso",

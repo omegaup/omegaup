@@ -55,6 +55,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
+ * @psalm-type CourseClarificationsPayload=array{page: int, length: int, pagerItems: list<PageItem>, clarifications: list<Clarification>}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -4926,50 +4927,70 @@ class Course extends \OmegaUp\Controllers\Controller {
         ];
     }
 
-    // /**
-    //  * Gets the latest clarifications for course with pagination
-    //  *
-    //  * @return array{smartyProperties: array{payload: SubmissionsListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
-    //  *
-    //  * @omegaup-request-param string $course_alias
-    //  * @omegaup-request-param int $offset
-    //  * @omegaup-request-param int $rowcount
-    //  */
-    // public static function getClarificationsForTypeScript(\OmegaUp\Request $r): array {
-    //     $clarifications = self::apiClarifications($r);
+    /**
+     * Gets the latest clarifications for course with pagination
+     *
+     * @return array{smartyProperties: array{payload: CourseClarificationsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     */
+    public static function getClarificationsForTypeScript(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
 
-    //     $page = is_null($r['page']) ? 1 : intval($r['page']);
-    //     $length = is_null($r['length']) ? 100 : intval($r['length']);
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
 
-    //     $latestSubmissions = \OmegaUp\DAO\Submissions::getLatestSubmissions(
-    //         $page,
-    //         $length,
-    //         null
-    //     );
-    //     return [
-    //         'smartyProperties' => [
-    //             'payload' => [
-    //                 'page' => $page,
-    //                 'length' => $length,
-    //                 'includeUser' => true,
-    //                 'submissions' => $latestSubmissions['submissions'],
-    //                 'totalRows' => $latestSubmissions['totalRows'],
-    //                 'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
-    //                     $latestSubmissions['totalRows'],
-    //                     $length,
-    //                     $page,
-    //                     '/submissions/',
-    //                     2,
-    //                     []
-    //                 ),
-    //             ],
-    //             'title' => new \OmegaUp\TranslationString(
-    //                 'omegaupTitleLatestSubmissions'
-    //             ),
-    //         ],
-    //         'entrypoint' => 'submissions_list',
-    //     ];
-    // }
+        $course = self::validateCourseExists(
+            $r->ensureString(
+                'course_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            )
+        );
+
+        if (
+            !\OmegaUp\Authorization::canViewCourse(
+                $r->identity,
+                $course,
+                self::resolveGroup($course)
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $list = \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
+            /* contest */            null,
+            $course,
+            \OmegaUp\Authorization::isCourseAdmin($r->identity, $course),
+            $r->identity,
+            $page,
+            $pageSize
+        );
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'page' => $page,
+                    'length' => $pageSize,
+                    'clarifications' => $list['clarifications'],
+                    'totalRows' => $list['totalRows'],
+                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+                        $list['totalRows'],
+                        $pageSize,
+                        $page,
+                        "/course/{$course->alias}/clarifications/",
+                        2,
+                        []
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCourseClarifications'
+                ),
+            ],
+            'entrypoint' => 'course_clarifications',
+        ];
+    }
 
     /**
      * Get clarifications of problem in a contest

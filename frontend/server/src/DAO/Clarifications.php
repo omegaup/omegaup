@@ -87,67 +87,6 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 cl.public
         ';
 
-        // $sql = '
-        //     SELECT
-        //         cl.clarification_id,
-        //         a.alias AS assignment_alias,
-        //         p.alias AS problem_alias,
-        //         i.username AS author,
-        //         r.username AS receiver,
-        //         cl.message,
-        //         cl.answer,
-        //         cl.`time`,
-        //         cl.public
-        //     FROM
-        //         Clarifications cl
-        //     INNER JOIN
-        //         Identities i ON i.identity_id = cl.author_id
-        //     LEFT JOIN
-        //         Identities r ON r.identity_id = cl.receiver_id
-        //     INNER JOIN
-        //         Problems p ON p.problem_id = cl.problem_id
-        //     INNER JOIN
-        //         Problemsets ps ON ps.problemset_id = cl.problemset_id
-        //     LEFT JOIN
-        //         Contests con ON (
-        //             con.contest_id = ps.contest_id AND
-        //             con.problemset_id = ps.problemset_id
-        //         )
-        //     LEFT JOIN
-        //         Assignments a ON a.problemset_id = cl.problemset_id
-        //     WHERE
-        //         (
-        //             con.contest_id = ? OR
-        //             a.course_id = ?
-        //         )';
-
-        // $params = [
-        //     is_null($contest) ? null : $contest->contest_id,
-        //     is_null($course) ? null : $course->course_id,
-        // ];
-
-        // if (!$isAdmin) {
-        //     $sql .= '
-        //         AND (
-        //             cl.public = 1
-        //             OR cl.author_id = ?
-        //             OR cl.receiver_id = ?
-        //         )';
-        //     $params[] = $currentIdentity->identity_id;
-        //     $params[] = $currentIdentity->identity_id;
-        // }
-
-        // $sql .= '
-        //     ORDER BY
-        //         cl.answer IS NULL DESC,
-        //         cl.clarification_id DESC
-        //     ';
-        // if (!is_null($offset)) {
-        //     $sql .= 'LIMIT ?, ?';
-        //     $params[] = $offset;
-        //     $params[] = $rowcount;
-        // }
-
         $query = $sql . $sqlFrom;
         $countQuery = $sqlCount . $sqlFrom;
 
