@@ -3715,13 +3715,21 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // Get scoreboard;
-        $scoreboard = new \OmegaUp\Scoreboard(
-            \OmegaUp\ScoreboardParams::fromAssignment(
-                $assignment,
-                intval($course->group_id),
-                /*showAllRuns*/true
+        $params = \OmegaUp\ScoreboardParams::fromAssignment(
+            $assignment,
+            intval($course->group_id),
+            /*showAllRuns*/false
+        );
+         $params->admin = (
+        \OmegaUp\Authorization::isCourseAdmin(
+            $r->identity,
+            $course
+        ) ||
+            \OmegaUp\Authorization::canCreatePublicCourse(
+                $r->identity
             )
         );
+        $scoreboard = new \OmegaUp\Scoreboard($params);
 
         return [
             'smartyProperties' => [
@@ -3777,7 +3785,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Courses $course,
         \OmegaUp\DAO\VO\Groups $group,
         string $assignmentAlias
-    ) {
+    ): array {
         $r->ensureIdentity();
         $assignment = self::validateCourseAssignmentAlias(
             $course,
