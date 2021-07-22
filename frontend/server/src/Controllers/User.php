@@ -4194,9 +4194,6 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{entrypoint: string, smartyProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
      *
-     * @omegaup-request-param string $code
-     * @omegaup-request-param string $redirect
-     * @omegaup-request-param string $state
      * @omegaup-request-param string $third_party_login
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
