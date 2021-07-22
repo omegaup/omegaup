@@ -183,6 +183,7 @@ const translations: { [key: string]: string; } = {
   contestEditArchiveContest: "(Archiv3 c0n7357)",
   contestEditArchiveHelpText: "(Wh3n archiving a c0n7357, i7 wi11 n0 10ng3r app3ar in a11 7h3 1i575. Th3 0n1y way 70 acc355 i7 i5 7hr0ugh i75 URL 0r fr0m 7h3 1i57 0f \"My c0n73575\", in 7h3 \"Archiv3d c0n73575\" 7ab. Thi5 ac7i0n can b3 und0n3.)",
   contestEditArchivedSuccess: "(C0n7357 archiv3d 5ucc355fu11y.)",
+  contestEditCannotReplaceTeamsGroupWithSubmissions: "(Y0u cann07 r3p1ac3 7h3 73am5 gr0up in a c0n7357 7ha7 a1r3ady ha5 5ubmi55i0n5)",
   contestEditContestClonedSuccessfully: "(C0n7357 wa5 c10n3d 5ucc355fu11y)",
   contestEditContestEdited: "(Y0ur c0n7357 ha5 b33n 3di73d)",
   contestEditGoToContest: "(Vi3w c0n7357)",
