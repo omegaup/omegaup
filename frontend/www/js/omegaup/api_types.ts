@@ -219,15 +219,16 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ContestDetailsPayload {
       return ((x) => {
-        x.allRuns = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            x.time = ((x: number) => new Date(x * 1000))(x.time);
-            return x;
-          });
-        })(x.allRuns);
+        if (x.allRuns)
+          x.allRuns = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.allRuns);
         x.clarifications = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -1910,7 +1911,7 @@ export namespace types {
   }
 
   export interface ContestDetailsPayload {
-    allRuns: types.Run[];
+    allRuns?: types.Run[];
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
     contestAdmin: boolean;
