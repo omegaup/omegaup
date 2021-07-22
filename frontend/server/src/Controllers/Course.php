@@ -3724,7 +3724,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Authorization::isCourseAdmin(
             $r->identity,
             $course
-        ) ||
+         ) ||
             \OmegaUp\Authorization::canCreatePublicCourse(
                 $r->identity
             )
