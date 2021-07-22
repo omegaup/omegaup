@@ -877,6 +877,8 @@ export class Arena {
       }
     }
 
+    this.setupPolls();
+
     // Trigger the event (useful on page load).
     this.onHashChanged();
 
