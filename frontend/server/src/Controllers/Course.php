@@ -3721,10 +3721,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             /*showAllRuns*/false
         );
          $params->admin = (
-        \OmegaUp\Authorization::isCourseAdmin(
-            $r->identity,
-            $course
-         ) ||
+            \OmegaUp\Authorization::isCourseAdmin(
+                $r->identity,
+                $course
+            ) ||
             \OmegaUp\Authorization::canCreatePublicCourse(
                 $r->identity
             )
