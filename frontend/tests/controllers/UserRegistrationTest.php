@@ -57,7 +57,7 @@ class UserRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Session::LoginViaGoogle($username . '@isp.com');
         $identity = \OmegaUp\DAO\Identities::findByUsername($username);
 
-        // Users logged via google, facebook, linkedin does not have password
+        // Users logged via google, facebook
         $this->assertNull($identity->password);
 
         // Inflate request
