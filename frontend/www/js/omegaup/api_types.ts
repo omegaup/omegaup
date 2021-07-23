@@ -101,6 +101,13 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.currentAssignment);
+        x.scoreboard = ((x) => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.scoreboard);
         return x;
       })(
         JSON.parse(
@@ -1573,6 +1580,7 @@ export namespace types {
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
     currentAssignment: types.ArenaAssignment;
+    scoreboard: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
   }
@@ -2347,6 +2355,7 @@ export namespace types {
     state?: string;
     state_id?: string;
     username: string;
+    usernames?: string;
   }
 
   export interface IdentityExt {
@@ -3655,7 +3664,7 @@ export namespace messages {
     verdict_counts: { [key: string]: number };
   };
   export type ContestUpdateRequest = { [key: string]: any };
-  export type ContestUpdateResponse = {};
+  export type ContestUpdateResponse = { teamsGroupName?: string };
   export type ContestUpdateEndTimeForIdentityRequest = { [key: string]: any };
   export type ContestUpdateEndTimeForIdentityResponse = {};
   export type ContestUsersRequest = { [key: string]: any };

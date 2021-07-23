@@ -45,9 +45,15 @@
       <form
         v-if="!clarification.answer || showUpdateAnswer"
         class="form-inline justify-content-between"
+        data-form-clarification-answer
+        @submit.prevent="sendClarificationResponse"
       >
         <div class="form-group">
-          <select v-model="selectedResponse" class="form-control">
+          <select
+            v-model="selectedResponse"
+            class="form-control"
+            data-select-answer
+          >
             <option
               v-for="response in responses"
               :key="response.value"
@@ -73,11 +79,7 @@
             {{ T.wordsPublic }}
           </label>
         </div>
-        <button
-          class="btn btn-primary btn-sm mt-2 mt-lg-2"
-          type="submit"
-          @click.prevent="sendClarificationResponse"
-        >
+        <button class="btn btn-primary btn-sm mt-2 mt-lg-2" type="submit">
           {{ T.wordsSend }}
         </button>
       </form>

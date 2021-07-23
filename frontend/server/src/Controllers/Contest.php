@@ -723,10 +723,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $result['smartyProperties']['title'] = new \OmegaUp\TranslationString(
                 'omegaupTitleContest'
             );
-            // TODO: Replace next lines with: $result['entrypoint'] = 'arena_contest_contestant';
-            // when arena contest migration is over
-            $result['template'] = 'arena.contest.contestant.tpl';
-            unset($result['entrypoint']);
+            $result['entrypoint'] = 'arena_contest_contestant';
             return $result;
         }
         $result['smartyProperties']['payload']['needsBasicInformation'] = false;
@@ -3270,6 +3267,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($problemset) || is_null($problemset->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
+        if (\OmegaUp\DAO\Problemsets::hasSubmissions($problemset)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'contestEditCannotReplaceTeamsGroupWithSubmissions'
+            );
+        }
 
         try {
             // Begin a new transaction
@@ -4266,7 +4268,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Update a Contest
      *
-     * @return array{status: string}
+     * @return array{status: string, teamsGroupName?: string}
      *
      * @omegaup-request-param null|string $admission_mode
      * @omegaup-request-param null|string $alias
@@ -4402,6 +4404,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'contestNotFound'
             );
         }
+        $result = [
+            'status' => 'ok',
+        ];
 
         // Push changes
         try {
@@ -4457,6 +4462,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                             'role_id' => \OmegaUp\Authorization::CONTESTANT_ROLE,
                         ])
                     );
+                    if (!is_null($teamsGroup->name)) {
+                        $result['teamsGroupName'] = $teamsGroup->name;
+                    }
                 }
             }
 
@@ -4522,9 +4530,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         self::$log->info("Contest updated (alias): {$contestAlias}");
 
-        return [
-            'status' => 'ok',
-        ];
+        return $result;
     }
 
     /**

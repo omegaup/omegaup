@@ -50,7 +50,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type IntroDetailsPayload=array{alias: string, archived: boolean, description: string, details?: CourseDetails, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
  * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
  * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, start_time: \OmegaUp\Timestamp}
- * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, courseDetails: CourseDetails, currentAssignment: ArenaAssignment}
+ * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard: Scoreboard, shouldShowFirstAssociatedIdentityRunWarning: bool, courseDetails: CourseDetails, currentAssignment: ArenaAssignment}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
@@ -3714,6 +3714,28 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
+        // Get scoreboard;
+        $scoreboard = new \OmegaUp\Scoreboard(
+            new \OmegaUp\ScoreboardParams([
+                'alias' => $assignment->alias,
+                'title' => $assignment->name,
+                'problemset_id' => $assignment->problemset_id,
+                'start_time' => $assignment->start_time,
+                'finish_time' => $assignment->finish_time,
+                'acl_id' => $assignment->acl_id,
+                'group_id' => $course->group_id,
+                'admin' => (
+                    \OmegaUp\Authorization::isCourseAdmin(
+                        $r->identity,
+                        $course
+                    ) ||
+                    \OmegaUp\Authorization::canCreatePublicCourse(
+                        $r->identity
+                    )
+                ),
+            ])
+        );
+
         return [
             'smartyProperties' => [
                 'payload' => [
@@ -3746,6 +3768,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'finish_time' => $assignment->finish_time,
                         'problems' => $problemsResponseArray,
                     ],
+                    'scoreboard' => $scoreboard->generate(
+                        /*$withRunDetails=*/                        false,
+                        /*$sortByName=*/false
+                    ),
                 ],
                 'fullWidth' => true,
                 'title' => strval($assignment->name),

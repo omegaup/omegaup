@@ -13,6 +13,8 @@ import {
   generateHumanReadablePassword,
   generatePassword,
   getCSVRecords,
+  identityOptionalFields,
+  identityRequiredFields,
 } from '../groups';
 
 OmegaUp.on('ready', () => {
@@ -165,15 +167,14 @@ OmegaUp.on('ready', () => {
               team_identities: JSON.stringify(
                 identities.map((identity) => ({
                   ...identity,
-                  ...{
-                    usernames: identitiesTeams[identity.username].join(';'),
-                  },
+                  usernames: identitiesTeams[identity.username].join(';'),
                 })),
               ),
               team_group_alias: payload.teamGroup.alias,
             })
               .then(() => {
                 this.refreshTeamsList();
+                this.refreshTeamsMembersList();
                 window.location.hash = `#${AvailableTabs.Teams}`;
                 this.tab = AvailableTabs.Teams;
                 ui.success(T.groupsIdentitiesSuccessfullyCreated);
@@ -231,6 +232,7 @@ OmegaUp.on('ready', () => {
                 'state_id',
                 'gender',
                 'school_name',
+                'usernames',
               ],
               records: identities,
             });
@@ -254,14 +256,8 @@ OmegaUp.on('ready', () => {
               const records = getCSVRecords<types.Identity>({
                 fields: dataset.fields,
                 records: dataset.records,
-                requiredFields: new Set([
-                  'username',
-                  'name',
-                  'country_id',
-                  'state_id',
-                  'gender',
-                  'school_name',
-                ]),
+                requiredFields: identityRequiredFields,
+                optionalFields: identityOptionalFields,
               });
               for (const {
                 username,
@@ -270,6 +266,7 @@ OmegaUp.on('ready', () => {
                 state_id,
                 gender,
                 school_name,
+                usernames,
               } of records) {
                 identities.push({
                   username: `teams:${payload.teamGroup.alias}:${username}`,
@@ -281,10 +278,11 @@ OmegaUp.on('ready', () => {
                   state_id,
                   school_name,
                   gender: gender ?? 'decline',
+                  usernames,
                 });
                 identitiesTeams[
                   `teams:${payload.teamGroup.alias}:${username}`
-                ] = [];
+                ] = usernames?.split(';') ?? [];
               }
               ui.dismissNotifications();
               this.userErrorRow = null;

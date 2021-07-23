@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card" data-tab-clarifications>
     <h5 class="card-header">{{ T.wordsClarifications }}</h5>
     <div class="card-body">
       <slot name="new-clarification">
@@ -40,6 +40,7 @@
           <select
             v-model="selectedAssignment"
             class="form-control custom-select ml-1"
+            name="problem"
           >
             <option
               v-for="assignmentName in assignmentsNames"
@@ -50,7 +51,7 @@
             </option>
           </select>
         </label>
-        <label :class="{ 'ml-4': allowFilterByAssignment }">
+        <label :class="{ 'ml-md-4': allowFilterByAssignment }">
           {{ T.wordsFilterByProblem }}
           <select
             v-model="selectedProblem"

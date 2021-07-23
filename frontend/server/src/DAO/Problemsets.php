@@ -158,4 +158,24 @@ class Problemsets extends \OmegaUp\DAO\Base\Problemsets {
             [$user->user_id]
         ) == '0';
     }
+
+    public static function hasSubmissions(
+        \OmegaUp\DAO\VO\Problemsets $problemset
+    ): bool {
+        $sql = 'SELECT
+                    COUNT(*)
+                FROM
+                    Submissions s
+                WHERE
+                    s.problemset_id = ?
+                LIMIT
+                    1;';
+
+        /** @var int */
+        $hasSubmissions = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$problemset->problemset_id]
+        );
+        return $hasSubmissions > 0;
+    }
 }
