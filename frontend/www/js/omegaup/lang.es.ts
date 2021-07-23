@@ -513,7 +513,6 @@ const translations: { [key: string]: string; } = {
   interviewNotStarted: "No iniciada",
   interviewResultsFor: "Resultados de ",
   interviews: "Entrevistas",
-  invalidCsrfToken: "Token CSRF inv\u00e1lido",
   invalidLanguage: "Languaje inv\u00e1lido",
   invalidParameters: "Par\u00e1metros inv\u00e1lidos.",
   invalidResetToken: "Token inv\u00e1lido.",
