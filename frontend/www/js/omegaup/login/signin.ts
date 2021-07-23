@@ -52,7 +52,6 @@ OmegaUp.on('ready', () => {
         props: {
           validateRecaptcha: payload.validateRecaptcha,
           facebookUrl: payload.facebookUrl,
-          linkedinUrl: payload.linkedinUrl,
         },
         on: {
           'register-and-login': (
