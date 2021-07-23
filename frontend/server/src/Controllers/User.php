@@ -32,7 +32,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
- * @psalm-type LoginDetailsPayload=array{facebookUrl: string, linkedinUrl: string, statusError?: string, validateRecaptcha: bool}
+ * @psalm-type LoginDetailsPayload=array{facebookUrl: string, statusError?: string, validateRecaptcha: bool}
  * @psalm-type Experiment=array{config: bool, hash: string, name: string}
  * @psalm-type UserRole=array{name: string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
@@ -4104,16 +4104,11 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{entrypoint: string, smartyProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
      *
-     * @omegaup-request-param string $code
-     * @omegaup-request-param string $redirect
-     * @omegaup-request-param string $state
      * @omegaup-request-param string $third_party_login
      */
     public static function getLoginDetailsForTypeScript(\OmegaUp\Request $r) {
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
-        if ($r->offsetExists('linkedin')) {
-            $thirdPartyLogin = 'linkedin';
-        } elseif ($r->offsetExists('fb')) {
+        if ($r->offsetExists('fb')) {
             $thirdPartyLogin = 'facebook';
         }
 
@@ -4122,7 +4117,6 @@ class User extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
                     'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
-                    'linkedinUrl' => \OmegaUp\Controllers\Session::getLinkedInLoginUrl(),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
                 'scripts' => [
@@ -4132,13 +4126,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'login_signin',
         ];
         try {
-            if ($thirdPartyLogin === 'linkedin') {
-                \OmegaUp\Controllers\Session::loginViaLinkedIn(
-                    $r->ensureString('code'),
-                    $r->ensureString('state'),
-                    $r->ensureOptionalString('redirect')
-                );
-            } elseif ($thirdPartyLogin === 'facebook') {
+            if ($thirdPartyLogin === 'facebook') {
                 \OmegaUp\Controllers\Session::loginViaFacebook();
             }
         } catch (\OmegaUp\Exceptions\ApiException $e) {

@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Description of DetailsContest
  */
@@ -106,7 +104,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Assert the log is empty.
         $this->assertEquals(0, count(\OmegaUp\DAO\ProblemsetAccessLog::getByProblemsetIdentityId(
@@ -158,7 +156,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare our request
         $login = self::login($identity);
@@ -199,7 +197,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contest
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
@@ -234,10 +232,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get a user for our scenario
-        [
-            'user' => $contestant,
-            'identity' => $identity,
-        ] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contest
         {
@@ -285,12 +280,12 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get some problems into the contest
-        $problems = \OmegaUp\Test\Factories\Contest::insertProblemsInContest(
+        \OmegaUp\Test\Factories\Contest::insertProblemsInContest(
             $contestData
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare our request
         $login = self::login($identity);
@@ -316,7 +311,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare our request
         $login = self::login($identity);
@@ -329,7 +324,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Contest::apiOpen($r);
 
         // Call api
-        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
+        \OmegaUp\Controllers\Contest::apiDetails($r);
 
         // We need to grab the access time from the ContestUsers table
         $contest = \OmegaUp\DAO\Contests::getByAlias(
@@ -343,7 +338,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $firstAccessTime = $problemset_identity->access_time;
 
         // Call API again, access time should not change
-        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
+        \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $problemset_identity = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
             $identity->identity_id,
@@ -363,7 +358,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare our request
         $login = self::login($identity);
@@ -376,7 +371,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Contest::apiOpen($r);
 
         // Call api
-        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
+        \OmegaUp\Controllers\Contest::apiDetails($r);
 
         // We need to grab the access time from the ContestUsers table
         $contest = \OmegaUp\DAO\Contests::getByAlias(
@@ -389,7 +384,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $firstAccessTime = $problemset_identity->access_time;
 
         // Call API again, access time should not change
-        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
+        \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $problemset_identity = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
             $identity->identity_id,
@@ -413,7 +408,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add user to our private contest
         \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
@@ -426,7 +421,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
 
         // Call api
-        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
+        \OmegaUp\Controllers\Contest::apiDetails($r);
 
         // We need to grab the access time from the ContestUsers table
         $contest = \OmegaUp\DAO\Contests::getByAlias(
@@ -439,7 +434,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $firstAccessTime = $problemset_identity->access_time;
 
         // Call API again, access time should not change
-        $response = \OmegaUp\Controllers\Contest::apiDetails($r);
+        \OmegaUp\Controllers\Contest::apiDetails($r);
 
         $problemset_identity = \OmegaUp\DAO\ProblemsetIdentities::getByPK(
             $identity->identity_id,
@@ -459,7 +454,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Set contest to not started yet
         $contest = \OmegaUp\DAO\Contests::getByAlias(
@@ -494,7 +489,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our user not added to the contest
-        ['user' => $externalUser, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $originalContestAccessLog = \OmegaUp\DAO\ProblemsetAccessLog::getAll();
 
@@ -591,7 +586,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our user not added to the contest
-        ['user' => $externalUser, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Call details using token
         $login = self::login($identity);
@@ -676,89 +671,97 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our contestants
-        $contestants = [];
         $identities = [];
         for ($i = 0; $i < 3; $i++) {
-            ['user' => $contestants[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
+            ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
         }
 
-        ['user' => $contestAdmin, 'identity' => $contestIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $contestIdentityAdmin] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Contest::addAdminUser(
             $contestData,
             $contestIdentityAdmin
         );
 
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+        try {
+            $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
-        // Create runs
-        $runsData = [];
-        $runsData[0] = \OmegaUp\Test\Factories\Run::createRun(
-            $problemData,
-            $contestData,
-            $identities[0]
-        );
-        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runsData[1] = \OmegaUp\Test\Factories\Run::createRun(
-            $problemData,
-            $contestData,
-            $identities[0]
-        );
-        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runsData[2] = \OmegaUp\Test\Factories\Run::createRun(
-            $problemData,
-            $contestData,
-            $identities[1]
-        );
-        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runsData[3] = \OmegaUp\Test\Factories\Run::createRun(
-            $problemData,
-            $contestData,
-            $identities[2]
-        );
-        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runDataDirector = \OmegaUp\Test\Factories\Run::createRun(
-            $problemData,
-            $contestData,
-            $contestDirector
-        );
-        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-        $runDataAdmin = \OmegaUp\Test\Factories\Run::createRun(
-            $problemData,
-            $contestData,
-            $contestIdentityAdmin
-        );
+            // Create runs
+            $runsData = [];
+            $runsData[0] = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $identities[0]
+            );
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
+            $runsData[1] = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $identities[0]
+            );
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
+            $runsData[2] = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $identities[1]
+            );
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
+            $runsData[3] = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $identities[2]
+            );
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
+            $runDataDirector = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $contestDirector
+            );
+            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
+            $runDataAdmin = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestData,
+                $contestIdentityAdmin
+            );
 
-        // Grade the runs
-        \OmegaUp\Test\Factories\Run::gradeRun($runsData[0], 0, 'CE');
-        \OmegaUp\Test\Factories\Run::gradeRun($runsData[1]);
-        \OmegaUp\Test\Factories\Run::gradeRun($runsData[2], .9, 'PA');
-        \OmegaUp\Test\Factories\Run::gradeRun($runsData[3], 1, 'AC', 180);
-        \OmegaUp\Test\Factories\Run::gradeRun($runDataDirector, 1, 'AC', 120);
-        \OmegaUp\Test\Factories\Run::gradeRun($runDataAdmin, 1, 'AC', 110);
+            // Grade the runs
+            \OmegaUp\Test\Factories\Run::gradeRun($runsData[0], 0, 'CE');
+            \OmegaUp\Test\Factories\Run::gradeRun($runsData[1]);
+            \OmegaUp\Test\Factories\Run::gradeRun($runsData[2], .9, 'PA');
+            \OmegaUp\Test\Factories\Run::gradeRun($runsData[3], 1, 'AC', 180);
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                $runDataDirector,
+                1,
+                'AC',
+                120
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runDataAdmin, 1, 'AC', 110);
 
-        // Create API
-        $login = self::login($contestDirector);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-        ]);
-        $response = \OmegaUp\Controllers\Contest::apiReport($r);
-        unset($login);
+            // Create API
+            $login = self::login($contestDirector);
+            $r = new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ]);
+            $response = \OmegaUp\Controllers\Contest::apiReport($r);
+            unset($login);
 
-        $this->assertEquals(
-            $problemData['request']['problem_alias'],
-            $response['problems'][0]['alias']
-        );
+            $this->assertEquals(
+                $problemData['request']['problem_alias'],
+                $response['problems'][0]['alias']
+            );
 
-        foreach ($identities as $contestant) {
-            $found = false;
-            foreach ($response['ranking'] as $rank) {
-                if ($rank['username'] == $contestant->username) {
-                    $found = true;
-                    break;
+            foreach ($identities as $contestant) {
+                $found = false;
+                foreach ($response['ranking'] as $rank) {
+                    if ($rank['username'] == $contestant->username) {
+                        $found = true;
+                        break;
+                    }
                 }
+                $this->assertTrue($found);
             }
-            $this->assertTrue($found);
+        } finally {
+            unset($detourGrader);
         }
     }
 
@@ -779,7 +782,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Get a user for our scenario
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Prepare our request
         $login = self::login($identity);
@@ -850,82 +853,85 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create our contestants
-        $contestants = [];
         $identities = [];
         for ($i = 0; $i < 2; $i++) {
-            ['user' => $contestants[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
+            ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
         }
 
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+        try {
+            $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
 
-        // Create runs
-        $runsData = [];
-        {
-            $run = \OmegaUp\Test\Factories\Run::createRun(
-                $problemData,
-                $contestData,
-                $identities[0]
+            // Create runs
+            $runsData = [];
+            {
+                $run = \OmegaUp\Test\Factories\Run::createRun(
+                    $problemData,
+                    $contestData,
+                    $identities[0]
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($run, 0, 'CE');
+                $runsData[] = $run;
+            }
+
+            {
+                \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
+                $run = \OmegaUp\Test\Factories\Run::createRun(
+                    $problemData,
+                    $contestData,
+                    $identities[0]
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($run, 1, 'AC', 60);
+                $runsData[] = $run;
+            }
+
+            {
+                \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
+                $run = \OmegaUp\Test\Factories\Run::createRun(
+                    $problemData,
+                    $contestData,
+                    $identities[1]
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($run, .9, 'PA');
+                $runsData[] = $run;
+            }
+
+            // Create a mock that stores the file name-contents mapping into an associative array.
+            $files = [];
+            include_once 'libs/third_party/ZipStream.php';
+            $zip = $this->createMock(ZipStream::class);
+            $zip->method('add_file')
+                ->will($this->returnCallback(function (
+                    string $path,
+                    string $contents,
+                    array $opt = []
+                ) use (&$files) {
+                    $files[$path] = $contents;
+                }));
+
+            \OmegaUp\Controllers\Problemset::downloadRuns(
+                $contestData['contest']->problemset_id,
+                $zip
             );
-            \OmegaUp\Test\Factories\Run::gradeRun($run, 0, 'CE');
-            $runsData[] = $run;
-        }
 
-        {
-            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-            $run = \OmegaUp\Test\Factories\Run::createRun(
-                $problemData,
-                $contestData,
-                $identities[0]
-            );
-            \OmegaUp\Test\Factories\Run::gradeRun($run, 1, 'AC', 60);
-            $runsData[] = $run;
-        }
-
-        {
-            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 60);
-            $run = \OmegaUp\Test\Factories\Run::createRun(
-                $problemData,
-                $contestData,
-                $identities[1]
-            );
-            \OmegaUp\Test\Factories\Run::gradeRun($run, .9, 'PA');
-            $runsData[] = $run;
-        }
-
-        // Create a mock that stores the file name-contents mapping into an associative array.
-        $files = [];
-        include_once 'libs/third_party/ZipStream.php';
-        $zip = $this->createMock(ZipStream::class);
-        $zip->method('add_file')
-            ->will($this->returnCallback(function (
-                string $path,
-                string $contents,
-                array $opt = []
-            ) use (&$files) {
-                $files[$path] = $contents;
-            }));
-
-        \OmegaUp\Controllers\Problemset::downloadRuns(
-            $contestData['contest']->problemset_id,
-            $zip
-        );
-
-        // Verify that the data is there.
-        $summary = $files['summary.csv'];
-        $this->assertNotEquals($summary, '');
-        foreach ($runsData as $runData) {
-            $this->assertEquals(
-                $files["runs/{$runData['response']['guid']}.{$runData['request']['language']}"],
-                $runData['request']['source']
-            );
-            $this->assertStringContainsString(
-                "{$runData['response']['guid']},{$runData['contestant']->username},{$problemData['problem']->alias}",
-                $summary
-            );
+            // Verify that the data is there.
+            $summary = $files['summary.csv'];
+            $this->assertNotEquals($summary, '');
+            foreach ($runsData as $runData) {
+                $this->assertEquals(
+                    $files["runs/{$runData['response']['guid']}.{$runData['request']['language']}"],
+                    $runData['request']['source']
+                );
+                $this->assertStringContainsString(
+                    "{$runData['response']['guid']},{$runData['contestant']->username},{$problemData['problem']->alias}",
+                    $summary
+                );
+            }
+        } finally {
+            unset($detourGrader);
         }
     }
 
-    public function testReplaceeTeamsGroupInContestForTeamsViaApi() {
+    public function testReplaceTeamsGroupInContestForTeamsViaApi() {
         // Create two teams groups
         [
             'teamGroup' => $teamGroup,
@@ -998,6 +1004,121 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals(
                 'teamsGroupsCanNotBeAddedInNormalContest',
+                $e->getMessage()
+            );
+        }
+    }
+
+    public function testReplaceTeamsGroupInContestWithSubmissions() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        // Users to associate
+        $identities = [];
+        foreach (range(0, 9) as $id) {
+            [
+                'identity' => $identity,
+            ] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams([
+                    'username' => "user{$id}",
+                ])
+            );
+
+            $identities[] = $identity;
+        }
+
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities.csv',
+                    $teamGroup->alias,
+                    /*$password=*/ '',
+                    /*$forTeams=*/ true
+                ),
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'title' => 'Contest_For_Teams',
+                'contestForTeams' => true,
+                'teamsGroupAlias' => $teamGroup->alias,
+            ])
+        );
+
+        // Get a problem
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contestData
+        );
+
+        $login = self::login($identities[0]);
+
+        [
+            'identities' => $associatedIdentities,
+        ] = \OmegaUp\Controllers\User::apiListAssociatedIdentities(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        // User switch the account
+        \OmegaUp\Controllers\Identity::apiSelectIdentity(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'usernameOrEmail' => $associatedIdentities[1]['username'],
+            ])
+        );
+
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contestData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Contest::openProblemInContest(
+            $contestData,
+            $problem,
+            $identities[0]
+        );
+
+        // User creates a run in a valid time
+        $run = \OmegaUp\Test\Factories\Run::createRun(
+            $problem,
+            $contestData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
+
+        $login = self::login($contestData['director']);
+        try {
+            \OmegaUp\Controllers\Contest::apiReplaceTeamsGroup(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                    'teams_group_alias' => $teamGroup->alias,
+                ])
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals(
+                'contestEditCannotReplaceTeamsGroupWithSubmissions',
                 $e->getMessage()
             );
         }

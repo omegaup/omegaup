@@ -2467,7 +2467,6 @@ export namespace types {
 
   export interface LoginDetailsPayload {
     facebookUrl: string;
-    linkedinUrl: string;
     statusError?: string;
     validateRecaptcha: boolean;
   }
