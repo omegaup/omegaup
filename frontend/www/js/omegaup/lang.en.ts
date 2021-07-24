@@ -1441,6 +1441,7 @@ const translations: { [key: string]: string; } = {
   wordsMessageTo: "Message to",
   wordsMonths: "Months",
   wordsMultipleUser: "Multiple users (Separated by commas or line breaks)",
+  wordsMyClarifications: "My clarifications",
   wordsMyContests: "My Contests",
   wordsMyScore: "My score",
   wordsName: "Name",

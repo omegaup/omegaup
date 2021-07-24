@@ -1441,6 +1441,7 @@ const translations: { [key: string]: string; } = {
   wordsMessageTo: "(M355ag3 70)",
   wordsMonths: "(M0n7h5)",
   wordsMultipleUser: "(Mu17ip13 u53r5 (S3para73d by c0mma5 0r 1in3 br3ak5))",
+  wordsMyClarifications: "(My c1arifica7i0n5)",
   wordsMyContests: "(My C0n73575)",
   wordsMyScore: "(My 5c0r3)",
   wordsName: "(Nam3)",

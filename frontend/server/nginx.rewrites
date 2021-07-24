@@ -45,6 +45,7 @@ rewrite ^/course/([a-zA-Z0-9_+-]+)/activity/?$ /course/activity.php?course=$1 la
 rewrite ^/course/new/?$ /course/new.php last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/?$ /course/assignment.php?course_alias=$1 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/admin/?$ /arena/courseadmin.php?course_alias=$1&assignment_alias=$2 last;
+rewrite ^/course/([a-zA-Z0-9_+-]+)/clarifications/?$ /course/clarifications.php?course_alias=$1 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/?$ /course/assignment.php?course_alias=$1&assignment_alias=$2 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/assignment/([a-zA-Z0-9_+-]+)/scoreboard/([a-zA-Z0-9_+-]+)/?$ /course/scoreboard.php?course_alias=$1&assignment_alias=$2 last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/clone/([a-zA-Z0-9._-]+)/?$ /course/clone.php?course_alias=$1&token=$2 last;
