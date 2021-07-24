@@ -55,6 +55,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
+ * @psalm-type CourseClarificationsPayload=array{page: int, length: int, pagerItems: list<PageItem>, clarifications: list<Clarification>}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -3715,26 +3716,21 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // Get scoreboard;
-        $scoreboard = new \OmegaUp\Scoreboard(
-            new \OmegaUp\ScoreboardParams([
-                'alias' => $assignment->alias,
-                'title' => $assignment->name,
-                'problemset_id' => $assignment->problemset_id,
-                'start_time' => $assignment->start_time,
-                'finish_time' => $assignment->finish_time,
-                'acl_id' => $assignment->acl_id,
-                'group_id' => $course->group_id,
-                'admin' => (
-                    \OmegaUp\Authorization::isCourseAdmin(
-                        $r->identity,
-                        $course
-                    ) ||
-                    \OmegaUp\Authorization::canCreatePublicCourse(
-                        $r->identity
-                    )
-                ),
-            ])
+        $params = \OmegaUp\ScoreboardParams::fromAssignment(
+            $assignment,
+            intval($course->group_id),
+            /*showAllRuns*/false
         );
+         $params->admin = (
+            \OmegaUp\Authorization::isCourseAdmin(
+                $r->identity,
+                $course
+            ) ||
+            \OmegaUp\Authorization::canCreatePublicCourse(
+                $r->identity
+            )
+        );
+        $scoreboard = new \OmegaUp\Scoreboard($params);
 
         return [
             'smartyProperties' => [
@@ -3790,7 +3786,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Courses $course,
         \OmegaUp\DAO\VO\Groups $group,
         string $assignmentAlias
-    ) {
+    ): array {
         $r->ensureIdentity();
         $assignment = self::validateCourseAssignmentAlias(
             $course,
@@ -4099,7 +4095,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     $identity,
                     /*$offset=*/ null,
                     /*$rowcount=*/ 100,
-                )
+                )['clarifications']
             ),
             'name' => strval($course->name),
             'description' => strval($course->description),
@@ -4922,7 +4918,72 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $r->identity,
                 $offset,
                 $rowcount
-            ),
+            )['clarifications'],
+        ];
+    }
+
+    /**
+     * Gets the latest clarifications for course with pagination
+     *
+     * @return array{smartyProperties: array{payload: CourseClarificationsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     */
+    public static function getClarificationsForTypeScript(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
+
+        $course = self::validateCourseExists(
+            $r->ensureString(
+                'course_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            )
+        );
+
+        if (
+            !\OmegaUp\Authorization::canViewCourse(
+                $r->identity,
+                $course,
+                self::resolveGroup($course)
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $list = \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
+            /* contest */            null,
+            $course,
+            \OmegaUp\Authorization::isCourseAdmin($r->identity, $course),
+            $r->identity,
+            $page,
+            $pageSize
+        );
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'page' => $page,
+                    'length' => $pageSize,
+                    'clarifications' => $list['clarifications'],
+                    'totalRows' => $list['totalRows'],
+                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+                        $list['totalRows'],
+                        $pageSize,
+                        $page,
+                        "/course/{$course->alias}/clarifications/",
+                        2,
+                        []
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCourseClarifications'
+                ),
+            ],
+            'entrypoint' => 'course_clarifications',
         ];
     }
 

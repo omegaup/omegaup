@@ -605,7 +605,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $identity,
                 /*$offset=*/ null,
                 /*$rowcount=*/ 100
-            ),
+            )['clarifications'],
             'problems' => $problems,
             'submissionDeadline' => $contestDetails['submission_deadline'] ?? $contest->finish_time,
         ];
@@ -3613,7 +3613,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $r->identity,
                 $offset,
                 $rowcount
-            ),
+            )['clarifications'],
         ];
     }
 
