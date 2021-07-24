@@ -508,6 +508,27 @@ export namespace types {
       );
     }
 
+    export function CourseClarificationsPayload(
+      elementId: string = 'payload',
+    ): types.CourseClarificationsPayload {
+      return ((x) => {
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function CourseCloneDetailsPayload(
       elementId: string = 'payload',
     ): types.CourseCloneDetailsPayload {
@@ -2068,6 +2089,13 @@ export namespace types {
     scoreboard_url: string;
     scoreboard_url_admin: string;
     start_time: Date;
+  }
+
+  export interface CourseClarificationsPayload {
+    clarifications: types.Clarification[];
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
   }
 
   export interface CourseCloneDetailsPayload {
