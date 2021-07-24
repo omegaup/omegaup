@@ -133,6 +133,7 @@ const translations: { [key: string]: string; } = {
   clarificationEmailSubject: "[omegaUp] Novo esclarecimento para o problema %(problem_name)",
   clarificationNotFound: "Esclarecimento n\u00e3o encontrado",
   clarificationUpdateAnswer: "Atualizar resposta",
+  clarificationsRangeHeader: "Clarifica\u00e7\u00f5es (da %(lowCount) \u00e0 %(highCount))",
   coderOfTheMonth: "Coder do M\u00eas Geral",
   coderOfTheMonthAlreadySelected: "O programador do m\u00eas foi selecionado anteriormente",
   coderOfTheMonthChooseAsCoder: "Escolha como Programador do M\u00eas",

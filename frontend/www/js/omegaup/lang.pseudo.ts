@@ -133,6 +133,7 @@ const translations: { [key: string]: string; } = {
   clarificationEmailSubject: "([0m3gaUp] N3w c1arifica7i0n f0r pr0b13m %(problem_name))",
   clarificationNotFound: "(C1arifica7i0n n07 f0und)",
   clarificationUpdateAnswer: "(Upda73 an5w3r)",
+  clarificationsRangeHeader: "(C1arifica7i0n5 (fr0m %(lowCount) 70 %(highCount)))",
   coderOfTheMonth: "(C0d3r 0f 7h3 M0n7h Ov3ra11)",
   coderOfTheMonthAlreadySelected: "(C0d3r 0f 7h3 m0n7h ha5 b33n pr3vi0u51y 5313c73d)",
   coderOfTheMonthChooseAsCoder: "(Ch0053 a5 c0d3r 0f 7h3 m0n7h)",

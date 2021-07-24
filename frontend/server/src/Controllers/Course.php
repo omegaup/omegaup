@@ -55,7 +55,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
- * @psalm-type CourseClarificationsPayload=array{page: int, length: int, pagerItems: list<PageItem>, clarifications: list<Clarification>}
+ * @psalm-type CourseClarificationsPayload=array{page: int, length: int, pagerItems: list<PageItem>, clarifications: list<Clarification>, courseAlias: string}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -4935,7 +4935,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         $page = $r->ensureOptionalInt('page') ?? 1;
-        $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 100;
 
         $course = self::validateCourseExists(
             $r->ensureString(
@@ -4968,6 +4968,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'page' => $page,
                     'length' => $pageSize,
+                    'courseAlias' => $course->alias,
                     'clarifications' => $list['clarifications'],
                     'totalRows' => $list['totalRows'],
                     'pagerItems' => \OmegaUp\Pager::paginateWithUrl(

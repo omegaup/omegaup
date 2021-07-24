@@ -99,7 +99,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $sqlLimit = '';
         if (!is_null($offset)) {
             $sqlLimit = 'LIMIT ?, ?';
-            $params[] = $offset;
+            $params[] = ($offset - 1) * $rowcount;
             $params[] = $rowcount;
         }
 

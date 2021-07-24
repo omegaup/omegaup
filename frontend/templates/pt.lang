@@ -131,6 +131,7 @@ clarificationEmailBody = "<p>Olá!</p><p>O usuário <strong><a href=\"https://om
 clarificationEmailSubject = "[omegaUp] Novo esclarecimento para o problema %(problem_name)"
 clarificationNotFound = "Esclarecimento não encontrado"
 clarificationUpdateAnswer = "Atualizar resposta"
+clarificationsRangeHeader = "Clarificações (da %(lowCount) à %(highCount))"
 coderOfTheMonth = "Coder do Mês Geral"
 coderOfTheMonthAlreadySelected = "O programador do mês foi selecionado anteriormente"
 coderOfTheMonthChooseAsCoder = "Escolha como Programador do Mês"

@@ -2091,6 +2091,7 @@ export namespace types {
 
   export interface CourseClarificationsPayload {
     clarifications: types.Clarification[];
+    courseAlias: string;
     length: number;
     page: number;
     pagerItems: types.PageItem[];
