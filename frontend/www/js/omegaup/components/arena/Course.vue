@@ -39,7 +39,7 @@
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :problem="problemInfo"
               :active-tab="'problems'"
-              :runs="activeProblem.runs"
+              :runs="runs"
               :guid="guid"
               :problem-alias="problemAlias"
               :should-show-run-details="shouldShowRunDetails"
@@ -56,6 +56,14 @@
           </div>
         </div>
       </div>
+    </template>
+    <template #arena-scoreboard>
+      <omegaup-arena-scoreboard
+        :show-invited-users-filter="false"
+        :problems="scoreboard.problems"
+        :ranking="scoreboard.ranking"
+        :last-updated="scoreboard.time"
+      ></omegaup-arena-scoreboard>
     </template>
     <template #arena-clarifications>
       <div class="container">
@@ -97,6 +105,7 @@ import T from '../../lang';
 import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
+import arena_Scoreboard from './Scoreboard.vue';
 import arena_Summary from './Summary.vue';
 import problem_Details from '../problem/Details.vue';
 import { SocketStatus } from '../../arena/events_socket';
@@ -106,6 +115,7 @@ import { SocketStatus } from '../../arena/events_socket';
     'omegaup-arena': arena_Arena,
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
+    'omegaup-arena-scoreboard': arena_Scoreboard,
     'omegaup-arena-summary': arena_Summary,
     'omegaup-problem-details': problem_Details,
   },
@@ -123,6 +133,7 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
+  @Prop() scoreboard!: types.Scoreboard;
   @Prop({ default: () => [] }) runs!: types.Run[];
 
   T = T;

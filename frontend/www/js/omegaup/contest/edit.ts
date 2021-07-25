@@ -24,6 +24,7 @@ OmegaUp.on('ready', () => {
       users: payload.users,
       searchResultProblems: [] as types.ListItem[],
       searchResultUsers: [] as types.ListItem[],
+      searchResultTeamsGroups: [] as types.ListItem[],
       searchResultGroups: [] as types.ListItem[],
       teamsGroup: payload.teams_group,
     }),
@@ -122,6 +123,7 @@ OmegaUp.on('ready', () => {
           users: this.users,
           searchResultProblems: this.searchResultProblems,
           searchResultUsers: this.searchResultUsers,
+          searchResultTeamsGroups: this.searchResultTeamsGroups,
           searchResultGroups: this.searchResultGroups,
           teamsGroup: this.teamsGroup,
         },
@@ -188,14 +190,43 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'update-contest': function (contest: types.ContestAdminDetails) {
-            api.Contest.update(
-              Object.assign({}, contest, {
-                contest_alias: contest.alias,
-                alias: null,
-              }),
-            )
-              .then(() => {
+          'update-search-result-teams-groups': (query: string) => {
+            api.TeamsGroup.list({
+              query,
+            })
+              .then((data) => {
+                this.searchResultTeamsGroups = data.map(
+                  ({ key, value }: { key: string; value: string }) => ({
+                    key,
+                    value: `${ui.escape(value)} (<strong>${ui.escape(
+                      key,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'update-contest': ({
+            contest,
+            teamsGroupAlias,
+          }: {
+            contest: types.ContestAdminDetails;
+            teamsGroupAlias?: string;
+          }): void => {
+            api.Contest.update({
+              contest,
+              contest_alias: contest.alias,
+              alias: null,
+              teams_group_alias: teamsGroupAlias,
+              contest_for_teams: !!teamsGroupAlias,
+            })
+              .then((data) => {
+                if (teamsGroupAlias && data.teamsGroupName) {
+                  this.teamsGroup = {
+                    alias: teamsGroupAlias,
+                    name: data.teamsGroupName,
+                  };
+                }
                 ui.success(`
                   ${T.contestEditContestEdited} <a href="/arena/${contest.alias}/">${T.contestEditGoToContest}</a>
                 `);

@@ -1182,37 +1182,6 @@ export const Identity = {
   >('/api/identity/updateIdentityTeam/'),
 };
 
-export const Interview = {
-  addUsers: apiCall<
-    messages.InterviewAddUsersRequest,
-    messages.InterviewAddUsersResponse
-  >('/api/interview/addUsers/'),
-  create: apiCall<
-    messages.InterviewCreateRequest,
-    messages.InterviewCreateResponse
-  >('/api/interview/create/'),
-  details: apiCall<
-    messages.InterviewDetailsRequest,
-    messages._InterviewDetailsServerResponse,
-    messages.InterviewDetailsResponse
-  >('/api/interview/details/', (x) => {
-    x.users = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (x.access_time)
-          x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
-        return x;
-      });
-    })(x.users);
-    return x;
-  }),
-  list: apiCall<messages.InterviewListRequest, messages.InterviewListResponse>(
-    '/api/interview/list/',
-  ),
-};
-
 export const Notification = {
   myList: apiCall<
     messages.NotificationMyListRequest,
@@ -1869,10 +1838,6 @@ export const User = {
     messages.UserGenerateOmiUsersRequest,
     messages.UserGenerateOmiUsersResponse
   >('/api/user/generateOmiUsers/'),
-  interviewStats: apiCall<
-    messages.UserInterviewStatsRequest,
-    messages.UserInterviewStatsResponse
-  >('/api/user/interviewStats/'),
   lastPrivacyPolicyAccepted: apiCall<
     messages.UserLastPrivacyPolicyAcceptedRequest,
     messages.UserLastPrivacyPolicyAcceptedResponse

@@ -21,7 +21,6 @@ OmegaUp.on('ready', () => {
     courseAlias: null,
     courseName: null,
     disableSockets: false,
-    isInterview: false,
     isLockdownMode: false,
     originalContestAlias: null,
     preferredLanguage: null,

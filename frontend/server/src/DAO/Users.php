@@ -49,22 +49,6 @@ class Users extends \OmegaUp\DAO\Base\Users {
         return new \OmegaUp\DAO\VO\Users($rs);
     }
 
-    public static function IsUserInterviewer(int $userId): bool {
-        $sql = '
-            SELECT
-                COUNT(*)
-            FROM
-                User_Roles ur
-            WHERE
-                ur.user_id = ? AND ur.role_id = 4;';
-        /** @var int */
-        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            $sql,
-            [$userId]
-        );
-        return $count > 0;
-    }
-
     /**
      * @return null|array{reset_digest: ?string, reset_sent_at: \OmegaUp\Timestamp|null}
      */

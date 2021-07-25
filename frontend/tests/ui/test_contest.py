@@ -155,7 +155,7 @@ def test_user_ranking_contest(driver):
                 (By.XPATH, '//a[@href = "#ranking"]'))).click()
         driver.wait.until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, '#ranking')))
+                (By.CSS_SELECTOR, '.omegaup-scoreboard')))
 
         assert_run_verdict(driver, user1, problem, classname='accepted')
         assert_run_verdict(driver, user2, problem, classname='wrong')
@@ -251,7 +251,7 @@ def check_ranking(driver, problem, user, *, scores):
             (By.XPATH, '//a[@href = "#ranking"]'))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, '#ranking')))
+            (By.CSS_SELECTOR, '.omegaup-scoreboard')))
 
     ranking_problem = driver.browser.find_element_by_xpath(
         '//tr[@class = "%s"]/td[contains(@class, "%s")]/div[@class = "points"]'
@@ -351,7 +351,7 @@ def create_contest_admin(driver, contest_alias, problem, users, user,
                 (By.XPATH, '//a[@href = "#ranking"]'))).click()
         driver.wait.until(
             EC.visibility_of_element_located(
-                (By.CSS_SELECTOR, '#ranking')))
+                (By.CSS_SELECTOR, '.omegaup-scoreboard')))
         assert ((contest_url) in
                 driver.browser.current_url), driver.browser.current_url
 
@@ -379,24 +379,27 @@ def create_clarification_user(driver, problem, question):
             (By.XPATH, '//a[@href = "#clarifications"]'))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, '#clarifications')))
+            (By.CSS_SELECTOR, '[data-tab-clarifications]')))
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH, '//a[@href = "#clarifications/new"]'))).click()
+            (By.XPATH, '//a[@href = "#clarifications/all/new"]'))).click()
 
     Select(driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH,
-             '//select[@name = "problem"]')))).select_by_value(problem)
+            (By.CSS_SELECTOR,
+             '[data-new-clarification-problem]')))).select_by_value(problem)
 
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.XPATH, '//textarea[@name = "message"]'))).send_keys(question)
+            (By.CSS_SELECTOR,
+             '[data-new-clarification-message]'))).send_keys(question)
 
-    driver.browser.find_element_by_id('clarification').submit()
+    driver.browser.find_element_by_css_selector(
+        '[data-new-clarification]').submit()
 
-    clarifications = driver.browser.find_elements_by_class_name('inserted')
+    clarifications = driver.browser.find_elements_by_css_selector(
+        '[data-tab-clarifications] table tbody tr')
 
     assert len(clarifications) == 1, len(clarifications)
 
@@ -410,18 +413,18 @@ def answer_clarification_admin(driver, answer):
             (By.XPATH, '//a[@href = "#clarifications"]'))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, '#clarifications')))
+            (By.CSS_SELECTOR, '[data-tab-clarifications]')))
 
     Select(driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             '.inserted .create-response-canned')))).select_by_value(answer)
+             '[data-select-answer]')))).select_by_value(answer)
 
     driver.browser.find_element_by_css_selector(
-        '.inserted .create-response-form').submit()
+        '[data-form-clarification-answer]').submit()
 
     resolved = driver.wait.until(
-        EC.visibility_of_element_located((By.CSS_SELECTOR, '.inserted')))
+        EC.visibility_of_element_located((By.CSS_SELECTOR, 'tr.resolved')))
 
     assert 'resolved' in resolved.get_attribute('class').split(), resolved
 
@@ -623,7 +626,7 @@ def compare_contestants_list(driver, users_set):
     ''' Compares list of contestants toggle scoreboard filter.'''
 
     contestants_list = driver.browser.find_elements_by_xpath(
-        '//*[@id="ranking"]/div/table/tbody/tr/td[@class="user"]')
+        '//*[@data-table-scoreboard]/tbody/tr/td[@class="user"]')
     # Considering only the username. All unassociated identities are created
     # with a name, which is appended after the username, like:
     #
