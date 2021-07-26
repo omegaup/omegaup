@@ -1,6 +1,6 @@
 <template>
   <div class="card" data-tab-clarifications>
-    <h5 v-if="page !== null && length !== null" class="card-header">
+    <h5 v-if="page && length" class="card-header">
       {{
         ui.formatString(T.clarificationsRangeHeader, {
           lowCount: (page - 1) * length + 1,
