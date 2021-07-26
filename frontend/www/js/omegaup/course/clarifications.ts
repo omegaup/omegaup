@@ -4,7 +4,7 @@ import Vue from 'vue';
 import * as api from '../api';
 import * as ui from '../ui';
 
-import course_Clarications from '../components/course/Clarifications.vue';
+import course_Clarifications from '../components/course/Clarifications.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseClarificationsPayload();
@@ -13,7 +13,7 @@ OmegaUp.on('ready', () => {
   new Vue({
     el: '#main-container',
     components: {
-      'omegaup-course-clarifications': course_Clarications,
+      'omegaup-course-clarifications': course_Clarifications,
     },
     render: function (createElement) {
       return createElement('omegaup-course-clarifications', {
@@ -21,7 +21,7 @@ OmegaUp.on('ready', () => {
           isAdmin: headerPayload.isAdmin,
           clarifications: payload.clarifications,
           pagerItems: payload.pagerItems,
-          length: payload.length,
+          pageSize: payload.length,
           page: payload.page,
         },
         on: {

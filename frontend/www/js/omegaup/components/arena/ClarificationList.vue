@@ -1,10 +1,10 @@
 <template>
   <div class="card" data-tab-clarifications>
-    <h5 v-if="page && length" class="card-header">
+    <h5 v-if="page && pageSize" class="card-header">
       {{
         ui.formatString(T.clarificationsRangeHeader, {
-          lowCount: (page - 1) * length + 1,
-          highCount: page * length,
+          lowCount: (page - 1) * pageSize + 1,
+          highCount: page * pageSize,
         })
       }}
     </h5>
@@ -150,7 +150,7 @@ export default class ArenaClarificationList extends Vue {
   @Prop() username!: null | string;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
   @Prop({ default: false }) allowFilterByAssignment!: boolean;
-  @Prop() length!: number;
+  @Prop() pageSize!: number;
   @Prop() page!: number;
   @Prop() pagerItems!: types.PageItem[];
 

@@ -3,7 +3,7 @@
     :clarifications="clarifications"
     :is-admin="isAdmin"
     :allow-filter-by-assignment="true"
-    :length="length"
+    :page-size="pageSize"
     :page="page"
     :pager-items="pagerItems"
     @clarification-response="
@@ -33,7 +33,7 @@ export default class CourseClarifications extends Vue {
   @Prop() isAdmin!: boolean;
   @Prop() clarifications!: types.Clarification[];
   @Prop() pagerItems!: types.PageItem[];
-  @Prop() length!: number;
+  @Prop() pageSize!: number;
   @Prop() page!: number;
 
   T = T;

@@ -20,7 +20,7 @@
       <div class="mt-2 row float-sm-right">
         <div class="col-sm">
           <a
-            :href="`/course/${course.alias}/clarifications/`"
+            :href="`/course/${course.alias}/clarification/`"
             role="button"
             class="btn btn-primary"
             >{{ T.wordsClarifications }}</a
@@ -105,7 +105,7 @@
       </div>
       <div class="d-flex justify-content-end">
         <a
-          :href="`/course/${course.alias}/clarifications/`"
+          :href="`/course/${course.alias}/clarification/`"
           role="button"
           class="btn btn-primary"
           >{{ T.wordsMyClarifications }}</a

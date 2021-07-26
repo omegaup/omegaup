@@ -27,7 +27,7 @@ describe('CourseClarifications.vue', () => {
             page: 0,
           },
         ],
-        length: 10,
+        pageSize: 10,
         page: 1,
       },
     });
