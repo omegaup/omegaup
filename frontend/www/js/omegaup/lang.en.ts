@@ -1540,7 +1540,7 @@ const translations: { [key: string]: string; } = {
   wordsSearchBy: "Search by",
   wordsSeeCourse: "See course",
   wordsSeeGeneralRanking: "See the general ranking",
-  wordsSeeLatestSubmissions: "See latest submissions sent by",
+  wordsSeeLatestSubmissions: "See latest submissions sent by %(username)",
   wordsSeeSolution: "See Solution",
   wordsSelectFilter: "Select a filter",
   wordsSend: "Send",
