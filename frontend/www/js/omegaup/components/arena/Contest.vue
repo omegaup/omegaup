@@ -94,6 +94,7 @@
     </template>
     <template #arena-runs>
       <omegaup-arena-runs
+        v-if="contestAdmin"
         :contest-alias="contest.alias"
         :runs="allRuns"
         :show-contest="false"
