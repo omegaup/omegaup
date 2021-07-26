@@ -106,7 +106,7 @@ OmegaUp.on('ready', () => {
           contest: payload.contest,
           contestAdmin,
           problems: this.problems,
-          users: payload.adminPayload?.users ?? [],
+          users: payload.adminPayload?.users,
           problemInfo: this.problemInfo,
           problem: this.problem,
           clarifications: clarificationStore.state.clarifications,

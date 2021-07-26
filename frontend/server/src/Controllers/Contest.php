@@ -711,7 +711,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 ),
             );
 
-            if (!$contestAdmin) {
+            if ($contestAdmin) {
                 $allRuns = [];
 
                 // Get our runs
