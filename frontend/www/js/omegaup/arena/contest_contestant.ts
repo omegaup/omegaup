@@ -37,7 +37,8 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
-  const activeTab = getSelectedValidTab(locationHash[0], payload.contestAdmin);
+  const contestAdmin = payload.adminPayload?.contestAdmin ?? false;
+  const activeTab = getSelectedValidTab(locationHash[0], contestAdmin);
   if (activeTab !== locationHash[0]) {
     window.location.hash = activeTab;
   }
@@ -103,9 +104,9 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-arena-contest', {
         props: {
           contest: payload.contest,
-          contestAdmin: payload.contestAdmin,
+          contestAdmin,
           problems: this.problems,
-          users: payload.users,
+          users: payload.adminPayload?.users ?? [],
           problemInfo: this.problemInfo,
           problem: this.problem,
           clarifications: clarificationStore.state.clarifications,
@@ -330,8 +331,8 @@ OmegaUp.on('ready', () => {
     return isValidTab ? tab : defaultTab;
   }
 
-  if (payload.allRuns) {
-    for (const run of payload.allRuns) {
+  if (payload.adminPayload?.allRuns) {
+    for (const run of payload.adminPayload.allRuns) {
       trackRun({ run });
     }
   }
@@ -339,7 +340,7 @@ OmegaUp.on('ready', () => {
   if (locationHash[1] && locationHash[1].includes('show-run:')) {
     const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
     const showRunMatch = window.location.hash.match(showRunRegex);
-    contestContestant.guid = showRunMatch ? showRunMatch[1] : null;
+    contestContestant.guid = showRunMatch?.[1] ?? null;
     contestContestant.popupDisplayed = PopupDisplayed.RunDetails;
   }
 

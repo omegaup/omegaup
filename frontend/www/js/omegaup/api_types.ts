@@ -219,16 +219,33 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ContestDetailsPayload {
       return ((x) => {
-        if (x.allRuns)
-          x.allRuns = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              x.time = ((x: number) => new Date(x * 1000))(x.time);
-              return x;
-            });
-          })(x.allRuns);
+        if (x.adminPayload)
+          x.adminPayload = ((x) => {
+            x.allRuns = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.allRuns);
+            x.users = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.access_time)
+                  x.access_time = ((x: number) => new Date(x * 1000))(
+                    x.access_time,
+                  );
+                if (x.end_time)
+                  x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+                return x;
+              });
+            })(x.users);
+            return x;
+          })(x.adminPayload);
         x.clarifications = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -257,20 +274,6 @@ export namespace types {
           x.submissionDeadline = ((x: number) => new Date(x * 1000))(
             x.submissionDeadline,
           );
-        x.users = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            if (x.access_time)
-              x.access_time = ((x: number) => new Date(x * 1000))(
-                x.access_time,
-              );
-            if (x.end_time)
-              x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
-            return x;
-          });
-        })(x.users);
         return x;
       })(
         JSON.parse(
@@ -1930,16 +1933,18 @@ export namespace types {
   }
 
   export interface ContestDetailsPayload {
-    allRuns?: types.Run[];
+    adminPayload?: {
+      allRuns: types.Run[];
+      contestAdmin: boolean;
+      users: types.ContestUser[];
+    };
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
-    contestAdmin: boolean;
     problems: types.NavbarProblemsetProblem[];
     scoreboard?: types.Scoreboard;
     scoreboardEvents?: types.ScoreboardEvent[];
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     submissionDeadline?: Date;
-    users: types.ContestUser[];
   }
 
   export interface ContestEditPayload {

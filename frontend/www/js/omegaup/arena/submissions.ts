@@ -7,6 +7,7 @@ import { myRunsStore, runsStore } from './runsStore';
 import { omegaup, OmegaUp } from '../omegaup';
 import JSZip from 'jszip';
 import type problem_Details from '../components/problem/Details.vue';
+import type arena_Contest from '../components/arena/Contest.vue';
 import T from '../lang';
 
 interface RunSubmit {
@@ -26,7 +27,7 @@ interface SubmissionResponse {
 
 export interface SubmissionRequest {
   request: { guid: string; isAdmin: boolean; problemAlias: string };
-  target: problem_Details;
+  target: problem_Details | arena_Contest;
 }
 
 export function submitRun({

@@ -234,7 +234,7 @@ export default class ArenaContest extends Vue {
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: true }) socketConnected!: boolean;
   @Prop({ default: () => [] }) runs!: types.Run[];
-  @Prop({ default: () => [] }) allRuns!: types.Run[];
+  @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
 
