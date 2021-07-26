@@ -93,7 +93,7 @@
       </div>
     </div>
     <a v-if="!profile.is_private" :href="`/submissions/${profile.username}/`">
-      {{ T.wordsSeeLatestSubmissions }}
+      {{ T.wordsSeeLatestSubmissions }} {{ profile.username }}
     </a>
   </div>
 </template>
