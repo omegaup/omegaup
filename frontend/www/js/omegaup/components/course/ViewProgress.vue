@@ -6,7 +6,7 @@
           <a :href="courseUrl">{{ course.name }}</a>
         </h2>
         <div class="table-responsive">
-          <table class="table table-striped">
+          <table class="table table-striped table-fixed mb-0 d-block">
             <thead>
               <tr>
                 <th class="text-center align-middle">
@@ -415,13 +415,34 @@ export default class CourseViewProgress extends Vue {
 }
 </script>
 
-<style scoped>
-.panel-body {
-  overflow: auto;
-  white-space: nowrap;
-}
-
+<style lang="scss" scoped>
 .sticky-offset {
   top: 4rem;
+}
+
+.table-fixed {
+  max-height: 80vh;
+  overflow: auto;
+}
+
+.table-fixed thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: white;
+}
+
+.table-fixed tbody /deep/ th {
+  position: sticky;
+  left: 0;
+  background: white;
+  z-index: 1;
+}
+
+.table-fixed thead th:first-child {
+  position: sticky;
+  left: 0;
+  background: white;
+  z-index: 2;
 }
 </style>
