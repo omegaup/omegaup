@@ -3689,7 +3689,10 @@ export namespace messages {
     verdict_counts: { [key: string]: number };
   };
   export type ContestUpdateRequest = { [key: string]: any };
-  export type ContestUpdateResponse = { teamsGroupName?: string };
+  export type ContestUpdateResponse = {
+    teamsGroupName?: string;
+    title: string;
+  };
   export type ContestUpdateEndTimeForIdentityRequest = { [key: string]: any };
   export type ContestUpdateEndTimeForIdentityResponse = {};
   export type ContestUsersRequest = { [key: string]: any };
