@@ -1,9 +1,17 @@
 <template>
   <div class="card" data-tab-clarifications>
-    <h5 class="card-header">{{ T.wordsClarifications }}</h5>
+    <h5 v-if="page && pageSize" class="card-header">
+      {{
+        ui.formatString(T.clarificationsRangeHeader, {
+          lowCount: (page - 1) * pageSize + 1,
+          highCount: page * pageSize,
+        })
+      }}
+    </h5>
+    <h5 v-else class="card-header">{{ T.wordsClarifications }}</h5>
     <div class="card-body">
       <slot name="new-clarification">
-        <div class="mb-3">
+        <div v-if="problems.length" class="mb-3">
           <a
             href="#clarifications/all/new"
             class="btn btn-primary"
@@ -99,6 +107,11 @@
         </tbody>
       </table>
     </div>
+    <div v-if="pagerItems" class="card-footer">
+      <omegaup-common-paginator
+        :pager-items="pagerItems"
+      ></omegaup-common-paginator>
+    </div>
   </div>
 </template>
 
@@ -106,11 +119,13 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
+import * as ui from '../../ui';
 
 import arena_Clarification from './Clarification.vue';
 import arena_NewClarification from './NewClarificationPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import clarificationsStore from '../../arena/clarificationsStore';
+import common_Paginator from '../common/Paginatorv2.vue';
 
 export enum PopupDisplayed {
   None,
@@ -122,6 +137,7 @@ export enum PopupDisplayed {
     'omegaup-clarification': arena_Clarification,
     'omegaup-arena-new-clarification-popup': arena_NewClarification,
     'omegaup-overlay': omegaup_Overlay,
+    'omegaup-common-paginator': common_Paginator,
   },
 })
 export default class ArenaClarificationList extends Vue {
@@ -134,8 +150,12 @@ export default class ArenaClarificationList extends Vue {
   @Prop() username!: null | string;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
   @Prop({ default: false }) allowFilterByAssignment!: boolean;
+  @Prop() pageSize!: number;
+  @Prop() page!: number;
+  @Prop() pagerItems!: types.PageItem[];
 
   T = T;
+  ui = ui;
   PopupDisplayed = PopupDisplayed;
   currentPopupDisplayed = this.popupDisplayed;
   selectedAssignment: string | null = null;
