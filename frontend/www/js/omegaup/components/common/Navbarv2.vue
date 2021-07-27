@@ -328,12 +328,6 @@
                     data-nav-user-groups
                     >{{ T.navMyGroups }}</a
                   >
-                  <a
-                    class="dropdown-item"
-                    href="/teamsgroup/"
-                    data-nav-user-teams-groups
-                    >{{ T.navMyTeamsGroups }}</a
-                  >
                   <a class="dropdown-item" href="/nomination/mine/">{{
                     T.navMyQualityNomination
                   }}</a>
