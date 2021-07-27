@@ -214,7 +214,7 @@ OmegaUp.on('ready', () => {
             teamsGroupAlias?: string;
           }): void => {
             api.Contest.update({
-              contest,
+              ...contest,
               contest_alias: contest.alias,
               alias: null,
               teams_group_alias: teamsGroupAlias,
@@ -227,6 +227,7 @@ OmegaUp.on('ready', () => {
                     name: data.teamsGroupName,
                   };
                 }
+                this.details.title = data.title;
                 ui.success(`
                   ${T.contestEditContestEdited} <a href="/arena/${contest.alias}/">${T.contestEditGoToContest}</a>
                 `);

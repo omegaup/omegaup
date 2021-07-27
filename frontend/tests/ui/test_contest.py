@@ -322,6 +322,10 @@ def create_contest_admin(driver, contest_alias, problem, users, user,
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, '#status span.message a')))
 
+        contest_title = driver.browser.find_element_by_css_selector(
+            '.page-header h1')
+
+        assert '(Updated)' in contest_title.text, 'Update contest failed'
         assert (contest_alias in
                 message_link.get_attribute('href')), 'Update contest failed'
 

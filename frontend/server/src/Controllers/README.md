@@ -1315,6 +1315,7 @@ Update a Contest
 | Name             | Type     |
 | ---------------- | -------- |
 | `teamsGroupName` | `string` |
+| `title`          | `string` |
 
 ## `/api/contest/updateEndTimeForIdentity/`
 
