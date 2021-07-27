@@ -4935,7 +4935,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         $page = $r->ensureOptionalInt('page') ?? 1;
-        $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 100;
 
         $course = self::validateCourseExists(
             $r->ensureString(
