@@ -41,10 +41,11 @@
               :active-tab="'problems'"
               :runs="runs"
               :guid="guid"
+              :popup-displayed="popupDisplayed"
               :problem-alias="problemAlias"
               :should-show-run-details="shouldShowRunDetails"
               @submit-run="onRunSubmitted"
-              @show-run="(source) => $emit('show-run', source)"
+              @show-run="onRunDetails"
             >
               <template #quality-nomination-buttons>
                 <div></div>
@@ -107,8 +108,9 @@ import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_Scoreboard from './Scoreboard.vue';
 import arena_Summary from './Summary.vue';
-import problem_Details from '../problem/Details.vue';
+import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { SocketStatus } from '../../arena/events_socket';
+import { SubmissionRequest } from '../../arena/submissions';
 
 @Component({
   components: {
@@ -135,6 +137,7 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
   @Prop() scoreboard!: types.Scoreboard;
   @Prop({ default: () => [] }) runs!: types.Run[];
+  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
 
   T = T;
   currentClarifications = this.clarifications;
@@ -175,6 +178,18 @@ export default class ArenaCourse extends Vue {
     this.$emit('submit-run', { ...run, problem: this.activeProblem });
   }
 
+  onRunDetails(source: SubmissionRequest): void {
+    this.$emit('show-run', {
+      ...source,
+      request: {
+        ...source.request,
+        hash: `#problems/${
+          this.activeProblemAlias ?? source.request.problemAlias
+        }/show-run:${source.request.guid}/`,
+      },
+    });
+  }
+
   @Watch('problem')
   onActiveProblemChanged(newValue: types.NavbarProblemsetProblem | null): void {
     if (!newValue) {
@@ -182,6 +197,15 @@ export default class ArenaCourse extends Vue {
       return;
     }
     this.onNavigateToProblem(newValue);
+  }
+
+  @Watch('popupDisplayed')
+  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
+    if (newValue === PopupDisplayed.RunDetails) {
+      this.$nextTick(() => {
+        this.shouldShowRunDetails = true;
+      });
+    }
   }
 }
 </script>

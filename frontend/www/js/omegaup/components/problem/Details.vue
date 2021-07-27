@@ -377,7 +377,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
-  @Prop() isAdmin!: boolean;
+  @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop() nextSubmissionTimestamp!: null | Date;
   @Prop({ default: false }) shouldShowTabs!: boolean;
@@ -474,6 +474,7 @@ export default class ProblemDetails extends Vue {
     this.$emit('show-run', {
       request: {
         guid,
+        hash: `#problems/show-run:${guid}/`,
         isAdmin: this.isAdmin,
         problemAlias: this.problem.alias,
       },
@@ -652,6 +653,7 @@ export default class ProblemDetails extends Vue {
       this.$emit('show-run', {
         request: {
           guid: this.guid,
+          hash: `#problems/show-run:${this.guid}/`,
           isAdmin: this.isAdmin,
           problemAlias: this.currentRunDetailsData?.alias,
         },

@@ -7,6 +7,7 @@ import * as ui from '../ui';
 import Vue from 'vue';
 import arena_Course from '../components/arena/Course.vue';
 import { getOptionsFromLocation } from './location';
+import { PopupDisplayed } from '../components/problem/Details.vue';
 import {
   showSubmission,
   SubmissionRequest,
@@ -41,6 +42,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       problemInfo: null as types.ProblemInfo | null,
       problem: null as types.NavbarProblemsetProblem | null,
+      popupDisplayed: PopupDisplayed.None,
       problems: payload.currentAssignment
         .problems as types.NavbarProblemsetProblem[],
       showNewClarificationPopup: false,
@@ -53,6 +55,7 @@ OmegaUp.on('ready', () => {
           clarifications: clarificationStore.state.clarifications,
           course: payload.courseDetails,
           currentAssignment: payload.currentAssignment,
+          popupDisplayed: this.popupDisplayed,
           problemInfo: this.problemInfo,
           problem: this.problem,
           problemAlias: this.problemAlias,
@@ -79,16 +82,14 @@ OmegaUp.on('ready', () => {
               problems: this.problems,
             });
           },
-          'show-run': (request: SubmissionRequest) => {
-            const hash = `#problems/${
-              this.problemAlias ?? request.request.problemAlias
-            }/show-run:${request.request.guid}/`;
-            api.Run.details({ run_alias: request.request.guid })
+          'show-run': (source: SubmissionRequest) => {
+            api.Run.details({ run_alias: source.request.guid })
               .then((runDetails) => {
-                showSubmission({ request, runDetails, hash });
+                showSubmission({ source, runDetails });
               })
               .catch((error) => {
                 ui.apiError(error);
+                this.popupDisplayed = PopupDisplayed.None;
               });
           },
           'submit-run': ({

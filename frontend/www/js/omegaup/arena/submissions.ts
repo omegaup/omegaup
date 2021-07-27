@@ -19,13 +19,17 @@ interface RunSubmit {
 }
 
 interface SubmissionResponse {
-  hash: string;
-  request: SubmissionRequest;
+  source: SubmissionRequest;
   runDetails: types.RunDetails;
 }
 
 export interface SubmissionRequest {
-  request: { guid: string; isAdmin: boolean; problemAlias: string };
+  request: {
+    guid: string;
+    hash: string;
+    isAdmin: boolean;
+    problemAlias: string;
+  };
   target: problem_Details;
 }
 
@@ -72,20 +76,15 @@ export function submitRunFailed({
   }
 }
 
-export function showSubmission({
-  request,
-  runDetails,
-  hash,
-}: SubmissionResponse) {
-  if (runDetails.show_diff === 'none' || !request.request.isAdmin) {
+export function showSubmission({ source, runDetails }: SubmissionResponse) {
+  if (runDetails.show_diff === 'none' || !source.request.isAdmin) {
     displayRunDetails({
-      request,
+      source,
       runDetails,
-      hash,
     });
     return;
   }
-  fetch(`/api/run/download/run_alias/${request.request.guid}/show_diff/true/`)
+  fetch(`/api/run/download/run_alias/${source.request.guid}/show_diff/true/`)
     .then((response) => {
       if (!response.ok) {
         return Promise.reject(new Error(response.statusText));
@@ -125,7 +124,7 @@ export function showSubmission({
           }
         });
       });
-      displayRunDetails({ request, runDetails, hash });
+      displayRunDetails({ source, runDetails });
     })
     .catch(ui.apiError);
 }
@@ -157,9 +156,8 @@ function numericSort<T extends { [key: string]: any }>(key: string) {
 }
 
 function displayRunDetails({
-  request: { request, target },
+  source: { request, target },
   runDetails,
-  hash,
 }: SubmissionResponse): void {
   let sourceHTML,
     sourceLink = false;
@@ -206,7 +204,7 @@ function displayRunDetails({
       feedback: omegaup.SubmissionFeedback.None as omegaup.SubmissionFeedback,
     }),
   );
-  window.location.hash = hash;
+  window.location.hash = request.hash;
 }
 
 export function updateRun({ run }: { run: types.Run }): void {

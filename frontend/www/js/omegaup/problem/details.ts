@@ -92,11 +92,10 @@ OmegaUp.on('ready', () => {
           searchResultUsers: this.searchResultUsers,
         },
         on: {
-          'show-run': (request: SubmissionRequest) => {
-            const hash = `#problems/show-run:${request.request.guid}/`;
-            api.Run.details({ run_alias: request.request.guid })
+          'show-run': (source: SubmissionRequest) => {
+            api.Run.details({ run_alias: source.request.guid })
               .then((runDetails) => {
-                showSubmission({ request, runDetails, hash });
+                showSubmission({ source, runDetails });
               })
               .catch((error) => {
                 ui.apiError(error);
@@ -303,7 +302,7 @@ OmegaUp.on('ready', () => {
                 refreshProblemClarifications({
                   problemAlias: payload.problem.alias,
                   rowcount: 20,
-                  offset: 0,
+                  offset: 1,
                 });
               })
               .catch(ui.apiError);
@@ -409,7 +408,7 @@ OmegaUp.on('ready', () => {
       refreshProblemClarifications({
         problemAlias: payload.problem.alias,
         rowcount: 20,
-        offset: 0,
+        offset: 1,
       });
     }, 5 * 60 * 1000);
   }

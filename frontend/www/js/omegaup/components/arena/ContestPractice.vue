@@ -49,7 +49,7 @@
                   })
               "
               @submit-run="onRunSubmitted"
-              @show-run="(source) => $emit('show-run', source)"
+              @show-run="onRunDetails"
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -124,6 +124,7 @@ import arena_Summary from './Summary.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { ContestClarificationType } from '../../arena/clarifications';
+import { SubmissionRequest } from '../../arena/submissions';
 
 @Component({
   components: {
@@ -169,6 +170,18 @@ export default class ArenaContestPractice extends Vue {
 
   onRunSubmitted(run: { code: string; language: string }): void {
     this.$emit('submit-run', { ...run, problem: this.activeProblem });
+  }
+
+  onRunDetails(source: SubmissionRequest): void {
+    this.$emit('show-run', {
+      ...source,
+      request: {
+        ...source.request,
+        hash: `#problems/${
+          this.activeProblemAlias ?? source.request.problemAlias
+        }/show-run:${source.request.guid}/`,
+      },
+    });
   }
 
   onClarificationResponse(response: types.Clarification): void {
