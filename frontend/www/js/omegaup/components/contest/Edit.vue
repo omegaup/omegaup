@@ -48,7 +48,7 @@
             >{{ T.wordsAddProblem }}</a
           >
           <a
-            v-if="!virtual"
+            v-if="!virtual && !details.contest_for_teams"
             href="#"
             data-toggle="tab"
             class="dropdown-item admission-mode"
@@ -57,6 +57,7 @@
             >{{ T.contestNewFormAdmissionMode }}</a
           >
           <a
+            v-if="!details.contest_for_teams"
             href="#"
             data-toggle="tab"
             data-nav-contestant
@@ -132,7 +133,14 @@
           :initial-needs-basic-information="details.needs_basic_information"
           :initial-requests-user-information="details.requests_user_information"
           :all-languages="details.available_languages"
+          :teams-group-alias="teamsGroupAlias"
+          :contest-for-teams="details.contest_for_teams"
+          :has-submissions="details.has_submissions"
           :update="true"
+          :search-result-teams-groups="searchResultTeamsGroups"
+          @update-search-result-teams-groups="
+            (query) => $emit('update-search-result-teams-groups', query)
+          "
           @update-contest="(contest) => $emit('update-contest', contest)"
         ></omegaup-contest-new-form>
       </div>
@@ -199,6 +207,7 @@
         <omegaup-contest-teams-groups
           :teams-group="teamsGroup"
           :search-result-teams-groups="searchResultTeamsGroups"
+          :has-submissions="details.has_submissions"
           @update-search-result-teams-groups="
             (query) => $emit('update-search-result-teams-groups', query)
           "
@@ -298,6 +307,8 @@ export default class Edit extends Vue {
   @Prop() users!: types.ContestUser[];
   @Prop() searchResultProblems!: types.ListItem[];
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() teamsGroup!: types.ContestGroup | null;
+  @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop() searchResultGroups!: types.ListItem[];
 
   T = T;
@@ -343,6 +354,10 @@ export default class Edit extends Vue {
       return T.contestEditUnarchiveHelpText;
     }
     return T.contestEditArchiveHelpText;
+  }
+
+  get teamsGroupAlias(): null | string {
+    return this.teamsGroup?.alias ?? null;
   }
 
   onArchiveContest(archive: boolean): void {

@@ -124,11 +124,6 @@
   - [`/api/identity/selectIdentity/`](#apiidentityselectidentity)
   - [`/api/identity/update/`](#apiidentityupdate)
   - [`/api/identity/updateIdentityTeam/`](#apiidentityupdateidentityteam)
-- [Interview](#interview)
-  - [`/api/interview/addUsers/`](#apiinterviewaddusers)
-  - [`/api/interview/create/`](#apiinterviewcreate)
-  - [`/api/interview/details/`](#apiinterviewdetails)
-  - [`/api/interview/list/`](#apiinterviewlist)
 - [Notification](#notification)
   - [`/api/notification/myList/`](#apinotificationmylist)
   - [`/api/notification/readNotifications/`](#apinotificationreadnotifications)
@@ -229,7 +224,6 @@
   - [`/api/user/extraInformation/`](#apiuserextrainformation)
   - [`/api/user/generateGitToken/`](#apiusergenerategittoken)
   - [`/api/user/generateOmiUsers/`](#apiusergenerateomiusers)
-  - [`/api/user/interviewStats/`](#apiuserinterviewstats)
   - [`/api/user/lastPrivacyPolicyAccepted/`](#apiuserlastprivacypolicyaccepted)
   - [`/api/user/list/`](#apiuserlist)
   - [`/api/user/listAPITokens/`](#apiuserlistapitokens)
@@ -1318,7 +1312,10 @@ Update a Contest
 
 ### Returns
 
-_Nothing_
+| Name             | Type     |
+| ---------------- | -------- |
+| `teamsGroupName` | `string` |
+| `title`          | `string` |
 
 ## `/api/contest/updateEndTimeForIdentity/`
 
@@ -2552,69 +2549,6 @@ Entry point for Update an Identity team API
 
 _Nothing_
 
-# Interview
-
-## `/api/interview/addUsers/`
-
-### Description
-
-### Parameters
-
-| Name                  | Type     | Description |
-| --------------------- | -------- | ----------- |
-| `interview_alias`     | `string` |             |
-| `usernameOrEmailsCSV` | `string` |             |
-
-### Returns
-
-_Nothing_
-
-## `/api/interview/create/`
-
-### Description
-
-### Parameters
-
-| Name          | Type           | Description |
-| ------------- | -------------- | ----------- |
-| `duration`    | `int`          |             |
-| `title`       | `string`       |             |
-| `alias`       | `null\|string` |             |
-| `description` | `null\|string` |             |
-
-### Returns
-
-_Nothing_
-
-## `/api/interview/details/`
-
-### Description
-
-### Parameters
-
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `interview_alias` | `string` |             |
-
-### Returns
-
-| Name            | Type                                                                                                                     |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `contest_alias` | `string`                                                                                                                 |
-| `description`   | `string`                                                                                                                 |
-| `problemset_id` | `number`                                                                                                                 |
-| `users`         | `{ access_time: Date; country: string; email: string; opened_interview: boolean; user_id: number; username: string; }[]` |
-
-## `/api/interview/list/`
-
-### Description
-
-### Returns
-
-| Name     | Type                                                                                                                                           |
-| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `result` | `{ acl_id: number; alias: string; description: string; interview_id: number; problemset_id: number; title: string; window_length: number; }[]` |
-
 # Notification
 
 BadgesController
@@ -3304,16 +3238,15 @@ and the number of solutions already seen
 
 ### Parameters
 
-| Name              | Type           | Description |
-| ----------------- | -------------- | ----------- |
-| `assignment`      | `string`       |             |
-| `contest_alias`   | `string`       |             |
-| `course`          | `string`       |             |
-| `interview_alias` | `string`       |             |
-| `problemset_id`   | `int`          |             |
-| `auth_token`      | `mixed`        |             |
-| `token`           | `null\|string` |             |
-| `tokens`          | `mixed`        |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `assignment`    | `string`       |             |
+| `contest_alias` | `string`       |             |
+| `course`        | `string`       |             |
+| `problemset_id` | `int`          |             |
+| `auth_token`    | `mixed`        |             |
+| `token`         | `null\|string` |             |
+| `tokens`        | `mixed`        |             |
 
 ### Returns
 
@@ -4446,29 +4379,6 @@ against the gitserver.
 ```typescript
 { [key: string]: string; }
 ```
-
-## `/api/user/interviewStats/`
-
-### Description
-
-Get the results for this user in a given interview
-
-### Parameters
-
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `interview` | `string` |             |
-| `username`  | `string` |             |
-
-### Returns
-
-| Name               | Type      |
-| ------------------ | --------- |
-| `finished`         | `boolean` |
-| `interview_url`    | `string`  |
-| `name_or_username` | `string`  |
-| `opened_interview` | `boolean` |
-| `user_verified`    | `boolean` |
 
 ## `/api/user/lastPrivacyPolicyAccepted/`
 

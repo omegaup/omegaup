@@ -101,6 +101,13 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.currentAssignment);
+        x.scoreboard = ((x) => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.scoreboard);
         return x;
       })(
         JSON.parse(
@@ -498,6 +505,27 @@ export namespace types {
     ): types.ContestNewPayload {
       return JSON.parse(
         (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function CourseClarificationsPayload(
+      elementId: string = 'payload',
+    ): types.CourseClarificationsPayload {
+      return ((x) => {
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -1573,6 +1601,7 @@ export namespace types {
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
     currentAssignment: types.ArenaAssignment;
+    scoreboard: types.Scoreboard;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
   }
@@ -1669,7 +1698,6 @@ export namespace types {
     coder_of_the_month_id: number;
     country_id: string;
     description?: string;
-    interview_url?: string;
     problems_solved: number;
     ranking: number;
     school_id?: number;
@@ -1696,7 +1724,6 @@ export namespace types {
       coder_of_the_month_id: number;
       country_id: string;
       description?: string;
-      interview_url?: string;
       problems_solved: number;
       ranking: number;
       school_id?: number;
@@ -2060,6 +2087,13 @@ export namespace types {
     scoreboard_url: string;
     scoreboard_url_admin: string;
     start_time: Date;
+  }
+
+  export interface CourseClarificationsPayload {
+    clarifications: types.Clarification[];
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
   }
 
   export interface CourseCloneDetailsPayload {
@@ -2461,7 +2495,6 @@ export namespace types {
 
   export interface LoginDetailsPayload {
     facebookUrl: string;
-    linkedinUrl: string;
     statusError?: string;
     validateRecaptcha: boolean;
   }
@@ -2861,7 +2894,6 @@ export namespace types {
       access_time?: Date;
       country?: string;
       email?: string;
-      opened_interview: boolean;
       user_id?: number;
       username: string;
     }[];
@@ -3657,7 +3689,10 @@ export namespace messages {
     verdict_counts: { [key: string]: number };
   };
   export type ContestUpdateRequest = { [key: string]: any };
-  export type ContestUpdateResponse = {};
+  export type ContestUpdateResponse = {
+    teamsGroupName?: string;
+    title: string;
+  };
   export type ContestUpdateEndTimeForIdentityRequest = { [key: string]: any };
   export type ContestUpdateEndTimeForIdentityResponse = {};
   export type ContestUsersRequest = { [key: string]: any };
@@ -3917,39 +3952,6 @@ export namespace messages {
   export type IdentityUpdateResponse = {};
   export type IdentityUpdateIdentityTeamRequest = { [key: string]: any };
   export type IdentityUpdateIdentityTeamResponse = {};
-
-  // Interview
-  export type InterviewAddUsersRequest = { [key: string]: any };
-  export type InterviewAddUsersResponse = {};
-  export type InterviewCreateRequest = { [key: string]: any };
-  export type InterviewCreateResponse = {};
-  export type InterviewDetailsRequest = { [key: string]: any };
-  export type _InterviewDetailsServerResponse = any;
-  export type InterviewDetailsResponse = {
-    contest_alias?: string;
-    description?: string;
-    problemset_id?: number;
-    users: {
-      access_time?: Date;
-      country?: string;
-      email?: string;
-      opened_interview: boolean;
-      user_id?: number;
-      username: string;
-    }[];
-  };
-  export type InterviewListRequest = { [key: string]: any };
-  export type InterviewListResponse = {
-    result: {
-      acl_id: number;
-      alias: string;
-      description: string;
-      interview_id: number;
-      problemset_id: number;
-      title: string;
-      window_length: number;
-    }[];
-  };
 
   // Notification
   export type NotificationMyListRequest = { [key: string]: any };
@@ -4318,14 +4320,6 @@ export namespace messages {
   export type UserGenerateGitTokenResponse = { token: string };
   export type UserGenerateOmiUsersRequest = { [key: string]: any };
   export type UserGenerateOmiUsersResponse = { [key: string]: string };
-  export type UserInterviewStatsRequest = { [key: string]: any };
-  export type UserInterviewStatsResponse = {
-    finished: boolean;
-    interview_url: string;
-    name_or_username?: string;
-    opened_interview: boolean;
-    user_verified: boolean;
-  };
   export type UserLastPrivacyPolicyAcceptedRequest = { [key: string]: any };
   export type UserLastPrivacyPolicyAcceptedResponse = { hasAccepted: boolean };
   export type UserListRequest = { [key: string]: any };
@@ -4774,21 +4768,6 @@ export namespace controllers {
     ) => Promise<messages.IdentityUpdateIdentityTeamResponse>;
   }
 
-  export interface Interview {
-    addUsers: (
-      params?: messages.InterviewAddUsersRequest,
-    ) => Promise<messages.InterviewAddUsersResponse>;
-    create: (
-      params?: messages.InterviewCreateRequest,
-    ) => Promise<messages.InterviewCreateResponse>;
-    details: (
-      params?: messages.InterviewDetailsRequest,
-    ) => Promise<messages.InterviewDetailsResponse>;
-    list: (
-      params?: messages.InterviewListRequest,
-    ) => Promise<messages.InterviewListResponse>;
-  }
-
   export interface Notification {
     myList: (
       params?: messages.NotificationMyListRequest,
@@ -5087,9 +5066,6 @@ export namespace controllers {
     generateOmiUsers: (
       params?: messages.UserGenerateOmiUsersRequest,
     ) => Promise<messages.UserGenerateOmiUsersResponse>;
-    interviewStats: (
-      params?: messages.UserInterviewStatsRequest,
-    ) => Promise<messages.UserInterviewStatsResponse>;
     lastPrivacyPolicyAccepted: (
       params?: messages.UserLastPrivacyPolicyAcceptedRequest,
     ) => Promise<messages.UserLastPrivacyPolicyAcceptedResponse>;

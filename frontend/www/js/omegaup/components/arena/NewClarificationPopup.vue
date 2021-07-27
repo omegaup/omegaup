@@ -53,6 +53,7 @@
             maxlength="200"
             required="required"
             :placeholder="T.arenaClarificationMaxLength"
+            data-new-clarification-message
           ></textarea>
         </label>
       </div>
