@@ -104,6 +104,7 @@ export default class Members extends Vue {
       usersToAdd: this.typeaheadContestants.map((user) => user.key),
       teamUsername: this.teamUsername,
     });
+    this.typeaheadContestants = null;
   }
 }
 </script>

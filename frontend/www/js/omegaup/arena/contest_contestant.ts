@@ -7,6 +7,7 @@ import Vue from 'vue';
 import arena_Contest from '../components/arena/Contest.vue';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import { getOptionsFromLocation } from './location';
+import problemsStore from './problemStore';
 import {
   ContestClarification,
   ContestClarificationRequest,
@@ -171,6 +172,19 @@ OmegaUp.on('ready', () => {
                 });
                 target.nextSubmissionTimestamp =
                   response.nextSubmissionTimestamp;
+
+                if (
+                  Object.prototype.hasOwnProperty.call(
+                    problemsStore.state.problems,
+                    problem.alias,
+                  )
+                ) {
+                  const problemInfo =
+                    problemsStore.state.problems[problem.alias];
+                  problemInfo.nextSubmissionTimestamp =
+                    response.nextSubmissionTimestamp;
+                  problemsStore.commit('addProblem', problemInfo);
+                }
               })
               .catch((run) => {
                 submitRunFailed({

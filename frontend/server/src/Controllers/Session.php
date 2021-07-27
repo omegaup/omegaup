@@ -617,44 +617,6 @@ class Session extends \OmegaUp\Controllers\Controller {
         self::redirect();
     }
 
-    public static function loginViaLinkedIn(
-        string $code,
-        string $state,
-        ?string $redirect
-    ): void {
-        try {
-            $li = self::getLinkedInInstance($redirect);
-            $authToken = $li->getAuthToken($code, $state);
-            $profile = $li->getProfileInfo($authToken);
-            $redirect = $li->extractRedirect($state);
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            self::$log->error("Unable to login via LinkedIn: $e");
-            throw $e;
-        }
-        \OmegaUp\Controllers\Session::thirdPartyLogin(
-            'LinkedIn',
-            $profile['emailAddress'],
-            "{$profile['firstName']} {$profile['lastName']}"
-        );
-
-        self::redirect($redirect);
-    }
-
-    private static function getLinkedInInstance(
-        ?string $redirect = null
-    ): \OmegaUp\LinkedIn {
-        return new \OmegaUp\LinkedIn(
-            OMEGAUP_LINKEDIN_CLIENTID,
-            OMEGAUP_LINKEDIN_SECRET,
-            OMEGAUP_URL . '/login?linkedin',
-            $redirect
-        );
-    }
-
-    public static function getLinkedInLoginUrl(): string {
-        return self::getLinkedInInstance()->getLoginUrl();
-    }
-
     private static function getRedirectUrl(?string $url = null): string {
         $defaultRedirectUrl = '/profile/';
         if (is_null($url)) {

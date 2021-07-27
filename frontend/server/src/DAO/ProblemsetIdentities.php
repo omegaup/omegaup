@@ -20,7 +20,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
     }
 
     /**
-     * @param \OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews $container
+     * @param \OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments $container
      */
     public static function checkAndSaveFirstTimeAccess(
         \OmegaUp\DAO\VO\Identities $identity,

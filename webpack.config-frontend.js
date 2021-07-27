@@ -26,7 +26,6 @@ module.exports = {
     arena_assignment: './frontend/www/js/omegaup/arena/assignment.ts',
     arena_assignment_admin:
       './frontend/www/js/omegaup/arena/assignment_admin.ts',
-    arena_contest: './frontend/www/js/omegaup/arena/contest.ts',
     arena_contest_contestant:
       './frontend/www/js/omegaup/arena/contest_contestant.ts',
     arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
@@ -55,6 +54,7 @@ module.exports = {
     contest_report: './frontend/www/js/omegaup/contest/report.js',
     contest_scoreboardmerge:
       './frontend/www/js/omegaup/contest/scoreboardmerge.js',
+    course_clarifications: './frontend/www/js/omegaup/course/clarifications.ts',
     course_clone: './frontend/www/js/omegaup/course/clone.ts',
     course_details: './frontend/www/js/omegaup/course/details.ts',
     course_edit: './frontend/www/js/omegaup/course/edit.ts',
