@@ -4,32 +4,31 @@
       <form
         class="form"
         @submit.prevent="
-          $emit('emit-add-student', { participant, participants })
+          $emit('emit-add-student', { participant, participants });
+          participants = '';
         "
       >
         <div class="form-group">
           <p class="card-title">{{ T.courseEditAddStudentsDescription }}</p>
-          <label>{{ T.username }}</label>
-          <span
-            aria-hidden="true"
-            class="glyphicon glyphicon-info-sign"
-            data-placement="top"
-            data-toggle="tooltip"
-            :title="T.courseEditAddStudentsTooltip"
-          ></span>
-          <omegaup-common-typeahead
-            :existing-options="searchResultUsers"
-            :value.sync="participant"
-            :max-results="10"
-            @update-existing-options="
-              (query) => $emit('update-search-result-users', query)
-            "
-          />
-        </div>
-        <div class="form-group pull-right">
-          <button class="btn btn-primary" type="submit">
-            {{ T.wordsAddStudents }}
-          </button>
+          <div class="d-flex align-items-center">
+            <omegaup-common-typeahead
+              class="w-100"
+              :existing-options="searchResultUsers"
+              :value.sync="participant"
+              :max-results="10"
+              @update:value="enableAddButton"
+              @update-existing-options="
+                (query) => $emit('update-search-result-users', query)
+              "
+            />
+            <button
+              class="btn btn-secondary ml-2"
+              :disabled="addButtonDisabled"
+              @click.prevent="addParticipantToList"
+            >
+              {{ T.wordsAdd }}
+            </button>
+          </div>
         </div>
         <div class="form-group">
           <label>{{ T.wordsMultipleUser }}</label>
@@ -39,8 +38,12 @@
             rows="4"
           ></textarea>
         </div>
-        <div class="form-group pull-right">
-          <button class="btn btn-primary user-add-bulk" type="submit">
+        <div class="form-group float-right">
+          <button
+            class="btn btn-primary user-add-bulk"
+            :disabled="participants === ''"
+            type="submit"
+          >
             {{ T.wordsAddStudents }}
           </button>
         </div>
@@ -108,6 +111,7 @@ export default class CourseAddStudents extends Vue {
   @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
+  addButtonDisabled = true;
   studentUsername = '';
   participant: null | string = null;
   participants = '';
@@ -115,6 +119,20 @@ export default class CourseAddStudents extends Vue {
 
   studentProgressUrl(student: types.CourseStudent): string {
     return `/course/${this.courseAlias}/student/${student.username}/`;
+  }
+
+  enableAddButton(student: string | null): void {
+    this.addButtonDisabled = student === null;
+  }
+
+  addParticipantToList(): void {
+    if (this.participants.length) {
+      this.participants += '\n';
+    }
+    this.participants += this.participant;
+
+    this.participant = '';
+    this.addButtonDisabled = true;
   }
 
   @Watch('identityRequests')

@@ -1321,6 +1321,7 @@ const translations: { [key: string]: string; } = {
   wizardTitle: "Problem Finder",
   wordAccepted: "Accepted",
   wordsActions: "Actions",
+  wordsAdd: "Add",
   wordsAddAdmin: "Add administrator",
   wordsAddIdentity: "Add identity",
   wordsAddMember: "Add member",
