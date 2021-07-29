@@ -423,26 +423,28 @@ export default class CourseViewProgress extends Vue {
 .table-fixed {
   max-height: 80vh;
   overflow: auto;
-}
 
-.table-fixed thead th {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: white;
-}
+  thead {
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: white;
 
-.table-fixed tbody /deep/ th {
-  position: sticky;
-  left: 0;
-  background: white;
-  z-index: 1;
-}
+      &:first-child {
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 2;
+      }
+    }
+  }
 
-.table-fixed thead th:first-child {
-  position: sticky;
-  left: 0;
-  background: white;
-  z-index: 2;
+  tbody /deep/ th {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 1;
+  }
 }
 </style>
