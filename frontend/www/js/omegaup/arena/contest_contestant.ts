@@ -114,7 +114,9 @@ OmegaUp.on('ready', () => {
           digitsAfterDecimalPoint: this.digitsAfterDecimalPoint,
           showPenalty: this.showPenalty,
           socketStatus: socketStore.state.socketStatus,
-          runs: myRunsStore.state.runs,
+          runs: myRunsStore.state.runs.filter(
+            (run) => run.alias === this.problem?.alias,
+          ),
         },
         on: {
           'navigate-to-problem': ({

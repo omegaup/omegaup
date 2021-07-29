@@ -63,7 +63,9 @@ OmegaUp.on('ready', () => {
           guid: this.guid,
           problemAlias: this.problemAlias,
           isAdmin: this.isAdmin,
-          runs: myRunsStore.state.runs,
+          runs: myRunsStore.state.runs.filter(
+            (run) => run.alias === this.problem?.alias,
+          ),
         },
         on: {
           'navigate-to-problem': ({
