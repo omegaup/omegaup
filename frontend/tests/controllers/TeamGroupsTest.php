@@ -1280,4 +1280,147 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('teamMemberUsernameInUse', $e->getMessage());
         }
     }
+
+    public function testUpdateMembersToTeam() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        // Users to associate
+        foreach (range(0, 8) as $id) {
+            \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams([
+                    'username' => "user{$id}",
+                ])
+            );
+        }
+
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities_original.csv',
+                    $teamGroup->alias,
+                    /*$password=*/ '',
+                    /*$forTeams=*/ true
+                ),
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        [
+            'identities' => $teams,
+        ] = \OmegaUp\Controllers\TeamsGroup::apiTeams(
+            new \OmegaUp\Request([
+                'team_group_alias' => $teamGroup->alias,
+                'auth_token' => $creatorLogin->auth_token,
+            ])
+        );
+
+        [
+            'teamsUsers' => $teamsUsers,
+        ] = \OmegaUp\Controllers\TeamsGroup::apiTeamsMembers(
+            new \OmegaUp\Request([
+                'team_group_alias' => $teamGroup->alias,
+                'auth_token' => $creatorLogin->auth_token,
+            ])
+        );
+
+        $expectedUsernames = [
+            [
+                0 => 'user0',
+                1 => 'user1',
+            ],
+            [
+                2 => 'user2',
+                3 => 'user3',
+            ],
+        ];
+        foreach ($teams as $index => $team) {
+            $members = array_filter(
+                $teamsUsers,
+                fn ($teamUser) => $teamUser['team_alias'] === $team['username']
+            );
+            $usernames = array_map(
+                fn ($member) => $member['username'],
+                $members
+            );
+            $this->assertEquals($usernames, $expectedUsernames[$index]);
+        }
+
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                    'team_identities_updated.csv',
+                    $teamGroup->alias,
+                    /*$password=*/ '',
+                    /*$forTeams=*/ true
+                ),
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        [
+            'identities' => $teams,
+        ] = \OmegaUp\Controllers\TeamsGroup::apiTeams(
+            new \OmegaUp\Request([
+                'team_group_alias' => $teamGroup->alias,
+                'auth_token' => $creatorLogin->auth_token,
+            ])
+        );
+
+        [
+            'teamsUsers' => $teamsUsers,
+        ] = \OmegaUp\Controllers\TeamsGroup::apiTeamsMembers(
+            new \OmegaUp\Request([
+                'team_group_alias' => $teamGroup->alias,
+                'auth_token' => $creatorLogin->auth_token,
+            ])
+        );
+
+        $expectedUsernames = [
+            [
+                0 => 'user0',
+                1 => 'user1',
+            ],
+            [
+                2 => 'user2',
+                3 => 'user3',
+                4 => 'user4', // identities were merged
+            ],
+            [
+                5 => 'user5',
+                6 => 'user6',
+            ],
+            [
+                7 => 'user7',
+                8 => 'user8',
+            ],
+        ];
+        foreach ($teams as $index => $team) {
+            $members = array_filter(
+                $teamsUsers,
+                fn ($teamUser) => $teamUser['team_alias'] === $team['username']
+            );
+            $usernames = array_map(
+                fn ($member) => $member['username'],
+                $members
+            );
+            $this->assertEquals($usernames, $expectedUsernames[$index]);
+        }
+    }
 }
