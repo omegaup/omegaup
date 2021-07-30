@@ -337,7 +337,6 @@ courseEditAddAdminsTooltip = "Adicionar administratores usando seu nome de usuá
 courseEditAddGroupAdminsTooltip = "Adicionar grupos de administratores"
 courseEditAddProblems = "Adicionar problema"
 courseEditAddStudentsDescription = "Gerenciar os alunos que participarão do curso"
-courseEditAddStudentsTooltip = "Adicionar alunos usando seu nome de usuário omegaUp"
 courseEditAdmins = "Administratores"
 courseEditAdminsEmpty = "Não hay administratores"
 courseEditAdmissionModeDescription = "Manual: os alunos não podem acessá-lo, a menos que tenham sido explicitamente convidados.\nCompartilhar URL: qualquer pessoa com o link pode se inscrever para participar. Além disso, você pode adicionar manualmente nomes de usuário ao seu curso."

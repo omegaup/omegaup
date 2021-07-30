@@ -338,7 +338,6 @@
 	"courseEditAddGroupAdminsTooltip": "Agrega grupos de administradores",
 	"courseEditAddProblems": "Agregar problema",
 	"courseEditAddStudentsDescription": "Administra a los estudiantes que van a participar en el curso",
-	"courseEditAddStudentsTooltip": "Agrega estudiantes utilizando su nombre de usuario de omegaUp",
 	"courseEditAdmins": "Administradores",
 	"courseEditAdminsEmpty": "No hay administradores",
 	"courseEditAdmissionModeDescription": "Manual: Los estudiantes no pueden inscribirse a menos que sean expl\u00edcitamente invitados.\nCompartir URL: Cualquiera con el link puede solicitar inscribirse. Adicionalmente, puedes agregar de forma manual los nombres de usuario de los estudiantes.",

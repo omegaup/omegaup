@@ -78,7 +78,8 @@ class StatusBarIsDismissed:
 
 # pylint: disable=too-many-arguments
 def add_students(driver, users, *, tab_xpath,
-                 container_xpath, parent_selector, submit_locator):
+                 container_xpath, parent_selector,
+                 add_button_locator, submit_locator):
     '''Add students to a recently :instance.'''
 
     driver.wait.until(
@@ -93,7 +94,13 @@ def add_students(driver, users, *, tab_xpath,
 
         with dismiss_status(driver):
             driver.wait.until(
-                EC.element_to_be_clickable(submit_locator)).click()
+                EC.element_to_be_clickable(add_button_locator)).click()
+
+    with dismiss_status(driver):
+        driver.wait.until(
+            EC.element_to_be_clickable(submit_locator)).click()
+
+    for user in users:
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,

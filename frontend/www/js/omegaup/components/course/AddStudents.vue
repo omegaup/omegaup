@@ -16,14 +16,13 @@
               :existing-options="searchResultUsers"
               :value.sync="participant"
               :max-results="10"
-              @update:value="enableAddButton"
               @update-existing-options="
                 (query) => $emit('update-search-result-users', query)
               "
             />
             <button
-              class="btn btn-secondary ml-2"
-              :disabled="addButtonDisabled"
+              class="btn btn-secondary add-participant ml-2"
+              :disabled="!participant"
               @click.prevent="addParticipantToList"
             >
               {{ T.wordsAdd }}
@@ -111,7 +110,6 @@ export default class CourseAddStudents extends Vue {
   @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
-  addButtonDisabled = true;
   studentUsername = '';
   participant: null | string = null;
   participants = '';
@@ -121,18 +119,13 @@ export default class CourseAddStudents extends Vue {
     return `/course/${this.courseAlias}/student/${student.username}/`;
   }
 
-  enableAddButton(student: string | null): void {
-    this.addButtonDisabled = student === null;
-  }
-
   addParticipantToList(): void {
     if (this.participants.length) {
       this.participants += '\n';
     }
     this.participants += this.participant;
 
-    this.participant = '';
-    this.addButtonDisabled = true;
+    this.participant = null;
   }
 
   @Watch('identityRequests')

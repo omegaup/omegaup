@@ -339,7 +339,6 @@ const translations: { [key: string]: string; } = {
   courseEditAddGroupAdminsTooltip: "Add groups admins",
   courseEditAddProblems: "Add problem",
   courseEditAddStudentsDescription: "Manage the students who will participate in the course",
-  courseEditAddStudentsTooltip: "Add students using their omegaUp username",
   courseEditAdmins: "Administrators",
   courseEditAdminsEmpty: "No administrators",
   courseEditAdmissionModeDescription: "Manual only: Students can not access it unless they have been explicitly invited.\nShare URL: Anyone with the link can apply to join. Additionally you can manually add usernames to your course.",

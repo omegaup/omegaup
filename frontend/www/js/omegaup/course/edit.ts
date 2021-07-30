@@ -368,9 +368,8 @@ OmegaUp.on('ready', () => {
             participants: string;
           }) => {
             let participants: string[] = [];
-            if (ev.participants !== '')
-              participants = ev.participants.split(/[\n,]/);
-            if (ev.participant !== '') participants.push(ev.participant);
+            if (ev.participants) participants = ev.participants.split(/[\n,]/);
+            if (ev.participant) participants.push(ev.participant);
             if (participants.length === 0) {
               ui.error(T.wordsEmptyAddStudentInput);
               return;
