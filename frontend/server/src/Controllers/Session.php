@@ -88,7 +88,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             return [
                 'token' => $token,
                 'username' => null,
-                'cacheKey' => "api-token:${token}",
+                'cacheKey' => "api-token:{$token}",
             ];
         }
         $tokens = explode(',', $token);
@@ -110,7 +110,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         return [
             'token' => $authorization['Credential'],
             'username' => $authorization['Username'],
-            'cacheKey' => "api-token:${authorization['Credential']}:${authorization['Username']}",
+            'cacheKey' => "api-token:{$authorization['Credential']}:{$authorization['Username']}",
         ];
     }
 
@@ -193,7 +193,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                 "X-RateLimit-Limit: {$usageData['limit']}"
             );
             $sessionManagerInstance->setHeader(
-                "X-RateLimit-Remaining: ${usageData['remaining']}"
+                "X-RateLimit-Remaining: {$usageData['remaining']}"
             );
             $sessionManagerInstance->setHeader(
                 "X-RateLimit-Reset: {$usageData['reset']->time}"
@@ -211,24 +211,9 @@ class Session extends \OmegaUp\Controllers\Controller {
                 $authToken = self::getAuthToken($r);
                 $r['auth_token'] = $authToken;
             }
-            if (
-                defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
-                OMEGAUP_SESSION_CACHE_ENABLED === true &&
-                !is_null($authToken)
-            ) {
-                self::$_currentSession = \OmegaUp\Cache::getFromCacheOrSet(
-                    \OmegaUp\Cache::SESSION_PREFIX,
-                    $authToken,
-                    fn () => self::getCurrentSessionImplForAuthToken(
-                        $authToken
-                    ),
-                    APC_USER_CACHE_SESSION_TIMEOUT
-                );
-            } else {
-                self::$_currentSession = self::getCurrentSessionImplForAuthToken(
-                    $authToken
-                );
-            }
+            self::$_currentSession = self::getCurrentSessionImplForAuthToken(
+                $authToken
+            );
         }
         return self::$_currentSession;
     }
@@ -237,12 +222,11 @@ class Session extends \OmegaUp\Controllers\Controller {
      * @return CurrentSession
      */
     private static function getCurrentSessionImplForAuthToken(?string $authToken): array {
+        $identityExt = null;
         if (!empty($authToken)) {
             $identityExt = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
                 $authToken
             );
-        } else {
-            $identityExt = null;
         }
         if (is_null($identityExt) || is_null($authToken)) {
             // Means user has auth token, but does not exist in DB
@@ -655,26 +639,20 @@ class Session extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $usernameOrEmail
      */
     public static function nativeLogin(\OmegaUp\Request $r): string {
-        \OmegaUp\Validators::validateStringNonEmpty($r['password'], 'password');
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['usernameOrEmail'],
-            'usernameOrEmail'
-        );
+        $password = $r->ensureString('password');
+        $usernameOrEmail = $r->ensureString('usernameOrEmail');
 
         try {
             $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
-                $r['usernameOrEmail']
+                $usernameOrEmail
             );
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            self::$log->warn("Identity {$r['usernameOrEmail']} not found.");
+            self::$log->warn("Identity {$usernameOrEmail} not found.");
             throw new \OmegaUp\Exceptions\InvalidCredentialsException();
         }
 
         if (
-            !\OmegaUp\Controllers\Identity::testPassword(
-                $identity,
-                $r['password']
-            )
+            !\OmegaUp\Controllers\Identity::testPassword($identity, $password)
         ) {
             self::$log->warn(
                 "Identity {$identity->username} has introduced invalid credentials."
@@ -689,9 +667,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             self::$log->warn(
                 "Identity {$identity->username}'s password hash is being upgraded."
             );
-            $identity->password = \OmegaUp\SecurityTools::hashString(
-                $r['password']
-            );
+            $identity->password = \OmegaUp\SecurityTools::hashString($password);
             \OmegaUp\DAO\Identities::update($identity);
         }
 
