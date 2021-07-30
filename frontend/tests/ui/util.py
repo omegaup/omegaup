@@ -91,20 +91,18 @@ def add_students(driver, users, *, tab_xpath,
 
     for user in users:
         driver.typeahead_helper_v2(parent_selector, user)
+        driver.wait.until(
+            EC.element_to_be_clickable(add_button_locator)).click()
 
-        with dismiss_status(driver):
-            driver.wait.until(
-                EC.element_to_be_clickable(add_button_locator)).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(submit_locator)).click()
 
     with dismiss_status(driver):
-        driver.wait.until(
-            EC.element_to_be_clickable(submit_locator)).click()
-
-    for user in users:
-        driver.wait.until(
-            EC.visibility_of_element_located(
-                (By.XPATH,
-                 '%s//a[text()="%s"]' % (container_xpath, user))))
+        for user in users:
+            driver.wait.until(
+                EC.visibility_of_element_located(
+                    (By.XPATH,
+                     '%s//a[text()="%s"]' % (container_xpath, user))))
 
 
 def add_students_to_contest(driver, users, *, tab_xpath, container_xpath,
