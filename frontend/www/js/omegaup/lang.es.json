@@ -239,6 +239,8 @@
 	"contestNewFormImmediateSummaryFeedbackDesc": "Despu\u00e9s de evaluar cada env\u00edo, se mostrar\u00e1 el resumen de puntajes y veredictos para cada grupo de casos.",
 	"contestNewFormLanguages": "Establecer lenguajes para el concurso actual",
 	"contestNewFormNoPenalty": "Usuarios con el mismo puntaje quedar\u00e1n empatados, sin importar el tiempo que le haya tomado a cada uno.",
+	"contestNewFormNumberOfContestants": "N\u00famero de concursantes",
+	"contestNewFormNumberOfContestantsDesc": "N\u00famero de concursantes para cada equipo",
 	"contestNewFormOmiStyle": "Estilo OMI - IOI",
 	"contestNewFormPartialScore": "Puntaje parcial",
 	"contestNewFormPartialScoreDesc": "El puntaje de los env\u00edos ser\u00e1 el 100% de los puntos para ese problema cuando el veredicto es AC. De lo contrario, la puntuaci\u00f3n ser\u00e1 0 si al menos un caso es incorrecto",

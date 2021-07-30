@@ -239,6 +239,8 @@
 	"contestNewFormImmediateSummaryFeedbackDesc": "After evaluating each submission, the summary of scores and verdicts for each group of cases will be shown.",
 	"contestNewFormLanguages": "Set languages to the current contest",
 	"contestNewFormNoPenalty": "Users with the same score will end up in a draw, regardless of the time it has taken each one.",
+	"contestNewFormNumberOfContestants": "Number of contestants",
+	"contestNewFormNumberOfContestantsDesc": "Number of contestants allowed for every team",
 	"contestNewFormOmiStyle": "OMI - IOI Style",
 	"contestNewFormPartialScore": "Partial score",
 	"contestNewFormPartialScoreDesc": "The score for the submissions will be 100% of the points for that problem when the verdict is AC. Otherwise, the score will be 0 whether at least one case is incorrect.",

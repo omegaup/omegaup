@@ -3,6 +3,7 @@
     :alias.sync="alias"
     :description.sync="description"
     :name.sync="name"
+    :number-of-contestants.sync="numberOfContestants"
     @submit="(request) => $emit('create-teams-group', { ...request, alias })"
   >
     <template #teams-group-title>
@@ -31,6 +32,7 @@ export default class TeamsGroupFormCreate extends Vue {
   alias: null | string = null;
   description: null | string = null;
   name: null | string = null;
+  numberOfContestants: number = 3;
 
   generateAlias(name: string): string {
     // Remove accents

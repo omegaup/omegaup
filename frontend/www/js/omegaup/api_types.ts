@@ -3284,7 +3284,12 @@ export namespace types {
     countries: dao.Countries[];
     identities: types.Identity[];
     isOrganizer: boolean;
-    teamGroup: { alias: string; description?: string; name?: string };
+    teamGroup: {
+      alias: string;
+      description?: string;
+      name?: string;
+      numberOfContestants: number;
+    };
     teamsMembers: types.TeamMember[];
   }
 

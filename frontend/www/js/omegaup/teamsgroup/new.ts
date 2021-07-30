@@ -38,15 +38,18 @@ OmegaUp.on('ready', () => {
             name,
             alias,
             description,
+            numberOfContestants,
           }: {
             name: string;
             alias: string;
             description: string;
+            numberOfContestants: number;
           }) => {
             api.TeamsGroup.create({
-              alias: alias,
-              name: name,
-              description: description,
+              alias,
+              name,
+              description,
+              numberOfContestants,
             })
               .then(() => {
                 window.location.replace(`/teamsgroup/${alias}/edit/#upload`);

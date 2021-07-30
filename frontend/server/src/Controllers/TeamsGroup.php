@@ -7,13 +7,15 @@
  *
  * @psalm-type Identity=array{classname?: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, password?: string, school: null|string, school_id: int|null, school_name?: string, state: null|string, state_id: null|string, username: string, usernames?: string}
  * @psalm-type TeamMember=array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}
- * @psalm-type TeamGroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<Identity>, isOrganizer: bool, teamGroup: array{alias: string, description: null|string, name: null|string}, teamsMembers: list<TeamMember>}
+ * @psalm-type TeamGroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<Identity>, isOrganizer: bool, teamGroup: array{alias: string, description: null|string, name: null|string, numberOfContestants: int}, teamsMembers: list<TeamMember>}
  * @psalm-type TeamsGroup=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
  * @psalm-type TeamsGroupListPayload=array{teamsGroups: list<TeamsGroup>}
  * @psalm-type ListItem=array{key: string, value: string}
  */
 
 class TeamsGroup extends \OmegaUp\Controllers\Controller {
+    const MAX_NUMBER_OF_CONTESTANTS = 3;
+
     /**
      * Validate team group param
      *
@@ -125,6 +127,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
                         'alias' => $teamGroupAlias,
                         'name' => $teamGroup->name,
                         'description' => $teamGroup->description,
+                        'numberOfContestants' => $teamGroup->number_of_contestants,
                     ],
                     'countries' => \OmegaUp\DAO\Countries::getAll(
                         null,
@@ -152,16 +155,18 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
     /**
      * Utility function to create a new team group.
      */
-    public static function createTeamGroup(
+    private static function createTeamGroup(
         string $alias,
         string $name,
         string $description,
+        int $numberOfContestants,
         int $ownerUserId
     ): \OmegaUp\DAO\VO\TeamGroups {
         $teamGroup = new \OmegaUp\DAO\VO\TeamGroups([
             'alias' => $alias,
             'name' => $name,
             'description' => $description,
+            'number_of_contestants' => $numberOfContestants,
         ]);
         $teamGroupAcl = new \OmegaUp\DAO\VO\ACLs(['owner_id' => $ownerUserId]);
 
@@ -198,6 +203,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $alias
      * @omegaup-request-param string $description
      * @omegaup-request-param string $name
+     * @omegaup-request-param int|null $numberOfContestants
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
@@ -208,11 +214,15 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         );
         $name = $r->ensureString('name');
         $description = $r->ensureString('description');
+        $numberOfContestants = $r->ensureOptionalInt(
+            'numberOfContestants'
+        ) ?? self::MAX_NUMBER_OF_CONTESTANTS;
 
         self::createTeamGroup(
             $teamGroupAlias,
             $name,
             $description,
+            $numberOfContestants,
             $r->user->user_id
         );
 
@@ -227,6 +237,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $alias
      * @omegaup-request-param string $description
      * @omegaup-request-param string $name
+     * @omegaup-request-param int|null $numberOfContestants
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
@@ -249,6 +260,9 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
 
         $teamsGroup->name = $r->ensureString('name');
         $teamsGroup->description = $r->ensureString('description');
+        $teamsGroup->number_of_contestants = $r->ensureInt(
+            'numberOfContestants'
+        );
         \OmegaUp\DAO\TeamGroups::update($teamsGroup);
         self::$log->info(
             "Teams group {$teamsGroup->alias} updated succesfully."

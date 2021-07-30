@@ -24,6 +24,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'alias' => $teamGroup->alias,
                 'name' => $teamGroup->name,
                 'description' => $teamGroup->description,
+                'numberOfContestants' => $teamGroup->number_of_contestants,
             ]
         );
     }
@@ -116,6 +117,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $updatedName = \OmegaUp\Test\Utils::createRandomString();
         $updatedDescription = \OmegaUp\Test\Utils::createRandomString();
+        $updatedNumberOfContestants = 5;
 
         \OmegaUp\Controllers\TeamsGroup::apiUpdate(
             new \OmegaUp\Request([
@@ -123,6 +125,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'name' => $updatedName,
                 'alias' => $alias,
                 'description' => $updatedDescription,
+                'numberOfContestants' => $updatedNumberOfContestants,
             ])
         );
 
@@ -130,6 +133,10 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotNull($teamsGroup);
         $this->assertEquals($updatedName, $teamsGroup->name);
         $this->assertEquals($updatedDescription, $teamsGroup->description);
+        $this->assertEquals(
+            $updatedNumberOfContestants,
+            $teamsGroup->number_of_contestants
+        );
     }
 
     public function testCreateTeamGroupWithCorrectOwnership() {
@@ -206,6 +213,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
+            null,
             null,
             null,
             null,
@@ -305,6 +313,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             null,
+            null,
             $creatorLogin
         );
 
@@ -379,6 +388,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             null,
+            null,
             $creatorLogin
         );
 
@@ -412,6 +422,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
+            null,
             null,
             null,
             null,
@@ -449,6 +460,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             null,
+            null,
             $creatorLogin
         );
 
@@ -483,6 +495,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             null,
+            null,
             $creatorLogin
         );
 
@@ -514,6 +527,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
+            null,
             null,
             null,
             null,
@@ -657,6 +671,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             null,
+            null,
             $creatorLogin
         );
         $numberOfUsers = 10;
@@ -730,6 +745,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             /*$name*/ null,
             /*$description*/ null,
             /*$alias*/ null,
+            /*$numberOfContestants*/ null,
             $creatorLogin
         )['teamGroup'];
 
@@ -808,6 +824,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             null,
+            null,
             $creatorLogin
         )['teamGroup'];
 
@@ -878,6 +895,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
+            null,
             null,
             null,
             null,
@@ -966,6 +984,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
+            null,
             null,
             null,
             null,
@@ -1062,6 +1081,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             null,
+            null,
             $creatorLogin
         );
 
@@ -1152,6 +1172,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             null,
+            null,
             $creatorLogin
         );
 
@@ -1231,6 +1252,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
+            null,
             null,
             null,
             null,

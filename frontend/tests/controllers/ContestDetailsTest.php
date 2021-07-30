@@ -1022,6 +1022,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             null,
+            null,
             $creatorLogin
         );
 
