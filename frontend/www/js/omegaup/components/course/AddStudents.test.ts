@@ -15,6 +15,7 @@ describe('AddStudents.vue', () => {
       },
     });
 
+    expect(wrapper.text()).toContain(T.courseEditAddStudentsAdd);
     expect(wrapper.text()).toContain(T.courseStudentsEmpty);
   });
 
@@ -40,6 +41,7 @@ describe('AddStudents.vue', () => {
       },
     });
 
+    expect(wrapper.text()).toContain(T.courseEditAddStudentsAdd);
     expect(wrapper.text()).toContain('omegaUp user');
   });
 });

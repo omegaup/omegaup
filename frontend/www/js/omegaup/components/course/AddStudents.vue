@@ -25,7 +25,7 @@
               :disabled="!participant"
               @click.prevent="addParticipantToList"
             >
-              {{ T.wordsAdd }}
+              {{ T.courseEditAddStudentsAdd }}
             </button>
           </div>
         </div>
