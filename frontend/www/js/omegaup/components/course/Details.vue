@@ -19,6 +19,14 @@
       }}</span>
       <div class="mt-2 row float-sm-right">
         <div class="col-sm">
+          <a
+            :href="`/course/${course.alias}/clarification/`"
+            role="button"
+            class="btn btn-primary"
+            >{{ T.wordsClarifications }}</a
+          >
+        </div>
+        <div class="col-sm">
           <div class="dropdown">
             <a
               data-button-statistics
@@ -84,16 +92,26 @@
         </div>
       </div>
     </div>
-    <div v-else class="text-center align-middle">
-      <span>
-        {{ T.overallCompletedPercentage }}:
-        <progress
-          max="100"
-          :value="overallCompletedPercentage"
-          :title="`${overallCompletedPercentage} %`"
-        ></progress>
-      </span>
-    </div>
+    <template v-else>
+      <div class="text-center align-middle">
+        <span>
+          {{ T.overallCompletedPercentage }}:
+          <progress
+            max="100"
+            :value="overallCompletedPercentage"
+            :title="`${overallCompletedPercentage} %`"
+          ></progress>
+        </span>
+      </div>
+      <div class="d-flex justify-content-end">
+        <a
+          :href="`/course/${course.alias}/clarification/`"
+          role="button"
+          class="btn btn-primary"
+          >{{ T.wordsMyClarifications }}</a
+        >
+      </div>
+    </template>
     <div class="mt-4 card">
       <h5 class="card-header">{{ T.wordsContent }}</h5>
       <div class="table-responsive">

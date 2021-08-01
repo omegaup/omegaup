@@ -119,12 +119,12 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
-    public static function expireAuthTokens(int $identity_id): int {
+    public static function expireAuthTokens(int $identityId): int {
         $sql = 'DELETE FROM
                     `Auth_Tokens`
                 WHERE
                     identity_id = ?;';
-        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$identity_id]);
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$identityId]);
 
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
