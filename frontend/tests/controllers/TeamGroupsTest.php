@@ -1281,7 +1281,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    public function testUpdateMembersToTeam() {
+    public function testUpdateTeamMembers() {
         // Identity creator group member will upload csv file
         [
             'identity' => $creatorIdentity,
