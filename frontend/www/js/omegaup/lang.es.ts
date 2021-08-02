@@ -1177,7 +1177,6 @@ const translations: { [key: string]: string; } = {
   tagSourceVoted: "Etiqueta de los usuarios",
   teamAliasInUse: "Existe al menos un alias de equipo duplicado. Por favor revisa el archivo CSV y corrige la informaci\u00f3n",
   teamMemberUsernameInUse: "Existe al menos un nombre de usuario duplicado en los equipos del grupo. Por favor corrige la informaci\u00f3n.",
-  teamNotExist: "El equipo no existe",
   teamsGroupAddUsersDone: "Listo",
   teamsGroupAliasMustBeRequired: "En un concurso para equipos, el alias debe ser requerido.",
   teamsGroupCreateIdentitiesAsTeams: "Crear identidades como equipos",
