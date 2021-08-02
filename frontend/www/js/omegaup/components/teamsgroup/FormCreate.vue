@@ -4,6 +4,7 @@
     :description.sync="description"
     :name.sync="name"
     :number-of-contestants.sync="numberOfContestants"
+    :max-number-of-contestants="maxNumberOfContestants"
     @submit="(request) => $emit('create-teams-group', { ...request, alias })"
   >
     <template #teams-group-title>
@@ -18,7 +19,7 @@
 
 <script lang="ts">
 import teamsgroup_FormBase from './FormBase.vue';
-import { Vue, Component, Watch, Emit } from 'vue-property-decorator';
+import { Vue, Component, Watch, Emit, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import latinize from 'latinize';
 
@@ -28,6 +29,8 @@ import latinize from 'latinize';
   },
 })
 export default class TeamsGroupFormCreate extends Vue {
+  @Prop({ default: 10 }) maxNumberOfContestants!: number;
+
   T = T;
   alias: null | string = null;
   description: null | string = null;

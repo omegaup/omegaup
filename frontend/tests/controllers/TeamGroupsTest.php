@@ -139,6 +139,56 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    /**
+     * A PHPUnit data provider for the test with different number of contestants.
+     *
+     * @return list<array{0: int, 1: string}>
+     */
+    public function numberOfContestantsProvider(): array {
+        return [
+            [-1, 'parameterNumberTooSmall'],
+            [0, 'parameterNumberTooSmall'],
+            [12, 'parameterNumberTooLarge'],
+        ];
+    }
+
+    /**
+     * Update number of contestants in teams group test
+     *
+     * @dataProvider numberOfContestantsProvider
+     */
+    public function testUpdateNumberOfContestantsInTeamsGroup(
+        int $numberOfContestants,
+        string $displayedException
+    ) {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+        \OmegaUp\Controllers\TeamsGroup::apiCreate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => $alias,
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+            ])
+        );
+
+        try {
+            \OmegaUp\Controllers\TeamsGroup::apiUpdate(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'name' => \OmegaUp\Test\Utils::createRandomString(),
+                    'alias' => $alias,
+                    'description' => \OmegaUp\Test\Utils::createRandomString(),
+                    'numberOfContestants' => $numberOfContestants,
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals($displayedException, $e->getMessage());
+        }
+    }
+
     public function testCreateTeamGroupWithCorrectOwnership() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         [
@@ -1303,6 +1353,55 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    public function testExceededNumberOfTeamMembers() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            /*$numberOfContestants=*/ 2,
+            $creatorLogin
+        );
+
+        // Users to associate
+        foreach (range(0, 8) as $id) {
+            \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams([
+                    'username' => "user{$id}",
+                ])
+            );
+        }
+
+        try {
+            // Call api using identity creator group member
+            \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+                new \OmegaUp\Request([
+                    'auth_token' => $creatorLogin->auth_token,
+                    'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                        'team_identities_with_exceeded_number_of_contestants.csv',
+                        $teamGroup->alias,
+                        /*$password=*/ '',
+                        /*$forTeams=*/ true
+                    ),
+                    'team_group_alias' => $teamGroup->alias,
+                ])
+            );
+            $this->fail('It should fail because of number of contestants');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'teamMemberExceededNumberOfContestants',
+                $e->getMessage()
+            );
+        }
+    }
+
     public function testUpdateTeamMembers() {
         // Identity creator group member will upload csv file
         [
@@ -1313,6 +1412,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'teamGroup' => $teamGroup,
         ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup(
             $creatorIdentity,
+            null,
             null,
             null,
             null,

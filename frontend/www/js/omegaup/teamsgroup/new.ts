@@ -4,8 +4,10 @@ import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
+import { types } from '../api_types';
 
 OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.TeamGroupNewPayload();
   new Vue({
     el: '#main-container',
     components: {
@@ -13,6 +15,10 @@ OmegaUp.on('ready', () => {
     },
     render: function (createElement) {
       return createElement('omegaup-teams-group-create', {
+        props: {
+          numberOfContestants: payload.numberOfContestants,
+          maxNumberOfContestants: payload.maxNumberOfContestants,
+        },
         on: {
           'validate-unused-alias': (alias: string): void => {
             if (!alias) {

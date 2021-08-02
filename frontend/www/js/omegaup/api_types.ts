@@ -1399,6 +1399,14 @@ export namespace types {
       );
     }
 
+    export function TeamGroupNewPayload(
+      elementId: string = 'payload',
+    ): types.TeamGroupNewPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function TeamsGroupListPayload(
       elementId: string = 'payload',
     ): types.TeamsGroupListPayload {
@@ -3284,6 +3292,7 @@ export namespace types {
     countries: dao.Countries[];
     identities: types.Identity[];
     isOrganizer: boolean;
+    maxNumberOfContestants: number;
     teamGroup: {
       alias: string;
       description?: string;
@@ -3291,6 +3300,11 @@ export namespace types {
       numberOfContestants: number;
     };
     teamsMembers: types.TeamMember[];
+  }
+
+  export interface TeamGroupNewPayload {
+    maxNumberOfContestants: number;
+    numberOfContestants: number;
   }
 
   export interface TeamMember {

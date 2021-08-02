@@ -1178,6 +1178,7 @@ const translations: { [key: string]: string; } = {
   tagSourceOwner: "Etiqueta do autor",
   tagSourceVoted: "Etiqueta dos usu\u00e1rios",
   teamAliasInUse: "H\u00e1 pelo menos um alias de equipe duplicado. Verifique o arquivo CSV para corrigir as informa\u00e7\u00f5es.",
+  teamMemberExceededNumberOfContestants: "O n\u00famero de competidores em uma das equipes excede o m\u00e1ximo permitido",
   teamMemberUsernameInUse: "H\u00e1 pelo menos um nome de usu\u00e1rio duplicado nas equipes do grupo. Corrija as informa\u00e7\u00f5es.",
   teamsGroupAddUsersDone: "Feito",
   teamsGroupAliasMustBeRequired: "Em um concurso para equipes, o alias deve ser exigido",

@@ -89,7 +89,7 @@ class Groups {
         }
 
         if (is_null($numberOfContestants)) {
-            $numberOfContestants = \OmegaUp\Controllers\TeamsGroup::MAX_NUMBER_OF_CONTESTANTS;
+            $numberOfContestants = \OmegaUp\Controllers\TeamsGroup::NUMBER_OF_CONTESTANTS;
         }
 
         if (is_null($login)) {
@@ -102,7 +102,7 @@ class Groups {
                 'alias' => $alias,
                 'name' => $name,
                 'description' => $description,
-                'number_of_contestants' => $numberOfContestants,
+                'numberOfContestants' => $numberOfContestants,
             ])
         );
 

@@ -7,14 +7,16 @@
  *
  * @psalm-type Identity=array{classname?: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, password?: string, school: null|string, school_id: int|null, school_name?: string, state: null|string, state_id: null|string, username: string, usernames?: string}
  * @psalm-type TeamMember=array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}
- * @psalm-type TeamGroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<Identity>, isOrganizer: bool, teamGroup: array{alias: string, description: null|string, name: null|string, numberOfContestants: int}, teamsMembers: list<TeamMember>}
+ * @psalm-type TeamGroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<Identity>, isOrganizer: bool, maxNumberOfContestants: int, teamGroup: array{alias: string, description: null|string, name: null|string, numberOfContestants: int}, teamsMembers: list<TeamMember>}
+ * @psalm-type TeamGroupNewPayload=array{numberOfContestants: int, maxNumberOfContestants: int}
  * @psalm-type TeamsGroup=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
  * @psalm-type TeamsGroupListPayload=array{teamsGroups: list<TeamsGroup>}
  * @psalm-type ListItem=array{key: string, value: string}
  */
 
 class TeamsGroup extends \OmegaUp\Controllers\Controller {
-    const MAX_NUMBER_OF_CONTESTANTS = 3;
+    const NUMBER_OF_CONTESTANTS = 3;
+    const MAX_NUMBER_OF_CONTESTANTS = 10;
 
     /**
      * Validate team group param
@@ -95,6 +97,29 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{smartyProperties: array{payload: TeamGroupNewPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     */
+    public static function getTeamGroupNewDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ) {
+        // Authenticate user
+        $r->ensureMainUserIdentity();
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'numberOfContestants' => self::NUMBER_OF_CONTESTANTS,
+                    'maxNumberOfContestants' => self::MAX_NUMBER_OF_CONTESTANTS,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleTeamsGroupNew'
+                ),
+            ],
+            'entrypoint' => 'teams_group_new',
+        ];
+    }
+
+    /**
      * @return array{smartyProperties: array{payload: TeamGroupEditPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $team_group_alias
@@ -129,6 +154,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
                         'description' => $teamGroup->description,
                         'numberOfContestants' => $teamGroup->number_of_contestants,
                     ],
+                    'maxNumberOfContestants' => self::MAX_NUMBER_OF_CONTESTANTS,
                     'countries' => \OmegaUp\DAO\Countries::getAll(
                         null,
                         100,
@@ -216,7 +242,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         $description = $r->ensureString('description');
         $numberOfContestants = $r->ensureOptionalInt(
             'numberOfContestants'
-        ) ?? self::MAX_NUMBER_OF_CONTESTANTS;
+        ) ?? self::NUMBER_OF_CONTESTANTS;
 
         self::createTeamGroup(
             $teamGroupAlias,
@@ -261,7 +287,9 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         $teamsGroup->name = $r->ensureString('name');
         $teamsGroup->description = $r->ensureString('description');
         $teamsGroup->number_of_contestants = $r->ensureInt(
-            'numberOfContestants'
+            'numberOfContestants',
+            /*$lowerBound=*/ 1,
+            /*$upperBound=*/ self::MAX_NUMBER_OF_CONTESTANTS,
         );
         \OmegaUp\DAO\TeamGroups::update($teamsGroup);
         self::$log->info(

@@ -58,6 +58,7 @@ OmegaUp.on('ready', () => {
           name: payload.teamGroup.name,
           description: payload.teamGroup.description,
           numberOfContestants: payload.teamGroup.numberOfContestants,
+          maxNumberOfContestants: payload.maxNumberOfContestants,
           countries: payload.countries,
           isOrganizer: payload.isOrganizer,
           tab: this.tab,

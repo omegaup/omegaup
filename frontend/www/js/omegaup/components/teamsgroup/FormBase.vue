@@ -65,6 +65,8 @@
                 v-model="currentNumberOfContestants"
                 name="number-of-contestants"
                 required
+                :max="maxNumberOfContestants"
+                :min="minNumberOfContestants"
                 type="number"
                 class="form-control"
               />
@@ -97,6 +99,8 @@ export default class TeamsGroupFormBase extends Vue {
   @Prop() description!: null | string;
   @Prop() name!: null | string;
   @Prop({ default: 3 }) numberOfContestants!: number;
+  @Prop({ default: 10 }) maxNumberOfContestants!: number;
+  @Prop({ default: 1 }) minNumberOfContestants!: number;
 
   T = T;
   currentAlias: null | string = this.alias;
