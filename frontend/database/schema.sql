@@ -1050,6 +1050,7 @@ CREATE TABLE `Teams` (
   `team_group_id` int NOT NULL COMMENT 'Id del grupo de equipos',
   `identity_id` int NOT NULL COMMENT 'La identidad asociada al equipo',
   PRIMARY KEY (`team_id`),
+  UNIQUE KEY `team_group_identity` (`team_group_id`,`identity_id`),
   KEY `identity_id` (`identity_id`),
   KEY `team_group_id` (`team_group_id`),
   CONSTRAINT `fk_ti_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
