@@ -764,20 +764,22 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Identities::create($identity);
         } else {
             $identity->identity_id = $preexistingIdentity->identity_id;
-            $identity->user_id = $preexistingIdentity->user_id;
         }
+        $preexistingTeam = \OmegaUp\DAO\Teams::getByTeamGroupIdAndIdentityId(
+            intval($teamGroup->team_group_id),
+            intval($identity->identity_id)
+        );
         $team = new \OmegaUp\DAO\VO\Teams([
             'team_group_id' => $teamGroup->team_group_id,
             'identity_id' => $identity->identity_id,
         ]);
-        if (is_null($team->team_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException(
-                'teamNotExist'
-            );
+        if (is_null($preexistingTeam)) {
+            \OmegaUp\DAO\Teams::create($team);
+            return $team;
         }
+        $team->team_id = $preexistingTeam->team_id;
 
-        \OmegaUp\DAO\Teams::create($team);
-
+        \OmegaUp\DAO\Teams::update($team);
         return $team;
     }
 

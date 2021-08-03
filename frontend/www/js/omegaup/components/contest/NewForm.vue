@@ -185,7 +185,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-4">
             <label>{{ T.wordsFeedback }}</label>
             <select v-model="feedback" class="form-control">
               <option value="none">
@@ -202,39 +202,7 @@
               {{ T.contestNewFormImmediateFeedbackDesc }}
             </p>
           </div>
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormForTeams }}</label>
-            <div class="checkbox">
-              <label>
-                <input
-                  v-model="currentContestForTeams"
-                  type="checkbox"
-                  :disabled="update"
-                />
-                {{ T.wordsEnable }}
-              </label>
-            </div>
-
-            <omegaup-common-typeahead
-              v-if="currentContestForTeams && !hasSubmissions"
-              :existing-options="searchResultTeamsGroups"
-              :value.sync="currentTeamsGroupAlias"
-              @update-existing-options="
-                (query) => $emit('update-search-result-teams-groups', query)
-              "
-            >
-            </omegaup-common-typeahead>
-            <input
-              v-else
-              class="form-control"
-              disabled
-              :value="currentTeamsGroupAlias"
-            />
-            <p class="help-block">{{ T.contestNewFormForTeamsDesc }}</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-4">
             <label>{{ T.contestNewFormScoreboardAtEnd }}</label>
             <select v-model="showScoreboardAfter" class="form-control">
               <option :value="true">
@@ -246,7 +214,7 @@
             </select>
             <p class="help-block">{{ T.contestNewFormScoreboardAtEndDesc }}</p>
           </div>
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-4">
             <label>{{ T.contestNewFormPartialScore }}</label>
             <select v-model="partialScore" class="form-control">
               <option :value="true">

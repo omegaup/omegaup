@@ -4301,7 +4301,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Update a Contest
      *
-     * @return array{status: string, teamsGroupName?: string}
+     * @return array{status: string, teamsGroupName?: string, title: string}
      *
      * @omegaup-request-param null|string $admission_mode
      * @omegaup-request-param null|string $alias
@@ -4448,6 +4448,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
             // Save the contest object with data sent by user to the database
             self::updateContest($contest, $originalContest, $r->identity);
+            $result['title'] = strval($contest->title);
 
             if ($updateProblemset) {
                 // Save the problemset object with data sent by user to the database

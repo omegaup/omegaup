@@ -172,7 +172,7 @@
           <omegaup-arena-runs
             :problem-alias="problem.alias"
             :contest-alias="contestAlias"
-            :runs="runs"
+            :runs="runsByProblem"
             :show-details="true"
             :problemset-problems="[]"
             :is-contest-finished="isContestFinished"
@@ -460,6 +460,10 @@ export default class ProblemDetails extends Vue {
 
   get histogramDifficulty(): number {
     return this.histogram?.difficulty ?? 0;
+  }
+
+  get runsByProblem(): types.Run[] {
+    return this.runs.filter((run) => run.alias === this.problem.alias);
   }
 
   onNewSubmission(): void {

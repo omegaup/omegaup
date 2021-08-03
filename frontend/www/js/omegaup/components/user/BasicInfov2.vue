@@ -93,7 +93,11 @@
       </div>
     </div>
     <a v-if="!profile.is_private" :href="`/submissions/${profile.username}/`">
-      {{ T.wordsSeeLatestSubmissions }}
+      {{
+        ui.formatString(T.wordsSeeLatestSubmissions, {
+          username: profile.username,
+        })
+      }}
     </a>
   </div>
 </template>
@@ -103,6 +107,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import user_Username from './Username.vue';
+import * as ui from '../../ui';
 
 @Component({
   components: {
@@ -113,6 +118,7 @@ export default class UserBasicInfo extends Vue {
   @Prop() profile!: types.UserProfile;
   @Prop() rank!: string;
   T = T;
+  ui = ui;
 
   get urlUsername(): string {
     return `https://omegaup.com/profile/${this.profile.username}/`;
