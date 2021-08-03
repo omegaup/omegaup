@@ -54,16 +54,17 @@
                 :key="problem.alias"
                 class="nav-item"
                 role="presentation"
-                :class="{
-                  active:
-                    selectedProblem && problem.alias === selectedProblem.alias,
-                }"
               >
                 <a
                   aria-controls="home"
                   data-toggle="tab"
                   href="#home"
                   class="nav-link"
+                  :class="{
+                    active:
+                      selectedProblem &&
+                      problem.alias === selectedProblem.alias,
+                  }"
                   role="tab"
                   :data-problem-alias="problem.alias"
                   @click="selectedProblem = problem"
@@ -80,7 +81,7 @@
             <div class="empty-category px-10 py-10"></div>
           </div>
           <div v-else-if="selectedProblem.runs.length === 0">
-            <div class="empty-category px-10 py-10">
+            <div class="empty-table-message px-10 py-10">
               {{ T.courseAssignmentProblemRunsEmpty }}
             </div>
           </div>
@@ -89,24 +90,34 @@
               <h5 class="card-title">
                 {{ T.arenaCommonCode }}
               </h5>
-              <pre>{{ bestRunSource(selectedProblem) }}</pre>
+              <pre>{{ selectedRunSource }}</pre>
             </div>
             <div class="card-body pb-0">
               <h5 class="card-title">
                 {{ T.wordsSubmissions }}
               </h5>
-              <table class="table table-striped">
+              <table class="table table-hover student-runs-table">
                 <thead>
                   <tr>
-                    <th>{{ T.wordsTime }}</th>
-                    <th>{{ T.wordsStatus }}</th>
+                    <th class="text-center">{{ T.wordsTime }}</th>
+                    <th class="text-center">{{ T.wordsStatus }}</th>
                     <th class="numeric">{{ T.wordsPercentage }}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(run, index) in selectedProblem.runs" :key="index">
-                    <td>{{ time.formatDateTime(run.time) }}</td>
-                    <td>{{ run.verdict }}</td>
+                  <tr
+                    v-for="(run, index) in selectedProblem.runs"
+                    :key="index"
+                    :class="{
+                      'table-active':
+                        selectedRun && run.guid === selectedRun.guid,
+                    }"
+                    @click="selectedRun = run"
+                  >
+                    <td class="text-center">
+                      {{ time.formatDateTime(run.time) }}
+                    </td>
+                    <td class="text-center">{{ run.verdict }}</td>
                     <td class="numeric">{{ 100 * run.score }}</td>
                   </tr>
                 </tbody>
@@ -146,6 +157,7 @@ export default class CourseViewStudent extends Vue {
   selectedAssignment: string | null = null;
   selectedProblem: Partial<types.CourseProblem> | null = null;
   selectedStudent: Partial<types.StudentProgress> = this.initialStudent || {};
+  selectedRun: Partial<types.CourseRun> | null = null;
 
   get problemsWithPoints(): types.CourseProblem[] {
     return this.problems.filter(
@@ -169,12 +181,6 @@ export default class CourseViewStudent extends Vue {
     return assignment?.description ?? '';
   }
 
-  data(): { [name: string]: any } {
-    return {
-      selectedProblem: null,
-    };
-  }
-
   mounted(): void {
     window.addEventListener('popstate', (ev: PopStateEvent) => {
       this.selectedStudent =
@@ -196,9 +202,10 @@ export default class CourseViewStudent extends Vue {
     return best;
   }
 
-  bestRunSource(problem: omegaup.CourseProblem): string {
-    const best = this.bestRun(problem);
-    return (best && best.source) || '';
+  get selectedRunSource(): string {
+    return this.selectedRun && this.selectedRun.source
+      ? this.selectedRun.source
+      : '';
   }
 
   bestScore(problem: omegaup.CourseProblem): number {
@@ -242,6 +249,13 @@ export default class CourseViewStudent extends Vue {
       return;
     }
     this.selectedProblem = found;
+    this.selectedRun = found.runs.length ? found.runs[0] : null;
   }
 }
 </script>
+
+<style scoped>
+.student-runs-table tbody tr {
+  cursor: pointer;
+}
+</style>
