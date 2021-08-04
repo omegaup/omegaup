@@ -99,6 +99,7 @@ OmegaUp.on('ready', () => {
       showPenalty: true,
       searchResultUsers: [] as types.ListItem[],
       runDetailsData: null as types.RunDetails | null,
+      shouldShowRunDetailsForAdmin: false,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
@@ -126,6 +127,7 @@ OmegaUp.on('ready', () => {
           allRuns: runsStore.state.runs,
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
+          shouldShowRunDetailsForAdmin: this.shouldShowRunDetailsForAdmin,
         },
         on: {
           'navigate-to-problem': ({
@@ -182,7 +184,10 @@ OmegaUp.on('ready', () => {
               })
               .catch((error) => {
                 ui.apiError(error);
+              })
+              .finally(() => {
                 this.popupDisplayed = PopupDisplayed.None;
+                this.shouldShowRunDetailsForAdmin = false;
               });
           },
           'submit-run': ({
@@ -292,7 +297,14 @@ OmegaUp.on('ready', () => {
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
           },
-          'reset-hash': (request: { selectedTab: string; alias: string }) => {
+          'reset-hash': (request: {
+            selectedTab: string;
+            alias: null | string;
+          }) => {
+            if (!request.alias) {
+              window.location.replace(`#${request.selectedTab}`);
+              return;
+            }
             window.location.replace(`#${request.selectedTab}/${request.alias}`);
           },
         },
@@ -341,6 +353,7 @@ OmegaUp.on('ready', () => {
     const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
     const showRunMatch = window.location.hash.match(showRunRegex);
     contestContestant.guid = showRunMatch?.[1] ?? null;
+    contestContestant.shouldShowRunDetailsForAdmin = true;
     contestContestant.popupDisplayed = PopupDisplayed.RunDetails;
   }
 

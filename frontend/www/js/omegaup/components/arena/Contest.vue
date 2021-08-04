@@ -238,6 +238,7 @@ export default class ArenaContest extends Vue {
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
+  @Prop({ default: false }) shouldShowRunDetailsForAdmin!: boolean;
 
   T = T;
   ui = ui;
@@ -310,6 +311,7 @@ export default class ArenaContest extends Vue {
 
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
+    this.$emit('reset-hash', { selectedTab: 'runs', alias: null });
   }
 
   @Watch('problem')
@@ -336,11 +338,24 @@ export default class ArenaContest extends Vue {
 
   @Watch('popupDisplayed')
   onPopupDisplayedChanged(newValue: PopupDisplayed): void {
-    if (newValue === PopupDisplayed.RunDetails) {
-      this.$nextTick(() => {
-        this.shouldShowRunDetails = true;
-      });
+    if (newValue !== PopupDisplayed.RunDetails) {
+      return;
     }
+    if (this.shouldShowRunDetailsForAdmin) {
+      this.$emit('show-run-all', {
+        request: {
+          guid: this.guid,
+          isAdmin: this.contestAdmin,
+          problemAlias: this.currentRunDetailsData?.alias,
+        },
+        target: this,
+      });
+      this.currentPopupDisplayed = newValue;
+      return;
+    }
+    this.$nextTick(() => {
+      this.shouldShowRunDetails = true;
+    });
   }
 }
 </script>
