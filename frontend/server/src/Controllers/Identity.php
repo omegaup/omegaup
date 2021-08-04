@@ -341,6 +341,15 @@ class Identity extends \OmegaUp\Controllers\Controller {
             // When usernames are provided we need to avoid duplicated users in
             // different teams.
             $identitiesUsernames = explode(';', $teamIdentity['usernames']);
+            if (
+                count(
+                    $identitiesUsernames
+                ) > $teamGroup->number_of_contestants
+            ) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'teamMemberExceededNumberOfContestants'
+                );
+            }
             foreach ($identitiesUsernames as $identityMemberUsername) {
                 if (isset($seenMemberUsernames[$identityMemberUsername])) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
