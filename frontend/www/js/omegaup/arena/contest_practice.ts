@@ -51,9 +51,9 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-arena-contest-practice', {
         props: {
           contest: payload.contest,
-          contestAdmin: payload.contestAdmin,
+          contestAdmin: payload.adminPayload?.contestAdmin ?? false,
           problems: this.problems,
-          users: payload.users,
+          users: payload.adminPayload?.users,
           problemInfo: this.problemInfo,
           problem: this.problem,
           clarifications: clarificationStore.state.clarifications,
