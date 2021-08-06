@@ -240,7 +240,7 @@
               <button
                 class="details btn-outline-dark btn-sm"
                 data-run-details
-                @click="$emit('details', run)"
+                @click="onRunDetails(run)"
               >
                 <font-awesome-icon :icon="['fas', 'search-plus']" />
               </button>
@@ -260,7 +260,7 @@
                   <button
                     v-if="showDetails"
                     class="btn-link dropdown-item"
-                    @click="$emit('details', run)"
+                    @click="onRunDetails(run)"
                   >
                     {{ T.wordsDetails }}
                   </button>
@@ -287,6 +287,20 @@
         </tbody>
       </table>
     </div>
+    <slot v-if="globalRuns" name="runs">
+      <omegaup-overlay
+        :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
+        @hide-overlay="onPopupDismissed"
+      >
+        <template #popup>
+          <omegaup-arena-rundetails-popup
+            v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
+            :data="currentRunDetailsData"
+            @dismiss="onPopupDismissed"
+          ></omegaup-arena-rundetails-popup>
+        </template>
+      </omegaup-overlay>
+    </slot>
   </div>
 </template>
 
@@ -298,6 +312,8 @@ import * as time from '../../time';
 import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
+import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
+import omegaup_Overlay from '../Overlay.vue';
 
 import Autocomplete from '../Autocomplete.vue';
 
@@ -325,12 +341,19 @@ declare global {
   }
 }
 
+export enum PopupDisplayed {
+  None,
+  RunDetails,
+}
+
 @Component({
   components: {
     FontAwesomeIcon,
+    'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-autocomplete': Autocomplete,
-    'omegaup-user-username': user_Username,
+    'omegaup-overlay': omegaup_Overlay,
     'omegaup-common-typeahead': common_Typeahead,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class Runsv2 extends Vue {
@@ -346,13 +369,17 @@ export default class Runsv2 extends Vue {
   @Prop({ default: false }) showUser!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop({ default: null }) problemAlias!: string | null;
-  @Prop({ default: null }) problemsetProblems!: types.ProblemsetProblem[];
+  @Prop({ default: () => [] }) problemsetProblems!: types.ProblemsetProblem[];
   @Prop({ default: null }) username!: string | null;
   @Prop({ default: 100 }) rowCount!: number;
   @Prop() runs!: types.Run[];
   @Prop({ default: false }) globalRuns!: boolean;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
+  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
+  @Prop({ default: null }) guid!: null | string;
 
+  PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
   typeahead = typeahead;
@@ -365,6 +392,8 @@ export default class Runsv2 extends Vue {
   filterVerdict: string = '';
   filterContest: string = '';
   filters: { name: string; value: string }[] = [];
+  currentRunDetailsData = this.runDetailsData;
+  currentPopupDisplayed = this.popupDisplayed;
 
   get filteredRuns(): types.Run[] {
     if (
@@ -555,6 +584,23 @@ export default class Runsv2 extends Vue {
     return `${verdict}: ${verdictHelp}`;
   }
 
+  onRunDetails(run: types.Run): void {
+    this.$emit('details', {
+      request: {
+        guid: run.guid,
+        isAdmin: true,
+        problemAlias: run.alias,
+      },
+      target: this,
+    });
+    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+  }
+
+  onPopupDismissed(): void {
+    this.currentPopupDisplayed = PopupDisplayed.None;
+    window.location.replace('#');
+  }
+
   @Watch('username')
   onUsernameChanged(newValue: string | null) {
     this.filterUsername = newValue;
@@ -597,6 +643,19 @@ export default class Runsv2 extends Vue {
   @Watch('filterVerdict')
   onFilterVerdictChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'verdict');
+  }
+
+  @Watch('popupDisplayed')
+  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
+    this.currentPopupDisplayed = newValue;
+    if (newValue === PopupDisplayed.None) return;
+    if (newValue === PopupDisplayed.RunDetails && this.guid) {
+      this.$emit('details', {
+        request: { guid: this.guid, isAdmin: true },
+        target: this,
+      });
+      this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+    }
   }
 
   @Emit('filter-changed')
