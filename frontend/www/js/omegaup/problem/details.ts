@@ -302,7 +302,7 @@ OmegaUp.on('ready', () => {
                 refreshProblemClarifications({
                   problemAlias: payload.problem.alias,
                   rowcount: 20,
-                  offset: 1,
+                  offset: 0,
                 });
               })
               .catch(ui.apiError);
@@ -408,7 +408,7 @@ OmegaUp.on('ready', () => {
       refreshProblemClarifications({
         problemAlias: payload.problem.alias,
         rowcount: 20,
-        offset: 1,
+        offset: 0,
       });
     }, 5 * 60 * 1000);
   }

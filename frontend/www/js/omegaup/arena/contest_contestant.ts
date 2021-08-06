@@ -263,7 +263,7 @@ OmegaUp.on('ready', () => {
     refreshContestClarifications({
       type: ContestClarificationType.AllProblems,
       contestAlias: payload.contest.alias,
-      offset: 1,
+      offset: 0,
       rowcount: 100,
     });
   }, 5 * 60 * 1000);
