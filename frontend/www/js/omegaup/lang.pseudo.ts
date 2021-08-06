@@ -710,6 +710,7 @@ const translations: { [key: string]: string; } = {
   problemDeployerConfigInvalidPublishingMode: "(Th3 ch053n pub1i5hing m0d3 i5 n07 5upp0r73d.)",
   problemDeployerConfigRepositoryNotAbsoluteUrl: "(Th3 r3p05i70ry 70 b3 pub1i5h3d 70 i5 n07 an ab501u73 URL.)",
   problemDeployerConfigSubdirectoryMissingTarget: "(Th3 r3p05i70ry 70 b3 pub1i5h3d 70 i5 mi55ing a 5ubdir3c70ry 7arg37.)",
+  problemDeployerEsNoStatement: "(N0 5pani5h 57a73m3n7 f0und.)",
   problemDeployerExceededZipSizeLimit: "(Ex7rac73d zip 5iz3 (%(size) MiB) i5 0v3r max a110w3d (%(max_size) MiB). R3j3c7ing.)",
   problemDeployerFailed: "(Unab13 70 d3p10y pr0b13m.)",
   problemDeployerInteractiveBadLayout: "(Th3 in73rac7iv3 pr0b13m'5 1ay0u7 i5 n07 va1id.)",

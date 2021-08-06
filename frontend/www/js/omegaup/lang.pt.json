@@ -709,6 +709,7 @@
 	"problemDeployerConfigInvalidPublishingMode": "O modo de publica\u00e7\u00e3o escolhido n\u00e3o \u00e9 suportado.",
 	"problemDeployerConfigRepositoryNotAbsoluteUrl": "O reposit\u00f3rio a ser publicado n\u00e3o \u00e9 um URL absoluto.",
 	"problemDeployerConfigSubdirectoryMissingTarget": "O reposit\u00f3rio a ser publicado n\u00e3o tem um destino no 'target'.",
+	"problemDeployerEsNoStatement": "Nenhuma reda\u00e7\u00e3o em espanhol encontrada.",
 	"problemDeployerExceededZipSizeLimit": "Tamanho do .zip extra\u00eddo (%(size) MiB) supera o m\u00e1ximo permitido (%(max_size) MiB). Rejeitando.",
 	"problemDeployerFailed": "N\u00e3o foi poss\u00edvel implementar problema",
 	"problemDeployerInteractiveBadLayout": "O problema interativo n\u00e3o possui a estrutura esperada.",

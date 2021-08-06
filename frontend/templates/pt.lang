@@ -708,6 +708,7 @@ problemDeployerConfigBadLayout = "O commit para 'refs/meta/config' tem uma estru
 problemDeployerConfigInvalidPublishingMode = "O modo de publicação escolhido não é suportado."
 problemDeployerConfigRepositoryNotAbsoluteUrl = "O repositório a ser publicado não é um URL absoluto."
 problemDeployerConfigSubdirectoryMissingTarget = "O repositório a ser publicado não tem um destino no 'target'."
+problemDeployerEsNoStatement = "Nenhuma redação em espanhol encontrada."
 problemDeployerExceededZipSizeLimit = "Tamanho do .zip extraído (%(size) MiB) supera o máximo permitido (%(max_size) MiB). Rejeitando."
 problemDeployerFailed = "Não foi possível implementar problema"
 problemDeployerInteractiveBadLayout = "O problema interativo não possui a estrutura esperada."
