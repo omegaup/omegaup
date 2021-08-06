@@ -1941,11 +1941,7 @@ export namespace types {
   }
 
   export interface ContestDetailsPayload {
-    adminPayload?: {
-      allRuns: types.Run[];
-      contestAdmin: boolean;
-      users: types.ContestUser[];
-    };
+    adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
     problems: types.NavbarProblemsetProblem[];
