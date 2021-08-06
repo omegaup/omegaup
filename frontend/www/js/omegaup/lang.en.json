@@ -711,6 +711,7 @@
 	"problemDeployerConfigInvalidPublishingMode": "The chosen publishing mode is not supported.",
 	"problemDeployerConfigRepositoryNotAbsoluteUrl": "The repository to be published to is not an absolute URL.",
 	"problemDeployerConfigSubdirectoryMissingTarget": "The repository to be published to is missing a subdirectory target.",
+	"problemDeployerEsNoStatement": "No spanish statement found.",
 	"problemDeployerExceededZipSizeLimit": "Extracted zip size (%(size) MiB) is over max allowed (%(max_size) MiB). Rejecting.",
 	"problemDeployerFailed": "Unable to deploy problem.",
 	"problemDeployerInteractiveBadLayout": "The interactive problem's layout is not valid.",

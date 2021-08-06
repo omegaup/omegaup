@@ -711,6 +711,7 @@
 	"problemDeployerConfigInvalidPublishingMode": "El modo de publicaci\u00f3n elegido no est\u00e1 soportado.",
 	"problemDeployerConfigRepositoryNotAbsoluteUrl": "El repositorio a ser publicado no es un URL absoluto.",
 	"problemDeployerConfigSubdirectoryMissingTarget": "El repositorio a ser publicado no tiene un destino en 'target'.",
+	"problemDeployerEsNoStatement": "No se encontr\u00f3 redacci\u00f3n en espa\u00f1ol.",
 	"problemDeployerExceededZipSizeLimit": "El tama\u00f1o del .zip despu\u00e9s de descomprimir (%(size) MiB) es mayor al l\u00edmite de (%(max_size) MiB). Rechazando.",
 	"problemDeployerFailed": "Hubo un error al instalar el problema",
 	"problemDeployerInteractiveBadLayout": "El problema interactivo no tiene la estructura esperada.",
