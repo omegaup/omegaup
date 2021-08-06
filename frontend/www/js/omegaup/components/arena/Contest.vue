@@ -56,6 +56,7 @@
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :next-submission-timestamp="nextSubmissionTimestamp"
+              :languages="contest.languages"
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="runs"

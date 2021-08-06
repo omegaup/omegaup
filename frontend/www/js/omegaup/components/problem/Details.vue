@@ -113,7 +113,7 @@
             <omegaup-arena-runsubmit-popup
               v-show="currentPopupDisplayed === PopupDisplayed.RunSubmit"
               :preferred-language="problem.preferred_language"
-              :languages="problem.languages"
+              :languages="filteredLanguages"
               :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
               @dismiss="onPopupDismissed"
               @submit-run="onRunSubmitted"
@@ -385,6 +385,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: null }) languages!: null | string[];
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
@@ -464,6 +465,15 @@ export default class ProblemDetails extends Vue {
 
   get runsByProblem(): types.Run[] {
     return this.runs.filter((run) => run.alias === this.problem.alias);
+  }
+
+  get filteredLanguages(): string[] {
+    if (!this.languages) {
+      return this.problem.languages;
+    }
+    return this.problem.languages.filter((language) =>
+      this.languages?.includes(language),
+    );
   }
 
   onNewSubmission(): void {
