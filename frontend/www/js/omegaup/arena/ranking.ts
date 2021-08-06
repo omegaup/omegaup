@@ -181,7 +181,7 @@ export function updateProblemScore({
         const problemRanking = problem;
         if (problemRanking.alias == alias) {
           const maxScore = getMaxScore(
-            myRunsStore.state.runs,
+            myRunsStore.state.runs.filter((run) => run.alias === problem.alias),
             problemRanking.alias,
             previousScore,
           );
@@ -248,7 +248,7 @@ export function onRankingChanged({
 
         currentProblem.hasRuns = problem.runs > 0;
         currentProblem.bestScore = getMaxScore(
-          myRunsStore.state.runs,
+          myRunsStore.state.runs.filter((run) => run.alias === problem.alias),
           alias,
           problem.points,
         );

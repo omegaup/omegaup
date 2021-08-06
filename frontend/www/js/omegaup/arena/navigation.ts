@@ -74,7 +74,7 @@ export async function navigateToProblem(
       target.problemInfo = problemInfo;
       problem.alias = problemInfo.alias;
       problem.bestScore = getMaxScore(
-        myRunsStore.state.runs,
+        myRunsStore.state.runs.filter((run) => run.alias === problemInfo.alias),
         problemInfo.alias,
         0,
       );
