@@ -471,8 +471,9 @@ export default class ProblemDetails extends Vue {
     if (!this.languages) {
       return this.problem.languages;
     }
+    const languagesSet = new Set(this.languages);
     return this.problem.languages.filter((language) =>
-      this.languages?.includes(language),
+      languagesSet.has(language),
     );
   }
 
