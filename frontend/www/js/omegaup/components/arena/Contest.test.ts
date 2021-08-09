@@ -34,7 +34,7 @@ describe('Contest.vue', () => {
     director: 'omegaUpDirector',
     feedback: 'detailed',
     finish_time: futureDate,
-    languages: 'py',
+    languages: 'py3',
     partial_score: true,
     penalty: 1,
     penalty_calc_policy: 'sum',
