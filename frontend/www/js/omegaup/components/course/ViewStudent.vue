@@ -106,8 +106,8 @@
                 </thead>
                 <tbody>
                   <tr
-                    v-for="(run, index) in selectedProblem.runs"
-                    :key="index"
+                    v-for="run in selectedProblem.runs"
+                    :key="run.guid"
                     :class="{
                       'table-active':
                         selectedRun && run.guid === selectedRun.guid,
@@ -203,9 +203,7 @@ export default class CourseViewStudent extends Vue {
   }
 
   get selectedRunSource(): string {
-    return this.selectedRun && this.selectedRun.source
-      ? this.selectedRun.source
-      : '';
+    return this.selectedRun?.source ?? '';
   }
 
   bestScore(problem: omegaup.CourseProblem): number {
@@ -249,7 +247,7 @@ export default class CourseViewStudent extends Vue {
       return;
     }
     this.selectedProblem = found;
-    this.selectedRun = found.runs.length ? found.runs[0] : null;
+    this.selectedRun = found.runs?.[0] ?? null;
   }
 }
 </script>
