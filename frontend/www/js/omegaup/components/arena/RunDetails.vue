@@ -2,7 +2,7 @@
   <form data-run-details-view>
     <div v-if="data">
       <button class="close">❌</button>
-      <div v-if="inCourse">
+      <div v-if="inCourse && (data.admin || data.feedback)">
         <h3>{{ T.feedbackTitle }}</h3>
         <pre>{{
           data.feedback ? data.feedback.feedback : T.feedbackNotSentYet
