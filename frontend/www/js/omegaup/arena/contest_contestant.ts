@@ -33,6 +33,7 @@ OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
+  const contestAdmin = Boolean(payload.adminPayload);
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
@@ -96,9 +97,9 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-arena-contest', {
         props: {
           contest: payload.contest,
-          contestAdmin: payload.contestAdmin,
+          contestAdmin,
           problems: this.problems,
-          users: payload.users,
+          users: payload.adminPayload?.users,
           problemInfo: this.problemInfo,
           problem: this.problem,
           clarifications: clarificationStore.state.clarifications,
