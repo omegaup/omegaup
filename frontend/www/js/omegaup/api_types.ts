@@ -508,6 +508,23 @@ export namespace types {
       );
     }
 
+    export function ContestVirtualDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestVirtualDetailsPayload {
+      return ((x) => {
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function CourseClarificationsPayload(
       elementId: string = 'payload',
     ): types.CourseClarificationsPayload {
@@ -2064,6 +2081,10 @@ export namespace types {
     end_time?: Date;
     is_owner?: number;
     username: string;
+  }
+
+  export interface ContestVirtualDetailsPayload {
+    contest: types.ContestPublicDetails;
   }
 
   export interface Contestant {

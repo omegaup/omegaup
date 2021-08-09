@@ -1,6 +1,7 @@
 import T from './lang';
 import { formatDate, formatDateTime } from './time';
 import { omegaup } from './omegaup';
+import { types } from './api_types';
 
 export enum MessageType {
   Danger = 'alert-danger',
@@ -51,6 +52,13 @@ export function contestTitle(contest: {
     });
   }
   return contest.title;
+}
+
+export function contestURL(contest: types.ContestPublicDetails): string {
+  if (isVirtual(contest)) {
+    return `/arena/${contest.alias}/virtual/`;
+  }
+  return `/arena/${contest.alias}/`;
 }
 
 export function formatString(

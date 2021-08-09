@@ -75,7 +75,7 @@ export default class ArenaVirtual extends Vue {
   virtualContestStartTime = new Date();
 
   onSubmit(): void {
-    this.$emit('submit', this);
+    this.$emit('submit', this.virtualContestStartTime);
   }
 }
 </script>
