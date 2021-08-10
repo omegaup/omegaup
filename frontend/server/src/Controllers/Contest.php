@@ -42,7 +42,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
- * @psalm-type ContestDetailsPayload=array{adminPayload?: array{allRuns: list<Run>}, clarifications: list<Clarification>, contest: ContestPublicDetails, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null, users: list<ContestUser>}
+ * @psalm-type ContestDetailsPayload=array{adminPayload?: array{allRuns: list<Run>, users: list<ContestUser>}, clarifications: list<Clarification>, contest: ContestPublicDetails, problems: list<NavbarProblemsetProblem>, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
@@ -554,7 +554,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{clarifications: list<Clarification>, problems: list<NavbarProblemsetProblem>, submissionDeadline: \OmegaUp\Timestamp|null, users: list<ContestUser>}
+     * @return array{clarifications: list<Clarification>, problems: list<NavbarProblemsetProblem>, submissionDeadline: \OmegaUp\Timestamp|null}
      */
     private static function getCommonDetails(
         \OmegaUp\DAO\VO\Contests $contest,
@@ -595,9 +595,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'users' => \OmegaUp\DAO\ProblemsetIdentities::getWithExtraInformation(
-                intval($contest->problemset_id)
-            ),
             'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
                 $contest,
                 /*course=*/ null,
@@ -614,7 +611,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Get all the properties for smarty.
      *
-     * @return array{inContest: bool, smartyProperties: array{fullWidth: bool, payload: ContestDetailsPayload, title: \OmegaUp\TranslationString}, template: string}|array{entrypoint: string, smartyProperties: array{payload: ContestIntroPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: ContestDetailsPayload, title: \OmegaUp\TranslationString}}|array{entrypoint: string, smartyProperties: array{payload: ContestIntroPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $contest_alias
@@ -696,7 +693,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $result['smartyProperties']['payload'],
                 [
                     'shouldShowFirstAssociatedIdentityRunWarning' => $shouldShowFirstAssociatedIdentityRunWarning,
-                    'contestAdmin' => $contestAdmin,
                     'scoreboard' => self::getScoreboard(
                         $contest,
                         $problemset,
@@ -714,12 +710,47 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $r->identity
                 ),
             );
-            if (!$contestAdmin) {
-                $result['smartyProperties']['payload']['users'] = [];
+            if ($contestAdmin) {
+                $allRuns = [];
+
+                // Get our runs
+                $runs = \OmegaUp\DAO\Runs::getAllRuns(
+                    $problemset->problemset_id,
+                    /*$status=*/ null,
+                    /*$verdict=*/ null,
+                    /*$problem_id=*/ null,
+                    /*$language=*/ null,
+                    /*$identity_id=*/ null,
+                    /*$offset=*/ 0,
+                    /*$rowcount=*/ 100
+                );
+
+                foreach ($runs as $run) {
+                    unset($run['run_id']);
+                    if ($contest->partial_score || $run['score'] == 1) {
+                        $run['contest_score'] = round(
+                            floatval(
+                                $run['contest_score']
+                            ),
+                            2
+                        );
+                        $run['score'] = round(floatval($run['score']), 4);
+                    } else {
+                        $run['contest_score'] = 0;
+                        $run['score'] = 0;
+                    }
+                    $allRuns[] = $run;
+                }
+
+                $result['smartyProperties']['payload']['adminPayload'] = [
+                    'users' => \OmegaUp\DAO\ProblemsetIdentities::getWithExtraInformation(
+                        intval($contest->problemset_id)
+                    ),
+                    'allRuns' => $allRuns,
+                ];
             }
 
             $result['smartyProperties']['fullWidth'] = true;
-            $result['inContest'] = true;
             $result['smartyProperties']['title'] = new \OmegaUp\TranslationString(
                 'omegaupTitleContest'
             );

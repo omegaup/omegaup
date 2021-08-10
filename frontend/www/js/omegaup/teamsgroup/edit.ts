@@ -57,6 +57,8 @@ OmegaUp.on('ready', () => {
           alias: payload.teamGroup.alias,
           name: payload.teamGroup.name,
           description: payload.teamGroup.description,
+          numberOfContestants: payload.teamGroup.numberOfContestants,
+          maxNumberOfContestants: payload.maxNumberOfContestants,
           countries: payload.countries,
           isOrganizer: payload.isOrganizer,
           tab: this.tab,
@@ -66,14 +68,20 @@ OmegaUp.on('ready', () => {
           searchResultUsers: this.searchResultUsers,
         },
         on: {
-          'update-teams-group': (request: {
+          'update-teams-group': ({
+            name,
+            description,
+            numberOfContestants,
+          }: {
             name: string;
             description: string;
+            numberOfContestants: number;
           }) => {
             api.TeamsGroup.update({
               alias: payload.teamGroup.alias,
-              name: request.name,
-              description: request.description,
+              name,
+              description,
+              numberOfContestants,
             })
               .then(() => {
                 ui.success(T.teamsGroupEditGroupUpdated);

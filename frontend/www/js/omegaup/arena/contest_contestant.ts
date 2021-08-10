@@ -37,7 +37,7 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
-  const contestAdmin = payload.contestAdmin;
+  const contestAdmin = Boolean(payload.adminPayload);
   const activeTab = getSelectedValidTab(locationHash[0], contestAdmin);
   if (activeTab !== locationHash[0]) {
     window.location.hash = activeTab;
@@ -107,7 +107,7 @@ OmegaUp.on('ready', () => {
           contest: payload.contest,
           contestAdmin,
           problems: this.problems,
-          users: payload.users,
+          users: payload.adminPayload?.users,
           problemInfo: this.problemInfo,
           problem: this.problem,
           clarifications: clarificationStore.state.clarifications,

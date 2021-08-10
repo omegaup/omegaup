@@ -230,6 +230,20 @@ export namespace types {
                 return x;
               });
             })(x.allRuns);
+            x.users = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.access_time)
+                  x.access_time = ((x: number) => new Date(x * 1000))(
+                    x.access_time,
+                  );
+                if (x.end_time)
+                  x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+                return x;
+              });
+            })(x.users);
             return x;
           })(x.adminPayload);
         x.clarifications = ((x) => {
@@ -260,20 +274,6 @@ export namespace types {
           x.submissionDeadline = ((x: number) => new Date(x * 1000))(
             x.submissionDeadline,
           );
-        x.users = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            if (x.access_time)
-              x.access_time = ((x: number) => new Date(x * 1000))(
-                x.access_time,
-              );
-            if (x.end_time)
-              x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
-            return x;
-          });
-        })(x.users);
         return x;
       })(
         JSON.parse(
@@ -1412,6 +1412,14 @@ export namespace types {
       );
     }
 
+    export function TeamGroupNewPayload(
+      elementId: string = 'payload',
+    ): types.TeamGroupNewPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function TeamsGroupListPayload(
       elementId: string = 'payload',
     ): types.TeamsGroupListPayload {
@@ -1933,16 +1941,14 @@ export namespace types {
   }
 
   export interface ContestDetailsPayload {
-    adminPayload?: { allRuns: types.Run[] };
+    adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
-    contestAdmin: boolean;
     problems: types.NavbarProblemsetProblem[];
     scoreboard?: types.Scoreboard;
     scoreboardEvents?: types.ScoreboardEvent[];
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     submissionDeadline?: Date;
-    users: types.ContestUser[];
   }
 
   export interface ContestEditPayload {
@@ -2186,20 +2192,7 @@ export namespace types {
     letter: string;
     order: number;
     points: number;
-    runs: {
-      contest_score?: number;
-      guid: string;
-      language: string;
-      memory: number;
-      penalty: number;
-      runtime: number;
-      score: number;
-      source?: string;
-      status: string;
-      submit_delay: number;
-      time: Date;
-      verdict: string;
-    }[];
+    runs: types.CourseRun[];
     submissions: number;
     title: string;
     version: string;
@@ -2232,6 +2225,21 @@ export namespace types {
     problem_id: number;
     runs: number;
     verdict?: string;
+  }
+
+  export interface CourseRun {
+    contest_score?: number;
+    guid: string;
+    language: string;
+    memory: number;
+    penalty: number;
+    runtime: number;
+    score: number;
+    source?: string;
+    status: string;
+    submit_delay: number;
+    time: Date;
+    verdict: string;
   }
 
   export interface CourseStatisticsPayload {
@@ -3298,8 +3306,19 @@ export namespace types {
     countries: dao.Countries[];
     identities: types.Identity[];
     isOrganizer: boolean;
-    teamGroup: { alias: string; description?: string; name?: string };
+    maxNumberOfContestants: number;
+    teamGroup: {
+      alias: string;
+      description?: string;
+      name?: string;
+      numberOfContestants: number;
+    };
     teamsMembers: types.TeamMember[];
+  }
+
+  export interface TeamGroupNewPayload {
+    maxNumberOfContestants: number;
+    numberOfContestants: number;
   }
 
   export interface TeamMember {
