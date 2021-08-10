@@ -22,8 +22,11 @@ OmegaUp.on('ready', () => {
           submissionsGap: payload.contest.submissions_gap,
         },
         on: {
-          submit: (virtualContestStartTime: Date) => {
-            console.log(virtualContestStartTime);
+          submit: ({
+            virtualContestStartTime,
+          }: {
+            virtualContestStartTime: Date;
+          }) => {
             api.Contest.createVirtual({
               alias: payload.contest.alias,
               start_time: virtualContestStartTime.getTime() / 1000,
