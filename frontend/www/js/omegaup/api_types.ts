@@ -291,19 +291,22 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
-        x.original = ((x) => {
-          if (x.scoreboard)
-            x.scoreboard = ((x) => {
-              if (x.finish_time)
-                x.finish_time = ((x: number) => new Date(x * 1000))(
-                  x.finish_time,
+        if (x.original)
+          x.original = ((x) => {
+            if (x.scoreboard)
+              x.scoreboard = ((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
                 );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              x.time = ((x: number) => new Date(x * 1000))(x.time);
-              return x;
-            })(x.scoreboard);
-          return x;
-        })(x.original);
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              })(x.scoreboard);
+            return x;
+          })(x.original);
         if (x.scoreboard)
           x.scoreboard = ((x) => {
             if (x.finish_time)
@@ -1988,7 +1991,7 @@ export namespace types {
     adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
-    original: {
+    original?: {
       contest: dao.Contests;
       scoreboard?: types.Scoreboard;
       scoreboardEvents?: types.ScoreboardEvent[];

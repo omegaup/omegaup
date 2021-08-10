@@ -316,18 +316,15 @@ class Contest {
     }
 
     /**
-     * @param array{contest: \OmegaUp\DAO\VO\Contests, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
+     * @param \OmegaUp\DAO\VO\Contests $contest
      * @param \OmegaUp\DAO\VO\Identities $user
      */
-    public static function openContest(
-        $contestData,
-        $user
-    ): void {
+    public static function openContest($contest, $user): void {
         $login = \OmegaUp\Test\ControllerTestCase::login($user);
 
         \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
+            'contest_alias' => $contest->alias,
         ]));
     }
 
