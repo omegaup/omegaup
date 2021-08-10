@@ -377,7 +377,7 @@ export function mergeRankings({
 
   // Override ranking
   dataRanking.forEach((rank, index) => (rank.place = index + 1));
-  const mergedScoreboard = scoreboard;
+  const mergedScoreboard = data;
   mergedScoreboard.ranking = dataRanking;
   return { mergedScoreboard, originalContestEvents };
 }
