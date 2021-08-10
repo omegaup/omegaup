@@ -2192,20 +2192,7 @@ export namespace types {
     letter: string;
     order: number;
     points: number;
-    runs: {
-      contest_score?: number;
-      guid: string;
-      language: string;
-      memory: number;
-      penalty: number;
-      runtime: number;
-      score: number;
-      source?: string;
-      status: string;
-      submit_delay: number;
-      time: Date;
-      verdict: string;
-    }[];
+    runs: types.CourseRun[];
     submissions: number;
     title: string;
     version: string;
@@ -2238,6 +2225,21 @@ export namespace types {
     problem_id: number;
     runs: number;
     verdict?: string;
+  }
+
+  export interface CourseRun {
+    contest_score?: number;
+    guid: string;
+    language: string;
+    memory: number;
+    penalty: number;
+    runtime: number;
+    score: number;
+    source?: string;
+    status: string;
+    submit_delay: number;
+    time: Date;
+    verdict: string;
   }
 
   export interface CourseStatisticsPayload {
