@@ -2,6 +2,37 @@
 
 // DAO types
 export namespace dao {
+  export interface Contests {
+    acl_id?: number;
+    admission_mode?: string;
+    alias?: string;
+    archived?: boolean;
+    certificate_cutoff?: number;
+    certificates_status?: string;
+    contest_for_teams?: boolean;
+    contest_id?: number;
+    description?: string;
+    feedback?: string;
+    finish_time?: Date;
+    languages?: string;
+    last_updated?: Date;
+    partial_score?: boolean;
+    penalty?: number;
+    penalty_calc_policy?: string;
+    penalty_type?: string;
+    points_decay_factor?: number;
+    problemset_id?: number;
+    recommended?: boolean;
+    rerun_id?: number;
+    scoreboard?: number;
+    show_scoreboard_after?: boolean;
+    start_time?: Date;
+    submissions_gap?: number;
+    title?: string;
+    urgent?: boolean;
+    window_length?: number;
+  }
+
   export interface Countries {
     country_id?: string;
     name?: string;
@@ -260,6 +291,19 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
+        x.original = ((x) => {
+          if (x.scoreboard)
+            x.scoreboard = ((x) => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            })(x.scoreboard);
+          return x;
+        })(x.original);
         if (x.scoreboard)
           x.scoreboard = ((x) => {
             if (x.finish_time)
@@ -1944,6 +1988,11 @@ export namespace types {
     adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
+    original: {
+      contest: dao.Contests;
+      scoreboard?: types.Scoreboard;
+      scoreboardEvents?: types.ScoreboardEvent[];
+    };
     problems: types.NavbarProblemsetProblem[];
     scoreboard?: types.Scoreboard;
     scoreboardEvents?: types.ScoreboardEvent[];

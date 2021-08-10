@@ -42,7 +42,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
- * @psalm-type ContestDetailsPayload=array{adminPayload?: array{allRuns: list<Run>, users: list<ContestUser>}, clarifications: list<Clarification>, contest: ContestPublicDetails, problems: list<NavbarProblemsetProblem>, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null}
+ * @psalm-type ContestDetailsPayload=array{adminPayload?: array{allRuns: list<Run>, users: list<ContestUser>}, clarifications: list<Clarification>, contest: ContestPublicDetails, original: array{contest: \OmegaUp\DAO\VO\Contests, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>}, problems: list<NavbarProblemsetProblem>, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
@@ -754,6 +754,46 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $result['smartyProperties']['title'] = new \OmegaUp\TranslationString(
                 'omegaupTitleContest'
             );
+
+            if ($contest->rerun_id !== 0) {
+                $originalContest = \OmegaUp\DAO\Contests::getByPK(
+                    $contest->rerun_id
+                );
+                if (
+                    is_null(
+                        $originalContest
+                    ) || is_null(
+                        $originalContest->problemset_id
+                    )
+                ) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'contestNotFound'
+                    );
+                }
+                $originalProblemset = \OmegaUp\DAO\Problemsets::getByPK(
+                    $contest->problemset_id
+                );
+                if (is_null($originalProblemset)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'contestNotFound'
+                    );
+                }
+                $result['smartyProperties']['payload']['original'] = [
+                    'contest' => $originalContest,
+                    'scoreboard' => self::getScoreboard(
+                        $originalContest,
+                        $originalProblemset,
+                        $r->identity
+                    ),
+                    'scoreboardEvents' => self::getScoreboardEvents(
+                        $originalContest,
+                        $r->identity
+                    ),
+                ];
+                $result['entrypoint'] = 'arena_contest_virtual';
+                return $result;
+            }
+
             $result['entrypoint'] = 'arena_contest_contestant';
             return $result;
         }
