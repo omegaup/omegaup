@@ -151,7 +151,7 @@ const translations: { [key: string]: string; } = {
   codersOfTheMonthFemale: "Las Coders del Mes",
   codersOfTheMonthFemaleListCandidate: "Lista de candidatas para la coder del mes",
   codersOfTheMonthFemaleRank: "Las mejores 100 coders del mes pasado",
-  codersOfTheMonthListCandidate: "Lista de candidatos a coder del mes",
+  codersOfTheMonthListCandidate: "Lista de aspirantes a coder del mes",
   codersOfTheMonthRank: "Top 100 coders del mes pasado",
   codersOfTheMonthUser: "Usuario",
   collecionOtherTags: "Otras etiquetas",
