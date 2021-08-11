@@ -34,7 +34,8 @@ module.exports = {
       './frontend/www/js/omegaup/arena/contest_practice.ts',
     arena_course: './frontend/www/js/omegaup/arena/course.ts',
     arena_scoreboard: './frontend/www/js/omegaup/arena/scoreboard.ts',
-    arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
+    // TODO: Replace with contest_virtual.ts when  it is created
+    arena_contest_virtual: './frontend/www/js/omegaup/arena/contest_contestant.ts',
     authors_rank: './frontend/www/js/omegaup/user/authors_rank.ts',
     badge_details: './frontend/www/js/omegaup/badge/details.ts',
     badge_list: './frontend/www/js/omegaup/badge/list.ts',
@@ -54,6 +55,7 @@ module.exports = {
     contest_report: './frontend/www/js/omegaup/contest/report.js',
     contest_scoreboardmerge:
       './frontend/www/js/omegaup/contest/scoreboardmerge.js',
+    contest_virtual: './frontend/www/js/omegaup/contest/virtual.ts',
     course_clarifications: './frontend/www/js/omegaup/course/clarifications.ts',
     course_clone: './frontend/www/js/omegaup/course/clone.ts',
     course_details: './frontend/www/js/omegaup/course/details.ts',
