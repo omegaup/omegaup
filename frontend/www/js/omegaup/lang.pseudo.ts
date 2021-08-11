@@ -150,7 +150,7 @@ const translations: { [key: string]: string; } = {
   codersOfTheMonthDate: "(Da73)",
   codersOfTheMonthFemale: "(F3ma13 c0d3r5 0f 7h3 M0n7h)",
   codersOfTheMonthFemaleListCandidate: "(Li57 0f candida735 70 f3ma13 c0d3r 0f 7h3 m0n7h)",
-  codersOfTheMonthFemaleRank: "(T0p 100 c0d3r5, f3ma13 ca73g0ry 0f 7h3 pr3vi0u5 m0n7h)",
+  codersOfTheMonthFemaleRank: "(T0p 100 c0d3r5 0f 7h3 pr3vi0u5 m0n7h)",
   codersOfTheMonthListCandidate: "(Li57 0f candida735 70 c0d3r 0f 7h3 m0n7h)",
   codersOfTheMonthRank: "(T0p 100 c0d3r5 0f 7h3 pr3vi0u5 m0n7h)",
   codersOfTheMonthUser: "(U53rnam3)",
