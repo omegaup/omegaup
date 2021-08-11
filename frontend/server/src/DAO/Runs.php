@@ -844,7 +844,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, feedback_author: null|string, feedback_author_classname: string, feedback_content: null|string, feedback_date: null|\OmegaUp\Timestamp, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}>
+     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, feedback_author: null|string, feedback_author_classname: string, feedback_content: null|string, feedback_date: \OmegaUp\Timestamp|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}>
      */
     final public static function getForProblemDetails(
         int $problemId,
@@ -895,7 +895,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     "user-rank-unranked"
                 ) AS classname,
                 sf.feedback as feedback_content,
-                ii.identity_id as feedback_author,
+                ii.username as feedback_author,
                 IFNULL(
                     (
                         SELECT urc.classname
@@ -954,7 +954,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ' AND s.problemset_id = ?';
             $params[] = $problemsetId;
         }
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, feedback_author: null|string, feedback_author_classname: string, feedback_content: null|string, feedback_date: null|\OmegaUp\Timestamp, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, feedback_author: null|string, feedback_author_classname: string, feedback_content: null|string, feedback_date: \OmegaUp\Timestamp|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
