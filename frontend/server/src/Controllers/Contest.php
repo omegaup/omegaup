@@ -755,7 +755,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'omegaupTitleContest'
             );
 
-            if (!is_null($contest->rerun_id) && $contest->rerun_id !== 0) {
+            if (!empty($contest->rerun_id)) {
                 $originalContest = \OmegaUp\DAO\Contests::getByPK(
                     $contest->rerun_id
                 );
