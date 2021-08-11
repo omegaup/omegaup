@@ -50,7 +50,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type IntroDetailsPayload=array{alias: string, archived: boolean, description: string, details?: CourseDetails, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
  * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
- * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, start_time: \OmegaUp\Timestamp}
+ * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, runs: null|list<Run>, start_time: \OmegaUp\Timestamp}
  * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard: Scoreboard, shouldShowFirstAssociatedIdentityRunWarning: bool, courseDetails: CourseDetails, currentAssignment: ArenaAssignment}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
@@ -3716,13 +3716,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
-        // Get scoreboard;
-        $params = \OmegaUp\ScoreboardParams::fromAssignment(
-            $assignment,
-            intval($course->group_id),
-            /*showAllRuns*/false
-        );
-         $params->admin = (
+        $isAdmin = (
             \OmegaUp\Authorization::isCourseAdmin(
                 $r->identity,
                 $course
@@ -3731,6 +3725,15 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $r->identity
             )
         );
+
+        // Get scoreboard;
+        $params = \OmegaUp\ScoreboardParams::fromAssignment(
+            $assignment,
+            intval($course->group_id),
+            /*showAllRuns*/false
+        );
+
+        $params->admin = $isAdmin;
         $scoreboard = new \OmegaUp\Scoreboard($params);
 
         return [
@@ -3764,6 +3767,16 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'start_time' => $assignment->start_time,
                         'finish_time' => $assignment->finish_time,
                         'problems' => $problemsResponseArray,
+                        'runs' => $isAdmin ? \OmegaUp\DAO\Runs::getAllRuns(
+                            $assignment->problemset_id,
+                            /*$status=*/ null,
+                            /*$verdict=*/ null,
+                            /*$problem_id=*/ null,
+                            /*$language=*/ null,
+                            /*$identity_id=*/ null,
+                            /*$offset=*/ 0,
+                            /*$rowcount=*/ 100
+                        ) : [],
                     ],
                     'scoreboard' => $scoreboard->generate(
                         /*$withRunDetails=*/                        false,
