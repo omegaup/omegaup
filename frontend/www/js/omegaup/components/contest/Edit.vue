@@ -9,7 +9,7 @@
         }}
         <small>
           &ndash;
-          <a :href="`/arena/${details.alias}/`">
+          <a :href="ui.contestURL(details)">
             {{ T.contestDetailsGoToContest }}</a
           >
         </small>
