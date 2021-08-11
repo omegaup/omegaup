@@ -67,7 +67,7 @@
 
           <td>
             <strong
-              ><a :href="'/arena/' + contest.alias + '/'">{{
+              ><a :href="ui.contestURL(contest)">{{
                 ui.contestTitle(contest)
               }}</a></strong
             >
