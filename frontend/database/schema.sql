@@ -204,7 +204,9 @@ CREATE TABLE `Contests` (
   KEY `rerun_id` (`contest_id`),
   KEY `acl_id` (`acl_id`),
   KEY `fk_cop_problemset_id` (`problemset_id`),
+  KEY `fk_cc_rerun_id` (`rerun_id`),
   FULLTEXT KEY `title` (`title`,`description`),
+  CONSTRAINT `fk_cc_rerun_id` FOREIGN KEY (`rerun_id`) REFERENCES `Contests` (`contest_id`),
   CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
   CONSTRAINT `fk_cop_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Concursos que se llevan a cabo en el juez.';
