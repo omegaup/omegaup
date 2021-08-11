@@ -340,7 +340,7 @@ export default class CourseViewProgress extends Vue {
     });
     let metaInf = zip.folder('META-INF');
     let table = this.progressTable;
-    metaInf.file(
+    metaInf?.file(
       'manifest.xml',
       `<?xml version="1.0" encoding="UTF-8"?>
 <manifest:manifest
