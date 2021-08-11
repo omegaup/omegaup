@@ -21,7 +21,10 @@
               &lt;
             </button>
             {{ filterOffset + 1 }}
-            <button :disabled="runs.length < rowCount" @click="filterOffset++">
+            <button
+              :disabled="runs && runs.length < rowCount"
+              @click="filterOffset++"
+            >
               &gt;
             </button>
 
@@ -349,7 +352,7 @@ export default class Runsv2 extends Vue {
   @Prop({ default: null }) problemsetProblems!: types.ProblemsetProblem[];
   @Prop({ default: null }) username!: string | null;
   @Prop({ default: 100 }) rowCount!: number;
-  @Prop() runs!: types.Run[];
+  @Prop() runs!: null | types.Run[];
   @Prop({ default: false }) globalRuns!: boolean;
   @Prop() searchResultUsers!: types.ListItem[];
 
@@ -408,8 +411,8 @@ export default class Runsv2 extends Vue {
 
   get sortedRuns(): types.Run[] {
     return this.runs
-      .slice()
-      .sort((a, b) => b.time.getTime() - a.time.getTime());
+      ? this.runs.slice().sort((a, b) => b.time.getTime() - a.time.getTime())
+      : [];
   }
 
   get newSubmissionUrl(): string {
