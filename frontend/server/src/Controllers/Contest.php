@@ -2213,7 +2213,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
             $contest->problemset_id = $problemset->problemset_id;
             $contest->penalty_calc_policy = $contest->penalty_calc_policy ?: 'sum';
-            $contest->rerun_id = $contest->rerun_id ?: 0;
+            $contest->rerun_id = $contest->rerun_id;
             if (!is_null($originalProblemsetId)) {
                 if (is_null($contest->problemset_id)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(

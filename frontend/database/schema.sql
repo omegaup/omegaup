@@ -180,7 +180,7 @@ CREATE TABLE `Contests` (
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este concurso',
   `last_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Indica la hora en que se actualizó de privado a público un concurso o viceversa',
   `window_length` int DEFAULT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso',
-  `rerun_id` int NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso, Contiene el id del concurso original.',
+  `rerun_id` int DEFAULT NULL COMMENT 'Este campo es para las repeticiones de algún concurso, Contiene el id del concurso original o null en caso de ser un concurso original.',
   `admission_mode` enum('private','registration','public') NOT NULL DEFAULT 'private' COMMENT 'Modalidad en la que se registra un concurso.',
   `alias` varchar(32) NOT NULL COMMENT 'Almacenará el token necesario para acceder al concurso',
   `scoreboard` int NOT NULL DEFAULT '1' COMMENT 'Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible',
