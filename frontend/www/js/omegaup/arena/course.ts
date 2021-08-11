@@ -3,6 +3,7 @@ import { types } from '../api_types';
 import * as time from '../time';
 import * as api from '../api';
 import * as ui from '../ui';
+import T from '../lang';
 
 import Vue from 'vue';
 import arena_Course from '../components/arena/Course.vue';
