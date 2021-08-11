@@ -844,7 +844,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}>
+     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, feedback_author: null|string, feedback_author_classname: string, feedback_content: null|string, feedback_date: null|\OmegaUp\Timestamp, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}>
      */
     final public static function getForProblemDetails(
         int $problemId,
@@ -893,7 +893,29 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                         LIMIT 1
                     ),
                     "user-rank-unranked"
-                ) AS classname
+                ) AS classname,
+                sf.feedback as feedback_content,
+                ii.identity_id as feedback_author,
+                IFNULL(
+                    (
+                        SELECT urc.classname
+                        FROM User_Rank_Cutoffs urc
+                        WHERE
+                            urc.score <= (
+                                SELECT
+                                    ur.score
+                                FROM
+                                    User_Rank ur
+                                WHERE
+                                    ur.user_id = ii.user_id
+                            )
+                        ORDER BY
+                            urc.percentile ASC
+                        LIMIT 1
+                    ),
+                    "user-rank-unranked"
+                ) AS feedback_author_classname,
+                sf.date as feedback_date
             FROM
                 Submissions s
             INNER JOIN
@@ -908,6 +930,14 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 Problems p
             ON
                 p.problem_id = s.problem_id
+            LEFT JOIN
+                Submission_Feedback sf
+            ON
+                sf.submission_id = s.submission_id
+            LEFT JOIN
+                Identities ii
+            ON
+                ii.identity_id = sf.identity_id
             LEFT JOIN
                 Problemsets ps
             ON
@@ -924,7 +954,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ' AND s.problemset_id = ?';
             $params[] = $problemsetId;
         }
-        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, feedback_author: null|string, feedback_author_classname: string, feedback_content: null|string, feedback_date: null|\OmegaUp\Timestamp, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 

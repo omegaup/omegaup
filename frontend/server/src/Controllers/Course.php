@@ -2072,15 +2072,23 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
             $problem['runs'] = [];
             foreach ($runsArray as $run) {
-                $runSubmission = \OmegaUp\DAO\Submissions::getByGuid(
-                    $run['guid']
-                );
                 $run['feedback'] = null;
-                if (!is_null($runSubmission)) {
-                    $run['feedback'] = \OmegaUp\DAO\Submissions::getSubmissionFeedback(
-                        $runSubmission
-                    );
+                if (
+                    !is_null($run['feedback_author']) &&
+                    !is_null($run['feedback_content']) &&
+                    !is_null($run['feedback_date'])
+                ) {
+                    $run['feedback'] = [
+                        'author' => $run['feedback_author'],
+                        'author_classname' => $run['feedback_author_classname'],
+                        'feedback' => $run['feedback_content'],
+                        'date' => $run['feedback_date']
+                    ];
                 }
+                unset($run['feedback_author']);
+                unset($run['feedback_author_classname']);
+                unset($run['feedback_content']);
+                unset($run['feedback_date']);
 
                 try {
                     $run['source'] = \OmegaUp\Controllers\Submission::getSource(

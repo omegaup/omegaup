@@ -63,7 +63,6 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             'assignment_alias' => $courseData['assignment_alias'],
             'usernameOrEmail' => $students[0]->username,
         ]));
-        print_r($response);
         $this->assertCount(1, $response['problems']);
         $this->assertCount(1, $response['problems'][0]['runs']);
         $this->assertEquals(
@@ -71,6 +70,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             $submissionSource
         );
         $this->assertEquals($response['problems'][0]['runs'][0]['score'], 0.5);
+        $this->assertNull($response['problems'][0]['runs'][0]['feedback']);
     }
 
     /**
