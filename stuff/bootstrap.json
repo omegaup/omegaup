@@ -32,6 +32,32 @@
 				"api": "/problem/create/",
 				"params": {
 					"visibility": "public",
+					"title": "Solo lectura",
+					"problem_alias": "sololectura",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"show_diff": "examples",
+					"allow_user_add_tags": "true",
+					"languages": "",
+					"email_clarifications": 1,
+					"problem_level": "problemLevelBasicIntroductionToProgramming",
+					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/readonlylecture.zip"
+				}
+			},
+			{
+				"api": "/problem/create/",
+				"params": {
+					"visibility": "public",
 					"title": "Triangulos",
 					"problem_alias": "triangulos",
 					"validator": "token-numeric",
