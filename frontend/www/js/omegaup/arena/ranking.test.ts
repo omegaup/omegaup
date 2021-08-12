@@ -12,6 +12,22 @@ import {
 } from './ranking';
 
 describe('ranking', () => {
+  const now = Date.now();
+  let dateNowSpy: jest.SpyInstance<number, []> | null = null;
+
+  beforeEach(() => {
+    dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+    if (dateNowSpy) {
+      dateNowSpy.mockRestore();
+    }
+  });
+
   const scoreboard: types.Scoreboard = {
     problems: [
       {
