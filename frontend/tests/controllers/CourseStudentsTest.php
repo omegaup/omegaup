@@ -55,6 +55,18 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
+        // Send feedback for the submission
+        $feedback = 'Test feedback';
+        \OmegaUp\Controllers\Submission::apiSetFeedback(
+            new \OmegaUp\Request([
+                'auth_token' => self::login($courseData['admin'])->auth_token,
+                'guid' => $runResponsePA['guid'],
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias'],
+                'feedback' => $feedback,
+            ])
+        );
+
         // Call API
         $adminLogin = self::login($courseData['admin']);
         $response = \OmegaUp\Controllers\Course::apiStudentProgress(new \OmegaUp\Request([
@@ -70,7 +82,8 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             $submissionSource
         );
         $this->assertEquals($response['problems'][0]['runs'][0]['score'], 0.5);
-        $this->assertNull($response['problems'][0]['runs'][0]['feedback']);
+        $this->assertNotNull($response['problems'][0]['runs'][0]['feedback']);
+        $this->assertEquals($feedback, $response['problems'][0]['runs'][0]['feedback']['feedback']);
     }
 
     /**

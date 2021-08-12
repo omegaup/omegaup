@@ -2738,11 +2738,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $run['alias'] = strval($problem->alias);
                 $run['username'] = strval($loggedIdentity->username);
 
-                unset($run['feedback_author']);
-                unset($run['feedback_author_classname']);
-                unset($run['feedback_content']);
-                unset($run['feedback_date']);
-
                 $results[] = $run;
             }
             $response['runs'] = $results;
@@ -3392,11 +3387,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             foreach ($runsArray as $run) {
                 $run['alias'] = strval($problem->alias);
                 $run['country'] = 'xx';
-
-                unset($run['feedback_author']);
-                unset($run['feedback_author_classname']);
-                unset($run['feedback_content']);
-                unset($run['feedback_date']);
 
                 $result[] = $run;
             }
@@ -4530,21 +4520,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        $runsPayload = [];
-        foreach (
-            \OmegaUp\DAO\Runs::getForProblemDetails(
-                intval($problem->problem_id),
-                /*$problemsetId=*/null,
-                intval($r->identity->identity_id)
-            ) as $run
-        ) {
-            unset($run['feedback_author']);
-            unset($run['feedback_author_classname']);
-            unset($run['feedback_content']);
-            unset($run['feedback_date']);
-
-            $runsPayload[] = $run;
-        }
+        $runsPayload = \OmegaUp\DAO\Runs::getForProblemDetails(
+            intval($problem->problem_id),
+            /*$problemsetId=*/null,
+            intval($r->identity->identity_id)
+        );
 
         $response['smartyProperties']['payload'] = array_merge(
             $response['smartyProperties']['payload'],

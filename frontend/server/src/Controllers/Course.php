@@ -2065,7 +2065,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $letter = 0;
         $problems = [];
         foreach ($rawProblems as $problem) {
-            $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
+            $runsArray = \OmegaUp\DAO\Runs::getForCourseProblemDetails(
                 intval($problem['problem_id']),
                 intval($assignment->problemset_id),
                 intval($resolvedIdentity->identity_id)
