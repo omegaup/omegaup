@@ -893,7 +893,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                         LIMIT 1
                     ),
                     "user-rank-unranked"
-                ) AS classname,
+                ) AS classname
             FROM
                 Submissions s
             INNER JOIN
