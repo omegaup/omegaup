@@ -112,7 +112,10 @@ export function showSubmission({
           return;
         }
         result.cases.push(basename);
-        result.promises.push(zip.file(zipEntry.name).async('text'));
+        const zipFile = zip.file(zipEntry.name);
+        if (zipFile) {
+          result.promises.push(zipFile.async('text'));
+        }
       });
       return result;
     })
