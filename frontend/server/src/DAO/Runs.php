@@ -894,28 +894,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     ),
                     "user-rank-unranked"
                 ) AS classname,
-                sf.feedback as feedback_content,
-                ii.username as feedback_author,
-                IFNULL(
-                    (
-                        SELECT urc.classname
-                        FROM User_Rank_Cutoffs urc
-                        WHERE
-                            urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = ii.user_id
-                            )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT 1
-                    ),
-                    "user-rank-unranked"
-                ) AS feedback_author_classname,
-                sf.date as feedback_date
             FROM
                 Submissions s
             INNER JOIN
@@ -930,14 +908,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 Problems p
             ON
                 p.problem_id = s.problem_id
-            LEFT JOIN
-                Submission_Feedback sf
-            ON
-                sf.submission_id = s.submission_id
-            LEFT JOIN
-                Identities ii
-            ON
-                ii.identity_id = sf.identity_id
             LEFT JOIN
                 Problemsets ps
             ON
