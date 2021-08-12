@@ -83,7 +83,10 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertEquals($response['problems'][0]['runs'][0]['score'], 0.5);
         $this->assertNotNull($response['problems'][0]['runs'][0]['feedback']);
-        $this->assertEquals($feedback, $response['problems'][0]['runs'][0]['feedback']['feedback']);
+        $this->assertEquals(
+            $feedback,
+            $response['problems'][0]['runs'][0]['feedback']['feedback']
+        );
     }
 
     /**
