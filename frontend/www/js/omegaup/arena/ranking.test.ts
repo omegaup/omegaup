@@ -95,7 +95,7 @@ describe('ranking', () => {
       username: 'omegaUp_virtual',
       name: 'omegaUp [virtual]',
       country: 'MX',
-      delta: 7,
+      delta: 0.0008,
       is_invited: true,
       problem: {
         alias: 'problem_alias',
@@ -112,7 +112,7 @@ describe('ranking', () => {
       username: 'omegaUp_virtual',
       name: 'omegaUp [virtual]',
       country: 'MX',
-      delta: 7.5,
+      delta: 1,
       is_invited: true,
       problem: {
         alias: 'problem_alias_2',
@@ -145,12 +145,24 @@ describe('ranking', () => {
   ];
 
   describe('mergeRankings', () => {
-    it('Should original ranking with current scoreboard', () => {
-      const { mergedScoreboard } = mergeRankings({
+    it('Should merge original ranking with current scoreboard', () => {
+      const { mergedScoreboard, originalContestEvents } = mergeRankings({
         scoreboard,
         originalScoreboardEvents,
         navbarProblems,
       });
+      expect(originalContestEvents).toEqual([
+        {
+          classname: 'user-rank-unranked',
+          country: 'MX',
+          delta: 0.0008,
+          is_invited: true,
+          name: 'omegaUp [virtual]',
+          problem: { alias: 'problem_alias', penalty: 3, points: 100 },
+          total: { penalty: 3, points: 100 },
+          username: 'omegaUp_virtual',
+        },
+      ]);
       expect(mergedScoreboard).toEqual({
         problems: [
           { alias: 'problem_alias', order: 1 },
@@ -161,7 +173,35 @@ describe('ranking', () => {
             classname: 'user-rank-unranked',
             country: 'MX',
             is_invited: true,
+            name: 'omegaUp [virtual]',
             place: 1,
+            problems: [
+              {
+                alias: 'problem_alias',
+                penalty: 3,
+                percent: 100,
+                points: 100,
+                runs: 1,
+              },
+              {
+                alias: 'problem_alias_2',
+                penalty: 0,
+                percent: 0,
+                points: 0,
+                runs: 0,
+              },
+            ],
+            total: {
+              penalty: 3,
+              points: 100,
+            },
+            username: 'omegaUp_virtual',
+          },
+          {
+            classname: 'user-rank-unranked',
+            country: 'MX',
+            is_invited: true,
+            place: 2,
             problems: [
               {
                 alias: 'problem_alias',
@@ -184,34 +224,6 @@ describe('ranking', () => {
             },
             username: 'omegaUp',
             virtual: true,
-          },
-          {
-            classname: 'user-rank-unranked',
-            country: 'MX',
-            is_invited: true,
-            name: 'omegaUp [virtual]',
-            place: 2,
-            problems: [
-              {
-                alias: 'problem_alias',
-                penalty: 0,
-                percent: 0,
-                points: 0,
-                runs: 0,
-              },
-              {
-                alias: 'problem_alias_2',
-                penalty: 0,
-                percent: 0,
-                points: 0,
-                runs: 0,
-              },
-            ],
-            total: {
-              penalty: 0,
-              points: 0,
-            },
-            username: 'omegaUp_virtual',
           },
         ],
         start_time: expect.any(String),

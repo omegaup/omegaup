@@ -296,7 +296,7 @@ export function mergeRankings({
   const dataRanking: (types.ScoreboardRankingEntry & {
     virtual?: boolean;
   })[] = data.ranking;
-  const events = originalScoreboardEvents ?? [];
+  const events = originalScoreboardEvents;
   const currentDelta =
     (new Date().getTime() - scoreboard.start_time.getTime()) / (1000 * 60);
 
