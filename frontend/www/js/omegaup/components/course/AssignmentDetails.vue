@@ -52,6 +52,7 @@
                   'is-invalid': invalidParameterName === 'assignment_type',
                 }"
                 required
+                @change="onChangeSelect($event)"
               >
                 <option value="lesson">
                   {{ T.wordsLesson }}
@@ -325,6 +326,10 @@ export default class CourseAssignmentDetails extends Vue {
 
   onSubmit(): void {
     this.$emit('submit', this, this.scheduledProblemList?.problems ?? []);
+  }
+
+  onChangeSelect(event: { target: { value: string } }): void {
+    this.assignment.assignment_type = event.target.value;
   }
 }
 </script>
