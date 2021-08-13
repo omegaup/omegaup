@@ -615,7 +615,7 @@ export class Arena {
           start_time: new Date(),
           finish_time: null,
           window_length: 0,
-          rerun_id: 0,
+          rerun_id: null,
           title: '',
           director: '',
         },

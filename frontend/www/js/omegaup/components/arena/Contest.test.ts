@@ -41,7 +41,6 @@ describe('Contest.vue', () => {
     penalty_type: 'contest_start',
     points_decay_factor: 0,
     problemset_id: 1,
-    rerun_id: 0,
     scoreboard: 100,
     show_penalty: true,
     show_scoreboard_after: true,
