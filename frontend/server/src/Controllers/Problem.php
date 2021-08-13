@@ -2737,7 +2737,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             foreach ($runsArray as $run) {
                 $run['alias'] = strval($problem->alias);
                 $run['username'] = strval($loggedIdentity->username);
-
                 $results[] = $run;
             }
             $response['runs'] = $results;
@@ -3387,7 +3386,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             foreach ($runsArray as $run) {
                 $run['alias'] = strval($problem->alias);
                 $run['country'] = 'xx';
-
                 $result[] = $run;
             }
             $response['runs'] = $result;
