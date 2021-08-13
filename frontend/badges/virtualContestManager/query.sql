@@ -5,4 +5,4 @@ FROM
 INNER JOIN
   `ACLs` AS `a` ON `c`.`acl_id` = `a`.`acl_id`
 WHERE
-  `c`.`rerun_id` != NULL;
+  `c`.`rerun_id` IS NOT NULL;
