@@ -111,7 +111,7 @@ describe('ranking', () => {
       username: 'omegaUp_virtual',
       name: 'omegaUp [virtual]',
       country: 'MX',
-      delta: 0.0008,
+      delta: 0.0001,
       is_invited: true,
       problem: {
         alias: 'problem_alias',
@@ -171,7 +171,7 @@ describe('ranking', () => {
         {
           classname: 'user-rank-unranked',
           country: 'MX',
-          delta: 0.0008,
+          delta: 0.0001,
           is_invited: true,
           name: 'omegaUp [virtual]',
           problem: { alias: 'problem_alias', penalty: 3, points: 100 },

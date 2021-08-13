@@ -344,8 +344,6 @@ export function mergeRankings({
         place: 0,
       };
     }
-    console.log(evt.delta);
-    console.log(currentDelta);
     if (evt.delta > currentDelta) {
       refreshTime = Math.min(
         refreshTime,
