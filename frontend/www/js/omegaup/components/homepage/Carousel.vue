@@ -60,7 +60,7 @@ import carouselConfig from '../../carousel.config';
 })
 export default class Carousel extends Vue {
   T = T;
-  slides = carouselConfig;
+  slides = carouselConfig.reverse();
 }
 </script>
 
