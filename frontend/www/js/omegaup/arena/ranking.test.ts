@@ -9,7 +9,11 @@ import {
   createChart,
   scoreboardColors,
   mergeRankings,
+  onVirtualRankingChanged,
 } from './ranking';
+import { rankingStoreConfig } from './rankingStore';
+import { createLocalVue } from '@vue/test-utils';
+import Vuex from 'vuex';
 
 describe('ranking', () => {
   const now = Date.now();
@@ -246,6 +250,114 @@ describe('ranking', () => {
         time: expect.any(String),
         title: 'contest',
       });
+    });
+
+    it('Should handle onVirtualRankingChanged function', () => {
+      const localVue = createLocalVue();
+      localVue.use(Vuex);
+      const store = new Vuex.Store(rankingStoreConfig);
+      const contest: types.ContestPublicDetails = {
+        admission_mode: 'Public',
+        alias: 'contest_alias',
+        description: 'Description contest',
+        director: 'admin_omegaUp',
+        feedback: 'none',
+        finish_time: new Date(),
+        languages: 'py3',
+        partial_score: false,
+        penalty: 100,
+        penalty_calc_policy: 'sum',
+        penalty_type: 'none',
+        points_decay_factor: 1.0,
+        problemset_id: 1,
+        rerun_id: 0,
+        scoreboard: 1,
+        show_penalty: false,
+        show_scoreboard_after: false,
+        start_time: new Date(0),
+        submissions_gap: 1,
+        title: 'Contest',
+      };
+
+      onVirtualRankingChanged({
+        scoreboard,
+        scoreboardEvents: originalScoreboardEvents,
+        problems: navbarProblems,
+        contest,
+        currentUsername: 'omegaUp',
+      });
+
+      expect(store.state.ranking).toEqual([
+        {
+          country: 'MX',
+          name: 'omegaUp [virtual]',
+          username: 'omegaUp_virtual',
+          classname: 'user-rank-unranked',
+          is_invited: true,
+          problems: [
+            {
+              alias: 'problem_alias',
+              penalty: 3,
+              percent: 100,
+              points: 100,
+              runs: 1,
+            },
+            {
+              alias: 'problem_alias_2',
+              penalty: 0,
+              percent: 0,
+              points: 0,
+              runs: 0,
+            },
+          ],
+          total: { points: 100, penalty: 3 },
+          place: 1,
+        },
+        {
+          classname: 'user-rank-unranked',
+          username: 'omegaUp',
+          country: 'MX',
+          is_invited: true,
+          problems: [
+            {
+              alias: 'problem_alias',
+              penalty: 3,
+              percent: 0,
+              points: 100,
+              runs: 1,
+            },
+            {
+              alias: 'problem_alias_2',
+              penalty: 5,
+              percent: 0,
+              points: 100,
+              runs: 1,
+            },
+          ],
+          total: { points: 0, penalty: 0 },
+          virtual: true,
+          place: 2,
+        },
+      ]);
+      expect(store.state.miniRankingUsers).toEqual([
+        {
+          position: 1,
+          username: 'omegaUp_virtual (omegaUp [virtual])',
+          country: 'MX',
+          classname: 'user-rank-unranked',
+          points: 100,
+          penalty: 3,
+        },
+        {
+          position: 2,
+          username: 'omegaUp [virtual]',
+          country: 'MX',
+          classname: 'user-rank-unranked',
+          points: 0,
+          penalty: 0,
+        },
+      ]);
+      expect(store.state.rankingChartOptions.series).toBeTruthy();
     });
   });
 
