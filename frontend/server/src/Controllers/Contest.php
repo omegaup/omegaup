@@ -1573,7 +1573,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             /** @return ContestDetails */
             function () use ($contest) {
                 // Initialize response to be the contest information
-                /** @var array{admission_mode: string, alias: string, archived: bool, contest_for_teams: bool, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null} */
+                /** @var array{admission_mode: string, alias: string, archived: bool, contest_for_teams: bool, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, has_submissions: bool, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int|null, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null} */
                 $result = $contest->asFilteredArray([
                     'admission_mode',
                     'alias',
@@ -1611,6 +1611,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                         $result['original_contest_alias'] = $originalContest->alias;
                         $result['original_problemset_id'] = $originalContest->problemset_id;
                     }
+                } else {
+                    unset($result['rerun_id']);
                 }
 
                 if (
