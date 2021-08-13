@@ -521,6 +521,23 @@ export namespace types {
       );
     }
 
+    export function ContestVirtualDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestVirtualDetailsPayload {
+      return ((x) => {
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function CourseClarificationsPayload(
       elementId: string = 'payload',
     ): types.CourseClarificationsPayload {
@@ -2078,6 +2095,10 @@ export namespace types {
     username: string;
   }
 
+  export interface ContestVirtualDetailsPayload {
+    contest: types.ContestPublicDetails;
+  }
+
   export interface Contestant {
     country?: string;
     email?: string;
@@ -2192,20 +2213,7 @@ export namespace types {
     letter: string;
     order: number;
     points: number;
-    runs: {
-      contest_score?: number;
-      guid: string;
-      language: string;
-      memory: number;
-      penalty: number;
-      runtime: number;
-      score: number;
-      source?: string;
-      status: string;
-      submit_delay: number;
-      time: Date;
-      verdict: string;
-    }[];
+    runs: types.CourseRun[];
     submissions: number;
     title: string;
     version: string;
@@ -2238,6 +2246,21 @@ export namespace types {
     problem_id: number;
     runs: number;
     verdict?: string;
+  }
+
+  export interface CourseRun {
+    contest_score?: number;
+    guid: string;
+    language: string;
+    memory: number;
+    penalty: number;
+    runtime: number;
+    score: number;
+    source?: string;
+    status: string;
+    submit_delay: number;
+    time: Date;
+    verdict: string;
   }
 
   export interface CourseStatisticsPayload {
