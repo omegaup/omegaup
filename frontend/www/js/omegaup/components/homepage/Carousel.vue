@@ -60,6 +60,7 @@ import carouselConfig from '../../carousel.config';
 })
 export default class Carousel extends Vue {
   T = T;
+  // Reverse the entries so that newer ones appear first.
   slides = carouselConfig.reverse();
 }
 </script>
