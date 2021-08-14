@@ -2250,6 +2250,7 @@ export namespace types {
 
   export interface CourseRun {
     contest_score?: number;
+    feedback?: types.SubmissionFeedback;
     guid: string;
     language: string;
     memory: number;
@@ -3043,12 +3044,7 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback?: {
-      author: string;
-      author_classname: string;
-      date: Date;
-      feedback: string;
-    };
+    feedback?: types.SubmissionFeedback;
     guid: string;
     judged_by?: string;
     language: string;
@@ -3303,6 +3299,13 @@ export namespace types {
     title: string;
     username: string;
     verdict: string;
+  }
+
+  export interface SubmissionFeedback {
+    author: string;
+    author_classname: string;
+    date: Date;
+    feedback: string;
   }
 
   export interface SubmissionsListPayload {
