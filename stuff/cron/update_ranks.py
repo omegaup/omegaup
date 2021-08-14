@@ -529,16 +529,16 @@ def update_coder_of_the_month_candidates(
             1)
 
     # First make sure there are not already selected coder of the month
-    cur.execute('''
-            SELECT
-                COUNT(*) AS `count`
-            FROM
-                `Coder_Of_The_Month`
-            WHERE
-                `time` = %s AND
-                `selected_by` IS NOT NULL AND
-                `category` = %s;
-            ''', (first_day_of_next_month, category))
+        cur.execute('''
+                SELECT
+                    COUNT(*) AS `count`
+                FROM
+                    `Coder_Of_The_Month`
+                WHERE
+                    `time` = %s AND
+                    `selected_by` IS NOT NULL AND
+                    `category` = %s;
+                ''', (first_day_of_next_month, category))
     for row in cur:
         if row['count'] > 0:
             logging.info('Skipping because already exist selected coder')
@@ -705,8 +705,7 @@ def update_coder_of_the_month_candidates(
 def update_users_stats(
         cur: MySQLdb.cursors.BaseCursor,
         dbconn: MySQLdb.connections.Connection,
-        date: datetime.date,
-        update_coder_of_the_month: bool) -> None:
+        date: datetime.date) -> None:
     '''Updates all the information and ranks related to users'''
     logging.info('Updating users stats...')
     try:
@@ -726,25 +725,21 @@ def update_users_stats(
         # transaction since both are stored in the same DB table.
         dbconn.commit()
 
-        if update_coder_of_the_month:
-            try:
-                update_coder_of_the_month_candidates(cur, date, 'all')
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception(
-                    'Failed to update candidates to coder of the month')
-                raise
+        try:
+            update_coder_of_the_month_candidates(cur, date, 'all')
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to update candidates to coder of the month')
+            raise
 
-            try:
-                update_coder_of_the_month_candidates(cur, date, 'female')
-                dbconn.commit()
-            except:  # noqa: bare-except
-                logging.exception(
-                    'Failed to update candidates to coder of the month female')
-                raise
-        else:
-            logging.info('Skipping updating Coder of the Month')
-
+        try:
+            update_coder_of_the_month_candidates(cur, date, 'female')
+            dbconn.commit()
+        except:  # noqa: bare-except
+            logging.exception(
+                'Failed to update candidates to coder of the month female')
+            raise
         logging.info('Users stats updated')
     except:  # noqa: bare-except
         logging.exception('Failed to update all users stats')
@@ -794,9 +789,6 @@ def main() -> None:
                         type=_parse_date,
                         default=_default_date(),
                         help='The date the command should take as today')
-    parser.add_argument('--update-coder-of-the-month',
-                        action='store_true',
-                        help='Update the Coder of the Month')
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
@@ -805,8 +797,7 @@ def main() -> None:
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
             update_problem_accepted_stats(cur)
-            update_users_stats(cur, dbconn, args.date,
-                               args.update_coder_of_the_month)
+            update_users_stats(cur, dbconn, args.date)
             update_schools_stats(cur, dbconn, args.date)
     finally:
         dbconn.close()
