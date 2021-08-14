@@ -294,7 +294,7 @@ class Contests extends \OmegaUp\DAO\VO\VO {
     public $window_length = null;
 
     /**
-     * Este campo es para las repeticiones de algún concurso, Contiene el id del concurso original.
+     * Este campo es para las repeticiones de algún concurso, Contiene el id del concurso original o null en caso de ser un concurso original.
      *
      * @var int|null
      */
