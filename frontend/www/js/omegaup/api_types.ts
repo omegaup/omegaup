@@ -1865,7 +1865,7 @@ export namespace types {
     points_decay_factor?: number;
     problemset_id: number;
     recommended: boolean;
-    rerun_id: number;
+    rerun_id?: number;
     scoreboard?: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
@@ -2018,7 +2018,7 @@ export namespace types {
     participating: boolean;
     problemset_id: number;
     recommended: boolean;
-    rerun_id: number;
+    rerun_id?: number;
     start_time: Date;
     title: string;
     window_length?: number;
@@ -2065,7 +2065,7 @@ export namespace types {
     penalty_type: string;
     points_decay_factor: number;
     problemset_id: number;
-    rerun_id: number;
+    rerun_id?: number;
     scoreboard: number;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
@@ -3608,7 +3608,7 @@ export namespace messages {
       original_finish_time: Date;
       problemset_id: number;
       recommended: boolean;
-      rerun_id: number;
+      rerun_id?: number;
       start_time: Date;
       title: string;
       window_length?: number;
