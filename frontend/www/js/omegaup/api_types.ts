@@ -1876,7 +1876,7 @@ export namespace types {
     points_decay_factor?: number;
     problemset_id: number;
     recommended: boolean;
-    rerun_id: number;
+    rerun_id?: number;
     scoreboard?: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
@@ -2029,7 +2029,7 @@ export namespace types {
     participating: boolean;
     problemset_id: number;
     recommended: boolean;
-    rerun_id: number;
+    rerun_id?: number;
     start_time: Date;
     title: string;
     window_length?: number;
@@ -2076,7 +2076,7 @@ export namespace types {
     penalty_type: string;
     points_decay_factor: number;
     problemset_id: number;
-    rerun_id: number;
+    rerun_id?: number;
     scoreboard: number;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
@@ -2261,6 +2261,7 @@ export namespace types {
 
   export interface CourseRun {
     contest_score?: number;
+    feedback?: types.SubmissionFeedback;
     guid: string;
     language: string;
     memory: number;
@@ -3054,12 +3055,7 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback?: {
-      author: string;
-      author_classname: string;
-      date: Date;
-      feedback: string;
-    };
+    feedback?: types.SubmissionFeedback;
     guid: string;
     judged_by?: string;
     language: string;
@@ -3314,6 +3310,13 @@ export namespace types {
     title: string;
     username: string;
     verdict: string;
+  }
+
+  export interface SubmissionFeedback {
+    author: string;
+    author_classname: string;
+    date: Date;
+    feedback: string;
   }
 
   export interface SubmissionsListPayload {
@@ -3619,7 +3622,7 @@ export namespace messages {
       original_finish_time: Date;
       problemset_id: number;
       recommended: boolean;
-      rerun_id: number;
+      rerun_id?: number;
       start_time: Date;
       title: string;
       window_length?: number;
