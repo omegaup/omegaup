@@ -929,6 +929,121 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
+     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, feedback_author: null|string, feedback_author_classname: string, feedback_content: null|string, feedback_date: \OmegaUp\Timestamp|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}>
+     */
+    final public static function getForCourseProblemDetails(
+        int $problemId,
+        ?int $problemsetId,
+        int $identityId
+    ): array {
+        $sql = '
+            SELECT
+                p.alias,
+                s.guid,
+                s.language,
+                r.status,
+                r.verdict,
+                r.runtime,
+                r.penalty,
+                r.memory,
+                IF(
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                        0,
+                        r.score
+                ) AS score,
+                IF(
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                        0,
+                        r.contest_score
+                ) AS contest_score,
+                s.`time`,
+                s.submit_delay,
+                i.username, IFNULL(i.country_id, "xx") AS country,
+                c.alias AS contest_alias, IFNULL(s.`type`, "normal") AS `type`,
+                IFNULL(
+                    (
+                        SELECT urc.classname
+                        FROM User_Rank_Cutoffs urc
+                        WHERE
+                            urc.score <= (
+                                SELECT
+                                    ur.score
+                                FROM
+                                    User_Rank ur
+                                WHERE
+                                    ur.user_id = i.user_id
+                            )
+                        ORDER BY
+                            urc.percentile ASC
+                        LIMIT 1
+                    ),
+                    "user-rank-unranked"
+                ) AS classname,
+                sf.feedback as feedback_content,
+                ii.username as feedback_author,
+                IFNULL(
+                    (
+                        SELECT urc.classname
+                        FROM User_Rank_Cutoffs urc
+                        WHERE
+                            urc.score <= (
+                                SELECT
+                                    ur.score
+                                FROM
+                                    User_Rank ur
+                                WHERE
+                                    ur.user_id = ii.user_id
+                            )
+                        ORDER BY
+                            urc.percentile ASC
+                        LIMIT 1
+                    ),
+                    "user-rank-unranked"
+                ) AS feedback_author_classname,
+                sf.date as feedback_date
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r
+            ON
+                r.run_id = s.current_run_id
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = s.identity_id
+            INNER JOIN
+                Problems p
+            ON
+                p.problem_id = s.problem_id
+            LEFT JOIN
+                Submission_Feedback sf
+            ON
+                sf.submission_id = s.submission_id
+            LEFT JOIN
+                Identities ii
+            ON
+                ii.identity_id = sf.identity_id
+            LEFT JOIN
+                Problemsets ps
+            ON
+                ps.problemset_id = s.problemset_id
+            LEFT JOIN
+                Contests c
+            ON
+                c.problemset_id = ps.problemset_id
+            WHERE
+                s.problem_id = ? AND s.identity_id = ?
+        ';
+        $params = [$problemId, $identityId];
+        if (!is_null($problemsetId)) {
+            $sql .= ' AND s.problemset_id = ?';
+            $params[] = $problemsetId;
+        }
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, feedback_author: null|string, feedback_author_classname: string, feedback_content: null|string, feedback_date: \OmegaUp\Timestamp|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+    }
+
+    /**
      * Returns the time of the next submission to the current problem
      */
     final public static function nextSubmissionTimestamp(
