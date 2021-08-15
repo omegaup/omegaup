@@ -328,8 +328,8 @@ export default class CourseAssignmentDetails extends Vue {
     this.$emit('submit', this, this.scheduledProblemList?.problems ?? []);
   }
 
-  onChangeSelect(event: { target: { value: string } }): void {
-    this.assignment.assignment_type = event.target.value;
+  onChangeSelect(event: Event): void {
+    this.assignment.assignment_type = (event.target as HTMLSelectElement).value;
   }
 }
 </script>
