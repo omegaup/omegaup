@@ -296,7 +296,11 @@ OmegaUp.on('ready', () => {
             }
             api.Course.addProblem(problemParams)
               .then(() => {
-                ui.success(T.courseAssignmentProblemAdded);
+                if (assignment.assignment_type == 'lesson') {
+                  ui.success(T.courseAssignmentLectureAdded);
+                } else {
+                  ui.success(T.courseAssignmentProblemAdded);
+                }
                 this.refreshProblemList(assignment);
               })
               .catch(ui.apiError);
@@ -323,7 +327,11 @@ OmegaUp.on('ready', () => {
               assignment_alias: assignment.alias,
             })
               .then(() => {
-                ui.success(T.courseAssignmentProblemRemoved);
+                if (assignment.assignment_type == 'lesson') {
+                  ui.success(T.courseAssignmentLectureRemoved);
+                } else {
+                  ui.success(T.courseAssignmentProblemRemoved);
+                }
                 this.refreshProblemList(assignment);
               })
               .catch(ui.apiError);
