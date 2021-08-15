@@ -410,9 +410,12 @@ export default class Runsv2 extends Vue {
   }
 
   get sortedRuns(): types.Run[] {
+    if (!this.runs) {
+      return [];
+    }
     return this.runs
-      ? this.runs.slice().sort((a, b) => b.time.getTime() - a.time.getTime())
-      : [];
+      .slice()
+      .sort((a, b) => b.time.getTime() - a.time.getTime());
   }
 
   get newSubmissionUrl(): string {

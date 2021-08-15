@@ -251,7 +251,6 @@ export default class ArenaCourse extends Vue {
       target: this,
     });
     this.currentPopupDisplayed = newValue;
-    return;
   }
 }
 </script>
