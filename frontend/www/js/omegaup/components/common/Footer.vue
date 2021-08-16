@@ -80,7 +80,11 @@
     <div class="copy">
       <div class="copy-content">
         <div class="">
-          {{ T.wordsCopyright }}
+          {{
+            ui.formatString(T.frontPageFooterCopyright, {
+              currentYear: new Date().getFullYear(),
+            })
+          }}
         </div>
         <div class="menu">
           <ul>
@@ -104,6 +108,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import * as ui from '../../ui';
 import T from '../../lang';
 import { reportAnIssueURL } from '../../errors';
 
@@ -113,6 +118,7 @@ export default class Footer extends Vue {
   @Prop() omegaUpLockDown!: boolean;
 
   T = T;
+  ui = ui;
   reportAnIssueURL = reportAnIssueURL;
 }
 </script>

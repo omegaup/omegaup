@@ -521,6 +521,23 @@ export namespace types {
       );
     }
 
+    export function ContestVirtualDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestVirtualDetailsPayload {
+      return ((x) => {
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function CourseClarificationsPayload(
       elementId: string = 'payload',
     ): types.CourseClarificationsPayload {
@@ -1848,7 +1865,7 @@ export namespace types {
     points_decay_factor?: number;
     problemset_id: number;
     recommended: boolean;
-    rerun_id: number;
+    rerun_id?: number;
     scoreboard?: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
@@ -2001,7 +2018,7 @@ export namespace types {
     participating: boolean;
     problemset_id: number;
     recommended: boolean;
-    rerun_id: number;
+    rerun_id?: number;
     start_time: Date;
     title: string;
     window_length?: number;
@@ -2048,7 +2065,7 @@ export namespace types {
     penalty_type: string;
     points_decay_factor: number;
     problemset_id: number;
-    rerun_id: number;
+    rerun_id?: number;
     scoreboard: number;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
@@ -2076,6 +2093,10 @@ export namespace types {
     end_time?: Date;
     is_owner?: number;
     username: string;
+  }
+
+  export interface ContestVirtualDetailsPayload {
+    contest: types.ContestPublicDetails;
   }
 
   export interface Contestant {
@@ -2192,20 +2213,7 @@ export namespace types {
     letter: string;
     order: number;
     points: number;
-    runs: {
-      contest_score?: number;
-      guid: string;
-      language: string;
-      memory: number;
-      penalty: number;
-      runtime: number;
-      score: number;
-      source?: string;
-      status: string;
-      submit_delay: number;
-      time: Date;
-      verdict: string;
-    }[];
+    runs: types.CourseRun[];
     submissions: number;
     title: string;
     version: string;
@@ -2238,6 +2246,22 @@ export namespace types {
     problem_id: number;
     runs: number;
     verdict?: string;
+  }
+
+  export interface CourseRun {
+    contest_score?: number;
+    feedback?: types.SubmissionFeedback;
+    guid: string;
+    language: string;
+    memory: number;
+    penalty: number;
+    runtime: number;
+    score: number;
+    source?: string;
+    status: string;
+    submit_delay: number;
+    time: Date;
+    verdict: string;
   }
 
   export interface CourseStatisticsPayload {
@@ -3020,12 +3044,7 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback?: {
-      author: string;
-      author_classname: string;
-      date: Date;
-      feedback: string;
-    };
+    feedback?: types.SubmissionFeedback;
     guid: string;
     judged_by?: string;
     language: string;
@@ -3280,6 +3299,13 @@ export namespace types {
     title: string;
     username: string;
     verdict: string;
+  }
+
+  export interface SubmissionFeedback {
+    author: string;
+    author_classname: string;
+    date: Date;
+    feedback: string;
   }
 
   export interface SubmissionsListPayload {
@@ -3585,7 +3611,7 @@ export namespace messages {
       original_finish_time: Date;
       problemset_id: number;
       recommended: boolean;
-      rerun_id: number;
+      rerun_id?: number;
       start_time: Date;
       title: string;
       window_length?: number;
