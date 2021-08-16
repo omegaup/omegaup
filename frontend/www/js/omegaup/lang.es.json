@@ -132,6 +132,7 @@
 	"clarificationEmailSubject": "[omegaUp] Nueva clarificaci\u00f3n para el problema %(problem_name)",
 	"clarificationNotFound": "Clarificaci\u00f3n no encontrada",
 	"clarificationUpdateAnswer": "Actualizar respuesta",
+	"clarificationsEmpty": "A\u00fan no hay clarificaciones",
 	"clarificationsRangeHeader": "Clarificaciones (del %(lowCount) al %(highCount))",
 	"coderOfTheMonth": "Coder del Mes General",
 	"coderOfTheMonthAlreadySelected": "El coder del mes ya ha sido seleccionado con anterioridad",
