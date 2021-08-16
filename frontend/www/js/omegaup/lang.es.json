@@ -142,7 +142,7 @@
 	"coderOfTheMonthFullList": "Ver listado completo",
 	"coderOfTheMonthIsNotInPeriodToBeChosen": "Coder del mes no est\u00e1 en periodo de ser elegido",
 	"coderOfTheMonthNotFound": "No se encontr\u00f3 coder del mes.",
-	"coderOfTheMonthNotice": "\u00a1Hola %(username)! \u00a1Felicidades por ganar el reconocimiento al Coder del Mes! Tenemos un premio para ti, por favor cont\u00e1ctanos en mentores@omegaup.org",
+	"coderOfTheMonthNotice": "\u00a1Hola %(username)! \u00a1Felicidades por ganar el reconocimiento al Coder del Mes!",
 	"coderOfTheMonthSelectedSuccessfully": "Coder del mes ha sido seleccionado satisfactoriamente.",
 	"codersOfTheMonth": "Coders del Mes",
 	"codersOfTheMonthCountry": "Pa\u00eds / Regi\u00f3n",
