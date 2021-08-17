@@ -73,8 +73,6 @@ OmegaUp.on('ready', () => {
           scoreboard: payload.scoreboard,
           showNewClarificationPopup: this.showNewClarificationPopup,
           showRanking: payload.showRanking,
-          shouldShowFirstAssociatedIdentityRunWarning:
-            payload.shouldShowFirstAssociatedIdentityRunWarning,
           activeTab,
           guid: this.guid,
           runs: myRunsStore.state.runs,

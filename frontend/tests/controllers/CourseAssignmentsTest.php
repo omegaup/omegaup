@@ -214,8 +214,10 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         // Create a problem, a student and a run
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
+        $adminLogin = self::login($courseData['admin']);
+
         \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
-            self::login($courseData['admin']),
+            $adminLogin,
             $courseData['course_alias'],
             $courseData['assignment_alias'],
             [ $problemData ]
@@ -237,10 +239,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $adminPayload = \OmegaUp\Controllers\Course::getAssignmentDetailsForTypeScript(
-            new \Omegaup\Request([
-                'auth_token' => self::login($courseData['admin'])->auth_token,
-                'course_alias' => $courseData['course_alias']
-            ]),
+            $courseData['admin'],
             $courseData['course'],
             \OmegaUp\DAO\Groups::getByPK(
                 $courseData['course']->group_id
@@ -262,10 +261,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(1, $adminPayload['currentAssignment']['runs']);
 
         $studentPayload = \OmegaUp\Controllers\Course::getAssignmentDetailsForTypeScript(
-            new \Omegaup\Request([
-                'auth_token' => self::login($student['identity'])->auth_token,
-                'course_alias' => $courseData['course_alias']
-            ]),
+            $student['identity'],
             $courseData['course'],
             \OmegaUp\DAO\Groups::getByPK(
                 $courseData['course']->group_id

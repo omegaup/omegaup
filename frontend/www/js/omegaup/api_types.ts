@@ -1651,7 +1651,6 @@ export namespace types {
     courseDetails: types.CourseDetails;
     currentAssignment: types.ArenaAssignment;
     scoreboard: types.Scoreboard;
-    shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
   }
 
