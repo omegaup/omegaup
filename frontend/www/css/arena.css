@@ -165,10 +165,6 @@ body#only-problem #problems .main {
   margin-right: -1em;
 }
 
-#summary {
-  min-height: 10em;
-}
-
 #summary td {
   border: 1px solid #000;
   padding: 0.2em;
