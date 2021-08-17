@@ -100,6 +100,8 @@ const translations: { [key: string]: string; } = {
   badge_legacyUser_name: "(L3gacy U53r)",
   badge_pascalExpert_description: "(Th3 u53r ha5 501v3d m0r3 7han 10 pr0b13m5 in Pa5ca1.)",
   badge_pascalExpert_name: "(Pa5ca1 Exp3r7 U53r)",
+  badge_problemOfTheWeekWithOmegaUp_description: "(Th3 u53r ha5 501v3d 0n3 pr0b13m 0f S01ving Pr0b13m5 in 0m3gaUp c0ur53.)",
+  badge_problemOfTheWeekWithOmegaUp_name: "(Pr0b13m 0f 7h3 W33k wi7h 0m3gaUp)",
   badge_problemSetter_description: "(U53r ha5 cr3a73d a7 13a57 0n3 pr0b13m.)",
   badge_problemSetter_name: "(Pr0b13m S3773r)",
   badge_pythonCourseGraduate_description: "(Th3 u53r ha5 501v3d m0r3 7han 90% 0f In7r0duc7i0n 70 Py7h0n c0ur53.)",
