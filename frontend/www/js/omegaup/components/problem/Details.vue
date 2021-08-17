@@ -381,7 +381,6 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop() nextSubmissionTimestamp!: null | Date;
   @Prop({ default: false }) shouldShowTabs!: boolean;
-  @Prop({ default: false }) shouldShowRunDetails!: boolean;
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
@@ -645,21 +644,6 @@ export default class ProblemDetails extends Vue {
   onClarificationsChanged(newValue: types.Clarification[]): void {
     if (this.selectedTab === 'clarifications' || newValue.length === 0) return;
     this.hasUnreadClarifications = true;
-  }
-
-  @Watch('shouldShowRunDetails')
-  onShouldShowRunDetailsChanged(newValue: boolean): void {
-    if (newValue && this.guid) {
-      this.$emit('show-run', {
-        request: {
-          guid: this.guid,
-          hash: `#problems/show-run:${this.guid}/`,
-          isAdmin: this.isAdmin,
-          problemAlias: this.currentRunDetailsData?.alias,
-        },
-        target: this,
-      });
-    }
   }
 }
 </script>

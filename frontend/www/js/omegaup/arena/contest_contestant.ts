@@ -87,6 +87,7 @@ OmegaUp.on('ready', () => {
       problems: payload.problems as types.NavbarProblemsetProblem[],
       popupDisplayed: PopupDisplayed.None,
       showNewClarificationPopup: false,
+      shouldShowRunDetails: false,
       guid: null as null | string,
       problemAlias: null as null | string,
       digitsAfterDecimalPoint: 2,
@@ -104,6 +105,7 @@ OmegaUp.on('ready', () => {
           clarifications: clarificationStore.state.clarifications,
           popupDisplayed: this.popupDisplayed,
           showNewClarificationPopup: this.showNewClarificationPopup,
+          shouldShowRunDetails: this.shouldShowRunDetails,
           activeTab,
           guid: this.guid,
           problemAlias: this.problemAlias,
@@ -134,6 +136,7 @@ OmegaUp.on('ready', () => {
             api.Run.details({ run_alias: source.request.guid })
               .then((runDetails) => {
                 showSubmission({ source, runDetails });
+                this.popupDisplayed = PopupDisplayed.RunDetails;
               })
               .catch((error) => {
                 ui.apiError(error);

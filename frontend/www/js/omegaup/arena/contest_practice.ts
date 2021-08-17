@@ -46,6 +46,7 @@ OmegaUp.on('ready', () => {
       guid: null as null | string,
       problemAlias: null as null | string,
       isAdmin: false,
+      shouldShowRunDetails: false,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
@@ -59,6 +60,7 @@ OmegaUp.on('ready', () => {
           clarifications: clarificationStore.state.clarifications,
           popupDisplayed: this.popupDisplayed,
           showNewClarificationPopup: this.showNewClarificationPopup,
+          shouldShowRunDetails: this.shouldShowRunDetails,
           activeTab,
           guid: this.guid,
           problemAlias: this.problemAlias,
@@ -83,6 +85,7 @@ OmegaUp.on('ready', () => {
             api.Run.details({ run_alias: source.request.guid })
               .then((runDetails) => {
                 showSubmission({ source, runDetails });
+                this.popupDisplayed = PopupDisplayed.RunDetails;
               })
               .catch((error) => {
                 ui.apiError(error);

@@ -151,13 +151,13 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop({ default: () => [] }) runs!: types.Run[];
+  @Prop({ default: false }) shouldShowRunDetails!: boolean;
 
   T = T;
   ui = ui;
   currentClarifications = this.clarifications;
   ContestClarificationType = ContestClarificationType;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  shouldShowRunDetails = false;
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;
@@ -209,11 +209,17 @@ export default class ArenaContestPractice extends Vue {
     this.currentClarifications = newValue;
   }
 
-  @Watch('popupDisplayed')
-  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
-    if (newValue === PopupDisplayed.RunDetails) {
-      this.$nextTick(() => {
-        this.shouldShowRunDetails = true;
+  @Watch('shouldShowRunDetails')
+  onShouldShowRunDetailsChanged(newValue: boolean): void {
+    if (newValue && this.guid) {
+      this.$emit('show-run', {
+        request: {
+          guid: this.guid,
+          hash: `#problems/show-run:${this.guid}/`,
+          isAdmin: this.contestAdmin,
+          problemAlias: this.activeProblemAlias,
+        },
+        target: new problem_Details(),
       });
     }
   }

@@ -43,7 +43,10 @@
               :guid="guid"
               :popup-displayed="popupDisplayed"
               :problem-alias="problemAlias"
-              :should-show-run-details="shouldShowRunDetails"
+              @update:activeTab="
+                (selectedTab) =>
+                  $emit('reset-hash', { selectedTab, problemAlias })
+              "
               @submit-run="onRunSubmitted"
               @show-run="onRunDetails"
             >
@@ -138,11 +141,11 @@ export default class ArenaCourse extends Vue {
   @Prop() scoreboard!: types.Scoreboard;
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
+  @Prop({ default: false }) shouldShowRunDetails!: boolean;
 
   T = T;
   currentClarifications = this.clarifications;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  shouldShowRunDetails = false;
   clock = '00:00:00';
 
   get activeProblemAlias(): null | string {
@@ -199,11 +202,17 @@ export default class ArenaCourse extends Vue {
     this.onNavigateToProblem(newValue);
   }
 
-  @Watch('popupDisplayed')
-  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
-    if (newValue === PopupDisplayed.RunDetails) {
-      this.$nextTick(() => {
-        this.shouldShowRunDetails = true;
+  @Watch('shouldShowRunDetails')
+  onShouldShowRunDetailsChanged(newValue: boolean): void {
+    if (newValue && this.guid) {
+      this.$emit('show-run', {
+        request: {
+          guid: this.guid,
+          hash: `#problems/show-run:${this.guid}/`,
+          isAdmin: this.course.is_admin,
+          problemAlias: this.activeProblemAlias,
+        },
+        target: new problem_Details(),
       });
     }
   }

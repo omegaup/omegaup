@@ -43,6 +43,7 @@ OmegaUp.on('ready', () => {
       problemInfo: null as types.ProblemInfo | null,
       problem: null as types.NavbarProblemsetProblem | null,
       popupDisplayed: PopupDisplayed.None,
+      shouldShowRunDetails: false,
       problems: payload.currentAssignment
         .problems as types.NavbarProblemsetProblem[],
       showNewClarificationPopup: false,
@@ -63,6 +64,7 @@ OmegaUp.on('ready', () => {
           scoreboard: payload.scoreboard,
           showNewClarificationPopup: this.showNewClarificationPopup,
           showRanking: payload.showRanking,
+          shouldShowRunDetails: this.shouldShowRunDetails,
           shouldShowFirstAssociatedIdentityRunWarning:
             payload.shouldShowFirstAssociatedIdentityRunWarning,
           activeTab,
@@ -86,6 +88,7 @@ OmegaUp.on('ready', () => {
             api.Run.details({ run_alias: source.request.guid })
               .then((runDetails) => {
                 showSubmission({ source, runDetails });
+                this.popupDisplayed = PopupDisplayed.RunDetails;
               })
               .catch((error) => {
                 ui.apiError(error);
@@ -163,6 +166,15 @@ OmegaUp.on('ready', () => {
           },
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
+          },
+          'reset-hash': ({
+            selectedTab,
+            problemAlias,
+          }: {
+            selectedTab: string;
+            problemAlias: string;
+          }) => {
+            window.location.replace(`#${selectedTab}/${problemAlias}`);
           },
         },
       });

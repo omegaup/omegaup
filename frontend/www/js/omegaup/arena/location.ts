@@ -3,6 +3,7 @@ import { PopupDisplayed } from '../components/problem/Details.vue';
 import clarificationsStore from './clarificationsStore';
 
 export interface LocationOptions {
+  shouldShowRunDetails: boolean;
   problem: types.NavbarProblemsetProblem | null;
   popupDisplayed: PopupDisplayed;
   guid: null | string;
@@ -12,6 +13,7 @@ export interface LocationOptions {
 
 export function getOptionsFromLocation(location: string): LocationOptions {
   const response: LocationOptions = {
+    shouldShowRunDetails: false,
     problem: null,
     popupDisplayed: PopupDisplayed.None,
     guid: null,
@@ -43,7 +45,7 @@ export function getOptionsFromLocation(location: string): LocationOptions {
       } else if (match.groups.popup?.startsWith('show-run')) {
         response.guid = match.groups.popup.split(':')[1];
         response.problemAlias = response.problem.alias;
-        response.popupDisplayed = PopupDisplayed.RunDetails;
+        response.shouldShowRunDetails = true;
       }
       break;
     case 'clarifications':

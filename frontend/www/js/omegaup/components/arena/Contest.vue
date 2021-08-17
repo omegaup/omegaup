@@ -192,13 +192,13 @@ export default class ArenaContest extends Vue {
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: true }) socketConnected!: boolean;
   @Prop({ default: () => [] }) runs!: types.Run[];
+  @Prop({ default: false }) shouldShowRunDetails!: boolean;
 
   T = T;
   ui = ui;
   ContestClarificationType = ContestClarificationType;
   currentClarifications = this.clarifications;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  shouldShowRunDetails = false;
   nextSubmissionTimestamp: Date | null = null;
   now = new Date();
 
@@ -285,11 +285,17 @@ export default class ArenaContest extends Vue {
     this.currentClarifications = newValue;
   }
 
-  @Watch('popupDisplayed')
-  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
-    if (newValue === PopupDisplayed.RunDetails) {
-      this.$nextTick(() => {
-        this.shouldShowRunDetails = true;
+  @Watch('shouldShowRunDetails')
+  onShouldShowRunDetailsChanged(newValue: boolean): void {
+    if (newValue && this.guid) {
+      this.$emit('show-run', {
+        request: {
+          guid: this.guid,
+          hash: `#problems/show-run:${this.guid}/`,
+          isAdmin: this.isAdmin,
+          problemAlias: this.activeProblemAlias,
+        },
+        target: new problem_Details(),
       });
     }
   }
