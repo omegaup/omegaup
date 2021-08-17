@@ -107,6 +107,12 @@
         </tbody>
       </table>
     </div>
+    <div
+      v-if="filteredClarifications.length === 0"
+      class="empty-table-message py-2"
+    >
+      {{ T.clarificationsEmpty }}
+    </div>
     <div v-if="pagerItems" class="card-footer">
       <omegaup-common-paginator
         :pager-items="pagerItems"

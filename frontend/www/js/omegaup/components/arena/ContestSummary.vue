@@ -6,7 +6,7 @@
     <omegaup-markdown
       :markdown="(contest && contest.description) || ''"
     ></omegaup-markdown>
-    <table>
+    <table v-if="contest.finish_time !== null">
       <tr v-if="showDeadlines">
         <td>
           <strong>{{ T.arenaPracticeStartTime }}</strong>
