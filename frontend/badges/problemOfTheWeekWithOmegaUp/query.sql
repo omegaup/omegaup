@@ -18,7 +18,7 @@ INNER JOIN
 INNER JOIN
     Courses c ON c.course_id = a.course_id
 WHERE
-    c.alias = 'ResolviendoProblemas' AND
+    c.alias = 'ResolviendoProblemas2021' AND
     r.verdict = 'AC' AND
     i.user_id IS NOT NULL
 GROUP BY

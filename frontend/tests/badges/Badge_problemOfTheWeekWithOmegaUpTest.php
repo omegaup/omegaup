@@ -22,7 +22,7 @@ class Badge_problemOfTheWeekWithOmegaUpTest extends \OmegaUp\Test\BadgesTestCase
             /*$startTimeDelay=*/ 0,
             /*$courseDuration=*/ 120,
             /*$assignmentDuration=*/ 120,
-            /*$courseAlias=*/ 'ResolviendoProblemas'
+            /*$courseAlias=*/ 'ResolviendoProblemas2021'
         );
         $assignmentAlias = $courseData['assignment_alias'];
 
@@ -32,7 +32,7 @@ class Badge_problemOfTheWeekWithOmegaUpTest extends \OmegaUp\Test\BadgesTestCase
         // Add the problems to the assignment
         \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $login,
-            'ResolviendoProblemas',
+            'ResolviendoProblemas2021',
             $assignmentAlias,
             $problems
         );
