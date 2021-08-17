@@ -144,7 +144,7 @@ const translations: { [key: string]: string; } = {
   coderOfTheMonthFullList: "See full list",
   coderOfTheMonthIsNotInPeriodToBeChosen: "Coder of the month is not in the period to be chosen",
   coderOfTheMonthNotFound: "Coder of the month not found.",
-  coderOfTheMonthNotice: "Hi %(username)! Congratulations for winning the Coder of the Month! We have a prize for you, please contact us at mentores@omegaup.org",
+  coderOfTheMonthNotice: "Hi %(username)! Congratulations for winning the Coder of the Month!",
   coderOfTheMonthSelectedSuccessfully: "Coder of the month has been selected successfully!",
   codersOfTheMonth: "Coders of the Month",
   codersOfTheMonthCountry: "Country / Region",
