@@ -40,11 +40,16 @@ class Badge_problemOfTheWeekWithOmegaUpTest extends \OmegaUp\Test\BadgesTestCase
         // Create students
         $students = [];
         $students[0] = \OmegaUp\Test\Factories\User::createUser();
+        $students[1] = \OmegaUp\Test\Factories\User::createUser();
 
         // Add students to course
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $courseData,
             $students[0]['identity']
+        );
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $students[1]['identity']
         );
 
         // One student solves 1 problem
