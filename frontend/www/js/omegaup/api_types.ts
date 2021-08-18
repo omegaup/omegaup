@@ -307,16 +307,13 @@ export namespace types {
               })(x.scoreboard);
             return x;
           })(x.original);
-        if (x.scoreboard)
-          x.scoreboard = ((x) => {
-            if (x.finish_time)
-              x.finish_time = ((x: number) => new Date(x * 1000))(
-                x.finish_time,
-              );
-            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-            x.time = ((x: number) => new Date(x * 1000))(x.time);
-            return x;
-          })(x.scoreboard);
+        x.scoreboard = ((x) => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.scoreboard);
         if (x.submissionDeadline)
           x.submissionDeadline = ((x: number) => new Date(x * 1000))(
             x.submissionDeadline,
@@ -565,6 +562,79 @@ export namespace types {
     ): types.ContestNewPayload {
       return JSON.parse(
         (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function ContestPracticeDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestPracticeDetailsPayload {
+      return ((x) => {
+        if (x.adminPayload)
+          x.adminPayload = ((x) => {
+            x.allRuns = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.allRuns);
+            x.users = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.access_time)
+                  x.access_time = ((x: number) => new Date(x * 1000))(
+                    x.access_time,
+                  );
+                if (x.end_time)
+                  x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+                return x;
+              });
+            })(x.users);
+            return x;
+          })(x.adminPayload);
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        if (x.original)
+          x.original = ((x) => {
+            if (x.scoreboard)
+              x.scoreboard = ((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              })(x.scoreboard);
+            return x;
+          })(x.original);
+        if (x.submissionDeadline)
+          x.submissionDeadline = ((x: number) => new Date(x * 1000))(
+            x.submissionDeadline,
+          );
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -2014,8 +2084,8 @@ export namespace types {
       scoreboardEvents?: types.ScoreboardEvent[];
     };
     problems: types.NavbarProblemsetProblem[];
-    scoreboard?: types.Scoreboard;
-    scoreboardEvents?: types.ScoreboardEvent[];
+    scoreboard: types.Scoreboard;
+    scoreboardEvents: types.ScoreboardEvent[];
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     submissionDeadline?: Date;
   }
@@ -2101,6 +2171,20 @@ export namespace types {
     last_updated: Date;
     start_time: Date;
     title: string;
+  }
+
+  export interface ContestPracticeDetailsPayload {
+    adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
+    clarifications: types.Clarification[];
+    contest: types.ContestPublicDetails;
+    original?: {
+      contest: dao.Contests;
+      scoreboard?: types.Scoreboard;
+      scoreboardEvents?: types.ScoreboardEvent[];
+    };
+    problems: types.NavbarProblemsetProblem[];
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    submissionDeadline?: Date;
   }
 
   export interface ContestPublicDetails {
