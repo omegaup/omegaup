@@ -2,7 +2,7 @@
   <omegaup-arena
     :active-tab="activeTab"
     :contest-title="currentAssignment.name"
-    :should-show-runs="course.is_admin || course.is_curator"
+    :should-show-runs="isAdmin"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
     <template #socket-status>
@@ -70,19 +70,46 @@
         :last-updated="scoreboard.time"
       ></omegaup-arena-scoreboard>
     </template>
+    <template #arena-runs>
+      <omegaup-arena-runs
+        v-if="isAdmin"
+        :contest-alias="currentAssignment.alias"
+        :runs="allRuns"
+        :show-problem="true"
+        :show-details="true"
+        :show-disqualify="true"
+        :show-pager="true"
+        :show-rejudge="true"
+        :show-user="true"
+        :problemset-problems="Object.values(problems)"
+        :global-runs="false"
+        @details="(run) => onRunDetails(run.guid)"
+        @rejudge="(run) => $emit('rejudge', run)"
+        @disqualify="(run) => $emit('disqualify', run)"
+      ></omegaup-arena-runs>
+      <omegaup-overlay
+        v-if="isAdmin"
+        :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
+        @hide-overlay="onPopupDismissed"
+      >
+        <template #popup>
+          <omegaup-arena-rundetails-popup
+            v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
+            :data="currentRunDetailsData"
+            @dismiss="onPopupDismissed"
+          ></omegaup-arena-rundetails-popup>
+        </template>
+      </omegaup-overlay>
+    </template>
     <template #arena-clarifications>
       <div class="container">
         <omegaup-arena-clarification-list
           :problems="problems"
           :users="users"
           :problem-alias="problems.length != 0 ? problems[0].alias : null"
-          :username="
-            (course.is_admin || course.is_curator) && users.length != 0
-              ? users[0].username
-              : null
-          "
+          :username="isAdmin && users.length != 0 ? users[0].username : null"
           :clarifications="currentClarifications"
-          :is-admin="course.is_admin || course.is_curator"
+          :is-admin="isAdmin"
           :allow-filter-by-assignment="true"
           :show-new-clarification-popup="showNewClarificationPopup"
           @new-clarification="(request) => $emit('new-clarification', request)"
@@ -110,6 +137,9 @@ import T from '../../lang';
 import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
+import arena_Runs from './Runsv2.vue';
+import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
+import omegaup_Overlay from '../Overlay.vue';
 import arena_Scoreboard from './Scoreboard.vue';
 import arena_Summary from './Summary.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
@@ -121,6 +151,9 @@ import { SubmissionRequest } from '../../arena/submissions';
     'omegaup-arena': arena_Arena,
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
+    'omegaup-arena-runs': arena_Runs,
+    'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
+    'omegaup-overlay': omegaup_Overlay,
     'omegaup-arena-scoreboard': arena_Scoreboard,
     'omegaup-arena-summary': arena_Summary,
     'omegaup-problem-details': problem_Details,
@@ -140,13 +173,19 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: false }) showNewClarificationPopup!: boolean;
   @Prop() scoreboard!: types.Scoreboard;
-  @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
+  @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: false }) shouldShowRunDetails!: boolean;
+  @Prop({ default: null }) allRuns!: null | types.Run[];
+  @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
 
   T = T;
+  PopupDisplayed = PopupDisplayed;
+  isAdmin = this.course.is_admin || this.course.is_curator;
   currentClarifications = this.clarifications;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
+  currentRunDetailsData = this.runDetailsData;
+  currentPopupDisplayed = this.popupDisplayed;
   clock = '00:00:00';
 
   get activeProblemAlias(): null | string {
@@ -171,6 +210,11 @@ export default class ArenaCourse extends Vue {
       return T.socketStatusFailed;
     }
     return T.socketStatusWaiting;
+  }
+
+  onPopupDismissed(): void {
+    this.currentPopupDisplayed = PopupDisplayed.None;
+    this.$emit('reset-hash', { selectedTab: 'runs', alias: null });
   }
 
   onNavigateToProblem(problem: types.NavbarProblemsetProblem) {
