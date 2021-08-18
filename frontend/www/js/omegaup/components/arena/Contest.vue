@@ -54,6 +54,7 @@
           ></omegaup-arena-summary>
           <div v-else class="problem main">
             <omegaup-problem-details
+              ref="problem-details"
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :next-submission-timestamp="nextSubmissionTimestamp"
               :languages="contest.languages.split(',')"
@@ -288,7 +289,11 @@ export default class ArenaContest extends Vue {
 
   @Watch('shouldShowRunDetails')
   onShouldShowRunDetailsChanged(newValue: boolean): void {
-    if (newValue && this.guid) {
+    if (!newValue || !this.guid) {
+      return;
+    }
+    this.$nextTick(() => {
+      const problemDetails = this.$refs['problem-details'] as problem_Details;
       this.$emit('show-run', {
         request: {
           guid: this.guid,
@@ -296,9 +301,9 @@ export default class ArenaContest extends Vue {
           isAdmin: this.isAdmin,
           problemAlias: this.activeProblemAlias,
         },
-        target: new problem_Details(),
+        target: problemDetails,
       });
-    }
+    });
   }
 }
 </script>
