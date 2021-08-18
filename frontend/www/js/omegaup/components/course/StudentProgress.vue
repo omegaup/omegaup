@@ -30,6 +30,7 @@
         getPointsByAsssignment(assignment.alias)
       }}</span>
       <div class="d-flex justify-content-center mt-1">
+        <!-- Inicia barra de progreso -->
         <div
           v-if="
             Object.prototype.hasOwnProperty.call(
@@ -49,8 +50,10 @@
             :class="getProblemColor(assignment.alias, problem)"
             data-toggle="tooltip"
             data-placement="bottom"
+            @click="redirectToStudentProgress(assignment.alias, problem)"
           ></div>
         </div>
+        <!-- Termina barra de progreso -->
       </div>
     </td>
   </tr>
@@ -222,6 +225,11 @@ export default class StudentProgress extends Vue {
         progress: this.getProgress(assignmentAlias, problemAlias),
       }),
     );
+  }
+
+  redirectToStudentProgress(assignmentAlias: string, problemAlias: string) {
+    console.log(assignmentAlias + ' / ' + problemAlias);
+    window.location.href = this.studentProgressUrl;
   }
 
   get studentProgressUrl(): string {
