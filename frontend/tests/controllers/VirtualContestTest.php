@@ -44,6 +44,8 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['request']['alias']
         );
 
+        $this->assertNull($originalContest->rerun_id);
+
         // Assert virtual contest
         $this->assertEquals(
             $originalContest->contest_id,

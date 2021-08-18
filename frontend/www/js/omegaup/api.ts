@@ -1042,6 +1042,11 @@ export const Course = {
             return x;
           }
           return x.map((x) => {
+            if (x.feedback)
+              x.feedback = ((x) => {
+                x.date = ((x: number) => new Date(x * 1000))(x.date);
+                return x;
+              })(x.feedback);
             x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           });

@@ -21,9 +21,9 @@
         </thead>
         <tbody class="contest-list">
           <template v-for="contest in page">
-            <tr>
+            <tr :key="contest.alias">
               <td class="">
-                <a :href="`/arena/${contest.alias}/`">
+                <a :href="ui.contestURL(contest)">
                   <span>{{ ui.contestTitle(contest) }}</span>
                   <span
                     v-if="contest.recommended"
@@ -56,7 +56,7 @@
                 </a>
               </td>
               <td v-if="!ui.isVirtual(contest) && showVirtual">
-                <a :href="`/arena/${contest.alias}/virtual/`">
+                <a :href="`/contest/${contest.alias}/virtual/`">
                   <span>{{ T.virtualContest }}</span>
                 </a>
               </td>
@@ -64,7 +64,7 @@
                 {{ contest.last_updated.long() }}
               </td>
             </tr>
-            <tr>
+            <tr :key="`${contest.alias}-description`">
               <td colspan="5">
                 {{ contest.description }}
               </td>
