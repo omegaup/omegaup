@@ -67,6 +67,7 @@ class Groups {
         ?string $name = null,
         ?string $description = null,
         ?string $alias = null,
+        ?int $numberOfContestants = null,
         ?\OmegaUp\Test\ScopedLoginToken $login = null
     ) {
         if (is_null($owner)) {
@@ -87,6 +88,10 @@ class Groups {
             $alias = \OmegaUp\Test\Utils::createRandomString();
         }
 
+        if (is_null($numberOfContestants)) {
+            $numberOfContestants = \OmegaUp\Controllers\TeamsGroup::NUMBER_OF_CONTESTANTS;
+        }
+
         if (is_null($login)) {
             $login = \OmegaUp\Test\ControllerTestCase::login($owner);
         }
@@ -97,6 +102,7 @@ class Groups {
                 'alias' => $alias,
                 'name' => $name,
                 'description' => $description,
+                'numberOfContestants' => $numberOfContestants,
             ])
         );
 

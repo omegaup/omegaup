@@ -435,9 +435,7 @@ class Request extends \ArrayObject {
         $this->user = null;
         $this->identity = null;
         $this->loginIdentity = null;
-        $session = \OmegaUp\Controllers\Session::getCurrentSession(
-            $this
-        );
+        $session = \OmegaUp\Controllers\Session::getCurrentSession($this);
         if (is_null($session['identity'])) {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
         }

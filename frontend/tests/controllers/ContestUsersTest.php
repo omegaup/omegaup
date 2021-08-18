@@ -182,8 +182,8 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['smartyProperties']['payload'];
 
-        // Users list should be empty
-        $this->assertEmpty($contestDetails['users']);
+        // adminPayload object should not exist
+        $this->assertArrayNotHasKey('adminPayload', $contestDetails);
     }
 
     public function testContestParticipantsReport() {

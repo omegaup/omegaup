@@ -123,6 +123,10 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
+        // The admin is also going to send runs that should not be present
+        // in the scoreboard events
+        $students[] = $courseData['admin'];
+
         // Generate runs
         $expectedScores = \OmegaUp\Test\Factories\Course::submitRunsToAssignmentsInCourse(
             $courseData,
@@ -133,7 +137,7 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Call API
         $response = \OmegaUp\Controllers\Problemset::apiScoreboardEvents(new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
+            'auth_token' => self::login($courseData['admin'])->auth_token,
             'problemset_id' => $courseData['problemset_id'],
         ]));
 
@@ -141,6 +145,12 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
         foreach ($response['events'] as $runData) {
             $results[$runData['username']][$courseData['assignment_alias']][$runData['problem']['alias']] = $runData['problem']['points'];
         }
+
+        // Now remove again the admin from students before making assertions
+        array_pop($students);
+
+        // Admin should not be in the results
+        $this->assertCount($studentsInCourse, $results);
 
         // From the map above, there are 9 meaningful combinations for events
         $this->assertNotEmpty($response['events']);

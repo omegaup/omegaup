@@ -48,6 +48,7 @@
           :name="name"
           :alias="alias"
           :description="description"
+          :number-of-contestants="numberOfContestants"
           @update-teams-group="
             (request) => $emit('update-teams-group', request)
           "
@@ -130,6 +131,7 @@ export default class TeamsGroupEdit extends Vue {
   @Prop() alias!: string;
   @Prop() name!: string;
   @Prop() description!: string;
+  @Prop() numberOfContestants!: number;
   @Prop() countries!: dao.Countries[];
   @Prop() isOrganizer!: boolean;
   @Prop() tab!: AvailableTabs;

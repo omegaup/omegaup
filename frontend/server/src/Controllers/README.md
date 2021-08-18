@@ -3937,11 +3937,12 @@ New team group
 
 ### Parameters
 
-| Name          | Type     | Description |
-| ------------- | -------- | ----------- |
-| `alias`       | `string` |             |
-| `description` | `string` |             |
-| `name`        | `string` |             |
+| Name                  | Type        | Description |
+| --------------------- | ----------- | ----------- |
+| `alias`               | `string`    |             |
+| `description`         | `string`    |             |
+| `name`                | `string`    |             |
+| `numberOfContestants` | `int\|null` |             |
 
 ### Returns
 
@@ -4066,11 +4067,12 @@ Update an existing teams group
 
 ### Parameters
 
-| Name          | Type     | Description |
-| ------------- | -------- | ----------- |
-| `alias`       | `string` |             |
-| `description` | `string` |             |
-| `name`        | `string` |             |
+| Name                  | Type        | Description |
+| --------------------- | ----------- | ----------- |
+| `alias`               | `string`    |             |
+| `description`         | `string`    |             |
+| `name`                | `string`    |             |
+| `numberOfContestants` | `int\|null` |             |
 
 ### Returns
 

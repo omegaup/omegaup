@@ -93,7 +93,7 @@
                   :value="contest.alias"
                 />
                 <div class="d-inline-block ml-2">
-                  <a class="mr-1" :href="`/arena/${contest.alias}/`">{{
+                  <a class="mr-1" :href="ui.contestURL(contest)">{{
                     ui.contestTitle(contest)
                   }}</a>
                 </div>
