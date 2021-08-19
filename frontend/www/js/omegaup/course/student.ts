@@ -3,6 +3,7 @@ import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
+import T from '../lang';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
@@ -27,6 +28,23 @@ OmegaUp.on('ready', () => {
     data: () => ({
       problems: [] as types.CourseProblem[],
     }),
+    methods: {
+      refreshStudentProgress: (
+        student: string,
+        assignmentAlias: string,
+      ): void => {
+        if (assignmentAlias == null) return;
+        api.Course.studentProgress({
+          course_alias: payload.course.alias,
+          assignment_alias: assignmentAlias,
+          usernameOrEmail: student,
+        })
+          .then((data) => {
+            viewStudent.problems = data.problems;
+          })
+          .catch(ui.apiError);
+      },
+    },
     render: function (createElement) {
       return createElement('omegaup-course-viewstudent', {
         props: {
@@ -37,17 +55,59 @@ OmegaUp.on('ready', () => {
           students: payload.students,
         },
         on: {
-          update: (student: types.StudentProgress, assignmentAlias: string) => {
-            if (assignmentAlias == null) return;
-            api.Course.studentProgress({
+          'set-feedback': ({
+            guid,
+            feedback,
+            isUpdate,
+            assignmentAlias,
+            studentUsername,
+          }: {
+            guid: string;
+            feedback: string;
+            isUpdate: boolean;
+            assignmentAlias: string;
+            studentUsername: string;
+          }) => {
+            console.log({
+              guid,
+              feedback,
+              isUpdate,
+              assignmentAlias,
+              studentUsername,
+            });
+            api.Submission.setFeedback({
+              guid,
               course_alias: payload.course.alias,
               assignment_alias: assignmentAlias,
-              usernameOrEmail: student.username,
+              feedback,
             })
-              .then((data) => {
-                viewStudent.problems = data.problems;
+              .then(() => {
+                ui.success(
+                  isUpdate
+                    ? T.feedbackSuccesfullyUpdated
+                    : T.feedbackSuccesfullyAdded,
+                );
+                viewStudent.refreshStudentProgress(
+                  studentUsername,
+                  assignmentAlias,
+                );
+                api.Course.studentProgress({
+                  course_alias: payload.course.alias,
+                  assignment_alias: assignmentAlias,
+                  usernameOrEmail: studentUsername,
+                })
+                  .then((data) => {
+                    viewStudent.problems = data.problems;
+                  })
+                  .catch(ui.apiError);
               })
-              .catch(ui.apiError);
+              .catch(ui.error);
+          },
+          update: (student: types.StudentProgress, assignmentAlias: string) => {
+            viewStudent.refreshStudentProgress(
+              student.username,
+              assignmentAlias,
+            );
           },
         },
       });

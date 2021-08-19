@@ -448,7 +448,7 @@ const translations: { [key: string]: string; } = {
   emailNotVerified: "Tu direcci\u00f3n de correo a\u00fan no ha sido verificada. Busca el correo de verificaci\u00f3n en tu bandeja de entrada o de spam. Si sigues teniendo problemas, escribe a omegaup-soporte@googlegroups.com para obtener ayuda.",
   enterContest: "Entrar al concurso",
   errorWhileSendingMail: "Hubo un problema al enviar el correo de verificaci\u00f3n. Por favor intenta m\u00e1s tarde o escribe a omegaup-soporte@googlegroups.com para obtener ayuda. Tu direcci\u00f3n de correo a\u00fan no ha sido verificada.",
-  feedbackLeftBy: "Retroalimentaci\u00f3n dejada por:",
+  feedbackLeftBy: "Retroalimentaci\u00f3n dejada el d\u00eda %(date), por:",
   feedbackNotSentYet: "A\u00fan no se ha enviado la retroalimentaci\u00f3n para este env\u00edo.",
   feedbackSuccesfullyAdded: "La retroalimentaci\u00f3n se agreg\u00f3 correctamente.",
   feedbackSuccesfullyUpdated: "La retroalimentaci\u00f3n se actualiz\u00f3 correctamente.",
