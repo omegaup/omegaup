@@ -275,7 +275,10 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // User joins the contest 1 hour and 50 minutes after it starts
         $updatedTime = $originalTime + 110 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        \OmegaUp\Test\Factories\Contest::openContest($contest, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contest['contest'],
+            $identity
+        );
         \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $contest,
             $problem,
