@@ -114,7 +114,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -138,6 +138,7 @@ import { SubmissionRequest } from '../../arena/submissions';
   },
 })
 export default class ArenaContestPractice extends Vue {
+  @Ref('problem-details') readonly problemDetails!: Vue;
   @Prop() contest!: types.ContestPublicDetails;
   @Prop() contestAdmin!: boolean;
   @Prop() problems!: types.NavbarProblemsetProblem[];
@@ -216,7 +217,6 @@ export default class ArenaContestPractice extends Vue {
       return;
     }
     this.$nextTick(() => {
-      const problemDetails = this.$refs['problem-details'] as problem_Details;
       this.$emit('show-run', {
         request: {
           guid: this.guid,
@@ -224,7 +224,7 @@ export default class ArenaContestPractice extends Vue {
           isAdmin: this.contestAdmin,
           problemAlias: this.activeProblemAlias,
         },
-        target: problemDetails,
+        target: this.problemDetails,
       });
     });
   }
