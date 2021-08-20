@@ -43,6 +43,7 @@ describe('ViewStudent.vue', () => {
         ],
         problems: [
           {
+            accepted: 1,
             alias: 'problem',
             commit: '',
             letter: 'A',
@@ -50,12 +51,19 @@ describe('ViewStudent.vue', () => {
             points: 1,
             runs: [
               {
+                guid: 'guid',
+                language: 'cpp',
+                memory: 200,
                 penalty: 0,
                 score: 1,
+                status: 'ready',
+                runtime: 1,
+                submit_delay: 1,
                 source: 'print(3)',
                 time: expectedDate,
                 verdict: 'AC',
-              } as omegaup.CourseProblemRun,
+                feedback: undefined,
+              } as types.CourseRun,
             ],
             submissions: 1,
             title: 'problem_1',
@@ -93,5 +101,7 @@ describe('ViewStudent.vue', () => {
     expect(wrapper.find('table tbody td').text()).toBe(
       expectedDate.toLocaleString(T.locale),
     );
+
+    expect(wrapper.text()).toContain(T.feedbackNotSentYet);
   });
 });

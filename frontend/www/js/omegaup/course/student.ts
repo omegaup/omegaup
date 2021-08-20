@@ -68,13 +68,6 @@ OmegaUp.on('ready', () => {
             assignmentAlias: string;
             studentUsername: string;
           }) => {
-            console.log({
-              guid,
-              feedback,
-              isUpdate,
-              assignmentAlias,
-              studentUsername,
-            });
             api.Submission.setFeedback({
               guid,
               course_alias: payload.course.alias,
