@@ -147,7 +147,7 @@
                   </div>
                 </div>
               </template>
-              <h5 class="card-title m-2">
+              <h5 class="card-title mt-3 mb-2">
                 {{ T.wordsSubmissions }}
               </h5>
               <table class="table table-hover student-runs-table">
@@ -166,6 +166,7 @@
                       'table-active':
                         selectedRun && run.guid === selectedRun.guid,
                     }"
+                    :data-run-guid="run.guid"
                     @click="selectedRun = run"
                   >
                     <td class="text-center">

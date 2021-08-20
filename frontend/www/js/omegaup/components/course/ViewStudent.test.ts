@@ -102,6 +102,7 @@ describe('ViewStudent.vue', () => {
       expectedDate.toLocaleString(T.locale),
     );
 
+    await wrapper.find('tr[data-run-guid="guid"]').trigger('click');
     expect(wrapper.text()).toContain(T.feedbackNotSentYet);
   });
 });
