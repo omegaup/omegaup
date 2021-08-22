@@ -158,7 +158,7 @@
               <td>
                 <a
                   class="text-center"
-                  :href="`/course/${course.alias}/assignment/${assignment.alias}`"
+                  :href="`/course/${course.alias}/assignment/${assignment.alias}/`"
                 >
                   {{ assignment.name }}
                 </a>
