@@ -1,4 +1,4 @@
 ALTER TABLE
-    Problemset_Problems
+    `Problemset_Problems`
 ADD COLUMN
-    `is_extra_problem` TINYINT(1) NOT NULL DEFAULT '0';
+    `is_extra_problem` tinyint(1) NOT NULL DEFAULT '0';
