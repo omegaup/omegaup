@@ -207,4 +207,69 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             $details['smartyProperties']['payload']
         );
     }
+
+    public function testGetAssignmentDetails() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+
+        // Create a problem, a student and a run
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $adminLogin = self::login($courseData['admin']);
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $adminLogin,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [ $problemData ]
+        );
+
+        $student = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student['identity']
+        );
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+                $problemData,
+                $courseData,
+                $student['identity']
+            )
+        );
+
+        $adminPayload = \OmegaUp\Controllers\Course::getAssignmentDetailsForTypeScript(
+            $courseData['admin'],
+            $courseData['course'],
+            \OmegaUp\DAO\Groups::getByPK(
+                $courseData['course']->group_id
+            ),
+            $courseData['assignment']->alias
+        )['smartyProperties']['payload'];
+
+        $this->assertEquals(
+            $courseData['course']->name,
+            $adminPayload['courseDetails']['name']
+        );
+        $this->assertEmpty($adminPayload['courseDetails']['clarifications']);
+
+        $this->assertEquals(
+            $courseData['assignment']->alias,
+            $adminPayload['currentAssignment']['alias']
+        );
+        $this->assertCount(1, $adminPayload['currentAssignment']['problems']);
+        $this->assertCount(1, $adminPayload['currentAssignment']['runs']);
+
+        $studentPayload = \OmegaUp\Controllers\Course::getAssignmentDetailsForTypeScript(
+            $student['identity'],
+            $courseData['course'],
+            \OmegaUp\DAO\Groups::getByPK(
+                $courseData['course']->group_id
+            ),
+            $courseData['assignment']->alias
+        )['smartyProperties']['payload'];
+
+        // The student should not see the runs
+        $this->assertEmpty($studentPayload['currentAssignment']['runs']);
+    }
 }

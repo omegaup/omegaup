@@ -6,26 +6,23 @@ import arena_Course from './Course.vue';
 import { types } from '../../api_types';
 
 describe('Course.vue', () => {
-  const currentAssignment: types.CourseAssignment = {
+  const currentAssignment: types.ArenaAssignment = {
     alias: 'Tarea de prueba',
     assignment_type: 'homework',
     description: 'Descripción de la tarea de prueba',
+    director: 'Director',
     finish_time: new Date(),
     name: 'Tarea de prueba',
     start_time: new Date(),
-    has_runs: true,
-    max_points: 100,
-    order: 1,
-    problemset_id: 1,
-    scoreboard_url: '',
-    scoreboard_url_admin: '',
+    problems: [],
+    runs: [],
   };
 
   const course: types.CourseDetails = {
     admission_mode: 'registration',
     alias: 'test-course',
     archived: false,
-    assignments: [currentAssignment],
+    assignments: [],
     clarifications: [],
     needs_basic_information: false,
     description: '# Test',

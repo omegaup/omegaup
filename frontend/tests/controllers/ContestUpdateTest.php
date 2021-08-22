@@ -213,7 +213,10 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Our contestant has to open the contest before sending a run
-        \OmegaUp\Test\Factories\Contest::openContest($contestData, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contestData['contest'],
+            $identity
+        );
 
         // Then we need to open the problem
         \OmegaUp\Test\Factories\Contest::openProblemInContest(
@@ -347,7 +350,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
             // The problem is opened 5 minutes after contest starts.
             \OmegaUp\Test\Factories\Contest::openContest(
-                $contestData,
+                $contestData['contest'],
                 $identity
             );
             \OmegaUp\Test\Factories\Contest::openProblemInContest(
@@ -693,7 +696,10 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // User joins the contest 4 hours and 50 minutes after it starts
         $updatedTime = $originalTime->time + 290 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        \OmegaUp\Test\Factories\Contest::openContest($contest, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contest['contest'],
+            $identity
+        );
         $directorLogin = self::login($contest['director']);
 
         // Update window_length
@@ -757,7 +763,10 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Contest::addUser($contest, $identity);
 
         // User joins contest immediatly it was created
-        \OmegaUp\Test\Factories\Contest::openContest($contest, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contest['contest'],
+            $identity
+        );
 
         $directorLogin = self::login($contest['director']);
 
@@ -833,7 +842,10 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // User joins the contest 4 hours and 30 minutes after it starts
         $updatedTime = $originalTime + 270 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        \OmegaUp\Test\Factories\Contest::openContest($contest, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contest['contest'],
+            $identity
+        );
         \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $contest,
             $problem,
@@ -905,7 +917,10 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // User joins the contest 10 minutes after it starts
         $updatedTime = $originalTime + 10 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        \OmegaUp\Test\Factories\Contest::openContest($contest, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contest['contest'],
+            $identity
+        );
         \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $contest,
             $problem,
