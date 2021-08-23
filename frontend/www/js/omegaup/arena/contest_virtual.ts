@@ -50,7 +50,7 @@ OmegaUp.on('ready', () => {
     virtualContestRefreshInterval: ReturnType<typeof setInterval> | null;
     problems: types.NavbarProblemsetProblem[];
     contest: types.ContestPublicDetails;
-    originalContest: dao.Contests;
+    originalContest: dao.Contests | null;
     currentUsername: string;
   }): void {
     api.Problemset.scoreboard({
@@ -58,7 +58,7 @@ OmegaUp.on('ready', () => {
     })
       .then((scoreboard) => {
         api.Problemset.scoreboardEvents({
-          problemset_id: originalContest.problemset_id,
+          problemset_id: originalContest?.problemset_id,
         })
           .then((response) => {
             onVirtualRankingChanged({
@@ -96,7 +96,7 @@ OmegaUp.on('ready', () => {
         virtualContestRefreshInterval,
         problems: payload.problems,
         contest: payload.contest,
-        originalContest: payload.original.contest,
+        originalContest: payload.original?.contest ?? null,
         currentUsername: commonPayload.currentUsername,
       });
     }, refreshTime);
@@ -120,9 +120,9 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-arena-contest', {
         props: {
           contest: payload.contest,
-          contestAdmin: payload.contestAdmin,
+          contestAdmin: Boolean(payload.adminPayload),
           problems: this.problems,
-          users: payload.users,
+          users: payload.adminPayload?.users,
           problemInfo: this.problemInfo,
           problem: this.problem,
           clarifications: clarificationStore.state.clarifications,
