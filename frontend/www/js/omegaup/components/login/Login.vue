@@ -13,7 +13,11 @@
               <div id="google-signin" :title="T.loginWithGoogle"></div>
               <!-- id-lint on -->
             </div>
-            <div class="col-xs-12 col-sm-4 text-center py-2">
+            <!-- hidden until privacy policy updated -->
+            <div
+              class="col-xs-12 col-sm-4 text-center py-2"
+              style="display: none"
+            >
               <a :href="facebookUrl" :title="T.loginWithFacebook">
                 <img src="/css/fb-oauth.png" height="45px" width="45px" />
               </a>
