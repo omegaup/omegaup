@@ -45,6 +45,13 @@
               :should-show-run-details="shouldShowRunDetails"
               @submit-run="onRunSubmitted"
               @show-run="(source) => $emit('show-run', source)"
+              @update:activeTab="
+                (selectedTab) =>
+                  $emit('reset-hash', {
+                    selectedTab,
+                    alias: activeProblemAlias,
+                  })
+              "
             >
               <template #quality-nomination-buttons>
                 <div></div>
