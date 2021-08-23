@@ -615,7 +615,7 @@ export class Arena {
           start_time: new Date(),
           finish_time: null,
           window_length: 0,
-          rerun_id: 0,
+          rerun_id: null,
           title: '',
           director: '',
         },
@@ -1980,7 +1980,10 @@ export class Arena {
                 return;
               }
               result.cases.push(basename);
-              result.promises.push(zip.file(zipEntry.name).async('text'));
+              const zipFile = zip.file(zipEntry.name);
+              if (zipFile) {
+                result.promises.push(zipFile.async('text'));
+              }
             });
             return result;
           })

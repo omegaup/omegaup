@@ -1090,7 +1090,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         \OmegaUp\Test\Factories\Contest::openContest(
-            $contestData,
+            $contestData['contest'],
             $identities[0]
         );
         \OmegaUp\Test\Factories\Contest::openProblemInContest(

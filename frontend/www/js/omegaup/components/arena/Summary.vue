@@ -2,7 +2,10 @@
   <div class="summary main">
     <h1>{{ title }}</h1>
     <omegaup-markdown :markdown="eventDescription"></omegaup-markdown>
-    <table class="table table-bordered mx-auto w-50 mb-0">
+    <table
+      v-if="finishTime !== null"
+      class="table table-bordered mx-auto w-50 mb-0"
+    >
       <tr v-if="showDeadlines">
         <td>
           <strong>{{ T.arenaPracticeStartTime }}</strong>

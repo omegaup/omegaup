@@ -48,4 +48,13 @@ describe('ClarificationList.vue', () => {
     });
     expect(wrapper.text()).toContain(clarifications[0].assignment_alias);
   });
+
+  it('Should handle empty clarifications', async () => {
+    const wrapper = mount(arena_ClarificationList, {
+      propsData: {
+        clarifications: [],
+      },
+    });
+    expect(wrapper.text()).toContain(T.clarificationsEmpty);
+  });
 });
