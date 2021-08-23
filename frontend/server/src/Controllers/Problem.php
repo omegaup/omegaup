@@ -4278,7 +4278,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'TimeLimit' => '30s',
                 ];
             }
-            $problemSettings['Validator']['Limits']['TimeLimit'] = "{$params->validatorTimeLimit}ms";
+            if (!is_null($params->validatorTimeLimit)) {
+                $problemSettings['Validator']['Limits']['TimeLimit'] = "{$params->validatorTimeLimit}ms";
+            }
         } else {
             if (!empty($problemSettings['Validator']['Limits'])) {
                 unset($problemSettings['Validator']['Limits']);
