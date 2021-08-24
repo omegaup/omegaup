@@ -8,9 +8,7 @@ import Vue from 'vue';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.StudentProgressPayload();
 
-  const match = /#(?<alias>[^/]+)?/g.exec(
-    window.location.hash,
-  );
+  const match = /#(?<alias>[^/]+)?/g.exec(window.location.hash);
   const selectedProblem = match?.groups?.alias;
 
   const initialStudent = payload.students.find(
