@@ -23,17 +23,17 @@
         </div>
       </div>
 
-      <div v-if="profile.email || !profile.is_private">
-        <div class="form-group row padding-field">
-          <div class="col-sm-3">
-            <strong>{{ T.profileEmail }}</strong>
-          </div>
-          <div class="col-sm-9 field-data">
-            Primary: <strong data-email> {{ profile.email }}</strong
-            >&nbsp;
-          </div>
+      <div v-if="profile.email" class="form-group row padding-field">
+        <div class="col-sm-3">
+          <strong>{{ T.profileEmail }}</strong>
         </div>
+        <div class="col-sm-9 field-data">
+          Primary: <strong data-email> {{ profile.email }}</strong
+          >&nbsp;
+        </div>
+      </div>
 
+      <div v-if="profile.email || !profile.is_private">
         <div class="form-group row padding-field">
           <div class="col-sm-3">
             <strong>{{ T.profileCountry }}</strong>
