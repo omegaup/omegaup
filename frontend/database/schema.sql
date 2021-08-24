@@ -277,6 +277,7 @@ CREATE TABLE `Courses` (
   `course_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `description` tinytext NOT NULL,
+  `objective` tinytext,
   `alias` varchar(32) NOT NULL,
   `group_id` int NOT NULL,
   `acl_id` int NOT NULL,
