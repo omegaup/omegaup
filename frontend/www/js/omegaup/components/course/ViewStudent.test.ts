@@ -1,6 +1,8 @@
 import { mount, shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
+import * as ui from '../../ui';
+import * as time from '../../time';
 import { omegaup } from '../../omegaup';
 import type { types } from '../../api_types';
 
@@ -20,6 +22,13 @@ describe('ViewStudent.vue', () => {
     expect(wrapper.text()).toContain(T.courseStudentSelectStudent);
     expect(wrapper.text()).toContain(T.courseStudentSelectAssignment);
   });
+
+  const submissionFeedback = {
+    author: 'omegaUp',
+    author_classname: 'user-rank-unranked',
+    date: new Date(),
+    feedback: 'Test feedback',
+  } as types.SubmissionFeedback;
 
   it('Should handle runs', async () => {
     const expectedDate = new Date('1/1/2020, 12:00:00 AM');
@@ -51,7 +60,7 @@ describe('ViewStudent.vue', () => {
             points: 1,
             runs: [
               {
-                guid: 'guid',
+                guid: 'guid-1',
                 language: 'cpp',
                 memory: 200,
                 penalty: 0,
@@ -62,7 +71,20 @@ describe('ViewStudent.vue', () => {
                 source: 'print(3)',
                 time: expectedDate,
                 verdict: 'AC',
-                feedback: undefined,
+              } as types.CourseRun,
+              {
+                guid: 'guid-2',
+                language: 'cpp',
+                memory: 200,
+                penalty: 0,
+                score: 1,
+                status: 'ready',
+                runtime: 1,
+                submit_delay: 1,
+                source: 'print(3)',
+                time: expectedDate,
+                verdict: 'AC',
+                feedback: submissionFeedback,
               } as types.CourseRun,
             ],
             submissions: 1,
@@ -102,7 +124,19 @@ describe('ViewStudent.vue', () => {
       expectedDate.toLocaleString(T.locale),
     );
 
-    await wrapper.find('tr[data-run-guid="guid"]').trigger('click');
+    await wrapper.find('tr[data-run-guid="guid-1"]').trigger('click');
     expect(wrapper.text()).toContain(T.feedbackNotSentYet);
+    await wrapper.find('a[data-show-feedback-form]').trigger('click');
+    expect(wrapper.find('button[data-feedback-button]').element).toBeDisabled();
+    await wrapper.find('textarea').setValue('Test feedback');
+    expect(wrapper.find('button[data-feedback-button]').element).toBeEnabled();
+
+    await wrapper.find('tr[data-run-guid="guid-2"]').trigger('click');
+    expect(wrapper.text()).toContain(submissionFeedback.feedback);
+    expect(wrapper.text()).toContain(
+      ui.formatString(T.feedbackLeftBy, {
+        date: time.formatDate(submissionFeedback.date),
+      }),
+    );
   });
 });

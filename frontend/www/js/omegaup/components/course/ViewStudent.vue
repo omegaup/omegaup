@@ -119,6 +119,7 @@
                 <div class="mt-3">
                   <a
                     role="button"
+                    data-show-feedback-form
                     @click="showFeedbackForm = !showFeedbackForm"
                     >{{
                       selectedRun.feedback === null
@@ -135,6 +136,7 @@
                     ></textarea>
                     <button
                       class="btn btn-sm btn-primary mt-1"
+                      data-feedback-button
                       :disabled="!feedback || feedback.length < 2"
                       @click.prevent="sendFeedback"
                     >
