@@ -1352,6 +1352,23 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.course);
+        x.problems = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.runs = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.runs);
+            return x;
+          });
+        })(x.problems);
         return x;
       })(
         JSON.parse(
@@ -3277,7 +3294,9 @@ export namespace types {
   }
 
   export interface StudentProgressPayload {
+    assignment: string;
     course: types.CourseDetails;
+    problems: types.CourseProblem[];
     student: string;
     students: types.StudentProgress[];
   }

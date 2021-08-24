@@ -41,7 +41,7 @@
           class="d-flex"
           :class="{ invisible: points(assignment.alias) === 0 }"
         >
-          <div
+          <a
             v-for="(problem, index) in Object.keys(
               student.points[assignment.alias],
             )"
@@ -50,8 +50,14 @@
             :class="getProblemColor(assignment.alias, problem)"
             data-toggle="tooltip"
             data-placement="bottom"
-            @click="redirectToStudentProgress(assignment.alias, problem)"
-          ></div>
+            :href="
+              getStudentProgressUrlWithAssignmentAndProblem(
+                assignment.alias,
+                problem,
+              )
+            "
+          >
+          </a>
         </div>
         <!-- Termina barra de progreso -->
       </div>
@@ -227,13 +233,15 @@ export default class StudentProgress extends Vue {
     );
   }
 
-  redirectToStudentProgress(assignmentAlias: string, problemAlias: string) {
-    console.log(assignmentAlias + ' / ' + problemAlias);
-    window.location.href = this.studentProgressUrl;
-  }
-
   get studentProgressUrl(): string {
     return `/course/${this.course.alias}/student/${this.student.username}/`;
+  }
+
+  getStudentProgressUrlWithAssignmentAndProblem(
+    selectedAssignment: string,
+    selectedProblem: string,
+  ): string {
+    return `/course/${this.course.alias}/student/${this.student.username}/${selectedAssignment}/#${selectedProblem}`;
   }
 }
 </script>
