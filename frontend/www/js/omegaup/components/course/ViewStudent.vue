@@ -97,7 +97,7 @@
                 <h5>{{ T.feedbackTitle }}</h5>
                 <pre
                   class="border rounded rounded-lg p-2 m-0"
-                  :class="{ 'bg-light': selectedRun.feedback === null }"
+                  :class="{ 'bg-light': selectedRun.feedback == null }"
                   >{{
                     selectedRun.feedback
                       ? selectedRun.feedback.feedback
@@ -122,7 +122,7 @@
                     data-show-feedback-form
                     @click="showFeedbackForm = !showFeedbackForm"
                     >{{
-                      selectedRun.feedback === null
+                      selectedRun.feedback == null
                         ? T.submissionFeedbackSendButton
                         : T.submissionFeedbackUpdateButton
                     }}</a
@@ -141,7 +141,7 @@
                       @click.prevent="sendFeedback"
                     >
                       {{
-                        selectedRun.feedback === null
+                        selectedRun.feedback == null
                           ? T.submissionSendFeedback
                           : T.submissionUpdateFeedback
                       }}
@@ -285,7 +285,7 @@ export default class CourseViewStudent extends Vue {
     this.$emit('set-feedback', {
       guid: this.selectedRun?.guid,
       feedback: this.feedback,
-      isUpdate: this.selectedRun?.feedback !== null,
+      isUpdate: this.selectedRun?.feedback != null,
       assignmentAlias: this.selectedAssignment,
       studentUsername: this.selectedStudent.username,
     });

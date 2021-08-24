@@ -30,6 +30,26 @@ describe('ViewStudent.vue', () => {
     feedback: 'Test feedback',
   } as types.SubmissionFeedback;
 
+  const assignment = {
+    alias: 'assignment',
+    assignment_type: 'homework',
+    description: 'Assignment description',
+    start_time: new Date(0),
+    finish_time: new Date(),
+    name: 'Assignment',
+    order: 1,
+    scoreboard_url: '',
+    scoreboard_url_admin: '',
+  } as omegaup.Assignment;
+
+  const student = {
+    name: 'student',
+    username: 'student',
+    progress: {
+      problem: 1,
+    },
+  } as types.CourseStudent;
+
   it('Should handle runs', async () => {
     const expectedDate = new Date('1/1/2020, 12:00:00 AM');
     const wrapper = mount(course_ViewStudent, {
@@ -37,19 +57,7 @@ describe('ViewStudent.vue', () => {
         course: {
           alias: 'hello',
         },
-        assignments: [
-          {
-            alias: 'assignment',
-            assignment_type: 'homework',
-            description: 'Assignment description',
-            start_time: new Date(0),
-            finish_time: new Date(),
-            name: 'Assignment',
-            order: 1,
-            scoreboard_url: '',
-            scoreboard_url_admin: '',
-          } as omegaup.Assignment,
-        ],
+        assignments: [assignment],
         problems: [
           {
             accepted: 1,
@@ -92,22 +100,8 @@ describe('ViewStudent.vue', () => {
             visits: 1,
           } as types.CourseProblem,
         ],
-        students: [
-          {
-            name: 'student',
-            username: 'student',
-            progress: {
-              problem: 1,
-            },
-          } as types.CourseStudent,
-        ],
-        initialStudent: {
-          name: 'student',
-          username: 'student',
-          progress: {
-            problem: 1,
-          },
-        } as types.CourseStudent,
+        students: [student],
+        initialStudent: student,
       },
     });
 
@@ -126,10 +120,25 @@ describe('ViewStudent.vue', () => {
 
     await wrapper.find('tr[data-run-guid="guid-1"]').trigger('click');
     expect(wrapper.text()).toContain(T.feedbackNotSentYet);
+
     await wrapper.find('a[data-show-feedback-form]').trigger('click');
     expect(wrapper.find('button[data-feedback-button]').element).toBeDisabled();
-    await wrapper.find('textarea').setValue('Test feedback');
+
+    await wrapper.find('textarea').setValue(submissionFeedback.feedback);
     expect(wrapper.find('button[data-feedback-button]').element).toBeEnabled();
+    wrapper.find('button[data-feedback-button]').trigger('click');
+    expect(wrapper.emitted('set-feedback')).toBeDefined();
+    expect(wrapper.emitted('set-feedback')).toEqual([
+      [
+        {
+          guid: 'guid-1',
+          feedback: submissionFeedback.feedback,
+          isUpdate: false,
+          assignmentAlias: assignment.alias,
+          studentUsername: student.username,
+        },
+      ],
+    ]);
 
     await wrapper.find('tr[data-run-guid="guid-2"]').trigger('click');
     expect(wrapper.text()).toContain(submissionFeedback.feedback);
