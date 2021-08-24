@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <div v-if="profile.email">
+      <div v-if="profile.email || !profile.is_private">
         <div class="form-group row padding-field">
           <div class="col-sm-3">
             <strong>{{ T.profileEmail }}</strong>

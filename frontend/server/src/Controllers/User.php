@@ -1424,12 +1424,18 @@ class User extends \OmegaUp\Controllers\Controller {
                 'Identity'
             );
         }
-        return self::getUserProfile(
+
+        $userProfile = self::getUserProfile(
             $r->identity,
             $identity,
             $r->ensureOptionalBool('omit_rank') ?? false,
             $category
         );
+
+        // avoid divulging the birth date and gender in the response.
+        unset($userProfile['birth_date']);
+        unset($userProfile['gender']);
+        return $userProfile;
     }
 
     /**
