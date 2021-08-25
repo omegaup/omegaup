@@ -30,7 +30,6 @@
         getPointsByAsssignment(assignment.alias)
       }}</span>
       <div class="d-flex justify-content-center mt-1">
-        <!-- Inicia barra de progreso -->
         <div
           v-if="
             Object.prototype.hasOwnProperty.call(
@@ -59,7 +58,6 @@
           >
           </a>
         </div>
-        <!-- Termina barra de progreso -->
       </div>
     </td>
   </tr>
@@ -241,7 +239,7 @@ export default class StudentProgress extends Vue {
     selectedAssignment: string,
     selectedProblem: string,
   ): string {
-    return `/course/${this.course.alias}/student/${this.student.username}/${selectedAssignment}/#${selectedProblem}`;
+    return `/course/${this.course.alias}/student/${this.student.username}/assignment/${selectedAssignment}/#${selectedProblem}`;
   }
 }
 </script>

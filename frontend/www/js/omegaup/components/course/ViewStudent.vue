@@ -33,7 +33,7 @@
               :key="assignment.alias"
               :value="assignment.alias"
             >
-              {{ assignment.name || selectedAssignmentAlias }}
+              {{ assignment.name }}
             </option>
           </select>
         </div>
@@ -185,8 +185,11 @@ export default class CourseViewStudent extends Vue {
 
   mounted(): void {
     window.addEventListener('popstate', (ev: PopStateEvent) => {
-      this.selectedStudent =
-        (ev.state && ev.state.student) || this.initialStudent;
+      if (this.selectedStudent === null) {
+        console.log('Entra');
+        this.selectedStudent =
+          (ev.state && ev.state.student) || this.initialStudent;
+      }
     });
   }
 
@@ -227,32 +230,40 @@ export default class CourseViewStudent extends Vue {
     newVal?: types.StudentProgress,
     oldVal?: types.StudentProgress,
   ) {
-    let url: string = '';
-    this.$emit('update', this.selectedStudent, this.selectedAssignment);
+    this.$emit('update', newVal, this.selectedAssignment);
     if (!newVal || newVal?.username === oldVal?.username) {
       return;
     }
+    let url: string = '';
     if (this.selectedAssignment !== null) {
-      url = `/course/${this.course.alias}/student/${newVal.username}/${this.selectedAssignment}/#${this.selectedProblem?.alias}`;
+      url = `/course/${this.course.alias}/student/${newVal.username}/assignment/${this.selectedAssignment}/#${this.selectedProblem?.alias}`;
     } else {
       url = `/course/${this.course.alias}/student/${newVal.username}/`;
     }
-    window.history.pushState({ student: newVal }, document.title, url);
+    window.history.pushState(
+      { assignment: this.selectedAssignment, student: newVal },
+      document.title,
+      url,
+    );
   }
 
   @Watch('selectedAssignment')
   onSelectedAssignmentChange(newVal?: string, oldVal?: string) {
-    let url: string = '';
     this.$emit('update', this.selectedStudent, this.selectedAssignment);
     if (!newVal || newVal === oldVal) {
       return;
     }
+    let url: string = '';
     if (this.selectedProblem !== null) {
-      url = `/course/${this.course.alias}/student/${this.selectedStudent.username}/${newVal}/#${this.selectedProblem?.alias}`;
+      url = `/course/${this.course.alias}/student/${this.selectedStudent.username}/assignment/${newVal}/#${this.selectedProblem.alias}`;
     } else {
-      url = `/course/${this.course.alias}/student/${this.selectedStudent.username}/${newVal}/`;
+      url = `/course/${this.course.alias}/student/${this.selectedStudent.username}/assignment/${newVal}/`;
     }
-    window.history.pushState({ assignment: newVal }, document.title, url);
+    window.history.pushState(
+      { assignment: newVal, student: this.selectedStudent },
+      document.title,
+      url,
+    );
   }
 
   @Watch('problems')
