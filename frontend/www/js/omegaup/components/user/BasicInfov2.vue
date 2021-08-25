@@ -28,8 +28,7 @@
           <strong>{{ T.profileEmail }}</strong>
         </div>
         <div class="col-sm-9 field-data">
-          Primary: <strong data-email> {{ profile.email }}</strong
-          >&nbsp;
+          Primary: <strong data-email>{{ profile.email }}</strong>
         </div>
       </div>
 
