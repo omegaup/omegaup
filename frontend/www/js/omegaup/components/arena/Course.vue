@@ -38,6 +38,11 @@
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :problem="problemInfo"
+              :popup-displayed="
+                problemInfo && problemInfo.runs.length
+                  ? PopupDisplayed.Promotion
+                  : PopupDisplayed.None
+              "
               :active-tab="'problems'"
               :runs="runs"
               :guid="guid"
