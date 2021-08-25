@@ -90,10 +90,66 @@
               <h5 class="card-title">
                 {{ T.arenaCommonCode }}
               </h5>
-              <pre>{{ selectedRunSource }}</pre>
+              <pre class="m-0"><code>{{ selectedRunSource }}</code></pre>
             </div>
             <div class="card-body pb-0">
-              <h5 class="card-title">
+              <template v-if="selectedRun">
+                <h5>{{ T.feedbackTitle }}</h5>
+                <pre
+                  class="border rounded rounded-lg p-2 m-0"
+                  :class="{ 'bg-light': selectedRun.feedback == null }"
+                  >{{
+                    selectedRun.feedback
+                      ? selectedRun.feedback.feedback
+                      : T.feedbackNotSentYet
+                  }}</pre
+                >
+                <div v-if="selectedRun.feedback && selectedRun.feedback.author">
+                  {{
+                    ui.formatString(T.feedbackLeftBy, {
+                      date: time.formatDate(selectedRun.feedback.date),
+                    })
+                  }}
+                  <omegaup-user-username
+                    :username="selectedRun.feedback.author"
+                    :classname="selectedRun.feedback.author_classname"
+                    :linkify="true"
+                  ></omegaup-user-username>
+                </div>
+                <div class="mt-3">
+                  <a
+                    role="button"
+                    data-show-feedback-form
+                    @click="showFeedbackForm = !showFeedbackForm"
+                    >{{
+                      selectedRun.feedback == null
+                        ? T.submissionFeedbackSendButton
+                        : T.submissionFeedbackUpdateButton
+                    }}</a
+                  >
+                  <div v-show="showFeedbackForm" class="form-group">
+                    <textarea
+                      v-model="feedback"
+                      class="form-control"
+                      rows="3"
+                      maxlength="200"
+                    ></textarea>
+                    <button
+                      class="btn btn-sm btn-primary mt-1"
+                      data-feedback-button
+                      :disabled="!feedback || feedback.length < 2"
+                      @click.prevent="sendFeedback"
+                    >
+                      {{
+                        selectedRun.feedback == null
+                          ? T.submissionSendFeedback
+                          : T.submissionUpdateFeedback
+                      }}
+                    </button>
+                  </div>
+                </div>
+              </template>
+              <h5 class="card-title mt-3 mb-2">
                 {{ T.wordsSubmissions }}
               </h5>
               <table class="table table-hover student-runs-table">
@@ -112,6 +168,7 @@
                       'table-active':
                         selectedRun && run.guid === selectedRun.guid,
                     }"
+                    :data-run-guid="run.guid"
                     @click="selectedRun = run"
                   >
                     <td class="text-center">
@@ -127,22 +184,25 @@
         </div>
       </div>
     </div>
-    <!-- card-body -->
   </div>
-  <!-- card -->
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
+
 import omegaup_Markdown from '../Markdown.vue';
+import user_Username from '../user/Username.vue';
+
 import T from '../../lang';
+import * as ui from '../../ui';
 import * as time from '../../time';
 
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class CourseViewStudent extends Vue {
@@ -154,10 +214,13 @@ export default class CourseViewStudent extends Vue {
 
   T = T;
   time = time;
+  ui = ui;
   selectedAssignment: string | null = null;
   selectedProblem: Partial<types.CourseProblem> | null = null;
   selectedStudent: Partial<types.StudentProgress> = this.initialStudent || {};
   selectedRun: Partial<types.CourseRun> | null = null;
+  showFeedbackForm = false;
+  feedback = '';
 
   get problemsWithPoints(): types.CourseProblem[] {
     return this.problems.filter(
@@ -215,6 +278,21 @@ export default class CourseViewStudent extends Vue {
     return `/course/${this.course.alias}/`;
   }
 
+  sendFeedback(): void {
+    if (this.feedback.length < 2) {
+      return;
+    }
+    this.$emit('set-feedback', {
+      guid: this.selectedRun?.guid,
+      feedback: this.feedback,
+      isUpdate: this.selectedRun?.feedback != null,
+      assignmentAlias: this.selectedAssignment,
+      studentUsername: this.selectedStudent.username,
+    });
+    this.feedback = '';
+    this.showFeedbackForm = false;
+  }
+
   @Watch('selectedStudent')
   onSelectedStudentChange(
     newVal?: types.StudentProgress,
@@ -252,7 +330,9 @@ export default class CourseViewStudent extends Vue {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .student-runs-table tbody tr {
   cursor: pointer;
 }
