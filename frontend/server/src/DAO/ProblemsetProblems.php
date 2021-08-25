@@ -271,7 +271,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ORDER BY
                     `order`, `problem_id` ASC;';
 
-        /** @var list<array{commit: string, order: int, points: float, problem_id: int, problemset_id: int, version: string}> */
+        /** @var list<array{commit: string, is_extra_problem: bool, order: int, points: float, problem_id: int, problemset_id: int, version: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
