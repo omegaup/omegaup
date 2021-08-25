@@ -557,7 +557,6 @@ const translations: { [key: string]: string; } = {
   loginSignUp: "(R3gi573r)",
   loginSignupHeader: "(Cr3a73 an 0m3gaUp acc0un7, i7'5 quick and 3a5y!)",
   loginThroughThirdParty: "(Y0ur u53r wa5 cr3a73d 7hr0ugh a 7hird-par7y 10gin (G00g13, Fac3b00k, 37c.). P13a53 10gin u5ing 7ha7 m3chani5m again in 0rd3r 70 537 a pa55w0rd.)",
-  loginWithFacebook: "(L0g in wi7h Fac3b00k)",
   loginWithGoogle: "(L0g in wi7h G00g13)",
   mailInUse: "(Thi5 mai1 i5 a1r3ady in u53. Try again.)",
   makePrivate: "(Mak3 priva73)",
