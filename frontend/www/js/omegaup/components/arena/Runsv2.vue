@@ -262,6 +262,7 @@
                 <div class="dropdown-menu">
                   <button
                     v-if="showDetails"
+                    data-action-details
                     class="btn-link dropdown-item"
                     @click="$emit('details', run)"
                   >
