@@ -114,7 +114,14 @@ OmegaUp.on('ready', () => {
             language: string;
             problem: types.NavbarProblemsetProblem;
           }) => {
+            console.log({
+              problemset_id: payload.currentAssignment.problemset_id,
+              problem_alias: problem.alias,
+              language: language,
+              source: code,
+            });
             api.Run.create({
+              problemset_id: payload.currentAssignment.problemset_id,
               problem_alias: problem.alias,
               language: language,
               source: code,

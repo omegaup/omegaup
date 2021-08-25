@@ -1709,6 +1709,7 @@ export namespace types {
     finish_time?: Date;
     name?: string;
     problems: types.NavbarProblemsetProblem[];
+    problemset_id: number;
     runs?: types.Run[];
     start_time: Date;
   }
