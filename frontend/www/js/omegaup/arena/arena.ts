@@ -203,12 +203,6 @@ export class Arena {
   // The interval of time that submissions button will be disabled
   submissionGapInterval: ReturnType<typeof setTimeout> | null = null;
 
-  // Cache scoreboard data for virtual contest
-  originalContestScoreboardEvents: types.ScoreboardEvent[] | null = null;
-
-  // Virtual contest refresh interval
-  virtualContestRefreshInterval: ReturnType<typeof setTimeout> | null = null;
-
   // Ephemeral grader support.
   ephemeralGrader: EphemeralGrader = new EphemeralGrader();
 
@@ -615,7 +609,7 @@ export class Arena {
           start_time: new Date(),
           finish_time: null,
           window_length: 0,
-          rerun_id: 0,
+          rerun_id: null,
           title: '',
           director: '',
         },
@@ -1006,10 +1000,7 @@ export class Arena {
     if (this.options.contestAlias != null) {
       api.Problemset.scoreboard(scoreboardParams)
         .then((response) => {
-          // Differentiate ranking change between virtual and normal contest
-          if (this.options.originalContestAlias != null)
-            this.virtualRankingChange(response);
-          else this.rankingChange(response);
+          this.rankingChange(response);
         })
         .catch(ui.ignoreError);
     } else if (
@@ -1021,143 +1012,6 @@ export class Arena {
       api.Problemset.scoreboard(scoreboardParams)
         .then((response) => this.rankingChange(response))
         .catch(ui.ignoreError);
-    }
-  }
-
-  onVirtualRankingChange(virtualContestData: types.Scoreboard): void {
-    // This clones virtualContestData to data so that virtualContestData values
-    // won't be overriden by processes below
-    const data = JSON.parse(
-      JSON.stringify(virtualContestData.ranking),
-    ) as types.Scoreboard;
-    const dataRanking: (types.ScoreboardRankingEntry & {
-      virtual?: boolean;
-    })[] = data.ranking;
-    const events = this.originalContestScoreboardEvents ?? [];
-    const currentDelta =
-      (new Date().getTime() - (this.startTime?.getTime() ?? 0)) / (1000 * 60);
-
-    for (const rank of dataRanking) rank.virtual = true;
-
-    const problemOrder: { [problemAlias: string]: number } = {};
-    const problems: { order: number; alias: string }[] = [];
-    const initialProblems: types.ScoreboardRankingProblem[] = [];
-
-    for (const problem of Object.values(this.problems)) {
-      problemOrder[problem.alias] = problems.length;
-      initialProblems.push({
-        alias: problem.alias,
-        penalty: 0,
-        percent: 0,
-        points: 0,
-        runs: 0,
-      });
-      problems.push({ order: problems.length + 1, alias: problem.alias });
-    }
-
-    // Calculate original contest scoreboard with current delta time
-    const originalContestRanking: {
-      [username: string]: types.ScoreboardRankingEntry;
-    } = {};
-    const originalContestEvents: types.ScoreboardEvent[] = [];
-
-    // Refresh after time T
-    let refreshTime = 30 * 1000; // 30 seconds
-
-    events.forEach((evt) => {
-      const key = evt.username;
-      if (!Object.prototype.hasOwnProperty.call(originalContestRanking, key)) {
-        originalContestRanking[key] = {
-          country: evt.country,
-          name: evt.name,
-          username: evt.username,
-          classname: evt.classname,
-          is_invited: evt.is_invited,
-          problems: Array.from(initialProblems),
-          total: {
-            penalty: 0,
-            points: 0,
-          },
-          place: 0,
-        };
-      }
-      if (evt.delta > currentDelta) {
-        refreshTime = Math.min(
-          refreshTime,
-          (evt.delta - currentDelta) * 60 * 1000,
-        );
-        return;
-      }
-      originalContestEvents.push(evt);
-      const problem =
-        originalContestRanking[key].problems[problemOrder[evt.problem.alias]];
-      originalContestRanking[key].problems[problemOrder[evt.problem.alias]] = {
-        alias: evt.problem.alias,
-        penalty: evt.problem.penalty,
-        points: evt.problem.points,
-        percent: evt.problem.points,
-        // If problem appeared in event for than one, it means a problem has
-        // been solved multiple times
-        runs: problem ? problem.runs + 1 : 1,
-      };
-      originalContestRanking[key].total = evt.total;
-    });
-    // Merge original contest scoreboard ranking with virtual contest
-    for (const ranking of Object.values(originalContestRanking)) {
-      dataRanking.push(ranking);
-    }
-
-    // Re-sort rank
-    dataRanking.sort((rank1, rank2) => {
-      return rank2.total.points - rank1.total.points;
-    });
-
-    // Override ranking
-    dataRanking.forEach((rank, index) => (rank.place = index + 1));
-    this.onRankingChanged(data);
-
-    api.Problemset.scoreboardEvents({
-      problemset_id: this.options.problemsetId,
-      token: this.options.scoreboardToken,
-    })
-      .then((response) => {
-        // Change username to username-virtual
-        for (const evt of response.events) {
-          evt.username = ui.formatString(T.virtualSuffix, {
-            username: evt.username,
-          });
-          evt.name = ui.formatString(T.virtualSuffix, { username: evt.name });
-        }
-
-        // Merge original contest and virtual contest scoreboard events
-        this.onRankingEvents(response.events.concat(originalContestEvents));
-      })
-      .catch(ui.ignoreError);
-
-    this.virtualContestRefreshInterval = setTimeout(() => {
-      this.onVirtualRankingChange(virtualContestData);
-    }, refreshTime);
-  }
-
-  /**
-   * Merge original contest scoreboard and virtual contest
-   */
-  virtualRankingChange(scoreboard: types.Scoreboard): void {
-    // Stop existing scoreboard simulation
-    if (this.virtualContestRefreshInterval != null)
-      clearTimeout(this.virtualContestRefreshInterval);
-
-    if (this.originalContestScoreboardEvents == null) {
-      api.Problemset.scoreboardEvents({
-        problemset_id: this.options.originalProblemsetId,
-      })
-        .then((response) => {
-          this.originalContestScoreboardEvents = response.events;
-          this.onVirtualRankingChange(scoreboard);
-        })
-        .catch(ui.apiError);
-    } else {
-      this.onVirtualRankingChange(scoreboard);
     }
   }
 
@@ -2420,11 +2274,6 @@ export class EventsSocket {
       }
     } else if (data.message == '/scoreboard/update/') {
       data.time = time.remoteTime(data.time * 1000);
-      if (this.arena.problemsetAdmin && data.scoreboard_type != 'admin') {
-        if (this.arena.options.originalContestAlias == null) return;
-        this.arena.virtualRankingChange(data.scoreboard);
-        return;
-      }
       this.arena.rankingChange(data.scoreboard);
     }
   }

@@ -53,7 +53,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Our contestant has to open the contest before sending a run
         \OmegaUp\Test\Factories\Contest::openContest(
-            $this->contestData,
+            $this->contestData['contest'],
             $this->contestantIdentity
         );
 
@@ -689,7 +689,10 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Our contestant has to open the contest before sending a run
-        \OmegaUp\Test\Factories\Contest::openContest($contestData, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contestData['contest'],
+            $identity
+        );
 
         // Then we need to open the problem
         \OmegaUp\Test\Factories\Contest::openProblemInContest(

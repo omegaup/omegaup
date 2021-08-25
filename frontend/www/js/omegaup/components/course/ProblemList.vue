@@ -2,21 +2,21 @@
   <div class="card" data-course-problemlist>
     <div class="card-header">
       <h5>
-        {{ T.courseAddProblemsAdd }}
+        {{ addCardHeaderTitleLabel }}
       </h5>
-      <span>{{ T.courseAddProblemsEditAssignmentDesc }}</span>
+      <span>{{ addCardHeaderDescLabel }}</span>
     </div>
     <div class="card-body">
       <div v-if="problems.length == 0" class="empty-table-message">
-        {{ T.courseAssignmentProblemsEmpty }}
+        {{ emptyTableLabel }}
       </div>
       <div v-else>
         <table class="table table-striped">
           <thead>
             <tr>
               <th>{{ T.contestAddproblemProblemOrder }}</th>
-              <th>{{ T.contestAddproblemProblemName }}</th>
-              <th>{{ T.contestAddproblemProblemPoints }}</th>
+              <th>{{ problemTableHeaderLabel }}</th>
+              <th>{{ pointsTableHeaderLabel }}</th>
               <th>{{ T.contestAddproblemProblemRemove }}</th>
             </tr>
           </thead>
@@ -26,7 +26,7 @@
                 <button
                   class="btn btn-link"
                   type="button"
-                  :title="T.courseAssignmentProblemReorder"
+                  :title="reorderButtonLabel"
                 >
                   <font-awesome-icon icon="arrows-alt" />
                 </button>
@@ -40,7 +40,7 @@
               <td class="button-column">
                 <button
                   class="btn btn-link"
-                  :title="T.courseAssignmentProblemRemove"
+                  :title="removeButtonLabel"
                   @click.prevent="onRemoveProblem(assignment, problem)"
                 >
                   <font-awesome-icon icon="trash" />
@@ -68,7 +68,7 @@
             <div class="row">
               <div class="form-group col-md-5">
                 <label class="w-100"
-                  >{{ T.wordsProblem }}
+                  >{{ problemCardFooterLabel }}
                   <omegaup-autocomplete
                     v-model="problemAlias"
                     class="form-control"
@@ -76,7 +76,7 @@
                   ></omegaup-autocomplete
                 ></label>
                 <p class="help-block">
-                  {{ T.courseAddProblemsAssignmentsDesc }}
+                  {{ addCardFooterDescLabel }}
                 </p>
               </div>
               <div class="form-group col-md-2">
@@ -209,6 +209,60 @@ export default class CourseProblemList extends Vue {
     return t;
   }
 
+  get addCardHeaderTitleLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAddLecturesAdd
+      : T.courseAddProblemsAdd;
+  }
+
+  get addCardHeaderDescLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAddLecturesEditAssignmentDesc
+      : T.courseAddProblemsEditAssignmentDesc;
+  }
+
+  get emptyTableLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAssignmentLecturesEmpty
+      : T.courseAssignmentProblemsEmpty;
+  }
+
+  get problemTableHeaderLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.contestAddlectureLectureName
+      : T.contestAddproblemProblemName;
+  }
+
+  get pointsTableHeaderLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.contestAddlectureLecturePoints
+      : T.contestAddproblemProblemPoints;
+  }
+
+  get reorderButtonLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAssignmentLectureReorder
+      : T.courseAssignmentProblemReorder;
+  }
+
+  get removeButtonLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAssignmentLectureRemove
+      : T.courseAssignmentProblemRemove;
+  }
+
+  get problemCardFooterLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.wordsLecture
+      : T.wordsProblem;
+  }
+
+  get addCardFooterDescLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAddLecturesAssignmentsDesc
+      : T.courseAddProblemsAssignmentsDesc;
+  }
+
   get addProblemButtonDisabled(): boolean {
     if (this.useLatestVersion) return this.problemAlias === '';
     return !this.selectedRevision;
@@ -217,8 +271,14 @@ export default class CourseProblemList extends Vue {
   get addProblemButtonLabel(): string {
     for (const problem of this.problems) {
       if (this.problemAlias === problem.alias) {
+        if (this.assignment.assignment_type === 'lesson') {
+          return T.wordsUpdateLecture;
+        }
         return T.wordsUpdateProblem;
       }
+    }
+    if (this.assignment.assignment_type === 'lesson') {
+      return T.wordsAddLecture;
     }
     return T.wordsAddProblem;
   }

@@ -160,7 +160,7 @@ class Run {
         // Our contestant has to open the contest before sending a run
         if (!$inPracticeMode) {
             \OmegaUp\Test\Factories\Contest::openContest(
-                $contestData,
+                $contestData['contest'],
                 $contestant
             );
         }

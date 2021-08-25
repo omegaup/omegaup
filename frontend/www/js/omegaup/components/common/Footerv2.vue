@@ -106,7 +106,11 @@
         class="container-xl d-flex flex-wrap justify-content-between align-items-center py-3"
       >
         <div>
-          {{ T.wordsCopyright }}
+          {{
+            ui.formatString(T.frontPageFooterCopyright, {
+              currentYear: new Date().getFullYear(),
+            })
+          }}
         </div>
         <div class="d-none d-md-block">
           <ul class="m-0 list-unstyled text-right">
@@ -130,6 +134,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import * as ui from '../../ui';
 import T from '../../lang';
 import { reportAnIssueURL } from '../../errors';
 
@@ -152,6 +157,7 @@ export default class Footer extends Vue {
   @Prop() omegaUpLockDown!: boolean;
 
   T = T;
+  ui = ui;
   reportAnIssueURL = reportAnIssueURL;
 }
 </script>

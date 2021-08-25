@@ -4,6 +4,7 @@ import { myRunsStore } from './runsStore';
 import { omegaup } from '../omegaup';
 import { getMaxScore } from './navigation';
 import T from '../lang';
+import rankingStore from './rankingStore';
 
 export const scoreboardColors = [
   '#FB3F51',
@@ -275,4 +276,162 @@ export function onRankingChanged({
     maxPoints,
     lastTimeUpdated: scoreboard.time,
   };
+}
+
+export function mergeRankings({
+  scoreboard,
+  originalScoreboardEvents,
+  navbarProblems,
+}: {
+  scoreboard: types.Scoreboard;
+  originalScoreboardEvents: types.ScoreboardEvent[];
+  navbarProblems: types.NavbarProblemsetProblem[];
+}): {
+  mergedScoreboard: types.Scoreboard;
+  originalContestEvents: types.ScoreboardEvent[];
+} {
+  // This clones virtualContestData to data so that virtualContestData values
+  // won't be overriden by processes below
+  const data = JSON.parse(JSON.stringify(scoreboard)) as types.Scoreboard;
+  const dataRanking: (types.ScoreboardRankingEntry & {
+    virtual?: boolean;
+  })[] = data.ranking;
+  const events = originalScoreboardEvents;
+  const currentDelta =
+    (new Date().getTime() - scoreboard.start_time.getTime()) / (1000 * 60);
+
+  for (const rank of dataRanking) rank.virtual = true;
+
+  const problemOrder: { [problemAlias: string]: number } = {};
+  const problems: { order: number; alias: string }[] = [];
+  const initialProblems: types.ScoreboardRankingProblem[] = [];
+
+  for (const problem of Object.values(navbarProblems)) {
+    problemOrder[problem.alias] = problems.length;
+    initialProblems.push({
+      alias: problem.alias,
+      penalty: 0,
+      percent: 0,
+      points: 0,
+      runs: 0,
+    });
+    problems.push({ order: problems.length + 1, alias: problem.alias });
+  }
+
+  // Calculate original contest scoreboard with current delta time
+  const originalContestRanking: {
+    [username: string]: types.ScoreboardRankingEntry;
+  } = {};
+  const originalContestEvents: types.ScoreboardEvent[] = [];
+
+  // Refresh after time T
+  let refreshTime = 30 * 1000; // 30 seconds
+
+  events.forEach((evt: types.ScoreboardEvent) => {
+    const key = evt.username;
+    if (!Object.prototype.hasOwnProperty.call(originalContestRanking, key)) {
+      originalContestRanking[key] = {
+        country: evt.country,
+        name: evt.name,
+        username: evt.username,
+        classname: evt.classname,
+        is_invited: evt.is_invited,
+        problems: Array.from(initialProblems),
+        total: {
+          penalty: 0,
+          points: 0,
+        },
+        place: 0,
+      };
+    }
+    if (evt.delta > currentDelta) {
+      refreshTime = Math.min(
+        refreshTime,
+        (evt.delta - currentDelta) * 60 * 1000,
+      );
+      return;
+    }
+    originalContestEvents.push(evt);
+    const problem =
+      originalContestRanking[key].problems[problemOrder[evt.problem.alias]];
+    originalContestRanking[key].problems[problemOrder[evt.problem.alias]] = {
+      alias: evt.problem.alias,
+      penalty: evt.problem.penalty,
+      points: evt.problem.points,
+      percent: evt.problem.points,
+      // If problem appeared in event for than one, it means a problem has
+      // been solved multiple times
+      runs: problem ? problem.runs + 1 : 1,
+    };
+    originalContestRanking[key].total = evt.total;
+  });
+  // Merge original contest scoreboard ranking with virtual contest
+  for (const ranking of Object.values(originalContestRanking)) {
+    dataRanking.push(ranking);
+  }
+
+  // Re-sort rank
+  dataRanking.sort((rank1, rank2) => {
+    return rank2.total.points - rank1.total.points;
+  });
+
+  // Override ranking
+  dataRanking.forEach((rank, index) => (rank.place = index + 1));
+  const mergedScoreboard = data;
+  mergedScoreboard.ranking = dataRanking;
+  return { mergedScoreboard, originalContestEvents };
+}
+
+export function onVirtualRankingChanged({
+  scoreboard,
+  scoreboardEvents,
+  problems,
+  contest,
+  currentUsername,
+}: {
+  scoreboard: types.Scoreboard;
+  scoreboardEvents: types.ScoreboardEvent[];
+  problems: types.NavbarProblemsetProblem[];
+  contest: types.ContestPublicDetails;
+  currentUsername: string;
+}): void {
+  let rankingChartOptions: Highcharts.Options | null = null;
+  const { mergedScoreboard, originalContestEvents } = mergeRankings({
+    scoreboard,
+    originalScoreboardEvents: scoreboardEvents,
+    navbarProblems: problems,
+  });
+  const rankingInfo = onRankingChanged({
+    scoreboard: mergedScoreboard,
+    currentUsername: currentUsername,
+    navbarProblems: problems,
+  });
+  const ranking = rankingInfo.ranking;
+  const users = rankingInfo.users;
+  const lastTimeUpdated = rankingInfo.lastTimeUpdated;
+  rankingStore.commit('updateRanking', ranking);
+  rankingStore.commit('updateMiniRankingUsers', users);
+  rankingStore.commit('updateLastTimeUpdated', lastTimeUpdated);
+
+  const startTimestamp = contest.start_time.getTime();
+  const finishTimestamp = Math.min(
+    contest.finish_time?.getTime() || Infinity,
+    Date.now(),
+  );
+  const { series, navigatorData } = onRankingEvents({
+    events: scoreboardEvents.concat(originalContestEvents),
+    currentRanking: rankingInfo.currentRanking,
+    startTimestamp,
+    finishTimestamp,
+  });
+  if (series.length) {
+    rankingChartOptions = createChart({
+      series,
+      navigatorData,
+      startTimestamp,
+      finishTimestamp,
+      maxPoints: rankingInfo.maxPoints,
+    });
+    rankingStore.commit('updateRankingChartOptions', rankingChartOptions);
+  }
 }
