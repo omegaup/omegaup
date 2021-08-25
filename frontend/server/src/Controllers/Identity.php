@@ -1053,7 +1053,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Get identity profile from cache
      *
-     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: null|string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: string|null, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null}
+     * @return array{birth_date?: \OmegaUp\Timestamp|null, classname: null|string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: string|null, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null}
      */
     public static function getProfile(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
@@ -1071,7 +1071,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $response = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::USER_PROFILE,
             $identity->username,
-            /** @return array{birth_date: \OmegaUp\Timestamp|null, classname: null|string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null} */
+            /** @return array{birth_date?: \OmegaUp\Timestamp|null, classname: null|string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null} */
             function () use ($identity, $user) {
                 if (!is_null($user)) {
                     return \OmegaUp\Controllers\User::getProfileImpl(
@@ -1097,8 +1097,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 );
         }
 
-        // Do not leak plain emails in case the request is for a profile other than
-        // the logged identity's one. Admins can see emails
+        // Do not leak plain emails, birth dates and genders in case the request is for a profile other than
+        // the logged identity's one. Admins can see emails, birth dates and genders
         if (
             !is_null($loggedIdentity)
             && (\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
@@ -1106,6 +1106,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
         ) {
             return $response;
         }
+        unset($response['birth_date']);
+        unset($response['gender']);
 
         // Mentors can see current coder of the month email.
         if (
