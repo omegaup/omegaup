@@ -185,11 +185,10 @@ export default class CourseViewStudent extends Vue {
 
   mounted(): void {
     window.addEventListener('popstate', (ev: PopStateEvent) => {
-      if (this.selectedStudent === null) {
-        console.log('Entra');
-        this.selectedStudent =
-          (ev.state && ev.state.student) || this.initialStudent;
+      if (this.selectedStudent !== null) {
+        return;
       }
+      this.selectedStudent = ev.state?.student ?? this.initialStudent;
     });
   }
 
