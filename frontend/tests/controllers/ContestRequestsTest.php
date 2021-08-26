@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Any admin can accept / reject participant requests for a public contest with

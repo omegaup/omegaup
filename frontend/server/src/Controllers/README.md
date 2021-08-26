@@ -43,6 +43,7 @@
   - [`/api/contest/removeGroupAdmin/`](#apicontestremovegroupadmin)
   - [`/api/contest/removeProblem/`](#apicontestremoveproblem)
   - [`/api/contest/removeUser/`](#apicontestremoveuser)
+  - [`/api/contest/replaceTeamsGroup/`](#apicontestreplaceteamsgroup)
   - [`/api/contest/report/`](#apicontestreport)
   - [`/api/contest/requests/`](#apicontestrequests)
   - [`/api/contest/role/`](#apicontestrole)
@@ -122,11 +123,7 @@
   - [`/api/identity/create/`](#apiidentitycreate)
   - [`/api/identity/selectIdentity/`](#apiidentityselectidentity)
   - [`/api/identity/update/`](#apiidentityupdate)
-- [Interview](#interview)
-  - [`/api/interview/addUsers/`](#apiinterviewaddusers)
-  - [`/api/interview/create/`](#apiinterviewcreate)
-  - [`/api/interview/details/`](#apiinterviewdetails)
-  - [`/api/interview/list/`](#apiinterviewlist)
+  - [`/api/identity/updateIdentityTeam/`](#apiidentityupdateidentityteam)
 - [Notification](#notification)
   - [`/api/notification/myList/`](#apinotificationmylist)
   - [`/api/notification/readNotifications/`](#apinotificationreadnotifications)
@@ -201,10 +198,14 @@
   - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
 - [TeamsGroup](#teamsgroup)
+  - [`/api/teamsGroup/addMembers/`](#apiteamsgroupaddmembers)
   - [`/api/teamsGroup/create/`](#apiteamsgroupcreate)
   - [`/api/teamsGroup/details/`](#apiteamsgroupdetails)
+  - [`/api/teamsGroup/list/`](#apiteamsgrouplist)
+  - [`/api/teamsGroup/removeMember/`](#apiteamsgroupremovemember)
   - [`/api/teamsGroup/removeTeam/`](#apiteamsgroupremoveteam)
   - [`/api/teamsGroup/teams/`](#apiteamsgroupteams)
+  - [`/api/teamsGroup/teamsMembers/`](#apiteamsgroupteamsmembers)
   - [`/api/teamsGroup/update/`](#apiteamsgroupupdate)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
@@ -223,7 +224,6 @@
   - [`/api/user/extraInformation/`](#apiuserextrainformation)
   - [`/api/user/generateGitToken/`](#apiusergenerategittoken)
   - [`/api/user/generateOmiUsers/`](#apiusergenerateomiusers)
-  - [`/api/user/interviewStats/`](#apiuserinterviewstats)
   - [`/api/user/lastPrivacyPolicyAccepted/`](#apiuserlastprivacypolicyaccepted)
   - [`/api/user/list/`](#apiuserlist)
   - [`/api/user/listAPITokens/`](#apiuserlistapitokens)
@@ -492,7 +492,7 @@ _Nothing_
 
 ### Description
 
-Adds an group to a contest
+Adds a group to a contest
 
 ### Parameters
 
@@ -509,7 +509,7 @@ _Nothing_
 
 ### Description
 
-Adds an group admin to a contest
+Adds a group admin to a contest
 
 ### Parameters
 
@@ -715,9 +715,9 @@ previously agreed to share their information.
 
 ### Returns
 
-| Name          | Type                                                                                                   |
-| ------------- | ------------------------------------------------------------------------------------------------------ |
-| `contestants` | `{ country: string; email: string; name: string; school: string; state: string; username: string; }[]` |
+| Name          | Type                 |
+| ------------- | -------------------- |
+| `contestants` | `types.Contestant[]` |
 
 ## `/api/contest/create/`
 
@@ -731,6 +731,7 @@ Creates a new contest
 | --------------------------- | -------------- | ----------- |
 | `admission_mode`            | `mixed`        |             |
 | `alias`                     | `mixed`        |             |
+| `contest_for_teams`         | `bool\|null`   |             |
 | `description`               | `mixed`        |             |
 | `feedback`                  | `mixed`        |             |
 | `finish_time`               | `mixed`        |             |
@@ -747,6 +748,7 @@ Creates a new contest
 | `show_scoreboard_after`     | `mixed`        |             |
 | `start_time`                | `mixed`        |             |
 | `submissions_gap`           | `mixed`        |             |
+| `teams_group_alias`         | `null\|string` |             |
 | `title`                     | `mixed`        |             |
 | `window_length`             | `int\|null`    |             |
 
@@ -1033,6 +1035,23 @@ Remove a user from a private contest
 
 _Nothing_
 
+## `/api/contest/replaceTeamsGroup/`
+
+### Description
+
+Replace the teams group assigned to a contest
+
+### Parameters
+
+| Name                | Type     | Description                  |
+| ------------------- | -------- | ---------------------------- |
+| `contest_alias`     | `string` | The alias of the contest     |
+| `teams_group_alias` | `string` | The alias of the teams group |
+
+### Returns
+
+_Nothing_
+
 ## `/api/contest/report/`
 
 ### Description
@@ -1203,20 +1222,16 @@ Search users in contest
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `query`         | `mixed`  |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `contest_alias` | `string`       |             |
+| `query`         | `null\|string` |             |
 
 ### Returns
 
-```typescript
-{
-  label: string;
-  value: string;
-}
-[];
-```
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/contest/setRecommended/`
 
@@ -1275,8 +1290,9 @@ Update a Contest
 | `finish_time`               | `int`                     |             |
 | `submissions_gap`           | `int`                     |             |
 | `window_length`             | `int`                     |             |
-| `admission_mode`            | `mixed`                   |             |
+| `admission_mode`            | `null\|string`            |             |
 | `alias`                     | `null\|string`            |             |
+| `contest_for_teams`         | `bool\|null`              |             |
 | `description`               | `null\|string`            |             |
 | `feedback`                  | `mixed`                   |             |
 | `languages`                 | `mixed`                   |             |
@@ -1291,11 +1307,15 @@ Update a Contest
 | `scoreboard`                | `float\|null`             |             |
 | `show_scoreboard_after`     | `bool\|null`              |             |
 | `start_time`                | `OmegaUp\Timestamp\|null` |             |
+| `teams_group_alias`         | `null\|string`            |             |
 | `title`                     | `null\|string`            |             |
 
 ### Returns
 
-_Nothing_
+| Name             | Type     |
+| ---------------- | -------- |
+| `teamsGroupName` | `string` |
+| `title`          | `string` |
 
 ## `/api/contest/updateEndTimeForIdentity/`
 
@@ -2228,11 +2248,7 @@ array instead of an object since it is used by typeahead.
 ### Returns
 
 ```typescript
-{
-  label: string;
-  value: string;
-}
-[];
+types.GroupListItem[]
 ```
 
 ## `/api/group/members/`
@@ -2509,68 +2525,29 @@ Entry point for Update an Identity API
 
 _Nothing_
 
-# Interview
-
-## `/api/interview/addUsers/`
+## `/api/identity/updateIdentityTeam/`
 
 ### Description
 
+Entry point for Update an Identity team API
+
 ### Parameters
 
-| Name                  | Type     | Description |
-| --------------------- | -------- | ----------- |
-| `interview_alias`     | `string` |             |
-| `usernameOrEmailsCSV` | `string` |             |
+| Name                | Type           | Description |
+| ------------------- | -------------- | ----------- |
+| `gender`            | `string`       |             |
+| `group_alias`       | `string`       |             |
+| `name`              | `string`       |             |
+| `original_username` | `string`       |             |
+| `school_name`       | `string`       |             |
+| `username`          | `string`       |             |
+| `country_id`        | `null\|string` |             |
+| `identities`        | `mixed`        |             |
+| `state_id`          | `null\|string` |             |
 
 ### Returns
 
 _Nothing_
-
-## `/api/interview/create/`
-
-### Description
-
-### Parameters
-
-| Name          | Type           | Description |
-| ------------- | -------------- | ----------- |
-| `duration`    | `int`          |             |
-| `title`       | `string`       |             |
-| `alias`       | `null\|string` |             |
-| `description` | `null\|string` |             |
-
-### Returns
-
-_Nothing_
-
-## `/api/interview/details/`
-
-### Description
-
-### Parameters
-
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `interview_alias` | `string` |             |
-
-### Returns
-
-| Name            | Type                                                                                                                     |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `contest_alias` | `string`                                                                                                                 |
-| `description`   | `string`                                                                                                                 |
-| `problemset_id` | `number`                                                                                                                 |
-| `users`         | `{ access_time: Date; country: string; email: string; opened_interview: boolean; user_id: number; username: string; }[]` |
-
-## `/api/interview/list/`
-
-### Description
-
-### Returns
-
-| Name     | Type                                                                                                                                           |
-| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `result` | `{ acl_id: number; alias: string; description: string; interview_id: number; problemset_id: number; title: string; window_length: number; }[]` |
 
 # Notification
 
@@ -2862,12 +2839,10 @@ Gets a list of problems where current user is the owner
 
 ### Parameters
 
-| Name        | Type    | Description |
-| ----------- | ------- | ----------- |
-| `page`      | `int`   |             |
-| `page_size` | `int`   |             |
-| `offset`    | `mixed` |             |
-| `rowcount`  | `mixed` |             |
+| Name       | Type        | Description |
+| ---------- | ----------- | ----------- |
+| `page`     | `int`       |             |
+| `rowcount` | `int\|null` |             |
 
 ### Returns
 
@@ -3263,16 +3238,15 @@ and the number of solutions already seen
 
 ### Parameters
 
-| Name              | Type           | Description |
-| ----------------- | -------------- | ----------- |
-| `assignment`      | `string`       |             |
-| `contest_alias`   | `string`       |             |
-| `course`          | `string`       |             |
-| `interview_alias` | `string`       |             |
-| `problemset_id`   | `int`          |             |
-| `auth_token`      | `mixed`        |             |
-| `token`           | `null\|string` |             |
-| `tokens`          | `mixed`        |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `assignment`    | `string`       |             |
+| `contest_alias` | `string`       |             |
+| `course`        | `string`       |             |
+| `problemset_id` | `int`          |             |
+| `auth_token`    | `mixed`        |             |
+| `token`         | `null\|string` |             |
+| `tokens`        | `mixed`        |             |
 
 ### Returns
 
@@ -3938,6 +3912,23 @@ Gets a list of tags
 
 TeamsGroupController
 
+## `/api/teamsGroup/addMembers/`
+
+### Description
+
+Add one or more users to a given team
+
+### Parameters
+
+| Name               | Type     | Description                    |
+| ------------------ | -------- | ------------------------------ |
+| `team_group_alias` | `string` | The username of the team.      |
+| `usernames`        | `string` | Username of all members to add |
+
+### Returns
+
+_Nothing_
+
 ## `/api/teamsGroup/create/`
 
 ### Description
@@ -3946,11 +3937,12 @@ New team group
 
 ### Parameters
 
-| Name          | Type     | Description |
-| ------------- | -------- | ----------- |
-| `alias`       | `string` |             |
-| `description` | `string` |             |
-| `name`        | `string` |             |
+| Name                  | Type        | Description |
+| --------------------- | ----------- | ----------- |
+| `alias`               | `string`    |             |
+| `description`         | `string`    |             |
+| `name`                | `string`    |             |
+| `numberOfContestants` | `int\|null` |             |
 
 ### Returns
 
@@ -3973,6 +3965,42 @@ Details of a team group
 | Name         | Type                                                                         |
 | ------------ | ---------------------------------------------------------------------------- |
 | `team_group` | `{ alias: string; create_time: number; description: string; name: string; }` |
+
+## `/api/teamsGroup/list/`
+
+### Description
+
+Gets a list of teams groups. This returns an array instead of an object
+since it is used by typeahead.
+
+### Parameters
+
+| Name    | Type           | Description |
+| ------- | -------------- | ----------- |
+| `query` | `null\|string` |             |
+
+### Returns
+
+```typescript
+types.ListItem[]
+```
+
+## `/api/teamsGroup/removeMember/`
+
+### Description
+
+Remove an existing team member of a teams group
+
+### Parameters
+
+| Name               | Type     | Description                    |
+| ------------------ | -------- | ------------------------------ |
+| `team_group_alias` | `string` | The username of the team       |
+| `username`         | `string` | The username of user to remove |
+
+### Returns
+
+_Nothing_
 
 ## `/api/teamsGroup/removeTeam/`
 
@@ -4009,6 +4037,28 @@ Teams of a teams group
 | ------------ | ------------------ |
 | `identities` | `types.Identity[]` |
 
+## `/api/teamsGroup/teamsMembers/`
+
+### Description
+
+Get a list of team members of a teams group
+
+### Parameters
+
+| Name               | Type     | Description               |
+| ------------------ | -------- | ------------------------- |
+| `page`             | `int`    |                           |
+| `page_size`        | `int`    |                           |
+| `team_group_alias` | `string` | The username of the team. |
+
+### Returns
+
+| Name         | Type                 |
+| ------------ | -------------------- |
+| `pageNumber` | `number`             |
+| `teamsUsers` | `types.TeamMember[]` |
+| `totalRows`  | `number`             |
+
 ## `/api/teamsGroup/update/`
 
 ### Description
@@ -4017,11 +4067,12 @@ Update an existing teams group
 
 ### Parameters
 
-| Name          | Type     | Description |
-| ------------- | -------- | ----------- |
-| `alias`       | `string` |             |
-| `description` | `string` |             |
-| `name`        | `string` |             |
+| Name                  | Type        | Description |
+| --------------------- | ----------- | ----------- |
+| `alias`               | `string`    |             |
+| `description`         | `string`    |             |
+| `name`                | `string`    |             |
+| `numberOfContestants` | `int\|null` |             |
 
 ### Returns
 
@@ -4331,29 +4382,6 @@ against the gitserver.
 { [key: string]: string; }
 ```
 
-## `/api/user/interviewStats/`
-
-### Description
-
-Get the results for this user in a given interview
-
-### Parameters
-
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `interview` | `string` |             |
-| `username`  | `string` |             |
-
-### Returns
-
-| Name               | Type      |
-| ------------------ | --------- |
-| `finished`         | `boolean` |
-| `interview_url`    | `string`  |
-| `name_or_username` | `string`  |
-| `opened_interview` | `boolean` |
-| `user_verified`    | `boolean` |
-
 ## `/api/user/lastPrivacyPolicyAccepted/`
 
 ### Description
@@ -4376,8 +4404,7 @@ Gets the last privacy policy accepted by user
 
 ### Description
 
-Gets a list of users. This returns an array instead of an object since
-it is used by typeahead.
+Gets a list of users.
 
 ### Parameters
 
@@ -4388,9 +4415,9 @@ it is used by typeahead.
 
 ### Returns
 
-```typescript
-types.UserListItem[]
-```
+| Name      | Type               |
+| --------- | ------------------ |
+| `results` | `types.ListItem[]` |
 
 ## `/api/user/listAPITokens/`
 

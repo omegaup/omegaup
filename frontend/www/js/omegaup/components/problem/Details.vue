@@ -113,7 +113,7 @@
             <omegaup-arena-runsubmit-popup
               v-show="currentPopupDisplayed === PopupDisplayed.RunSubmit"
               :preferred-language="problem.preferred_language"
-              :languages="problem.languages"
+              :languages="filteredLanguages"
               :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
               @dismiss="onPopupDismissed"
               @submit-run="onRunSubmitted"
@@ -164,16 +164,28 @@
             ></omegaup-quality-nomination-reviewer-popup>
           </template>
         </omegaup-overlay>
-        <omegaup-arena-runs
-          :problem-alias="problem.alias"
-          :contest-alias="contestAlias"
-          :runs="runs"
-          :show-details="true"
-          :problemset-problems="[]"
-          :is-contest-finished="isContestFinished"
-          @details="(run) => onRunDetails(run.guid)"
-          @new-submission="onNewSubmission"
-        ></omegaup-arena-runs>
+        <template v-if="problem.accepts_submissions">
+          <omegaup-arena-ephemeral-grader
+            v-if="!problem.karel_problem"
+            :problem="problem"
+          ></omegaup-arena-ephemeral-grader>
+          <omegaup-arena-runs
+            :problem-alias="problem.alias"
+            :contest-alias="contestAlias"
+            :runs="runsByProblem"
+            :show-details="true"
+            :problemset-problems="[]"
+            :is-contest-finished="isContestFinished"
+            @details="(run) => onRunDetails(run.guid)"
+            @update-search-result-users-contest="
+              (request) => $emit('update-search-result-users-contest', request)
+            "
+            @update-search-result-users="
+              (request) => $emit('update-search-result-users', request)
+            "
+            @new-submission="onNewSubmission"
+          ></omegaup-arena-runs>
+        </template>
         <omegaup-problem-feedback
           :quality-histogram="parsedQualityHistogram"
           :difficulty-histogram="parsedDifficultyHistogram"
@@ -181,7 +193,10 @@
           :difficulty-score="histogramDifficulty"
         ></omegaup-problem-feedback>
         <slot name="best-solvers-list">
-          <omegaup-arena-solvers :solvers="solvers"></omegaup-arena-solvers>
+          <omegaup-arena-solvers
+            v-if="problem.accepts_submissions"
+            :solvers="solvers"
+          ></omegaup-arena-solvers>
         </slot>
       </div>
       <div
@@ -211,11 +226,18 @@
           :show-pager="true"
           :show-disqualify="true"
           :problemset-problems="[]"
+          :search-result-users="searchResultUsers"
           @details="(run) => onRunDetails(run.guid)"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
           @filter-changed="
             (filter, value) => $emit('apply-filter', filter, value)
+          "
+          @update-search-result-users-contest="
+            (request) => $emit('update-search-result-users-contest', request)
+          "
+          @update-search-result-users="
+            (request) => $emit('update-search-result-users', request)
           "
         ></omegaup-arena-runs>
         <omegaup-overlay
@@ -259,6 +281,7 @@ import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
+import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
 import arena_Runs from '../arena/Runs.vue';
 import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
@@ -308,6 +331,7 @@ export enum PopupDisplayed {
   components: {
     FontAwesomeIcon,
     'omegaup-arena-clarification-list': arena_ClarificationList,
+    'omegaup-arena-ephemeral-grader': arena_EphemeralGrader,
     'omegaup-arena-runs': arena_Runs,
     'omegaup-arena-runsubmit-popup': arena_RunSubmitPopup,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
@@ -360,6 +384,8 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: false }) shouldShowRunDetails!: boolean;
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
+  @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: null }) languages!: null | string[];
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
@@ -435,6 +461,20 @@ export default class ProblemDetails extends Vue {
 
   get histogramDifficulty(): number {
     return this.histogram?.difficulty ?? 0;
+  }
+
+  get runsByProblem(): types.Run[] {
+    return this.runs.filter((run) => run.alias === this.problem.alias);
+  }
+
+  get filteredLanguages(): string[] {
+    if (!this.languages) {
+      return this.problem.languages;
+    }
+    const languagesSet = new Set(this.languages);
+    return this.problem.languages.filter((language) =>
+      languagesSet.has(language),
+    );
   }
 
   onNewSubmission(): void {

@@ -48,6 +48,7 @@
           :name="name"
           :alias="alias"
           :description="description"
+          :number-of-contestants="numberOfContestants"
           @update-teams-group="
             (request) => $emit('update-teams-group', request)
           "
@@ -63,12 +64,19 @@
           :teams="currentTeamsIdentities"
           :alias="alias"
           :countries="countries"
+          :search-result-users="searchResultUsers"
+          :teams-members="teamsMembers"
+          @update-search-result-users="
+            (query) => $emit('update-search-result-users', query)
+          "
           @edit-identity-team="
             (request) => $emit('edit-identity-team', request)
           "
           @change-password-identity-team="
             (request) => $emit('change-password-identity-team', request)
           "
+          @add-members="(request) => $emit('add-members', request)"
+          @remove-member="(request) => $emit('remove-member', request)"
           @remove="(name) => $emit('remove', name)"
           @cancel="(teamComponent) => $emit('cancel', teamComponent)"
         ></omegaup-teams-group-teams>
@@ -85,7 +93,7 @@
           @bulk-identities="
             (identities) => $emit('bulk-identities', identities)
           "
-          @download-teams="(teams) => $emit('download-teams', teams)"
+          @download-teams="(identities) => $emit('download-teams', identities)"
           @read-csv="(source) => $emit('read-csv', source)"
           @invalid-file="$emit('invalid-file')"
           @update-search-result-users="
@@ -99,7 +107,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import teamsgroup_FormUpdate from '../teamsgroup/FormUpdate.vue';
+import teamsgroup_FormUpdate from './FormUpdate.vue';
 import teamsgroup_Upload from './Upload.vue';
 import teamsgroup_Teams from './Teams.vue';
 import T from '../../lang';
@@ -123,10 +131,12 @@ export default class TeamsGroupEdit extends Vue {
   @Prop() alias!: string;
   @Prop() name!: string;
   @Prop() description!: string;
+  @Prop() numberOfContestants!: number;
   @Prop() countries!: dao.Countries[];
   @Prop() isOrganizer!: boolean;
   @Prop() tab!: AvailableTabs;
   @Prop({ default: () => [] }) teamsIdentities!: types.Identity[];
+  @Prop({ default: () => [] }) teamsMembers!: types.TeamMember[];
   @Prop() teamErrorRow!: null | string;
   @Prop() searchResultUsers!: types.ListItem[];
 

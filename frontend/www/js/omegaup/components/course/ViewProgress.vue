@@ -6,7 +6,7 @@
           <a :href="courseUrl">{{ course.name }}</a>
         </h2>
         <div class="table-responsive">
-          <table class="table table-striped">
+          <table class="table table-striped table-fixed mb-0 d-block">
             <thead>
               <tr>
                 <th class="text-center align-middle">
@@ -14,6 +14,20 @@
                     {{ T.wordsName }}
                     <omegaup-common-sort-controls
                       column="student"
+                      :sort-order="sortOrder"
+                      :column-name="columnName"
+                      @apply-filter="onApplyFilter"
+                    ></omegaup-common-sort-controls>
+                  </span>
+                </th>
+                <th class="text-center align-middle">
+                  <span>
+                    {{ T.courseProgressGlobalScore }}
+                    <span class="d-block">{{
+                      getTotalPointsByCourse(assignments)
+                    }}</span>
+                    <omegaup-common-sort-controls
+                      column="total"
                       :sort-order="sortOrder"
                       :column-name="columnName"
                       @apply-filter="onApplyFilter"
@@ -37,20 +51,6 @@
                         ><img src="/media/question.png"
                       /></a>
                     </span>
-                  </span>
-                </th>
-                <th class="text-center align-middle">
-                  <span>
-                    {{ T.courseProgressGlobalScore }}
-                    <span class="d-block">{{
-                      getTotalPointsByCourse(assignments)
-                    }}</span>
-                    <omegaup-common-sort-controls
-                      column="total"
-                      :sort-order="sortOrder"
-                      :column-name="columnName"
-                      @apply-filter="onApplyFilter"
-                    ></omegaup-common-sort-controls>
                   </span>
                 </th>
               </tr>
@@ -268,18 +268,17 @@ export default class CourseViewProgress extends Vue {
   get progressTable(): TableCell[][] {
     const table: TableCell[][] = [];
     const header = [T.profileUsername, T.wordsName];
+    header.push(T.courseProgressGlobalScore);
     for (const assignment of this.assignments) {
       header.push(assignment.name);
     }
-    header.push(T.courseProgressGlobalScore);
     table.push(header);
     for (const student of this.students) {
       const row: TableCell[] = [student.username, student.name || ''];
-
+      row.push(this.getGlobalScoreByStudent(student));
       for (const assignment of this.assignments) {
         row.push(this.score(student, assignment));
       }
-      row.push(this.getGlobalScoreByStudent(student));
 
       table.push(row);
     }
@@ -341,7 +340,7 @@ export default class CourseViewProgress extends Vue {
     });
     let metaInf = zip.folder('META-INF');
     let table = this.progressTable;
-    metaInf.file(
+    metaInf?.file(
       'manifest.xml',
       `<?xml version="1.0" encoding="UTF-8"?>
 <manifest:manifest
@@ -416,13 +415,36 @@ export default class CourseViewProgress extends Vue {
 }
 </script>
 
-<style scoped>
-.panel-body {
-  overflow: auto;
-  white-space: nowrap;
-}
-
+<style lang="scss" scoped>
 .sticky-offset {
   top: 4rem;
+}
+
+.table-fixed {
+  max-height: 80vh;
+  overflow: auto;
+
+  thead {
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: white;
+
+      &:first-child {
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 2;
+      }
+    }
+  }
+
+  tbody /deep/ th {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 1;
+  }
 }
 </style>

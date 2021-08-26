@@ -39,6 +39,7 @@ describe('FormBase.vue', () => {
         {
           description: 'Hello omegaUp Description',
           name: 'Hello omegaUp',
+          numberOfContestants: 3,
         },
       ],
     ]);

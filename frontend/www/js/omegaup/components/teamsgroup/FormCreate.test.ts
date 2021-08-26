@@ -39,6 +39,7 @@ describe('FormCreate.vue', () => {
           alias: null,
           description: 'Hello omegaUp Description',
           name: 'Hello omegaUp',
+          numberOfContestants: 3,
         },
       ],
     ]);

@@ -8,7 +8,8 @@
  * @psalm-type ProblemCasesContents=array<string, array{contestantOutput?: string, in: string, out: string}>
  * @psalm-type RunMetadata=array{memory: int, sys_time: int, time: float, verdict: string, wall_time: float}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
- * @psalm-type RunDetails=array{admin: bool, alias: string, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<array{cases: list<CaseResult>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: null|array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp}}
+ * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp}
+ * @psalm-type RunDetails=array{admin: bool, alias: string, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<array{cases: list<CaseResult>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: null|SubmissionFeedback}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
@@ -133,7 +134,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{isPractice: bool, problem: \OmegaUp\DAO\VO\Problems, contest: null|\OmegaUp\DAO\VO\Contests, problemsetContainer: null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews, problemset: null|\OmegaUp\DAO\VO\Problemsets}
+     * @return array{isPractice: bool, problem: \OmegaUp\DAO\VO\Problems, contest: null|\OmegaUp\DAO\VO\Contests, problemsetContainer: null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments, problemset: null|\OmegaUp\DAO\VO\Problemsets}
      *
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param mixed $language
@@ -191,7 +192,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         /** @var null|int */
         $problemsetId = null;
-        /** @var null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews */
+        /** @var null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments */
         $problemsetContainer = null;
         /** @var null|\OmegaUp\DAO\VO\Contests */
         $contest = null;
@@ -1492,7 +1493,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::RUN_COUNTS,
             '',
-            function () use ($r) {
+            function () {
                 $totals = [];
                 $totals['total'] = [];
                 $totals['ac'] = [];

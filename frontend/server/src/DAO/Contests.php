@@ -11,9 +11,9 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  *
- * @psalm-type Contest=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
- * @psalm-type Contestv2=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
- * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type Contest=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type Contestv2=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: bool, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
   */
 class Contests extends \OmegaUp\DAO\Base\Contests {
     /** @var string */
@@ -37,7 +37,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     final public static function getByAlias(string $alias): ?\OmegaUp\DAO\VO\Contests {
         $sql = 'SELECT * FROM Contests WHERE alias = ? LIMIT 1;';
 
-        /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
+        /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
         if (empty($rs)) {
             return null;
@@ -47,7 +47,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
-     * @return array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null}|null
+     * @return array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int|null, scoreboard: int, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null}|null
      */
     final public static function getByAliasWithDirector(string $alias) {
         $sql = 'SELECT
@@ -87,7 +87,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 LIMIT
                     1;';
 
-        /** @var array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, show_penalty: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null}|null */
+        /** @var array{admission_mode: string, alias: string, description: string, director: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int|null, scoreboard: int, show_penalty: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$alias]);
         if (empty($rs)) {
             return null;
@@ -103,7 +103,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     final public static function getByTitle(string $title) {
         $sql = 'SELECT * FROM Contests WHERE title = ? AND archived = 0;';
 
-        /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}> */
+        /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$title]);
 
         $contests = [];
@@ -114,7 +114,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
-     * @return array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null
+     * @return array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null
      */
     final public static function getByAliasWithExtraInformation(string $alias): ?array {
         $sql = '
@@ -133,7 +133,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 LIMIT 1;';
         $params = [$alias];
 
-        /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
+        /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -145,7 +145,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         int $problemsetId
     ): ?\OmegaUp\DAO\VO\Contests {
         $sql = 'SELECT * FROM Contests WHERE problemset_id = ? LIMIT 0, 1;';
-        /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
+        /** @var array{acl_id: int, admission_mode: string, alias: string, archived: bool, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: null|string, last_updated: \OmegaUp\Timestamp, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard: int, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, urgent: bool, window_length: int|null}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$problemsetId]
@@ -224,7 +224,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             ORDER BY
                 c.contest_id DESC;';
 
-        /** @var list<array{access_mode: string, acl_id: int, acl_id: int, admission_mode: string, alias: string, archived: bool, assignment_id: int|null, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, contest_id: int|null, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, interview_id: int|null, languages: null|string, languages: null|string, last_updated: \OmegaUp\Timestamp, needs_basic_information: bool, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, problemset_id: int, recommended: bool, requests_user_information: string, rerun_id: int, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, type: string, urgent: bool, window_length: int|null}> */
+        /** @var list<array{access_mode: string, acl_id: int, acl_id: int, admission_mode: string, alias: string, archived: bool, assignment_id: int|null, certificate_cutoff: int|null, certificates_status: string, contest_for_teams: bool|null, contest_id: int, contest_id: int|null, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, interview_id: int|null, languages: null|string, languages: null|string, last_updated: \OmegaUp\Timestamp, needs_basic_information: bool, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, problemset_id: int, recommended: bool, requests_user_information: string, rerun_id: int|null, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, type: string, urgent: bool, window_length: int|null}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId]
@@ -305,7 +305,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             $pageSize,
         ];
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
@@ -392,7 +392,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             intval($pageSize),
         ];
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
@@ -457,6 +457,21 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                         Groups_Identities gi
                     ON
                         gi.group_id = gr.group_id
+                    UNION DISTINCT
+                    SELECT
+                        t.identity_id,
+                        p.problemset_id
+                    FROM
+                        Problemsets p
+                    INNER JOIN
+                        Teams_Group_Roles tgr
+                    ON
+                        tgr.acl_id = p.acl_id AND
+                        tgr.role_id = ?
+                    INNER JOIN
+                        Teams t
+                    ON
+                        t.team_group_id = tgr.team_group_id
                 ) pi
             ON
                 pi.problemset_id = p.problemset_id AND
@@ -482,6 +497,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         ";
         $params = [
             \OmegaUp\Authorization::CONTESTANT_ROLE,
+            \OmegaUp\Authorization::CONTESTANT_ROLE,
             $identityId,
         ];
         if ($filter['type'] === \OmegaUp\DAO\Enum\FilteredStatus::FULLTEXT) {
@@ -500,7 +516,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $params[] = intval($offset);
         $params[] = intval($pageSize);
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $contests = [];
@@ -580,7 +596,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         $params[] = intval($offset);
         $params[] = intval($pageSize);
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $contests = [];
@@ -912,7 +928,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
         $params[] = intval($offset);
         $params[] = intval($renglones_por_pagina);
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $contests = [];
@@ -986,7 +1002,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
         $params[] = intval($offset);
         $params[] = intval($renglones_por_pagina);
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $contests = [];
@@ -1054,7 +1070,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
         }
         $params[] = intval($offset);
         $params[] = intval($renglones_por_pagina);
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, contestants: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, organizer: string, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, participating: int, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
 
         $contests = [];
@@ -1123,7 +1139,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
      * Check if contest is virtual contest
      */
     public static function isVirtual(\OmegaUp\DAO\VO\Contests $contest): bool {
-        return $contest->rerun_id != 0;
+        return !is_null($contest->rerun_id);
     }
 
     /**
@@ -1149,7 +1165,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
-     * @return list<array{name: null|string, username: string, email: null|string, state: null|string, country: null|string, school: null|string}>
+     * @return list<array{name: null|string, username: string, email: null|string, gender: null|string, state: null|string, country: null|string, school: null|string}>
      */
     public static function getContestantsInfo(
         int $contestId
@@ -1158,6 +1174,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             SELECT
                 i.name,
                 i.username,
+                i.gender,
                 IF(pi.share_user_information, e.email, NULL) AS email,
                 IF(pi.share_user_information, st.name, NULL) AS state,
                 IF(pi.share_user_information, cn.name, NULL) AS country,
@@ -1185,7 +1202,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 AND archived = 0;
         ';
 
-        /** @var list<array{country: null|string, email: null|string, name: null|string, school: null|string, state: null|string, username: string}> */
+        /** @var list<array{country: null|string, email: null|string, gender: null|string, name: null|string, school: null|string, state: null|string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$contestId]
@@ -1208,7 +1225,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             [$contestId]
         );
 
-        return $requestsUsersInfo === 'yes' || $requestsUsersInfo ===  'optional';
+        return $requestsUsersInfo === 'required' || $requestsUsersInfo ===  'optional';
     }
 
     /**

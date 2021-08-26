@@ -1,6 +1,6 @@
 <template>
   <tr>
-    <td class="text-center align-middle">
+    <th scope="row" class="text-center align-middle">
       <a :href="studentProgressUrl">
         <omegaup-user-username
           :classname="student.classname"
@@ -9,11 +9,19 @@
           :country="student.country_id"
         ></omegaup-user-username>
       </a>
+    </th>
+    <td data-global-score class="text-center font-weight-bold align-middle">
+      <span class="d-block">{{ globalScore }}%</span>
+      <span class="d-block">{{
+        ui.formatString(T.studentProgressDescriptionTotalPoints, {
+          points: globalPoints,
+        })
+      }}</span>
     </td>
     <td
       v-for="assignment in assignments"
       :key="assignment.alias"
-      class="flex-column text-center text-nowrap justify-content-center align-items-center"
+      class="flex-column text-center align-middle text-nowrap justify-content-center align-items-center"
     >
       <span class="d-block">{{
         getProgressByAssignment(assignment.alias)
@@ -44,14 +52,6 @@
           ></div>
         </div>
       </div>
-    </td>
-    <td data-global-score class="text-center font-weight-bold align-middle">
-      <span class="d-block">{{ globalScore }}%</span>
-      <span class="d-block">{{
-        ui.formatString(T.studentProgressDescriptionTotalPoints, {
-          points: globalPoints,
-        })
-      }}</span>
     </td>
   </tr>
 </template>

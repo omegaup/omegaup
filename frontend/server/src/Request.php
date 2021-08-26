@@ -78,7 +78,7 @@ class Request extends \ArrayObject {
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
         }
         if (is_null($response) || !is_array($response)) {
-            $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
+            throw new \OmegaUp\Exceptions\InternalServerErrorException(
                 'generalError',
                 new \Exception('API did not return an array.')
             );
@@ -435,9 +435,7 @@ class Request extends \ArrayObject {
         $this->user = null;
         $this->identity = null;
         $this->loginIdentity = null;
-        $session = \OmegaUp\Controllers\Session::getCurrentSession(
-            $this
-        );
+        $session = \OmegaUp\Controllers\Session::getCurrentSession($this);
         if (is_null($session['identity'])) {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
         }

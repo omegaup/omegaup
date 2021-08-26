@@ -241,6 +241,7 @@ class ScoreboardParams {
         return new ScoreboardParams([
             'alias' => $assignment->alias,
             'title' => $assignment->name,
+            'admin' => $showAllRuns,
             'problemset_id' => $assignment->problemset_id,
             'start_time' => $assignment->start_time,
             'finish_time' => $assignment->finish_time,

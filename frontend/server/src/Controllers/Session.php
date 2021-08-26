@@ -88,7 +88,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             return [
                 'token' => $token,
                 'username' => null,
-                'cacheKey' => "api-token:${token}",
+                'cacheKey' => "api-token:{$token}",
             ];
         }
         $tokens = explode(',', $token);
@@ -110,7 +110,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         return [
             'token' => $authorization['Credential'],
             'username' => $authorization['Username'],
-            'cacheKey' => "api-token:${authorization['Credential']}:${authorization['Username']}",
+            'cacheKey' => "api-token:{$authorization['Credential']}:{$authorization['Username']}",
         ];
     }
 
@@ -193,7 +193,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                 "X-RateLimit-Limit: {$usageData['limit']}"
             );
             $sessionManagerInstance->setHeader(
-                "X-RateLimit-Remaining: ${usageData['remaining']}"
+                "X-RateLimit-Remaining: {$usageData['remaining']}"
             );
             $sessionManagerInstance->setHeader(
                 "X-RateLimit-Reset: {$usageData['reset']->time}"
@@ -211,24 +211,9 @@ class Session extends \OmegaUp\Controllers\Controller {
                 $authToken = self::getAuthToken($r);
                 $r['auth_token'] = $authToken;
             }
-            if (
-                defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
-                OMEGAUP_SESSION_CACHE_ENABLED === true &&
-                !is_null($authToken)
-            ) {
-                self::$_currentSession = \OmegaUp\Cache::getFromCacheOrSet(
-                    \OmegaUp\Cache::SESSION_PREFIX,
-                    $authToken,
-                    fn () => self::getCurrentSessionImplForAuthToken(
-                        $authToken
-                    ),
-                    APC_USER_CACHE_SESSION_TIMEOUT
-                );
-            } else {
-                self::$_currentSession = self::getCurrentSessionImplForAuthToken(
-                    $authToken
-                );
-            }
+            self::$_currentSession = self::getCurrentSessionImplForAuthToken(
+                $authToken
+            );
         }
         return self::$_currentSession;
     }
@@ -237,12 +222,11 @@ class Session extends \OmegaUp\Controllers\Controller {
      * @return CurrentSession
      */
     private static function getCurrentSessionImplForAuthToken(?string $authToken): array {
+        $identityExt = null;
         if (!empty($authToken)) {
             $identityExt = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
                 $authToken
             );
-        } else {
-            $identityExt = null;
         }
         if (is_null($identityExt) || is_null($authToken)) {
             // Means user has auth token, but does not exist in DB
@@ -314,9 +298,17 @@ class Session extends \OmegaUp\Controllers\Controller {
         $loginIdentity = new \OmegaUp\DAO\VO\Identities($loginIdentityExt);
 
         $associatedIdentities = [];
+        $currentUser = null;
+        $email = null;
         if (is_null($currentIdentity->user_id)) {
-            $currentUser = null;
-            $email = null;
+            if (\OmegaUp\DAO\Identities::isMainIdentity($loginIdentity)) {
+                $associatedIdentities = [
+                    [
+                        'username' => strval($loginIdentity->username),
+                        'default' => true,
+                    ],
+                ];
+            }
         } else {
             $currentUser = \OmegaUp\DAO\Users::getByPK(
                 $currentIdentity->user_id
@@ -609,44 +601,6 @@ class Session extends \OmegaUp\Controllers\Controller {
         self::redirect();
     }
 
-    public static function loginViaLinkedIn(
-        string $code,
-        string $state,
-        ?string $redirect
-    ): void {
-        try {
-            $li = self::getLinkedInInstance($redirect);
-            $authToken = $li->getAuthToken($code, $state);
-            $profile = $li->getProfileInfo($authToken);
-            $redirect = $li->extractRedirect($state);
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            self::$log->error("Unable to login via LinkedIn: $e");
-            throw $e;
-        }
-        \OmegaUp\Controllers\Session::thirdPartyLogin(
-            'LinkedIn',
-            $profile['emailAddress'],
-            "{$profile['firstName']} {$profile['lastName']}"
-        );
-
-        self::redirect($redirect);
-    }
-
-    private static function getLinkedInInstance(
-        ?string $redirect = null
-    ): \OmegaUp\LinkedIn {
-        return new \OmegaUp\LinkedIn(
-            OMEGAUP_LINKEDIN_CLIENTID,
-            OMEGAUP_LINKEDIN_SECRET,
-            OMEGAUP_URL . '/login?linkedin',
-            $redirect
-        );
-    }
-
-    public static function getLinkedInLoginUrl(): string {
-        return self::getLinkedInInstance()->getLoginUrl();
-    }
-
     private static function getRedirectUrl(?string $url = null): string {
         $defaultRedirectUrl = '/profile/';
         if (is_null($url)) {
@@ -685,26 +639,20 @@ class Session extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $usernameOrEmail
      */
     public static function nativeLogin(\OmegaUp\Request $r): string {
-        \OmegaUp\Validators::validateStringNonEmpty($r['password'], 'password');
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['usernameOrEmail'],
-            'usernameOrEmail'
-        );
+        $password = $r->ensureString('password');
+        $usernameOrEmail = $r->ensureString('usernameOrEmail');
 
         try {
             $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
-                $r['usernameOrEmail']
+                $usernameOrEmail
             );
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            self::$log->warn("Identity {$r['usernameOrEmail']} not found.");
+            self::$log->warn("Identity {$usernameOrEmail} not found.");
             throw new \OmegaUp\Exceptions\InvalidCredentialsException();
         }
 
         if (
-            !\OmegaUp\Controllers\Identity::testPassword(
-                $identity,
-                $r['password']
-            )
+            !\OmegaUp\Controllers\Identity::testPassword($identity, $password)
         ) {
             self::$log->warn(
                 "Identity {$identity->username} has introduced invalid credentials."
@@ -719,9 +667,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             self::$log->warn(
                 "Identity {$identity->username}'s password hash is being upgraded."
             );
-            $identity->password = \OmegaUp\SecurityTools::hashString(
-                $r['password']
-            );
+            $identity->password = \OmegaUp\SecurityTools::hashString($password);
             \OmegaUp\DAO\Identities::update($identity);
         }
 
@@ -757,9 +703,19 @@ class Session extends \OmegaUp\Controllers\Controller {
         string $usernameOrEmail,
         \OmegaUp\DAO\VO\Identities $loggedIdentity
     ): void {
-        // Only users that originally logged in from their main identities can
-        // select another identity.
-        if (!$r->isLoggedAsMainIdentity()) {
+        // Only users that originally logged in from their main identities, or
+        // from an identity that matches the target identity can select another
+        // identity.
+        $targetIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $usernameOrEmail
+        );
+        if (
+            !$r->isLoggedAsMainIdentity()
+            && (
+                is_null($r->loginIdentity)
+                || $targetIdentity->identity_id !== $r->loginIdentity->identity_id
+            )
+        ) {
             throw new \OmegaUp\Exceptions\UnauthorizedException(
                 'userNotAllowed'
             );
@@ -775,7 +731,9 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         $identity = \OmegaUp\DAO\Identities::resolveAssociatedIdentity(
             $usernameOrEmail,
-            $loggedIdentity
+            /*$currentIdentity=*/ !is_null(
+                $loggedIdentity->user_id
+            ) ? $loggedIdentity : $targetIdentity
         );
         if (is_null($identity) || is_null($identity->identity_id)) {
             self::$log->warn("Identity {$usernameOrEmail} not found.");

@@ -5,13 +5,19 @@
 /**
  *  TeamsGroupController
  *
- * @psalm-type Identity=array{classname?: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, password?: string, school: null|string, school_id: int|null, school_name?: string, state: null|string, state_id: null|string, username: string}
- * @psalm-type TeamGroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<Identity>, isOrganizer: bool, teamGroup: array{alias: string, description: null|string, name: null|string}}
+ * @psalm-type Identity=array{classname?: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, password?: string, school: null|string, school_id: int|null, school_name?: string, state: null|string, state_id: null|string, username: string, usernames?: string}
+ * @psalm-type TeamMember=array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}
+ * @psalm-type TeamGroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<Identity>, isOrganizer: bool, maxNumberOfContestants: int, teamGroup: array{alias: string, description: null|string, name: null|string, numberOfContestants: int}, teamsMembers: list<TeamMember>}
+ * @psalm-type TeamGroupNewPayload=array{numberOfContestants: int, maxNumberOfContestants: int}
  * @psalm-type TeamsGroup=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
  * @psalm-type TeamsGroupListPayload=array{teamsGroups: list<TeamsGroup>}
+ * @psalm-type ListItem=array{key: string, value: string}
  */
 
 class TeamsGroup extends \OmegaUp\Controllers\Controller {
+    const NUMBER_OF_CONTESTANTS = 3;
+    const MAX_NUMBER_OF_CONTESTANTS = 10;
+
     /**
      * Validate team group param
      *
@@ -91,6 +97,29 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{smartyProperties: array{payload: TeamGroupNewPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     */
+    public static function getTeamGroupNewDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ) {
+        // Authenticate user
+        $r->ensureMainUserIdentity();
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'numberOfContestants' => self::NUMBER_OF_CONTESTANTS,
+                    'maxNumberOfContestants' => self::MAX_NUMBER_OF_CONTESTANTS,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleTeamsGroupNew'
+                ),
+            ],
+            'entrypoint' => 'teams_group_new',
+        ];
+    }
+
+    /**
      * @return array{smartyProperties: array{payload: TeamGroupEditPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $team_group_alias
@@ -123,7 +152,9 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
                         'alias' => $teamGroupAlias,
                         'name' => $teamGroup->name,
                         'description' => $teamGroup->description,
+                        'numberOfContestants' => $teamGroup->number_of_contestants,
                     ],
+                    'maxNumberOfContestants' => self::MAX_NUMBER_OF_CONTESTANTS,
                     'countries' => \OmegaUp\DAO\Countries::getAll(
                         null,
                         100,
@@ -132,9 +163,10 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
                     'identities' => \OmegaUp\DAO\Teams::getTeamGroupIdentities(
                         $teamGroup
                     ),
-                    'isOrganizer' => \OmegaUp\Experiments::getInstance()->isEnabled(
-                        \OmegaUp\Experiments::IDENTITIES
-                    ) && \OmegaUp\Authorization::canCreateGroupIdentities(
+                    'teamsMembers' => \OmegaUp\DAO\TeamUsers::getByTeamGroupId(
+                        $teamGroup->team_group_id
+                    )['teamsUsers'],
+                    'isOrganizer' => \OmegaUp\Authorization::canCreateGroupIdentities(
                         $r->identity
                     ),
                 ],
@@ -149,16 +181,18 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
     /**
      * Utility function to create a new team group.
      */
-    public static function createTeamGroup(
+    private static function createTeamGroup(
         string $alias,
         string $name,
         string $description,
+        int $numberOfContestants,
         int $ownerUserId
     ): \OmegaUp\DAO\VO\TeamGroups {
         $teamGroup = new \OmegaUp\DAO\VO\TeamGroups([
             'alias' => $alias,
             'name' => $name,
             'description' => $description,
+            'number_of_contestants' => $numberOfContestants,
         ]);
         $teamGroupAcl = new \OmegaUp\DAO\VO\ACLs(['owner_id' => $ownerUserId]);
 
@@ -195,6 +229,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $alias
      * @omegaup-request-param string $description
      * @omegaup-request-param string $name
+     * @omegaup-request-param int|null $numberOfContestants
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
@@ -205,11 +240,15 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         );
         $name = $r->ensureString('name');
         $description = $r->ensureString('description');
+        $numberOfContestants = $r->ensureOptionalInt(
+            'numberOfContestants'
+        ) ?? self::NUMBER_OF_CONTESTANTS;
 
         self::createTeamGroup(
             $teamGroupAlias,
             $name,
             $description,
+            $numberOfContestants,
             $r->user->user_id
         );
 
@@ -224,6 +263,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $alias
      * @omegaup-request-param string $description
      * @omegaup-request-param string $name
+     * @omegaup-request-param int|null $numberOfContestants
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
@@ -246,6 +286,11 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
 
         $teamsGroup->name = $r->ensureString('name');
         $teamsGroup->description = $r->ensureString('description');
+        $teamsGroup->number_of_contestants = $r->ensureInt(
+            'numberOfContestants',
+            /*$lowerBound=*/ 1,
+            /*$upperBound=*/ self::MAX_NUMBER_OF_CONTESTANTS,
+        );
         \OmegaUp\DAO\TeamGroups::update($teamsGroup);
         self::$log->info(
             "Teams group {$teamsGroup->alias} updated succesfully."
@@ -332,5 +377,179 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         self::$log->info("Removed {$resolvedIdentity->username}");
 
         return ['status' => 'ok'];
+    }
+
+    /**
+     * Add one or more users to a given team
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $team_group_alias The username of the team.
+     * @omegaup-request-param string $usernames Username of all members to add
+     */
+    public static function apiAddMembers(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+
+        $teamUsername = $r->ensureString(
+            'team_group_alias',
+            fn (string $alias) => \OmegaUp\Validators::usernameOrTeamUsernameOrEmail(
+                $alias
+            )
+        );
+        $team = \OmegaUp\DAO\TeamGroups::getByTeamUsername($teamUsername);
+        if (is_null($team)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'teams_group_alias'
+            );
+        }
+
+        $teamsGroup = self::validateTeamGroupAndOwner(
+            $team['alias'],
+            $r->identity
+        );
+        if (is_null($teamsGroup) || is_null($teamsGroup->team_group_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'teams_group_alias'
+            );
+        }
+
+        $identitiesUsernames = explode(',', $r->ensureString('usernames'));
+
+        $teamUsers = \OmegaUp\DAO\TeamUsers::getByTeamGroupId(
+            $teamsGroup->team_group_id
+        )['teamsUsers'];
+
+        $teamsUsersUsernames = array_map(
+            fn ($teamUser) => $teamUser['username'],
+            $teamUsers,
+        );
+
+        foreach ($identitiesUsernames as $identityUsername) {
+            if (in_array($identityUsername, $teamsUsersUsernames)) {
+                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'teamMemberUsernameInUse'
+                );
+            }
+        }
+
+        \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
+            $team['team_id'],
+            $identitiesUsernames
+        );
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Gets a list of teams groups. This returns an array instead of an object
+     * since it is used by typeahead.
+     *
+     * @omegaup-request-param null|string $query
+     *
+     * @return list<ListItem>
+     */
+    public static function apiList(\OmegaUp\Request $r): array {
+        // Authenticate user
+        $r->ensureMainUserIdentity();
+
+        $query = $r->ensureString('query');
+
+        return \OmegaUp\DAO\TeamGroups::findByNameOrAlias($query);
+    }
+
+    /**
+     * Remove an existing team member of a teams group
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $team_group_alias The username of the team
+     * @omegaup-request-param string $username The username of user to remove
+     */
+    public static function apiRemoveMember(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+
+        $teamUsername = $r->ensureString(
+            'team_group_alias',
+            fn (string $alias) => \OmegaUp\Validators::usernameOrTeamUsernameOrEmail(
+                $alias
+            )
+        );
+        $team = \OmegaUp\DAO\TeamGroups::getByTeamUsername($teamUsername);
+        if (is_null($team)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'teams_group_alias'
+            );
+        }
+
+        $teamsGroup = self::validateTeamGroupAndOwner(
+            $team['alias'],
+            $r->identity
+        );
+        if (is_null($teamsGroup) || is_null($teamsGroup->team_group_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'teams_group_alias'
+            );
+        }
+
+        $user = \OmegaUp\DAO\Users::FindByUsername(
+            $r->ensureString(
+                'username'
+            )
+        );
+        if (is_null($user) || is_null($user->user_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'user_id'
+            );
+        }
+
+        \OmegaUp\DAO\TeamUsers::delete(
+            new \OmegaUp\DAO\VO\TeamUsers([
+                'team_id' => $team['team_id'],
+                'user_id' => $user->user_id,
+            ])
+        );
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Get a list of team members of a teams group
+     *
+     * @return array{pageNumber: int, teamsUsers: list<TeamMember>, totalRows: int}
+     *
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     * @omegaup-request-param string $team_group_alias The username of the team.
+     */
+    public static function apiTeamsMembers(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 100;
+        $teamGroupAlias = $r->ensureString(
+            'team_group_alias',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
+        );
+        $teamGroup = self::validateTeamGroupAndOwner(
+            $teamGroupAlias,
+            $r->identity
+        );
+        if (is_null($teamGroup) || is_null($teamGroup->team_group_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'team_group_alias'
+            );
+        }
+
+        return \OmegaUp\DAO\TeamUsers::getByTeamGroupId(
+            $teamGroup->team_group_id,
+            $page,
+            $pageSize
+        );
     }
 }

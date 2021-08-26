@@ -6,12 +6,12 @@
           <strong>{{ T.profileUsername }}</strong>
         </div>
         <div class="col-sm-9 field-data">
-          https://omegaup.com/profile/<strong
-            ><omegaup-user-username
-              :classname="profile.classname"
-              :username="profile.username"
-            ></omegaup-user-username></strong
-          >/
+          <omegaup-user-username
+            :classname="profile.classname"
+            :username="profile.username"
+          >
+            <template #username-url>{{ urlUsername }}</template>
+          </omegaup-user-username>
         </div>
       </div>
       <div v-if="!profile.is_private" class="form-group row padding-field">
@@ -23,17 +23,16 @@
         </div>
       </div>
 
-      <div v-if="!profile.is_private">
-        <div class="form-group row padding-field">
-          <div class="col-sm-3">
-            <strong>{{ T.profileEmail }}</strong>
-          </div>
-          <div class="col-sm-9 field-data">
-            Primary: <strong data-email> {{ profile.email }}</strong
-            >&nbsp;
-          </div>
+      <div v-if="profile.email" class="form-group row padding-field">
+        <div class="col-sm-3">
+          <strong>{{ T.profileEmail }}</strong>
         </div>
+        <div class="col-sm-9 field-data">
+          Primary: <strong data-email>{{ profile.email }}</strong>
+        </div>
+      </div>
 
+      <div v-if="profile.email || !profile.is_private">
         <div class="form-group row padding-field">
           <div class="col-sm-3">
             <strong>{{ T.profileCountry }}</strong>
@@ -92,8 +91,12 @@
         </div>
       </div>
     </div>
-    <a v-if="!profile.email" :href="`/submissions/${profile.username}/`">
-      {{ T.wordsSeeLatestSubmissions }}
+    <a v-if="!profile.is_private" :href="`/submissions/${profile.username}/`">
+      {{
+        ui.formatString(T.wordsSeeLatestSubmissions, {
+          username: profile.username,
+        })
+      }}
     </a>
   </div>
 </template>
@@ -103,6 +106,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import user_Username from './Username.vue';
+import * as ui from '../../ui';
 
 @Component({
   components: {
@@ -113,6 +117,11 @@ export default class UserBasicInfo extends Vue {
   @Prop() profile!: types.UserProfile;
   @Prop() rank!: string;
   T = T;
+  ui = ui;
+
+  get urlUsername(): string {
+    return `https://omegaup.com/profile/${this.profile.username}/`;
+  }
 }
 </script>
 

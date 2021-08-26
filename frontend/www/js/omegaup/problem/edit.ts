@@ -35,6 +35,7 @@ OmegaUp.on('ready', () => {
       problemLevel: payload.problemLevel,
       selectedPublicTags: payload.selectedPublicTags,
       selectedPrivateTags: payload.selectedPrivateTags,
+      searchResultUsers: [] as types.ListItem[],
     }),
     methods: {
       refreshProblemAdmins: (): void => {
@@ -61,6 +62,7 @@ OmegaUp.on('ready', () => {
           problemLevel: this.problemLevel,
           selectedPublicTags: this.selectedPublicTags,
           selectedPrivateTags: this.selectedPrivateTags,
+          searchResultUsers: this.searchResultUsers,
         },
         on: {
           'update-problem-level': (levelTag?: string) => {
@@ -281,6 +283,20 @@ OmegaUp.on('ready', () => {
             api.Problem.delete({ problem_alias: problemAlias })
               .then(() => {
                 window.location.href = '/problem/mine/';
+              })
+              .catch(ui.apiError);
+          },
+          'update-search-result-users': (query: string) => {
+            api.User.list({ query })
+              .then(({ results }) => {
+                this.searchResultUsers = results.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
               })
               .catch(ui.apiError);
           },

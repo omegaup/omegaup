@@ -176,6 +176,7 @@
         <omegaup-problem-admins
           :initial-admins="initialAdmins"
           :has-parent-component="true"
+          :search-result-users="searchResultUsers"
           @emit-add-admin="
             (addAdminComponent) =>
               $emit('add-admin', addAdminComponent.username)
@@ -183,6 +184,9 @@
           @emit-remove-admin="
             (addAdminComponent) =>
               $emit('remove-admin', addAdminComponent.selected.username)
+          "
+          @update-search-result-users="
+            (query) => $emit('update-search-result-users', query)
           "
         ></omegaup-problem-admins>
         <omegaup-problem-groupadmins
@@ -296,6 +300,7 @@ export default class ProblemEdit extends Vue {
   @Prop() initialGroups!: types.ProblemGroupAdmin[];
   @Prop({ default: null }) solution!: types.ProblemStatement | null;
   @Prop() statement!: types.ProblemStatement;
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
   alias = this.data.alias;

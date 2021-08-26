@@ -24,6 +24,9 @@ OmegaUp.on('ready', () => {
       users: payload.users,
       searchResultProblems: [] as types.ListItem[],
       searchResultUsers: [] as types.ListItem[],
+      searchResultTeamsGroups: [] as types.ListItem[],
+      searchResultGroups: [] as types.ListItem[],
+      teamsGroup: payload.teams_group,
     }),
     methods: {
       arbitrateRequest: (username: string, resolution: boolean): void => {
@@ -120,6 +123,9 @@ OmegaUp.on('ready', () => {
           users: this.users,
           searchResultProblems: this.searchResultProblems,
           searchResultUsers: this.searchResultUsers,
+          searchResultTeamsGroups: this.searchResultTeamsGroups,
+          searchResultGroups: this.searchResultGroups,
+          teamsGroup: this.teamsGroup,
         },
         on: {
           'update-search-result-problems': (query: string) => {
@@ -143,34 +149,85 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'update-search-result-groups': (query: string) => {
+            api.Group.list({
+              query,
+            })
+              .then((data) => {
+                // Groups previously added into the contest should not be
+                // shown in the dropdown
+                const addedGroups = new Set(
+                  this.groups.map((problem) => problem.alias),
+                );
+                this.searchResultGroups = data
+                  .filter((group) => !addedGroups.has(group.value))
+                  .map((group) => ({
+                    key: group.value,
+                    value: `${ui.escape(group.label)} (<strong>${ui.escape(
+                      group.value,
+                    )}</strong>)`,
+                  }));
+              })
+              .catch(ui.apiError);
+          },
           'update-search-result-users': (query: string) => {
             api.User.list({ query })
-              .then((data) => {
+              .then(({ results }) => {
                 // Users previously invited to the contest should not be shown
                 // in the dropdown
                 const addedUsers = new Set(
                   this.users.map((user) => user.username),
                 );
 
-                this.searchResultUsers = data
-                  .filter((user) => !addedUsers.has(user.label))
-                  .map((user) => ({
-                    key: user.label,
-                    value: `${ui.escape(user.label)} (<strong>${ui.escape(
-                      user.value,
+                this.searchResultUsers = results
+                  .filter((user) => !addedUsers.has(user.key))
+                  .map(({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
                     )}</strong>)`,
                   }));
               })
               .catch(ui.apiError);
           },
-          'update-contest': function (contest: types.ContestAdminDetails) {
-            api.Contest.update(
-              Object.assign({}, contest, {
-                contest_alias: contest.alias,
-                alias: null,
-              }),
-            )
-              .then(() => {
+          'update-search-result-teams-groups': (query: string) => {
+            api.TeamsGroup.list({
+              query,
+            })
+              .then((data) => {
+                this.searchResultTeamsGroups = data.map(
+                  ({ key, value }: { key: string; value: string }) => ({
+                    key,
+                    value: `${ui.escape(value)} (<strong>${ui.escape(
+                      key,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
+          'update-contest': ({
+            contest,
+            teamsGroupAlias,
+          }: {
+            contest: types.ContestAdminDetails;
+            teamsGroupAlias?: string;
+          }): void => {
+            api.Contest.update({
+              ...contest,
+              contest_alias: contest.alias,
+              alias: null,
+              teams_group_alias: teamsGroupAlias,
+              contest_for_teams: !!teamsGroupAlias,
+            })
+              .then((data) => {
+                if (teamsGroupAlias && data.teamsGroupName) {
+                  this.teamsGroup = {
+                    alias: teamsGroupAlias,
+                    name: data.teamsGroupName,
+                  };
+                }
+                this.details.title = data.title;
                 ui.success(`
                   ${T.contestEditContestEdited} <a href="/arena/${contest.alias}/">${T.contestEditGoToContest}</a>
                 `);
@@ -442,6 +499,23 @@ OmegaUp.on('ready', () => {
                   return;
                 }
                 ui.success(T.contestEditUnarchivedSuccess);
+              })
+              .catch(ui.apiError);
+          },
+          'replace-teams-group': ({
+            alias,
+            name,
+          }: {
+            alias: string;
+            name: string;
+          }) => {
+            api.Contest.replaceTeamsGroup({
+              contest_alias: payload.details.alias,
+              teams_group_alias: alias,
+            })
+              .then(() => {
+                this.teamsGroup = { alias, name };
+                ui.success(T.contestEditTeamsGroupReplaced);
               })
               .catch(ui.apiError);
           },

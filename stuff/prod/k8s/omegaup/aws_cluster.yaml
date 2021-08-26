@@ -1,0 +1,42 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: omegaup-eks-cluster
+  region: us-east-1
+  version: "1.20"
+  tags: { k8s: "" }
+
+vpc:
+  id: vpc-0184b58c0938e54cd
+  securityGroup: sg-0d971795d82c9af80
+  cidr: 192.168.0.0/16
+  subnets:
+    private:
+      us-east-1a: { id: subnet-0201c193734a01645 }
+      us-east-1b: { id: subnet-04b2d4d5664c55ecd }
+    public:
+      us-east-1a: { id: subnet-0770ecf68cf733eb6 }
+      us-east-1b: { id: subnet-0372ef2108c0387da }
+  autoAllocateIPv6: true
+
+nodeGroups:
+- name: omegaup-eks-nodes
+  labels: { role: workers, k8s: "" }
+  instanceType: t2.medium
+  desiredCapacity: 2
+  privateNetworking: true
+  ssh:
+    allow: true
+    publicKeyPath: ~/.ssh/omegaup-eks.pem.pub
+
+secretsEncryption:
+  keyARN: arn:aws:kms:us-east-1:273107833591:key/mrk-b51dea56f02f4964835066e80ee531b0
+
+addons:
+- name: vpc-cni
+  version: 1.8.0
+- name: coredns
+  version: 1.8.3
+- name: kube-proxy
+  version: 1.19.6

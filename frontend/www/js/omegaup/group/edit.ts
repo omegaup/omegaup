@@ -9,9 +9,12 @@ import T from '../lang';
 import Vue from 'vue';
 import * as CSV from '@/third_party/js/csv.js/csv.js';
 import {
-  cleanRecords,
+  downloadCsvFile,
   generateHumanReadablePassword,
   generatePassword,
+  getCSVRecords,
+  identityOptionalFields,
+  identityRequiredFields,
 } from '../groups';
 
 OmegaUp.on('ready', () => {
@@ -33,6 +36,7 @@ OmegaUp.on('ready', () => {
       ),
       scoreboards: payload.scoreboards,
       userErrorRow: null,
+      searchResultUsers: [] as types.ListItem[],
     }),
     methods: {
       refreshGroupScoreboards: (): void => {
@@ -68,6 +72,7 @@ OmegaUp.on('ready', () => {
           identitiesCsv: this.identitiesCsv,
           scoreboards: this.scoreboards,
           userErrorRow: this.userErrorRow,
+          searchResultUsers: this.searchResultUsers,
         },
         on: {
           'update-group': (name: string, description: string) => {
@@ -205,40 +210,19 @@ OmegaUp.on('ready', () => {
               });
           },
           'download-identities': (identities: types.Identity[]) => {
-            const dialect = {
-              dialect: {
-                csvddfVersion: 1.2,
-                delimiter: ',',
-                doubleQuote: true,
-                lineTerminator: '\r\n',
-                quoteChar: '"',
-                skipInitialSpace: true,
-                header: true,
-                commentChar: '#',
-              },
-            };
-            const csv = CSV.serialize(
-              {
-                fields: [
-                  { id: 'username' },
-                  { id: 'name' },
-                  { id: 'password' },
-                  { id: 'country_id' },
-                  { id: 'state_id' },
-                  { id: 'gender' },
-                  { id: 'school_name' },
-                ],
-                records: identities,
-              },
-              dialect,
-            );
-            const hiddenElement = document.createElement('a');
-            hiddenElement.href = `data:text/csv;charset=utf-8,${window.encodeURIComponent(
-              csv,
-            )}`;
-            hiddenElement.target = '_blank';
-            hiddenElement.download = 'identities.csv';
-            hiddenElement.click();
+            downloadCsvFile({
+              fileName: `identities_${payload.groupAlias}.csv`,
+              columns: [
+                'username',
+                'name',
+                'password',
+                'country_id',
+                'state_id',
+                'gender',
+                'school_name',
+              ],
+              records: identities,
+            });
           },
           'read-csv': ({
             identities,
@@ -251,18 +235,24 @@ OmegaUp.on('ready', () => {
           }) => {
             CSV.fetch({ file })
               .done((dataset: CSV.Dataset) => {
-                if (!dataset.fields || dataset.fields.length != 6) {
+                if (!dataset.fields) {
                   ui.error(T.groupsInvalidCsv);
                   return;
                 }
-                for (const [
+                const records = getCSVRecords<types.Identity>({
+                  fields: dataset.fields,
+                  records: dataset.records,
+                  requiredFields: identityRequiredFields,
+                  optionalFields: identityOptionalFields,
+                });
+                for (const {
                   username,
                   name,
                   country_id,
                   state_id,
                   gender,
                   school_name,
-                ] of cleanRecords(dataset.records)) {
+                } of records) {
                   identities.push({
                     username: `${payload.groupAlias}:${username}`,
                     name,
@@ -284,6 +274,20 @@ OmegaUp.on('ready', () => {
           },
           'invalid-file': () => {
             ui.error(T.groupsInvalidCsv);
+          },
+          'update-search-result-users': (query: string) => {
+            api.User.list({ query })
+              .then(({ results }) => {
+                this.searchResultUsers = results.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
           },
         },
       });

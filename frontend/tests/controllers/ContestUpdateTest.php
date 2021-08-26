@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of ContestUpdateContest
@@ -212,7 +213,10 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Our contestant has to open the contest before sending a run
-        \OmegaUp\Test\Factories\Contest::openContest($contestData, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contestData['contest'],
+            $identity
+        );
 
         // Then we need to open the problem
         \OmegaUp\Test\Factories\Contest::openProblemInContest(
@@ -346,7 +350,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
             // The problem is opened 5 minutes after contest starts.
             \OmegaUp\Test\Factories\Contest::openContest(
-                $contestData,
+                $contestData['contest'],
                 $identity
             );
             \OmegaUp\Test\Factories\Contest::openProblemInContest(
@@ -692,7 +696,10 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // User joins the contest 4 hours and 50 minutes after it starts
         $updatedTime = $originalTime->time + 290 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        \OmegaUp\Test\Factories\Contest::openContest($contest, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contest['contest'],
+            $identity
+        );
         $directorLogin = self::login($contest['director']);
 
         // Update window_length
@@ -756,7 +763,10 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Contest::addUser($contest, $identity);
 
         // User joins contest immediatly it was created
-        \OmegaUp\Test\Factories\Contest::openContest($contest, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contest['contest'],
+            $identity
+        );
 
         $directorLogin = self::login($contest['director']);
 
@@ -832,7 +842,10 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // User joins the contest 4 hours and 30 minutes after it starts
         $updatedTime = $originalTime + 270 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        \OmegaUp\Test\Factories\Contest::openContest($contest, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contest['contest'],
+            $identity
+        );
         \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $contest,
             $problem,
@@ -904,7 +917,10 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // User joins the contest 10 minutes after it starts
         $updatedTime = $originalTime + 10 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        \OmegaUp\Test\Factories\Contest::openContest($contest, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contest['contest'],
+            $identity
+        );
         \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $contest,
             $problem,
@@ -1149,6 +1165,98 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $partialScore,
             $identity->username
         );
+    }
+
+    public function testUpdateContestForTeams() {
+        // Get a problem
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get two teams groups
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+        [
+            'teamGroup' => $otherTeamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestForTeams' => true,
+                'teamsGroupAlias' => $teamGroup->alias,
+            ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contestData
+        );
+
+        $login = self::login($contestData['director']);
+
+        $response = \OmegaUp\Controllers\Contest::getContestEditForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertTrue($response['details']['contest_for_teams']);
+        $this->assertEquals([
+            'alias' => $teamGroup->alias,
+            'name' =>  $teamGroup->name,
+        ], $response['teams_group']);
+
+        // Update teams group
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'contest_for_teams' => true,
+            'teams_group_alias' => $otherTeamGroup->alias,
+        ]));
+
+        $response = \OmegaUp\Controllers\Contest::getContestEditForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertTrue($response['details']['contest_for_teams']);
+        $this->assertEquals([
+            'alias' => $otherTeamGroup->alias,
+            'name' =>  $otherTeamGroup->name,
+        ], $response['teams_group']);
+    }
+
+    public function testUpdateContestForTeamsFromPrivateToPublic() {
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestForTeams' => true,
+                'teamsGroupAlias' => $teamGroup->alias,
+            ])
+        );
+
+        $login = self::login($contestData['director']);
+
+        // Update contest for teams to normal contest is not allowed
+        try {
+            \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'contest_for_teams' => false,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'contestForTeamsCanNotChangeToContest',
+                $e->getMessage()
+            );
+        }
     }
 
     private function assertAPIsShowCorrectContestScore(

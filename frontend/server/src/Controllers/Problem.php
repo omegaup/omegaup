@@ -2850,9 +2850,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r
         );
 
-        // Get the expected commit version.
+        // Get the expected commit.
         $commit = $problem->commit;
-        $version = strval($problem->current_version);
         if (!empty($problemset)) {
             $problemsetProblem = \OmegaUp\DAO\ProblemsetProblems::getByPK(
                 $problemset->problemset_id,
@@ -2864,7 +2863,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
             $commit = $problemsetProblem->commit;
-            $version = strval($problemsetProblem->version);
         }
 
         $response = [
@@ -4002,29 +4000,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{pagerItems: list<PageItem>, problems: list<ProblemListItem>}
      *
-     * @omegaup-request-param mixed $offset
      * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
-     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param int|null $rowcount
      */
     public static function apiMyList(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
         // Defaults for offset and rowcount
-        $offset = null;
-        $pageSize = \OmegaUp\Controllers\Problem::PAGE_SIZE;
-
-        if (is_null($r['page'])) {
-            $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
-        }
-        if (!is_null($r['rowcount'])) {
-            $pageSize = intval($r['rowcount']);
-        }
-
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('page_size');
-
-        $page = isset($r['page']) ? intval($r['page']) : 1;
+        $pageSize = $r->ensureOptionalInt(
+            'rowcount'
+        ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
+        $page = $r->ensureOptionalInt('page') ?? 1;
 
         [
             'problems' => $problems,
@@ -4190,7 +4176,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Removing existing data
-            $deletedLanguages = \OmegaUp\DAO\ProblemsLanguages::deleteProblemLanguages(new \OmegaUp\DAO\VO\ProblemsLanguages([
+            \OmegaUp\DAO\ProblemsLanguages::deleteProblemLanguages(new \OmegaUp\DAO\VO\ProblemsLanguages([
                 'problem_id' => $problem->problem_id,
             ]));
 
@@ -4292,7 +4278,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'TimeLimit' => '30s',
                 ];
             }
-            $problemSettings['Validator']['Limits']['TimeLimit'] = "{$params->validatorTimeLimit}ms";
+            if (!is_null($params->validatorTimeLimit)) {
+                $problemSettings['Validator']['Limits']['TimeLimit'] = "{$params->validatorTimeLimit}ms";
+            }
         } else {
             if (!empty($problemSettings['Validator']['Limits'])) {
                 unset($problemSettings['Validator']['Limits']);
@@ -4316,6 +4304,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if ($privateProblemsAlert) {
             $_SESSION['private_problems_alert'] = true;
         }
+            unset($scopedSession);
         }
         $visibilityStatuses = [
             'deleted' => \OmegaUp\ProblemParams::VISIBILITY_DELETED,
@@ -4924,7 +4913,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty($r['message'], 'message');
         if ($r['request'] === 'submit') {
             try {
-                $originalVisibility = $problem->visibility;
                 [
                     'problem' => $problem,
                 ] = self::updateProblem(
@@ -6002,7 +5990,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $sort_order
      */
     public static function getCollectionsDetailsByAuthorForTypeScript(\OmegaUp\Request $r): array {
-        $problems = [];
         $authorsRanking = [];
 
         $offset = $r->ensureOptionalInt('offset');

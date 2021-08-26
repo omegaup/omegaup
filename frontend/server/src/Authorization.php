@@ -58,9 +58,6 @@ class Authorization {
     // Problem reviewer.
     const REVIEWER_ROLE = 3;
 
-    // Interviewer.
-    const INTERVIEWER_ROLE = 4;
-
     // Mentor.
     const MENTOR_ROLE = 5;
 
@@ -299,16 +296,6 @@ class Authorization {
         return self::isAdmin($identity, $contest);
     }
 
-    public static function isInterviewAdmin(
-        \OmegaUp\DAO\VO\Identities $identity,
-        \OmegaUp\DAO\VO\Interviews $interview
-    ): bool {
-        if (is_null($identity->user_id)) {
-            return false;
-        }
-        return self::isAdmin($identity, $interview);
-    }
-
     public static function isProblemAdmin(
         \OmegaUp\DAO\VO\Identities $identity,
         \OmegaUp\DAO\VO\Problems $problem
@@ -541,6 +528,10 @@ class Authorization {
         }
         return self::isAdmin($identity, $problemset) ||
             \OmegaUp\DAO\GroupRoles::isContestant(
+                intval($identity->identity_id),
+                $problemset->acl_id
+            ) ||
+            \OmegaUp\DAO\TeamsGroupRoles::isContestant(
                 intval($identity->identity_id),
                 $problemset->acl_id
             );

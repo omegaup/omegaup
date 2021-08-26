@@ -484,6 +484,10 @@ export const Contest = {
     messages.ContestRemoveUserRequest,
     messages.ContestRemoveUserResponse
   >('/api/contest/removeUser/'),
+  replaceTeamsGroup: apiCall<
+    messages.ContestReplaceTeamsGroupRequest,
+    messages.ContestReplaceTeamsGroupResponse
+  >('/api/contest/replaceTeamsGroup/'),
   report: apiCall<
     messages.ContestReportRequest,
     messages._ContestReportServerResponse,
@@ -1038,6 +1042,11 @@ export const Course = {
             return x;
           }
           return x.map((x) => {
+            if (x.feedback)
+              x.feedback = ((x) => {
+                x.date = ((x: number) => new Date(x * 1000))(x.date);
+                return x;
+              })(x.feedback);
             x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           });
@@ -1172,37 +1181,10 @@ export const Identity = {
     messages.IdentityUpdateRequest,
     messages.IdentityUpdateResponse
   >('/api/identity/update/'),
-};
-
-export const Interview = {
-  addUsers: apiCall<
-    messages.InterviewAddUsersRequest,
-    messages.InterviewAddUsersResponse
-  >('/api/interview/addUsers/'),
-  create: apiCall<
-    messages.InterviewCreateRequest,
-    messages.InterviewCreateResponse
-  >('/api/interview/create/'),
-  details: apiCall<
-    messages.InterviewDetailsRequest,
-    messages._InterviewDetailsServerResponse,
-    messages.InterviewDetailsResponse
-  >('/api/interview/details/', (x) => {
-    x.users = ((x) => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map((x) => {
-        if (x.access_time)
-          x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
-        return x;
-      });
-    })(x.users);
-    return x;
-  }),
-  list: apiCall<messages.InterviewListRequest, messages.InterviewListResponse>(
-    '/api/interview/list/',
-  ),
+  updateIdentityTeam: apiCall<
+    messages.IdentityUpdateIdentityTeamRequest,
+    messages.IdentityUpdateIdentityTeamResponse
+  >('/api/identity/updateIdentityTeam/'),
 };
 
 export const Notification = {
@@ -1716,6 +1698,10 @@ export const Tag = {
 };
 
 export const TeamsGroup = {
+  addMembers: apiCall<
+    messages.TeamsGroupAddMembersRequest,
+    messages.TeamsGroupAddMembersResponse
+  >('/api/teamsGroup/addMembers/'),
   create: apiCall<
     messages.TeamsGroupCreateRequest,
     messages.TeamsGroupCreateResponse
@@ -1724,6 +1710,14 @@ export const TeamsGroup = {
     messages.TeamsGroupDetailsRequest,
     messages.TeamsGroupDetailsResponse
   >('/api/teamsGroup/details/'),
+  list: apiCall<
+    messages.TeamsGroupListRequest,
+    messages.TeamsGroupListResponse
+  >('/api/teamsGroup/list/'),
+  removeMember: apiCall<
+    messages.TeamsGroupRemoveMemberRequest,
+    messages.TeamsGroupRemoveMemberResponse
+  >('/api/teamsGroup/removeMember/'),
   removeTeam: apiCall<
     messages.TeamsGroupRemoveTeamRequest,
     messages.TeamsGroupRemoveTeamResponse
@@ -1732,6 +1726,10 @@ export const TeamsGroup = {
     messages.TeamsGroupTeamsRequest,
     messages.TeamsGroupTeamsResponse
   >('/api/teamsGroup/teams/'),
+  teamsMembers: apiCall<
+    messages.TeamsGroupTeamsMembersRequest,
+    messages.TeamsGroupTeamsMembersResponse
+  >('/api/teamsGroup/teamsMembers/'),
   update: apiCall<
     messages.TeamsGroupUpdateRequest,
     messages.TeamsGroupUpdateResponse
@@ -1845,10 +1843,6 @@ export const User = {
     messages.UserGenerateOmiUsersRequest,
     messages.UserGenerateOmiUsersResponse
   >('/api/user/generateOmiUsers/'),
-  interviewStats: apiCall<
-    messages.UserInterviewStatsRequest,
-    messages.UserInterviewStatsResponse
-  >('/api/user/interviewStats/'),
   lastPrivacyPolicyAccepted: apiCall<
     messages.UserLastPrivacyPolicyAcceptedRequest,
     messages.UserLastPrivacyPolicyAcceptedResponse

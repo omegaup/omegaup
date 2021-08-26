@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * Description of ContestUsersTest
@@ -42,7 +43,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         // the list of contest's users.
         ['user' => $nonRegisteredUser, 'identity' => $nonRegisteredIdentity] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Contest::openContest(
-            $contestData,
+            $contestData['contest'],
             $nonRegisteredIdentity
         );
 
@@ -60,11 +61,13 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount($n + 1, $response['users']);
 
         // Call search API
-        $response = \OmegaUp\Controllers\Contest::apiSearchUsers(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'query' => 'test_contest_user_'
-        ]));
+        $response = \OmegaUp\Controllers\Contest::apiSearchUsers(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'query' => 'test_contest_user_'
+            ])
+        )['results'];
         $this->assertCount(2, $response);
     }
 
@@ -73,7 +76,10 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        \OmegaUp\Test\Factories\Contest::openContest($contestData, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contestData['contest'],
+            $identity
+        );
 
         $userLogin = self::login($identity);
         \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
@@ -179,8 +185,8 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['smartyProperties']['payload'];
 
-        // Users list should be empty
-        $this->assertEmpty($contestDetails['users']);
+        // adminPayload object should not exist
+        $this->assertArrayNotHasKey('adminPayload', $contestDetails);
     }
 
     public function testContestParticipantsReport() {

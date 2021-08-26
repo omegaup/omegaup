@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Testing identity can access to contest and resolve any problem
  */
@@ -107,7 +106,10 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         $contestant->password = $password;
 
         // Our contestant has to open the contest before sending a run
-        \OmegaUp\Test\Factories\Contest::openContest($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contestData['contest'],
+            $contestant
+        );
 
         // Then we need to open the problem
         \OmegaUp\Test\Factories\Contest::openProblemInContest(
@@ -116,17 +118,20 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             $contestant
         );
 
-        $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
-
-        // Create valid run
-        $contestantLogin = self::login($contestant);
-        $runRequest = new \OmegaUp\Request([
-            'auth_token' => $contestantLogin->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'language' => 'c11-gcc',
-            'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
-        ]);
+        try {
+            $detourGrader = new \OmegaUp\Test\ScopedGraderDetour();
+            // Create valid run
+            $contestantLogin = self::login($contestant);
+            $runRequest = new \OmegaUp\Request([
+                'auth_token' => $contestantLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'language' => 'c11-gcc',
+                'source' => "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }",
+            ]);
+        } finally {
+            unset($detourGrader);
+        }
 
         return \OmegaUp\Controllers\Run::apiCreate($runRequest);
     }
@@ -180,7 +185,9 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Identity creator group member will upload csv file
-        ['user' => $creator, 'identity' => $creatorIdentity] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
         $creatorLogin = self::login($creatorIdentity);
         $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creatorIdentity,
@@ -353,6 +360,79 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             );
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+    }
+
+    public function testAddUsersToContestForTeams() {
+        // Create the user to associate
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestForTeams' => true,
+                'teamsGroupAlias' => $teamGroup->alias,
+            ])
+        );
+
+        $login = self::login($contestData['director']);
+
+        // Add users to contest for teams is not allowed
+        try {
+            \OmegaUp\Controllers\Contest::apiAddUser(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'usernameOrEmail' => $identity->username,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'usersCanNotBeAddedInContestForTeams',
+                $e->getMessage()
+            );
+        }
+    }
+
+    public function testAddGroupsToContestForTeams() {
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestForTeams' => true,
+                'teamsGroupAlias' => $teamGroup->alias,
+            ])
+        );
+
+        $login = self::login($contestData['director']);
+
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
+            /*$owner=*/            null,
+            /*$name=*/null,
+            /*$description=*/null,
+            /*$alias=*/null,
+            $login
+        );
+
+        // Add groups to contest for teams is not allowed
+        try {
+            \OmegaUp\Controllers\Contest::apiAddGroup(
+                new \OmegaUp\Request([
+                    'contest_alias' => strval($contestData['request']['alias']),
+                    'group' => $groupData['group']->alias,
+                    'auth_token' => $login->auth_token,
+                ])
+            );
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'groupsCanNotBeAddedInContestForTeams',
+                $e->getMessage()
+            );
         }
     }
 }

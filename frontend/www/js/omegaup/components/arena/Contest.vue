@@ -1,7 +1,7 @@
 <template>
   <omegaup-arena
     :active-tab="activeTab"
-    :contest-title="contest.title"
+    :contest-title="ui.contestTitle(contest)"
     :is-admin="isAdmin"
     :clarifications="currentClarifications"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
@@ -56,6 +56,7 @@
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :next-submission-timestamp="nextSubmissionTimestamp"
+              :languages="contest.languages.split(',')"
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="runs"

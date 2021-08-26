@@ -22,6 +22,7 @@ class TeamGroups extends \OmegaUp\DAO\VO\VO {
         'alias' => true,
         'name' => true,
         'description' => true,
+        'number_of_contestants' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -74,6 +75,11 @@ class TeamGroups extends \OmegaUp\DAO\VO\VO {
                 $data['description']
             ) ? strval($data['description']) : '';
         }
+        if (isset($data['number_of_contestants'])) {
+            $this->number_of_contestants = intval(
+                $data['number_of_contestants']
+            );
+        }
     }
 
     /**
@@ -119,4 +125,11 @@ class TeamGroups extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $description = null;
+
+    /**
+     * Número de concursantes para los equipos del grupo
+     *
+     * @var int
+     */
+    public $number_of_contestants = 3;
 }

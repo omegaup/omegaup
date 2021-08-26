@@ -9,7 +9,6 @@ class Identity {
         string $password = '',
         bool $forTeams = false
     ): string {
-        $row = 0;
         /** @var list<array{username: string, name: string, country_id: string, state_id: string, gender: string, school_name: string, password: string, usernames: string}> */
         $identities = [];
         $path_file = OMEGAUP_TEST_RESOURCES_ROOT . $file;
@@ -19,7 +18,7 @@ class Identity {
                 'identities'
             );
         }
-        $headers = fgetcsv($handle, 1000, ',');
+        $_headers = fgetcsv($handle, 1000, ',');
         while (
             ($data = fgetcsv(
                 $handle,
@@ -49,7 +48,6 @@ class Identity {
      * @return list<string>
      */
     public static function getUsernamesInCsvFile(string $file): array {
-        $row = 0;
         $usernames = [];
         $path_file = OMEGAUP_TEST_RESOURCES_ROOT . $file;
         if (($handle = fopen($path_file, 'r')) == false) {
@@ -58,7 +56,7 @@ class Identity {
                 'identities'
             );
         }
-        $headers = fgetcsv($handle, 1000, ',');
+        $_headers = fgetcsv($handle, 1000, ',');
         while (
             ($data = fgetcsv(
                 $handle,

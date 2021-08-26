@@ -2,6 +2,37 @@
 
 // DAO types
 export namespace dao {
+  export interface Contests {
+    acl_id?: number;
+    admission_mode?: string;
+    alias?: string;
+    archived?: boolean;
+    certificate_cutoff?: number;
+    certificates_status?: string;
+    contest_for_teams?: boolean;
+    contest_id?: number;
+    description?: string;
+    feedback?: string;
+    finish_time?: Date;
+    languages?: string;
+    last_updated?: Date;
+    partial_score?: boolean;
+    penalty?: number;
+    penalty_calc_policy?: string;
+    penalty_type?: string;
+    points_decay_factor?: number;
+    problemset_id?: number;
+    recommended?: boolean;
+    rerun_id?: number;
+    scoreboard?: number;
+    show_scoreboard_after?: boolean;
+    start_time?: Date;
+    submissions_gap?: number;
+    title?: string;
+    urgent?: boolean;
+    window_length?: number;
+  }
+
   export interface Countries {
     country_id?: string;
     name?: string;
@@ -98,9 +129,26 @@ export namespace types {
         x.currentAssignment = ((x) => {
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          if (x.runs)
+            x.runs = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.runs);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.currentAssignment);
+        x.scoreboard = ((x) => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.scoreboard);
         return x;
       })(
         JSON.parse(
@@ -212,6 +260,33 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ContestDetailsPayload {
       return ((x) => {
+        if (x.adminPayload)
+          x.adminPayload = ((x) => {
+            x.allRuns = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.allRuns);
+            x.users = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.access_time)
+                  x.access_time = ((x: number) => new Date(x * 1000))(
+                    x.access_time,
+                  );
+                if (x.end_time)
+                  x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+                return x;
+              });
+            })(x.users);
+            return x;
+          })(x.adminPayload);
         x.clarifications = ((x) => {
           if (!Array.isArray(x)) {
             return x;
@@ -226,34 +301,33 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
-        if (x.scoreboard)
-          x.scoreboard = ((x) => {
-            if (x.finish_time)
-              x.finish_time = ((x: number) => new Date(x * 1000))(
-                x.finish_time,
-              );
-            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-            x.time = ((x: number) => new Date(x * 1000))(x.time);
+        if (x.original)
+          x.original = ((x) => {
+            if (x.scoreboard)
+              x.scoreboard = ((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              })(x.scoreboard);
             return x;
-          })(x.scoreboard);
+          })(x.original);
+        x.scoreboard = ((x) => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.scoreboard);
         if (x.submissionDeadline)
           x.submissionDeadline = ((x: number) => new Date(x * 1000))(
             x.submissionDeadline,
           );
-        x.users = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            if (x.access_time)
-              x.access_time = ((x: number) => new Date(x * 1000))(
-                x.access_time,
-              );
-            if (x.end_time)
-              x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
-            return x;
-          });
-        })(x.users);
         return x;
       })(
         JSON.parse(
@@ -498,6 +572,117 @@ export namespace types {
     ): types.ContestNewPayload {
       return JSON.parse(
         (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function ContestPracticeDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestPracticeDetailsPayload {
+      return ((x) => {
+        if (x.adminPayload)
+          x.adminPayload = ((x) => {
+            x.allRuns = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.allRuns);
+            x.users = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.access_time)
+                  x.access_time = ((x: number) => new Date(x * 1000))(
+                    x.access_time,
+                  );
+                if (x.end_time)
+                  x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+                return x;
+              });
+            })(x.users);
+            return x;
+          })(x.adminPayload);
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        if (x.original)
+          x.original = ((x) => {
+            if (x.scoreboard)
+              x.scoreboard = ((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              })(x.scoreboard);
+            return x;
+          })(x.original);
+        if (x.submissionDeadline)
+          x.submissionDeadline = ((x: number) => new Date(x * 1000))(
+            x.submissionDeadline,
+          );
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ContestVirtualDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestVirtualDetailsPayload {
+      return ((x) => {
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function CourseClarificationsPayload(
+      elementId: string = 'payload',
+    ): types.CourseClarificationsPayload {
+      return ((x) => {
+        x.clarifications = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.clarifications);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -1371,6 +1556,14 @@ export namespace types {
       );
     }
 
+    export function TeamGroupNewPayload(
+      elementId: string = 'payload',
+    ): types.TeamGroupNewPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function TeamsGroupListPayload(
       elementId: string = 'payload',
     ): types.TeamsGroupListPayload {
@@ -1516,6 +1709,7 @@ export namespace types {
     finish_time?: Date;
     name?: string;
     problems: types.NavbarProblemsetProblem[];
+    runs?: types.Run[];
     start_time: Date;
   }
 
@@ -1573,7 +1767,7 @@ export namespace types {
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
     currentAssignment: types.ArenaAssignment;
-    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    scoreboard: types.Scoreboard;
     showRanking: boolean;
   }
 
@@ -1669,7 +1863,6 @@ export namespace types {
     coder_of_the_month_id: number;
     country_id: string;
     description?: string;
-    interview_url?: string;
     problems_solved: number;
     ranking: number;
     school_id?: number;
@@ -1696,7 +1889,6 @@ export namespace types {
       coder_of_the_month_id: number;
       country_id: string;
       description?: string;
-      interview_url?: string;
       problems_solved: number;
       ranking: number;
       school_id?: number;
@@ -1800,7 +1992,7 @@ export namespace types {
     points_decay_factor?: number;
     problemset_id: number;
     recommended: boolean;
-    rerun_id: number;
+    rerun_id?: number;
     scoreboard?: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
@@ -1823,6 +2015,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     available_languages: { [key: string]: string };
+    contest_for_teams: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -1859,6 +2052,7 @@ export namespace types {
     admission_mode: string;
     alias: string;
     archived: boolean;
+    contest_for_teams: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -1891,15 +2085,19 @@ export namespace types {
   }
 
   export interface ContestDetailsPayload {
+    adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
-    contestAdmin: boolean;
+    original?: {
+      contest: dao.Contests;
+      scoreboard?: types.Scoreboard;
+      scoreboardEvents?: types.ScoreboardEvent[];
+    };
     problems: types.NavbarProblemsetProblem[];
-    scoreboard?: types.Scoreboard;
-    scoreboardEvents?: types.ScoreboardEvent[];
+    scoreboard: types.Scoreboard;
+    scoreboardEvents: types.ScoreboardEvent[];
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     submissionDeadline?: Date;
-    users: types.ContestUser[];
   }
 
   export interface ContestEditPayload {
@@ -1909,6 +2107,7 @@ export namespace types {
     groups: types.ContestGroup[];
     problems: types.ProblemsetProblemWithVersions[];
     requests: types.ContestRequest[];
+    teams_group?: types.ContestGroup;
     users: types.ContestUser[];
   }
 
@@ -1951,7 +2150,7 @@ export namespace types {
     participating: boolean;
     problemset_id: number;
     recommended: boolean;
-    rerun_id: number;
+    rerun_id?: number;
     start_time: Date;
     title: string;
     window_length?: number;
@@ -1984,6 +2183,20 @@ export namespace types {
     title: string;
   }
 
+  export interface ContestPracticeDetailsPayload {
+    adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
+    clarifications: types.Clarification[];
+    contest: types.ContestPublicDetails;
+    original?: {
+      contest: dao.Contests;
+      scoreboard?: types.Scoreboard;
+      scoreboardEvents?: types.ScoreboardEvent[];
+    };
+    problems: types.NavbarProblemsetProblem[];
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    submissionDeadline?: Date;
+  }
+
   export interface ContestPublicDetails {
     admission_mode: string;
     alias: string;
@@ -1998,7 +2211,7 @@ export namespace types {
     penalty_type: string;
     points_decay_factor: number;
     problemset_id: number;
-    rerun_id: number;
+    rerun_id?: number;
     scoreboard: number;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
@@ -2028,6 +2241,20 @@ export namespace types {
     username: string;
   }
 
+  export interface ContestVirtualDetailsPayload {
+    contest: types.ContestPublicDetails;
+  }
+
+  export interface Contestant {
+    country?: string;
+    email?: string;
+    gender?: string;
+    name?: string;
+    school?: string;
+    state?: string;
+    username: string;
+  }
+
   export interface CourseAdmin {
     role: string;
     username: string;
@@ -2047,6 +2274,13 @@ export namespace types {
     scoreboard_url: string;
     scoreboard_url_admin: string;
     start_time: Date;
+  }
+
+  export interface CourseClarificationsPayload {
+    clarifications: types.Clarification[];
+    length: number;
+    page: number;
+    pagerItems: types.PageItem[];
   }
 
   export interface CourseCloneDetailsPayload {
@@ -2125,20 +2359,7 @@ export namespace types {
     letter: string;
     order: number;
     points: number;
-    runs: {
-      contest_score?: number;
-      guid: string;
-      language: string;
-      memory: number;
-      penalty: number;
-      runtime: number;
-      score: number;
-      source?: string;
-      status: string;
-      submit_delay: number;
-      time: Date;
-      verdict: string;
-    }[];
+    runs: types.CourseRun[];
     submissions: number;
     title: string;
     version: string;
@@ -2171,6 +2392,22 @@ export namespace types {
     problem_id: number;
     runs: number;
     verdict?: string;
+  }
+
+  export interface CourseRun {
+    contest_score?: number;
+    feedback?: types.SubmissionFeedback;
+    guid: string;
+    language: string;
+    memory: number;
+    penalty: number;
+    runtime: number;
+    score: number;
+    source?: string;
+    status: string;
+    submit_delay: number;
+    time: Date;
+    verdict: string;
   }
 
   export interface CourseStatisticsPayload {
@@ -2291,6 +2528,11 @@ export namespace types {
     scoreboards: types.GroupScoreboard[];
   }
 
+  export interface GroupListItem {
+    label: string;
+    value: string;
+  }
+
   export interface GroupListPayload {
     groups: types.Group[];
   }
@@ -2329,6 +2571,7 @@ export namespace types {
     state?: string;
     state_id?: string;
     username: string;
+    usernames?: string;
   }
 
   export interface IdentityExt {
@@ -2442,7 +2685,6 @@ export namespace types {
 
   export interface LoginDetailsPayload {
     facebookUrl: string;
-    linkedinUrl: string;
     statusError?: string;
     validateRecaptcha: boolean;
   }
@@ -2842,7 +3084,6 @@ export namespace types {
       access_time?: Date;
       country?: string;
       email?: string;
-      opened_interview: boolean;
       user_id?: number;
       username: string;
     }[];
@@ -2949,12 +3190,7 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback?: {
-      author: string;
-      author_classname: string;
-      date: Date;
-      feedback: string;
-    };
+    feedback?: types.SubmissionFeedback;
     guid: string;
     judged_by?: string;
     language: string;
@@ -3211,6 +3447,13 @@ export namespace types {
     verdict: string;
   }
 
+  export interface SubmissionFeedback {
+    author: string;
+    author_classname: string;
+    date: Date;
+    feedback: string;
+  }
+
   export interface SubmissionsListPayload {
     includeUser: boolean;
     length: number;
@@ -3233,7 +3476,27 @@ export namespace types {
     countries: dao.Countries[];
     identities: types.Identity[];
     isOrganizer: boolean;
-    teamGroup: { alias: string; description?: string; name?: string };
+    maxNumberOfContestants: number;
+    teamGroup: {
+      alias: string;
+      description?: string;
+      name?: string;
+      numberOfContestants: number;
+    };
+    teamsMembers: types.TeamMember[];
+  }
+
+  export interface TeamGroupNewPayload {
+    maxNumberOfContestants: number;
+    numberOfContestants: number;
+  }
+
+  export interface TeamMember {
+    classname: string;
+    name?: string;
+    team_alias: string;
+    team_name?: string;
+    username: string;
   }
 
   export interface TeamsGroup {
@@ -3265,11 +3528,6 @@ export namespace types {
     admin: boolean;
     loggedIn: boolean;
     reviewer: boolean;
-  }
-
-  export interface UserListItem {
-    label: string;
-    value: string;
   }
 
   export interface UserProfile {
@@ -3477,16 +3735,7 @@ export namespace messages {
   export type ContestCloneRequest = { [key: string]: any };
   export type ContestCloneResponse = { alias: string };
   export type ContestContestantsRequest = { [key: string]: any };
-  export type ContestContestantsResponse = {
-    contestants: {
-      country?: string;
-      email?: string;
-      name?: string;
-      school?: string;
-      state?: string;
-      username: string;
-    }[];
-  };
+  export type ContestContestantsResponse = { contestants: types.Contestant[] };
   export type ContestCreateRequest = { [key: string]: any };
   export type ContestCreateResponse = {};
   export type ContestCreateVirtualRequest = { [key: string]: any };
@@ -3508,7 +3757,7 @@ export namespace messages {
       original_finish_time: Date;
       problemset_id: number;
       recommended: boolean;
-      rerun_id: number;
+      rerun_id?: number;
       start_time: Date;
       title: string;
       window_length?: number;
@@ -3547,6 +3796,8 @@ export namespace messages {
   export type ContestRemoveProblemResponse = {};
   export type ContestRemoveUserRequest = { [key: string]: any };
   export type ContestRemoveUserResponse = {};
+  export type ContestReplaceTeamsGroupRequest = { [key: string]: any };
+  export type ContestReplaceTeamsGroupResponse = {};
   export type ContestReportRequest = { [key: string]: any };
   export type _ContestReportServerResponse = any;
   export type ContestReportResponse = {
@@ -3625,7 +3876,7 @@ export namespace messages {
     }[];
   };
   export type ContestSearchUsersRequest = { [key: string]: any };
-  export type ContestSearchUsersResponse = { label: string; value: string }[];
+  export type ContestSearchUsersResponse = { results: types.ListItem[] };
   export type ContestSetRecommendedRequest = { [key: string]: any };
   export type ContestSetRecommendedResponse = {};
   export type ContestStatsRequest = { [key: string]: any };
@@ -3641,7 +3892,10 @@ export namespace messages {
     verdict_counts: { [key: string]: number };
   };
   export type ContestUpdateRequest = { [key: string]: any };
-  export type ContestUpdateResponse = {};
+  export type ContestUpdateResponse = {
+    teamsGroupName?: string;
+    title: string;
+  };
   export type ContestUpdateEndTimeForIdentityRequest = { [key: string]: any };
   export type ContestUpdateEndTimeForIdentityResponse = {};
   export type ContestUsersRequest = { [key: string]: any };
@@ -3806,7 +4060,7 @@ export namespace messages {
     scoreboards: types.GroupScoreboard[];
   };
   export type GroupListRequest = { [key: string]: any };
-  export type GroupListResponse = { label: string; value: string }[];
+  export type GroupListResponse = types.GroupListItem[];
   export type GroupMembersRequest = { [key: string]: any };
   export type GroupMembersResponse = { identities: types.Identity[] };
   export type GroupMyListRequest = { [key: string]: any };
@@ -3899,39 +4153,8 @@ export namespace messages {
   export type IdentitySelectIdentityResponse = {};
   export type IdentityUpdateRequest = { [key: string]: any };
   export type IdentityUpdateResponse = {};
-
-  // Interview
-  export type InterviewAddUsersRequest = { [key: string]: any };
-  export type InterviewAddUsersResponse = {};
-  export type InterviewCreateRequest = { [key: string]: any };
-  export type InterviewCreateResponse = {};
-  export type InterviewDetailsRequest = { [key: string]: any };
-  export type _InterviewDetailsServerResponse = any;
-  export type InterviewDetailsResponse = {
-    contest_alias?: string;
-    description?: string;
-    problemset_id?: number;
-    users: {
-      access_time?: Date;
-      country?: string;
-      email?: string;
-      opened_interview: boolean;
-      user_id?: number;
-      username: string;
-    }[];
-  };
-  export type InterviewListRequest = { [key: string]: any };
-  export type InterviewListResponse = {
-    result: {
-      acl_id: number;
-      alias: string;
-      description: string;
-      interview_id: number;
-      problemset_id: number;
-      title: string;
-      window_length: number;
-    }[];
-  };
+  export type IdentityUpdateIdentityTeamRequest = { [key: string]: any };
+  export type IdentityUpdateIdentityTeamResponse = {};
 
   // Notification
   export type NotificationMyListRequest = { [key: string]: any };
@@ -4224,6 +4447,8 @@ export namespace messages {
   export type TagListResponse = { name: string }[];
 
   // TeamsGroup
+  export type TeamsGroupAddMembersRequest = { [key: string]: any };
+  export type TeamsGroupAddMembersResponse = {};
   export type TeamsGroupCreateRequest = { [key: string]: any };
   export type TeamsGroupCreateResponse = {};
   export type TeamsGroupDetailsRequest = { [key: string]: any };
@@ -4235,10 +4460,20 @@ export namespace messages {
       name?: string;
     };
   };
+  export type TeamsGroupListRequest = { [key: string]: any };
+  export type TeamsGroupListResponse = types.ListItem[];
+  export type TeamsGroupRemoveMemberRequest = { [key: string]: any };
+  export type TeamsGroupRemoveMemberResponse = {};
   export type TeamsGroupRemoveTeamRequest = { [key: string]: any };
   export type TeamsGroupRemoveTeamResponse = {};
   export type TeamsGroupTeamsRequest = { [key: string]: any };
   export type TeamsGroupTeamsResponse = { identities: types.Identity[] };
+  export type TeamsGroupTeamsMembersRequest = { [key: string]: any };
+  export type TeamsGroupTeamsMembersResponse = {
+    pageNumber: number;
+    teamsUsers: types.TeamMember[];
+    totalRows: number;
+  };
   export type TeamsGroupUpdateRequest = { [key: string]: any };
   export type TeamsGroupUpdateResponse = {};
 
@@ -4288,18 +4523,10 @@ export namespace messages {
   export type UserGenerateGitTokenResponse = { token: string };
   export type UserGenerateOmiUsersRequest = { [key: string]: any };
   export type UserGenerateOmiUsersResponse = { [key: string]: string };
-  export type UserInterviewStatsRequest = { [key: string]: any };
-  export type UserInterviewStatsResponse = {
-    finished: boolean;
-    interview_url: string;
-    name_or_username?: string;
-    opened_interview: boolean;
-    user_verified: boolean;
-  };
   export type UserLastPrivacyPolicyAcceptedRequest = { [key: string]: any };
   export type UserLastPrivacyPolicyAcceptedResponse = { hasAccepted: boolean };
   export type UserListRequest = { [key: string]: any };
-  export type UserListResponse = types.UserListItem[];
+  export type UserListResponse = { results: types.ListItem[] };
   export type UserListAPITokensRequest = { [key: string]: any };
   export type _UserListAPITokensServerResponse = any;
   export type UserListAPITokensResponse = {
@@ -4499,6 +4726,9 @@ export namespace controllers {
     removeUser: (
       params?: messages.ContestRemoveUserRequest,
     ) => Promise<messages.ContestRemoveUserResponse>;
+    replaceTeamsGroup: (
+      params?: messages.ContestReplaceTeamsGroupRequest,
+    ) => Promise<messages.ContestReplaceTeamsGroupResponse>;
     report: (
       params?: messages.ContestReportRequest,
     ) => Promise<messages.ContestReportResponse>;
@@ -4736,21 +4966,9 @@ export namespace controllers {
     update: (
       params?: messages.IdentityUpdateRequest,
     ) => Promise<messages.IdentityUpdateResponse>;
-  }
-
-  export interface Interview {
-    addUsers: (
-      params?: messages.InterviewAddUsersRequest,
-    ) => Promise<messages.InterviewAddUsersResponse>;
-    create: (
-      params?: messages.InterviewCreateRequest,
-    ) => Promise<messages.InterviewCreateResponse>;
-    details: (
-      params?: messages.InterviewDetailsRequest,
-    ) => Promise<messages.InterviewDetailsResponse>;
-    list: (
-      params?: messages.InterviewListRequest,
-    ) => Promise<messages.InterviewListResponse>;
+    updateIdentityTeam: (
+      params?: messages.IdentityUpdateIdentityTeamRequest,
+    ) => Promise<messages.IdentityUpdateIdentityTeamResponse>;
   }
 
   export interface Notification {
@@ -4973,18 +5191,30 @@ export namespace controllers {
   }
 
   export interface TeamsGroup {
+    addMembers: (
+      params?: messages.TeamsGroupAddMembersRequest,
+    ) => Promise<messages.TeamsGroupAddMembersResponse>;
     create: (
       params?: messages.TeamsGroupCreateRequest,
     ) => Promise<messages.TeamsGroupCreateResponse>;
     details: (
       params?: messages.TeamsGroupDetailsRequest,
     ) => Promise<messages.TeamsGroupDetailsResponse>;
+    list: (
+      params?: messages.TeamsGroupListRequest,
+    ) => Promise<messages.TeamsGroupListResponse>;
+    removeMember: (
+      params?: messages.TeamsGroupRemoveMemberRequest,
+    ) => Promise<messages.TeamsGroupRemoveMemberResponse>;
     removeTeam: (
       params?: messages.TeamsGroupRemoveTeamRequest,
     ) => Promise<messages.TeamsGroupRemoveTeamResponse>;
     teams: (
       params?: messages.TeamsGroupTeamsRequest,
     ) => Promise<messages.TeamsGroupTeamsResponse>;
+    teamsMembers: (
+      params?: messages.TeamsGroupTeamsMembersRequest,
+    ) => Promise<messages.TeamsGroupTeamsMembersResponse>;
     update: (
       params?: messages.TeamsGroupUpdateRequest,
     ) => Promise<messages.TeamsGroupUpdateResponse>;
@@ -5039,9 +5269,6 @@ export namespace controllers {
     generateOmiUsers: (
       params?: messages.UserGenerateOmiUsersRequest,
     ) => Promise<messages.UserGenerateOmiUsersResponse>;
-    interviewStats: (
-      params?: messages.UserInterviewStatsRequest,
-    ) => Promise<messages.UserInterviewStatsResponse>;
     lastPrivacyPolicyAccepted: (
       params?: messages.UserLastPrivacyPolicyAcceptedRequest,
     ) => Promise<messages.UserLastPrivacyPolicyAcceptedResponse>;

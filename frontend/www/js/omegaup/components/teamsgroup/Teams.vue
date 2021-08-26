@@ -43,6 +43,14 @@
             </button>
             <button
               class="btn btn-link"
+              :data-add-members-identity="identity.username"
+              :title="T.groupEditMembersAddMembers"
+              @click="onAddMembers(identity.username)"
+            >
+              <font-awesome-icon :icon="['fas', 'users']" />
+            </button>
+            <button
+              class="btn btn-link"
               :data-remove-identity="identity.username"
               :title="T.groupEditMembersRemove"
               @click="$emit('remove', identity.username)"
@@ -66,6 +74,20 @@
       @emit-cancel="onCancel"
       @emit-change-password="onChangePasswordTeam"
     ></omegaup-identity-change-password>
+    <omegaup-identity-members
+      v-if="formToShow === AvailableForms.AddMembers"
+      :team-username="username"
+      :teams-members="
+        teamsMembers.filter((user) => user.team_alias === username)
+      "
+      :search-result-users="searchResultUsers"
+      @update-search-result-users="
+        (query) => $emit('update-search-result-users', query)
+      "
+      @cancel="onCancel"
+      @add-members="(request) => $emit('add-members', request)"
+      @remove-member="(request) => $emit('remove-member', request)"
+    ></omegaup-identity-members>
   </div>
 </template>
 
@@ -77,10 +99,16 @@ import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
 import identity_Edit from '../identity/Edit.vue';
 import identity_ChangePassword from '../identity/ChangePassword.vue';
+import teamsgroup_Members from './Members.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faEdit, faLock, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-library.add(faEdit, faLock, faTrashAlt);
+import {
+  faEdit,
+  faLock,
+  faTrashAlt,
+  faUsers,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faEdit, faLock, faTrashAlt, faUsers);
 
 export enum AvailableForms {
   None,
@@ -95,11 +123,14 @@ export enum AvailableForms {
     'omegaup-user-username': user_Username,
     'omegaup-identity-edit': identity_Edit,
     'omegaup-identity-change-password': identity_ChangePassword,
+    'omegaup-identity-members': teamsgroup_Members,
   },
 })
 export default class Teams extends Vue {
   @Prop() teams!: types.Identity[];
   @Prop() countries!: Array<dao.Countries>;
+  @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: () => [] }) teamsMembers!: types.TeamMember[];
 
   T = T;
   AvailableForms = AvailableForms;
@@ -116,6 +147,11 @@ export default class Teams extends Vue {
 
   onChangePass(username: string): void {
     this.formToShow = AvailableForms.ChangePassword;
+    this.username = username;
+  }
+
+  onAddMembers(username: string): void {
+    this.formToShow = AvailableForms.AddMembers;
     this.username = username;
   }
 

@@ -315,6 +315,7 @@ class Utils {
     private static function shellExec(string $command): void {
         $log = \Logger::getLogger('\\OmegaUp\\Test\\Utils::shellExec()');
         $log->info("========== Starting {$command}");
+        $pipes = [];
         /** @psalm-suppress ForbiddenCode this only runs in tests. */
         $proc = proc_open(
             $command,
@@ -365,7 +366,6 @@ class Utils {
              dirname(__DIR__, 2) . '/stuff/cron/update_ranks.py' .
              ' --verbose ' .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
-             ' --update-coder-of-the-month ' .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .

@@ -22,15 +22,16 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
 
         // Create a new contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'alias' => $contestData['request']['alias'],
-            'auth_token' => $login->auth_token
-        ]);
 
-        $response = \OmegaUp\Controllers\Contest::apiCreateVirtual($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreateVirtual(
+            new \OmegaUp\Request([
+                'alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
 
         // Get generated virtual contest alias
         $virtualContestAlias = $response['alias'];
@@ -42,6 +43,8 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
         $originalContest = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
+
+        $this->assertNull($originalContest->rerun_id);
 
         // Assert virtual contest
         $this->assertEquals(
@@ -91,7 +94,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
             $virtualContest->languages
         );
 
-        // Assert virtual contest problenset problems
+        // Assert virtual contest problemset problems
         $originalProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             $originalContest->problemset_id
         );
@@ -103,6 +106,35 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Because we only put one problem in contest we can assert only the first element
         $this->assertEquals($originalProblems[0], $virtualProblems[0]);
+
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $virtualContest,
+            $identity
+        );
+
+        $login = self::login($identity);
+
+        $result = \OmegaUp\Controllers\Contest::getContestDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'contest_alias' => $virtualContest->alias,
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $response = $result['smartyProperties']['payload'];
+
+        // Virtual contests have information of the original contest
+        $this->assertArrayHasKey('original', $response);
+
+        $this->assertArrayHasKey('contest', $response['original']);
+        $this->assertArrayHasKey('scoreboard', $response['original']);
+        $this->assertArrayHasKey('scoreboardEvents', $response['original']);
+
+        $this->assertEquals(
+            $originalContest->alias,
+            $response['original']['contest']->alias
+        );
+        $this->assertEquals('arena_contest_virtual', $result['entrypoint']);
     }
 
     public function testCreateVirtualContestBeforeTheOriginalEnded() {
@@ -110,7 +142,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create a new contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
@@ -121,7 +153,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() - 100);
 
         try {
-            $response = \OmegaUp\Controllers\Contest::apiCreateVirtual($r);
+            \OmegaUp\Controllers\Contest::apiCreateVirtual($r);
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'originalContestHasNotEnded');
@@ -129,9 +161,6 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testCreateVirtualContestWithInvalidAlias() {
-        // Create a real contest
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
-
         // Create a new contestant
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -144,7 +173,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() - 100);
 
         try {
-            $response = \OmegaUp\Controllers\Contest::apiCreateVirtual($r);
+            \OmegaUp\Controllers\Contest::apiCreateVirtual($r);
             $this->fail('Should have thrown a InvalidParameterException');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals($e->getMessage(), 'parameterInvalid');
@@ -159,7 +188,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Create a new contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Lets assume the original contest has been finished
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
@@ -200,7 +229,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Create a new contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Lets assume the original contest has been finished
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);
@@ -231,7 +260,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         // Create a new contestant
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Lets assume the original contest has been finished
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 3600);

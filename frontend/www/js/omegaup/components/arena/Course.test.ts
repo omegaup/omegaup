@@ -6,26 +6,23 @@ import arena_Course from './Course.vue';
 import { types } from '../../api_types';
 
 describe('Course.vue', () => {
-  const currentAssignment: types.CourseAssignment = {
+  const currentAssignment: types.ArenaAssignment = {
     alias: 'Tarea de prueba',
     assignment_type: 'homework',
     description: 'Descripción de la tarea de prueba',
+    director: 'Director',
     finish_time: new Date(),
     name: 'Tarea de prueba',
     start_time: new Date(),
-    has_runs: true,
-    max_points: 100,
-    order: 1,
-    problemset_id: 1,
-    scoreboard_url: '',
-    scoreboard_url_admin: '',
+    problems: [],
+    runs: [],
   };
 
   const course: types.CourseDetails = {
     admission_mode: 'registration',
     alias: 'test-course',
     archived: false,
-    assignments: [currentAssignment],
+    assignments: [],
     clarifications: [],
     needs_basic_information: false,
     description: '# Test',
@@ -39,6 +36,62 @@ describe('Course.vue', () => {
     start_time: new Date(),
     student_count: 1,
     unlimited_duration: false,
+  };
+
+  const scoreboard: types.Scoreboard = {
+    finish_time: new Date(0),
+    problems: [
+      {
+        alias: 'problem_1',
+        order: 1,
+      },
+      {
+        alias: 'problem_2',
+        order: 2,
+      },
+      {
+        alias: 'problem_3',
+        order: 3,
+      },
+    ],
+    ranking: [
+      {
+        classname: 'user-rank-unranked',
+        country: 'MX',
+        is_invited: true,
+        problems: [
+          {
+            alias: 'problem_1',
+            penalty: 20,
+            percent: 1,
+            points: 100,
+            runs: 1,
+          },
+          {
+            alias: 'problem_2',
+            penalty: 10,
+            percent: 1,
+            points: 100,
+            runs: 4,
+          },
+          {
+            alias: 'problem_3',
+            penalty: 30,
+            percent: 1,
+            points: 100,
+            runs: 5,
+          },
+        ],
+        total: {
+          penalty: 20,
+          points: 100,
+        },
+        username: 'omegaUp',
+      },
+    ],
+    start_time: new Date(0),
+    time: new Date(0),
+    title: 'omegaUp',
   };
 
   it('Should handle course in arena', async () => {
@@ -56,6 +109,7 @@ describe('Course.vue', () => {
         showNewClarificationPopup: false,
         socketConnected: true,
         users: [],
+        scoreboard,
       },
     });
 

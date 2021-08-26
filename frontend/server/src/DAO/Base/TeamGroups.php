@@ -36,7 +36,8 @@ abstract class TeamGroups {
                 `create_time` = ?,
                 `alias` = ?,
                 `name` = ?,
-                `description` = ?
+                `description` = ?,
+                `number_of_contestants` = ?
             WHERE
                 (
                     `team_group_id` = ?
@@ -53,6 +54,7 @@ abstract class TeamGroups {
             $Team_Groups->alias,
             $Team_Groups->name,
             $Team_Groups->description,
+            intval($Team_Groups->number_of_contestants),
             intval($Team_Groups->team_group_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -79,7 +81,8 @@ abstract class TeamGroups {
                 `Team_Groups`.`create_time`,
                 `Team_Groups`.`alias`,
                 `Team_Groups`.`name`,
-                `Team_Groups`.`description`
+                `Team_Groups`.`description`,
+                `Team_Groups`.`number_of_contestants`
             FROM
                 `Team_Groups`
             WHERE
@@ -166,7 +169,8 @@ abstract class TeamGroups {
                 `Team_Groups`.`create_time`,
                 `Team_Groups`.`alias`,
                 `Team_Groups`.`name`,
-                `Team_Groups`.`description`
+                `Team_Groups`.`description`,
+                `Team_Groups`.`number_of_contestants`
             FROM
                 `Team_Groups`
         ';
@@ -221,8 +225,10 @@ abstract class TeamGroups {
                     `create_time`,
                     `alias`,
                     `name`,
-                    `description`
+                    `description`,
+                    `number_of_contestants`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -241,6 +247,7 @@ abstract class TeamGroups {
             $Team_Groups->alias,
             $Team_Groups->name,
             $Team_Groups->description,
+            intval($Team_Groups->number_of_contestants),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

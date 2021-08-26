@@ -35,6 +35,7 @@ describe('FormUpdate.vue', () => {
     const formBase = wrapper.findComponent(teamsgroup_FormBase);
     formBase.setData({
       currentName: 'some updated name',
+      currentNumberOfContestants: 8,
     });
 
     await formBase.find('button[type="submit"]').trigger('click');
@@ -47,6 +48,7 @@ describe('FormUpdate.vue', () => {
         {
           description: 'Hello omegaUp Description',
           name: 'some updated name',
+          numberOfContestants: 8,
         },
       ],
     ]);

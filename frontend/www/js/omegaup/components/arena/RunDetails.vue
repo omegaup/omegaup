@@ -2,13 +2,17 @@
   <form data-run-details-view>
     <div v-if="data">
       <button class="close">❌</button>
-      <div v-if="inCourse">
+      <div v-if="inCourse && (data.admin || data.feedback)">
         <h3>{{ T.feedbackTitle }}</h3>
         <pre>{{
           data.feedback ? data.feedback.feedback : T.feedbackNotSentYet
         }}</pre>
         <div v-if="data.feedback">
-          {{ T.feedbackLeftBy }}
+          {{
+            ui.formatString(T.feedbackLeftBy, {
+              date: time.formatDate(data.feedback.date),
+            })
+          }}
           <omegaup-user-username
             :username="data.feedback.author"
             :classname="data.feedback.author_classname"
@@ -204,6 +208,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+import * as time from '../../time';
 import arena_CodeView from './CodeView.vue';
 import arena_DiffView from './DiffView.vue';
 import user_Username from '../user/Username.vue';
@@ -238,6 +243,7 @@ export default class ArenaRunDetails extends Vue {
   EMPTY_FIELD = EMPTY_FIELD;
   T = T;
   ui = ui;
+  time = time;
   groupVisible: GroupVisibility = {};
   showFeedbackForm = false;
   feedback = this.data?.feedback?.feedback ?? null;
@@ -298,23 +304,21 @@ export default class ArenaRunDetails extends Vue {
     display: flex;
     flex-direction: column;
 
-    .close-container {
-      width: 100%;
+    button.close {
+      position: sticky;
+      position: -webkit-sticky;
+      top: 0;
+      z-index: 100;
+      right: 0;
+      background-color: var(--arena-form-close-background-color);
+      border: 1px solid var(--arena-form-close-border-color);
+      border-width: 0 0 1px 1px;
+      font-size: 110%;
+      width: 25px;
+      height: 25px;
 
-      .close {
-        position: absolute;
-        top: 0;
-        right: 0;
-        background-color: var(--arena-form-close-background-color);
-        border: 1px solid var(--arena-form-close-border-color);
-        border-width: 0 0 1px 1px;
-        font-size: 110%;
-        width: 25px;
-        height: 25px;
-
-        &:hover {
-          background-color: var(--arena-form-close-background-color--hover);
-        }
+      &:hover {
+        background-color: var(--arena-form-close-background-color--hover);
       }
     }
 

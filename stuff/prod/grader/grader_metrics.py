@@ -4,6 +4,7 @@
 import argparse
 import datetime
 import logging
+import os
 import time
 
 from opencensus.ext.azure import metrics_exporter  # type: ignore
@@ -30,8 +31,14 @@ def _main() -> None:
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--grader-prometheus',
                            default='http://grader.omegaup.com:6061/metrics')
-    argparser.add_argument('--connection-string', required=True)
+    default_connection_string = os.getenv('CONNECTION_STRING')
+    argparser.add_argument('--connection-string',
+                           default=default_connection_string,
+                           type=str,
+                           required=default_connection_string is None)
     args = argparser.parse_args()
+    logging.basicConfig(level=logging.INFO)
+    logging.info('Starting grader_metrics.py')
 
     now = int(time.time())
     target_time = datetime.datetime.fromtimestamp(now, tz=_UTC)
@@ -59,7 +66,7 @@ def _main() -> None:
     while True:
         try:
             data.append(_queue_length(args.grader_prometheus))
-            print(tick_time, data)
+            logging.info('tick: %s %s', tick_time, data)
             if datetime.datetime.now(tz=_UTC) >= target_time:
                 queue_length_ts.set(max(data))
                 exporter.export_metrics(

@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /**
  * ContestCreateTest
@@ -274,7 +275,10 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // User joins the contest 1 hour and 50 minutes after it starts
         $updatedTime = $originalTime + 110 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
-        \OmegaUp\Test\Factories\Contest::openContest($contest, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contest['contest'],
+            $identity
+        );
         \OmegaUp\Test\Factories\Contest::openProblemInContest(
             $contest,
             $problem,
@@ -308,5 +312,43 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
         } finally {
             \OmegaUp\Time::setTimeForTesting($originalTime);
         }
+    }
+
+    public function testCreateContestForTeams() {
+        // Get a problem
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get a teams group
+        [
+            'teamGroup' => $teamGroup,
+        ] = \OmegaUp\Test\Factories\Groups::createTeamsGroup();
+
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams([
+                'contestForTeams' => true,
+                'teamsGroupAlias' => $teamGroup->alias,
+            ])
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problem,
+            $contestData
+        );
+
+        $login = self::login($contestData['director']);
+
+        $response = \OmegaUp\Controllers\Contest::getContestEditForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertTrue($response['details']['contest_for_teams']);
+        $this->assertEquals([
+            'alias' => $teamGroup->alias,
+            'name' =>  $teamGroup->name,
+        ], $response['teams_group']);
     }
 }

@@ -9,7 +9,6 @@ namespace OmegaUp\DAO;
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\TeamGroups}.
  *
- * @author juan.pablo
  * @access public
  * @package docs
  */
@@ -23,7 +22,7 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
                     `tg`.`alias` = ?
                 LIMIT 1;';
         $params = [$alias];
-        /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string, team_group_id: int}|null */
+        /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string, number_of_contestants: int, team_group_id: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -39,7 +38,7 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
                 WHERE
                     `tg`.`name` = ?
                 LIMIT 1;';
-        /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string, team_group_id: int}|null */
+        /** @var array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string, number_of_contestants: int, team_group_id: int}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($rs)) {
             return null;
@@ -70,5 +69,53 @@ class TeamGroups extends \OmegaUp\DAO\Base\TeamGroups {
 
         /** @var list<array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]);
+    }
+
+    /**
+     * @return list<array{key: string, value: string}>
+     */
+    public static function findByNameOrAlias(string $aliasOrName) {
+        $sql = "SELECT DISTINCT
+                    tg.alias AS `key`,
+                    tg.name AS `value`
+                FROM
+                    Team_Groups tg
+                WHERE
+                    tg.alias LIKE CONCAT('%', ?, '%') OR
+                    tg.name LIKE CONCAT('%', ?, '%')
+                LIMIT 100;";
+
+        /** @var list<array{key: string, value: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$aliasOrName, $aliasOrName]
+        );
+    }
+
+    /**
+     * @return array{alias: string, team_id: int}|null
+     */
+    public static function getByTeamUsername(string $teamUsername) {
+        $sql = 'SELECT
+                    `tg`.`alias`,
+                    `t`.`team_id`
+                FROM
+                    `Team_Groups` `tg`
+                INNER JOIN
+                    `Teams` `t`
+                ON
+                    `t`.`team_group_id` = `tg`.`team_group_id`
+                INNER JOIN
+                    `Identities` `i`
+                ON
+                    `t`.`identity_id` = `i`.`identity_id`
+                WHERE
+                    `i`.`username` = ?
+                LIMIT 1;';
+        /** @var array{alias: string, team_id: int}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$teamUsername]
+        );
     }
 }

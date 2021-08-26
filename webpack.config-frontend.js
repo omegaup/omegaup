@@ -26,7 +26,6 @@ module.exports = {
     arena_assignment: './frontend/www/js/omegaup/arena/assignment.ts',
     arena_assignment_admin:
       './frontend/www/js/omegaup/arena/assignment_admin.ts',
-    arena_contest: './frontend/www/js/omegaup/arena/contest.ts',
     arena_contest_contestant:
       './frontend/www/js/omegaup/arena/contest_contestant.ts',
     arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
@@ -35,7 +34,7 @@ module.exports = {
       './frontend/www/js/omegaup/arena/contest_practice.ts',
     arena_course: './frontend/www/js/omegaup/arena/course.ts',
     arena_scoreboard: './frontend/www/js/omegaup/arena/scoreboard.ts',
-    arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
+    arena_contest_virtual: './frontend/www/js/omegaup/arena/contest_virtual.ts',
     authors_rank: './frontend/www/js/omegaup/user/authors_rank.ts',
     badge_details: './frontend/www/js/omegaup/badge/details.ts',
     badge_list: './frontend/www/js/omegaup/badge/list.ts',
@@ -49,15 +48,14 @@ module.exports = {
     common_stats: './frontend/www/js/omegaup/common/stats.ts',
     contest_edit: './frontend/www/js/omegaup/contest/edit.ts',
     contest_intro: './frontend/www/js/omegaup/contest/intro.ts',
-    contest_list: './frontend/www/js/omegaup/contest/list.js',
-    contest_list_participant:
-      './frontend/www/js/omegaup/contest/list_participant.js',
     contest_mine: './frontend/www/js/omegaup/contest/mine.ts',
     contest_new: './frontend/www/js/omegaup/contest/new.ts',
     contest_print: './frontend/www/js/omegaup/contest/print.ts',
     contest_report: './frontend/www/js/omegaup/contest/report.js',
     contest_scoreboardmerge:
       './frontend/www/js/omegaup/contest/scoreboardmerge.js',
+    contest_virtual: './frontend/www/js/omegaup/contest/virtual.ts',
+    course_clarifications: './frontend/www/js/omegaup/course/clarifications.ts',
     course_clone: './frontend/www/js/omegaup/course/clone.ts',
     course_details: './frontend/www/js/omegaup/course/details.ts',
     course_edit: './frontend/www/js/omegaup/course/edit.ts',
@@ -179,7 +177,7 @@ module.exports = {
           priority: 20,
         },
         vendor: {
-          name: module => {
+          name: (module) => {
             const packageName = module.context.match(
               /\/node_modules\/([^@/]+)/,
             )[1];
@@ -232,6 +230,7 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         options: {
+          presets: ['@babel/env'],
           cacheDirectory: true,
         },
         exclude: /node_modules/,

@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
     private static $curator = null;

@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 /** @psalm-suppress MissingDependency we need to add PHPUnit */
 class AdminTest extends \OmegaUp\Test\ControllerTestCase {

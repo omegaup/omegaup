@@ -72,8 +72,11 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             FROM
                 Identities i
             WHERE
-                i.username LIKE CONCAT('%', ?, '%') OR
-                i.name LIKE CONCAT('%', ?, '%')
+                (
+                    i.username LIKE CONCAT('%', ?, '%') OR
+                    i.name LIKE CONCAT('%', ?, '%')
+                ) AND
+                i.username NOT REGEXP 'teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+'
             LIMIT 100";
         $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
 
@@ -494,11 +497,31 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 ill.time BETWEEN FROM_UNIXTIME(?) AND FROM_UNIXTIME(?)
             GROUP BY
                 gender;
-';
+            ';
         /** @var array{gender: string, users: int}[] */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$startTimestamp, $endTimestamp, $startTimestamp, $endTimestamp]
         );
+    }
+
+    public static function isMainIdentity(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): bool {
+        $sql = 'SELECT
+                    COUNT(*) AS main_identity
+                FROM
+                    Users u
+                WHERE
+                    u.main_identity_id = ?
+                LIMIT 1;';
+
+        return (
+            /** @var array{main_identity: int} */
+            \OmegaUp\MySQLConnection::getInstance()->GetOne(
+                $sql,
+                [$identity->identity_id]
+            )
+        ) > 0;
     }
 }

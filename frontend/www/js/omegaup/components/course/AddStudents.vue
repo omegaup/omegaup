@@ -4,28 +4,30 @@
       <form
         class="form"
         @submit.prevent="
-          $emit('emit-add-student', { participant, participants })
+          $emit('emit-add-student', { participant, participants });
+          participants = '';
         "
       >
         <div class="form-group">
           <p class="card-title">{{ T.courseEditAddStudentsDescription }}</p>
-          <label>{{ T.username }}</label>
-          <span
-            aria-hidden="true"
-            class="glyphicon glyphicon-info-sign"
-            data-placement="top"
-            data-toggle="tooltip"
-            :title="T.courseEditAddStudentsTooltip"
-          ></span>
-          <omegaup-autocomplete
-            v-model="participant"
-            :init="(el) => typeahead.userTypeahead(el)"
-          ></omegaup-autocomplete>
-        </div>
-        <div class="form-group pull-right">
-          <button class="btn btn-primary" type="submit">
-            {{ T.wordsAddStudents }}
-          </button>
+          <div class="d-flex align-items-center">
+            <omegaup-common-typeahead
+              class="w-100"
+              :existing-options="searchResultUsers"
+              :value.sync="participant"
+              :max-results="10"
+              @update-existing-options="
+                (query) => $emit('update-search-result-users', query)
+              "
+            />
+            <button
+              class="btn btn-secondary add-participant ml-2"
+              :disabled="!participant"
+              @click.prevent="addParticipantToList"
+            >
+              {{ T.courseEditAddStudentsAdd }}
+            </button>
+          </div>
         </div>
         <div class="form-group">
           <label>{{ T.wordsMultipleUser }}</label>
@@ -35,8 +37,12 @@
             rows="4"
           ></textarea>
         </div>
-        <div class="form-group pull-right">
-          <button class="btn btn-primary user-add-bulk" type="submit">
+        <div class="form-group float-right">
+          <button
+            class="btn btn-primary user-add-bulk"
+            :disabled="participants === ''"
+            type="submit"
+          >
             {{ T.wordsAddStudents }}
           </button>
         </div>
@@ -88,13 +94,12 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
-import Autocomplete from '../Autocomplete.vue';
+import common_Typeahead from '../common/Typeahead.vue';
 import common_Requests from '../common/Requests.vue';
 
 @Component({
   components: {
-    'omegaup-autocomplete': Autocomplete,
+    'omegaup-common-typeahead': common_Typeahead,
     'omegaup-common-requests': common_Requests,
   },
 })
@@ -102,16 +107,25 @@ export default class CourseAddStudents extends Vue {
   @Prop() courseAlias!: string;
   @Prop() students!: types.CourseStudent[];
   @Prop({ required: false }) identityRequests!: types.IdentityRequest[];
+  @Prop() searchResultUsers!: types.ListItem[];
 
   T = T;
-  typeahead = typeahead;
   studentUsername = '';
-  participant = '';
+  participant: null | string = null;
   participants = '';
   requests: types.IdentityRequest[] = [];
 
   studentProgressUrl(student: types.CourseStudent): string {
     return `/course/${this.courseAlias}/student/${student.username}/`;
+  }
+
+  addParticipantToList(): void {
+    if (this.participants.length) {
+      this.participants += '\n';
+    }
+    this.participants += this.participant;
+
+    this.participant = null;
   }
 
   @Watch('identityRequests')

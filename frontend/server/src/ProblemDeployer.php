@@ -144,13 +144,8 @@ class ProblemDeployer {
                 }
             }
         }
-        $updatedInteractiveFiles = false;
-        $updatedExamples = false;
         if (!empty($result['updated_files'])) {
             foreach ($result['updated_files'] as $updatedFile) {
-                if (strpos($updatedFile['path'], 'examples/') === 0) {
-                    $updatedExamples = true;
-                }
                 if (
                     preg_match(
                         '%statements/([a-z]{2})\\.markdown%',
@@ -168,14 +163,6 @@ class ProblemDeployer {
                     ) === 1
                 ) {
                     $this->updatedLanguages[] = $matches[1];
-                }
-                if (
-                    preg_match(
-                        '%interactive/(Main\\.distrib\\.[a-z0-9]+|[a-z0-9_]+\\.idl)$%',
-                        $updatedFile['path']
-                    ) === 1
-                ) {
-                    $updatedInteractiveFiles = true;
                 }
             }
         }
