@@ -1,6 +1,9 @@
 <template>
   <div class="card">
-    <table class="table table-striped" data-table-identities>
+    <div v-if="teams.length === 0" class="empty-table-message py-2">
+      {{ T.teamsGroupTeamsEmptyList }}
+    </div>
+    <table v-else class="table table-striped" data-table-identities>
       <thead>
         <tr>
           <th>{{ T.teamsGroupTeamName }}</th>

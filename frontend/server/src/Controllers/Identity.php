@@ -340,25 +340,26 @@ class Identity extends \OmegaUp\Controllers\Controller {
             }
             // When usernames are provided we need to avoid duplicated users in
             // different teams.
-            $identitiesUsernames = explode(';', $teamIdentity['usernames']);
+            /** @var list<array{password?: string, username: string}> */
+            $identities = json_decode($teamIdentity['usernames'], true);
             if (
                 count(
-                    $identitiesUsernames
+                    $identities
                 ) > $teamGroup->number_of_contestants
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'teamMemberExceededNumberOfContestants'
                 );
             }
-            foreach ($identitiesUsernames as $identityMemberUsername) {
-                if (isset($seenMemberUsernames[$identityMemberUsername])) {
+            foreach ($identities as $identityMember) {
+                if (isset($seenMemberUsernames[$identityMember['username']])) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                         'teamMemberUsernameInUse'
                     );
                 }
-                $seenMemberUsernames[$identityMemberUsername] = true;
+                $seenMemberUsernames[$identityMember['username']] = true;
             }
-            $teamIdentities[$username]['identityUsernames'] = $identitiesUsernames;
+            $teamIdentities[$username]['identityUsernames'] = $identities;
         }
 
         // Save objects into DB
@@ -408,9 +409,32 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     !is_null($teamIdentity['identityUsernames'])
                     && !is_null($team->team_id)
                 ) {
+                    //self::$log->info(print_r($teamIdentity['identityUsernames'], true));
+                    $selfGeneratedIdentities = array_filter(
+                        $teamIdentity['identityUsernames'],
+                        fn ($user) => isset(
+                            $user['password']
+                        )
+                    );
+
+                    foreach ($selfGeneratedIdentities as $selfGeneratedIdentity) {
+                        $newIdentity = self::createIdentity(
+                            $selfGeneratedIdentity['username'],
+                            /*$name=*/ null,
+                            $selfGeneratedIdentity['password'],
+                            $countryId,
+                            $stateId,
+                            /*$gender=*/ 'decline',
+                            $teamGroup->alias
+                        );
+                        \OmegaUp\DAO\Identities::create($newIdentity);
+                    }
                     \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
                         $team->team_id,
-                        $teamIdentity['identityUsernames']
+                        array_map(
+                            fn ($user) => $user['username'],
+                            $teamIdentity['identityUsernames']
+                        )
                     );
                 }
 
