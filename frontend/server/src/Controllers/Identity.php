@@ -314,7 +314,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
         $encodedTeamIdentities = $r->ensureString('team_identities');
 
-        /** @var list<array{country_id: string, gender: string, identityUsernames: list<string>|null, name: string, password: string, school_name: string, state_id: string, username: string, usernames: string}>|null $teamIdentities */
+        /** @var list<array{country_id: string, gender: string, identityUsernames: list<array{password?: string, username: string}>|null, name: string, password: string, school_name: string, state_id: string, username: string, usernames: string}>|null $teamIdentities */
         $teamIdentities = json_decode($encodedTeamIdentities, true);
         if (!is_array($teamIdentities) || empty($teamIdentities)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -352,7 +352,13 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 );
             }
             foreach ($identities as $identityMember) {
-                if (isset($seenMemberUsernames[$identityMember['username']])) {
+                if (
+                    isset(
+                        $seenMemberUsernames[$identityMember['username']]
+                    ) && !empty(
+                        $identityMember['username']
+                    )
+                ) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                         'teamMemberUsernameInUse'
                     );
@@ -409,7 +415,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     !is_null($teamIdentity['identityUsernames'])
                     && !is_null($team->team_id)
                 ) {
-                    //self::$log->info(print_r($teamIdentity['identityUsernames'], true));
+                    /** @var list<array{password?: string, username: string}> $selfGeneratedIdentities */
                     $selfGeneratedIdentities = array_filter(
                         $teamIdentity['identityUsernames'],
                         fn ($user) => isset(
@@ -418,6 +424,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     );
 
                     foreach ($selfGeneratedIdentities as $selfGeneratedIdentity) {
+                        if (!isset($selfGeneratedIdentity['password'])) {
+                            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                                'parameterInvalid',
+                                'password'
+                            );
+                        }
                         $newIdentity = self::createIdentity(
                             $selfGeneratedIdentity['username'],
                             /*$name=*/ null,
@@ -432,6 +444,10 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
                         $team->team_id,
                         array_map(
+                            /**
+                             * @param array{password?: string, username: string} $user
+                             * @return string
+                             */
                             fn ($user) => $user['username'],
                             $teamIdentity['identityUsernames']
                         )
