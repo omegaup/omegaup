@@ -626,8 +626,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 Runs r ON r.run_id = s.current_run_id
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
-            INNER JOIN
-                Users u ON u.user_id = i.user_id
             WHERE
                 r.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
                 AND NOT EXISTS (
@@ -637,7 +635,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         `Problems_Forfeited` AS `pf`
                     WHERE
                         `pf`.`problem_id` = `p`.`problem_id` AND
-                        `pf`.`user_id` = `u`.`user_id`
+                        `pf`.`user_id` = `i`.`user_id` AND
+                        `i`.`user_id` IS NOT NULL
                 )
                 AND NOT EXISTS (
                     SELECT
@@ -646,7 +645,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         `ACLs` AS `a`
                     WHERE
                         `a`.`acl_id` = `p`.`acl_id` AND
-                        `a`.`owner_id` = `u`.`user_id`
+                        `a`.`owner_id` = `i`.`user_id` AND
+                        `i`.`user_id` IS NOT NULL
                 )
             GROUP BY
                 p.problem_id
