@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid p-0 mt-0" data-user-profile-root>
-    <h1 v-if="profile.is_private">
+    <h1 v-if="!profile.is_own_profile && profile.is_private">
       {{ ui.info(T.userProfileIsPrivate) }}
     </h1>
     <div class="row">
@@ -36,7 +36,10 @@
                 </small>
               </p>
             </div>
-            <div v-if="!profile.is_private" class="mb-3">
+            <div
+              v-if="profile.is_own_profile || !profile.is_private"
+              class="mb-3"
+            >
               <h4 class="m-0">
                 {{ Object.keys(solvedProblems).length }}
               </h4>
@@ -45,7 +48,10 @@
               </p>
             </div>
             <div
-              v-if="profile.preferred_language && !profile.is_private"
+              v-if="
+                profile.preferred_language &&
+                (profile.is_own_profile || !profile.is_private)
+              "
               class="mb-3"
             >
               <h5 class="m-0">
@@ -60,7 +66,7 @@
               </p>
             </div>
           </div>
-          <div v-if="profile.email" class="mb-3 text-center">
+          <div v-if="profile.is_own_profile" class="mb-3 text-center">
             <a class="btn btn-primary btn-sm" href="/profile/edit/">{{
               T.profileEdit
             }}</a>
@@ -72,7 +78,7 @@
           <div class="card-header">
             <nav class="nav nav-tabs" role="tablist">
               <a
-                v-if="!profile.is_private"
+                v-if="profile.is_own_profile || !profile.is_private"
                 class="nav-item nav-link active"
                 data-toggle="tab"
                 @click="selectedTab = 'badges'"
@@ -83,14 +89,14 @@
                 </span>
               </a>
               <a
-                v-if="!profile.is_private"
+                v-if="profile.is_own_profile || !profile.is_private"
                 class="nav-item nav-link"
                 data-toggle="tab"
                 @click="selectedTab = 'problems'"
                 >{{ T.wordsProblems }}</a
               >
               <a
-                v-if="!profile.is_private"
+                v-if="profile.is_own_profile || !profile.is_private"
                 class="nav-item nav-link"
                 data-toggle="tab"
                 @click="selectedTab = 'contests'"
@@ -102,13 +108,12 @@
               </a>
               <a
                 class="nav-item nav-link"
-                :class="[!profile.is_private ? '' : 'active']"
                 data-toggle="tab"
                 @click="selectedTab = 'data'"
                 >{{ T.profilePersonalData }}</a
               >
               <a
-                v-if="!profile.is_private"
+                v-if="profile.is_own_profile || !profile.is_private"
                 class="nav-item nav-link"
                 data-toggle="tab"
                 @click="selectedTab = 'charts'"
@@ -254,7 +259,8 @@ export default class UserProfile extends Vue {
   T = T;
   ui = ui;
   columns = 3;
-  selectedTab = this.profile.is_private ? 'data' : 'badges';
+  selectedTab =
+    !this.profile.is_own_profile && this.profile.is_private ? 'data' : 'badges';
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
 
   get createdProblems(): Problem[] {
