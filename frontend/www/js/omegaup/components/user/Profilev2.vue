@@ -240,22 +240,24 @@ import { Problem, ContestResult } from '../../linkable_resource';
   },
 })
 export default class UserProfile extends Vue {
-  @Prop() data!: types.ExtraProfileDetails;
+  @Prop() data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
-  contests = this.data.contests
-    ? Object.values(this.data.contests)
-        .map((contest) => {
-          const now = new Date();
-          if (contest.place === null || now <= contest.data.finish_time) {
-            return null;
-          }
-          return new ContestResult(contest);
-        })
-        .filter((contest) => !!contest)
+  contests = this.data
+    ? this.data.contests
+      ? Object.values(this.data.contests)
+          .map((contest) => {
+            const now = new Date();
+            if (contest.place === null || now <= contest.data.finish_time) {
+              return null;
+            }
+            return new ContestResult(contest);
+          })
+          .filter((contest) => !!contest)
+      : []
     : [];
-  charts = this.data.stats;
+  charts = this.data ? this.data.stats : [];
   T = T;
   ui = ui;
   columns = 3;
@@ -264,14 +266,17 @@ export default class UserProfile extends Vue {
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
 
   get createdProblems(): Problem[] {
+    if (!this.data) return [];
     if (!this.data.createdProblems) return [];
     return this.data.createdProblems.map((problem) => new Problem(problem));
   }
   get unsolvedProblems(): Problem[] {
+    if (!this.data) return [];
     if (!this.data.unsolvedProblems) return [];
     return this.data.unsolvedProblems.map((problem) => new Problem(problem));
   }
   get solvedProblems(): Problem[] {
+    if (!this.data) return [];
     if (!this.data.solvedProblems) return [];
     return this.data.solvedProblems.map((problem) => new Problem(problem));
   }
