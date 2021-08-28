@@ -244,7 +244,9 @@ export default class UserProfile extends Vue {
   @Prop() profile!: types.UserProfileInfo;
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
-  contests = Object.values(this.data?.contests ?? ({} as types.UserProfileContests))
+  contests = Object.values(
+    this.data?.contests ?? ({} as types.UserProfileContests),
+  )
     .map((contest) => {
       const now = new Date();
       if (contest.place === null || now <= contest.data.finish_time) {
@@ -253,7 +255,7 @@ export default class UserProfile extends Vue {
       return new ContestResult(contest);
     })
     .filter((contest) => Boolean(contest));
-  charts: types.UserProfileStats[] = this.data?.stats ?? []; 
+  charts: types.UserProfileStats[] = this.data?.stats ?? [];
   T = T;
   ui = ui;
   columns = 3;
