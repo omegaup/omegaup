@@ -624,8 +624,30 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 Submissions s ON s.problem_id = p.problem_id
             INNER JOIN
                 Runs r ON r.run_id = s.current_run_id
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
             WHERE
                 r.verdict = "AC" AND s.type = "normal" AND s.identity_id = ?
+                AND NOT EXISTS (
+                    SELECT
+                        `pf`.`problem_id`, `pf`.`user_id`
+                    FROM
+                        `Problems_Forfeited` AS `pf`
+                    WHERE
+                        `pf`.`problem_id` = `p`.`problem_id` AND
+                        `pf`.`user_id` = `i`.`user_id` AND
+                        `i`.`user_id` IS NOT NULL
+                )
+                AND NOT EXISTS (
+                    SELECT
+                        `a`.`acl_id`
+                    FROM
+                        `ACLs` AS `a`
+                    WHERE
+                        `a`.`acl_id` = `p`.`acl_id` AND
+                        `a`.`owner_id` = `i`.`user_id` AND
+                        `i`.`user_id` IS NOT NULL
+                )
             GROUP BY
                 p.problem_id
             ORDER BY
