@@ -3540,6 +3540,7 @@ export namespace types {
     graduation_date?: Date;
     gravatar_92: string;
     hide_problem_tags: boolean;
+    is_own_profile: boolean;
     is_private: boolean;
     locale: string;
     name?: string;
@@ -3573,6 +3574,7 @@ export namespace types {
     graduation_date?: Date | string;
     gravatar_92?: string;
     hide_problem_tags: boolean;
+    is_own_profile: boolean;
     is_private: boolean;
     locale?: string;
     name?: string;
