@@ -207,6 +207,11 @@
                 <a class="dropdown-item" href="http://blog.omegaup.com/">{{
                   T.navBlog
                 }}</a>
+                <a
+                  class="dropdown-item"
+                  href="https://omegaup.com/img/libropre3.pdf"
+                  >{{ T.navAlgorithmsBook }}</a
+                >
               </div>
             </li>
           </ul>

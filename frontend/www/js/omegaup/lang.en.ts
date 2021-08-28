@@ -571,6 +571,7 @@ const translations: { [key: string]: string; } = {
   mustUpdateBasicInfoToFilterUsers: "You must update your basic information to filter users in the ranking.",
   myproblemsListCreateProblem: "Create a problem",
   myproblemsListMyProblems: "My Problems",
+  navAlgorithmsBook: "Algorithms Book",
   navAllContests: "All contests",
   navAllCourses: "All courses",
   navAllProblems: "All problems",
