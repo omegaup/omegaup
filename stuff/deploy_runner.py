@@ -16,7 +16,7 @@ DOWNLOAD_FILES = [
     ('https://github.com/omegaup/omegajail/releases/download/v3.0.1/'
      'omegajail-focal-distrib-x86_64.tar.xz'),
     'https://s3.amazonaws.com/omegaup-dist/omegaup-runner-config.tar.xz',
-    ('https://github.com/omegaup/quark/releases/download/v1.2.15/'
+    ('https://github.com/omegaup/quark/releases/download/v1.6.2/'
      'omegaup-runner.tar.xz'),
     ('https://github.com/omegaup/logslurp/releases/download/v0.1.4/'
      'omegaup-logslurp.tar.xz'),

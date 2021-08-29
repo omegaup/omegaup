@@ -87,6 +87,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'hide_problem_tags',
             'verified',
             'programming_languages',
+            'is_own_profile',
         ];
         foreach ($response as $k => $v) {
             if (in_array($k, $visibleAttributes)) {

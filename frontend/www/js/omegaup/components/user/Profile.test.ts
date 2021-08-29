@@ -27,6 +27,7 @@ describe('Profilev2.vue', () => {
             problems_solved: 2,
             rank: 1,
           },
+          is_own_profile: true,
         },
         data: {
           badges: badges,
