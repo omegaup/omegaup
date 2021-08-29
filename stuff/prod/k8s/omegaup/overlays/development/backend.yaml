@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: gitserver
-        image: omegaup/gitserver:v1.7.3
+        image: omegaup/gitserver:v1.8.2
         command: ['/usr/bin/omegaup-gitserver']
         ports:
         - name: gitserver
@@ -38,7 +38,7 @@ spec:
         - name: varlog
           mountPath: /var/log
       - name: broadcaster
-        image: omegaup/backend:v1.5.5
+        image: omegaup/backend:v1.6.2
         command: ['/usr/bin/omegaup-broadcaster']
         ports:
         - name: broadcaster
@@ -57,7 +57,7 @@ spec:
         - name: varlog
           mountPath: /var/log
       - name: grader
-        image: omegaup/backend:v1.5.5
+        image: omegaup/backend:v1.6.2
         command: ['/usr/bin/omegaup-grader']
         ports:
         - name: grader
