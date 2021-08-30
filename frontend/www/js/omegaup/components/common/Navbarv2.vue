@@ -208,7 +208,7 @@
                   T.navBlog
                 }}</a>
                 <a
-                  class="dropdown-item"
+                  class="dropdown-item text-wrap"
                   href="https://omegaup.com/img/libropre3.pdf"
                   >{{ T.navAlgorithmsBook }}</a
                 >
