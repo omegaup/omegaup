@@ -33,7 +33,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 a.publish_time_delay,
                 p.problem_id,
                 pp.order as problem_order,
-                pp.is_extra_problem
+                IFNULL(pp.is_extra_problem, 0) `is_extra_problem`
             FROM
                 Assignments a
             LEFT JOIN
@@ -111,7 +111,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
      * Get problemset problems including problemset alias, points, and order
      *
-     * @return list<array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
+     * @return list<array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, is_extra_problem: bool, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
      */
     final public static function getProblemsByProblemset(
         int $problemsetId
@@ -136,7 +136,8 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     ) > 0 AS has_submissions,
                     pp.points,
                     pp.commit,
-                    pp.version
+                    pp.version,
+                    pp.is_extra_problem
                 FROM
                     Problems p
                 INNER JOIN
@@ -157,7 +158,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, has_submissions: int, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, has_submissions: int, input_limit: int, is_extra_problem: bool, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
@@ -200,7 +201,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     pp.points,
                     pp.commit,
                     pp.version,
-                    pp.is_extra_problem
+                    IFNULL(pp.is_extra_problem, 0) `is_extra_problem`
                 FROM
                     Problems p
                 INNER JOIN
