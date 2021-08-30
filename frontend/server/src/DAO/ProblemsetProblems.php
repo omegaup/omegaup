@@ -172,7 +172,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     }
 
     /**
-     * @return list<array{accepted: int, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
+     * @return list<array{accepted: int, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, is_extra_problem: bool, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
      */
     final public static function getProblemsByAssignmentAlias(
         string $assignmentAlias,
@@ -199,7 +199,8 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     ) > 0 AS has_submissions,
                     pp.points,
                     pp.commit,
-                    pp.version
+                    pp.version,
+                    pp.is_extra_problem
                 FROM
                     Problems p
                 INNER JOIN
@@ -235,7 +236,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, has_submissions: int, input_limit: int, languages: string, order: int, points: float, problem_id: int, problemset_languages: null|string, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, has_submissions: int, input_limit: int, is_extra_problem: bool, languages: string, order: int, points: float, problem_id: int, problemset_languages: null|string, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$assignmentAlias, $courseAlias]
