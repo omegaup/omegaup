@@ -52,8 +52,10 @@ abstract class ProblemsetProblems {
                     `commit`,
                     `version`,
                     `points`,
-                    `order`
+                    `order`,
+                    `is_extra_problem`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -68,6 +70,7 @@ abstract class ProblemsetProblems {
             $Problemset_Problems->version,
             floatval($Problemset_Problems->points),
             intval($Problemset_Problems->order),
+            intval($Problemset_Problems->is_extra_problem),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -90,7 +93,8 @@ abstract class ProblemsetProblems {
                 `commit` = ?,
                 `version` = ?,
                 `points` = ?,
-                `order` = ?
+                `order` = ?,
+                `is_extra_problem` = ?
             WHERE
                 (
                     `problemset_id` = ? AND
@@ -101,6 +105,7 @@ abstract class ProblemsetProblems {
             $Problemset_Problems->version,
             floatval($Problemset_Problems->points),
             intval($Problemset_Problems->order),
+            intval($Problemset_Problems->is_extra_problem),
             (
                 is_null($Problemset_Problems->problemset_id) ?
                 null :
@@ -137,7 +142,8 @@ abstract class ProblemsetProblems {
                 `Problemset_Problems`.`commit`,
                 `Problemset_Problems`.`version`,
                 `Problemset_Problems`.`points`,
-                `Problemset_Problems`.`order`
+                `Problemset_Problems`.`order`,
+                `Problemset_Problems`.`is_extra_problem`
             FROM
                 `Problemset_Problems`
             WHERE
@@ -227,7 +233,8 @@ abstract class ProblemsetProblems {
                 `Problemset_Problems`.`commit`,
                 `Problemset_Problems`.`version`,
                 `Problemset_Problems`.`points`,
-                `Problemset_Problems`.`order`
+                `Problemset_Problems`.`order`,
+                `Problemset_Problems`.`is_extra_problem`
             FROM
                 `Problemset_Problems`
         ';
@@ -283,8 +290,10 @@ abstract class ProblemsetProblems {
                     `commit`,
                     `version`,
                     `points`,
-                    `order`
+                    `order`,
+                    `is_extra_problem`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -307,6 +316,7 @@ abstract class ProblemsetProblems {
             $Problemset_Problems->version,
             floatval($Problemset_Problems->points),
             intval($Problemset_Problems->order),
+            intval($Problemset_Problems->is_extra_problem),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
