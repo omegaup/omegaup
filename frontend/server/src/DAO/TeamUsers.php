@@ -19,13 +19,13 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
     public static function getByTeamId(int $teamId): array {
         $sql = 'SELECT
                     `team_id`,
-                    `user_id`
+                    `identity_id`
                 FROM
                     `Team_Users`
                 WHERE
                     `team_id` = ?
                 LIMIT 100;';
-        /** @var list<array{team_id: int, user_id: int}> */
+        /** @var list<array{team_id: int, identity_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$teamId]);
         $usersTeams = [];
         foreach ($rs as $row) {
@@ -43,14 +43,11 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
     ): int {
         $placeholders = array_fill(0, count($usernames), '?');
         $placeholders = join(',', $placeholders);
-        $sql = "REPLACE INTO Team_Users (team_id, user_id)
-                SELECT ? AS team_id, user_id FROM Identities
-                WHERE username IN ($placeholders) AND user_id IS NOT NULL;";
-
-        \OmegaUp\MySQLConnection::getInstance()->Execute(
-            $sql,
-            array_merge([$teamId], $usernames)
-        );
+        $sql = "REPLACE INTO Team_Users (team_id, identity_id)
+                SELECT ? AS team_id, identity_id FROM Identities
+                WHERE username IN ($placeholders);";
+        $params = array_merge([$teamId], $usernames);
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
@@ -98,7 +95,7 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
                 INNER JOIN
                     Identities i
                 ON
-                    i.user_id = tu.user_id
+                    i.identity_id = tu.identity_id
                 INNER JOIN
                     Identities it
                 ON
