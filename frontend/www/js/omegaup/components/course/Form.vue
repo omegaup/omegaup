@@ -263,6 +263,9 @@ export default class CourseDetails extends Vue {
   }
 
   onSubmit(): void {
+    if (!this.selectedLanguages?.includes('cat')) {
+      this.selectedLanguages?.push('cat');
+    }
     this.$emit('submit', this);
   }
 
