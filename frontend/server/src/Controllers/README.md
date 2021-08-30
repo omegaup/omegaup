@@ -2736,6 +2736,7 @@ Create a new problem
 | `allow_user_add_tags`     | `bool\|null`   |             |
 | `email_clarifications`    | `bool\|null`   |             |
 | `extra_wall_time`         | `mixed`        |             |
+| `group_score_policy`      | `null\|string` |             |
 | `input_limit`             | `mixed`        |             |
 | `languages`               | `mixed`        |             |
 | `memory_limit`            | `mixed`        |             |
@@ -3078,6 +3079,7 @@ Update problem contents
 | `allow_user_add_tags`     | `bool\|null`   |             |
 | `email_clarifications`    | `bool\|null`   |             |
 | `extra_wall_time`         | `mixed`        |             |
+| `group_score_policy`      | `null\|string` |             |
 | `input_limit`             | `mixed`        |             |
 | `languages`               | `mixed`        |             |
 | `memory_limit`            | `mixed`        |             |
@@ -3135,6 +3137,7 @@ Updates problem solution only
 | `allow_user_add_tags`     | `bool\|null`   |             |
 | `email_clarifications`    | `bool\|null`   |             |
 | `extra_wall_time`         | `mixed`        |             |
+| `group_score_policy`      | `null\|string` |             |
 | `input_limit`             | `mixed`        |             |
 | `lang`                    | `null\|string` |             |
 | `languages`               | `mixed`        |             |
@@ -3172,6 +3175,7 @@ Updates problem statement only
 | `allow_user_add_tags`     | `bool\|null`   |             |
 | `email_clarifications`    | `bool\|null`   |             |
 | `extra_wall_time`         | `mixed`        |             |
+| `group_score_policy`      | `null\|string` |             |
 | `input_limit`             | `mixed`        |             |
 | `lang`                    | `mixed`        |             |
 | `languages`               | `mixed`        |             |

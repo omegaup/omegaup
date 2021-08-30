@@ -2846,6 +2846,7 @@ export namespace types {
     emailClarifications: boolean;
     extraWallTime: number;
     groupAdmins: types.ProblemGroupAdmin[];
+    groupScorePolicy?: string;
     inputLimit: number;
     languages: string;
     levelTags: string[];
@@ -2880,6 +2881,7 @@ export namespace types {
     allowUserAddTags: boolean;
     emailClarifications: boolean;
     extraWallTime: number | string;
+    groupScorePolicy?: string;
     inputLimit: number | string;
     languages: string;
     levelTags: string[];
@@ -2999,6 +3001,7 @@ export namespace types {
     Limits: types.LimitsSettings;
     Slow: boolean;
     Validator: {
+      GroupScorePolicy?: string;
       Lang?: string;
       Limits?: types.LimitsSettings;
       Name: string;
@@ -3016,6 +3019,7 @@ export namespace types {
         limits?: types.LimitsSettings;
         source: string;
       };
+      group_score_policy?: string;
       name: string;
       tolerance?: number;
     };
@@ -3541,6 +3545,7 @@ export namespace types {
     graduation_date?: Date;
     gravatar_92: string;
     hide_problem_tags: boolean;
+    is_own_profile: boolean;
     is_private: boolean;
     locale: string;
     name?: string;
@@ -3574,6 +3579,7 @@ export namespace types {
     graduation_date?: Date | string;
     gravatar_92?: string;
     hide_problem_tags: boolean;
+    is_own_profile: boolean;
     is_private: boolean;
     locale?: string;
     name?: string;

@@ -27,7 +27,7 @@ services:
       CI: "${CI:-false}"
 
   gitserver:
-    image: omegaup/gitserver:v1.7.3
+    image: omegaup/gitserver:v1.8.2
     entrypoint: ["wait-for-it", "mysql:3306", "--", "/usr/bin/omegaup-gitserver"]
     user: "${UID_GID}"
     restart: always
@@ -50,7 +50,7 @@ services:
         mode: host
 
   broadcaster:
-    image: omegaup/backend:v1.5.5
+    image: omegaup/backend:v1.6.2
     entrypoint: ["/usr/bin/omegaup-broadcaster"]
     user: "${UID_GID}"
     restart: always
@@ -67,7 +67,7 @@ services:
       - '22291'
 
   grader:
-    image: omegaup/backend:v1.5.5
+    image: omegaup/backend:v1.6.2
     entrypoint: ["wait-for-it", "mysql:3306", "--", "/usr/bin/omegaup-grader"]
     user: "${UID_GID}"
     restart: always
