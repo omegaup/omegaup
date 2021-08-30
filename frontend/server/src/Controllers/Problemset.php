@@ -70,7 +70,8 @@ class Problemset extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         float $points,
         int $order_in_contest = 1,
-        bool $validateVisibility = true
+        bool $validateVisibility = true,
+        bool $isExtraProblem = false
     ): void {
         if ($validateVisibility) {
             \OmegaUp\Controllers\Problemset::validateAddProblemToProblemset(
@@ -87,6 +88,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             'version' => $currentVersion,
             'points' => $points,
             'order' => $order_in_contest,
+            'is_extra_problem' => $isExtraProblem,
         ]));
     }
 

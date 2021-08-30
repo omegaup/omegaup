@@ -165,7 +165,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $addedProblems = [];
         $problemsJson = $r->ensureOptionalString('problems');
         if (!empty($problemsJson)) {
-          /** @var list<array{alias: string, commit?: string, points?: int|float|string}> */
+          /** @var list<array{alias: string, commit?: string, points?: int|float|string, is_extra_problem?: bool}> */
             $problemsData = json_decode(
                 $problemsJson,
                 /*$assoc=*/ true
@@ -727,6 +727,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $problem['problem_alias'],
                         $problemset->problemset_id,
                         $r->identity,
+                        $problem['is_extra_problem'],
                         false, // visbility mode validation no needed when it is a clone
                         100,
                         null,
@@ -927,6 +928,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $addedProblem['alias'],
                         $problemset->problemset_id,
                         $identity,
+                        false, // FIXME: This must be passed
                         /*$validateVisibility=*/false,
                         /*$points=*/$addedProblem['points'],
                         $addedProblem['commit'] ?? null,
@@ -970,6 +972,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         int $problemsetId,
         \OmegaUp\DAO\VO\Identities $identity,
         bool $validateVisibility,
+        bool $isExtraProblem = false,
         ?float $points = 100,
         ?string $commit = null,
         ?int $order = 1
@@ -994,7 +997,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             $identity,
             $problem->languages === '' ? 0 : $assignedPoints,
             is_null($order) ? 1 : $order,
-            $validateVisibility
+            $validateVisibility,
+            $isExtraProblem
         );
     }
 
@@ -1176,6 +1180,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param float $points
      * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param null|bool $is_extra_problem
      */
     public static function apiAddProblem(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -1193,6 +1198,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             'assignment_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+
+        $isExtraProblem = $r->ensureOptionalBool('is_extra_problem') ?? false;
+
         $course = self::validateCourseExists($courseAlias);
         if (is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1226,6 +1234,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $problemAlias,
             $problemset->problemset_id,
             $r->identity,
+            $isExtraProblem,
             true, /* validateVisibility */
             $r->ensureOptionalFloat('points') ?? 100.0,
             $r['commit']
