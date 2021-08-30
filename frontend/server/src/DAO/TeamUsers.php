@@ -25,7 +25,7 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
                 WHERE
                     `team_id` = ?
                 LIMIT 100;';
-        /** @var list<array{team_id: int, identity_id: int}> */
+        /** @var list<array{identity_id: int, team_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$teamId]);
         $usersTeams = [];
         foreach ($rs as $row) {
@@ -77,7 +77,7 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
                                         FROM
                                             User_Rank ur
                                         WHERE
-                                            ur.user_id = tu.user_id
+                                            ur.user_id = u.user_id
                                     )
                             ORDER BY
                                 urc.percentile ASC
@@ -100,6 +100,10 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
                     Identities it
                 ON
                     it.identity_id = t.identity_id
+                LEFT JOIN
+                    Users u
+                ON
+                    i.user_id = u.user_id
                 WHERE
                     team_group_id = ?
                 ';
