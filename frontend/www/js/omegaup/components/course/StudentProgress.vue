@@ -222,7 +222,7 @@ export default class StudentProgress extends Vue {
       problem: this.problemTitles[problemAlias],
       score: this.getScore(assignmentAlias, problemAlias),
       points: this.getPoints(assignmentAlias, problemAlias),
-      progress: this.getProgress(assignmentAlias, problemAlias),
+      progress: '-> ' + this.getProgress(assignmentAlias, problemAlias),
     });
   }
 

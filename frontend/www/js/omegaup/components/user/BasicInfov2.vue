@@ -14,7 +14,10 @@
           </omegaup-user-username>
         </div>
       </div>
-      <div class="form-group row padding-field">
+      <div
+        v-if="profile.is_own_profile || !profile.is_private"
+        class="form-group row padding-field"
+      >
         <div class="col-sm-3">
           <strong>{{ T.profile }}</strong>
         </div>
@@ -22,18 +25,16 @@
           {{ profile.name }}
         </div>
       </div>
-
-      <div v-if="profile.email">
-        <div class="form-group row padding-field">
-          <div class="col-sm-3">
-            <strong>{{ T.profileEmail }}</strong>
-          </div>
-          <div class="col-sm-9 field-data">
-            Primary: <strong data-email> {{ profile.email }}</strong
-            >&nbsp;
-          </div>
+      <div v-if="profile.is_own_profile" class="form-group row padding-field">
+        <div class="col-sm-3">
+          <strong>{{ T.profileEmail }}</strong>
         </div>
+        <div class="col-sm-9 field-data">
+          Primary: <strong data-email>{{ profile.email }}</strong>
+        </div>
+      </div>
 
+      <div v-if="profile.is_own_profile || !profile.is_private">
         <div class="form-group row padding-field">
           <div class="col-sm-3">
             <strong>{{ T.profileCountry }}</strong>
@@ -92,7 +93,10 @@
         </div>
       </div>
     </div>
-    <a v-if="!profile.is_private" :href="`/submissions/${profile.username}/`">
+    <a
+      v-if="profile.is_own_profile || !profile.is_private"
+      :href="`/submissions/${profile.username}/`"
+    >
       {{
         ui.formatString(T.wordsSeeLatestSubmissions, {
           username: profile.username,
