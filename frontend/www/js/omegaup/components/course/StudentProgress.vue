@@ -70,10 +70,7 @@ import * as ui from '../../ui';
 import T from '../../lang';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
-import * as markdown from '../../markdown';
 import user_Username from '../user/Username.vue';
-
-const markdownConverter = new markdown.Converter();
 
 @Component({
   directives: {
@@ -221,14 +218,12 @@ export default class StudentProgress extends Vue {
     assignmentAlias: string,
     problemAlias: string,
   ): string {
-    return markdownConverter.makeHtml(
-      ui.formatString(T.studentProgressTooltipDescription, {
-        problem: this.problemTitles[problemAlias],
-        score: this.getScore(assignmentAlias, problemAlias),
-        points: this.getPoints(assignmentAlias, problemAlias),
-        progress: this.getProgress(assignmentAlias, problemAlias),
-      }),
-    );
+    return ui.formatString(T.studentProgressTooltipDescription, {
+      problem: this.problemTitles[problemAlias],
+      score: this.getScore(assignmentAlias, problemAlias),
+      points: this.getPoints(assignmentAlias, problemAlias),
+      progress: this.getProgress(assignmentAlias, problemAlias),
+    });
   }
 
   get studentProgressUrl(): string {

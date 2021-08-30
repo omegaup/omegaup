@@ -229,7 +229,7 @@ export default class CourseViewStudent extends Vue {
     newVal?: types.StudentProgress,
     oldVal?: types.StudentProgress,
   ) {
-    this.$emit('update', newVal, this.selectedAssignment);
+    this.$emit('update', this.selectedStudent, this.selectedAssignment);
     if (!newVal || newVal?.username === oldVal?.username) {
       return;
     }
@@ -239,11 +239,7 @@ export default class CourseViewStudent extends Vue {
     } else {
       url = `/course/${this.course.alias}/student/${newVal.username}/`;
     }
-    window.history.pushState(
-      { assignment: this.selectedAssignment, student: newVal },
-      document.title,
-      url,
-    );
+    window.history.pushState({ student: newVal }, document.title, url);
   }
 
   @Watch('selectedAssignment')
@@ -259,7 +255,7 @@ export default class CourseViewStudent extends Vue {
       url = `/course/${this.course.alias}/student/${this.selectedStudent.username}/assignment/${newVal}/`;
     }
     window.history.pushState(
-      { assignment: newVal, student: this.selectedStudent },
+      { student: this.selectedStudent },
       document.title,
       url,
     );
