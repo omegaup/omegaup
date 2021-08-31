@@ -254,6 +254,9 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
             }
             $problem['has_submissions'] = boolval($problem['has_submissions']);
             unset($problem['problemset_languages']);
+            $problem['is_extra_problem'] = boolval(
+                $problem['is_extra_problem']
+            );
             $problems[] = $problem;
         }
         return $problems;
