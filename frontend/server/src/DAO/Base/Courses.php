@@ -34,6 +34,7 @@ abstract class Courses {
             SET
                 `name` = ?,
                 `description` = ?,
+                `objective` = ?,
                 `alias` = ?,
                 `group_id` = ?,
                 `acl_id` = ?,
@@ -54,6 +55,7 @@ abstract class Courses {
         $params = [
             $Courses->name,
             $Courses->description,
+            $Courses->objective,
             $Courses->alias,
             (
                 is_null($Courses->group_id) ?
@@ -111,6 +113,7 @@ abstract class Courses {
                 `Courses`.`course_id`,
                 `Courses`.`name`,
                 `Courses`.`description`,
+                `Courses`.`objective`,
                 `Courses`.`alias`,
                 `Courses`.`group_id`,
                 `Courses`.`acl_id`,
@@ -208,6 +211,7 @@ abstract class Courses {
                 `Courses`.`course_id`,
                 `Courses`.`name`,
                 `Courses`.`description`,
+                `Courses`.`objective`,
                 `Courses`.`alias`,
                 `Courses`.`group_id`,
                 `Courses`.`acl_id`,
@@ -273,6 +277,7 @@ abstract class Courses {
                 `Courses` (
                     `name`,
                     `description`,
+                    `objective`,
                     `alias`,
                     `group_id`,
                     `acl_id`,
@@ -301,11 +306,13 @@ abstract class Courses {
                     ?,
                     ?,
                     ?,
+                    ?,
                     ?
                 );';
         $params = [
             $Courses->name,
             $Courses->description,
+            $Courses->objective,
             $Courses->alias,
             (
                 is_null($Courses->group_id) ?

@@ -19,6 +19,7 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         'course_id' => true,
         'name' => true,
         'description' => true,
+        'objective' => true,
         'alias' => true,
         'group_id' => true,
         'acl_id' => true,
@@ -58,6 +59,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
             $this->description = is_scalar(
                 $data['description']
             ) ? strval($data['description']) : '';
+        }
+        if (isset($data['objective'])) {
+            $this->objective = is_scalar(
+                $data['objective']
+            ) ? strval($data['objective']) : '';
         }
         if (isset($data['alias'])) {
             $this->alias = is_scalar(
@@ -164,6 +170,13 @@ class Courses extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $description = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $objective = null;
 
     /**
      * [Campo no documentado]
