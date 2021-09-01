@@ -43,14 +43,52 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Course::apiCreate($r);
 
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(
+        $this->assertCount(
             1,
-            count(
-                \OmegaUp\DAO\Courses::findByName(
-                    $r['name']
-                )
+            \OmegaUp\DAO\Courses::findByName(
+                $r['name']
             )
         );
+    }
+
+    /**
+     * Create course hot path
+     */
+    public function testCreateAndUpdateCourseWithObjective() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'alias' => \OmegaUp\Test\Utils::createRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'objective' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => (\OmegaUp\Time::get() + 60),
+            'finish_time' => (\OmegaUp\Time::get() + 120)
+        ]);
+        \OmegaUp\Controllers\Course::apiCreate($r);
+
+        $courses = \OmegaUp\DAO\Courses::findByName(
+            $r['name']
+        );
+        $this->assertCount(1, $courses);
+
+        $this->assertEquals($r['objective'], $courses[0]->objective);
+
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => $courses[0]->name,
+            'alias' => $courses[0]->alias,
+            'description' => $courses[0]->description,
+            'objective' => \OmegaUp\Test\Utils::createRandomString(),
+        ]);
+        \OmegaUp\Controllers\Course::apiUpdate($r);
+
+        $courses = \OmegaUp\DAO\Courses::findByName(
+            $r['name']
+        );
+        $this->assertEquals($r['objective'], $courses[0]->objective);
     }
 
     /**
