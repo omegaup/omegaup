@@ -279,6 +279,7 @@
                   <div class="dropdown-divider"></div>
                   <button
                     v-if="showDisqualify"
+                    data-actions-disqualify
                     class="btn-link dropdown-item"
                     @click="$emit('disqualify', run)"
                   >
