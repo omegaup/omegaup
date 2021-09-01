@@ -320,7 +320,8 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotNull($assignment);
 
         // Add a problem to the assignment.
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+        $problemsData = [];
+        $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => 'public',
                 'user' => $user
@@ -332,15 +333,36 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignment->alias,
-            'problem_alias' => $problemData['problem']->alias,
+            'problem_alias' => $problemsData[0]['problem']->alias,
             'points' => $points,
+        ]));
+
+        // Add an extra problem to the assignment
+        $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'public',
+                'user' => $user
+            ]),
+            $login
+        );
+        $points = 1337;
+        \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'course_alias' => $courseAlias,
+            'assignment_alias' => $assignment->alias,
+            'problem_alias' => $problemsData[1]['problem']->alias,
+            'points' => $points + 2,
+            'is_extra_problem' => true,
         ]));
 
         $problems = \OmegaUp\DAO\ProblemsetProblems::getByProblemset(
             $assignment->problemset_id
         );
-        $this->assertEquals(1, count($problems));
+        $this->assertEquals(2, count($problems));
         $this->assertEquals($points, $problems[0]->points);
+        $this->assertEquals(true, $problems[0]->points);
+        $this->assertEquals($points + 2, $problems[1]->points);
+        $this->assertEquals(true, $problems[1]->is_extra_problem);
     }
 
     /**
