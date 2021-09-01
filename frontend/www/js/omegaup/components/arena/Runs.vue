@@ -425,7 +425,7 @@ export default class Runs extends Vue {
 
   // eslint-disable-next-line no-undef -- This is defined in TypeScript.
   initProblemAutocomplete(el: JQuery<HTMLElement>) {
-    if (this.problemsetProblems.length !== 0) {
+    if (this.problemsetProblems !== null) {
       typeahead.problemsetProblemTypeahead(
         el,
         () => this.problemsetProblems,
