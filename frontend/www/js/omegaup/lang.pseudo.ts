@@ -574,6 +574,7 @@ const translations: { [key: string]: string; } = {
   mustUpdateBasicInfoToFilterUsers: "(Y0u mu57 upda73 y0ur ba5ic inf0rma7i0n 70 fi173r u53r5 in 7h3 ranking.)",
   myproblemsListCreateProblem: "(Cr3a73 a pr0b13m)",
   myproblemsListMyProblems: "(My Pr0b13m5)",
+  navAlgorithmsBook: "(Tu70ria1 B00k \"Pr0b13ma5 y A1g0ri7m05\" by Lui5 Varga5)",
   navAllContests: "(A11 c0n73575)",
   navAllCourses: "(A11 c0ur535)",
   navAllProblems: "(A11 pr0b13m5)",
