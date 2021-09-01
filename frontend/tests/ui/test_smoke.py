@@ -134,7 +134,7 @@ def test_create_problem(driver):
 
     with driver.login_admin():
         prepare_run(driver, problem_alias)
-        util.show_run_details(driver, code='#include <iostream>')
+        util.show_run_details(driver, code='java.util.Scanner')
 
         driver.wait.until(
             EC.element_to_be_clickable(
