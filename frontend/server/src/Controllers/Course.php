@@ -669,6 +669,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 new \OmegaUp\DAO\VO\Courses([
                     'name' => $newName,
                     'description' => $originalCourse->description,
+                    'objective' => $originalCourse->objective,
                     'alias' => $newAlias,
                     'languages' => $originalCourse->languages,
                     'school_id' => $originalCourse->school_id,
