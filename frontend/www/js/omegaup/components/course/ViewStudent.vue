@@ -283,12 +283,11 @@ export default class CourseViewStudent extends Vue {
     return `/course/${this.course.alias}/`;
   }
 
-
   selectProblem(selectedProblem: types.CourseProblem) {
     this.selectedProblem = selectedProblem;
     window.location.hash = `#${selectedProblem.alias}`;
   }
-  
+
   sendFeedback(): void {
     if (this.feedback.length < 2) {
       return;
