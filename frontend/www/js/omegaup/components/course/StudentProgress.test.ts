@@ -56,8 +56,8 @@ describe('StudentProgress.vue', () => {
         },
       },
     });
-    expect(wrapper.find('div.bg-yellow').exists()).toBe(true);
-    expect(wrapper.find('div.bg-red').exists()).toBe(true);
+    expect(wrapper.find('a.bg-yellow').exists()).toBe(true);
+    expect(wrapper.find('a.bg-red').exists()).toBe(true);
     expect(wrapper.find('td[data-global-score]').text()).toBe(
       '50% ' +
         ui.formatString(T.studentProgressDescriptionTotalPoints, {
