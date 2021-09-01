@@ -382,6 +382,78 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($courseAlias, $courseClonedData['alias']);
     }
 
+    public function testCloneCourseWithExtraProblems() {
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = self::login($admin);
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
+            $admin,
+            $adminLogin,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
+
+        $adminLogin = self::login($courseData['admin']);
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problems = [
+            [
+                'alias' => $problemData['problem']->alias,
+                'is_extra_problem' => true,
+            ],
+        ];
+
+        // Create the assignment with problems
+        \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'alias' => 'test-assignment',
+            'assignment_type' => 'homework',
+            'course_alias' => $courseData['course_alias'],
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => \OmegaUp\Time::get(),
+            'finish_time' => \OmegaUp\Time::get() + (2 * 60),
+            'problems' => json_encode($problems),
+        ]));
+
+        $courseAlias = \OmegaUp\Test\Utils::createRandomString();
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $courseClonedData = \OmegaUp\Controllers\Course::apiClone(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => $courseAlias,
+                'start_time' => \OmegaUp\Time::get(),
+            ])
+        );
+        $this->assertEquals($courseAlias, $courseClonedData['alias']);
+
+        [
+            'assignments' => $assignmentsForClonedCourse,
+        ] = \OmegaUp\Controllers\Course::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'alias' => $courseAlias
+            ])
+        );
+        [
+            'problems' => $problems,
+        ] = \OmegaUp\Controllers\Course::apiAssignmentDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'assignment' => $assignmentsForClonedCourse[0]['alias'],
+                'course' => $courseData['course_alias']
+            ])
+        );
+        $this->assertCount(1, $problems);
+        $this->assertEquals(
+            $problemData['problem']->alias,
+            $problems[0]['alias']
+        );
+        $this->assertTrue($problems[0]['is_extra_problem']);
+    }
+
     public function testClonePublicCourseWithEmptyContent() {
         ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
         $adminLogin = self::login($admin);

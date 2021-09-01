@@ -1429,6 +1429,7 @@ Adds a problem to an assignment
 | `points`           | `float`        |             |
 | `problem_alias`    | `string`       |             |
 | `commit`           | `null\|string` |             |
+| `is_extra_problem` | `null\|bool`   |             |
 
 ### Returns
 
