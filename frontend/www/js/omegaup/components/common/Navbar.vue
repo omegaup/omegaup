@@ -167,6 +167,11 @@
               <li>
                 <a href="http://blog.omegaup.com/">{{ T.navBlog }}</a>
               </li>
+              <a
+                class="dropdown-item text-wrap"
+                href="https://omegaup.com/img/libropre3.pdf"
+                >{{ T.navAlgorithmsBook }}</a
+              >
             </ul>
           </li>
         </ul>

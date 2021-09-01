@@ -1686,6 +1686,7 @@ export namespace types {
   export interface AddedProblem {
     alias: string;
     commit?: string;
+    is_extra_problem?: boolean;
     points: number;
   }
 
@@ -3103,6 +3104,7 @@ export namespace types {
     difficulty: number;
     has_submissions: boolean;
     input_limit: number;
+    is_extra_problem: boolean;
     languages: string;
     letter?: string;
     order: number;
