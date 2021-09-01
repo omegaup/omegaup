@@ -1,42 +1,110 @@
 import { OmegaUp } from '../omegaup';
 import * as time from '../time';
-import { types } from '../api_types';
+import { dao, types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
-import arena_ContestPractice from '../components/arena/ContestPractice.vue';
+import arena_Contest from '../components/arena/Contest.vue';
 import { PopupDisplayed } from '../components/problem/Details.vue';
+import { getOptionsFromLocation } from './location';
+import problemsStore from './problemStore';
+import {
+  ContestClarification,
+  ContestClarificationRequest,
+  ContestClarificationType,
+  refreshContestClarifications,
+  trackClarifications,
+} from './clarifications';
+import { navigateToProblem, NavigationType } from './navigation';
+import clarificationStore from './clarificationsStore';
 import {
   showSubmission,
   SubmissionRequest,
   submitRun,
   submitRunFailed,
 } from './submissions';
-import { getOptionsFromLocation } from './location';
-import {
-  ContestClarification,
-  ContestClarificationType,
-  ContestClarificationRequest,
-  refreshContestClarifications,
-  trackClarifications,
-} from './clarifications';
-import clarificationStore from './clarificationsStore';
-import { navigateToProblem, NavigationType } from './navigation';
+import { onVirtualRankingChanged } from './ranking';
+import { EventsSocket } from './events_socket';
+import rankingStore from './rankingStore';
+import socketStore from './socketStore';
 import { myRunsStore } from './runsStore';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
-  const payload = types.payloadParsers.ContestPracticeDetailsPayload();
+  const payload = types.payloadParsers.ContestDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
-
   trackClarifications(payload.clarifications);
 
-  const contestPractice = new Vue({
+  // Refresh after time T
+  const refreshTime: number = 30 * 1000; // 30 seconds
+
+  function loadVirtualRanking({
+    problems,
+    contest,
+    originalContest,
+    currentUsername,
+  }: {
+    virtualContestRefreshInterval: ReturnType<typeof setInterval> | null;
+    problems: types.NavbarProblemsetProblem[];
+    contest: types.ContestPublicDetails;
+    originalContest: dao.Contests | null;
+    currentUsername: string;
+  }): void {
+    api.Problemset.scoreboard({
+      problemset_id: contest.problemset_id,
+    })
+      .then((scoreboard) => {
+        api.Problemset.scoreboardEvents({
+          problemset_id: originalContest?.problemset_id,
+        })
+          .then((response) => {
+            onVirtualRankingChanged({
+              scoreboard,
+              scoreboardEvents: response.events,
+              problems,
+              contest,
+              currentUsername,
+            });
+          })
+          .catch(ui.apiError);
+      })
+      .catch(ui.ignoreError);
+  }
+
+  // Cache scoreboard data for virtual contest
+  let virtualContestRefreshInterval: ReturnType<
+    typeof setInterval
+  > | null = null;
+  if (
+    payload.scoreboard &&
+    payload.scoreboardEvents &&
+    payload.original?.scoreboard &&
+    payload.original?.scoreboardEvents
+  ) {
+    onVirtualRankingChanged({
+      scoreboard: payload.scoreboard,
+      scoreboardEvents: payload.original.scoreboardEvents,
+      problems: payload.problems,
+      contest: payload.contest,
+      currentUsername: commonPayload.currentUsername,
+    });
+    virtualContestRefreshInterval = setInterval(() => {
+      loadVirtualRanking({
+        virtualContestRefreshInterval,
+        problems: payload.problems,
+        contest: payload.contest,
+        originalContest: payload.original?.contest ?? null,
+        currentUsername: commonPayload.currentUsername,
+      });
+    }, refreshTime);
+  }
+
+  const contestContestant = new Vue({
     el: '#main-container',
-    components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
+    components: { 'omegaup-arena-contest': arena_Contest },
     data: () => ({
       problemInfo: null as types.ProblemInfo | null,
       problem: null as types.NavbarProblemsetProblem | null,
@@ -45,11 +113,11 @@ OmegaUp.on('ready', () => {
       showNewClarificationPopup: false,
       guid: null as null | string,
       problemAlias: null as null | string,
-      isAdmin: false,
-      shouldShowRunDetails: false,
+      digitsAfterDecimalPoint: 2,
+      showPenalty: true,
     }),
     render: function (createElement) {
-      return createElement('omegaup-arena-contest-practice', {
+      return createElement('omegaup-arena-contest', {
         props: {
           contest: payload.contest,
           contestAdmin: Boolean(payload.adminPayload),
@@ -60,11 +128,16 @@ OmegaUp.on('ready', () => {
           clarifications: clarificationStore.state.clarifications,
           popupDisplayed: this.popupDisplayed,
           showNewClarificationPopup: this.showNewClarificationPopup,
-          shouldShowRunDetails: this.shouldShowRunDetails,
           activeTab,
           guid: this.guid,
           problemAlias: this.problemAlias,
-          isAdmin: this.isAdmin,
+          miniRankingUsers: rankingStore.state.miniRankingUsers,
+          ranking: rankingStore.state.ranking,
+          rankingChartOptions: rankingStore.state.rankingChartOptions,
+          lastUpdated: rankingStore.state.lastTimeUpdated,
+          digitsAfterDecimalPoint: this.digitsAfterDecimalPoint,
+          showPenalty: this.showPenalty,
+          socketStatus: socketStore.state.socketStatus,
           runs: myRunsStore.state.runs,
         },
         on: {
@@ -76,16 +149,18 @@ OmegaUp.on('ready', () => {
             navigateToProblem({
               type: NavigationType.ForContest,
               problem,
-              target: contestPractice,
+              target: contestContestant,
               problems: this.problems,
               contestAlias: payload.contest.alias,
             });
           },
-          'show-run': (source: SubmissionRequest) => {
-            api.Run.details({ run_alias: source.request.guid })
+          'show-run': (request: SubmissionRequest) => {
+            const hash = `#problems/${
+              this.problemAlias ?? request.request.problemAlias
+            }/show-run:${request.request.guid}/`;
+            api.Run.details({ run_alias: request.request.guid })
               .then((runDetails) => {
-                showSubmission({ source, runDetails });
-                this.popupDisplayed = PopupDisplayed.RunDetails;
+                showSubmission({ request, runDetails, hash });
               })
               .catch((error) => {
                 ui.apiError(error);
@@ -96,12 +171,15 @@ OmegaUp.on('ready', () => {
             problem,
             code,
             language,
+            target,
           }: {
+            problem: types.NavbarProblemsetProblem;
             code: string;
             language: string;
-            problem: types.NavbarProblemsetProblem;
+            target: Vue & { nextSubmissionTimestamp: Date };
           }) => {
             api.Run.create({
+              contest_alias: payload.contest.alias,
               problem_alias: problem.alias,
               language: language,
               source: code,
@@ -116,6 +194,21 @@ OmegaUp.on('ready', () => {
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
                 });
+                target.nextSubmissionTimestamp =
+                  response.nextSubmissionTimestamp;
+
+                if (
+                  Object.prototype.hasOwnProperty.call(
+                    problemsStore.state.problems,
+                    problem.alias,
+                  )
+                ) {
+                  const problemInfo =
+                    problemsStore.state.problems[problem.alias];
+                  problemInfo.nextSubmissionTimestamp =
+                    response.nextSubmissionTimestamp;
+                  problemsStore.commit('addProblem', problemInfo);
+                }
               })
               .catch((run) => {
                 submitRunFailed({
@@ -137,9 +230,8 @@ OmegaUp.on('ready', () => {
             if (!clarification) {
               return;
             }
-            const contestAlias = payload.contest.alias;
             api.Clarification.create({
-              contest_alias: contestAlias,
+              contest_alias: payload.contest.alias,
               problem_alias: clarification.problem_alias,
               username: clarification.author,
               message: clarification.message,
@@ -174,14 +266,32 @@ OmegaUp.on('ready', () => {
   // This needs to be set here and not at the top because it depends
   // on the `navigate-to-problem` callback being invoked, and that is
   // not the case if this is set a priori.
-  Object.assign(contestPractice, getOptionsFromLocation(window.location.hash));
+  Object.assign(
+    contestContestant,
+    getOptionsFromLocation(window.location.hash),
+  );
+
+  const socket = new EventsSocket({
+    disableSockets: false,
+    problemsetAlias: payload.contest.alias,
+    locationProtocol: window.location.protocol,
+    locationHost: window.location.host,
+    problemsetId: payload.contest.problemset_id,
+    scoreboardToken: null,
+    clarificationsOffset: 1,
+    clarificationsRowcount: 30,
+    navbarProblems: payload.problems,
+    currentUsername: commonPayload.currentUsername,
+    intervalInMilliseconds: 5 * 60 * 1000,
+  });
+  socket.connect();
 
   setInterval(() => {
     refreshContestClarifications({
       type: ContestClarificationType.AllProblems,
       contestAlias: payload.contest.alias,
-      rowcount: 20,
       offset: 0,
+      rowcount: 100,
     });
   }, 5 * 60 * 1000);
 });

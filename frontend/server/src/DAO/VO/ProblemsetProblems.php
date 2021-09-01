@@ -22,6 +22,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\VO\VO {
         'version' => true,
         'points' => true,
         'order' => true,
+        'is_extra_problem' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -62,6 +63,11 @@ class ProblemsetProblems extends \OmegaUp\DAO\VO\VO {
         if (isset($data['order'])) {
             $this->order = intval(
                 $data['order']
+            );
+        }
+        if (isset($data['is_extra_problem'])) {
+            $this->is_extra_problem = boolval(
+                $data['is_extra_problem']
             );
         }
     }
@@ -109,4 +115,11 @@ class ProblemsetProblems extends \OmegaUp\DAO\VO\VO {
      * @var int
      */
     public $order = 1;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var bool
+     */
+    public $is_extra_problem = false;
 }
