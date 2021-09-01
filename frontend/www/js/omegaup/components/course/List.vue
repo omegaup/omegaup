@@ -91,7 +91,6 @@
         </div>
       </template>
     </div>
-    <omegaup-course-tabs></omegaup-course-tabs>
   </div>
 </template>
 
@@ -110,7 +109,6 @@ import {
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
-import courseTabs from './Tabs.vue';
 
 @Component({
   components: {
@@ -119,7 +117,6 @@ import courseTabs from './Tabs.vue';
     'font-awesome-layers-text': FontAwesomeLayersText,
     'omegaup-course': course_Course,
     'omegaup-markdown': omegaup_Markdown,
-    'omegaup-course-tabs': courseTabs,
   },
 })
 export default class CourseList extends Vue {
