@@ -270,6 +270,7 @@
                   </button>
                   <button
                     v-if="showRejudge"
+                    data-actions-rejudge
                     class="btn-link dropdown-item"
                     @click="$emit('rejudge', run)"
                   >
