@@ -554,11 +554,8 @@ def show_run_details(driver, *, code: str) -> None:
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH,
-             '//table[contains(concat(" ", normalize-space(@class), " "), " '
-             'runs ")]/tbody/tr/td/div[contains(concat(" ", normalize-space('
-             '@class), " "), " show ")]/div/button[@data-run-details]')
-        )).click()
+            (By.CSS_SELECTOR,
+             'table.runs div button[data-run-details]'))).click()
 
     assert (('show-run:') in
             driver.browser.current_url), driver.browser.current_url
