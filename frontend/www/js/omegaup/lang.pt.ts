@@ -1375,7 +1375,7 @@ const translations: { [key: string]: string; } = {
   wordsAnswer: "Resposta",
   wordsAnyLanguage: "Qualquer Linguagem",
   wordsArchiveCourse: "Arquivar curso",
-  wordsAuthor: "Autor",
+  wordsAuthor: "Contribuinte",
   wordsBack: "Voltar",
   wordsBadgesObtained: "Crach\u00e1s obtidos",
   wordsBadgesSeeAll: "Ver todas as crach\u00e1s dispon\u00edveis",
