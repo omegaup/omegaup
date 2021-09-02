@@ -199,6 +199,11 @@ def test_create_identities_for_course(driver):
                 (By.CSS_SELECTOR,
                  'button[data-run-details]'))).click()
 
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 '.show form[data-run-details-view] .CodeMirror-code')))
+
         assert (('show-run:') in
                 driver.browser.current_url), driver.browser.current_url
 

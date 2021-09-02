@@ -557,13 +557,13 @@ def show_run_details(driver, *, code: str) -> None:
             (By.CSS_SELECTOR,
              'table.runs div button[data-run-details]'))).click()
 
-    assert (('show-run:') in
-            driver.browser.current_url), driver.browser.current_url
-
     code_element = driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR,
              '.show form[data-run-details-view] .CodeMirror-code')))
     code_text = code_element.get_attribute('innerText')
+
+    assert (('show-run:') in
+            driver.browser.current_url), driver.browser.current_url
 
     assert ((code) in code_text), code_text
