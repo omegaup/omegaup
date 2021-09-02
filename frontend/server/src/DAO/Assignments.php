@@ -44,7 +44,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     /**
      * Returns each problem with the statistics of the runs submmited by the students
      *
-     * @return list<array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}>
+     * @return list<array{assignment_alias: string, average: float|null, avg_runs: float|null, completed_score_percentage: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}>
      */
     public static function getAssignmentsProblemsStatistics(
         int $courseId,
@@ -56,6 +56,9 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             bpr.problem_alias,
             VARIANCE(bpr.max_user_score_for_problem) AS variance,
             AVG(bpr.max_user_score_for_problem) AS average,
+            AVG(
+                CASE WHEN bpr.max_user_percent_for_problem > 0.6 THEN 1 ELSE 0 END
+            ) * 100 AS completed_score_percentage,
             AVG(
                 CASE WHEN bpr.max_user_percent_for_problem > 0.6 THEN 1 ELSE 0 END
             ) * 100 AS high_score_percentage,
@@ -124,7 +127,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             bpr.assignment_id, bpr.order, bpr.problem_id;
         ';
 
-        /** @var list<array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}> */
+        /** @var list<array{assignment_alias: string, average: float|null, avg_runs: float|null, completed_score_percentage: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [ $courseId, $groupId ]

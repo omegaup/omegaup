@@ -411,6 +411,7 @@ const translations: { [key: string]: string; } = {
   courseStatisticsMinimumScore: "Puntaje m\u00ednimo",
   courseStatisticsScoreVariance: "Varianza de puntaje",
   courseStatisticsStudentsAbove: "Estudiantes con puntaje mayor a 60%",
+  courseStatisticsStudentsCompleted: "Estudiantes con puntuaje igual a 100%",
   courseStatisticsStudentsScored: "Estudiantes con puntaje de 0%",
   courseStatisticsVariance: "Varianza",
   courseStatisticsVerdicts: "Distribuci\u00f3n de veredictos",

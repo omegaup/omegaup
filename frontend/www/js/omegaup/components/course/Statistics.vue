@@ -50,9 +50,13 @@ export default class Statistics extends Vue {
   @Prop() verdicts!: types.CourseProblemVerdict[];
   T = T;
   // chart options
-  selected = this.averageChartOptions;
+  selected = this.completedScoreChartOptions;
   options = [
     { value: this.averageChartOptions, text: T.courseStatisticsAverageScore },
+    {
+      value: this.completedScoreChartOptions,
+      text: T.courseStatisticsStudentsCompleted,
+    },
     {
       value: this.highScoreChartOptions,
       text: T.courseStatisticsStudentsAbove,
@@ -98,6 +102,17 @@ export default class Statistics extends Vue {
       this.problems,
     );
   }
+  get completedScoreChartOptions() {
+    return this.createChartOptions(
+      T.courseStatisticsStudentsCompleted,
+      '{y} %',
+      T.wordsPercentage,
+      this.getStatistic('completed_score_percentage'),
+      100,
+      this.problems,
+    );
+  }
+
   get lowScoreChartOptions() {
     return this.createChartOptions(
       T.courseStatisticsStudentsScored,
@@ -274,6 +289,7 @@ export default class Statistics extends Vue {
       | 'variance'
       | 'average'
       | 'avg_runs'
+      | 'completed_score_percentage'
       | 'high_score_percentage'
       | 'low_score_percentage'
       | 'maximum'
