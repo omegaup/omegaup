@@ -317,6 +317,54 @@ export namespace types {
               })(x.scoreboard);
             return x;
           })(x.original);
+        if (x.problemDetails)
+          x.problemDetails = ((x) => {
+            x.creation_date = ((x: number) => new Date(x * 1000))(
+              x.creation_date,
+            );
+            if (x.nextSubmissionTimestamp)
+              x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
+                x.nextSubmissionTimestamp,
+              );
+            if (x.problemsetter)
+              x.problemsetter = ((x) => {
+                if (x.creation_date)
+                  x.creation_date = ((x: number) => new Date(x * 1000))(
+                    x.creation_date,
+                  );
+                return x;
+              })(x.problemsetter);
+            if (x.runs)
+              x.runs = ((x) => {
+                if (!Array.isArray(x)) {
+                  return x;
+                }
+                return x.map((x) => {
+                  x.time = ((x: number) => new Date(x * 1000))(x.time);
+                  return x;
+                });
+              })(x.runs);
+            if (x.solvers)
+              x.solvers = ((x) => {
+                if (!Array.isArray(x)) {
+                  return x;
+                }
+                return x.map((x) => {
+                  x.time = ((x: number) => new Date(x * 1000))(x.time);
+                  return x;
+                });
+              })(x.solvers);
+            return x;
+          })(x.problemDetails);
+        if (x.runDetails)
+          x.runDetails = ((x) => {
+            if (x.feedback)
+              x.feedback = ((x) => {
+                x.date = ((x: number) => new Date(x * 1000))(x.date);
+                return x;
+              })(x.feedback);
+            return x;
+          })(x.runDetails);
         x.scoreboard = ((x) => {
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
@@ -2089,12 +2137,17 @@ export namespace types {
     adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
+    guid?: string;
     original?: {
       contest: dao.Contests;
       scoreboard?: types.Scoreboard;
       scoreboardEvents?: types.ScoreboardEvent[];
     };
+    problem?: types.NavbarProblemsetProblem;
+    problemAlias?: string;
+    problemDetails?: types.ProblemDetails;
     problems: types.NavbarProblemsetProblem[];
+    runDetails?: types.RunDetails;
     scoreboard: types.Scoreboard;
     scoreboardEvents: types.ScoreboardEvent[];
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
