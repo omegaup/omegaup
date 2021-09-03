@@ -369,7 +369,7 @@
 	"courseEditStudents": "Estudiantes",
 	"courseExamEmpty": "No hay ex\u00e1menes",
 	"courseExtraPointsProblem": "V\u00e1lido para puntos extra",
-	"courseExtraPointsProblemDesc": "Los puntos de este problema solo se cuentan en caso no se llegue a la nota m\u00e1xima del curso.",
+	"courseExtraPointsProblemDesc": "Los puntos de este problema solo se cuentan en caso de que no se llegue al puntaje m\u00e1ximo del curso.",
 	"courseExtraPointsProblemLabel": "Problema para puntos extra",
 	"courseGroupNotFound": "No se encontr\u00f3 el grupo del curso",
 	"courseHomepageStudentsSectionContent": "**Estudiantes**\n\n- Obtienen retroalimentaci\u00f3n autom\u00e1tica de sus soluciones.\n- Aprenden habilidades que les servir\u00e1n en su vida profesional.\n- Acceden a cursos en l\u00ednea 24/7.\n",
