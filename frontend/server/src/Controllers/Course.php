@@ -65,6 +65,11 @@ class Course extends \OmegaUp\Controllers\Controller {
     const ADMISSION_MODE_PRIVATE = 'private';
     const ADMISSION_MODE_REGISTRATION = 'registration';
 
+    // Course level constants
+    const COURSE_LEVEL_INTRODUCTORY = 'introductory';
+    const COURSE_LEVEL_INTERMEDIATE = 'intermediate';
+    const COURSE_LEVEL_ADVANCED = 'advanced';
+
     // Number of rows shown in course list
     const PAGE_SIZE = 100;
 
@@ -289,6 +294,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param null|string $alias
      * @omegaup-request-param null|string $description
+     * @omegaup-request-param null|string $level
      * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param null|string $languages
      * @omegaup-request-param null|string $name
@@ -378,6 +384,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param null|string $alias
      * @omegaup-request-param null|string $description
+     * * @omegaup-request-param null|string $level
      * @omegaup-request-param int|null $finish_time
      * @omegaup-request-param null|string $languages
      * @omegaup-request-param null|string $name
@@ -467,6 +474,15 @@ class Course extends \OmegaUp\Controllers\Controller {
         ) {
             return;
         }
+
+        $r->ensureOptionalEnum(
+            'level',
+            [
+                self::COURSE_LEVEL_INTRODUCTORY,
+                self::COURSE_LEVEL_INTERMEDIATE,
+                self::COURSE_LEVEL_ADVANCED,
+            ]
+        );
 
         // Only curator can set public
         if (
@@ -776,6 +792,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $description
+     * @omegaup-request-param string|null $level
      * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param mixed $name
@@ -802,6 +819,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'name' => $r['name'],
             'description' => $r['description'],
             'alias' => $r['alias'],
+            'level' => $r['level'],
             'school_id' => $r['school_id'],
             'languages' => $r['languages'],
             'start_time' => $r['start_time'],
@@ -4789,6 +4807,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param string $alias
      * @omegaup-request-param null|string $description
+     * @omegaup-request-param null|string $level
      * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
      * @omegaup-request-param string $languages
      * @omegaup-request-param null|string $name
@@ -4841,6 +4860,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'needs_basic_information' => [
                 'transform' => fn (string $value): bool => boolval($value),
             ],
+            'level',
             'requests_user_information',
             'admission_mode',
         ];
