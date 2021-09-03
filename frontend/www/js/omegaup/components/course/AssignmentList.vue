@@ -1,8 +1,6 @@
 <template>
   <div class="omegaup-course-assignmentlist card">
-    <div class="card-header">
-      <h3>{{ T.wordsCourseContent }}</h3>
-    </div>
+    <h3 class="card-header">{{ T.wordsCourseContent }}</h3>
     <div class="card-body">
       <div v-if="content.length === 0" class="card-body">
         <div class="empty-table-message">
@@ -93,13 +91,15 @@
         </button>
       </div>
     </div>
-    <div class="card-footer">
+    <div
+      v-show="assignmentFormMode === AssignmentFormMode.Default"
+      class="card-footer"
+    >
       <form class="new">
         <div class="row">
-          <div class="form-group col-md-12">
+          <div class="form-group col-md-12 mb-0">
             <div class="text-right">
               <button
-                v-if="assignmentFormMode === AssignmentFormMode.Default"
                 class="btn btn-primary"
                 type="submit"
                 @click.prevent="$emit('emit-new')"
