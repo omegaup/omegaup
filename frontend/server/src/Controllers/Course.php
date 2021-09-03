@@ -332,6 +332,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $description
      * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
      * @omegaup-request-param null|string $languages
+     * @omegaup-request-param null|string $level
      * @omegaup-request-param null|string $name
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
