@@ -43,8 +43,21 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
+ * @psalm-type ProblemCasesContents=array<string, array{contestantOutput?: string, in: string, out: string}>
+ * @psalm-type RunMetadata=array{memory: int, sys_time: int, time: float, verdict: string, wall_time: float}
+ * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
+ * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp}
+ * @psalm-type RunDetails=array{admin: bool, alias: string, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<array{cases: list<CaseResult>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: null|SubmissionFeedback}
+ * @psalm-type SettingLimits=array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}
+ * @psalm-type InteractiveSettingsDistrib=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
+ * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
+ * @psalm-type ProblemSettingsDistrib=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettingsDistrib, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, group_score_policy?: string, name: string, tolerance?: float}}
+ * @psalm-type ProblemsetterInfo=array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}
+ * @psalm-type BestSolvers=array{classname: string, language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}
+ * @psalm-type ProblemStatement=array{images: array<string, string>, sources: array<string, string>, language: string, markdown: string}
+ * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type ContestDetailsPayload=array{adminPayload?: array{allRuns: list<Run>, users: list<ContestUser>}, clarifications: list<Clarification>, contest: ContestPublicDetails, original?: array{contest: \OmegaUp\DAO\VO\Contests, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>}, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardEvents: list<ScoreboardEvent>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null}
- * @psalm-type ContestPracticeDetailsPayload=array{adminPayload?: array{allRuns: list<Run>, users: list<ContestUser>}, clarifications: list<Clarification>, contest: ContestPublicDetails, original?: array{contest: \OmegaUp\DAO\VO\Contests, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>}, problems: list<NavbarProblemsetProblem>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null}
+ * @psalm-type ContestPracticeDetailsPayload=array{adminPayload?: array{allRuns: list<Run>, users: list<ContestUser>}, clarifications: list<Clarification>, contest: ContestPublicDetails, original?: array{contest: \OmegaUp\DAO\VO\Contests, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>}, guid: null|string, problemAlias: null|string, problemDetails: null|ProblemDetails, runDetails: null|RunDetails, problem: null|NavbarProblemsetProblem, problems: list<NavbarProblemsetProblem>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
@@ -849,6 +862,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: ContestPracticeDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param null|string $guid
+     * @omegaup-request-param null|string $lang
+     * @omegaup-request-param null|string $problem_alias
      */
     public static function getContestPracticeDetailsForTypeScript(
         \OmegaUp\Request $r
@@ -888,7 +904,59 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (!$contestAdmin) {
             $commonDetails['users'] = [];
         }
-
+        $problemAlias = $r->ensureOptionalString(
+            'problem_alias',
+            /*$required=*/ false,
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $guid = $r->ensureOptionalString('guid');
+        $runDetails = null;
+        $problemDetails = null;
+        $navbarProblem = null;
+        if (!is_null($guid)) {
+            $runDetails = \OmegaUp\Controllers\Run::getRunDetails(
+                $guid,
+                $r->identity
+            );
+        }
+        if (!is_null($problemAlias)) {
+            $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
+                $r->identity,
+                $r
+            );
+            [
+                'problem' => $problem,
+            ] = \OmegaUp\Controllers\Problem::getValidProblemAndProblemset(
+                $r->identity,
+                $contestAlias,
+                $problemAlias,
+                /*$statementType=*/ '',
+                $contest->problemset_id
+            );
+            if (is_null($problem)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemNotFound'
+                );
+            }
+            $problemDetails = \OmegaUp\Controllers\Problem::getProblemDetails(
+                $r->identity,
+                $problem,
+                $problemset,
+                $lang,
+                /*$showSolvers=*/ false,
+                /*$preventProblemsetOpen=*/ true,
+                $contestAlias
+            );
+            if (is_null($problemDetails)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemNotFound'
+                );
+            }
+            $navbarProblem = array_filter(
+                $commonDetails['problems'],
+                fn ($problem) => ($problem['alias'] === $problemAlias)
+            );
+        }
         return [
             'smartyProperties' => [
                 'payload' => array_merge(
@@ -903,6 +971,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
                                 $r->user
                             )
                         ),
+                        'problemAlias' => $problemAlias,
+                        'guid' => $guid,
+                        'problemDetails' => $problemDetails,
+                        'runDetails' => $runDetails,
+                        'problem' => !is_null(
+                            $navbarProblem
+                        ) ? array_shift(
+                            $navbarProblem
+                        ) : null,
                         'contest' => self::getPublicDetails(
                             $contestWithDirector,
                             $r->identity

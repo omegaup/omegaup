@@ -870,15 +870,30 @@ class Run extends \OmegaUp\Controllers\Controller {
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
+        $runAlias = $r->ensureString(
+            'run_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        return self::getRunDetails($runAlias, $r->identity);
+    }
+
+    /**
+     * @return RunDetails
+     */
+    public static function getRunDetails(
+        string $runAlias,
+        \OmegaUp\DAO\VO\Identities $identity
+    ) {
+        if (is_null($identity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemsetIdentityNotFound'
+            );
+        }
+
         [
             'run' => $run,
             'submission' => $submission,
-        ] = self::validateDetailsRequest(
-            $r->ensureString(
-                'run_alias',
-                fn (string $alias) => \OmegaUp\Validators::alias($alias)
-            )
-        );
+        ] = self::validateDetailsRequest($runAlias);
 
         if (is_null($submission->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
@@ -907,7 +922,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         if (
             !\OmegaUp\Authorization::canViewSubmission(
-                $r->identity,
+                $identity,
                 $submission
             )
         ) {
@@ -919,7 +934,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Get the source
         $response = [
             'admin' => \OmegaUp\Authorization::isProblemAdmin(
-                $r->identity,
+                $identity,
                 $problem
             ),
             'guid' => strval($submission->guid),
@@ -930,7 +945,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             ),
         ];
         $showRunDetails = !$response['admin'] ? self::shouldShowRunDetails(
-            $r->identity->identity_id,
+            $identity->identity_id,
             $problem,
             $contest
         ) : 'detailed';
