@@ -303,6 +303,11 @@ export default class BaseList extends Vue {
   top: 4rem;
 }
 
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
 .table-fixed {
   max-height: 80vh;
   overflow: auto;
@@ -312,6 +317,7 @@ export default class BaseList extends Vue {
       top: 0;
       z-index: 1;
       background: white;
+      border-bottom: 0;
       &:nth-child(2) {
         position: sticky;
         left: 0;
