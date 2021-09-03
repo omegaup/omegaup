@@ -103,7 +103,7 @@
 
             <template v-if="showUser">
               <label
-                >{{ T.wordsUser }}:
+                >{{ T.contestParticipant }}:
                 <omegaup-common-typeahead
                   :existing-options="searchResultUsers"
                   :value.sync="filterUsername"
@@ -138,7 +138,7 @@
           <tr>
             <th>{{ T.wordsTime }}</th>
             <th>GUID</th>
-            <th v-if="showUser">{{ T.wordsUser }}</th>
+            <th v-if="showUser">{{ T.contestParticipant }}</th>
             <th v-if="showContest">{{ T.wordsContest }}</th>
             <th v-if="showProblem">{{ T.wordsProblem }}</th>
             <th>{{ T.wordsStatus }}</th>

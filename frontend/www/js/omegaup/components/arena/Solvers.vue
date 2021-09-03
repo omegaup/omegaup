@@ -7,7 +7,7 @@
     </caption>
     <thead>
       <tr>
-        <th>{{ T.wordsUser }}</th>
+        <th>{{ T.contestParticipant }}</th>
         <th>{{ T.wordsLanguage }}</th>
         <th>{{ T.wordsMemory }}</th>
         <th>{{ T.wordsRuntime }}</th>
