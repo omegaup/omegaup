@@ -38,6 +38,7 @@ abstract class Courses {
                 `alias` = ?,
                 `group_id` = ?,
                 `acl_id` = ?,
+                `level` = ?,
                 `start_time` = ?,
                 `finish_time` = ?,
                 `admission_mode` = ?,
@@ -67,6 +68,7 @@ abstract class Courses {
                 null :
                 intval($Courses->acl_id)
             ),
+            $Courses->level,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Courses->start_time
             ),
@@ -117,6 +119,7 @@ abstract class Courses {
                 `Courses`.`alias`,
                 `Courses`.`group_id`,
                 `Courses`.`acl_id`,
+                `Courses`.`level`,
                 `Courses`.`start_time`,
                 `Courses`.`finish_time`,
                 `Courses`.`admission_mode`,
@@ -215,6 +218,7 @@ abstract class Courses {
                 `Courses`.`alias`,
                 `Courses`.`group_id`,
                 `Courses`.`acl_id`,
+                `Courses`.`level`,
                 `Courses`.`start_time`,
                 `Courses`.`finish_time`,
                 `Courses`.`admission_mode`,
@@ -281,6 +285,7 @@ abstract class Courses {
                     `alias`,
                     `group_id`,
                     `acl_id`,
+                    `level`,
                     `start_time`,
                     `finish_time`,
                     `admission_mode`,
@@ -292,6 +297,7 @@ abstract class Courses {
                     `archived`,
                     `minimum_progress_for_certificate`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -324,6 +330,7 @@ abstract class Courses {
                 null :
                 intval($Courses->acl_id)
             ),
+            $Courses->level,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Courses->start_time
             ),
