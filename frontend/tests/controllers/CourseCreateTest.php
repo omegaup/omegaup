@@ -51,9 +51,6 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    /**
-     * Create course hot path
-     */
     public function testCreateAndUpdateCourseWithObjective() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
