@@ -1650,22 +1650,22 @@ Create new course API
 
 ### Parameters
 
-| Name                        | Type         | Description |
-| --------------------------- | ------------ | ----------- |
-| `admission_mode`            | `mixed`      |             |
-| `alias`                     | `mixed`      |             |
-| `description`               | `mixed`      |             |
-| `finish_time`               | `mixed`      |             |
-| `languages`                 | `mixed`      |             |
-| `name`                      | `mixed`      |             |
-| `needs_basic_information`   | `mixed`      |             |
-| `objective`                 | `mixed`      |             |
-| `public`                    | `mixed`      |             |
-| `requests_user_information` | `mixed`      |             |
-| `school_id`                 | `mixed`      |             |
-| `show_scoreboard`           | `mixed`      |             |
-| `start_time`                | `mixed`      |             |
-| `unlimited_duration`        | `bool\|null` |             |
+| Name                        | Type           | Description |
+| --------------------------- | -------------- | ----------- |
+| `admission_mode`            | `mixed`        |             |
+| `alias`                     | `mixed`        |             |
+| `description`               | `mixed`        |             |
+| `finish_time`               | `mixed`        |             |
+| `languages`                 | `mixed`        |             |
+| `name`                      | `mixed`        |             |
+| `needs_basic_information`   | `mixed`        |             |
+| `objective`                 | `string\|null` |             |
+| `public`                    | `mixed`        |             |
+| `requests_user_information` | `mixed`        |             |
+| `school_id`                 | `mixed`        |             |
+| `show_scoreboard`           | `mixed`        |             |
+| `start_time`                | `mixed`        |             |
+| `unlimited_duration`        | `bool\|null`   |             |
 
 ### Returns
 

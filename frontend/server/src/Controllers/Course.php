@@ -784,7 +784,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $description
-     * @omegaup-request-param mixed $objective
+     * @omegaup-request-param string|null $objective
      * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param mixed $name
