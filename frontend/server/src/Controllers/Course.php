@@ -384,7 +384,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param null|string $alias
      * @omegaup-request-param null|string $description
-     * * @omegaup-request-param null|string $level
+     * @omegaup-request-param null|string $level
      * @omegaup-request-param int|null $finish_time
      * @omegaup-request-param null|string $languages
      * @omegaup-request-param null|string $name
