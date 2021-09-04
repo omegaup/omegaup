@@ -248,12 +248,14 @@
             <label>{{ T.wordsLanguages }}</label
             ><br />
             <multiselect
-              v-model="languages"
+              :value="languages"
               :options="Object.keys(allLanguages)"
               :multiple="true"
               :placeholder="T.contestNewFormLanguages"
               :close-on-select="false"
               :allow-empty="false"
+              @remove="onRemove"
+              @select="onSelect"
             >
             </multiselect>
             <p class="help-block">{{ T.contestNewFormLanguages }}</p>
@@ -345,6 +347,8 @@ export default class NewForm extends Vue {
   @Prop({ default: null }) teamsGroupAlias!: null | string;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop({ default: false }) contestForTeams!: boolean;
+  @Prop({ default: null })
+  initialProblems!: types.ProblemsetProblemWithVersions[];
 
   T = T;
   alias = this.initialAlias;
@@ -370,6 +374,13 @@ export default class NewForm extends Vue {
   currentContestForTeams = this.contestForTeams;
   currentTeamsGroupAlias = this.teamsGroupAlias;
   titlePlaceHolder = '';
+  catLanguageBlocked = false;
+
+  beforeMount() {
+    if (this.initialProblems) {
+      this.blockCatLanguage();
+    }
+  }
 
   @Watch('windowLengthEnabled')
   onPropertyChange(newValue: boolean): void {
@@ -484,6 +495,29 @@ export default class NewForm extends Vue {
       return;
     }
     this.$emit('create-contest', request);
+  }
+
+  blockCatLanguage(): void {
+    for (const problem of this.initialProblems) {
+      if (problem.languages.split(',').includes('cat')) {
+        this.catLanguageBlocked = true;
+        break;
+      }
+    }
+  }
+
+  onRemove(language: string) {
+    if (
+      !this.catLanguageBlocked ||
+      (this.catLanguageBlocked && language !== 'cat')
+    ) {
+      const index = this.languages.indexOf(language);
+      this.languages.splice(index, 1);
+    }
+  }
+
+  onSelect(language: string) {
+    this.languages.push(language);
   }
 }
 </script>

@@ -138,6 +138,7 @@
           :has-submissions="details.has_submissions"
           :update="true"
           :search-result-teams-groups="searchResultTeamsGroups"
+          :initial-problems="problems"
           @update-search-result-teams-groups="
             (query) => $emit('update-search-result-teams-groups', query)
           "
