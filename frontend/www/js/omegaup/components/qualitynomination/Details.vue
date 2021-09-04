@@ -37,7 +37,7 @@
         </div>
         <div class="row">
           <div class="col-sm-3">
-            <strong>{{ T.wordsAuthor }}</strong>
+            <strong>{{ T.contentCreator }}</strong>
           </div>
           <div class="col-sm-4">
             {{ author.name }} (<a :href="userUrl(author.username)">{{
