@@ -10,12 +10,7 @@
       </span>
     </div>
     <div class="summary" :class="{ active: !activeProblem }">
-      <a
-        class="name"
-        href="#problems"
-        @click="$emit('disable-active-problem')"
-        >{{ T.wordsSummary }}</a
-      >
+      <a class="name" @click="selectSummary">{{ T.wordsSummary }}</a>
     </div>
     <div
       v-for="problem in problems"
@@ -81,6 +76,7 @@ import {
 } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { setLocationHref } from '../../location';
 library.add(fas);
 
 @Component({
@@ -107,6 +103,11 @@ export default class ArenaNavbarProblems extends Vue {
 
   get urlAssignment(): string {
     return `/course/${this.courseAlias}/`;
+  }
+
+  selectSummary(): void {
+    this.$emit('disable-active-problem');
+    setLocationHref({ url: window.location.pathname });
   }
 
   onNavigateToProblem(problem: types.NavbarProblemsetProblem) {

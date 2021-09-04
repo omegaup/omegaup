@@ -41,12 +41,13 @@
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="runs"
+              :run-details-data="runDetailsData"
               :guid="guid"
               :popup-displayed="popupDisplayed"
               :problem-alias="problemAlias"
               @update:activeTab="
                 (selectedTab) =>
-                  $emit('reset-hash', { selectedTab, problemAlias })
+                  $emit('reset-url', { selectedTab, problemAlias })
               "
               @submit-run="onRunSubmitted"
               @show-run="onRunDetails"
@@ -176,7 +177,6 @@ export default class ArenaCourse extends Vue {
   @Prop() scoreboard!: types.Scoreboard;
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop({ default: () => [] }) runs!: types.Run[];
-  @Prop({ default: false }) shouldShowRunDetails!: boolean;
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
 
@@ -246,24 +246,6 @@ export default class ArenaCourse extends Vue {
       return;
     }
     this.onNavigateToProblem(newValue);
-  }
-
-  @Watch('shouldShowRunDetails')
-  onShouldShowRunDetailsChanged(newValue: boolean): void {
-    if (!newValue || !this.guid) {
-      return;
-    }
-    this.$nextTick(() => {
-      this.$emit('show-run', {
-        request: {
-          guid: this.guid,
-          hash: `#problems/show-run:${this.guid}/`,
-          isAdmin: this.course.is_admin,
-          problemAlias: this.activeProblemAlias,
-        },
-        target: this.problemDetails,
-      });
-    });
   }
 }
 </script>

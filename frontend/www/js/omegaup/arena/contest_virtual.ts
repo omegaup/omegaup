@@ -22,12 +22,14 @@ import {
   SubmissionRequest,
   submitRun,
   submitRunFailed,
+  trackRun,
 } from './submissions';
 import { onVirtualRankingChanged } from './ranking';
 import { EventsSocket } from './events_socket';
 import rankingStore from './rankingStore';
 import socketStore from './socketStore';
 import { myRunsStore } from './runsStore';
+import { setLocationHref } from '../location';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -36,6 +38,10 @@ OmegaUp.on('ready', () => {
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
+  const popupDisplayed = payload.runDetails
+    ? PopupDisplayed.RunDetails
+    : PopupDisplayed.None;
+
   trackClarifications(payload.clarifications);
 
   // Refresh after time T
@@ -101,20 +107,26 @@ OmegaUp.on('ready', () => {
       });
     }, refreshTime);
   }
+  if (payload.problemDetails?.runs) {
+    for (const run of payload.problemDetails.runs ?? []) {
+      trackRun({ run });
+    }
+  }
 
-  const contestContestant = new Vue({
+  const contestVirtual = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest': arena_Contest },
     data: () => ({
-      problemInfo: null as types.ProblemInfo | null,
-      problem: null as types.NavbarProblemsetProblem | null,
+      problemInfo: payload.problemDetails as types.ProblemInfo | null,
+      problem: payload.problem as types.NavbarProblemsetProblem | null,
       problems: payload.problems as types.NavbarProblemsetProblem[],
-      popupDisplayed: PopupDisplayed.None,
+      popupDisplayed,
       showNewClarificationPopup: false,
-      guid: null as null | string,
-      problemAlias: null as null | string,
+      guid: payload.guid as null | string,
+      problemAlias: payload.problemAlias as null | string,
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
+      runDetailsData: payload.runDetails,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
@@ -139,6 +151,7 @@ OmegaUp.on('ready', () => {
           showPenalty: this.showPenalty,
           socketStatus: socketStore.state.socketStatus,
           runs: myRunsStore.state.runs,
+          runDetailsData: this.runDetailsData,
         },
         on: {
           'navigate-to-problem': ({
@@ -149,13 +162,13 @@ OmegaUp.on('ready', () => {
             navigateToProblem({
               type: NavigationType.ForContest,
               problem,
-              target: contestContestant,
+              target: contestVirtual,
               problems: this.problems,
               contestAlias: payload.contest.alias,
             });
           },
           'show-run': (source: SubmissionRequest) => {
-            source.request.hash = `#problems/${
+            source.request.url = `#problems/${
               this.problemAlias ?? source.request.problemAlias
             }/show-run:${source.request.guid}/`;
             api.Run.details({ run_alias: source.request.guid })
@@ -255,8 +268,12 @@ OmegaUp.on('ready', () => {
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
           },
-          'reset-hash': (request: { selectedTab: string; alias: string }) => {
-            window.location.replace(`#${request.selectedTab}/${request.alias}`);
+          'reset-url': (request: { selectedTab: string; alias: string }) => {
+            this.popupDisplayed = PopupDisplayed.None;
+            setLocationHref({
+              url: window.location.pathname,
+              problemAlias: request.alias,
+            });
           },
         },
       });
@@ -266,10 +283,9 @@ OmegaUp.on('ready', () => {
   // This needs to be set here and not at the top because it depends
   // on the `navigate-to-problem` callback being invoked, and that is
   // not the case if this is set a priori.
-  Object.assign(
-    contestContestant,
-    getOptionsFromLocation(window.location.hash),
-  );
+  if (popupDisplayed === PopupDisplayed.None) {
+    Object.assign(contestVirtual, getOptionsFromLocation(window.location.hash));
+  }
 
   const socket = new EventsSocket({
     disableSockets: false,

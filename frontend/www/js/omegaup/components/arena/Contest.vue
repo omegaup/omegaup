@@ -61,14 +61,14 @@
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="runs"
+              :run-details-data="runDetailsData"
               :popup-displayed="popupDisplayed"
               :guid="guid"
-              :should-show-run-details="shouldShowRunDetails"
               :contest-alias="contest.alias"
               :is-contest-finished="isContestFinished"
               @update:activeTab="
                 (selectedTab) =>
-                  $emit('reset-hash', {
+                  $emit('reset-url', {
                     selectedTab,
                     alias: activeProblemAlias,
                   })
@@ -195,7 +195,7 @@ export default class ArenaContest extends Vue {
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: true }) socketConnected!: boolean;
   @Prop({ default: () => [] }) runs!: types.Run[];
-  @Prop({ default: false }) shouldShowRunDetails!: boolean;
+  @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
 
   T = T;
   ui = ui;
@@ -286,24 +286,6 @@ export default class ArenaContest extends Vue {
   @Watch('clarifications')
   onClarificationsChanged(newValue: types.Clarification[]): void {
     this.currentClarifications = newValue;
-  }
-
-  @Watch('shouldShowRunDetails')
-  onShouldShowRunDetailsChanged(newValue: boolean): void {
-    if (!newValue || !this.guid) {
-      return;
-    }
-    this.$nextTick(() => {
-      this.$emit('show-run', {
-        request: {
-          guid: this.guid,
-          hash: `#problems/show-run:${this.guid}/`,
-          isAdmin: this.isAdmin,
-          problemAlias: this.activeProblemAlias,
-        },
-        target: this.problemDetails,
-      });
-    });
   }
 }
 </script>

@@ -25,6 +25,7 @@ import {
 } from './clarifications';
 import clarificationStore from './clarificationsStore';
 import { myRunsStore, runsStore } from './runsStore';
+import { setLocationHref } from '../location';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -39,26 +40,33 @@ OmegaUp.on('ready', () => {
   if (activeTab !== locationHash[0]) {
     window.location.hash = activeTab;
   }
+  const popupDisplayed = payload.runDetails
+    ? PopupDisplayed.RunDetails
+    : PopupDisplayed.None;
 
   trackClarifications(payload.courseDetails.clarifications);
 
+  if (payload.problemDetails?.runs) {
+    for (const run of payload.problemDetails.runs ?? []) {
+      trackRun({ run });
+    }
+  }
   const arenaCourse = new Vue({
     el: '#main-container',
     components: {
       'omegaup-arena-course': arena_Course,
     },
     data: () => ({
-      popupDisplayed: PopupDisplayed.None,
-      problemInfo: null as types.ProblemInfo | null,
-      problem: null as types.NavbarProblemsetProblem | null,
-      shouldShowRunDetails: false,
+      popupDisplayed,
+      problemInfo: payload.problemDetails as types.ProblemInfo | null,
+      problem: payload.problem as types.NavbarProblemsetProblem | null,
       problems: payload.currentAssignment
         .problems as types.NavbarProblemsetProblem[],
       showNewClarificationPopup: false,
-      guid: null as null | string,
-      problemAlias: null as null | string,
+      guid: payload.guid as null | string,
+      problemAlias: payload.problemAlias as null | string,
       searchResultUsers: [] as types.ListItem[],
-      runDetailsData: null as types.RunDetails | null,
+      runDetailsData: payload.runDetails as types.RunDetails | null,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-course', {
@@ -74,7 +82,6 @@ OmegaUp.on('ready', () => {
           scoreboard: payload.scoreboard,
           showNewClarificationPopup: this.showNewClarificationPopup,
           showRanking: payload.showRanking,
-          shouldShowRunDetails: this.shouldShowRunDetails,
           activeTab,
           guid: this.guid,
           runs: myRunsStore.state.runs,
@@ -199,15 +206,12 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.ignoreError);
           },
-          'reset-hash': (request: {
-            selectedTab: string;
-            alias: null | string;
-          }) => {
-            if (!request.alias) {
-              window.location.replace(`#${request.selectedTab}`);
-              return;
-            }
-            window.location.replace(`#${request.selectedTab}/${request.alias}`);
+          'reset-url': (request: { selectedTab: string; alias: string }) => {
+            this.popupDisplayed = PopupDisplayed.None;
+            setLocationHref({
+              url: window.location.pathname,
+              problemAlias: request.alias,
+            });
           },
         },
       });
@@ -217,7 +221,9 @@ OmegaUp.on('ready', () => {
   // This needs to be set here and not at the top because it depends
   // on the `navigate-to-problem` callback being invoked, and that is
   // not the case if this is set a priori.
-  Object.assign(arenaCourse, getOptionsFromLocation(window.location.hash));
+  if (popupDisplayed === PopupDisplayed.None) {
+    Object.assign(arenaCourse, getOptionsFromLocation(window.location.hash));
+  }
 
   function getSelectedValidTab(tab: string, isAdmin: boolean): string {
     const validTabs = ['problems', 'ranking', 'runs', 'clarifications'];

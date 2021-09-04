@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import * as api from '../api';
 import * as ui from '../ui';
-import { setLocationHash } from '../location';
+import { setLocationHash, setLocationHref } from '../location';
 import { types } from '../api_types';
 import { myRunsStore } from './runsStore';
 import problemsStore from './problemStore';
@@ -55,7 +55,10 @@ export async function navigateToProblem(
       setLocationHash(`#problems/${problem.alias}/new-run`);
       return;
     }
-    setLocationHash(`#problems/${problem.alias}`);
+    setLocationHref({
+      url: window.location.pathname,
+      problemAlias: problem.alias,
+    });
     return;
   }
   return api.Problem.details({
@@ -84,7 +87,10 @@ export async function navigateToProblem(
         setLocationHash(`#problems/${problem.alias}/new-run`);
         return;
       }
-      setLocationHash(`#problems/${problem.alias}`);
+      setLocationHref({
+        url: window.location.pathname,
+        problemAlias: problem.alias,
+      });
     })
     .catch(() => {
       ui.dismissNotifications();
