@@ -764,7 +764,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $navbarProblem = array_filter(
                     $commonDetails['problems'],
                     fn ($problem) => ($problem['alias'] === $problemAlias)
-                )[0];
+                );
             }
             $result['smartyProperties']['payload'] = array_merge(
                 $result['smartyProperties']['payload'],
@@ -774,7 +774,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'guid' => $guid,
                     'problemDetails' => $problemDetails,
                     'runDetails' => $runDetails,
-                    'problem' => $navbarProblem,
+                    'problem' => !is_null(
+                        $navbarProblem
+                    ) ? array_shift(
+                        $navbarProblem
+                    ) : null,
                     'scoreboard' => self::getScoreboard(
                         $contest,
                         $problemset,
