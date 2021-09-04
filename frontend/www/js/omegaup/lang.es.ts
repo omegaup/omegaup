@@ -189,7 +189,7 @@ const translations: { [key: string]: string; } = {
   contestEditArchiveHelpText: "Al archivar un concurso, \u00e9ste dejar\u00e1 de aparecer en todos los listados. La \u00fanica forma de acceder al mismo, es a trav\u00e9s de su URL o desde el listado de \"Mis concursos\", en la pesta\u00f1a \"Concursos archivados\". Esta acci\u00f3n puede deshacerse.",
   contestEditArchivedSuccess: "Concurso archivado exitosamente.",
   contestEditCannotReplaceTeamsGroupWithSubmissions: "No puedes reemplazar un grupo de equipos en un concurso que ya tiene env\u00edos",
-  contestEditCatLanguageAddedWarning: "Se agreg\u00f3 \"cat\" a los lenguajes del curso porque el problema agregado lo requiere",
+  contestEditCatLanguageAddedWarning: "Se agreg\u00f3 \"cat\" a los lenguajes del concurso porque el problema agregado lo requiere",
   contestEditContestClonedSuccessfully: "El concurso se clon\u00f3 exitosamente",
   contestEditContestEdited: "Tu concurso ha sido editado.",
   contestEditGoToContest: "Ver Concurso",

@@ -65,12 +65,29 @@ OmegaUp.on('ready', () => {
           })
           .catch(ui.apiError);
       },
-      refreshProblems: (): void => {
+      refreshProblems: (problemAdded: boolean): void => {
         api.Contest.problems({
           contest_alias: payload.details.alias,
         })
           .then((response) => {
             contestEdit.problems = response.problems;
+            if (problemAdded) {
+              if (
+                contestEdit.problems[contestEdit.problems.length - 1].languages
+                  .split(',')
+                  .includes('cat') &&
+                !payload.details.languages.includes('cat')
+              ) {
+                api.Contest.update({
+                  contest_alias: payload.details.alias,
+                  languages: payload.details.languages.concat(['cat']),
+                })
+                  .then(() => {
+                    ui.warning(T.contestEditCatLanguageAddedWarning);
+                  })
+                  .catch(ui.apiError);
+              }
+            }
           })
           .catch(ui.apiError);
       },
@@ -107,50 +124,6 @@ OmegaUp.on('ready', () => {
         })
           .then((response) => {
             contestEdit.groupAdmins = response.group_admins;
-          })
-          .catch(ui.apiError);
-      },
-      addCatToLanguages: (): void => {
-        const contest: types.ContestAdminDetails = {
-          admin: true,
-          admission_mode: 'private',
-          alias: contestEdit.details.alias,
-          archived: false,
-          available_languages: {},
-          director: '',
-          opened: false,
-          penalty_calc_policy: 'sum',
-          problemset_id: 0,
-          show_penalty: true,
-          title: contestEdit.details.title,
-          description: contestEdit.details.description,
-          has_submissions: contestEdit.details.has_submissions,
-          start_time: contestEdit.details.start_time,
-          finish_time: contestEdit.details.finish_time,
-          points_decay_factor: contestEdit.details.points_decay_factor,
-          submissions_gap: contestEdit.details.submissions_gap,
-          languages: contestEdit.details.languages,
-          feedback: contestEdit.details.feedback,
-          penalty: contestEdit.details.penalty,
-          scoreboard: contestEdit.details.scoreboard,
-          penalty_type: contestEdit.details.penalty_type,
-          show_scoreboard_after: contestEdit.details.show_scoreboard_after,
-          partial_score: contestEdit.details.partial_score,
-          needs_basic_information: contestEdit.details.needs_basic_information,
-          requests_user_information:
-            contestEdit.details.requests_user_information,
-          contest_for_teams: contestEdit.details.contest_for_teams,
-        };
-        contest.languages.push('cat');
-        api.Contest.update({
-          ...contest,
-          contest_alias: contest.alias,
-          alias: null,
-          teams_group_alias: contestEdit.teamsGroup?.alias,
-          contest_for_teams: !!contestEdit.teamsGroup?.alias,
-        })
-          .then(() => {
-            ui.warning(T.contestEditCatLanguageAddedWarning);
           })
           .catch(ui.apiError);
       },
@@ -285,18 +258,6 @@ OmegaUp.on('ready', () => {
             problem: types.ProblemsetProblem;
             isUpdate: boolean;
           }) => {
-            api.Problem.details({
-              problem_alias: problem.alias,
-            })
-              .then((problemDetails) => {
-                if (
-                  problemDetails.languages.includes('cat') &&
-                  !this.details.languages.includes('cat')
-                ) {
-                  this.addCatToLanguages();
-                }
-              })
-              .catch(ui.apiError);
             api.Contest.addProblem({
               contest_alias: payload.details.alias,
               order_in_contest: problem.order,
@@ -305,7 +266,7 @@ OmegaUp.on('ready', () => {
               commit: problem.commit,
             })
               .then(() => {
-                this.refreshProblems();
+                this.refreshProblems(true);
                 if (isUpdate) {
                   ui.success(T.problemSuccessfullyUpdated);
                   return;
@@ -359,7 +320,7 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.problemSuccessfullyRemoved);
-                this.refreshProblems();
+                this.refreshProblems(false);
               })
               .catch(ui.apiError);
           },

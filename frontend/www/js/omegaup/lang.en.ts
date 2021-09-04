@@ -189,7 +189,7 @@ const translations: { [key: string]: string; } = {
   contestEditArchiveHelpText: "When archiving a contest, it will no longer appear in all the lists. The only way to access it is through its URL or from the list of \"My contests\", in the \"Archived contests\" tab. This action can be undone.",
   contestEditArchivedSuccess: "Contest archived successfully.",
   contestEditCannotReplaceTeamsGroupWithSubmissions: "You cannot replace the teams group in a contest that already has submissions",
-  contestEditCatLanguageAddedWarning: "\"cat\" was added to course languages because the added problem requires it",
+  contestEditCatLanguageAddedWarning: "\"cat\" was added to contest languages because the added problem requires it",
   contestEditContestClonedSuccessfully: "Contest was cloned successfully",
   contestEditContestEdited: "Your contest has been edited",
   contestEditGoToContest: "View contest",
