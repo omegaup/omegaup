@@ -138,11 +138,14 @@
           :has-submissions="details.has_submissions"
           :update="true"
           :search-result-teams-groups="searchResultTeamsGroups"
-          :initial-problems="problems"
+          :problems="problems"
           @update-search-result-teams-groups="
             (query) => $emit('update-search-result-teams-groups', query)
           "
           @update-contest="(contest) => $emit('update-contest', contest)"
+          @language-remove-blocked="
+            (language) => $emit('language-remove-blocked', language)
+          "
         ></omegaup-contest-new-form>
       </div>
       <div v-if="showTab === 'problems'" class="tab-pane active">

@@ -241,6 +241,7 @@ contestNewFormEndDateDesc = "La hora (en hora local) en la que termina el concur
 contestNewFormICPCStyle = "Estilo ICPC"
 contestNewFormImmediateFeedbackDesc = "Después de evaluar cada envío, se mostrará el veredicto."
 contestNewFormImmediateSummaryFeedbackDesc = "Después de evaluar cada envío, se mostrará el resumen de puntajes y veredictos para cada grupo de casos."
+contestNewFormLanguageRemoveBlockedWarning = "No se puede quitar \"%(language)\" de los lenguajes porque hay por lo menos un problema que lo requiere"
 contestNewFormLanguages = "Establecer lenguajes para el concurso actual"
 contestNewFormNoPenalty = "Usuarios con el mismo puntaje quedarán empatados, sin importar el tiempo que le haya tomado a cada uno."
 contestNewFormNumberOfContestants = "Número de concursantes"

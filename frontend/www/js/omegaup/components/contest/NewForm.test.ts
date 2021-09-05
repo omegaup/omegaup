@@ -4,6 +4,10 @@ import T from '../../lang';
 
 import contest_NewForm from './NewForm.vue';
 
+import { Multiselect } from 'vue-multiselect';
+
+import { types } from '../../api_types';
+
 describe('NewForm.vue', () => {
   beforeAll(() => {
     const div = document.createElement('div');
@@ -65,6 +69,54 @@ describe('NewForm.vue', () => {
     );
     await wrapper.find('form button[type="submit"]').trigger('click');
     expect(wrapper.emitted('update-contest')).toBeDefined();
+
+    wrapper.destroy();
+  });
+
+  const problems: types.ProblemsetProblemWithVersions[] = [
+    {
+      accepted: 0,
+      accepts_submissions: true,
+      alias: 'problemaSoloSalida',
+      commit: 'commit',
+      difficulty: 0,
+      has_submissions: false,
+      input_limit: 1024,
+      languages: 'cat',
+      order: 1,
+      points: 100,
+      quality_seal: false,
+      submissions: 0,
+      title: 'Problema solo salida',
+      version: 'version',
+      versions: { log: [], published: '' },
+      visibility: 2,
+      visits: 0,
+    },
+  ];
+
+  it('Should block language removal', async () => {
+    const wrapper = shallowMount(contest_NewForm, {
+      propsData: {
+        update: true,
+        allLanguages: [
+          { py2: 'Python 2' },
+          { py3: 'Python 3' },
+          { cat: 'cat' },
+        ],
+        initialLanguages: ['py2', 'cat'],
+        initialFinishTime: new Date(),
+        initialStartTime: new Date(),
+        initialSubmissionsGap: 1,
+        initialAlias: 'contestAlias',
+        initialTitle: 'Contest Title',
+        initialDescription: 'Contest description.',
+        problems,
+      },
+    });
+
+    await wrapper.findComponent(Multiselect).vm.$emit('remove', 'cat');
+    expect(wrapper.emitted('language-remove-blocked')).toBeDefined();
 
     wrapper.destroy();
   });

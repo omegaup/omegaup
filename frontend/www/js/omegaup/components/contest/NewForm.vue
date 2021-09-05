@@ -347,8 +347,7 @@ export default class NewForm extends Vue {
   @Prop({ default: null }) teamsGroupAlias!: null | string;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop({ default: false }) contestForTeams!: boolean;
-  @Prop({ default: null })
-  initialProblems!: types.ProblemsetProblemWithVersions[];
+  @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
 
   T = T;
   alias = this.initialAlias;
@@ -374,13 +373,6 @@ export default class NewForm extends Vue {
   currentContestForTeams = this.contestForTeams;
   currentTeamsGroupAlias = this.teamsGroupAlias;
   titlePlaceHolder = '';
-  catLanguageBlocked = false;
-
-  beforeMount() {
-    if (this.initialProblems) {
-      this.blockCatLanguage();
-    }
-  }
 
   @Watch('windowLengthEnabled')
   onPropertyChange(newValue: boolean): void {
@@ -497,23 +489,24 @@ export default class NewForm extends Vue {
     this.$emit('create-contest', request);
   }
 
-  blockCatLanguage(): void {
-    for (const problem of this.initialProblems) {
-      if (problem.languages.split(',').includes('cat')) {
-        this.catLanguageBlocked = true;
-        break;
+  get catLanguageBlocked(): boolean {
+    if (this.problems) {
+      for (const problem of this.problems) {
+        if (problem.languages.split(',').includes('cat')) {
+          return true;
+        }
       }
     }
+    return false;
   }
 
   onRemove(language: string) {
-    if (
-      !this.catLanguageBlocked ||
-      (this.catLanguageBlocked && language !== 'cat')
-    ) {
-      const index = this.languages.indexOf(language);
-      this.languages.splice(index, 1);
+    if (this.catLanguageBlocked && language == 'cat') {
+      this.$emit('language-remove-blocked', language);
+      return;
     }
+    const index = this.languages.indexOf(language);
+    this.languages.splice(index, 1);
   }
 
   onSelect(language: string) {

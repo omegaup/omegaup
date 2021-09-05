@@ -243,6 +243,7 @@ const translations: { [key: string]: string; } = {
   contestNewFormICPCStyle: "Estilo ICPC",
   contestNewFormImmediateFeedbackDesc: "Despu\u00e9s de evaluar cada env\u00edo, se mostrar\u00e1 el veredicto.",
   contestNewFormImmediateSummaryFeedbackDesc: "Despu\u00e9s de evaluar cada env\u00edo, se mostrar\u00e1 el resumen de puntajes y veredictos para cada grupo de casos.",
+  contestNewFormLanguageRemoveBlockedWarning: "No se puede quitar \"%(language)\" de los lenguajes porque hay por lo menos un problema que lo requiere",
   contestNewFormLanguages: "Establecer lenguajes para el concurso actual",
   contestNewFormNoPenalty: "Usuarios con el mismo puntaje quedar\u00e1n empatados, sin importar el tiempo que le haya tomado a cada uno.",
   contestNewFormNumberOfContestants: "N\u00famero de concursantes",
