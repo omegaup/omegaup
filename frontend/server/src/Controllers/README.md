@@ -1650,21 +1650,22 @@ Create new course API
 
 ### Parameters
 
-| Name                        | Type         | Description |
-| --------------------------- | ------------ | ----------- |
-| `admission_mode`            | `mixed`      |             |
-| `alias`                     | `mixed`      |             |
-| `description`               | `mixed`      |             |
-| `finish_time`               | `mixed`      |             |
-| `languages`                 | `mixed`      |             |
-| `name`                      | `mixed`      |             |
-| `needs_basic_information`   | `mixed`      |             |
-| `public`                    | `mixed`      |             |
-| `requests_user_information` | `mixed`      |             |
-| `school_id`                 | `mixed`      |             |
-| `show_scoreboard`           | `mixed`      |             |
-| `start_time`                | `mixed`      |             |
-| `unlimited_duration`        | `bool\|null` |             |
+| Name                        | Type           | Description |
+| --------------------------- | -------------- | ----------- |
+| `admission_mode`            | `mixed`        |             |
+| `alias`                     | `mixed`        |             |
+| `description`               | `mixed`        |             |
+| `finish_time`               | `mixed`        |             |
+| `languages`                 | `mixed`        |             |
+| `name`                      | `mixed`        |             |
+| `needs_basic_information`   | `mixed`        |             |
+| `objective`                 | `string\|null` |             |
+| `public`                    | `mixed`        |             |
+| `requests_user_information` | `mixed`        |             |
+| `school_id`                 | `mixed`        |             |
+| `show_scoreboard`           | `mixed`        |             |
+| `start_time`                | `mixed`        |             |
+| `unlimited_duration`        | `bool\|null`   |             |
 
 ### Returns
 
@@ -2080,6 +2081,7 @@ Edit Course contents
 | `finish_time`               | `OmegaUp\Timestamp\|null`                   |             |
 | `name`                      | `null\|string`                              |             |
 | `needs_basic_information`   | `bool\|null`                                |             |
+| `objective`                 | `null\|string`                              |             |
 | `requests_user_information` | `'no'\|'optional'\|'required'\|null`        |             |
 | `show_scoreboard`           | `bool\|null`                                |             |
 | `start_time`                | `OmegaUp\Timestamp\|null`                   |             |
