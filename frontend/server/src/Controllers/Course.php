@@ -295,6 +295,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $alias
      * @omegaup-request-param null|string $description
      * @omegaup-request-param null|string $level
+     * @omegaup-request-param null|string $objective
      * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param null|string $languages
      * @omegaup-request-param null|string $name
@@ -330,6 +331,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param null|string $alias
      * @omegaup-request-param null|string $description
+     * @omegaup-request-param null|string $objective
      * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
      * @omegaup-request-param null|string $languages
      * @omegaup-request-param null|string $level
@@ -386,6 +388,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $alias
      * @omegaup-request-param null|string $description
      * @omegaup-request-param null|string $level
+     * @omegaup-request-param null|string $objective
      * @omegaup-request-param int|null $finish_time
      * @omegaup-request-param null|string $languages
      * @omegaup-request-param null|string $name
@@ -412,6 +415,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r['description'],
             'description',
             $isRequired
+        );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['objective'],
+            'objective',
+            /*required=*/false // TODO: This should be $isRequired when the UI is ready
         );
 
         $r->ensureOptionalInt('start_time', null, null, !$isUpdate);
@@ -794,6 +802,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param string|null $level
+     * @omegaup-request-param string|null $objective
      * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param mixed $name
@@ -818,9 +827,10 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         self::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
             'name' => $r['name'],
-            'description' => $r['description'],
             'alias' => $r['alias'],
             'level' => $r['level'],
+            'description' => $r['description'],
+            'objective' => $r['objective'],
             'school_id' => $r['school_id'],
             'languages' => $r['languages'],
             'start_time' => $r['start_time'],
@@ -4809,6 +4819,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $alias
      * @omegaup-request-param null|string $description
      * @omegaup-request-param null|string $level
+     * @omegaup-request-param null|string $objective
      * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
      * @omegaup-request-param string $languages
      * @omegaup-request-param null|string $name
@@ -4851,6 +4862,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'alias',
             'name',
             'description',
+            'objective',
             'languages' => ['important' => true],
             'start_time',
             'finish_time',
