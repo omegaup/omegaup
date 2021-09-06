@@ -38,7 +38,7 @@ spec:
         - name: varlog
           mountPath: /var/log
       - name: broadcaster
-        image: omegaup/backend:v1.6.2
+        image: omegaup/backend:v1.6.3
         command: ['/usr/bin/omegaup-broadcaster']
         ports:
         - name: broadcaster
@@ -57,7 +57,7 @@ spec:
         - name: varlog
           mountPath: /var/log
       - name: grader
-        image: omegaup/backend:v1.6.2
+        image: omegaup/backend:v1.6.3
         command: ['/usr/bin/omegaup-grader']
         ports:
         - name: grader
