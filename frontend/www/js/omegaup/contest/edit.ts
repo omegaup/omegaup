@@ -71,22 +71,22 @@ OmegaUp.on('ready', () => {
         })
           .then((response) => {
             contestEdit.problems = response.problems;
-            if (problemAdded) {
-              if (
-                contestEdit.problems[contestEdit.problems.length - 1].languages
-                  .split(',')
-                  .includes('cat') &&
-                !payload.details.languages.includes('cat')
-              ) {
-                api.Contest.update({
-                  contest_alias: payload.details.alias,
-                  languages: payload.details.languages.concat(['cat']),
+            if (
+              problemAdded &&
+              !contestEdit.details.languages.includes('cat') &&
+              contestEdit.problems.some((problem) =>
+                problem.languages.split(',').includes('cat'),
+              )
+            ) {
+              api.Contest.update({
+                contest_alias: contestEdit.details.alias,
+                languages: contestEdit.details.languages.concat(['cat']),
+              })
+                .then(() => {
+                  contestEdit.details.languages.push('cat');
+                  ui.warning(T.contestEditCatLanguageAddedWarning);
                 })
-                  .then(() => {
-                    ui.warning(T.contestEditCatLanguageAddedWarning);
-                  })
-                  .catch(ui.apiError);
-              }
+                .catch(ui.apiError);
             }
           })
           .catch(ui.apiError);
