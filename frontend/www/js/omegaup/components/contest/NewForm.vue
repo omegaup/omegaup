@@ -490,11 +490,12 @@ export default class NewForm extends Vue {
   }
 
   get catLanguageBlocked(): boolean {
-    if (this.problems) {
-      for (const problem of this.problems) {
-        if (problem.languages.split(',').includes('cat')) {
-          return true;
-        }
+    if (!this.problems) {
+      return false;
+    }
+    for (const problem of this.problems) {
+      if (problem.languages.split(',').includes('cat')) {
+        return true;
       }
     }
     return false;
