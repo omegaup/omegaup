@@ -290,6 +290,7 @@ OmegaUp.on('ready', () => {
               assignment_alias: assignment.alias,
               problem_alias: problem.alias,
               points: problem.points,
+              is_extra_problem: problem.is_extra_problem,
             };
             if (problem.commit) {
               problemParams.commit = problem.commit;

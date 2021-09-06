@@ -105,7 +105,7 @@
                   :disabled="!unlimitedDurationCourse"
                 />{{ T.wordsYes }}</label
               >
-              <label class="radio-inline"
+              <label class="radio-inline ml-3"
                 ><input
                   v-model="unlimitedDuration"
                   type="radio"
