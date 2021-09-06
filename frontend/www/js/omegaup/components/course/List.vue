@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container-fluid p-5">
     <div class="card-header mb-3">
       <h3>{{ T.courseCardAboutCourses }}</h3>
       <omegaup-markdown
