@@ -65,12 +65,29 @@ OmegaUp.on('ready', () => {
           })
           .catch(ui.apiError);
       },
-      refreshProblems: (): void => {
+      refreshProblems: (problemAdded: boolean): void => {
         api.Contest.problems({
           contest_alias: payload.details.alias,
         })
           .then((response) => {
             contestEdit.problems = response.problems;
+            if (
+              problemAdded &&
+              !contestEdit.details.languages.includes('cat') &&
+              contestEdit.problems.some((problem) =>
+                problem.languages.split(',').includes('cat'),
+              )
+            ) {
+              api.Contest.update({
+                contest_alias: contestEdit.details.alias,
+                languages: contestEdit.details.languages.concat(['cat']),
+              })
+                .then(() => {
+                  contestEdit.details.languages.push('cat');
+                  ui.warning(T.contestEditCatLanguageAddedWarning);
+                })
+                .catch(ui.apiError);
+            }
           })
           .catch(ui.apiError);
       },
@@ -249,7 +266,7 @@ OmegaUp.on('ready', () => {
               commit: problem.commit,
             })
               .then(() => {
-                this.refreshProblems();
+                this.refreshProblems(true);
                 if (isUpdate) {
                   ui.success(T.problemSuccessfullyUpdated);
                   return;
@@ -303,7 +320,7 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.problemSuccessfullyRemoved);
-                this.refreshProblems();
+                this.refreshProblems(false);
               })
               .catch(ui.apiError);
           },
