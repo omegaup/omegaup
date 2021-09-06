@@ -39,6 +39,7 @@
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :problem="problemInfo"
               :active-tab="'problems'"
+              :languages="course.languages"
               :runs="runs"
               :guid="guid"
               :problem-alias="problemAlias"
