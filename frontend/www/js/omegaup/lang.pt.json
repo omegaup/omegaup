@@ -188,6 +188,7 @@
 	"contestEditArchiveHelpText": "Ao arquivar um concurso, ele n\u00e3o aparecer\u00e1 mais em todas as listas. A \u00fanica forma de acess\u00e1-lo \u00e9 atrav\u00e9s do seu URL ou da lista de \"Meus Concursos que eu administro\", na sec\u00e7\u00e3o \" Concursos arquivados\". Esta a\u00e7\u00e3o pode ser desfeita.",
 	"contestEditArchivedSuccess": "Concurso arquivado com sucesso.",
 	"contestEditCannotReplaceTeamsGroupWithSubmissions": "Voc\u00ea n\u00e3o pode substituir o grupo de equipes em um concurso que j\u00e1 tenha solu\u00e7\u00f5es",
+	"contestEditCatLanguageAddedWarning": "Adicionado \"cat\" aos idiomas do concurso porque o problema adicionado exige",
 	"contestEditContestClonedSuccessfully": "Seu concurso foi clonado com sucesso",
 	"contestEditContestEdited": "O concurso foi editado",
 	"contestEditGoToContest": "Exibir concurso",
