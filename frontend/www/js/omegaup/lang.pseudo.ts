@@ -244,6 +244,7 @@ const translations: { [key: string]: string; } = {
   contestNewFormICPCStyle: "(ICPC 57y13)",
   contestNewFormImmediateFeedbackDesc: "(Af73r 3va1ua7ing 3ach 5ubmi55i0n, 7h3 v3rdic7 wi11 b3 5h0wn.)",
   contestNewFormImmediateSummaryFeedbackDesc: "(Af73r 3va1ua7ing 3ach 5ubmi55i0n, 7h3 5ummary 0f 5c0r35 and v3rdic75 f0r 3ach gr0up 0f ca535 wi11 b3 5h0wn.)",
+  contestNewFormLanguageRemoveBlockedWarning: "(Cann07 r3m0v3 \"%(language)\" fr0m 1anguag35 b3cau53 7h3r3 i5 a7 13a57 0n3 pr0b13m 7ha7 r3quir35 i7)",
   contestNewFormLanguages: "(S37 1anguag35 70 7h3 curr3n7 c0n7357)",
   contestNewFormNoPenalty: "(U53r5 wi7h 7h3 5am3 5c0r3 wi11 3nd up in a draw, r3gard1355 0f 7h3 7im3 i7 ha5 7ak3n 3ach 0n3.)",
   contestNewFormNumberOfContestants: "(Numb3r 0f c0n7357an75)",
