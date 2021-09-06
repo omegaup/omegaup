@@ -255,6 +255,8 @@ class Grader {
                     CURLOPT_SSLKEY => '/etc/omegaup/frontend/key.pem',
                     CURLOPT_SSLCERT => '/etc/omegaup/frontend/certificate.pem',
                     CURLOPT_CAINFO => '/etc/omegaup/frontend/certificate.pem',
+                    CURLOPT_CONNECTTIMEOUT => 2,
+                    CURLOPT_TIMEOUT => 10,
                 ]
             );
             if (!is_null($postData)) {

@@ -1463,6 +1463,8 @@ class Run extends \OmegaUp\Controllers\Controller {
                     array_keys($headers)
                 ),
                 CURLOPT_RETURNTRANSFER => intval(!$passthru),
+                CURLOPT_CONNECTTIMEOUT => 2,
+                CURLOPT_TIMEOUT => 10,
             ]
         );
 
