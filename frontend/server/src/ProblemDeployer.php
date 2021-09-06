@@ -422,6 +422,8 @@ class ProblemDeployer {
                     CURLOPT_INFILESIZE => $zipFileSize,
                     CURLOPT_POST => 1,
                     CURLOPT_RETURNTRANSFER => 1,
+                    CURLOPT_CONNECTTIMEOUT => 2,
+                    CURLOPT_TIMEOUT => 120,
                 ]
             );
             $output = curl_exec($curl);
@@ -512,6 +514,8 @@ class ProblemDeployer {
                     CURLOPT_POSTFIELDS => $payload,
                     CURLOPT_POST => 1,
                     CURLOPT_RETURNTRANSFER => 1,
+                    CURLOPT_CONNECTTIMEOUT => 2,
+                    CURLOPT_TIMEOUT => 120,
                 ]
             );
             $output = curl_exec($curl);
@@ -546,6 +550,8 @@ class ProblemDeployer {
                         ),
                     ],
                     CURLOPT_RETURNTRANSFER => 1,
+                    CURLOPT_CONNECTTIMEOUT => 2,
+                    CURLOPT_TIMEOUT => 10,
                 ]
             );
             $output = curl_exec($curl);
