@@ -4,6 +4,7 @@
       <h3>{{ T.courseCardAboutCourses }}</h3>
       <omegaup-markdown
         :markdown="T.courseCardDescriptionCourses"
+        :full-width="true"
       ></omegaup-markdown>
       <div class="text-right align-middle">
         <a href="/course/home/">{{ T.wordsReadMore }}</a>
