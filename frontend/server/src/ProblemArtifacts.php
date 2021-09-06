@@ -274,6 +274,8 @@ class GitServerBrowser {
             [
                 CURLOPT_URL => $url,
                 CURLOPT_RETURNTRANSFER => !$this->passthru,
+                CURLOPT_CONNECTTIMEOUT => 2,
+                CURLOPT_TIMEOUT => 10,
             ]
         );
     }
