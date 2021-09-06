@@ -1,9 +1,10 @@
 <template>
-  <div>
+  <div class="container-fluid p-5">
     <div class="card-header mb-3">
       <h3>{{ T.courseCardAboutCourses }}</h3>
       <omegaup-markdown
         :markdown="T.courseCardDescriptionCourses"
+        :full-width="true"
       ></omegaup-markdown>
       <div class="text-right align-middle">
         <a href="/course/home/">{{ T.wordsReadMore }}</a>
