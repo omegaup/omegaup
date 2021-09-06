@@ -536,6 +536,13 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'language-remove-blocked': (language: string) => {
+            ui.warning(
+              ui.formatString(T.contestNewFormLanguageRemoveBlockedWarning, {
+                language: language,
+              }),
+            );
+          },
         },
       });
     },
