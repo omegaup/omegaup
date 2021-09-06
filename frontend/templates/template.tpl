@@ -60,11 +60,7 @@
     <script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
     <div id="common-navbar"></div>
     {js_include entrypoint="common_navbar_v2"}
-	  <main role="main"
-      {if (isset($fluidWidth) && $fluidWidth)} class="container-fluid p-5"
-      {else if (!isset($fullWidth) || !$fullWidth)}class="container-lg p-5"
-      {/if}
-    >
+	  <main role="main" {if (!isset($fullWidth) || !$fullWidth)}class="container-lg p-5"{/if}>
       {if (!isset($inArena) || !$inArena) && isset($ERROR_MESSAGE)}
         <div class="alert alert-danger">
           {$ERROR_MESSAGE}
