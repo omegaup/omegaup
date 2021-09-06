@@ -139,9 +139,13 @@
         </div>
         <div class="row">
           <div class="form-group col-md-6">
-            <label class="font-weight-bold w-100">{{
-              T.courseNewFormLevel
-            }}</label>
+            <label class="font-weight-bold w-100"
+              >{{ T.courseNewFormLevel }}
+              <font-awesome-icon
+                :title="T.courseNewFormLevelDesc"
+                icon="info-circle"
+              />
+            </label>
             <select v-model="level" class="form-control">
               <option
                 v-for="levelOption in levelOptions"
@@ -177,7 +181,6 @@
                 }"
                 cols="30"
                 rows="5"
-                required="required"
               ></textarea>
             </label>
           </div>
