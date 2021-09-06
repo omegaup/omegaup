@@ -1657,6 +1657,7 @@ Create new course API
 | `description`               | `mixed`        |             |
 | `finish_time`               | `mixed`        |             |
 | `languages`                 | `mixed`        |             |
+| `level`                     | `string\|null` |             |
 | `name`                      | `mixed`        |             |
 | `needs_basic_information`   | `mixed`        |             |
 | `objective`                 | `string\|null` |             |
@@ -2079,6 +2080,7 @@ Edit Course contents
 | `admission_mode`            | `'private'\|'public'\|'registration'\|null` |             |
 | `description`               | `null\|string`                              |             |
 | `finish_time`               | `OmegaUp\Timestamp\|null`                   |             |
+| `level`                     | `null\|string`                              |             |
 | `name`                      | `null\|string`                              |             |
 | `needs_basic_information`   | `bool\|null`                                |             |
 | `objective`                 | `null\|string`                              |             |
