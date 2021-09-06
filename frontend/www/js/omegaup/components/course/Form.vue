@@ -138,6 +138,49 @@
           </div>
         </div>
         <div class="row">
+          <div class="form-group col-md-6">
+            <label class="font-weight-bold w-100">{{
+              T.courseNewFormLevel
+            }}</label>
+            <select v-model="level" class="form-control">
+              <option
+                v-for="levelOption in levelOptions"
+                :key="levelOption.value"
+                :value="levelOption.value"
+              >
+                {{ levelOption.label }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label class="font-weight-bold w-100">{{ T.wordsLanguages }}</label>
+            <vue-multiselect
+              v-model="selectedLanguages"
+              :options="Object.keys(allLanguages)"
+              :multiple="true"
+              :placeholder="T.courseNewFormLanguages"
+              :close-on-select="false"
+              :allow-empty="false"
+            >
+            </vue-multiselect>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group container-fluid col-md-6">
+            <label class="font-weight-bold w-100"
+              >{{ T.courseNewFormObjective }}
+              <textarea
+                v-model="objective"
+                class="form-control"
+                :class="{
+                  'is-invalid': invalidParameterName === 'objective',
+                }"
+                cols="30"
+                rows="5"
+                required="required"
+              ></textarea>
+            </label>
+          </div>
           <div class="form-group container-fluid col-md-6">
             <label class="font-weight-bold w-100"
               >{{ T.courseNewFormDescription }}
@@ -152,18 +195,6 @@
                 required="required"
               ></textarea>
             </label>
-          </div>
-          <div class="form-group col-md-6">
-            <label class="font-weight-bold w-100">{{ T.wordsLanguages }}</label>
-            <vue-multiselect
-              v-model="selectedLanguages"
-              :options="Object.keys(allLanguages)"
-              :multiple="true"
-              :placeholder="T.courseNewFormLanguages"
-              :close-on-select="false"
-              :allow-empty="false"
-            >
-            </vue-multiselect>
           </div>
         </div>
         <div class="row">
@@ -225,12 +256,31 @@ export default class CourseDetails extends Vue {
   showScoreboard = this.course.show_scoreboard;
   startTime = this.course.start_time;
   name = this.course.name;
+  level = this.course.level;
+  objective = this.course.objective;
   school_name = this.course.school_name;
   school_id = this.course.school_id;
   needsBasicInformation = this.course.needs_basic_information;
   requests_user_information = this.course.requests_user_information;
   unlimitedDuration = this.course.finish_time === null;
   selectedLanguages = this.course.languages;
+
+  get levelOptions() {
+    return [
+      {
+        value: 'introductory',
+        label: T.courseLevelIntroductory,
+      },
+      {
+        value: 'intermediate',
+        label: T.courseLevelIntermediate,
+      },
+      {
+        value: 'advanced',
+        label: T.courseLevelAdvanced,
+      },
+    ];
+  }
 
   data(): { [name: string]: any } {
     return {
