@@ -43,14 +43,49 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Course::apiCreate($r);
 
         $this->assertEquals('ok', $response['status']);
-        $this->assertEquals(
+        $this->assertCount(
             1,
-            count(
-                \OmegaUp\DAO\Courses::findByName(
-                    $r['name']
-                )
+            \OmegaUp\DAO\Courses::findByName(
+                $r['name']
             )
         );
+    }
+
+    public function testCreateAndUpdateCourseWithObjective() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'alias' => \OmegaUp\Test\Utils::createRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'objective' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => (\OmegaUp\Time::get() + 60),
+            'finish_time' => (\OmegaUp\Time::get() + 120)
+        ]);
+        \OmegaUp\Controllers\Course::apiCreate($r);
+
+        $courses = \OmegaUp\DAO\Courses::findByName(
+            $r['name']
+        );
+        $this->assertCount(1, $courses);
+
+        $this->assertEquals($r['objective'], $courses[0]->objective);
+
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => $courses[0]->name,
+            'alias' => $courses[0]->alias,
+            'description' => $courses[0]->description,
+            'objective' => \OmegaUp\Test\Utils::createRandomString(),
+        ]);
+        \OmegaUp\Controllers\Course::apiUpdate($r);
+
+        $courses = \OmegaUp\DAO\Courses::findByName(
+            $r['name']
+        );
+        $this->assertEquals($r['objective'], $courses[0]->objective);
     }
 
     /**
@@ -137,6 +172,49 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
             $this->assertEquals('aliasInUse', $e->getMessage());
         }
+    }
+
+    public function testCreateAndUpdateCourseWithLevel() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'alias' => \OmegaUp\Test\Utils::createRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => (\OmegaUp\Time::get() + 60),
+            'finish_time' => (\OmegaUp\Time::get() + 120),
+            'level' => \OmegaUp\Controllers\Course::COURSE_LEVEL_INTERMEDIATE,
+        ]);
+        \OmegaUp\Controllers\Course::apiCreate($r);
+
+        $courses = \OmegaUp\DAO\Courses::findByName(
+            $r['name']
+        );
+        $this->assertCount(1, $courses);
+
+        $this->assertEquals(
+            \OmegaUp\Controllers\Course::COURSE_LEVEL_INTERMEDIATE,
+            $courses[0]->level
+        );
+
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => $courses[0]->name,
+            'alias' => $courses[0]->alias,
+            'description' => $courses[0]->description,
+            'level' => \OmegaUp\Controllers\Course::COURSE_LEVEL_ADVANCED,
+        ]);
+        \OmegaUp\Controllers\Course::apiUpdate($r);
+
+        $courses = \OmegaUp\DAO\Courses::findByName(
+            $r['name']
+        );
+        $this->assertEquals(
+            \OmegaUp\Controllers\Course::COURSE_LEVEL_ADVANCED,
+            $courses[0]->level
+        );
     }
 
     public function testCreateCourseWithDefinedLanguages() {
@@ -282,7 +360,8 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotNull($assignment);
 
         // Add a problem to the assignment.
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+        $problemsData = [];
+        $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => 'public',
                 'user' => $user
@@ -294,15 +373,36 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignment->alias,
-            'problem_alias' => $problemData['problem']->alias,
+            'problem_alias' => $problemsData[0]['problem']->alias,
             'points' => $points,
+        ]));
+
+        // Add an extra problem to the assignment
+        $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => 'public',
+                'user' => $user
+            ]),
+            $login
+        );
+        $points = 1337;
+        \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'course_alias' => $courseAlias,
+            'assignment_alias' => $assignment->alias,
+            'problem_alias' => $problemsData[1]['problem']->alias,
+            'points' => $points + 2,
+            'is_extra_problem' => true,
         ]));
 
         $problems = \OmegaUp\DAO\ProblemsetProblems::getByProblemset(
             $assignment->problemset_id
         );
-        $this->assertEquals(1, count($problems));
+        $this->assertEquals(2, count($problems));
         $this->assertEquals($points, $problems[0]->points);
+        $this->assertEquals(true, $problems[0]->points);
+        $this->assertEquals($points + 2, $problems[1]->points);
+        $this->assertEquals(true, $problems[1]->is_extra_problem);
     }
 
     /**

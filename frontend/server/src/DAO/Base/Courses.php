@@ -34,9 +34,11 @@ abstract class Courses {
             SET
                 `name` = ?,
                 `description` = ?,
+                `objective` = ?,
                 `alias` = ?,
                 `group_id` = ?,
                 `acl_id` = ?,
+                `level` = ?,
                 `start_time` = ?,
                 `finish_time` = ?,
                 `admission_mode` = ?,
@@ -54,6 +56,7 @@ abstract class Courses {
         $params = [
             $Courses->name,
             $Courses->description,
+            $Courses->objective,
             $Courses->alias,
             (
                 is_null($Courses->group_id) ?
@@ -65,6 +68,7 @@ abstract class Courses {
                 null :
                 intval($Courses->acl_id)
             ),
+            $Courses->level,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Courses->start_time
             ),
@@ -111,9 +115,11 @@ abstract class Courses {
                 `Courses`.`course_id`,
                 `Courses`.`name`,
                 `Courses`.`description`,
+                `Courses`.`objective`,
                 `Courses`.`alias`,
                 `Courses`.`group_id`,
                 `Courses`.`acl_id`,
+                `Courses`.`level`,
                 `Courses`.`start_time`,
                 `Courses`.`finish_time`,
                 `Courses`.`admission_mode`,
@@ -208,9 +214,11 @@ abstract class Courses {
                 `Courses`.`course_id`,
                 `Courses`.`name`,
                 `Courses`.`description`,
+                `Courses`.`objective`,
                 `Courses`.`alias`,
                 `Courses`.`group_id`,
                 `Courses`.`acl_id`,
+                `Courses`.`level`,
                 `Courses`.`start_time`,
                 `Courses`.`finish_time`,
                 `Courses`.`admission_mode`,
@@ -273,9 +281,11 @@ abstract class Courses {
                 `Courses` (
                     `name`,
                     `description`,
+                    `objective`,
                     `alias`,
                     `group_id`,
                     `acl_id`,
+                    `level`,
                     `start_time`,
                     `finish_time`,
                     `admission_mode`,
@@ -301,11 +311,14 @@ abstract class Courses {
                     ?,
                     ?,
                     ?,
+                    ?,
+                    ?,
                     ?
                 );';
         $params = [
             $Courses->name,
             $Courses->description,
+            $Courses->objective,
             $Courses->alias,
             (
                 is_null($Courses->group_id) ?
@@ -317,6 +330,7 @@ abstract class Courses {
                 null :
                 intval($Courses->acl_id)
             ),
+            $Courses->level,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Courses->start_time
             ),
