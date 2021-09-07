@@ -189,6 +189,7 @@
               >{{ T.courseNewFormDescription }}
               <textarea
                 v-model="description"
+                data-course-new-description
                 class="form-control"
                 :class="{
                   'is-invalid': invalidParameterName === 'description',

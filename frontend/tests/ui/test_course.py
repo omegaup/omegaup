@@ -302,8 +302,9 @@ def create_course(driver, course_alias: str, school_name: str) -> None:
     driver.typeahead_helper('*[contains(@class, "omegaup-course-details")]',
                             school_name,
                             select_suggestion=False)
-    driver.browser.find_element_by_tag_name('textarea').send_keys(
-        'course description')
+    driver.browser.find_element_by_css_selector(
+        'textarea[data-course-new-description]'
+    ).send_keys('course description')
 
     with driver.page_transition():
         driver.browser.find_element_by_css_selector(
