@@ -89,6 +89,13 @@ export default class Markdown extends Vue {
           preElement,
         );
       });
+    this.root
+      .querySelectorAll('[data-markdown-statement] > p > a')
+      .forEach((preElement) => {
+        preElement.parentElement?.setAttribute('style', 'display: flex;');
+        preElement.setAttribute('style', 'text-align: right; width: 100%');
+        preElement.setAttribute('target', '_blank');
+      });
     if (!window.MathJax?.startup) {
       window.MathJax = {
         tex: {

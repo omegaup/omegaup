@@ -3,37 +3,48 @@
     <div class="card-body">
       <div class="mb-4">
         <omegaup-markdown :markdown="T.teamsGroupsCsvHelp"></omegaup-markdown>
-        <div class="container">
-          <div class="row">
-            <div class="col-sm form-check mb-4">
-              <label class="form-check-label">
+        <div class="card">
+          <div class="container">
+            <div class="row">
+              <div class="col-sm form-check m-4">
+                {{ T.groupsUploadCsvFile }}
                 <input
-                  v-model="humanReadable"
-                  class="form-check-input"
-                  type="checkbox"
+                  name="identities"
+                  type="file"
+                  accept=".csv,.txt"
+                  @change="readCsv"
                 />
-                {{ T.passwordHumanReadable }}
-              </label>
-            </div>
-            <div class="col-sm form-check mb-4">
-              <label class="form-check-label">
-                <input
-                  v-model="selfGeneratedIdentities"
-                  class="form-check-input"
-                  type="checkbox"
-                />
-                {{ T.teamsGroupTeamsSelfGenerateIdentities }}
-              </label>
+              </div>
+              <div class="col-sm form-check my-4">
+                <div class="container">
+                  <h5 class="row">
+                    {{ T.teamsGroupTeamsAdvancedOptions }}
+                  </h5>
+                  <div class="row">
+                    <label class="form-check-label">
+                      <input
+                        v-model="humanReadable"
+                        class="form-check-input"
+                        type="checkbox"
+                      />
+                      {{ T.passwordHumanReadable }}
+                    </label>
+                  </div>
+                  <div class="row">
+                    <label class="form-check-label">
+                      <input
+                        v-model="selfGeneratedIdentities"
+                        class="form-check-input"
+                        type="checkbox"
+                      />
+                      {{ T.teamsGroupTeamsSelfGenerateIdentities }}
+                    </label>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        {{ T.groupsUploadCsvFile }}
-        <input
-          name="identities"
-          type="file"
-          accept=".csv,.txt"
-          @change="readCsv"
-        />
       </div>
       <template v-if="identities.length > 0">
         <h3 class="card-header">{{ T.teamsGroupEditTeams }}</h3>
