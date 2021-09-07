@@ -70,11 +70,11 @@ def test_user_ranking_course(driver):
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.CSS_SELECTOR,
-                     '.popup button.close'))).click()
+                     '[data-overlay-popup] .close'))).click()
             driver.wait.until(
                 EC.invisibility_of_element_located(
                     (By.CSS_SELECTOR,
-                     '.popup button.close')))
+                     '[data-overlay-popup] .close')))
 
         _click_on_problem(driver, problem)
         driver.wait.until(
