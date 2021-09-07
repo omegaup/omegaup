@@ -3304,7 +3304,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: \OmegaUp\TranslationString, fullWidth: bool}}
      */
     public static function getCourseSummaryListDetailsForTypeScript(
         \OmegaUp\Request $r
@@ -3334,6 +3334,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'course_type' => null,
                     ],
                     'title' => new \OmegaUp\TranslationString('courseList'),
+                    'fullWidth' => true,
                 ],
                 'entrypoint' => 'course_list',
             ];
@@ -3379,6 +3380,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'course_type' => null,
                 ],
                 'title' => new \OmegaUp\TranslationString('courseList'),
+                'fullWidth' => true,
             ],
             'entrypoint' => 'course_list',
         ];
