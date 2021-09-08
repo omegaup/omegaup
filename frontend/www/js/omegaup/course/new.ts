@@ -29,6 +29,8 @@ OmegaUp.on('ready', () => {
             start_time: defaultStartTime,
             finish_time: defaultFinishTime,
             show_scoreboard: false,
+            level: null,
+            objective: null,
             name: '',
             school_name: '',
             languages: Object.keys(payload.languages),
@@ -61,6 +63,8 @@ OmegaUp.on('ready', () => {
                   name: source.name,
                   description: source.description,
                   languages: source.selectedLanguages,
+                  level: source.level,
+                  objective: source.objective,
                   start_time: source.startTime,
                   show_scoreboard: source.showScoreboard,
                   needs_basic_information: source.needsBasicInformation,
@@ -71,6 +75,7 @@ OmegaUp.on('ready', () => {
                     ? source.finishTime
                     : null,
                 };
+                console.log(params);
 
                 api.Course.create(params)
                   .then(() => {

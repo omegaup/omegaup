@@ -237,6 +237,21 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
+const levelOptions = [
+  {
+    value: 'introductory',
+    label: T.courseLevelIntroductory,
+  },
+  {
+    value: 'intermediate',
+    label: T.courseLevelIntermediate,
+  },
+  {
+    value: 'advanced',
+    label: T.courseLevelAdvanced,
+  },
+];
+
 @Component({
   components: {
     'omegaup-datepicker': DatePicker,
@@ -268,23 +283,7 @@ export default class CourseDetails extends Vue {
   requests_user_information = this.course.requests_user_information;
   unlimitedDuration = this.course.finish_time === null;
   selectedLanguages = this.course.languages;
-
-  get levelOptions() {
-    return [
-      {
-        value: 'introductory',
-        label: T.courseLevelIntroductory,
-      },
-      {
-        value: 'intermediate',
-        label: T.courseLevelIntermediate,
-      },
-      {
-        value: 'advanced',
-        label: T.courseLevelAdvanced,
-      },
-    ];
-  }
+  levelOptions = levelOptions;
 
   data(): { [name: string]: any } {
     return {

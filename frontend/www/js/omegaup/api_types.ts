@@ -2301,10 +2301,10 @@ export namespace types {
     is_admin: boolean;
     is_curator: boolean;
     languages?: string[];
-    level: string;
+    level?: string;
     name: string;
     needs_basic_information: boolean;
-    objective: string;
+    objective?: string;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;
