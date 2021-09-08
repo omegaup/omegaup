@@ -6,6 +6,7 @@ import argparse
 import logging
 import os
 import sys
+import json
 import MySQLdb
 import MySQLdb.cursors
 import pika
@@ -40,12 +41,14 @@ def send_messages(cur: MySQLdb.cursors.BaseCursor,
         '''
     )
     for row in cur:
-        message = str.encode(str(row['course_id']) +
-                             '#' + str(row['identity_id']))
+        data = {"course_id": str(row['course_id']),
+                "identity_id": str(row['identity_id'])}
+        message = json.dumps(data)
+        body = message.encode()
         channel.basic_publish(
             exchange='logs_exchange',
             routing_key='CourseQueue',
-            body=message)
+            body=body)
     logging.info('Send messages to Contest_Queue')
     cur.execute(
         '''
@@ -56,12 +59,13 @@ def send_messages(cur: MySQLdb.cursors.BaseCursor,
         '''
     )
     for row in cur:
-        message = str.encode(str(row['contest_id']))
+        data = {"contest_id": str(row['contest_id'])}
+        message = json.dumps(data)
+        body = message.encode()
         channel.basic_publish(
             exchange='logs_exchange',
             routing_key='ContestQueue',
-            body=message)
-
+            body=body)
     connection.close()
 
 

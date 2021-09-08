@@ -19,8 +19,6 @@ import lib.logs  # pylint: disable=wrong-import-position
 
 
 def receive_coder_month_messages(
-        cur: MySQLdb.cursors.BaseCursor,
-        # pylint: disable=unused-argument,
         rabbit_user: str,
         rabbit_password: str) -> None:
     '''Receive coder of month messages'''
@@ -37,7 +35,7 @@ def receive_coder_month_messages(
         exchange='logs_exchange',
         queue=queue_name,
         routing_key="CoderMonthQueue")
-    print('[*] waiting for the messages')
+    logging.info('[*] waiting for the messages')
 
     def callback(channel: pika.adapters.blocking_connection.BlockingChannel,
                  method: pika.spec.Basic.Deliver,
@@ -66,9 +64,9 @@ def main() -> None:
     logging.info('Started')
     dbconn = lib.db.connect(args)
     try:
-        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
+        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor):
             receive_coder_month_messages(
-                cur, args.user_rabbit, args.password_rabbit)
+                args.user_rabbit, args.password_rabbit)
     finally:
         dbconn.close()
         logging.info('Done')

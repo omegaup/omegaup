@@ -6,8 +6,8 @@ import argparse
 import logging
 import os
 import sys
-import string
 import random
+import json
 import MySQLdb
 import MySQLdb.cursors
 import pika
@@ -23,12 +23,14 @@ import lib.logs  # pylint: disable=wrong-import-position
 
 def generate_code() -> str:
     '''Generate an aleatory code'''
-    code_str = string.ascii_letters + string.digits
-    return ''.join(random.sample(code_str, 10))
+    code_alfabeth = "23456789CFGHJMPQRVWX"
+    code_generate = ''.join(random.sample(code_alfabeth, 10))
+    return code_generate
 
 
 def receive_course_messages(
         cur: MySQLdb.cursors.BaseCursor,
+        dbconn: MySQLdb.connections.Connection,
         rabbit_user: str,
         rabbit_password: str) -> None:
     '''Receive courses messages'''
@@ -45,7 +47,7 @@ def receive_course_messages(
         exchange='logs_exchange',
         queue=queue_name,
         routing_key="CourseQueue")
-    print('[*] waiting for the messages')
+    logging.info('[*] waiting for the messages')
 
     def callback(channel: pika.adapters.blocking_connection.BlockingChannel,
                  method: pika.spec.Basic.Deliver,
@@ -53,9 +55,22 @@ def receive_course_messages(
                  # pylint: disable=unused-argument,
                  body: bytes) -> None:
         '''Function to receive messages'''
-        course_id, identity_id = [int(x) for x in body.decode().split('#')]
-        print(course_id)
-        print(identity_id)
+        data = json.loads(body.decode())
+        print(data["course_id"])
+        print(data["identity_id"])
+        cur.execute('''
+                SELECT
+                    COUNT(*) AS `count`
+                FROM
+                    `Certificates`
+                WHERE
+                    `identity_id` = %s AND
+                    `course_id` = %s;
+                ''', (data["identity_id"], data["course_id"]))
+        for row in cur:
+            if row['count'] > 0:
+                logging.info('Skipping because already exist certificate')
+                return
         code_verification = generate_code()
         cur.execute('''
                     INSERT INTO
@@ -63,8 +78,9 @@ def receive_course_messages(
                                      `certificate_type`,
                                      `course_id`, `verification_code`)
                     VALUES(%s, %s, %s, %s);''',
-                    (identity_id, 'course', course_id, code_verification))
-
+                    (data["identity_id"],
+                     'course', data["course_id"], code_verification))
+        dbconn.commit()
     channel.basic_consume(
         queue=queue_name,
         on_message_callback=callback,
@@ -85,14 +101,13 @@ def main() -> None:
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
-    print(args.user_rabbit)
-
     logging.info('Started')
     dbconn = lib.db.connect(args)
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
             receive_course_messages(
                 cur,
+                dbconn,
                 args.user_rabbit,
                 args.password_rabbit)
     finally:
