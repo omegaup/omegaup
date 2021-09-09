@@ -13,6 +13,7 @@ namespace OmegaUp\DAO;
  *
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CourseCardPublic=array{alias: string, name: string, level: string|null, lecturesCount: int, studentsCount: int}
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
@@ -232,6 +233,69 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $courses[] = $row;
         }
         return $courses;
+    }
+
+    /**
+     * @return list<CourseCardPublic>
+     */
+    public static function getPublicCoursesForTab() {
+        $sql = '
+            SELECT
+                c.course_id,
+                c.group_id,
+                c.alias,
+                c.name,
+                c.level
+            FROM
+                Courses c
+            WHERE
+                c.admission_mode = ? AND
+                c.finish_time IS NULL AND
+                c.archived = 0;';
+
+        /** @var list<array{course_id: int, group_id: int, alias: string, name: string, level: string|null}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [ \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC ]
+        );
+
+        $courses = [];
+        foreach ($rs as $row) {
+            $allAssignmentsCounts = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
+                $row['course_id']
+            );
+            $row['lecturesCount'] = $allAssignmentsCounts['lesson'];
+            $row['studentsCount'] = self::getStudentsInCourseCount(
+                $row['group_id']
+            );
+
+            unset($row['course_id']);
+            unset($row['group_id']);
+
+            $courses[] = $row;
+        }
+        return $courses;
+    }
+
+    /**
+     * Returns the number of students in a course
+     */
+    public static function getStudentsInCourseCount(int $groupId): int {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                Groups_Identities gi
+            INNER JOIN
+                Identities i ON i.identity_id = gi.identity_id
+            WHERE
+                gi.group_id = ?';
+
+        /** @var int */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [ $groupId ]
+        );
     }
 
     /**

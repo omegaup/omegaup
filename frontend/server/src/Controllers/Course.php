@@ -58,6 +58,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
  * @psalm-type CourseClarificationsPayload=array{page: int, length: int, pagerItems: list<PageItem>, clarifications: list<Clarification>}
+ * @psalm-type CourseCardPublic=array{alias: string, name: string, level: string|null, lecturesCount: int, studentsCount: int}
+ * @psalm-type CourseTabsPayload=array{courses: array{enrolled: list<CourseCardPublic>, finished: list<CourseCardPublic>, general: list<CourseCardPublic>}}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -3425,6 +3427,49 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'courses' => $filteredCourses,
                     'course_type' => null,
+                ],
+                'title' => new \OmegaUp\TranslationString('courseList'),
+                'fullWidth' => true,
+            ],
+            'entrypoint' => 'course_list',
+        ];
+    }
+
+    /**
+     *
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseTabsPayload, title: \OmegaUp\TranslationString, fullWidth: bool}}
+     */
+    public static function getCourseTabsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        // Check who is visiting, but a not logged user can still
+        // view the list of public courses.
+        $courses = [
+            'enrolled' => [],
+            'finished' => [],
+            'general' => [],
+        ];
+
+        try {
+            $courses['general'] = \OmegaUp\DAO\Courses::getPublicCoursesForTab();
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            return [
+                'smartyProperties' => [
+                    'payload' => [
+                        'courses' => $courses,
+                    ],
+                    'title' => new \OmegaUp\TranslationString('courseList'),
+                    'fullWidth' => true,
+                ],
+                'entrypoint' => 'course_list',
+            ];
+        }
+        // TODO: Add the courses enrolled and finished for student
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'courses' => $courses,
                 ],
                 'title' => new \OmegaUp\TranslationString('courseList'),
                 'fullWidth' => true,

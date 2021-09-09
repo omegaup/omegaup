@@ -51,9 +51,7 @@ class Course {
             'alias' => $courseAlias,
             'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => $courseStartTime,
-            'finish_time' => !is_null(
-                $courseDuration
-            ) ? $courseStartTime + $courseDuration : null,
+            'unlimited_duration' => is_null($courseDuration),
             'admission_mode' => $admissionMode,
             'requests_user_information' => $requestsUserInformation,
             'show_scoreboard' => $showScoreboard,
@@ -65,6 +63,9 @@ class Course {
                 $languages
             ) : null,
         ]);
+        if (!is_null($courseDuration)) {
+            $r['finish_time'] = $courseStartTime + $courseDuration;
+        }
 
         \OmegaUp\Controllers\Course::apiCreate($r);
 
