@@ -19,9 +19,6 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             /* $showScoreboard */'false',
             /* $courseDuration= */ null,
         );
-        print_r(\OmegaUp\DAO\Courses::getByAlias(
-            $courseData['course_alias']
-        ));
         $admin = $courseData['admin'];
         [ 'identity' => $identity ] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
