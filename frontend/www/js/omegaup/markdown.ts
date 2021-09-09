@@ -396,7 +396,8 @@ export class Converter {
             contents = contents
               .replace(/&/g, '&amp;')
               .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;');
+              .replace(/>/g, '&gt;')
+              .replace(/#/g, '&num;');
           }
           if (indentation != '') {
             const lines = [];
