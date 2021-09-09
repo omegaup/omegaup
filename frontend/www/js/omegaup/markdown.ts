@@ -396,22 +396,30 @@ export class Converter {
             contents = contents
               .replace(/&/g, '&amp;')
               .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/#/g, '&num;');
+              .replace(/>/g, '&gt;');
           }
-          if (indentation != '') {
-            const lines = [];
-            const stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
-            for (const line of contents.split('\n')) {
-              lines.push(line.replace(stripPrefix, ''));
-            }
+
+          if (indentation == '') {
             contents = escapeCharacters(
-              lines.join('\n'),
+              contents,
               ' \t*_{}[]()<>#+=.!|`-',
               /*afterBackslash=*/ false,
               /*doNotEscapeTildeAnDollar=*/ true,
             );
+            return `<pre><code${className}>${contents}</code></pre>`;
           }
+
+          const lines = [];
+          const stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
+          for (const line of contents.split('\n')) {
+            lines.push(line.replace(stripPrefix, ''));
+          }
+          contents = escapeCharacters(
+            lines.join('\n'),
+            ' \t*_{}[]()<>#+=.!|`-',
+            /*afterBackslash=*/ false,
+            /*doNotEscapeTildeAnDollar=*/ true,
+          );
           return `<pre><code${className}>${contents}</code></pre>`;
         };
         text = text.replace(
