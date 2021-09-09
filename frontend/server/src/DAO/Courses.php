@@ -253,7 +253,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 c.finish_time IS NULL AND
                 c.archived = 0;';
 
-        /** @var list<array{course_id: int, group_id: int, alias: string, name: string, level: string|null}> */
+        /** @var list<array{alias: string, course_id: int, group_id: int, level: null|string, name: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [ \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC ]
