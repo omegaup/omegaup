@@ -4,7 +4,7 @@
       {{ T.wordsProblems }}
     </h5>
     <div class="table-responsive">
-      <table class="table mb-0 table-fixed">
+      <table class="table mb-0 table-fixed d-block">
         <thead>
           <tr>
             <th scope="col" class="align-middle text-nowrap">
@@ -308,12 +308,9 @@ table {
   border-spacing: 0;
 }
 
-.table-responsive {
+.table-fixed {
   max-height: 80vh;
   overflow: auto;
-}
-
-.table-fixed {
   thead {
     th {
       position: sticky;
