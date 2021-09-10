@@ -602,6 +602,74 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
+     * Returns the list of assignments with their problems and points.
+     *
+     * @return list<array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, is_extra_problem: bool, points: float}>, order: int}>
+     */
+    public static function getStudentsProgressPerAssignmentv2(
+        int $courseId
+    ): array {
+        $sql = '
+            SELECT
+                a.alias AS assignment_alias,
+                a.name AS assignment_name,
+                a.`order` AS assignment_order,
+                p.title AS problem_title,
+                p.alias AS problem_alias,
+                psp.is_extra_problem,
+                psp.points AS problem_points
+            FROM
+                Assignments a
+            INNER JOIN
+                Problemsets ps ON a.problemset_id = ps.problemset_id
+            INNER JOIN
+                Problemset_Problems psp ON psp.problemset_id = ps.problemset_id
+            INNER JOIN
+                Problems p ON p.problem_id = psp.problem_id
+            WHERE
+                a.course_id = ?
+            ORDER BY
+                a.`order`, psp.`order`';
+
+        /** @var list<array{assignment_alias: string, assignment_name: string, assignment_order: int, problem_title: string, problem_alias: string, is_extra_problem: bool, problem_points: float}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [ $courseId ]
+        );
+
+        $assignmentsProblems = [];
+        foreach ($rs as $row) {
+            if (!isset($assignmentsProblems[$row['assignment_alias']])) {
+                $assignmentsProblems[$row['assignment_alias']] = [
+                    'alias' => $row['assignment_alias'],
+                    'name' => $row['assignment_name'],
+                    'points' => 0.0,
+                    'problems' => [],
+                    'order' => $row['assignment_order'],
+                ];
+            }
+            $assignmentsProblems[$row['assignment_alias']]['points'] += $row['problem_points'];
+            $assignmentsProblems[$row['assignment_alias']]['problems'][] = [
+                'alias' => $row['problem_alias'],
+                'title' => $row['problem_title'],
+                'is_extra_problem' => $row['is_extra_problem'],
+                'points' => $row['problem_points'],
+            ];
+        }
+
+        usort(
+            $assignmentsProblems,
+            /**
+             * @param array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, is_extra_problem: bool, points: float}>, order: int} $a
+             * @param array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, is_extra_problem: bool, points: float}>, order: int} $b
+             */
+            fn (array $a, array $b) => $a['order'] - $b['order']
+        );
+
+        return $assignmentsProblems;
+    }
+
+    /**
      * Returns the score per assignment of a user, as well as the maximum score
      * attainable
      *

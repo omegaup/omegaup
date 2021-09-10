@@ -234,6 +234,89 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testGetStudentProgressForCourseWithExtraProblems() {
+        // One course, with two assignments
+        // A1 has 2 problems that the student will solve => score 100%
+        // A2 has 2 problems, the student will solve just one => score 50%
+        // Global score will be 75% (A1: 100% + A2: 50%)
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
+            2
+        );
+        $assignmentAliases = $courseData['assignment_aliases'];
+
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseData['course_alias']);
+        if (is_null($course)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        [
+            'user' => $user,
+            'identity' => $participant
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $participant
+        );
+
+        $login = self::login($courseData['admin']);
+
+        $problemsData = [];
+        for ($i = 0; $i < 4; $i++) {
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $course->alias,
+            $assignmentAliases[0],
+            [
+                $problemsData[0],
+                $problemsData[1],
+            ]
+        );
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $course->alias,
+            $assignmentAliases[1],
+            [
+                $problemsData[2],
+                $problemsData[3],
+            ]
+        );
+
+        // Student will solve problems 0, 1 and 2.
+        for ($i = 0; $i < 2; $i++) {
+            $runData = \OmegaUp\Test\Factories\Run::createAssignmentRun(
+                $course->alias,
+                $assignmentAliases[0],
+                $problemsData[$i],
+                $participant
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        }
+
+        $runData = \OmegaUp\Test\Factories\Run::createAssignmentRun(
+            $course->alias,
+            $assignmentAliases[1],
+            $problemsData[2],
+            $participant
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $results = \OmegaUp\DAO\Courses::getAssignmentsProblemsScores(
+            $course->course_id
+        );
+        print_r($results);
+
+        // One student
+        // $this->assertEquals(1, $results['totalRows']);
+
+        // print_r($results);
+
+        return;
+    }
+
     public function testGetStudentsProgressForCourseWithZeroes() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $problemData['points'] = 0;
