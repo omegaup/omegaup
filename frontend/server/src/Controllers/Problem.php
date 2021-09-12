@@ -5777,7 +5777,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      *
-     * @return array{smartyProperties: array{payload: CollectionDetailsByLevelPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: CollectionDetailsByLevelPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
      *
      * @omegaup-request-param string $level
      * @omegaup-request-param null|string $difficulty
@@ -5877,6 +5877,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCollectionsByLevel'
                 ),
+                'fullWidth' => true,
             ],
             'entrypoint' => 'problem_collection_list',
         ];
@@ -6005,7 +6006,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      *
-     * @return array{smartyProperties: array{payload: CollectionDetailsByAuthorPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: CollectionDetailsByAuthorPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
      *
      * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
@@ -6097,6 +6098,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCollectionsByAuthor'
                 ),
+                'fullWidth' => true,
             ],
             'entrypoint' => 'problem_collection_list_by_author',
         ];
