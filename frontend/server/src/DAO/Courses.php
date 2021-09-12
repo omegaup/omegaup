@@ -604,7 +604,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * Returns the list of assignments with their problems and points.
      *
-     * @return list<array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, is_extra_problem: bool, points: float}>, order: int}>
+     * @return list<array{alias: string, name: string, points: float, pointsWithExtraProblems: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, points: float}>, order: int}>
      */
     public static function getStudentsProgressPerAssignmentv2(
         int $courseId
@@ -644,15 +644,17 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     'alias' => $row['assignment_alias'],
                     'name' => $row['assignment_name'],
                     'points' => 0.0,
+                    'pointsWithExtraProblems' => 0.0,
                     'problems' => [],
                     'order' => $row['assignment_order'],
                 ];
             }
-            $assignmentsProblems[$row['assignment_alias']]['points'] += $row['problem_points'];
+            $assignmentsProblems[$row['assignment_alias']]['pointsWithExtraProblems'] += $row['problem_points'];
+            $assignmentsProblems[$row['assignment_alias']]['points'] += $row['is_extra_problem'] ? 0.0 : $row['problem_points'];
             $assignmentsProblems[$row['assignment_alias']]['problems'][] = [
                 'alias' => $row['problem_alias'],
                 'title' => $row['problem_title'],
-                'is_extra_problem' => $row['is_extra_problem'],
+                'isExtraProblem' => $row['is_extra_problem'],
                 'points' => $row['problem_points'],
             ];
         }
@@ -660,8 +662,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         usort(
             $assignmentsProblems,
             /**
-             * @param array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, is_extra_problem: bool, points: float}>, order: int} $a
-             * @param array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, is_extra_problem: bool, points: float}>, order: int} $b
+             * @param array{alias: string, name: string, points: float, pointsWithExtraProblems: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, points: float}>, order: int} $a
+             * @param array{alias: string, name: string, points: float, pointsWithExtraProblems: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, points: float}>, order: int} $b
              */
             fn (array $a, array $b) => $a['order'] - $b['order']
         );

@@ -285,7 +285,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             ]
         );
 
-        // Student will solve problems 0, 1 and 2.
+        // Student will solve problems 0, 1 (from assignment 0)...
         for ($i = 0; $i < 2; $i++) {
             $runData = \OmegaUp\Test\Factories\Run::createAssignmentRun(
                 $course->alias,
@@ -295,7 +295,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             );
             \OmegaUp\Test\Factories\Run::gradeRun($runData);
         }
-
+        // ... and also problem 2 (from assignment 1)
         $runData = \OmegaUp\Test\Factories\Run::createAssignmentRun(
             $course->alias,
             $assignmentAliases[1],
@@ -304,14 +304,30 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Courses::getAssignmentsProblemsScores(
+        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
             $course->course_id
         );
-        print_r($results);
+
+        $this->assertCount(2, $results);
+        $this->assertEquals(1, $results[0]['order']);
+        $this->assertEquals($assignmentAliases[0], $results[0]['alias']);
+        $this->assertEquals(200, $results[0]['points']);
+        $this->assertEquals(
+            $results[0]['points'],
+            $results[0]['pointsWithExtraProblems']
+        );
+        $this->assertCount(2, $results[0]['problems']);
+
+        $this->assertEquals(2, $results[1]['order']);
+        $this->assertEquals($assignmentAliases[1], $results[1]['alias']);
+        $this->assertEquals(200, $results[1]['points']);
+        $this->assertEquals(
+            $results[1]['points'],
+            $results[1]['pointsWithExtraProblems']
+        );
+        $this->assertCount(2, $results[0]['problems']);
 
         // One student
-        // $this->assertEquals(1, $results['totalRows']);
-
         // print_r($results);
 
         return;

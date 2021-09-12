@@ -107,23 +107,37 @@ class Run {
         $participant,
         $language = 'c11-gcc'
     ): array {
+        if (!is_string($courseAssignmentData['request']['course_alias'])) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'course_alias'
+            );
+        }
+
+        if (!is_string($courseAssignmentData['request']['alias'])) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'alias'
+            );
+        }
+
         // Our participant has to open the course before sending a run
         \OmegaUp\Test\Factories\Course::openCourse(
-            $courseAssignmentData['request']['course_alias'],
+            strval($courseAssignmentData['request']['course_alias']),
             $participant
         );
 
         // Our participant has to open the assignment in a course before sending a run
         \OmegaUp\Test\Factories\Course::openAssignmentCourse(
-            $courseAssignmentData['request']['course_alias'],
-            $courseAssignmentData['request']['alias'],
+            strval($courseAssignmentData['request']['course_alias']),
+            strval($courseAssignmentData['request']['alias']),
             $participant
         );
 
         // Then we need to open the problem
         \OmegaUp\Test\Factories\Course::openProblemInCourseAssignment(
-            $courseAssignmentData['request']['course_alias'],
-            $courseAssignmentData['request']['alias'],
+            strval($courseAssignmentData['request']['course_alias']),
+            strval($courseAssignmentData['request']['alias']),
             $problemData,
             $participant
         );
@@ -192,7 +206,7 @@ class Run {
             $problemData,
             \OmegaUp\DAO\Assignments::getByAliasAndCourse(
                 $assignmentAlias,
-                $course->course_id
+                intval($course->course_id)
             ),
             $participant,
             /*$login=*/ null,
