@@ -289,18 +289,25 @@ class Course {
         \OmegaUp\Test\ScopedLoginToken $login,
         string $courseAlias,
         string $assignmentAlias,
-        array $problems
+        array $problems,
+        bool $extraProblems = false
     ): array {
         $responses = [];
         foreach ($problems as $problem) {
-            // Add a problem to the assignment
-            $responses[] = \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
+            $request = new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'course_alias' => $courseAlias,
                 'assignment_alias' => $assignmentAlias,
                 'problem_alias' => $problem['problem']->alias,
                 'points' => $problem['points'] ?? 100.0,
-            ]));
+            ]);
+
+            if ($extraProblems) {
+                $request['is_extra_problem'] = true;
+            }
+
+            // Add a problem to the assignment
+            $responses[] = \OmegaUp\Controllers\Course::apiAddProblem($request);
         }
 
         return $responses;

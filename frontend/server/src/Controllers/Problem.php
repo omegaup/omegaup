@@ -4671,7 +4671,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ProblemListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: ProblemListPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
      *
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param mixed $language
@@ -4762,6 +4762,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblems'
                 ),
+                'fullWidth' => true,
             ],
             'entrypoint' => 'problem_list',
         ];
@@ -5840,6 +5841,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $sort_order
      */
     public static function getCollectionsDetailsByLevelForTypeScript(\OmegaUp\Request $r): array {
+        // Authenticate request
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing, we allow unauthenticated users to use this API
+            $r->identity = null;
+        }
+
         $collectionLevel = $r->ensureString('level');
 
         $frequentTags = [];
@@ -6068,6 +6077,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $sort_order
      */
     public static function getCollectionsDetailsByAuthorForTypeScript(\OmegaUp\Request $r): array {
+        // Authenticate request
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing, we allow unauthenticated users to use this API
+            $r->identity = null;
+        }
+
         $authorsRanking = [];
 
         $offset = $r->ensureOptionalInt('offset');
