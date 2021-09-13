@@ -6,7 +6,7 @@ import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
 
-describe('vue', () => {
+describe('StudentProgress.vue', () => {
   it('Should handle scores', async () => {
     const wrapper = shallowMount(course_StudentProgress, {
       propsData: {

@@ -66,6 +66,24 @@ def send_messages(cur: MySQLdb.cursors.BaseCursor,
             exchange='logs_exchange',
             routing_key='ContestQueue',
             body=body)
+    logging.info('Send messages to Coder_Month_Queue')
+    cur.execute(
+        '''
+        SELECT
+            user_id, category
+        FROM
+            Coder_Of_The_Month;
+        '''
+    )
+    for row in cur:
+        data = {"user_id": str(row['user_id'])}
+        data = {"category": row['category']}
+        message = json.dumps(data)
+        body = message.encode()
+        channel.basic_publish(
+            exchange='logs_exchange',
+            routing_key='CoderMonthQueue',
+            body=body)
     connection.close()
 
 
