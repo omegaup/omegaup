@@ -63,6 +63,12 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
             $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
 
+        // Create extra problems
+        $extraProblems = [];
+        for ($i = 0; $i < 10; $i++) {
+            $extraProblems[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
         // Create course
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             /*$admin=*/            null,
@@ -88,6 +94,15 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
             $problems
         );
 
+        // Add the extra problems to the assignment
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignmentAlias,
+            $extraProblems,
+            true
+        );
+
         // Create students
         $students = [];
         $students[0] = \OmegaUp\Test\Factories\User::createUser();
@@ -103,7 +118,9 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
             $students[1]['identity']
         );
 
-        // One student solves 90% of the problems
+        // One student solves 90% of the problems that are not extra problems,
+        // including the extra problems, they were solved only 45%, nevertheless,
+        // the student must receive the badge.
         for ($i = 0; $i < 9; $i++) {
             $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
                 $problems[$i],
