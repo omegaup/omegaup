@@ -8,7 +8,6 @@ import { omegaup, OmegaUp } from '../omegaup';
 import JSZip from 'jszip';
 import type problem_Details from '../components/problem/Details.vue';
 import T from '../lang';
-import { setLocationHref } from '../location';
 
 interface RunSubmit {
   classname: string;
@@ -27,7 +26,7 @@ interface SubmissionResponse {
 export interface SubmissionRequest {
   request: {
     guid: string;
-    url: string;
+    hash: string;
     isAdmin: boolean;
     problemAlias: string;
   };
@@ -208,11 +207,7 @@ function displayRunDetails({
       feedback: omegaup.SubmissionFeedback.None as omegaup.SubmissionFeedback,
     }),
   );
-  setLocationHref({
-    url: window.location.pathname,
-    problemAlias: request.problemAlias,
-    guid: request.guid,
-  });
+  window.location.hash = request.hash;
 }
 
 export function updateRun({ run }: { run: types.Run }): void {

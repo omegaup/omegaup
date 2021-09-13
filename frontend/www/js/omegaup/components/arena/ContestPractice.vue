@@ -37,14 +37,14 @@
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="runs"
-              :run-details-data="runDetailsData"
               :popup-displayed="popupDisplayed"
               :guid="guid"
               :problem-alias="problemAlias"
               :contest-alias="contest.alias"
+              :should-show-run-details="shouldShowRunDetails"
               @update:activeTab="
                 (selectedTab) =>
-                  $emit('reset-url', {
+                  $emit('reset-hash', {
                     selectedTab,
                     alias: activeProblemAlias,
                   })
@@ -153,7 +153,7 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop({ default: () => [] }) runs!: types.Run[];
-  @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
+  @Prop({ default: false }) shouldShowRunDetails!: boolean;
 
   T = T;
   ui = ui;
@@ -209,6 +209,24 @@ export default class ArenaContestPractice extends Vue {
   @Watch('clarifications')
   onClarificationsChanged(newValue: types.Clarification[]): void {
     this.currentClarifications = newValue;
+  }
+
+  @Watch('shouldShowRunDetails')
+  onShouldShowRunDetailsChanged(newValue: boolean): void {
+    if (!newValue || !this.guid) {
+      return;
+    }
+    this.$nextTick(() => {
+      this.$emit('show-run', {
+        request: {
+          guid: this.guid,
+          hash: `#problems/show-run:${this.guid}/`,
+          isAdmin: this.contestAdmin,
+          problemAlias: this.activeProblemAlias,
+        },
+        target: this.problemDetails,
+      });
+    });
   }
 }
 </script>
