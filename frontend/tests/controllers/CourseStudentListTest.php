@@ -305,32 +305,178 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
-            $course->course_id
+            $course->course_id,
+            $course->group_id,
+            1,
+            100
         );
 
-        $this->assertCount(2, $results);
-        $this->assertEquals(1, $results[0]['order']);
-        $this->assertEquals($assignmentAliases[0], $results[0]['alias']);
-        $this->assertEquals(200, $results[0]['points']);
+        // First test assignmentsProblems info
+        $this->assertCount(2, $results['assignmentsProblems']);
+        $this->assertEquals(1, $results['assignmentsProblems'][0]['order']);
         $this->assertEquals(
-            $results[0]['points'],
-            $results[0]['pointsWithExtraProblems']
+            $assignmentAliases[0],
+            $results['assignmentsProblems'][0]['alias']
         );
-        $this->assertCount(2, $results[0]['problems']);
+        $this->assertEquals(200, $results['assignmentsProblems'][0]['points']);
+        $this->assertCount(2, $results['assignmentsProblems'][0]['problems']);
 
-        $this->assertEquals(2, $results[1]['order']);
-        $this->assertEquals($assignmentAliases[1], $results[1]['alias']);
-        $this->assertEquals(200, $results[1]['points']);
+        $this->assertEquals(2, $results['assignmentsProblems'][1]['order']);
         $this->assertEquals(
-            $results[1]['points'],
-            $results[1]['pointsWithExtraProblems']
+            $assignmentAliases[1],
+            $results['assignmentsProblems'][1]['alias']
         );
-        $this->assertCount(2, $results[0]['problems']);
+        $this->assertEquals(200, $results['assignmentsProblems'][1]['points']);
+        $this->assertCount(2, $results['assignmentsProblems'][0]['problems']);
 
-        // One student
-        // print_r($results);
+        // Then test studentsProgress info
+        $this->assertCount(1, $results['studentsProgress']);
+        $this->assertEquals(
+            $participant->username,
+            $results['studentsProgress'][0]['username']
+        );
+        $this->assertEquals(
+            300,
+            $results['studentsProgress'][0]['globalScore']
+        ); // 3 problems solved
+        $this->assertEquals(
+            75,
+            $results['studentsProgress'][0]['globalProgress']
+        );
 
-        return;
+        $this->assertEquals(
+            200,
+            $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['score']
+        );
+        $this->assertEquals(
+            100,
+            $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['progress']
+        );
+
+        $this->assertEquals(
+            100,
+            $results['studentsProgress'][0]['assignments'][$assignmentAliases[1]]['score']
+        );
+        $this->assertEquals(
+            50,
+            $results['studentsProgress'][0]['assignments'][$assignmentAliases[1]]['progress']
+        );
+
+        // Now add two extra problems and make the user solve them
+        // Only the global score should be different, all the previous
+        // results should be mantained.
+        for ($i = 0; $i < 2; $i++) {
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $course->alias,
+            $assignmentAliases[0],
+            [ $problemsData[4], $problemsData[5] ],
+            /*extraProblems=*/true
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createAssignmentRun(
+            $course->alias,
+            $assignmentAliases[0],
+            $problemsData[4],
+            $participant
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createAssignmentRun(
+            $course->alias,
+            $assignmentAliases[0],
+            $problemsData[5],
+            $participant
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $resultsWithExtraProblem = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
+            $course->course_id,
+            $course->group_id,
+            1,
+            100
+        );
+
+        // First test assignmentsProblems info
+        $this->assertEquals(
+            count($results['assignmentsProblems']),
+            count($resultsWithExtraProblem['assignmentsProblems'])
+        );
+        $this->assertEquals(
+            $results['assignmentsProblems'][0]['order'],
+            $resultsWithExtraProblem['assignmentsProblems'][0]['order']
+        );
+        $this->assertEquals(
+            $results['assignmentsProblems'][0]['alias'],
+            $resultsWithExtraProblem['assignmentsProblems'][0]['alias']
+        );
+        $this->assertEquals(
+            $results['assignmentsProblems'][0]['points'],
+            $resultsWithExtraProblem['assignmentsProblems'][0]['points']
+        );
+        $this->assertEquals(
+            count($results['assignmentsProblems'][0]['problems']) + 2,
+            count(
+                $resultsWithExtraProblem['assignmentsProblems'][0]['problems']
+            )
+        );
+
+        $this->assertEquals(
+            $results['assignmentsProblems'][1]['order'],
+            $resultsWithExtraProblem['assignmentsProblems'][1]['order']
+        );
+        $this->assertEquals(
+            $results['assignmentsProblems'][1]['alias'],
+            $resultsWithExtraProblem['assignmentsProblems'][1]['alias']
+        );
+        $this->assertEquals(
+            $results['assignmentsProblems'][1]['points'],
+            $resultsWithExtraProblem['assignmentsProblems'][1]['points']
+        );
+        $this->assertEquals(
+            count($results['assignmentsProblems'][1]['problems']),
+            count(
+                $resultsWithExtraProblem['assignmentsProblems'][1]['problems']
+            )
+        );
+
+        // Then test studentsProgress info
+        $this->assertEquals(
+            count($results['studentsProgress']),
+            count($resultsWithExtraProblem['studentsProgress'])
+        );
+        $this->assertEquals(
+            $results['studentsProgress'][0]['username'],
+            $resultsWithExtraProblem['studentsProgress'][0]['username']
+        );
+        $this->assertEquals(
+            $results['studentsProgress'][0]['globalScore'] + 200,
+            $resultsWithExtraProblem['studentsProgress'][0]['globalScore']
+        );
+        $this->assertEquals(
+            100, // 100% (3 problems + 1 extra problem / 4 problems)
+            $resultsWithExtraProblem['studentsProgress'][0]['globalProgress']
+        );
+
+        $this->assertEquals(
+            $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['score'],
+            $resultsWithExtraProblem['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['score']
+        );
+        $this->assertEquals(
+            $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['progress'],
+            $resultsWithExtraProblem['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['progress']
+        );
+
+        $this->assertEquals(
+            $results['studentsProgress'][0]['assignments'][$assignmentAliases[1]]['score'],
+            $resultsWithExtraProblem['studentsProgress'][0]['assignments'][$assignmentAliases[1]]['score']
+        );
+        $this->assertEquals(
+            $results['studentsProgress'][0]['assignments'][$assignmentAliases[1]]['progress'],
+            $resultsWithExtraProblem['studentsProgress'][0]['assignments'][$assignmentAliases[1]]['progress']
+        );
     }
 
     public function testGetStudentsProgressForCourseWithZeroes() {

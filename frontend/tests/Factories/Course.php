@@ -301,6 +301,7 @@ class Course {
                 'assignment_alias' => $assignmentAlias,
                 'problem_alias' => $problem['problem']->alias,
                 'points' => $problem['points'] ?? 100.0,
+                'is_extra_problem' => $extraProblems,
             ]));
         }
 
