@@ -294,15 +294,20 @@ class Course {
     ): array {
         $responses = [];
         foreach ($problems as $problem) {
-            // Add a problem to the assignment
-            $responses[] = \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
+            $request = new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'course_alias' => $courseAlias,
                 'assignment_alias' => $assignmentAlias,
                 'problem_alias' => $problem['problem']->alias,
                 'points' => $problem['points'] ?? 100.0,
-                'is_extra_problem' => $extraProblems,
-            ]));
+            ]);
+
+            if ($extraProblems) {
+                $request['is_extra_problem'] = true;
+            }
+
+            // Add a problem to the assignment
+            $responses[] = \OmegaUp\Controllers\Course::apiAddProblem($request);
         }
 
         return $responses;
