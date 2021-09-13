@@ -639,13 +639,12 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         $globalPoints = 0.0;
         $assignmentsProblems = [];
-        /** @var array{assignment_alias: string, assignment_name: string, assignment_order: int, problem_title: string, problem_alias: string, is_extra_problem: bool, problem_order: int, problem_points: float} */
-        foreach (
-            \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sqlAssignmentsProblems,
-                [ $courseId ]
-            ) as $row
-        ) {
+        /** @var list<array{assignment_alias: string, assignment_name: string, assignment_order: int, is_extra_problem: bool, problem_alias: string, problem_order: int, problem_points: float, problem_title: string}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sqlAssignmentsProblems,
+            [ $courseId ]
+        );
+        foreach ($rs as $row) {
             $globalPoints += $row['is_extra_problem'] ? 0.0 : $row['problem_points'];
 
             if (!isset($assignmentsProblems[$row['assignment_alias']])) {
@@ -719,7 +718,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 Assignments a ON a.problemset_id = s.problemset_id
             WHERE
                 a.course_id = ? AND
-                gi.group_id = ?
+                gi.group_id = ? AND
+                r.contest_score IS NOT NULL
             GROUP BY
                 i.identity_id, a.assignment_id, p.problem_id
             ORDER BY
@@ -728,18 +728,17 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         ';
 
         $studentsProgress = [];
-        /** @var array{assignment_alias: string, classname: string, country_id: null|string, is_extra_problem: bool, name: null|string, problem_alias: string, problem_score: float, username: string} */
-        foreach (
-            \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sqlStudentsProgress,
-                [
-                    $courseId,
-                    $groupId,
-                    $offset,
-                    $rowsPerPage,
-                ]
-            ) as $row
-        ) {
+        /** @var list<array{assignment_alias: string, classname: string, country_id: null|string, is_extra_problem: bool, name: null|string, problem_alias: string, problem_score: float, username: string}> */
+        $rs  = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sqlStudentsProgress,
+            [
+                $courseId,
+                $groupId,
+                $offset,
+                $rowsPerPage,
+            ]
+        );
+        foreach ($rs as $row) {
             $username = $row['username'];
             $assignmentAlias = $row['assignment_alias'];
             $problemAlias = $row['problem_alias'];
