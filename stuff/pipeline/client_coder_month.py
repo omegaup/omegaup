@@ -6,6 +6,8 @@ import argparse
 import logging
 import os
 import sys
+import json
+import random
 import MySQLdb
 import MySQLdb.cursors
 import pika
@@ -26,7 +28,7 @@ def generate_code() -> str:
                            "J": 12, "M": 13, "P": 14, "Q": 15,
                            "R": 16, "V": 17, "W": 18, "X": 19}
     code_alfabeth = "23456789CFGHJMPQRVWX"
-    code_generate = ''.join(random.choices(code_alfabeth, k = 9))
+    code_generate = ''.join(random.choices(code_alfabeth, k=9))
     sum_values = 0
     for i in range(1, 10):
         sum_values += i * diccionary_alfabeth[code_generate[i - 1]]
@@ -37,6 +39,7 @@ def generate_code() -> str:
 
 def receive_coder_month_messages(
         cur: MySQLdb.cursors.BaseCursor,
+        dbconn: MySQLdb.connections.Connection,
         rabbit_user: str,
         rabbit_password: str) -> None:
     '''Receive coder of month messages'''
@@ -72,7 +75,7 @@ def receive_coder_month_messages(
                     `certificate_type` = 'coder_of_the_month_female' AND
                     MONTH(timestamp) = MONTH(CURDATE()) AND
                     YEAR(timestamp) = YEAR(CURDATE());
-                ''', (data["user_id"],data['category']))
+                ''', (data["user_id"], data['category']))
         for row in cur:
             if row['count'] > 0:
                 logging.info('Skipping because already exist certificate')
@@ -85,8 +88,8 @@ def receive_coder_month_messages(
                                          `certificate_type`,
                                          `verification_code`)
                     VALUES(%s, %s, %s, %s);''',
-                    (data["user_id"],
-                     'coder_of_the_month', code_verification))
+                        (data["user_id"],
+                         'coder_of_the_month', code_verification))
         else:
             cur.execute('''
                         INSERT INTO
@@ -94,8 +97,8 @@ def receive_coder_month_messages(
                                          `certificate_type`,
                                          `verification_code`)
                     VALUES(%s, %s, %s, %s);''',
-                    (data["user_id"],
-                     'coder_of_the_month_female', code_verification))
+                        (data["user_id"],
+                         'coder_of_the_month_female', code_verification))
         dbconn.commit()
     channel.basic_consume(
         queue=queue_name,
@@ -118,7 +121,7 @@ def main() -> None:
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
             receive_coder_month_messages(
-                cur, args.user_rabbit, args.password_rabbit)
+                cur, dbconn, args.user_rabbit, args.password_rabbit)
     finally:
         dbconn.close()
         logging.info('Done')

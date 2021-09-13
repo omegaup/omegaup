@@ -29,7 +29,7 @@ def generate_code() -> str:
                            "J": 12, "M": 13, "P": 14, "Q": 15,
                            "R": 16, "V": 17, "W": 18, "X": 19}
     code_alfabeth = "23456789CFGHJMPQRVWX"
-    code_generate = ''.join(random.choices(code_alfabeth, k = 9))
+    code_generate = ''.join(random.choices(code_alfabeth, k=9))
     sum_values = 0
     for i in range(1, 10):
         sum_values += i * diccionary_alfabeth[code_generate[i - 1]]
