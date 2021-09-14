@@ -11,7 +11,7 @@
         <h4 class="section-title">{{ T.frontPageFooterSponsors }}</h4>
         <ul>
           <li>
-            <img class="img-fluid" src="/media/homepage/amazon_logo.png" />
+            <img class="sponsor-logo" src="/media/homepage/amazon_logo.png" />
           </li>
         </ul>
       </div>
@@ -211,8 +211,8 @@ export default class Footer extends Vue {
         margin: 0 auto;
       }
 
-      img.img-fluid {
-        max-width: 120px;
+      img.sponsor-logo {
+        width: 120px;
       }
     }
   }
