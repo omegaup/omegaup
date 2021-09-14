@@ -398,19 +398,21 @@ export class Converter {
               .replace(/</g, '&lt;')
               .replace(/>/g, '&gt;');
           }
-          if (indentation != '') {
-            const lines = [];
+
+          if (indentation !== '') {
+            // Delete any extra indentation spaces from each line.
             const stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
-            for (const line of contents.split('\n')) {
-              lines.push(line.replace(stripPrefix, ''));
-            }
-            contents = escapeCharacters(
-              lines.join('\n'),
-              ' \t*_{}[]()<>#+=.!|`-',
-              /*afterBackslash=*/ false,
-              /*doNotEscapeTildeAnDollar=*/ true,
-            );
+            contents = contents
+              .split('\n')
+              .map((line) => line.replace(stripPrefix, ''))
+              .join('\n');
           }
+          contents = escapeCharacters(
+            contents,
+            ' \t*_{}[]()<>#+=.!|`-',
+            /*afterBackslash=*/ false,
+            /*doNotEscapeTildeAnDollar=*/ true,
+          );
           return `<pre><code${className}>${contents}</code></pre>`;
         };
         text = text.replace(
