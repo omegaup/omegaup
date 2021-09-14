@@ -8,7 +8,7 @@ import T from '../lang';
 import Vue from 'vue';
 import arena_Course from '../components/arena/Course.vue';
 import { getOptionsFromLocation } from './location';
-import { PopupDisplayed } from '../components/problem/Details.vue';
+import problemsStore from './problemStore';
 import {
   showSubmission,
   SubmissionRequest,
@@ -26,7 +26,7 @@ import {
 import clarificationStore from './clarificationsStore';
 import { myRunsStore, runsStore } from './runsStore';
 
-OmegaUp.on('ready', () => {
+OmegaUp.on('ready', async () => {
   time.setSugarLocale();
 
   const commonPayload = types.payloadParsers.CommonPayload();
@@ -39,6 +39,29 @@ OmegaUp.on('ready', () => {
   if (activeTab !== locationHash[0]) {
     window.location.hash = activeTab;
   }
+  const {
+    guid,
+    popupDisplayed,
+    problem,
+    problemAlias,
+    showNewClarificationPopup,
+  } = getOptionsFromLocation(window.location.hash);
+  const runDetailsResponse: { runDetails: null | types.RunDetails } = {
+    runDetails: null,
+  };
+  const problemDetailsResponse: { problemInfo: null | types.ProblemDetails } = {
+    problemInfo: null,
+  };
+  if (problemAlias) {
+    await getProblemDetails({
+      problemAlias,
+      problems: payload.currentAssignment.problems,
+      response: problemDetailsResponse,
+    });
+    if (guid) {
+      await getRunDetails({ guid, response: runDetailsResponse });
+    }
+  }
 
   trackClarifications(payload.courseDetails.clarifications);
 
@@ -48,17 +71,17 @@ OmegaUp.on('ready', () => {
       'omegaup-arena-course': arena_Course,
     },
     data: () => ({
-      popupDisplayed: PopupDisplayed.None,
-      problemInfo: null as types.ProblemInfo | null,
-      problem: null as types.NavbarProblemsetProblem | null,
-      shouldShowRunDetails: false,
-      problems: payload.currentAssignment
-        .problems as types.NavbarProblemsetProblem[],
-      showNewClarificationPopup: false,
-      guid: null as null | string,
-      problemAlias: null as null | string,
+      problemInfo: problemDetailsResponse.problemInfo,
+      problem,
+      problems: payload.currentAssignment.problems,
+      popupDisplayed,
+      showNewClarificationPopup,
+      guid,
+      problemAlias,
       searchResultUsers: [] as types.ListItem[],
-      runDetailsData: null as types.RunDetails | null,
+      runDetailsData: runDetailsResponse.runDetails,
+      nextSubmissionTimestamp:
+        problemDetailsResponse.problemInfo?.nextSubmissionTimestamp,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-course', {
@@ -74,13 +97,13 @@ OmegaUp.on('ready', () => {
           scoreboard: payload.scoreboard,
           showNewClarificationPopup: this.showNewClarificationPopup,
           showRanking: payload.showRanking,
-          shouldShowRunDetails: this.shouldShowRunDetails,
           activeTab,
           guid: this.guid,
           runs: myRunsStore.state.runs,
           allRuns: runsStore.state.runs,
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
+          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
         },
         on: {
           'navigate-to-problem': ({
@@ -95,25 +118,27 @@ OmegaUp.on('ready', () => {
               problems: this.problems,
             });
           },
-          'show-run': (source: SubmissionRequest) => {
-            api.Run.details({ run_alias: source.request.guid })
-              .then((runDetails) => {
-                showSubmission({ source, runDetails });
-                this.popupDisplayed = PopupDisplayed.RunDetails;
-              })
-              .catch((error) => {
-                ui.apiError(error);
-                this.popupDisplayed = PopupDisplayed.None;
-              });
+          'show-run': async (source: SubmissionRequest) => {
+            await getRunDetails({
+              guid: source.request.guid,
+              response: runDetailsResponse,
+            });
+            const runDetails = runDetailsResponse.runDetails;
+            if (runDetails == null) {
+              return;
+            }
+            showSubmission({ source, runDetails });
           },
           'submit-run': ({
             problem,
             code,
             language,
+            target,
           }: {
             code: string;
             language: string;
             problem: types.NavbarProblemsetProblem;
+            target: Vue & { currentNextSubmissionTimestamp: Date };
           }) => {
             api.Run.create({
               problem_alias: problem.alias,
@@ -130,6 +155,8 @@ OmegaUp.on('ready', () => {
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
                 });
+                target.currentNextSubmissionTimestamp =
+                  response.nextSubmissionTimestamp;
               })
               .catch((run) => {
                 submitRunFailed({
@@ -214,10 +241,50 @@ OmegaUp.on('ready', () => {
     },
   });
 
-  // This needs to be set here and not at the top because it depends
-  // on the `navigate-to-problem` callback being invoked, and that is
-  // not the case if this is set a priori.
-  Object.assign(arenaCourse, getOptionsFromLocation(window.location.hash));
+  async function getRunDetails({
+    guid,
+    response,
+  }: {
+    guid: string;
+    response: { runDetails: null | types.RunDetails };
+  }): Promise<void> {
+    return api.Run.details({ run_alias: guid })
+      .then((runDetails) => {
+        response.runDetails = runDetails;
+      })
+      .catch((error) => {
+        ui.apiError(error);
+      });
+  }
+
+  async function getProblemDetails({
+    problemAlias,
+    problems,
+    response,
+  }: {
+    problemAlias: string;
+    problems: types.NavbarProblemsetProblem[];
+    response: { problemInfo: null | types.ProblemInfo };
+  }): Promise<void> {
+    return api.Problem.details({
+      problem_alias: problemAlias,
+      prevent_problemset_open: false,
+    })
+      .then((problemInfo) => {
+        for (const run of problemInfo.runs ?? []) {
+          trackRun({ run });
+        }
+        const currentProblem = problems?.find(
+          ({ alias }: { alias: string }) => alias === problemInfo.alias,
+        );
+        problemInfo.title = currentProblem?.text ?? '';
+        response.problemInfo = problemInfo;
+        problemsStore.commit('addProblem', problemInfo);
+      })
+      .catch(() => {
+        ui.dismissNotifications();
+      });
+  }
 
   function getSelectedValidTab(tab: string, isAdmin: boolean): string {
     const validTabs = ['problems', 'ranking', 'runs', 'clarifications'];
@@ -233,12 +300,12 @@ OmegaUp.on('ready', () => {
     }
   }
 
-  if (locationHash[1] && locationHash[1].includes('show-run:')) {
+  /*if (locationHash[1] && locationHash[1].includes('show-run:')) {
     const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
     const showRunMatch = window.location.hash.match(showRunRegex);
     arenaCourse.guid = showRunMatch?.[1] ?? null;
     arenaCourse.popupDisplayed = PopupDisplayed.RunDetails;
-  }
+  }*/
 
   setInterval(() => {
     refreshCourseClarifications({

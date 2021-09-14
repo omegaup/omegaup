@@ -56,14 +56,14 @@
             <omegaup-problem-details
               ref="problem-details"
               :user="{ loggedIn: true, admin: false, reviewer: false }"
-              :next-submission-timestamp="nextSubmissionTimestamp"
+              :next-submission-timestamp="currentNextSubmissionTimestamp"
               :languages="contest.languages.split(',')"
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="runs"
               :popup-displayed="popupDisplayed"
               :guid="guid"
-              :should-show-run-details="shouldShowRunDetails"
+              :run-details-data="runDetailsData"
               :contest-alias="contest.alias"
               :is-contest-finished="isContestFinished"
               @update:activeTab="
@@ -195,14 +195,15 @@ export default class ArenaContest extends Vue {
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: true }) socketConnected!: boolean;
   @Prop({ default: () => [] }) runs!: types.Run[];
-  @Prop({ default: false }) shouldShowRunDetails!: boolean;
+  @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
+  @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
 
   T = T;
   ui = ui;
   ContestClarificationType = ContestClarificationType;
   currentClarifications = this.clarifications;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  nextSubmissionTimestamp: Date | null = null;
+  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
   now = new Date();
 
   get socketClass(): string {
@@ -280,30 +281,13 @@ export default class ArenaContest extends Vue {
     if (!newValue) {
       return;
     }
-    this.nextSubmissionTimestamp = newValue.nextSubmissionTimestamp ?? null;
+    this.currentNextSubmissionTimestamp =
+      newValue.nextSubmissionTimestamp ?? null;
   }
 
   @Watch('clarifications')
   onClarificationsChanged(newValue: types.Clarification[]): void {
     this.currentClarifications = newValue;
-  }
-
-  @Watch('shouldShowRunDetails')
-  onShouldShowRunDetailsChanged(newValue: boolean): void {
-    if (!newValue || !this.guid) {
-      return;
-    }
-    this.$nextTick(() => {
-      this.$emit('show-run', {
-        request: {
-          guid: this.guid,
-          hash: `#problems/show-run:${this.guid}/`,
-          isAdmin: this.isAdmin,
-          problemAlias: this.activeProblemAlias,
-        },
-        target: this.problemDetails,
-      });
-    });
   }
 }
 </script>

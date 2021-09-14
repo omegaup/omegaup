@@ -34,6 +34,7 @@
             <omegaup-problem-details
               ref="problem-details"
               :user="{ loggedIn: true, admin: false, reviewer: false }"
+              :next-submission-timestamp="currentNextSubmissionTimestamp"
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="runs"
@@ -41,7 +42,7 @@
               :guid="guid"
               :problem-alias="problemAlias"
               :contest-alias="contest.alias"
-              :should-show-run-details="shouldShowRunDetails"
+              :run-details-data="runDetailsData"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', {
@@ -153,13 +154,15 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop({ default: () => [] }) runs!: types.Run[];
-  @Prop({ default: false }) shouldShowRunDetails!: boolean;
+  @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
+  @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
 
   T = T;
   ui = ui;
   currentClarifications = this.clarifications;
   ContestClarificationType = ContestClarificationType;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
+  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;
@@ -171,7 +174,11 @@ export default class ArenaContestPractice extends Vue {
   }
 
   onRunSubmitted(run: { code: string; language: string }): void {
-    this.$emit('submit-run', { ...run, problem: this.activeProblem });
+    this.$emit('submit-run', {
+      ...run,
+      problem: this.activeProblem,
+      target: this,
+    });
   }
 
   onRunDetails(source: SubmissionRequest): void {
@@ -206,27 +213,18 @@ export default class ArenaContestPractice extends Vue {
     this.onNavigateToProblem(newValue);
   }
 
+  @Watch('problemInfo')
+  onProblemInfoChanged(newValue: types.ProblemInfo | null): void {
+    if (!newValue) {
+      return;
+    }
+    this.currentNextSubmissionTimestamp =
+      newValue.nextSubmissionTimestamp ?? null;
+  }
+
   @Watch('clarifications')
   onClarificationsChanged(newValue: types.Clarification[]): void {
     this.currentClarifications = newValue;
-  }
-
-  @Watch('shouldShowRunDetails')
-  onShouldShowRunDetailsChanged(newValue: boolean): void {
-    if (!newValue || !this.guid) {
-      return;
-    }
-    this.$nextTick(() => {
-      this.$emit('show-run', {
-        request: {
-          guid: this.guid,
-          hash: `#problems/show-run:${this.guid}/`,
-          isAdmin: this.contestAdmin,
-          problemAlias: this.activeProblemAlias,
-        },
-        target: this.problemDetails,
-      });
-    });
   }
 }
 </script>

@@ -385,7 +385,6 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: null }) languages!: null | string[];
-  @Prop({ default: false }) shouldShowRunDetails!: boolean;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
@@ -399,7 +398,6 @@ export default class ProblemDetails extends Vue {
   hasUnreadClarifications =
     this.clarifications?.length > 0 && this.activeTab !== 'clarifications';
   currentRunDetailsData = this.runDetailsData;
-  currentShouldShowRunDetails = this.shouldShowRunDetails;
 
   get availableTabs(): Tab[] {
     const tabs = [
@@ -488,10 +486,6 @@ export default class ProblemDetails extends Vue {
 
   onRunDetails(guid: string): void {
     this.currentPopupDisplayed = PopupDisplayed.RunDetails;
-    if (this.currentShouldShowRunDetails) {
-      this.currentShouldShowRunDetails = false;
-      return;
-    }
     this.$emit('show-run', {
       request: {
         guid,
