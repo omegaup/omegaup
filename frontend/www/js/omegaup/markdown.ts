@@ -399,23 +399,16 @@ export class Converter {
               .replace(/>/g, '&gt;');
           }
 
-          if (indentation == '') {
-            contents = escapeCharacters(
-              contents,
-              ' \t*_{}[]()<>#+=.!|`-',
-              /*afterBackslash=*/ false,
-              /*doNotEscapeTildeAnDollar=*/ true,
-            );
-            return `<pre><code${className}>${contents}</code></pre>`;
-          }
-
-          const lines = [];
-          const stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
-          for (const line of contents.split('\n')) {
-            lines.push(line.replace(stripPrefix, ''));
+          if (indentation !== '') {
+            // Delete any extra indentation spaces from each line.
+            const stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
+            contents = contents
+              .split('\n')
+              .map((line) => line.replace(stripPrefix, ''))
+              .join('\n');
           }
           contents = escapeCharacters(
-            lines.join('\n'),
+            contents,
             ' \t*_{}[]()<>#+=.!|`-',
             /*afterBackslash=*/ false,
             /*doNotEscapeTildeAnDollar=*/ true,
