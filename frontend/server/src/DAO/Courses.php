@@ -718,10 +718,11 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 Assignments a ON a.problemset_id = s.problemset_id
             WHERE
                 a.course_id = ? AND
-                gi.group_id = ? AND
-                problem_score IS NOT NULL
+                gi.group_id = ?
             GROUP BY
                 i.identity_id, a.assignment_id, p.problem_id
+            HAVING
+                problem_score IS NOT NULL
             ORDER BY
                 a.`order`, psp.`order`
             LIMIT ?, ?
