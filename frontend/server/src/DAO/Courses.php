@@ -244,24 +244,30 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 c.alias,
                 c.name,
                 c.level,
-                (
-                    SELECT
-                        COUNT(*)
-                    FROM
-                        Groups_Identities gi
-                    INNER JOIN
-                        Identities i ON i.identity_id = gi.identity_id
-                    WHERE
-                        gi.group_id = c.group_id
+                IFNULL(
+                    (
+                        SELECT
+                            COUNT(*)
+                        FROM
+                            Groups_Identities gi
+                        INNER JOIN
+                            Identities i ON i.identity_id = gi.identity_id
+                        WHERE
+                            gi.group_id = c.group_id
+                    ),
+                    0
                 ) AS studentsCount,
-                (
-                    SELECT
-                        COUNT(*)
-                    FROM
-                        Assignments a
-                    WHERE
-                        a.course_id = c.course_id AND
-                        a.assignment_type = ?
+                IFNULL(
+                    (
+                        SELECT
+                            COUNT(*)
+                        FROM
+                            Assignments a
+                        WHERE
+                            a.course_id = c.course_id AND
+                            a.assignment_type = ?
+                    ),
+                    0
                 ) AS lessonsCount
             FROM
                 Courses c
