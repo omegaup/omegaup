@@ -722,7 +722,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             GROUP BY
                 i.identity_id, a.assignment_id, p.problem_id
             HAVING
-                problem_score IS NOT NULL
+                MAX(r.contest_score) IS NOT NULL
             ORDER BY
                 a.`order`, psp.`order`
             LIMIT ?, ?
