@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  *
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CourseCardPublic=array{alias: string, name: string, level: string|null, lecturesCount: int, studentsCount: int}
+ * @psalm-type CourseCardPublic=array{alias: string, lessonsCount: int, level: null|string, name: string, studentsCount: int}
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
@@ -241,11 +241,28 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     public static function getPublicCoursesForTab() {
         $sql = '
             SELECT
-                c.course_id,
-                c.group_id,
                 c.alias,
                 c.name,
-                c.level
+                c.level,
+                (
+                    SELECT
+                        COUNT(*)
+                    FROM
+                        Groups_Identities gi
+                    INNER JOIN
+                        Identities i ON i.identity_id = gi.identity_id
+                    WHERE
+                        gi.group_id = c.group_id
+                ) AS studentsCount,
+                (
+                    SELECT
+                        COUNT(*)
+                    FROM
+                        Assignments a
+                    WHERE
+                        a.course_id = c.course_id AND
+                        a.assignment_type = ?
+                ) AS lessonsCount
             FROM
                 Courses c
             WHERE
@@ -253,28 +270,14 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 c.finish_time IS NULL AND
                 c.archived = 0;';
 
-        /** @var list<array{alias: string, course_id: int, group_id: int, level: null|string, name: string}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var list<array{alias: string, lessonsCount: int, level: null|string, name: string, studentsCount: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [ \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC ]
+            [
+                /*assignment_type=*/'lesson',
+                \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+            ]
         );
-
-        $courses = [];
-        foreach ($rs as $row) {
-            $allAssignmentsCounts = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
-                $row['course_id']
-            );
-            $row['lecturesCount'] = $allAssignmentsCounts['lesson'];
-            $row['studentsCount'] = self::getStudentsInCourseCount(
-                $row['group_id']
-            );
-
-            unset($row['course_id']);
-            unset($row['group_id']);
-
-            $courses[] = $row;
-        }
-        return $courses;
     }
 
     /**

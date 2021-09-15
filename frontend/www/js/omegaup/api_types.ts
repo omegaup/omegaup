@@ -2287,7 +2287,7 @@ export namespace types {
 
   export interface CourseCardPublic {
     alias: string;
-    lecturesCount: number;
+    lessonsCount: number;
     level?: string;
     name: string;
     studentsCount: number;
