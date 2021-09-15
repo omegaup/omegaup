@@ -560,6 +560,20 @@ Tags &lt;b&gt;hello&lt;/b&gt;
       ).toEqual(
         '<pre><code class="language-python"><span class="token keyword">def</span> <span class="token function">foo</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>\n  <span class="token keyword">return</span> <span class="token number">3</span>\n</code></pre>',
       );
+      expect(
+        converter.makeHtml(
+          '```\n#include <iostream>\n#include <map>\n###\n```',
+        ),
+      ).toEqual(
+        '<pre><code>#include &lt;iostream&gt;\n#include &lt;map&gt;\n###\n</code></pre>',
+      );
+      expect(
+        converter.makeHtml(
+          '```cpp\n#include <iostream>\n#include <map>\n###\n```',
+        ),
+      ).toEqual(
+        '<pre><code class="language-cpp"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;iostream></span></span>\n<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;map></span></span>\n###\n</code></pre>',
+      );
     });
 
     it('Should handle file transclusions', () => {
