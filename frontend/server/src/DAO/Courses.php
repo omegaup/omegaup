@@ -698,7 +698,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ) AS classname,
                 a.alias AS assignment_alias,
                 p.alias AS problem_alias,
-                MAX(r.contest_score) AS problem_score,
+                IFNULL(
+                    MAX(r.contest_score),
+                    0.0
+                ) AS problem_score,
                 psp.is_extra_problem
             FROM
                 Groups_Identities AS gi
