@@ -11,6 +11,8 @@ import os.path
 import time
 import urllib
 
+from typing import Optional
+
 import pytest
 
 from selenium import webdriver
@@ -92,11 +94,13 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         self.wait = wait
         self._worker_id = worker_id
         self._next_id = 0
+        self._screenshot_index = 0
         self._url = url
         self.options = options
         self.user_username = self.create_user()
         self.admin_username = self.create_user(admin=True)
         self.log_collector = JavaScriptLogCollector(self)
+        self.test_name = ''
 
     def generate_id(self):
         '''Generates a relatively unique id.'''
@@ -272,6 +276,8 @@ class Driver:  # pylint: disable=too-many-instance-attributes
 
         try:
             yield
+        except:  # noqa: bare-except
+            self.screenshot()
         finally:
             # Wait until there are no more pending requests to avoid races
             # where those requests return 401. Navigate to a blank page just
@@ -511,6 +517,16 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             ''') % (user_id),
             dbname='omegaup', auth=self.mysql_auth())
 
+    def screenshot(self, name: Optional[str] = None) -> None:
+        '''Takes a screenshot.'''
+        results_dir = os.path.join(_DIRNAME, 'results')
+        os.makedirs(results_dir, exist_ok=True)
+        idx = self._screenshot_index
+        self._screenshot_index += 1
+        self.browser.get_screenshot_as_file(
+            os.path.join(results_dir,
+                         f'webdriver_{name or self.test_name}.{idx:03}.png'))
+
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_pyfunc_call(pyfuncitem):
@@ -518,15 +534,18 @@ def pytest_pyfunc_call(pyfuncitem):
 
     global _SUCCESS  # pylint: disable=global-statement
 
+    current_driver: Optional[Driver] = pyfuncitem.funcargs.get('driver')
+    if current_driver:
+        current_driver.test_name = pyfuncitem.name
+
     outcome = yield
 
     if not outcome.excinfo:
         return
     _SUCCESS = False
-    if 'driver' not in pyfuncitem.funcargs:
+    if not current_driver:
         return
     try:
-        current_driver = pyfuncitem.funcargs['driver']
         try:
             logs = current_driver.browser.get_log('browser')
         except:  # noqa: bare-except
@@ -535,8 +554,7 @@ def pytest_pyfunc_call(pyfuncitem):
             logs = []
         results_dir = os.path.join(_DIRNAME, 'results')
         os.makedirs(results_dir, exist_ok=True)
-        current_driver.browser.get_screenshot_as_file(
-            os.path.join(results_dir, 'webdriver_%s.png' % pyfuncitem.name))
+        current_driver.screenshot(pyfuncitem.name)
         logpath = os.path.join(results_dir,
                                'webdriver_%s.log' % pyfuncitem.name)
         with open(logpath, 'w') as logfile:
