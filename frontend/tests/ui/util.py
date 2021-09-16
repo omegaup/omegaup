@@ -539,8 +539,7 @@ def add_identities_group(driver, group_alias):
     return identities
 
 
-def show_run_details(driver, *, table_classname: str, dropdown_classname: str,
-                     code: str, has_been_migrated: bool) -> None:
+def show_run_details(driver, *, code: str) -> None:
     '''It shows details popup for a certain submission.'''
 
     driver.wait.until(EC.element_to_be_clickable(
@@ -550,30 +549,21 @@ def show_run_details(driver, *, table_classname: str, dropdown_classname: str,
         EC.element_to_be_clickable(
             (By.XPATH,
              '//table[contains(concat(" ", normalize-space(@class), " "), "'
-             ' %s ")]/tbody/tr/td/div[contains(concat(" ", '
-             'normalize-space(@class), " "), " dropdown ")]/button'
-             % table_classname))).click()
+             ' runs ")]/tbody/tr/td/div[contains(concat(" ", normalize-space'
+             '(@class), " "), " dropdown ")]/button'))).click()
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH,
-             '//table[contains(concat(" ", normalize-space(@class), " "), '
-             '" %s ")]/tbody/tr/td/div[contains(concat(" ", '
-             'normalize-space(@class), " "), " %s ")]/ul/li['
-             '@data-actions-details]/button'
-             % (table_classname, dropdown_classname)))).click()
+            (By.CSS_SELECTOR,
+             'table.runs div button[data-run-details]'))).click()
+
+    code_element = driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR,
+             '.show form[data-run-details-view] .CodeMirror-code')))
+    code_text = code_element.get_attribute('innerText')
 
     assert (('show-run:') in
             driver.browser.current_url), driver.browser.current_url
-
-    # It should be removed when everything is migrated
-    if has_been_migrated:
-        selector = '.show form[data-run-details-view] .CodeMirror-code'
-    else:
-        selector = 'form[data-run-details-view] .CodeMirror-code'
-
-    code_element = driver.wait.until(
-        EC.visibility_of_element_located((By.CSS_SELECTOR, selector)))
-    code_text = code_element.get_attribute('innerText')
 
     assert ((code) in code_text), code_text

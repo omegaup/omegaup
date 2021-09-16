@@ -144,4 +144,20 @@ describe('time', () => {
       });
     });
   });
+
+  describe('parseDateTimeLocal', () => {
+    const expectedValue = '2021-02-01T08:55';
+
+    it('Should parse dates correctly when given a month that does not have the current day', () => {
+      expect(
+        time.formatDateTimeLocal(time.parseDateTimeLocal(expectedValue)),
+      ).toEqual(expectedValue);
+    });
+
+    it('Should parse dates accordingly when given parameters outside of the expected range', () => {
+      expect(
+        time.formatDateTimeLocal(time.parseDateTimeLocal('2021-02-29T08:55')),
+      ).toEqual('2021-03-01T08:55');
+    });
+  });
 });
