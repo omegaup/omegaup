@@ -337,11 +337,11 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertEquals(
             300,
-            $results['studentsProgress'][0]['globalScore']
+            $results['studentsProgress'][0]['courseScore']
         ); // 3 problems solved
         $this->assertEquals(
             75,
-            $results['studentsProgress'][0]['globalProgress']
+            $results['studentsProgress'][0]['courseProgress']
         );
 
         $this->assertEquals(
@@ -452,12 +452,12 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $resultsWithExtraProblem['studentsProgress'][0]['username']
         );
         $this->assertEquals(
-            $results['studentsProgress'][0]['globalScore'] + 200,
-            $resultsWithExtraProblem['studentsProgress'][0]['globalScore']
+            $results['studentsProgress'][0]['courseScore'] + 200,
+            $resultsWithExtraProblem['studentsProgress'][0]['courseScore']
         );
         $this->assertEquals(
             100, // 100% (3 problems + 1 extra problem / 4 problems)
-            $resultsWithExtraProblem['studentsProgress'][0]['globalProgress']
+            $resultsWithExtraProblem['studentsProgress'][0]['courseProgress']
         );
 
         $this->assertEquals(

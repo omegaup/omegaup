@@ -604,7 +604,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * Returns the list of assignments with their problems and points.
      *
-     * @return array{assignmentsProblems: list<array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}>, studentsProgress: list<array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, globalProgress: float, globalScore: float, name: null|string, username: string}>}
+     * @return array{assignmentsProblems: list<array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}>, studentsProgress: list<array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}>}
      */
     public static function getStudentsProgressPerAssignmentv2(
         int $courseId,
@@ -637,7 +637,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ORDER BY
                 a.`order`, psp.`order`';
 
-        $globalPoints = 0.0;
+        $coursePoints = 0.0;
         $assignmentsProblems = [];
         /** @var list<array{assignment_alias: string, assignment_name: string, assignment_order: int, is_extra_problem: bool, problem_alias: string, problem_order: int, problem_points: float, problem_title: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
@@ -645,8 +645,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             [ $courseId ]
         );
         foreach ($rs as $row) {
-            $globalPoints += $row['is_extra_problem'] ? 0.0 : $row['problem_points'];
-
             if (!isset($assignmentsProblems[$row['assignment_alias']])) {
                 $assignmentsProblems[$row['assignment_alias']] = [
                     'alias' => $row['assignment_alias'],
@@ -656,7 +654,12 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     'order' => $row['assignment_order'],
                 ];
             }
-            $assignmentsProblems[$row['assignment_alias']]['points'] += $row['is_extra_problem'] ? 0.0 : $row['problem_points'];
+
+            if (!$row['is_extra_problem']) {
+                $assignmentsProblems[$row['assignment_alias']]['points'] += $row['problem_points'];
+                $coursePoints += $row['problem_points'];
+            }
+
             $assignmentsProblems[$row['assignment_alias']]['problems'][$row['problem_alias']] = [
                 'alias' => $row['problem_alias'],
                 'title' => $row['problem_title'],
@@ -754,19 +757,19 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     'name' => $row['name'],
                     'country_id' => $row['country_id'],
                     'classname' => $row['classname'],
-                    'globalScore' => 0.0,
-                    'globalProgress' => 0.0,
+                    'courseScore' => 0.0,
+                    'courseProgress' => 0.0,
                     'assignments' => [],
                 ];
             }
 
-            // Global score considers every problem in the course, including the extra problems.
-            $studentsProgress[$username]['globalScore'] += $problemScore;
-            $studentsProgress[$username]['globalProgress'] += $problemScore / $globalPoints * 100;
+            // Course score considers every problem in the course, including the extra problems.
+            $studentsProgress[$username]['courseScore'] += $problemScore;
+            $studentsProgress[$username]['courseProgress'] += $problemScore / $coursePoints * 100;
             // Ensure always to not surpass 100%
-            $studentsProgress[$username]['globalProgress'] = min(
+            $studentsProgress[$username]['courseProgress'] = min(
                 100,
-                $studentsProgress[$username]['globalProgress']
+                $studentsProgress[$username]['courseProgress']
             );
 
             if (
@@ -823,8 +826,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         usort(
             $studentsProgress,
             /**
-             * @param array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, globalProgress: float, globalScore: float, name: null|string, username: string} $a
-             * @param array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, globalProgress: float, globalScore: float, name: null|string, username: string} $b
+             * @param array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string} $a
+             * @param array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string} $b
              */
             fn (array $a, array $b) => strcasecmp(
                 !is_null($a['name']) ? $a['name'] : $a['username'],
