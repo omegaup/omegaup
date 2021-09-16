@@ -44,5 +44,6 @@ HAVING
         INNER JOIN
             Problemset_Problems psp ON psp.problemset_id = ps.problemset_id
         WHERE
-            c.alias = 'Curso-de-Python-FutureLabs'
+            c.alias = 'Curso-de-Python-FutureLabs' AND
+            psp.is_extra_problem = 0
     );
