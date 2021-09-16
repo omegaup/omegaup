@@ -111,8 +111,11 @@ export function parseDateTimeLocal(dateString: string): Date {
   if (matches !== null) {
     result.setFullYear(Number.parseInt(matches[1], 10));
     // Months in JavaScript start at 0.
-    result.setMonth(Number.parseInt(matches[2], 10) - 1);
-    result.setDate(Number.parseInt(matches[3], 10));
+    // Specifying optional param 'date' so the method won't use the value from 'getDate()'.
+    result.setMonth(
+      Number.parseInt(matches[2], 10) - 1,
+      Number.parseInt(matches[3], 10),
+    );
     result.setHours(Number.parseInt(matches[4], 10));
     result.setMinutes(Number.parseInt(matches[5], 10));
   }
