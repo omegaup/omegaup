@@ -406,11 +406,8 @@ class Course {
         return $expectedScores;
     }
 
-    /**
-     * @param array{admin: \OmegaUp\DAO\VO\Identities, assignment: \OmegaUp\DAO\VO\Assignments|null, assignment_alias: string, course: \OmegaUp\DAO\VO\Courses, course_alias: string, problemset_id: int|null, request: \OmegaUp\Request} $courseAssignmentData
-     */
     public static function openCourse(
-        array $courseAssignmentData,
+        string $courseAlias,
         \OmegaUp\DAO\VO\Identities $user
     ): void {
         // Log in as course admin
@@ -419,7 +416,7 @@ class Course {
         // Call api
         \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'course_alias' => $courseAssignmentData['request']['course_alias'],
+            'course_alias' => $courseAlias,
         ]));
     }
 
@@ -427,7 +424,8 @@ class Course {
      * @param array{admin: \OmegaUp\DAO\VO\Identities, assignment: \OmegaUp\DAO\VO\Assignments|null, assignment_alias: string, course: \OmegaUp\DAO\VO\Courses, course_alias: string, problemset_id: int|null, request: \OmegaUp\Request} $courseAssignmentData
      */
     public static function openAssignmentCourse(
-        array $courseAssignmentData,
+        string $courseAlias,
+        string $assignmentAlias,
         \OmegaUp\DAO\VO\Identities $user
     ): void {
         // Log in as course adminy
@@ -436,8 +434,8 @@ class Course {
         // Call api
         \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'course_alias' => $courseAssignmentData['request']['course_alias'],
-            'assignment_alias' => $courseAssignmentData['request']['alias'],
+            'course_alias' => $courseAlias,
+            'assignment_alias' => $assignmentAlias,
         ]));
     }
 
@@ -446,7 +444,8 @@ class Course {
      * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
      */
     public static function openProblemInCourseAssignment(
-        array $courseAssignmentData,
+        string $courseAlias,
+        string $assignmentAlias,
         array $problemData,
         \OmegaUp\DAO\VO\Identities $user
     ): void {
@@ -455,8 +454,8 @@ class Course {
 
         // Call api
         \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
-            'course_alias' => $courseAssignmentData['request']['course_alias'],
-            'assignment_alias' => $courseAssignmentData['request']['assignment_alias'],
+            'course_alias' => $courseAlias,
+            'assignment_alias' => $assignmentAlias,
             'problem_alias' => $problemData['request']['problem_alias'],
             'auth_token' => $login->auth_token,
         ]));
