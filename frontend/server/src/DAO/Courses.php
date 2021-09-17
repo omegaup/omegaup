@@ -604,7 +604,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * Returns the list of assignments with their problems and points.
      *
-     * @return array{assignmentsProblems: list<array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}>, studentsProgress: list<array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}>}
+     * @return array{assignmentsProblems: list<array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}>, studentsProgress: list<array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}>, totalRows: int}
      */
     public static function getStudentsProgressPerAssignmentv2(
         int $courseId,
@@ -612,8 +612,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         int $page,
         int $rowsPerPage
     ): array {
-        $offset = ($page - 1) * $rowsPerPage;
-
         $sqlAssignmentsProblems = '
             SELECT
                 a.alias AS assignment_alias,
@@ -668,6 +666,25 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 'order' => $row['problem_order'],
             ];
         }
+
+        $offset = ($page - 1) * $rowsPerPage;
+
+        // Gets the total number of students in a course
+        $sqlCount = '
+            SELECT
+                COUNT(*)
+            FROM
+                Groups_Identities AS gi
+            INNER JOIN Identities i
+                ON i.identity_id = gi.identity_id
+            WHERE
+                gi.group_id = ?';
+
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlCount,
+            [ $groupId ]
+        ) ?? 0;
 
         // Gets on each row:
         // - the students with their information;
@@ -838,6 +855,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return [
             'assignmentsProblems' => $assignmentsProblems,
             'studentsProgress' => $studentsProgress,
+            'totalRows' => $totalRows,
         ];
     }
 

@@ -161,7 +161,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
+        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
             $courseData['course']->course_id,
             $courseData['course']->group_id,
             1,
@@ -172,65 +172,83 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals(
             $participants[0]->name,
-            $results['allProgress'][0]['name']
+            $results['studentsProgress'][0]['name']
         );
         $this->assertArrayHasKey(
             $assignment,
-            $results['allProgress'][0]['progress']
+            $results['studentsProgress'][0]['assignments']
+        );
+        $this->assertEquals(
+            66,
+            intval(
+                $results['studentsProgress'][0]['assignments'][$assignment]['progress']
+            )
         );
         $this->assertEquals(
             100,
-            $results['allProgress'][0]['progress'][$assignment][$problemsData[0]['problem']->alias]
+            $results['studentsProgress'][0]['assignments'][$assignment]['problems'][$problemsData[0]['problem']->alias]['score']
         );
         $this->assertEquals(
             100,
-            $results['allProgress'][0]['progress'][$assignment][$problemsData[1]['problem']->alias]
+            $results['studentsProgress'][0]['assignments'][$assignment]['problems'][$problemsData[1]['problem']->alias]['score']
         );
         $this->assertEquals(
             0,
-            $results['allProgress'][0]['progress'][$assignment][$problemsData[2]['problem']->alias]
+            $results['studentsProgress'][0]['assignments'][$assignment]['problems'][$problemsData[2]['problem']->alias]['score']
         );
 
         $this->assertEquals(
             $participants[1]->name,
-            $results['allProgress'][1]['name']
+            $results['studentsProgress'][1]['name']
         );
         $this->assertArrayHasKey(
             $assignment,
-            $results['allProgress'][1]['progress']
+            $results['studentsProgress'][1]['assignments']
+        );
+        $this->assertEquals(
+            33,
+            intval(
+                $results['studentsProgress'][1]['assignments'][$assignment]['progress']
+            )
         );
         $this->assertEquals(
             0,
-            $results['allProgress'][1]['progress'][$assignment][$problemsData[0]['problem']->alias]
+            $results['studentsProgress'][1]['assignments'][$assignment]['problems'][$problemsData[0]['problem']->alias]['score']
         );
         $this->assertEquals(
             100,
-            $results['allProgress'][1]['progress'][$assignment][$problemsData[1]['problem']->alias]
+            $results['studentsProgress'][1]['assignments'][$assignment]['problems'][$problemsData[1]['problem']->alias]['score']
         );
-        $this->assertEquals(
-            0,
-            $results['allProgress'][1]['progress'][$assignment][$problemsData[2]['problem']->alias]
+        $this->assertArrayNotHasKey(
+            $problemsData[2]['problem']->alias,
+            $results['studentsProgress'][1]['assignments'][$assignment]['problems']
         );
 
         $this->assertEquals(
             $participants[2]->name,
-            $results['allProgress'][2]['name']
+            $results['studentsProgress'][2]['name']
         );
         $this->assertArrayHasKey(
             $assignment,
-            $results['allProgress'][2]['progress']
+            $results['studentsProgress'][2]['assignments']
         );
         $this->assertEquals(
-            0,
-            $results['allProgress'][2]['progress'][$assignment][$problemsData[0]['problem']->alias]
+            33,
+            intval(
+                $results['studentsProgress'][2]['assignments'][$assignment]['progress']
+            )
         );
-        $this->assertEquals(
-            0,
-            $results['allProgress'][2]['progress'][$assignment][$problemsData[1]['problem']->alias]
+        $this->assertArrayNotHasKey(
+            $problemsData[0]['problem']->alias,
+            $results['studentsProgress'][2]['assignments'][$assignment]['problems']
+        );
+        $this->assertArrayNotHasKey(
+            $problemsData[1]['problem']->alias,
+            $results['studentsProgress'][2]['assignments'][$assignment]['problems']
         );
         $this->assertEquals(
             100,
-            $results['allProgress'][2]['progress'][$assignment][$problemsData[2]['problem']->alias]
+            $results['studentsProgress'][2]['assignments'][$assignment]['problems'][$problemsData[2]['problem']->alias]['score']
         );
     }
 
