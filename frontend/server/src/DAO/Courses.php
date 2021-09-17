@@ -782,7 +782,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
             // Course score considers every problem in the course, including the extra problems.
             $studentsProgress[$username]['courseScore'] += $problemScore;
-            $studentsProgress[$username]['courseProgress'] += $problemScore / $coursePoints * 100;
+            $studentsProgress[$username]['courseProgress'] += $coursePoints !== 0.0 ? $problemScore / $coursePoints * 100 : 0.0;
             // Ensure always to not surpass 100%
             $studentsProgress[$username]['courseProgress'] = min(
                 100,
@@ -804,14 +804,14 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             // Assignment score doesn't consider the extra problems.
             $studentsProgress[$username]['assignments'][$assignmentAlias]['score'] += !$row['is_extra_problem'] ? $problemScore : 0.0;
             $studentsProgress[$username]['assignments'][$assignmentAlias]['progress'] += (
-                !$row['is_extra_problem'] ? (
+                !$row['is_extra_problem'] && $assignmentsProblems[$assignmentAlias]['points'] !== 0.0 ? (
                     $problemScore / $assignmentsProblems[$assignmentAlias]['points'] * 100
                  ) : 0.0
             );
 
             $studentsProgress[$username]['assignments'][$assignmentAlias]['problems'][$problemAlias] = [
                 'score' => $problemScore,
-                'progress' => $problemScore / $assignmentsProblems[$assignmentAlias]['problems'][$problemAlias]['points'] * 100,
+                'progress' => $assignmentsProblems[$assignmentAlias]['problems'][$problemAlias]['points'] !== 0.0 ? $problemScore / $assignmentsProblems[$assignmentAlias]['problems'][$problemAlias]['points'] * 100 : 0.0,
             ];
         }
 

@@ -532,7 +532,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
+        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
             $courseData['course']->course_id,
             $courseData['course']->group_id,
             1,
@@ -542,15 +542,15 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(1, $results['totalRows']);
         $this->assertEquals(
             $participant->name,
-            $results['allProgress'][0]['name']
+            $results['studentsProgress'][0]['name']
         );
         $this->assertArrayHasKey(
             $assignment,
-            $results['allProgress'][0]['progress']
+            $results['studentsProgress'][0]['assignments']
         );
         $this->assertEquals(
-            0,
-            $results['allProgress'][0]['progress'][$assignment][$problemData['problem']->alias]
+            100,
+            $results['studentsProgress'][0]['assignments'][$assignment]['problems'][$problemData['problem']->alias]['score']
         );
     }
 }
