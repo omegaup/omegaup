@@ -289,27 +289,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
-     * Returns the number of students in a course
-     */
-    public static function getStudentsInCourseCount(int $groupId): int {
-        $sql = '
-            SELECT
-                COUNT(*)
-            FROM
-                Groups_Identities gi
-            INNER JOIN
-                Identities i ON i.identity_id = gi.identity_id
-            WHERE
-                gi.group_id = ?';
-
-        /** @var int */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            $sql,
-            [ $groupId ]
-        );
-    }
-
-    /**
      * Returns the list of students in a course
      *
      * @return list<array{name: null|string, username: string}>
