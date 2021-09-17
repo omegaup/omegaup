@@ -75,7 +75,6 @@ OmegaUp.on('ready', () => {
                     ? source.finishTime
                     : null,
                 };
-                console.log(params);
 
                 api.Course.create(params)
                   .then(() => {
