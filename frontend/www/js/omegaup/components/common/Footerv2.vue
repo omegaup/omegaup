@@ -18,7 +18,13 @@
           <h4>{{ T.frontPageFooterSponsors }}</h4>
           <ul>
             <li class="mt-1">
-              <img class="sponsor-logo" src="/media/homepage/amazon_logo.png" />
+              <a href="https://www.aboutamazon.com/" target="_blank">
+                <img
+                  class="sponsor-logo"
+                  src="/media/homepage/amazon_logo.png"
+                  alt="AmazonLogo"
+                />
+              </a>
             </li>
           </ul>
         </div>

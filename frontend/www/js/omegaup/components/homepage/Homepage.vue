@@ -122,7 +122,13 @@
       ></omegaup-section>
       <omegaup-sponsors
         :title="T.homepageSponsorsSectionTitle"
-        :logos-src="['/media/homepage/amazon_logo.png']"
+        :logos="[
+          {
+            src: '/media/homepage/amazon_logo.png',
+            alt: 'AmazonLogo',
+            href: 'https://www.aboutamazon.com/',
+          },
+        ]"
       ></omegaup-sponsors>
     </div>
   </div>
