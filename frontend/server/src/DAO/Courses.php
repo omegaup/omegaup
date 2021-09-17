@@ -274,6 +274,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 c.admission_mode = ? AND
                 c.finish_time IS NULL AND
+                c.alias IS NOT NULL AND
+                c.name IS NOT NULL AND
                 c.archived = 0;';
 
         /** @var list<array{alias: string, lessonsCount: int, level: null|string, name: string, studentsCount: int}> */
