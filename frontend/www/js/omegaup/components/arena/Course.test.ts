@@ -27,6 +27,8 @@ describe('Course.vue', () => {
     clarifications: [],
     needs_basic_information: false,
     description: '# Test',
+    objective: 'Objetivo de prueba',
+    level: '',
     finish_time: new Date(),
     is_curator: true,
     is_admin: true,
