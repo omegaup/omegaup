@@ -278,14 +278,23 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 c.name IS NOT NULL AND
                 c.archived = 0;';
 
-        /** @var list<array{alias: string, lessonsCount: int, level: null|string, name: string, studentsCount: int}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var list<array{alias: null|string, lessonsCount: int, level: null|string, name: null|string, studentsCount: int}> */
+        $rs =  \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
                 /*assignment_type=*/'lesson',
                 \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
             ]
         );
+
+        $results = [];
+        foreach ($rs as $row) {
+            if (is_null($row['alias']) || is_null($row['name'])) {
+                continue;
+            }
+            $results[] = $row;
+        }
+        return $results;
     }
 
     /**
