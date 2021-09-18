@@ -8,8 +8,8 @@ import * as api from '../api';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserRankTablePayload();
 
-  const ranking = payload.ranking.rank.map((user, index) => ({
-    rank: index + 1,
+  const ranking = payload.ranking.rank.map((user) => ({
+    rank: user.ranking,
     country: user.country_id,
     username: user.username,
     name: user.name,
