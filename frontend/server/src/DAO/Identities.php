@@ -114,7 +114,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         string $usernameOrEmail,
         \OmegaUp\DAO\VO\Identities $currentIdentity
     ): ?\OmegaUp\DAO\VO\Identities {
-        if (is_null($currentIdentity->user_id)) {
+        if (is_null($currentIdentity->identity_id)) {
             return null;
         }
         $sql = '(
@@ -145,7 +145,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     ON
                         tu.team_id = t.team_id
                     WHERE
-                        tu.user_id = ?
+                        tu.identity_id = ?
                         AND i.username = ?
                 )
                 LIMIT 1;';
@@ -153,7 +153,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             $currentIdentity->user_id,
             $usernameOrEmail,
             $usernameOrEmail,
-            $currentIdentity->user_id,
+            $currentIdentity->identity_id,
             $usernameOrEmail,
         ];
 
@@ -428,17 +428,21 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             ON
                 tu.team_id = t.team_id
             INNER JOIN
+                Identities it
+            ON
+                tu.identity_id = it.identity_id
+            INNER JOIN
                 Users u
             ON
-                tu.user_id = u.user_id
+                it.user_id = u.user_id
             WHERE
-                u.user_id = ?
+                it.identity_id = ?
                 ';
 
         /** @var list<array{identity_id: int, main_identity_id: int|null, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$identity->user_id, $identity->user_id]
+            [$identity->user_id, $identity->identity_id]
         );
         $result = [];
         foreach ($rs as $identity) {
