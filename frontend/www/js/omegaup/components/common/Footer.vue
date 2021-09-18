@@ -8,6 +8,20 @@
         </div>
       </div>
       <div class="footer-list-section">
+        <h4 class="section-title">{{ T.frontPageFooterSponsors }}</h4>
+        <ul>
+          <li>
+            <a href="https://www.aboutamazon.com/" target="_blank">
+              <img
+                class="sponsor-logo"
+                src="/media/homepage/amazon_logo.png"
+                alt="AmazonLogo"
+              />
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="footer-list-section">
         <h4 class="section-title">{{ T.frontPageFooterSite }}</h4>
         <ul>
           <li>
@@ -139,14 +153,14 @@ export default class Footer extends Vue {
     padding-top: 20px;
     padding-bottom: 20px;
 
-    @media only screen and (max-width: 767px) {
+    @media only screen and (max-width: 991px) {
       display: table;
     }
 
     .footer-brand {
       max-width: 200px;
 
-      @media only screen and (max-width: 767px) {
+      @media only screen and (max-width: 991px) {
         max-width: 100%;
         margin-bottom: 40px;
       }
@@ -166,7 +180,7 @@ export default class Footer extends Vue {
     }
 
     .footer-list-section {
-      @media only screen and (max-width: 767px) {
+      @media only screen and (max-width: 991px) {
         width: 50%;
         display: inline-grid;
         margin-bottom: 20px;
@@ -201,6 +215,10 @@ export default class Footer extends Vue {
 
       .social-icons {
         margin: 0 auto;
+      }
+
+      img.sponsor-logo {
+        width: 120px;
       }
     }
   }
