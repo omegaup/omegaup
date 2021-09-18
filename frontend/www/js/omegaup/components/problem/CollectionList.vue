@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container-fluid p-5">
     <div class="row">
       <div class="col col-md-4 d-flex align-items-center">
         <a href="/problem/collection/" data-nav-problems-collection>{{

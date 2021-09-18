@@ -1686,6 +1686,7 @@ export namespace types {
   export interface AddedProblem {
     alias: string;
     commit?: string;
+    is_extra_problem?: boolean;
     points: number;
   }
 
@@ -1709,6 +1710,7 @@ export namespace types {
     finish_time?: Date;
     name?: string;
     problems: types.NavbarProblemsetProblem[];
+    problemset_id: number;
     runs?: types.Run[];
     start_time: Date;
   }
@@ -2300,8 +2302,10 @@ export namespace types {
     is_admin: boolean;
     is_curator: boolean;
     languages?: string[];
+    level?: string;
     name: string;
     needs_basic_information: boolean;
+    objective?: string;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;
@@ -2800,6 +2804,7 @@ export namespace types {
     letter?: string;
     limits: types.SettingLimits;
     nextSubmissionTimestamp?: Date;
+    nominationStatus: types.NominationStatus;
     order: string;
     points: number;
     preferred_language?: string;
@@ -2845,6 +2850,7 @@ export namespace types {
     emailClarifications: boolean;
     extraWallTime: number;
     groupAdmins: types.ProblemGroupAdmin[];
+    groupScorePolicy?: string;
     inputLimit: number;
     languages: string;
     levelTags: string[];
@@ -2879,6 +2885,7 @@ export namespace types {
     allowUserAddTags: boolean;
     emailClarifications: boolean;
     extraWallTime: number | string;
+    groupScorePolicy?: string;
     inputLimit: number | string;
     languages: string;
     levelTags: string[];
@@ -2998,6 +3005,7 @@ export namespace types {
     Limits: types.LimitsSettings;
     Slow: boolean;
     Validator: {
+      GroupScorePolicy?: string;
       Lang?: string;
       Limits?: types.LimitsSettings;
       Name: string;
@@ -3015,6 +3023,7 @@ export namespace types {
         limits?: types.LimitsSettings;
         source: string;
       };
+      group_score_policy?: string;
       name: string;
       tolerance?: number;
     };
@@ -3098,6 +3107,7 @@ export namespace types {
     difficulty: number;
     has_submissions: boolean;
     input_limit: number;
+    is_extra_problem: boolean;
     languages: string;
     letter?: string;
     order: number;
@@ -3540,6 +3550,7 @@ export namespace types {
     graduation_date?: Date;
     gravatar_92: string;
     hide_problem_tags: boolean;
+    is_own_profile: boolean;
     is_private: boolean;
     locale: string;
     name?: string;
@@ -3573,6 +3584,7 @@ export namespace types {
     graduation_date?: Date | string;
     gravatar_92?: string;
     hide_problem_tags: boolean;
+    is_own_profile: boolean;
     is_private: boolean;
     locale?: string;
     name?: string;

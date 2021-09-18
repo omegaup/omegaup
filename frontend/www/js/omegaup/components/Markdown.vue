@@ -1,5 +1,10 @@
 <template>
-  <div ref="root" data-markdown-statement :html="html"></div>
+  <div
+    ref="root"
+    data-markdown-statement
+    :html="html"
+    :class="{ 'full-width': fullWidth }"
+  ></div>
 </template>
 
 <script lang="ts">
@@ -36,6 +41,7 @@ export default class Markdown extends Vue {
   @Prop({ default: null })
   problemSettings!: types.ProblemSettingsDistrib | null;
   @Prop({ default: false }) preview!: boolean;
+  @Prop({ default: false }) fullWidth!: boolean;
 
   markdownConverter = new markdown.Converter({ preview: this.preview });
 
@@ -177,6 +183,10 @@ export default class Markdown extends Vue {
   display: block;
   max-width: 50em;
   margin: 0 auto;
+
+  &.full-width {
+    max-width: 100%;
+  }
 
   h1 {
     font-size: 1.3em;
