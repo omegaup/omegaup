@@ -21,7 +21,7 @@ import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 
-def generate_code() -> str:
+def generate_code(cur: MySQLdb.cursors.BaseCursor) -> str:
     '''Generate an aleatory code'''
     diccionary_alfabeth = {"2": 0, "3": 1, "4": 2, "5": 3,
                            "6": 4, "7": 5, "8": 6, "9": 7,
@@ -29,13 +29,49 @@ def generate_code() -> str:
                            "J": 12, "M": 13, "P": 14, "Q": 15,
                            "R": 16, "V": 17, "W": 18, "X": 19}
     code_alfabeth = "23456789CFGHJMPQRVWX"
-    code_generate = ''.join(random.choices(code_alfabeth, k=9))
-    sum_values = 0
-    for i in range(1, 10):
-        sum_values += i * diccionary_alfabeth[code_generate[i - 1]]
-    sum_values = sum_values % 20
-    code_generate += list(diccionary_alfabeth.keys())[sum_values]
+    condition = True
+    while condition:
+        code_generate = ''.join(random.choices(code_alfabeth, k=9))
+        sum_values = 0
+        for i in range(1, 10):
+            sum_values += i * diccionary_alfabeth[code_generate[i - 1]]
+        sum_values = sum_values % 20
+        code_generate += list(diccionary_alfabeth.keys())[sum_values]
+        cur.execute('''
+                SELECT
+                    COUNT(*) AS `count`
+                FROM
+                    `Certificates`
+                WHERE
+                    `verification_code` = %s;
+                ''', [code_generate])
+        for row in cur:
+            if row['count'] > 0:
+                logging.info('Verification_code exist, Chosing other')
+            else:
+                condition = False
     return code_generate
+
+
+def verificate_certificate(
+        cur: MySQLdb.cursors.BaseCursor,
+        identity_id: str,
+        course_id: str) -> bool:
+    '''verificate if certificate exist'''
+    cur.execute('''
+                SELECT
+                    COUNT(*) AS `count`
+                FROM
+                    `Certificates`
+                WHERE
+                    `identity_id` = %s AND
+                    `course_id` = %s;
+                ''', (identity_id, course_id))
+    for row in cur:
+        if row['count'] > 0:
+            logging.info('Skipping because already exist certificate')
+            return True
+    return False
 
 
 def receive_course_messages(
@@ -66,20 +102,9 @@ def receive_course_messages(
                  body: bytes) -> None:
         '''Function to receive messages'''
         data = json.loads(body.decode())
-        cur.execute('''
-                SELECT
-                    COUNT(*) AS `count`
-                FROM
-                    `Certificates`
-                WHERE
-                    `identity_id` = %s AND
-                    `course_id` = %s;
-                ''', (data["identity_id"], data["course_id"]))
-        for row in cur:
-            if row['count'] > 0:
-                logging.info('Skipping because already exist certificate')
-                return
-        code_verification = generate_code()
+        if verificate_certificate(cur, data["identity_id"], data["course_id"]):
+            return
+        code_verification = generate_code(cur)
         cur.execute('''
                     INSERT INTO
                         `Certificates` (`identity_id`,

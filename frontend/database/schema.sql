@@ -94,6 +94,7 @@ CREATE TABLE `Certificates` (
   `course_id` int DEFAULT NULL,
   `contest_id` int DEFAULT NULL,
   `verification_code` varchar(10) NOT NULL COMMENT 'Código de verificación del diploma',
+  `contest_place` int DEFAULT NULL COMMENT 'Si el tipo de certificado es CONTEST y el lugar en el que quedo el estudiante es menor o igual a `certificate_cutoff` entonces en este campo se guarda el lugar en el que quedó. Si no, NULL.',
   PRIMARY KEY (`certificate_id`),
   UNIQUE KEY `verification_code` (`verification_code`),
   KEY `identity_id` (`identity_id`),
