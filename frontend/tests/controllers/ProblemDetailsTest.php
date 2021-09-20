@@ -77,9 +77,6 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(0, $problemDAO->accepted);
         $this->assertEquals(0, $problemDAO->difficulty);
 
-        // Verify that we have the nomination status
-        $this->assertArrayHasKey('nominationStatus', $response);
-
         // Verify that we have an empty array of runs
         $this->assertEquals(0, count($response['runs']));
 
