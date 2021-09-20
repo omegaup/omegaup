@@ -17,7 +17,6 @@ import {
   updateRunFallback,
 } from './submissions';
 import { PopupDisplayed } from '../components/problem/Details.vue';
-import qualitynomination_Promotion from '../components/qualitynomination/PromotionPopup.vue';
 import { navigateToProblem, NavigationType } from './navigation';
 import {
   CourseClarificationType,
@@ -116,7 +115,6 @@ OmegaUp.on('ready', () => {
             problem: types.NavbarProblemsetProblem;
           }) => {
             api.Run.create({
-              problemset_id: payload.currentAssignment.problemset_id,
               problem_alias: problem.alias,
               language: language,
               source: code,
@@ -222,59 +220,6 @@ OmegaUp.on('ready', () => {
               return;
             }
             window.location.replace(`#${request.selectedTab}/${request.alias}`);
-          },
-          'submit-promotion': (source: qualitynomination_Promotion) => {
-            const contents: {
-              before_ac?: boolean;
-              difficulty?: number;
-              quality?: number;
-              tags?: string[];
-            } = {};
-            if (!source.solved && source.tried) {
-              contents.before_ac = true;
-            }
-            if (source.difficulty !== '') {
-              contents.difficulty = Number.parseInt(source.difficulty, 10);
-            }
-            if (source.tags.length > 0) {
-              contents.tags = source.tags;
-            }
-            if (source.quality !== '') {
-              contents.quality = Number.parseInt(source.quality, 10);
-            }
-            api.QualityNomination.create({
-              problem_alias: this.problemInfo?.alias,
-              nomination: 'suggestion',
-              contents: JSON.stringify(contents),
-            })
-              .then(() => {
-                this.popupDisplayed = PopupDisplayed.None;
-                ui.reportEvent('quality-nomination', 'submit');
-                ui.dismissNotifications();
-              })
-              .catch(ui.apiError);
-          },
-          'dismiss-promotion': (
-            source: qualitynomination_Promotion,
-            isDismissed: boolean,
-          ) => {
-            const contents: { before_ac?: boolean } = {};
-            if (!source.solved && source.tried) {
-              contents.before_ac = true;
-            }
-            if (!isDismissed) {
-              return;
-            }
-            api.QualityNomination.create({
-              problem_alias: this.problemInfo?.alias,
-              nomination: 'dismissal',
-              contents: JSON.stringify(contents),
-            })
-              .then(() => {
-                ui.reportEvent('quality-nomination', 'dismiss');
-                ui.info(T.qualityNominationRateProblemDesc);
-              })
-              .catch(ui.apiError);
           },
         },
       });
