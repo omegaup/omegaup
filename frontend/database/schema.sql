@@ -1040,12 +1040,12 @@ CREATE TABLE `Team_Groups` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Team_Users` (
   `team_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  PRIMARY KEY (`team_id`,`user_id`),
+  `identity_id` int NOT NULL COMMENT 'Id de la identidad que pertenece al equipo',
+  PRIMARY KEY (`team_id`,`identity_id`),
   KEY `team_id` (`team_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `fk_tut_team_id` FOREIGN KEY (`team_id`) REFERENCES `Teams` (`team_id`),
-  CONSTRAINT `fk_tuu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+  KEY `identity_id` (`identity_id`),
+  CONSTRAINT `fk_tui_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
+  CONSTRAINT `fk_tut_team_id` FOREIGN KEY (`team_id`) REFERENCES `Teams` (`team_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

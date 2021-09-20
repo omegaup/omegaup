@@ -19,6 +19,8 @@ const baseCourseFormProps = {
     is_admin: true,
     is_curator: true,
     name: 'Nuevo',
+    objective: 'Objetivo de prueba',
+    level: '',
     requests_user_information: 'no',
     school_id: 1,
     school_name: 'Escuela curso',
