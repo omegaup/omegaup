@@ -20,7 +20,8 @@ def _setup_course(driver: conftest.Driver, course_alias: str, school_name: str,
         util.create_problem(
             driver,
             problem_alias,
-            resource_path='frontend/tests/resources/testproblem.zip')
+            resource_path='frontend/tests/resources/testproblem.zip',
+            private=True)
         create_course(driver, course_alias, school_name)
         add_students_course(driver, [driver.user_username])
         add_assignment_with_problem(driver, assignment_alias, problem_alias)
@@ -454,3 +455,8 @@ def enter_course(driver, course_alias, assignment_alias, *, first_time=True):
             driver.browser.current_url), driver.browser.current_url
 
     driver.wait.until(EC.url_contains('#problems'))
+
+    # Verify the socket status logo
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, 'sup.socket-status-ok')))

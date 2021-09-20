@@ -310,7 +310,8 @@ def assert_no_js_errors(
 def create_problem(
         driver,
         problem_alias: str,
-        resource_path: str = 'frontend/tests/resources/triangulos.zip'
+        resource_path: str = 'frontend/tests/resources/triangulos.zip',
+        private: bool = False,
 ) -> None:
     '''Create a problem.'''
     driver.wait.until(
@@ -343,10 +344,13 @@ def create_problem(
     input_limit.send_keys('1024')
     # Alias should be set automatically
     driver.browser.find_element_by_name('source').send_keys('test')
-    # Make the problem public
-    driver.browser.find_element_by_xpath(
-        '//input[@type="radio" and @name="visibility" and @value="true"]'
-    ).click()
+
+    if not private:
+        # Make the problem public
+        driver.browser.find_element_by_xpath(
+            '//input[@type="radio" and @name="visibility" and @value="true"]'
+        ).click()
+
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH, '//input[@type = "search"]'))).send_keys('Recur')
