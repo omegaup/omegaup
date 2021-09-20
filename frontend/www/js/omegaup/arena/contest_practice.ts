@@ -5,12 +5,14 @@ import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
 import arena_ContestPractice from '../components/arena/ContestPractice.vue';
+import problemsStore from './problemStore';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import {
   showSubmission,
   SubmissionRequest,
   submitRun,
   submitRunFailed,
+  trackRun,
 } from './submissions';
 import { getOptionsFromLocation } from './location';
 import {
@@ -24,14 +26,31 @@ import clarificationStore from './clarificationsStore';
 import { navigateToProblem, NavigationType } from './navigation';
 import { myRunsStore } from './runsStore';
 
-OmegaUp.on('ready', () => {
+OmegaUp.on('ready', async () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestPracticeDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
-
+  const { guid, problemAlias } = getOptionsFromLocation(window.location.hash);
+  const runDetailsResponse: { runDetails: null | types.RunDetails } = {
+    runDetails: null,
+  };
+  const problemDetailsResponse: { problemInfo: null | types.ProblemDetails } = {
+    problemInfo: null,
+  };
+  if (problemAlias) {
+    await getProblemDetails({
+      problemAlias,
+      contestAlias: payload.contest.alias,
+      problems: payload.problems,
+      response: problemDetailsResponse,
+    });
+    if (guid) {
+      await getRunDetails({ guid, response: runDetailsResponse });
+    }
+  }
   trackClarifications(payload.clarifications);
 
   const contestPractice = new Vue({
@@ -40,12 +59,14 @@ OmegaUp.on('ready', () => {
     data: () => ({
       problemInfo: null as types.ProblemInfo | null,
       problem: null as types.NavbarProblemsetProblem | null,
-      problems: payload.problems as types.NavbarProblemsetProblem[],
+      problems: payload.problems,
       popupDisplayed: PopupDisplayed.None,
       showNewClarificationPopup: false,
       guid: null as null | string,
       problemAlias: null as null | string,
       isAdmin: false,
+      nextSubmissionTimestamp:
+        problemDetailsResponse.problemInfo?.nextSubmissionTimestamp,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
@@ -64,6 +85,7 @@ OmegaUp.on('ready', () => {
           problemAlias: this.problemAlias,
           isAdmin: this.isAdmin,
           runs: myRunsStore.state.runs,
+          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
         },
         on: {
           'navigate-to-problem': ({
@@ -175,6 +197,54 @@ OmegaUp.on('ready', () => {
   // on the `navigate-to-problem` callback being invoked, and that is
   // not the case if this is set a priori.
   Object.assign(contestPractice, getOptionsFromLocation(window.location.hash));
+
+  async function getRunDetails({
+    guid,
+    response,
+  }: {
+    guid: string;
+    response: { runDetails: null | types.RunDetails };
+  }): Promise<void> {
+    return api.Run.details({ run_alias: guid })
+      .then((runDetails) => {
+        response.runDetails = runDetails;
+      })
+      .catch((error) => {
+        ui.apiError(error);
+      });
+  }
+
+  async function getProblemDetails({
+    problemAlias,
+    contestAlias,
+    problems,
+    response,
+  }: {
+    problemAlias: string;
+    contestAlias: string;
+    problems: types.NavbarProblemsetProblem[];
+    response: { problemInfo: null | types.ProblemInfo };
+  }): Promise<void> {
+    return api.Problem.details({
+      problem_alias: problemAlias,
+      prevent_problemset_open: false,
+      contest_alias: contestAlias,
+    })
+      .then((problemInfo) => {
+        for (const run of problemInfo.runs ?? []) {
+          trackRun({ run });
+        }
+        const currentProblem = problems?.find(
+          ({ alias }: { alias: string }) => alias === problemInfo.alias,
+        );
+        problemInfo.title = currentProblem?.text ?? '';
+        response.problemInfo = problemInfo;
+        problemsStore.commit('addProblem', problemInfo);
+      })
+      .catch(() => {
+        ui.dismissNotifications();
+      });
+  }
 
   setInterval(() => {
     refreshContestClarifications({

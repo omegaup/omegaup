@@ -22,6 +22,7 @@ import {
   SubmissionRequest,
   submitRun,
   submitRunFailed,
+  trackRun,
 } from './submissions';
 import { createChart, onRankingChanged, onRankingEvents } from './ranking';
 import { EventsSocket } from './events_socket';
@@ -29,7 +30,7 @@ import rankingStore from './rankingStore';
 import socketStore from './socketStore';
 import { myRunsStore } from './runsStore';
 
-OmegaUp.on('ready', () => {
+OmegaUp.on('ready', async () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
@@ -37,6 +38,24 @@ OmegaUp.on('ready', () => {
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
+  const { guid, problemAlias } = getOptionsFromLocation(window.location.hash);
+  const runDetailsResponse: { runDetails: null | types.RunDetails } = {
+    runDetails: null,
+  };
+  const problemDetailsResponse: { problemInfo: null | types.ProblemDetails } = {
+    problemInfo: null,
+  };
+  if (problemAlias) {
+    await getProblemDetails({
+      problemAlias,
+      contestAlias: payload.contest.alias,
+      problems: payload.problems,
+      response: problemDetailsResponse,
+    });
+    if (guid) {
+      await getRunDetails({ guid, response: runDetailsResponse });
+    }
+  }
   trackClarifications(payload.clarifications);
 
   let ranking: types.ScoreboardRankingEntry[];
@@ -85,13 +104,15 @@ OmegaUp.on('ready', () => {
     data: () => ({
       problemInfo: null as types.ProblemInfo | null,
       problem: null as types.NavbarProblemsetProblem | null,
-      problems: payload.problems as types.NavbarProblemsetProblem[],
+      problems: payload.problems,
       popupDisplayed: PopupDisplayed.None,
       showNewClarificationPopup: false,
       guid: null as null | string,
       problemAlias: null as null | string,
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
+      nextSubmissionTimestamp:
+        problemDetailsResponse.problemInfo?.nextSubmissionTimestamp,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
@@ -116,6 +137,7 @@ OmegaUp.on('ready', () => {
           showPenalty: this.showPenalty,
           socketStatus: socketStore.state.socketStatus,
           runs: myRunsStore.state.runs,
+          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
         },
         on: {
           'navigate-to-problem': ({
@@ -247,6 +269,54 @@ OmegaUp.on('ready', () => {
     contestContestant,
     getOptionsFromLocation(window.location.hash),
   );
+
+  async function getRunDetails({
+    guid,
+    response,
+  }: {
+    guid: string;
+    response: { runDetails: null | types.RunDetails };
+  }): Promise<void> {
+    return api.Run.details({ run_alias: guid })
+      .then((runDetails) => {
+        response.runDetails = runDetails;
+      })
+      .catch((error) => {
+        ui.apiError(error);
+      });
+  }
+
+  async function getProblemDetails({
+    problemAlias,
+    contestAlias,
+    problems,
+    response,
+  }: {
+    problemAlias: string;
+    contestAlias: string;
+    problems: types.NavbarProblemsetProblem[];
+    response: { problemInfo: null | types.ProblemInfo };
+  }): Promise<void> {
+    return api.Problem.details({
+      problem_alias: problemAlias,
+      prevent_problemset_open: false,
+      contest_alias: contestAlias,
+    })
+      .then((problemInfo) => {
+        for (const run of problemInfo.runs ?? []) {
+          trackRun({ run });
+        }
+        const currentProblem = problems?.find(
+          ({ alias }: { alias: string }) => alias === problemInfo.alias,
+        );
+        problemInfo.title = currentProblem?.text ?? '';
+        response.problemInfo = problemInfo;
+        problemsStore.commit('addProblem', problemInfo);
+      })
+      .catch(() => {
+        ui.dismissNotifications();
+      });
+  }
 
   const socket = new EventsSocket({
     disableSockets: false,
