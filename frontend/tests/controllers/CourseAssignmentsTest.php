@@ -125,89 +125,6 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    public function testAllAdminsCanSeeAdminMode() {
-        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
-
-        // Login admin and getting assignments list
-        $adminLogin = self::login($courseData['admin']);
-        [
-            'assignments' => $assignments,
-        ] = \OmegaUp\Controllers\Course::apiListAssignments(
-            new \OmegaUp\Request([
-                'auth_token' => $adminLogin->auth_token,
-                'course_alias' => $courseData['course_alias']
-            ])
-        );
-
-        $details = \OmegaUp\Controllers\Course::getCourseAdminDetailsForTypeScript(
-            new \OmegaUp\Request([
-                'auth_token' => $adminLogin->auth_token,
-                'course_alias' => $courseData['course_alias'],
-                'assignment_alias' => $assignments[0]['alias'],
-            ])
-        );
-
-        $this->assertArrayHasKey('smartyProperties', $details);
-        $this->assertArrayHasKey('payload', $details['smartyProperties']);
-        $this->assertArrayHasKey(
-            'details',
-            $details['smartyProperties']['payload']
-        );
-
-        // A new student is added to course
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-
-        \OmegaUp\Test\Factories\Course::addStudentToCourse(
-            $courseData,
-            $identity
-        );
-
-        $userLogin = self::login($identity);
-
-        // Student tries to access into the course in admin mode
-        try {
-            \OmegaUp\Controllers\Course::getCourseAdminDetailsForTypeScript(
-                new \OmegaUp\Request([
-                    'auth_token' => $userLogin->auth_token,
-                    'course_alias' => $courseData['course_alias'],
-                    'assignment_alias' => $assignments[0]['alias'],
-                ])
-            );
-            $this->fail('User should not have access to admin mode');
-        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
-        }
-
-        $adminLogin = self::login($courseData['admin']);
-
-        // Making admin to the user previously created
-        \OmegaUp\Controllers\Course::apiAddAdmin(
-            new \OmegaUp\Request([
-                'auth_token' => $adminLogin->auth_token,
-                'usernameOrEmail' => $identity->username,
-                'course_alias' => $courseData['course_alias'],
-            ])
-        );
-
-        $addedAdminLogin = self::login($identity);
-
-        // Now, user is able to access into a course in admin mode
-        $details = \OmegaUp\Controllers\Course::getCourseAdminDetailsForTypeScript(
-            new \OmegaUp\Request([
-                'auth_token' => $addedAdminLogin->auth_token,
-                'course_alias' => $courseData['course_alias'],
-                'assignment_alias' => $assignments[0]['alias'],
-            ])
-        );
-
-        $this->assertArrayHasKey('smartyProperties', $details);
-        $this->assertArrayHasKey('payload', $details['smartyProperties']);
-        $this->assertArrayHasKey(
-            'details',
-            $details['smartyProperties']['payload']
-        );
-    }
-
     public function testGetAssignmentDetails() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
@@ -238,14 +155,14 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
 
-        $adminPayload = \OmegaUp\Controllers\Course::getAssignmentDetailsForTypeScript(
-            $courseData['admin'],
-            $courseData['course'],
-            \OmegaUp\DAO\Groups::getByPK(
-                $courseData['course']->group_id
-            ),
-            $courseData['assignment']->alias
-        )['smartyProperties']['payload'];
+        // Need to re-login because of the student login for submitting the run
+        $adminLogin = self::login($courseData['admin']);
+
+        $adminPayload = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment']->alias,
+        ]))['smartyProperties']['payload'];
 
         $this->assertEquals(
             $courseData['course']->name,
@@ -260,14 +177,12 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(1, $adminPayload['currentAssignment']['problems']);
         $this->assertCount(1, $adminPayload['currentAssignment']['runs']);
 
-        $studentPayload = \OmegaUp\Controllers\Course::getAssignmentDetailsForTypeScript(
-            $student['identity'],
-            $courseData['course'],
-            \OmegaUp\DAO\Groups::getByPK(
-                $courseData['course']->group_id
-            ),
-            $courseData['assignment']->alias
-        )['smartyProperties']['payload'];
+        $studentLogin = self::login($student['identity']);
+        $studentPayload = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
+            'auth_token' => $studentLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment']->alias,
+        ]))['smartyProperties']['payload'];
 
         // The student should not see the runs
         $this->assertEmpty($studentPayload['currentAssignment']['runs']);
