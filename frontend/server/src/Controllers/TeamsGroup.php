@@ -495,22 +495,20 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $user = \OmegaUp\DAO\Users::FindByUsername(
-            $r->ensureString(
-                'username'
-            )
+        $identity = \OmegaUp\DAO\Identities::findByUsername(
+            $r->ensureString('username')
         );
-        if (is_null($user) || is_null($user->user_id)) {
+        if (is_null($identity) || is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
-                'user_id'
+                'identity_id'
             );
         }
 
         \OmegaUp\DAO\TeamUsers::delete(
             new \OmegaUp\DAO\VO\TeamUsers([
                 'team_id' => $team['team_id'],
-                'user_id' => $user->user_id,
+                'identity_id' => $identity->identity_id,
             ])
         );
 

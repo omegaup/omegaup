@@ -138,7 +138,8 @@ class AssignmentRemoveTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         \OmegaUp\Test\Factories\Course::openProblemInCourseAssignment(
-            $courseData,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
             $problemData,
             $participant
         );

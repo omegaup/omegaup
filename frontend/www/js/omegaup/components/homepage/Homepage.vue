@@ -120,6 +120,16 @@
         :image-src="'/media/homepage/courses_section.svg'"
         :image-to-right="true"
       ></omegaup-section>
+      <omegaup-sponsors
+        :title="T.homepageSponsorsSectionTitle"
+        :logos="[
+          {
+            src: '/media/homepage/amazon_logo.png',
+            alt: 'AmazonLogo',
+            href: 'https://www.aboutamazon.com/',
+          },
+        ]"
+      ></omegaup-sponsors>
     </div>
   </div>
 </template>
@@ -136,6 +146,7 @@ import homepage_Testimonials from './Testimonials.vue';
 import homepage_Section from './Section.vue';
 import school_Rank from '../schools/Rank.vue';
 import user_Rank from '../user/Rank.vue';
+import homepage_Sponsors from './Sponsors.vue';
 
 @Component({
   components: {
@@ -146,6 +157,7 @@ import user_Rank from '../user/Rank.vue';
     'omegaup-user-rank': user_Rank,
     'omegaup-testimonials': homepage_Testimonials,
     'omegaup-section': homepage_Section,
+    'omegaup-sponsors': homepage_Sponsors,
   },
 })
 export default class Homepage extends Vue {
