@@ -158,7 +158,9 @@
               <td>
                 <a
                   class="text-center"
-                  :href="`/course/${course.alias}/assignment/${assignment.alias}/`"
+                  :href="`/course/${course.alias}/assignment/${
+                    assignment.alias
+                  }/${course.is_admin ? 'admin/' : ''}`"
                 >
                   {{ assignment.name }}
                 </a>
@@ -180,7 +182,7 @@
                 >
                 <a
                   class="mr-2"
-                  :href="`/course/${course.alias}/assignment/${assignment.alias}/#runs`"
+                  :href="`/course/${course.alias}/assignment/${assignment.alias}/admin/#runs`"
                 >
                   <font-awesome-icon :icon="['fas', 'tachometer-alt']" />
                   {{ T.wordsRuns }}
