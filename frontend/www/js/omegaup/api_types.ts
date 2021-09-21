@@ -1710,7 +1710,6 @@ export namespace types {
     finish_time?: Date;
     name?: string;
     problems: types.NavbarProblemsetProblem[];
-    problemset_id: number;
     runs?: types.Run[];
     start_time: Date;
   }
@@ -2804,7 +2803,6 @@ export namespace types {
     letter?: string;
     limits: types.SettingLimits;
     nextSubmissionTimestamp?: Date;
-    nominationStatus: types.NominationStatus;
     order: string;
     points: number;
     preferred_language?: string;
