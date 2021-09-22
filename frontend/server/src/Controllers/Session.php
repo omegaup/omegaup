@@ -309,6 +309,16 @@ class Session extends \OmegaUp\Controllers\Controller {
                     ],
                 ];
             }
+            $teamIdentity = \OmegaUp\DAO\Identities::getTeamIdentity(
+                $loginIdentity
+            );
+            if ($teamIdentity) {
+                unset($teamIdentity['classname']);
+                $currentIdentity = new \OmegaUp\DAO\VO\Identities(
+                    $teamIdentity
+                );
+                $loginIdentity = new \OmegaUp\DAO\VO\Identities($teamIdentity);
+            }
         } else {
             $currentUser = \OmegaUp\DAO\Users::getByPK(
                 $currentIdentity->user_id
