@@ -15,7 +15,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, languages: list<string>|null, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
+ * @psalm-type CourseDetails=array{admission_mode: string, alias: string, archived: boolean, assignments: list<CourseAssignment>, clarifications: list<Clarification>, description: string, objective: string|null, level: string|null, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, languages: list<string>|null, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
@@ -51,7 +51,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type IntroDetailsPayload=array{alias: string, archived: boolean, description: string, details?: CourseDetails, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
  * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
- * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, problemset_id: int, runs: null|list<Run>, start_time: \OmegaUp\Timestamp}
+ * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, runs: null|list<Run>, start_time: \OmegaUp\Timestamp}
  * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard: Scoreboard, courseDetails: CourseDetails, currentAssignment: ArenaAssignment}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float, is_extra_problem?: bool}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
@@ -2840,13 +2840,12 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload|AssignmentDetailsPayload, title: \OmegaUp\TranslationString|string}}
+     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload, title: \OmegaUp\TranslationString}}|array{inContest: bool, showRanking: bool, smartyProperties: array{payload: CourseDetailsPayload}, template: string}
      *
      * @omegaup-request-param null|string $assignment_alias
      * @omegaup-request-param string $course_alias
      */
     public static function getCourseDetailsForTypeScript(\OmegaUp\Request $r): array {
-        // TODO: Replace the getIntroDetails() content directly here.
         return self::getIntroDetails($r);
     }
 
@@ -2904,6 +2903,54 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString('wordsCloneCourse'),
             ],
             'entrypoint' => 'course_clone',
+        ];
+    }
+
+    /**
+     * @return array{smartyProperties: array{payload: CourseDetailsPayload}, template: string}
+     *
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $course_alias
+     */
+    public static function getCourseAdminDetailsForTypeScript(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $course = self::validateCourseExists($courseAlias);
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+        $group = self::resolveGroup($course);
+        if (
+            !\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)
+            && !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+        $assignmentAlias = $r->ensureString(
+            'assignment_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        self::validateCourseAssignmentAlias(
+            $course,
+            $assignmentAlias
+        );
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'shouldShowFirstAssociatedIdentityRunWarning' => false,
+                    'details' => self::getCommonCourseDetails(
+                        $course,
+                        $r->identity
+                    ),
+                ],
+            ],
+            'template' => 'arena.course.admin.tpl',
         ];
     }
 
@@ -3594,7 +3641,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Courses $course,
         \OmegaUp\DAO\VO\Groups $group,
         bool $showAssignment
-    ): array {
+    ) {
         $r->ensureIdentity();
 
         if ($course->admission_mode === self::ADMISSION_MODE_PUBLIC) {
@@ -3648,7 +3695,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Groups $group,
         array $registrationResponse = [],
         bool $showAssignment = false
-    ): array {
+    ) {
         $r->ensureIdentity();
 
         if (is_null($course->course_id)) {
@@ -3727,9 +3774,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the course and specific assignment details
      *
-     * @return array{smartyProperties: array{payload: AssignmentDetailsPayload, fullWidth: bool, title: string}, inContest: bool, entrypoint: string}
+     * @return array{smartyProperties: array{payload: AssignmentDetailsPayload, fullWidth: bool, title: string, inContest: bool}, entrypoint: string}
      */
-    private static function getAssignmentDetails(
+    public static function getAssignmentDetailsForTypeScript( // TODO: make this function private
         \OmegaUp\DAO\VO\Identities $currentIdentity,
         \OmegaUp\DAO\VO\Courses $course,
         \OmegaUp\DAO\VO\Groups $group,
@@ -3812,7 +3859,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'start_time' => $assignment->start_time,
                         'finish_time' => $assignment->finish_time,
                         'problems' => $problemsResponseArray,
-                        'problemset_id' => intval($assignment->problemset_id),
                         'runs' => $isAdmin ? \OmegaUp\DAO\Runs::getAllRuns(
                             $assignment->problemset_id,
                             /*$status=*/ null,
@@ -3831,10 +3877,50 @@ class Course extends \OmegaUp\Controllers\Controller {
                 ],
                 'fullWidth' => true,
                 'title' => strval($assignment->name),
+                // Navbar is only hidden during exams.
+                'inContest' => $assignment->assignment_type === 'test',
             ],
+            'entrypoint' => 'arena_course',
+        ];
+    }
+
+    /**
+     * @return array{inContest: bool, smartyProperties: array{payload: CourseDetailsPayload, showRanking: bool}, template: string}
+     */
+    private static function getAssignmentDetails(
+        \OmegaUp\Request $r,
+        \OmegaUp\DAO\VO\Courses $course,
+        \OmegaUp\DAO\VO\Groups $group,
+        string $assignmentAlias
+    ): array {
+        $r->ensureIdentity();
+        $assignment = self::validateCourseAssignmentAlias(
+            $course,
+            $assignmentAlias
+        );
+        $commonDetails = self::getCommonCourseDetails($course, $r->identity);
+        return [
+            'smartyProperties' => [
+                'showRanking' => \OmegaUp\Controllers\Course::shouldShowScoreboard(
+                    $r->identity,
+                    $course,
+                    $group
+                ),
+                'payload' => ['shouldShowFirstAssociatedIdentityRunWarning' =>
+                    !is_null($r->user) &&
+                    !\OmegaUp\Controllers\User::isMainIdentity(
+                        $r->user,
+                        $r->identity
+                    ) &&
+                    \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
+                        $r->user
+                    ),
+                    'details' => $commonDetails,
+                ],
+            ],
+            'template' => 'arena.contest.course.tpl',
             // Navbar is only hidden during exams.
             'inContest' => $assignment->assignment_type === 'test',
-            'entrypoint' => 'arena_course',
         ];
     }
 
@@ -3850,7 +3936,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         bool $hasAcceptedTeacher = true,
         bool $hasSharedUserInformation = false,
         array $registrationResponse = []
-    ): array {
+    ) {
         $courseDetails = self::getBasicCourseDetails($course);
         $commonDetails = [];
         if (
@@ -3951,7 +4037,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Refactor of apiIntroDetails in order to be called from php files and APIs
      *
-     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload|AssignmentDetailsPayload, title: \OmegaUp\TranslationString|string}}
+     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload, title: \OmegaUp\TranslationString}}|array{inContest: bool, showRanking: bool, smartyProperties: array{payload: CourseDetailsPayload}, template: string}
      *
      * @omegaup-request-param null|string $assignment_alias
      * @omegaup-request-param string $course_alias
@@ -3989,7 +4075,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         return self::getAssignmentDetails(
-            $r->identity,
+            $r,
             $course,
             $group,
             $assignmentAlias
@@ -4119,9 +4205,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             ),
             'name' => strval($course->name),
             'description' => strval($course->description),
+            'objective' => $course->objective,
+            'level' => $course->level,
             'alias' => strval($course->alias),
             'archived' => $course->archived,
-            'school_id' => intval($course->school_id),
+            'school_id' => $course->school_id,
             'school_name' => null,
             'start_time' => $course->start_time,
             'languages' => !is_null(

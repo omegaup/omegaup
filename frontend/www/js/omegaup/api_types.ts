@@ -1718,7 +1718,6 @@ export namespace types {
     finish_time?: Date;
     name?: string;
     problems: types.NavbarProblemsetProblem[];
-    problemset_id: number;
     runs?: types.Run[];
     start_time: Date;
   }
@@ -2318,8 +2317,10 @@ export namespace types {
     is_admin: boolean;
     is_curator: boolean;
     languages?: string[];
+    level?: string;
     name: string;
     needs_basic_information: boolean;
+    objective?: string;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;
@@ -2826,7 +2827,6 @@ export namespace types {
     letter?: string;
     limits: types.SettingLimits;
     nextSubmissionTimestamp?: Date;
-    nominationStatus: types.NominationStatus;
     order: string;
     points: number;
     preferred_language?: string;

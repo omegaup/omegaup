@@ -38,37 +38,13 @@
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :problem="problemInfo"
-              :nomination-status="
-                problemInfo ? problemInfo.nominationStatus : null
-              "
-              :popup-displayed="problemDetailsPopup"
               :active-tab="'problems'"
-              :languages="course.languages"
               :runs="runs"
               :guid="guid"
               :problem-alias="problemAlias"
               :should-show-run-details="shouldShowRunDetails"
               @submit-run="onRunSubmitted"
               @show-run="(source) => $emit('show-run', source)"
-              @update:activeTab="
-                (selectedTab) =>
-                  $emit('reset-hash', {
-                    selectedTab,
-                    alias: activeProblemAlias,
-                  })
-              "
-              @submit-promotion="
-                (qualityPromotionComponent) =>
-                  $emit('submit-promotion', qualityPromotionComponent)
-              "
-              @dismiss-promotion="
-                (qualityPromotionComponent, isDismissed) =>
-                  $emit(
-                    'dismiss-promotion',
-                    qualityPromotionComponent,
-                    isDismissed,
-                  )
-              "
             >
               <template #quality-nomination-buttons>
                 <div></div>
@@ -183,7 +159,7 @@ export default class ArenaCourse extends Vue {
   @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
   @Prop({ default: null }) problem!: types.NavbarProblemsetProblem | null;
-  @Prop() problemInfo!: types.ProblemDetails;
+  @Prop() problemInfo!: types.ProblemInfo;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() activeTab!: string;
   @Prop({ default: null }) guid!: null | string;
@@ -228,32 +204,6 @@ export default class ArenaCourse extends Vue {
       return T.socketStatusFailed;
     }
     return T.socketStatusWaiting;
-  }
-
-  get problemDetailsPopup(): PopupDisplayed {
-    if (
-      this.problemInfo &&
-      // Problem has been solved or tried
-      (this.problemInfo.nominationStatus.solved ||
-        this.problemInfo.nominationStatus.tried) &&
-      // And has not been dismissed
-      !(
-        this.problemInfo.nominationStatus.dismissed ||
-        (this.problemInfo.nominationStatus.dismissedBeforeAc &&
-          !this.problemInfo.nominationStatus.solved)
-      ) &&
-      // And has not been previously nominated
-      !(
-        this.problemInfo.nominationStatus.nominated ||
-        (this.problemInfo.nominationStatus.nominatedBeforeAc &&
-          !this.problemInfo.nominationStatus.solved)
-      ) &&
-      // And user can nominate the problem
-      this.problemInfo.nominationStatus.canNominateProblem
-    ) {
-      return PopupDisplayed.Promotion;
-    }
-    return this.currentPopupDisplayed;
   }
 
   onRunDetails(guid: string): void {

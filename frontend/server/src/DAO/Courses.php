@@ -667,7 +667,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * Returns the list of assignments with their problems and points.
      *
-     * @return array{assignmentsProblems: list<array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}>, studentsProgress: list<array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}>}
+     * @return array{assignmentsProblems: list<array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}>, studentsProgress: list<array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}>, totalRows: int}
      */
     public static function getStudentsProgressPerAssignmentv2(
         int $courseId,
@@ -675,8 +675,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         int $page,
         int $rowsPerPage
     ): array {
-        $offset = ($page - 1) * $rowsPerPage;
-
         $sqlAssignmentsProblems = '
             SELECT
                 a.alias AS assignment_alias,
@@ -731,6 +729,25 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 'order' => $row['problem_order'],
             ];
         }
+
+        $offset = ($page - 1) * $rowsPerPage;
+
+        // Gets the total number of students in a course
+        $sqlCount = '
+            SELECT
+                COUNT(*)
+            FROM
+                Groups_Identities AS gi
+            INNER JOIN Identities i
+                ON i.identity_id = gi.identity_id
+            WHERE
+                gi.group_id = ?';
+
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlCount,
+            [ $groupId ]
+        ) ?? 0;
 
         // Gets on each row:
         // - the students with their information;
@@ -828,7 +845,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
             // Course score considers every problem in the course, including the extra problems.
             $studentsProgress[$username]['courseScore'] += $problemScore;
-            $studentsProgress[$username]['courseProgress'] += $problemScore / $coursePoints * 100;
+            $studentsProgress[$username]['courseProgress'] += $coursePoints !== 0.0 ? $problemScore / $coursePoints * 100 : 0.0;
             // Ensure always to not surpass 100%
             $studentsProgress[$username]['courseProgress'] = min(
                 100,
@@ -850,14 +867,14 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             // Assignment score doesn't consider the extra problems.
             $studentsProgress[$username]['assignments'][$assignmentAlias]['score'] += !$row['is_extra_problem'] ? $problemScore : 0.0;
             $studentsProgress[$username]['assignments'][$assignmentAlias]['progress'] += (
-                !$row['is_extra_problem'] ? (
+                !$row['is_extra_problem'] && $assignmentsProblems[$assignmentAlias]['points'] !== 0.0 ? (
                     $problemScore / $assignmentsProblems[$assignmentAlias]['points'] * 100
                  ) : 0.0
             );
 
             $studentsProgress[$username]['assignments'][$assignmentAlias]['problems'][$problemAlias] = [
                 'score' => $problemScore,
-                'progress' => $problemScore / $assignmentsProblems[$assignmentAlias]['problems'][$problemAlias]['points'] * 100,
+                'progress' => $assignmentsProblems[$assignmentAlias]['problems'][$problemAlias]['points'] !== 0.0 ? $problemScore / $assignmentsProblems[$assignmentAlias]['problems'][$problemAlias]['points'] * 100 : 0.0,
             ];
         }
 
@@ -901,6 +918,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return [
             'assignmentsProblems' => $assignmentsProblems,
             'studentsProgress' => $studentsProgress,
+            'totalRows' => $totalRows,
         ];
     }
 

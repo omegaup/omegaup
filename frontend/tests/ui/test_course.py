@@ -68,14 +68,15 @@ def test_user_ranking_course(driver):
         _click_on_problem(driver, problem)
 
         # When user has tried or solved a problem, feedback popup will be shown
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, '[data-overlay-popup] button.close')
-            )).click()
-        driver.wait.until(
-            EC.invisibility_of_element_located(
-                (By.CSS_SELECTOR, '[data-overlay-popup] button.close')
-            ))
+        with util.dismiss_status(driver):
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR,
+                     '.popup button.close'))).click()
+            driver.wait.until(
+                EC.invisibility_of_element_located(
+                    (By.CSS_SELECTOR,
+                     '.popup button.close')))
 
         _click_on_problem(driver, problem)
         driver.wait.until(
@@ -157,12 +158,16 @@ def show_run_details_course(driver: conftest.Driver, course_alias: str,
     enter_course_assignments_page(driver, course_alias)
     with driver.page_transition():
         driver.wait.until(EC.element_to_be_clickable(
-            (By.XPATH, '//a[@href = "/course/%s/assignment/%s/"]'
+            (By.XPATH, '//a[@href = "/course/%s/assignment/%s/admin/"]'
              % (course_alias, assignment_alias)))).click()
 
-    util.show_run_details(driver, code='#include <iostream>')
+    util.show_run_details(driver,
+                          table_classname='local',
+                          dropdown_classname='open',
+                          code='#include <iostream>',
+                          has_been_migrated=False)
 
-    driver.browser.find_element_by_css_selector('div[data-overlay]').click()
+    driver.browser.find_element_by_css_selector('#overlay').click()
 
 
 def test_create_identities_for_course(driver):
@@ -207,11 +212,6 @@ def test_create_identities_for_course(driver):
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
                  'button[data-run-details]'))).click()
-
-        driver.wait.until(
-            EC.visibility_of_element_located(
-                (By.CSS_SELECTOR,
-                 '.show form[data-run-details-view] .CodeMirror-code')))
 
         assert (('show-run:') in
                 driver.browser.current_url), driver.browser.current_url
@@ -302,8 +302,9 @@ def create_course(driver, course_alias: str, school_name: str) -> None:
     driver.typeahead_helper('*[contains(@class, "omegaup-course-details")]',
                             school_name,
                             select_suggestion=False)
-    driver.browser.find_element_by_tag_name('textarea').send_keys(
-        'course description')
+    driver.browser.find_element_by_css_selector(
+        'textarea[data-course-new-description]'
+    ).send_keys('course description')
 
     with driver.page_transition():
         driver.browser.find_element_by_css_selector(
