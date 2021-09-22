@@ -180,8 +180,6 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          // TODO: Implement the API to search users from course, for
-          // 'update-search-result-users-contest';
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
           },
