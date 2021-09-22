@@ -13,6 +13,7 @@ namespace OmegaUp\DAO;
  *
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CourseCardPublic=array{alias: string, lessonsCount: int, level: null|string, name: string, studentsCount: int}
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
@@ -232,6 +233,68 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $courses[] = $row;
         }
         return $courses;
+    }
+
+    /**
+     * @return list<CourseCardPublic>
+     */
+    public static function getPublicCoursesForTab() {
+        $sql = '
+            SELECT
+                c.alias,
+                c.name,
+                c.level,
+                IFNULL(
+                    (
+                        SELECT
+                            COUNT(*)
+                        FROM
+                            Groups_Identities gi
+                        INNER JOIN
+                            Identities i ON i.identity_id = gi.identity_id
+                        WHERE
+                            gi.group_id = c.group_id
+                    ),
+                    0
+                ) AS studentsCount,
+                IFNULL(
+                    (
+                        SELECT
+                            COUNT(*)
+                        FROM
+                            Assignments a
+                        WHERE
+                            a.course_id = c.course_id AND
+                            a.assignment_type = ?
+                    ),
+                    0
+                ) AS lessonsCount
+            FROM
+                Courses c
+            WHERE
+                c.admission_mode = ? AND
+                c.finish_time IS NULL AND
+                c.alias IS NOT NULL AND
+                c.name IS NOT NULL AND
+                c.archived = 0;';
+
+        /** @var list<array{alias: null|string, lessonsCount: int, level: null|string, name: null|string, studentsCount: int}> */
+        $rs =  \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [
+                /*assignment_type=*/'lesson',
+                \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+            ]
+        );
+
+        $results = [];
+        foreach ($rs as $row) {
+            if (is_null($row['alias']) || is_null($row['name'])) {
+                continue;
+            }
+            $results[] = $row;
+        }
+        return $results;
     }
 
     /**
