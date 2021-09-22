@@ -2,13 +2,9 @@ import { shallowMount } from '@vue/test-utils';
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
 
-import course_ViewProgress, {
-  escapeCsv,
-  escapeXml,
-  toOds,
-  toCsv,
-} from './ViewProgress.vue';
+import course_ViewProgress, { escapeXml, toOds } from './ViewProgress.vue';
 import type { types } from '../../api_types';
+import { escapeCsv, toCsv } from '../../table_csv';
 
 describe('ViewProgress.vue', () => {
   if (typeof window.URL.createObjectURL === 'undefined') {

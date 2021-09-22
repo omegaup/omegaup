@@ -285,6 +285,7 @@ contestPublicRequiresProblem = "Os concursos públicos exigem pelo menos um prob
 contestRegistrationPreAcceptedDescription = "O usuário foi explicitamente convidado para o concurso"
 contestReport = "Relatório do Concurso: %(contest_alias)"
 contestScoreboardAdminLink = "link Admin painel de avaliação"
+contestScoreboardDownloadCsvFile = "Baixar painel de avaliação (.csv)"
 contestScoreboardLink = "link painel de avaliação"
 contestUpdateAlreadyHasRuns = "A duração do concurso não pode ser alterada se você já tem soluções julgadas."
 contestWillBeginIn = "Concurso inciará em "

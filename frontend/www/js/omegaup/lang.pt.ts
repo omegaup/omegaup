@@ -287,6 +287,7 @@ const translations: { [key: string]: string; } = {
   contestRegistrationPreAcceptedDescription: "O usu\u00e1rio foi explicitamente convidado para o concurso",
   contestReport: "Relat\u00f3rio do Concurso: %(contest_alias)",
   contestScoreboardAdminLink: "link Admin painel de avalia\u00e7\u00e3o",
+  contestScoreboardDownloadCsvFile: "Baixar painel de avalia\u00e7\u00e3o (.csv)",
   contestScoreboardLink: "link painel de avalia\u00e7\u00e3o",
   contestUpdateAlreadyHasRuns: "A dura\u00e7\u00e3o do concurso n\u00e3o pode ser alterada se voc\u00ea j\u00e1 tem solu\u00e7\u00f5es julgadas.",
   contestWillBeginIn: "Concurso inciar\u00e1 em ",

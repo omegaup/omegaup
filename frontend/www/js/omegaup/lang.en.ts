@@ -287,6 +287,7 @@ const translations: { [key: string]: string; } = {
   contestRegistrationPreAcceptedDescription: "User has been explicitly invited to the contest",
   contestReport: "Contest Report: %(contest_alias)",
   contestScoreboardAdminLink: "Admin Scoreboard link",
+  contestScoreboardDownloadCsvFile: "Download scoreboard (.csv)",
   contestScoreboardLink: "Scoreboard link",
   contestUpdateAlreadyHasRuns: "Length of a contest can't be changed once a solution has been judged.",
   contestWillBeginIn: "This contest will begin in ",

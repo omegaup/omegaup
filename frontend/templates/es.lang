@@ -285,6 +285,7 @@ contestPublicRequiresProblem = "Los concursos públicos necesitan tener un probl
 contestRegistrationPreAcceptedDescription = "El usuario ha sido invitado explícitamente al concurso"
 contestReport = "Reporte de Concurso: %(contest_alias)"
 contestScoreboardAdminLink = "Admin Scoreboard link"
+contestScoreboardDownloadCsvFile = "Descargar scoreboard (.csv)"
 contestScoreboardLink = "Scoreboard link"
 contestUpdateAlreadyHasRuns = "La duración del concurso no se puede cambiar si ya tiene soluciones revisadas."
 contestWillBeginIn = "Este concurso iniciará en "
