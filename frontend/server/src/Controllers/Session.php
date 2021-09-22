@@ -313,11 +313,11 @@ class Session extends \OmegaUp\Controllers\Controller {
                 $loginIdentity
             );
             if ($teamIdentity) {
+                $identityClassname = $teamIdentity['classname'];
                 unset($teamIdentity['classname']);
                 $currentIdentity = new \OmegaUp\DAO\VO\Identities(
                     $teamIdentity
                 );
-                $loginIdentity = new \OmegaUp\DAO\VO\Identities($teamIdentity);
             }
         } else {
             $currentUser = \OmegaUp\DAO\Users::getByPK(

@@ -415,7 +415,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     !is_null($teamIdentity['identityUsernames'])
                     && !is_null($team->team_id)
                 ) {
-                    /** @var list<array{password?: string, username: string}> $selfGeneratedIdentities */
+                    /** @var list<array{password: string, username: string}> $selfGeneratedIdentities */
                     $selfGeneratedIdentities = array_filter(
                         $teamIdentity['identityUsernames'],
                         fn ($user) => isset(
@@ -424,12 +424,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     );
 
                     foreach ($selfGeneratedIdentities as $selfGeneratedIdentity) {
-                        if (!isset($selfGeneratedIdentity['password'])) {
-                            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                                'parameterInvalid',
-                                'password'
-                            );
-                        }
                         $newIdentity = self::createIdentity(
                             $selfGeneratedIdentity['username'],
                             /*$name=*/ null,

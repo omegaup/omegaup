@@ -1236,7 +1236,7 @@ const translations: { [key: string]: string; } = {
   teamsGroupUsernames: "Users",
   teamsGroupsCanNotBeAddedInNormalContest: "Teams groups cannot be added in normal contests",
   teamsGroupsCreateNew: "Create new teams group",
-  teamsGroupsCsvHelp: "## Quickly add multiple identities as teams to this teams group. Identities are not real users, and don't need to have an email or validate their account.\n\n## Identities should be in a <code>.csv</code> file with the following format:\n<samp><pre>username,name,country_id,state_id,gender,school_name\nteam-1,Team 1,MX,AGU,other,Best School\nteam-2,Teams 2,MX,AGU,decline,Best School</pre></samp>\n\n<a href=\"https://blog.omegaup.com/administracion-de-identidades/\">More info (?)</a>",
+  teamsGroupsCsvHelp: "## Quickly add multiple identities as teams to this teams group. Identities are not real users, and don't need to have an email or validate their account.\n\n## Identities should be in a `.csv` file with the following format:\n```\nusername,name,country_id,state_id,gender,school_name\nteam-1,Team 1,MX,AGU,other,Best School\nteam-2,Teams 2,MX,AGU,decline,Best School\n```\n\n[\u2139\ufe0f More info](https://blog.omegaup.com/administracion-de-identidades/)",
   teamsGroupsErrorFieldIsNotPresentInCsv: "Some required fields were not found in csv file: %(missingFields)",
   teamsGroupsErrorFieldIsRequired: "The field %(field) is required.",
   titleInUse: "Title already exists. Please choose a different title.",
