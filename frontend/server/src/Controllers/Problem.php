@@ -25,7 +25,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type ArenaProblemDetails=array{accepts_submissions: bool, alias: string, commit: string, input_limit: int, languages: list<string>, letter?: string, points: float, problem_id?: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>,  settings?: ProblemSettingsDistrib, source?: string, statement?: ProblemStatement, title: string, visibility: int}
  * @psalm-type BestSolvers=array{classname: string, language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}
- * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
  * @psalm-type ProblemAdmin=array{role: string, username: string}
@@ -2618,7 +2618,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        // Add the problem to the response
+        // Add the problem the response
         $response['problem_id'] = intval($problem->problem_id);
         $response['title'] = strval($problem->title);
         $response['alias'] = strval($problem->alias);
@@ -2637,19 +2637,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $response['quality_seal'] = $problem->quality_seal;
         $response['version'] = $version;
         $response['commit'] = $commit;
-
-        // Add the default problem's nomination status to response
-        $response['nominationStatus'] = [
-            'alreadyReviewed' => false,
-            'dismissed' => false,
-            'dismissedBeforeAc' => false,
-            'nominated' => false,
-            'nominatedBeforeAc' => false,
-            'language' => '',
-            'canNominateProblem' => false,
-            'solved' => false,
-            'tried' => false,
-        ];
 
         // If the problem is public or if the user has admin privileges, show the
         // problem source and alias of owner.
@@ -2794,35 +2781,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $container,
                     $lastRunTime
                 );
-            }
-
-            // Fill nomination status
-            $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
-                intval($problem->problem_id),
-                intval($loggedIdentity->user_id)
-            );
-            $response['nominationStatus'] = [
-                'alreadyReviewed' => \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
-                    $loggedIdentity,
-                    $problem
-                ),
-                'dismissed' => $nominationStatus['dismissed'],
-                'dismissedBeforeAc' => $nominationStatus['dismissedBeforeAc'],
-                'nominated' => $nominationStatus['nominated'],
-                'nominatedBeforeAc' => $nominationStatus['nominatedBeforeAc'],
-                'language' => $response['statement']['language'],
-                'canNominateProblem' => !is_null($loggedIdentity->user_id),
-                'solved' => false,
-                'tried' => false,
-            ];
-
-            foreach ($runsArray as $run) {
-                if ($run['verdict'] === 'AC') {
-                    $response['nominationStatus']['solved'] = true;
-                    break;
-                } elseif ($run['verdict'] !== 'JE' && $run['verdict'] !== 'VE' && $run['verdict'] !== 'CE') {
-                    $response['nominationStatus']['tried'] = true;
-                }
             }
         }
 
