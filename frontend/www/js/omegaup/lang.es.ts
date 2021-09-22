@@ -286,7 +286,7 @@ const translations: { [key: string]: string; } = {
   contestPublicRequiresProblem: "Los concursos p\u00fablicos necesitan tener un problema. Agr\u00e9gale un problema y m\u00e1rcalo como p\u00fablico en Editar Concurso.",
   contestRegistrationPreAcceptedDescription: "El usuario ha sido invitado expl\u00edcitamente al concurso",
   contestReport: "Reporte de Concurso: %(contest_alias)",
-  contestScoreboardAdminLink: "Admin Scoreboard link",
+  contestScoreboardAdminLink: "Admin scoreboard link",
   contestScoreboardDownloadCsvFile: "Descargar scoreboard (.csv)",
   contestScoreboardLink: "Scoreboard link",
   contestUpdateAlreadyHasRuns: "La duraci\u00f3n del concurso no se puede cambiar si ya tiene soluciones revisadas.",
