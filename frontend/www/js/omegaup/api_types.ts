@@ -1094,6 +1094,14 @@ export namespace types {
       );
     }
 
+    export function CourseTabsPayload(
+      elementId: string = 'payload',
+    ): types.CourseTabsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function GroupEditPayload(
       elementId: string = 'payload',
     ): types.GroupEditPayload {
@@ -2277,6 +2285,14 @@ export namespace types {
     start_time: Date;
   }
 
+  export interface CourseCardPublic {
+    alias: string;
+    lessonsCount: number;
+    level?: string;
+    name: string;
+    studentsCount: number;
+  }
+
   export interface CourseClarificationsPayload {
     clarifications: types.Clarification[];
     length: number;
@@ -2301,8 +2317,10 @@ export namespace types {
     is_admin: boolean;
     is_curator: boolean;
     languages?: string[];
+    level?: string;
     name: string;
     needs_basic_information: boolean;
+    objective?: string;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;
@@ -2425,6 +2443,14 @@ export namespace types {
   export interface CourseSubmissionsListPayload {
     solvedProblems: { [key: string]: types.CourseProblemTried[] };
     unsolvedProblems: { [key: string]: types.CourseProblemTried[] };
+  }
+
+  export interface CourseTabsPayload {
+    courses: {
+      enrolled: types.CourseCardPublic[];
+      finished: types.CourseCardPublic[];
+      general: types.CourseCardPublic[];
+    };
   }
 
   export interface CoursesByAccessMode {
