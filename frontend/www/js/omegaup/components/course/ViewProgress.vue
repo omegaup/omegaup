@@ -1,116 +1,121 @@
 <template>
-  <div class="row">
-    <div class="col-lg-10 mb-3">
-      <div class="card">
-        <div class="card-header">
-          <h2>
-            <a :href="`/course/${course.alias}/`">{{ course.name }}</a>
-          </h2>
-          <h6 class="mb-0">
-            {{
-              ui.formatString(T.studentsProgressRangeHeader, {
-                lowCount: (page - 1) * length + 1,
-                highCount: page * length,
-              })
-            }}
-          </h6>
-        </div>
-        <div class="table-responsive">
-          <table class="table table-striped table-fixed mb-0 d-block">
-            <thead>
-              <tr>
-                <th class="text-center align-middle">
-                  <span>
-                    {{ T.wordsName }}
-                    <omegaup-common-sort-controls
-                      column="student"
-                      :sort-order="sortOrder"
-                      :column-name="columnName"
-                      @apply-filter="onApplyFilter"
-                    ></omegaup-common-sort-controls>
-                  </span>
-                </th>
-                <th class="text-center align-middle">
-                  <span>
-                    {{ T.courseProgressGlobalScore }}
-                    <span class="d-block">{{
-                      ui.formatString(T.studentProgressDescriptionTotalPoints, {
-                        points: courseTotalPoints,
-                      })
-                    }}</span>
-                    <omegaup-common-sort-controls
-                      column="total"
-                      :sort-order="sortOrder"
-                      :column-name="columnName"
-                      @apply-filter="onApplyFilter"
-                    ></omegaup-common-sort-controls>
-                  </span>
-                </th>
-                <th
-                  v-for="assignment in assignmentsProblems"
-                  :key="assignment.alias"
-                  class="score text-center align-middle"
-                >
-                  <span>
-                    {{ assignment.name }}
-                    <span class="d-block"
-                      >{{
+  <div class="container-fluid p-5">
+    <div class="row">
+      <div class="col-lg-10 mb-3">
+        <div class="card">
+          <div class="card-header">
+            <h2>
+              <a :href="`/course/${course.alias}/`">{{ course.name }}</a>
+            </h2>
+            <h6 class="mb-0">
+              {{
+                ui.formatString(T.studentsProgressRangeHeader, {
+                  lowCount: (page - 1) * length + 1,
+                  highCount: page * length,
+                })
+              }}
+            </h6>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-striped table-fixed mb-0 d-block">
+              <thead>
+                <tr>
+                  <th class="text-center align-middle">
+                    <span>
+                      {{ T.wordsName }}
+                      <omegaup-common-sort-controls
+                        column="student"
+                        :sort-order="sortOrder"
+                        :column-name="columnName"
+                        @apply-filter="onApplyFilter"
+                      ></omegaup-common-sort-controls>
+                    </span>
+                  </th>
+                  <th class="text-center align-middle">
+                    <span>
+                      {{ T.courseProgressGlobalScore }}
+                      <span class="d-block">{{
                         ui.formatString(
                           T.studentProgressDescriptionTotalPoints,
-                          { points: assignment.points },
+                          {
+                            points: courseTotalPoints,
+                          },
                         )
-                      }}
-                      <a
-                        v-if="assignment.points === 0"
-                        data-toggle="tooltip"
-                        rel="tooltip"
-                        :title="T.studentProgressOnlyLecturesDescription"
-                        ><img src="/media/question.png"
-                      /></a>
+                      }}</span>
+                      <omegaup-common-sort-controls
+                        column="total"
+                        :sort-order="sortOrder"
+                        :column-name="columnName"
+                        @apply-filter="onApplyFilter"
+                      ></omegaup-common-sort-controls>
                     </span>
-                  </span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <omegaup-course-student-progress
-                v-for="student in sortedStudents"
-                :key="student.username"
-                :student-progress="student"
-                :course-alias="course.alias"
-                :assignments-problems="assignmentsProblems"
-              >
-              </omegaup-course-student-progress>
-            </tbody>
-          </table>
-        </div>
-        <div class="card-footer">
-          <omegaup-common-paginator
-            :pager-items="pagerItems"
-          ></omegaup-common-paginator>
+                  </th>
+                  <th
+                    v-for="assignment in assignmentsProblems"
+                    :key="assignment.alias"
+                    class="score text-center align-middle"
+                  >
+                    <span>
+                      {{ assignment.name }}
+                      <span class="d-block"
+                        >{{
+                          ui.formatString(
+                            T.studentProgressDescriptionTotalPoints,
+                            { points: assignment.points },
+                          )
+                        }}
+                        <a
+                          v-if="assignment.points === 0"
+                          data-toggle="tooltip"
+                          rel="tooltip"
+                          :title="T.studentProgressOnlyLecturesDescription"
+                          ><img src="/media/question.png"
+                        /></a>
+                      </span>
+                    </span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <omegaup-course-student-progress
+                  v-for="student in sortedStudents"
+                  :key="student.username"
+                  :student-progress="student"
+                  :course-alias="course.alias"
+                  :assignments-problems="assignmentsProblems"
+                >
+                </omegaup-course-student-progress>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-footer">
+            <omegaup-common-paginator
+              :pager-items="pagerItems"
+            ></omegaup-common-paginator>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="col-md-2">
-      <div class="card sticky-top sticky-offset">
-        <div class="card-header p-1">
-          <p class="card-title text-sm-center mb-1">
-            {{ T.courseStudentsProgressExportToSpreadsheet }}
-          </p>
-        </div>
-        <div class="card-body">
-          <a
-            class="btn btn-primary btn-sm w-100 my-1"
-            :download="`${course.alias}.csv`"
-            :href="csvDataUrl"
-            >.csv</a
-          >
-          <a
-            class="btn btn-primary btn-sm w-100 my-1"
-            :download="`${alias}.ods`"
-            :href="odsDataUrl"
-            >.ods</a
-          >
+      <div class="col-md-2">
+        <div class="card sticky-top sticky-offset">
+          <div class="card-header p-1">
+            <p class="card-title text-sm-center mb-1">
+              {{ T.courseStudentsProgressExportToSpreadsheet }}
+            </p>
+          </div>
+          <div class="card-body">
+            <a
+              class="btn btn-primary btn-sm w-100 my-1"
+              :download="`${course.alias}.csv`"
+              :href="csvDataUrl"
+              >.csv</a
+            >
+            <a
+              class="btn btn-primary btn-sm w-100 my-1"
+              :download="`${course.alias}.ods`"
+              :href="odsDataUrl"
+              >.ods</a
+            >
+          </div>
         </div>
       </div>
     </div>
@@ -189,7 +194,9 @@ export function toOds(courseName: string, table: TableCell[][]): string {
     result += '<table:table-row>\n';
     for (const cell of row) {
       if (cell instanceof Percentage) {
-        result += `<table:table-cell office:value-type="percentage" office:value="${cell.value}"><text:p>${cell}</text:p></table:table-cell>`;
+        result += `<table:table-cell office:value-type="percentage" office:value="${
+          cell.value
+        }"><text:p>${cell.toString()}</text:p></table:table-cell>`;
       } else if (typeof cell === 'number') {
         const num: number = cell;
         result += `<table:table-cell office:value-type="float" office:value="${num}"><text:p>${num.toPrecision(
