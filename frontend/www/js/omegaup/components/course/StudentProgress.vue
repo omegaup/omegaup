@@ -152,7 +152,6 @@ export default class StudentProgress extends Vue {
       title: string;
     },
   ): string {
-    console.log(problem);
     return ui.formatString(T.studentProgressTooltipDescription, {
       problem: problem.title,
       score: this.getPointsByAssignmentProblem(assignmentAlias, problem.alias),
