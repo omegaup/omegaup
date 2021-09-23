@@ -5,7 +5,6 @@ import Vue from 'vue';
 
 OmegaUp.on('ready', function () {
   const payload = types.payloadParsers.StudentsProgressPayload();
-  console.log(payload);
 
   new Vue({
     el: '#main-container',

@@ -4,7 +4,7 @@
       <div class="card">
         <div class="card-header">
           <h2>
-            <a :href="courseUrl">{{ course.name }}</a>
+            <a :href="`/course/${course.alias}/`">{{ course.name }}</a>
           </h2>
           <h6 class="mb-0">
             {{
@@ -89,7 +89,6 @@
             :pager-items="pagerItems"
           ></omegaup-common-paginator>
         </div>
-        <!--
       </div>
     </div>
     <div class="col-md-2">
@@ -102,18 +101,18 @@
         <div class="card-body">
           <a
             class="btn btn-primary btn-sm w-100 my-1"
-            :download="csvFilename"
+            :download="`${course.alias}.csv`"
             :href="csvDataUrl"
             >.csv</a
           >
           <a
             class="btn btn-primary btn-sm w-100 my-1"
-            :download="odsFilename"
+            :download="`${alias}.ods`"
             :href="odsDataUrl"
             >.ods</a
           >
         </div>
-      --></div>
+      </div>
     </div>
   </div>
 </template>
@@ -141,7 +140,7 @@ class Percentage {
   }
 
   toString() {
-    return `${(this.value * 100).toFixed(2)}%`;
+    return `${this.value.toFixed(2)}%`;
   }
 }
 
@@ -229,22 +228,6 @@ export default class CourseViewProgress extends Vue {
   sortOrder: omegaup.SortOrder = omegaup.SortOrder.Ascending;
   columnName = 'student';
 
-  score(
-    student: types.StudentProgress,
-    assignment: omegaup.Assignment,
-  ): number {
-    if (
-      !Object.prototype.hasOwnProperty.call(student.score, assignment.alias)
-    ) {
-      return 0;
-    }
-
-    return Object.values(student.score[assignment.alias]).reduce(
-      (accumulator: number, currentValue: number) => accumulator + currentValue,
-      0,
-    );
-  }
-
   get sortedStudents(): types.StudentProgressInCourse[] {
     switch (this.columnName) {
       case 'student':
@@ -270,141 +253,121 @@ export default class CourseViewProgress extends Vue {
     }
   }
 
-  get courseUrl(): string {
-    return `/course/${this.course.alias}/`;
+  get progressTable(): TableCell[][] {
+    const table: TableCell[][] = [];
+    const header = [
+      T.profileUsername,
+      T.wordsName,
+      T.courseProgressGlobalScore,
+    ];
+    header.push();
+    for (const assignment of this.assignmentsProblems) {
+      header.push(assignment.name);
+    }
+    table.push(header);
+
+    for (const student of this.students) {
+      const row: TableCell[] = [
+        student.username,
+        student.name || '',
+        new Percentage(student.courseProgress),
+      ];
+      for (const assignment of this.assignmentsProblems) {
+        row.push(
+          assignment.alias in student.assignments
+            ? student.assignments[assignment.alias].score
+            : 0,
+        );
+      }
+      table.push(row);
+    }
+    return table;
   }
 
-  // get progressTable(): TableCell[][] {
-  //   const table: TableCell[][] = [];
-  //   const header = [T.profileUsername, T.wordsName];
-  //   header.push(T.courseProgressGlobalScore);
-  //   for (const assignment of this.assignments) {
-  //     header.push(assignment.name);
-  //   }
-  //   table.push(header);
-  //   for (const student of this.students) {
-  //     const row: TableCell[] = [student.username, student.name || ''];
-  //     row.push(this.getGlobalScoreByStudent(student));
-  //     for (const assignment of this.assignments) {
-  //       row.push(this.score(student, assignment));
-  //     }
-
-  //     table.push(row);
-  //   }
-  //   return table;
-  // }
-
-  get csvFilename(): string {
-    return `${this.course.alias}.csv`;
-  }
-
-  // get csvDataUrl() {
-  //   let table = this.progressTable;
-  //   let blob = new Blob([toCsv(table)], { type: 'text/csv;charset=utf-8;' });
-  //   return window.URL.createObjectURL(blob);
-  // }
-
-  get odsFilename(): string {
-    return `${this.course.alias}.ods`;
+  get csvDataUrl(): string {
+    return window.URL.createObjectURL(
+      new Blob([toCsv(this.progressTable)], {
+        type: 'text/csv;charset=utf-8;',
+      }),
+    );
   }
 
   get courseTotalPoints(): number {
     return this.assignmentsProblems.reduce((acc, curr) => acc + curr.points, 0);
   }
 
-  // getTotalPointsByAssignment(assignment: omegaup.Assignment): string {
-  //   return ui.formatString(T.studentProgressDescriptionTotalPoints, {
-  //     points: assignment.max_points,
-  //   });
-  // }
-
-  // getGlobalScoreByStudent(student: types.StudentProgress): Percentage {
-  //   const totalPoints = this.assignments
-  //     .map((assignment) => assignment.max_points ?? 0)
-  //     .reduce((acc, curr) => acc + curr, 0);
-  //   if (!totalPoints) {
-  //     return new Percentage(0);
-  //   }
-
-  //   return new Percentage(
-  //     this.assignments
-  //       .map((assignment) => this.score(student, assignment) / totalPoints)
-  //       .reduce((acc, curr) => acc + curr, 0),
-  //   );
-  // }
-
-  //   @AsyncComputed()
-  //   async odsDataUrl(): Promise<string> {
-  //     let zip = new JSZip();
-  //     zip.file('mimetype', 'application/vnd.oasis.opendocument.spreadsheet', {
-  //       compression: 'STORE',
-  //     });
-  //     let metaInf = zip.folder('META-INF');
-  //     let table = this.progressTable;
-  //     metaInf?.file(
-  //       'manifest.xml',
-  //       `<?xml version="1.0" encoding="UTF-8"?>
-  // <manifest:manifest
-  //     xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
-  //     manifest:version="1.2">
-  //  <manifest:file-entry manifest:full-path="/" manifest:version="1.2" manifest:media-type="application/vnd.oasis.opendocument.spreadsheet"/>
-  //  <manifest:file-entry manifest:full-path="settings.xml" manifest:media-type="text/xml"/>
-  //  <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>
-  //  <manifest:file-entry manifest:full-path="meta.xml" manifest:media-type="text/xml"/>
-  //  <manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/>
-  // </manifest:manifest>`,
-  //     );
-  //     zip.file(
-  //       'styles.xml',
-  //       `<?xml version="1.0" encoding="UTF-8"?>
-  // <office:document-styles
-  //     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  //     office:version="1.2">
-  // </office:document-styles>`,
-  //     );
-  //     zip.file(
-  //       'settings.xml',
-  //       `<?xml version="1.0" encoding="UTF-8"?>
-  // <office:document-settings
-  //     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  //     office:version="1.2">
-  // </office:document-settings>`,
-  //     );
-  //     zip.file(
-  //       'meta.xml',
-  //       `<?xml version="1.0" encoding="UTF-8"?>
-  // <office:document-meta
-  //     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  //     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
-  //     office:version="1.2">
-  //   <office:meta>
-  //     <meta:generator>omegaUp</meta:generator>
-  //   </office:meta>
-  // </office:document-meta>`,
-  //     );
-  //     zip.file(
-  //       'content.xml',
-  //       `<?xml version="1.0" encoding="UTF-8"?>
-  // <office:document-content
-  //     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  //     xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-  //     xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
-  //     office:version="1.2">
-  //   <office:body>
-  //     <office:spreadsheet>` +
-  //         toOds(this.course.name, table) +
-  //         `</office:spreadsheet>
-  //   </office:body>
-  // </office:document-content>`,
-  //     );
-  //     return window.URL.createObjectURL(
-  //       await zip.generateAsync({
-  //         type: 'blob',
-  //         mimeType: 'application/ods',
-  //         compression: 'DEFLATE',
-  //       }),
-  //     );
-  //   }
+  @AsyncComputed()
+  async odsDataUrl(): Promise<string> {
+    let zip = new JSZip();
+    zip.file('mimetype', 'application/vnd.oasis.opendocument.spreadsheet', {
+      compression: 'STORE',
+    });
+    let metaInf = zip.folder('META-INF');
+    let table = this.progressTable;
+    metaInf?.file(
+      'manifest.xml',
+      `<?xml version="1.0" encoding="UTF-8"?>
+  <manifest:manifest
+      xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
+      manifest:version="1.2">
+   <manifest:file-entry manifest:full-path="/" manifest:version="1.2" manifest:media-type="application/vnd.oasis.opendocument.spreadsheet"/>
+   <manifest:file-entry manifest:full-path="settings.xml" manifest:media-type="text/xml"/>
+   <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>
+   <manifest:file-entry manifest:full-path="meta.xml" manifest:media-type="text/xml"/>
+   <manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/>
+  </manifest:manifest>`,
+    );
+    zip.file(
+      'styles.xml',
+      `<?xml version="1.0" encoding="UTF-8"?>
+  <office:document-styles
+      xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+      office:version="1.2">
+  </office:document-styles>`,
+    );
+    zip.file(
+      'settings.xml',
+      `<?xml version="1.0" encoding="UTF-8"?>
+  <office:document-settings
+      xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+      office:version="1.2">
+  </office:document-settings>`,
+    );
+    zip.file(
+      'meta.xml',
+      `<?xml version="1.0" encoding="UTF-8"?>
+  <office:document-meta
+      xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+      xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+      office:version="1.2">
+    <office:meta>
+      <meta:generator>omegaUp</meta:generator>
+    </office:meta>
+  </office:document-meta>`,
+    );
+    zip.file(
+      'content.xml',
+      `<?xml version="1.0" encoding="UTF-8"?>
+  <office:document-content
+      xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+      xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+      xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
+      office:version="1.2">
+    <office:body>
+      <office:spreadsheet>` +
+        toOds(this.course.name, table) +
+        `</office:spreadsheet>
+    </office:body>
+  </office:document-content>`,
+    );
+    return window.URL.createObjectURL(
+      await zip.generateAsync({
+        type: 'blob',
+        mimeType: 'application/ods',
+        compression: 'DEFLATE',
+      }),
+    );
+  }
 
   onApplyFilter(columnName: string, sortOrder: string): void {
     this.columnName = columnName;
