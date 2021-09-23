@@ -5,7 +5,7 @@ import T from '../lang';
 import contest_Edit from '../components/contest/Edit.vue';
 import * as ui from '../ui';
 import * as api from '../api';
-import { toCsv, TableCell } from '../table_csv';
+import { toCsv, TableCell } from '../csv';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestEditPayload();

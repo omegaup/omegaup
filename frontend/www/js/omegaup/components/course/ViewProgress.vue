@@ -116,7 +116,7 @@ import JSZip from 'jszip';
 import common_SortControls from '../common/SortControls.vue';
 import course_StudentProgress from './StudentProgress.vue';
 import common_Paginator from '../common/Paginatorv2.vue';
-import { toCsv, TableCell, Percentage } from '../../table_csv';
+import { toCsv, TableCell, Percentage } from '../../csv';
 
 Vue.use(AsyncComputedPlugin);
 
