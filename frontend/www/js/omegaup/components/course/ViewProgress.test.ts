@@ -4,7 +4,6 @@ import { omegaup } from '../../omegaup';
 
 import course_ViewProgress, { escapeXml, toOds } from './ViewProgress.vue';
 import type { types } from '../../api_types';
-import { escapeCsv, toCsv } from '../../csv';
 
 describe('ViewProgress.vue', () => {
   if (typeof window.URL.createObjectURL === 'undefined') {
