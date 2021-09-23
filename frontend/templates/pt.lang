@@ -1108,6 +1108,7 @@ qualityNominationProblemHasBeenPromoted = "Este problema foi promovido. Você n�
 qualityNominationProblemHasWarning = "Este problema tem um aviso. Você não pode atualizar sua visibilidade."
 qualityNominationRateProblem = "Avaliar o problema"
 qualityNominationRateProblemDesc = "Se você quiser avaliar o problema mais tarde, clique no link \"Avaliar o problema\""
+qualityNominationReportedBy = "Reportado por"
 qualityNominationResolutionSuccess = "Nomeação resolvido com sucesso."
 qualityNominationReviewerHasAlreadySentNominationForProblem = "Uma nomeação já foi enviada para este problema"
 qualityNominationShowAll = "Mostre também as Nomeações resolvidas"

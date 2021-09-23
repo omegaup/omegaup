@@ -1110,6 +1110,7 @@ const translations: { [key: string]: string; } = {
   qualityNominationProblemHasWarning: "This problem has a warning. You cannot update its visibility.",
   qualityNominationRateProblem: "Rate problem",
   qualityNominationRateProblemDesc: "If you want to rate the problem later, click on \"Rate problem\" link",
+  qualityNominationReportedBy: "Reported by",
   qualityNominationResolutionSuccess: "Quality nomination successfully resolved.",
   qualityNominationReviewerHasAlreadySentNominationForProblem: "Reviewer has already sent nomination for problem",
   qualityNominationShowAll: "Also show resolved nominations",
