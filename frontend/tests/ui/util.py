@@ -310,6 +310,7 @@ def assert_no_js_errors(
 def create_problem(
         driver,
         problem_alias: str,
+        *,
         resource_path: str = 'frontend/tests/resources/triangulos.zip',
         private: bool = False,
 ) -> None:
