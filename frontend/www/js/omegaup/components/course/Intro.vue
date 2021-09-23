@@ -1,4 +1,9 @@
 <template>
+  <div>
+    <div class="card-header p-5">
+      <h2 class="text-center mb-4">{{ name }}</h2>
+      <omegaup-markdown :full-width="true" :markdown="description"></omegaup-markdown>
+    </div>
   <div class="card">
     <div class="card-header">
       <h2 class="card-title">{{ T.courseDetails }}</h2>
@@ -122,6 +127,7 @@
         ></omegaup-markdown>
       </template>
     </div>
+  </div>
   </div>
 </template>
 
