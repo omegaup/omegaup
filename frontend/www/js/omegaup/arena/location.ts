@@ -38,11 +38,11 @@ export function getOptionsFromLocation(location: string): LocationOptions {
         maxScore: 0,
         hasRuns: false,
       };
+      response.problemAlias = match?.groups?.alias;
       if (match.groups.popup === 'new-run') {
         response.popupDisplayed = PopupDisplayed.RunSubmit;
       } else if (match.groups.popup?.startsWith('show-run')) {
         response.guid = match.groups.popup.split(':')[1];
-        response.problemAlias = response.problem.alias;
         response.popupDisplayed = PopupDisplayed.RunDetails;
       }
       break;

@@ -34,21 +34,28 @@ OmegaUp.on('ready', async () => {
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
   const { guid, problemAlias } = getOptionsFromLocation(window.location.hash);
-  const runDetailsResponse: { runDetails: null | types.RunDetails } = {
-    runDetails: null,
-  };
-  const problemDetailsResponse: { problemInfo: null | types.ProblemDetails } = {
-    problemInfo: null,
-  };
+  let runDetails: null | types.RunDetails = null;
+  let problemDetails: null | types.ProblemDetails = null;
   if (problemAlias) {
-    await getProblemDetails({
-      problemAlias,
-      contestAlias: payload.contest.alias,
-      problems: payload.problems,
-      response: problemDetailsResponse,
-    });
-    if (guid) {
-      await getRunDetails({ guid, response: runDetailsResponse });
+    try {
+      [problemDetails, runDetails] = await Promise.all([
+        api.Problem.details({
+          problem_alias: problemAlias,
+          prevent_problemset_open: false,
+          contest_alias: payload.contest.alias,
+        }),
+        guid ? api.Run.details({ run_alias: guid }) : Promise.resolve(null),
+      ]);
+      for (const run of problemDetails.runs ?? []) {
+        trackRun({ run });
+      }
+      const currentProblem = payload.problems?.find(
+        ({ alias }: { alias: string }) => alias === problemDetails?.alias,
+      );
+      problemDetails.title = currentProblem?.text ?? '';
+      problemsStore.commit('addProblem', problemDetails);
+    } catch (e) {
+      ui.apiError(e);
     }
   }
   trackClarifications(payload.clarifications);
@@ -65,8 +72,8 @@ OmegaUp.on('ready', async () => {
       guid: null as null | string,
       problemAlias: null as null | string,
       isAdmin: false,
-      nextSubmissionTimestamp:
-        problemDetailsResponse.problemInfo?.nextSubmissionTimestamp,
+      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      runDetailsData: runDetails,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
@@ -86,6 +93,7 @@ OmegaUp.on('ready', async () => {
           isAdmin: this.isAdmin,
           runs: myRunsStore.state.runs,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          runDetailsData: this.runDetailsData,
         },
         on: {
           'navigate-to-problem': ({
@@ -197,54 +205,6 @@ OmegaUp.on('ready', async () => {
   // on the `navigate-to-problem` callback being invoked, and that is
   // not the case if this is set a priori.
   Object.assign(contestPractice, getOptionsFromLocation(window.location.hash));
-
-  async function getRunDetails({
-    guid,
-    response,
-  }: {
-    guid: string;
-    response: { runDetails: null | types.RunDetails };
-  }): Promise<void> {
-    return api.Run.details({ run_alias: guid })
-      .then((runDetails) => {
-        response.runDetails = runDetails;
-      })
-      .catch((error) => {
-        ui.apiError(error);
-      });
-  }
-
-  async function getProblemDetails({
-    problemAlias,
-    contestAlias,
-    problems,
-    response,
-  }: {
-    problemAlias: string;
-    contestAlias: string;
-    problems: types.NavbarProblemsetProblem[];
-    response: { problemInfo: null | types.ProblemInfo };
-  }): Promise<void> {
-    return api.Problem.details({
-      problem_alias: problemAlias,
-      prevent_problemset_open: false,
-      contest_alias: contestAlias,
-    })
-      .then((problemInfo) => {
-        for (const run of problemInfo.runs ?? []) {
-          trackRun({ run });
-        }
-        const currentProblem = problems?.find(
-          ({ alias }: { alias: string }) => alias === problemInfo.alias,
-        );
-        problemInfo.title = currentProblem?.text ?? '';
-        response.problemInfo = problemInfo;
-        problemsStore.commit('addProblem', problemInfo);
-      })
-      .catch(() => {
-        ui.dismissNotifications();
-      });
-  }
 
   setInterval(() => {
     refreshContestClarifications({
