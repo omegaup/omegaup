@@ -3,48 +3,23 @@
     <div class="card-body">
       <div class="mb-4">
         <omegaup-markdown :markdown="T.teamsGroupsCsvHelp"></omegaup-markdown>
-        <div class="card">
-          <div class="container">
-            <div class="row">
-              <div class="col-sm form-check m-4">
-                {{ T.groupsUploadCsvFile }}
-                <input
-                  name="identities"
-                  type="file"
-                  accept=".csv,.txt"
-                  @change="readCsv"
-                />
-              </div>
-              <div class="col-sm form-check my-4">
-                <div class="container">
-                  <h5 class="row">
-                    {{ T.teamsGroupTeamsAdvancedOptions }}
-                  </h5>
-                  <div class="row">
-                    <label class="form-check-label">
-                      <input
-                        v-model="humanReadable"
-                        class="form-check-input"
-                        type="checkbox"
-                      />
-                      {{ T.passwordHumanReadable }}
-                    </label>
-                  </div>
-                  <div class="row">
-                    <label class="form-check-label">
-                      <input
-                        v-model="selfGeneratedIdentities"
-                        class="form-check-input"
-                        type="checkbox"
-                      />
-                      {{ T.teamsGroupTeamsSelfGenerateIdentities }}
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="form-check mb-4">
+          <label class="form-check-label">
+            <input
+              v-model="humanReadable"
+              class="form-check-input"
+              type="checkbox"
+            />
+            {{ T.passwordHumanReadable }}
+          </label>
         </div>
+        {{ T.groupsUploadCsvFile }}
+        <input
+          name="identities"
+          type="file"
+          accept=".csv,.txt"
+          @change="readCsv"
+        />
       </div>
       <template v-if="identities.length > 0">
         <h3 class="card-header">{{ T.teamsGroupEditTeams }}</h3>
@@ -66,13 +41,38 @@
           <template #row-details="row">
             <b-form @submit.prevent="onAddUsers(row)">
               <b-card>
-                <b-table
-                  responsive
-                  striped
-                  hover
-                  :items="row.item.usernames"
-                  :fields="identitiesColumns"
-                ></b-table>
+                <b-row class="mb-2">
+                  <b-col sm="3" class="text-sm-right">
+                    <b>{{ T.teamsGroupUsernames }}:</b>
+                  </b-col>
+                  <b-col>
+                    <b-badge
+                      v-for="username of row.item.usernames"
+                      :key="username"
+                      variant="primary"
+                      class="ml-2"
+                    >
+                      {{ username }}
+                    </b-badge>
+                  </b-col>
+                </b-row>
+                <b-row>
+                  <omegaup-common-multi-typeahead
+                    :existing-options="searchResultUsers"
+                    :value.sync="typeaheadUsers"
+                    @update-existing-options="
+                      (query) => $emit('update-search-result-users', query)
+                    "
+                  >
+                  </omegaup-common-multi-typeahead>
+                  <b-button
+                    type="submit"
+                    variant="primary"
+                    class="d-inline-block mb-2"
+                  >
+                    {{ T.teamsGroupAddUsersDone }}
+                  </b-button>
+                </b-row>
               </b-card>
             </b-form>
           </template>
@@ -145,13 +145,11 @@ library.add(faDownload, faUserPlus);
 export default class Upload extends Vue {
   @Prop({ default: null }) userErrorRow!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
-  @Prop() numberOfContestants!: number;
 
   T = T;
   identities: types.Identity[] = [];
   identitiesTeams: { [team: string]: string[] } = {};
   humanReadable = false;
-  selfGeneratedIdentities = false;
   typeaheadUsers: types.ListItem[] = [];
   columns = [
     {
@@ -161,15 +159,12 @@ export default class Upload extends Vue {
       isRowHeader: true,
     },
     { key: 'name', label: T.profile },
+    { key: 'password', label: T.loginPassword },
     { key: 'country_id', label: T.profileCountry },
     { key: 'state_id', label: T.profileState },
     { key: 'gender', label: T.wordsGender },
     { key: 'school_name', label: T.profileSchool },
     { key: 'usernames', label: T.teamsGroupUsernames },
-  ];
-  identitiesColumns = [
-    { key: 'username', label: T.profileUsername },
-    { key: 'password', label: T.loginPassword },
   ];
 
   get items() {
@@ -198,8 +193,6 @@ export default class Upload extends Vue {
       identities: this.identities,
       file: file,
       humanReadable: this.humanReadable,
-      selfGeneratedIdentities: this.selfGeneratedIdentities,
-      numberOfContestants: this.numberOfContestants,
     });
   }
 

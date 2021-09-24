@@ -1,7 +1,6 @@
 import { mount, shallowMount } from '@vue/test-utils';
 
 import { dao, types } from '../../api_types';
-import T from '../../lang';
 
 import teamsgroup_Teams, { AvailableForms } from './Teams.vue';
 import identity_Edit from '../identity/Edit.vue';
@@ -42,9 +41,9 @@ describe('Members.vue', () => {
       },
     });
 
-    expect(wrapper.find('.empty-table-message').text()).toBe(
-      T.teamsGroupTeamsEmptyList,
-    );
+    expect(
+      wrapper.find('table[data-table-identities] tbody').text(),
+    ).toBeFalsy();
   });
 
   it('Should handle a list of teams as identities', () => {

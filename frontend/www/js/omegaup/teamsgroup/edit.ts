@@ -175,7 +175,7 @@ OmegaUp.on('ready', () => {
               team_identities: JSON.stringify(
                 identities.map((identity) => ({
                   ...identity,
-                  usernames: JSON.stringify(identitiesTeams[identity.username]),
+                  usernames: identitiesTeams[identity.username].join(';'),
                 })),
               ),
               team_group_alias: payload.teamGroup.alias,
@@ -229,7 +229,7 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'download-teams': (identities: types.Identity[]) => {
+          'download-identities': (identities: types.Identity[]) => {
             downloadCsvFile({
               fileName: `identities_${payload.teamGroup.alias}.csv`,
               columns: [
@@ -250,17 +250,11 @@ OmegaUp.on('ready', () => {
             identities,
             file,
             humanReadable,
-            selfGeneratedIdentities,
-            numberOfContestants,
           }: {
-            identitiesTeams: {
-              [team: string]: { username: string; password?: string }[];
-            };
+            identitiesTeams: { [team: string]: string[] };
             identities: types.Identity[];
             file: File;
             humanReadable: boolean;
-            selfGeneratedIdentities: boolean;
-            numberOfContestants: number;
           }) => {
             CSV.fetch({ file }).done((dataset: CSV.Dataset) => {
               if (!dataset.fields) {
@@ -294,27 +288,9 @@ OmegaUp.on('ready', () => {
                   gender: gender ?? 'decline',
                   usernames,
                 });
-                const members: { username: string; password?: string }[] =
-                  usernames?.split(';').map((user) => ({ username: user })) ??
-                  [];
-
-                const group = payload.teamGroup.alias;
-                if (selfGeneratedIdentities) {
-                  const numberOfExistingUsers = members.length;
-                  const numberOfContestantsToGenerate =
-                    numberOfContestants - numberOfExistingUsers;
-                  for (let i = 0; i < numberOfContestantsToGenerate; i++) {
-                    members.push({
-                      username: `${group}:${username}_identity_${i}`,
-                      password: humanReadable
-                        ? generateHumanReadablePassword()
-                        : generatePassword(),
-                    });
-                  }
-                }
                 identitiesTeams[
                   `teams:${payload.teamGroup.alias}:${username}`
-                ] = members;
+                ] = usernames?.split(';') ?? [];
               }
               ui.dismissNotifications();
               this.userErrorRow = null;
