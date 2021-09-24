@@ -182,6 +182,7 @@ export default class ArenaContest extends Vue {
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
   @Prop({ default: null }) guid!: null | string;
+  @Prop({ default: null }) problemAlias!: null | string;
   @Prop() miniRankingUsers!: omegaup.UserRank[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
   @Prop() rankingChartOptions!: Highcharts.Options;
@@ -201,6 +202,21 @@ export default class ArenaContest extends Vue {
   shouldShowRunDetails = false;
   nextSubmissionTimestamp: Date | null = null;
   now = new Date();
+
+  mounted() {
+    this.$nextTick(() => {
+      if (this.guid) {
+        this.$emit('show-run', {
+          request: {
+            guid: this.guid,
+            isAdmin: this.isAdmin,
+            problemAlias: this.problemAlias,
+          },
+          target: this,
+        });
+      }
+    });
+  }
 
   get socketClass(): string {
     if (this.socketStatus === SocketStatus.Connected) {
@@ -273,14 +289,14 @@ export default class ArenaContest extends Vue {
     this.currentClarifications = newValue;
   }
 
-  @Watch('popupDisplayed')
+  /*@Watch('popupDisplayed')
   onPopupDisplayedChanged(newValue: PopupDisplayed): void {
     if (newValue === PopupDisplayed.RunDetails) {
       this.$nextTick(() => {
         this.shouldShowRunDetails = true;
       });
     }
-  }
+  }*/
 }
 </script>
 
