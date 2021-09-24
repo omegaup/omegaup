@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="card-header p-5">
+    <div class="card-header pb-4 px-5 pt-5">
       <h2 class="text-center mb-4">{{ course.name }}</h2>
       <omegaup-markdown
         :full-width="true"
@@ -20,7 +20,7 @@
           :markdown="T.courseBasicInformationNeeded"
           :full-width="true"
         ></omegaup-markdown>
-        <template v-if="requestsUserInformation != 'no'">
+        <template v-if="course.requests_user_information != 'no'">
           <omegaup-markdown
             :markdown="statements.privacy.markdown || ''"
             :full-width="true"
@@ -89,130 +89,17 @@
         ></omegaup-markdown>
       </template>
     </div>
-    <div class="card">
-      <div class="card-header">
-        <h2 class="card-title">{{ T.courseDetails }}</h2>
+    <div class="mt-4">
+      <div class="mb-4">
+        <h5 class="intro-subtitle pb-1">{{ T.courseIntroWhatYouWillLearn }}</h5>
+        <omegaup-markdown
+          :markdown="course.objective"
+          :full-width="true"
+        ></omegaup-markdown>
       </div>
-      <div class="card-body text-center">
-        <h2 name="name">{{ course.name }}</h2>
-        <omegaup-markdown :markdown="course.description"></omegaup-markdown>
-        <div v-if="course !== null" class="my-4 card align-to-markdown">
-          <h5 class="card-header">{{ T.wordsContent }}</h5>
-          <div class="table-responsive">
-            <table class="table table-striped table-hover mb-0">
-              <thead>
-                <tr>
-                  <th class="text-center" scope="col">
-                    {{ T.wordsContentType }}
-                  </th>
-                  <th class="text-center" scope="col">{{ T.wordsName }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="!course.assignments.length">
-                  <td class="empty-table-message" colspan="2">
-                    {{ T.courseContentEmpty }}
-                  </td>
-                </tr>
-                <tr
-                  v-for="assignment in course.assignments"
-                  v-else
-                  :key="assignment.alias"
-                >
-                  <td class="text-center">
-                    <template v-if="assignment.assignment_type === 'homework'">
-                      <font-awesome-icon icon="file-alt" />
-                      <span class="ml-2">{{ T.wordsHomework }}</span>
-                    </template>
-                    <template
-                      v-else-if="assignment.assignment_type === 'lesson'"
-                    >
-                      <font-awesome-icon icon="chalkboard-teacher" />
-                      <span class="ml-2">{{ T.wordsLesson }}</span>
-                    </template>
-                    <template v-else>
-                      <font-awesome-icon icon="list-alt" />
-                      <span class="ml-2">{{ T.wordsExam }}</span>
-                    </template>
-                  </td>
-                  <td>
-                    <span>{{ assignment.name }}</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <template
-          v-if="userRegistrationRequested === null || userRegistrationAccepted"
-        >
-          <omegaup-markdown
-            v-if="needsBasicInformation"
-            :markdown="T.courseBasicInformationNeeded"
-          ></omegaup-markdown>
-          <template v-if="requestsUserInformation != 'no'">
-            <omegaup-markdown
-              :markdown="statements.privacy.markdown || ''"
-            ></omegaup-markdown>
-            <omegaup-radio-switch
-              :value.sync="shareUserInformation"
-              :selected-value="shareUserInformation"
-              class="align-to-markdown"
-            ></omegaup-radio-switch>
-          </template>
-          <template v-if="shouldShowAcceptTeacher">
-            <omegaup-markdown
-              :markdown="statements.acceptTeacher.markdown || ''"
-            ></omegaup-markdown>
-            <omegaup-radio-switch
-              :value.sync="acceptTeacher"
-              :selected-value="acceptTeacher"
-              name="accept-teacher"
-              class="align-to-markdown"
-            ></omegaup-radio-switch>
-          </template>
-          <div class="text-center mt-3">
-            <form v-if="loggedIn" @submit.prevent="onSubmit">
-              <button
-                class="btn btn-primary btn-lg"
-                name="start-course-submit"
-                type="submit"
-                :disabled="isButtonDisabled"
-              >
-                {{ T.startCourse }}
-              </button>
-            </form>
-            <a
-              v-else
-              class="btn btn-primary"
-              :href="`/login/?redirect=${encodeURIComponent(
-                window.location.pathname,
-              )}`"
-              >{{ T.loginLogIn }}</a
-            >
-          </div>
-        </template>
-        <template v-else>
-          <form
-            v-if="!userRegistrationRequested"
-            @submit.prevent="$emit('request-access-course')"
-          >
-            <omegaup-markdown
-              :markdown="T.mustRegisterToJoinCourse"
-            ></omegaup-markdown>
-            <button type="submit" class="btn btn-primary btn-lg">
-              {{ T.registerForCourse }}
-            </button>
-          </form>
-          <omegaup-markdown
-            v-else-if="!userRegistrationAnswered"
-            :markdown="T.registrationPendingCourse"
-          ></omegaup-markdown>
-          <omegaup-markdown
-            v-else
-            :markdown="T.registrationDenied"
-          ></omegaup-markdown>
-        </template>
+      <div v-if="course.school_id && course.school_name">
+        <h5 class="intro-subtitle pb-1 mb-2">{{ T.courseIntroImpartedBy }}</h5>
+        {{ course.school_name }}
       </div>
     </div>
   </div>
@@ -292,5 +179,11 @@ export default class CourseIntro extends Vue {
 @import '../../../../sass/main.scss';
 .course-level {
   color: $omegaup-pink;
+}
+
+h5.intro-subtitle {
+  color: $omegaup-grey;
+  width: 20rem;
+  border-bottom: 4px solid $omegaup-primary--accent;
 }
 </style>
