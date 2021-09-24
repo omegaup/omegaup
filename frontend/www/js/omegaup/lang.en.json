@@ -377,6 +377,7 @@
 	"courseHomepageStudentsSectionContent": "**Students**\n\n- Get instant feedback on their solutions.\n- Learn professional skills.\n- Access public online courses 24/7.\n",
 	"courseHomepageTeachersSectionContent": "**Professors**\n\n- Choose from more than 2000 problems for their assignments and exams in their courses.\n- Follow the student's progress in real-time.\n- Identify areas where students are struggling.\n",
 	"courseHomepageTitle": "Discovering and preparing the talent of Latin America",
+	"courseIntroLevel": "Level: %(level)",
 	"courseInvalidStartTime": "The start time must be before the end time.",
 	"courseLevelAdvanced": "Advanced",
 	"courseLevelIntermediate": "Intermediate",

@@ -378,6 +378,7 @@ const translations: { [key: string]: string; } = {
   courseHomepageStudentsSectionContent: "**Estudiantes**\n\n- Obtienen retroalimentaci\u00f3n autom\u00e1tica de sus soluciones.\n- Aprenden habilidades que les servir\u00e1n en su vida profesional.\n- Acceden a cursos en l\u00ednea 24/7.\n",
   courseHomepageTeachersSectionContent: "**Docentes**\n\n- Acceden y usar m\u00e1s de 2000 problemas de calidad para utilizar como tareas y ex\u00e1menes.\n- Observan el avance de sus estudiantes.\n- Identifican los temas que se est\u00e1n complicando a sus estudiantes.\n",
   courseHomepageTitle: "Descubriendo y preparando el talento de Latinoam\u00e9rica",
+  courseIntroLevel: "Nivel: %(level)",
   courseInvalidStartTime: "La fecha de inicio debe ser antes que la fecha de fin",
   courseLevelAdvanced: "Avanzado",
   courseLevelIntermediate: "Intermedio",

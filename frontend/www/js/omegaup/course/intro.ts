@@ -19,11 +19,8 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-course-intro', {
         props: {
-          course: payload.details,
-          name: payload.name,
-          description: payload.description,
+          course: payload.course,
           needsBasicInformation: payload.needsBasicInformation,
-          requestsUserInformation: payload.requestsUserInformation,
           shouldShowAcceptTeacher: payload.shouldShowAcceptTeacher,
           statements: payload.statements,
           userRegistrationRequested: this.userRegistrationRequested,
@@ -34,7 +31,7 @@ OmegaUp.on('ready', () => {
         on: {
           submit: (source: course_Intro) => {
             api.Course.addStudent({
-              course_alias: payload.alias,
+              course_alias: payload.course.alias,
               usernameOrEmail: headerPayload.currentUsername,
               share_user_information: source.shareUserInformation,
               accept_teacher: source.acceptTeacher,
@@ -44,12 +41,12 @@ OmegaUp.on('ready', () => {
               statement_type: payload.statements.privacy?.statementType,
             })
               .then(() => {
-                window.location.replace(`/course/${payload.alias}/`);
+                window.location.replace(`/course/${payload.course.alias}/`);
               })
               .catch(ui.apiError);
           },
           'request-access-course': () => {
-            api.Course.registerForCourse({ course_alias: payload.alias })
+            api.Course.registerForCourse({ course_alias: payload.course.alias })
               .then(() => {
                 courseIntro.userRegistrationRequested = true;
               })
