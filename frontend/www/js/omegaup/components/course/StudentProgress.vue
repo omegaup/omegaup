@@ -24,7 +24,9 @@
       class="flex-column text-center align-middle text-nowrap justify-content-center align-items-center"
     >
       <span class="d-block">{{
-        getProgressByAssignment(assignment.alias)
+        assignment.points === 0
+          ? T.courseWithoutProblems
+          : getProgressByAssignment(assignment.alias)
       }}</span>
       <span class="d-block">{{ getPointsByAssignment(assignment.alias) }}</span>
       <div class="d-flex justify-content-center mt-1">

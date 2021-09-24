@@ -161,7 +161,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
+        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
             $courseData['course']->course_id,
             $courseData['course']->group_id,
             1,
@@ -322,7 +322,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
+        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
             $course->course_id,
             $course->group_id,
             1,
@@ -410,7 +410,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $resultsWithExtraProblem = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
+        $resultsWithExtraProblem = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
             $course->course_id,
             $course->group_id,
             1,
@@ -532,7 +532,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
+        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
             $courseData['course']->course_id,
             $courseData['course']->group_id,
             1,
