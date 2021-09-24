@@ -53,7 +53,7 @@
       <thead>
         <tr>
           <th scope="col">#</th>
-          <th scope="col">{{ T.wordsUser }}</th>
+          <th scope="col">{{ T.contestParticipant }}</th>
           <th scope="col" class="text-right">{{ T.rankScore }}</th>
           <th v-if="!isIndex" scope="col" class="text-right">
             {{ T.rankSolved }}
