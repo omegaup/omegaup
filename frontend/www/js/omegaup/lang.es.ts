@@ -1236,7 +1236,7 @@ const translations: { [key: string]: string; } = {
   teamsGroupUsernames: "Usuarios",
   teamsGroupsCanNotBeAddedInNormalContest: "No se pueden agregar grupos de equipos en concursos normales",
   teamsGroupsCreateNew: "Crear nuevo grupo de equipos",
-  teamsGroupsCsvHelp: "## Agrega r\u00e1pidamente m\u00faltiples identidades como equipo a este grupo. Las identidades no son usuarios reales y no necesitan tener un correo electr\u00f3nico o validar su cuenta.\n\n## Las identidades deben estar en un archivo <code>.csv</code> con el siguiente formato:\n<samp><pre>username,name,country_id,state_id,gender,school_name\nteam-1,Team 1,MX,AGU,decline,Best School\nteam-2,Teams 2,MX,AGU,other,Best School</pre></samp>",
+  teamsGroupsCsvHelp: "## Agrega r\u00e1pidamente m\u00faltiples identidades como equipo a este grupo. Las identidades no son usuarios reales y no necesitan tener un correo electr\u00f3nico o validar su cuenta.\n\n## Las identidades deben estar en un archivo `.csv` con el siguiente formato:\n```\nusername,name,country_id,state_id,gender,school_name\nteam-1,Team 1,MX,AGU,decline,Best School\nteam-2,Teams 2,MX,AGU,other,Best School\n```\n\n[\u2139\ufe0f M\u00e1s informaci\u00f3n](https://blog.omegaup.com/administracion-de-identidades/)",
   teamsGroupsErrorFieldIsNotPresentInCsv: "Algunos campos requeridos no fueron encontrados en el archivo csv: %(missingFields)",
   teamsGroupsErrorFieldIsRequired: "El campo %(field) es requerido.",
   titleInUse: "El t\u00edtulo ya est\u00e1 siendo usado. Por favor elige un t\u00edtulo distinto.",

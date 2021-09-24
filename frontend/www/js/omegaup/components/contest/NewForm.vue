@@ -65,15 +65,17 @@
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormStartDate }}</label>
-            <omegaup-datepicker v-model="dates.startTime"></omegaup-datepicker>
+            <omegaup-datetimepicker
+              v-model="startTime"
+            ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormStartDateDesc }}</p>
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormEndDate }}</label>
-            <omegaup-datepicker
+            <omegaup-datetimepicker
               v-model="finishTime"
               :is-invalid="invalidParameterName === 'finish_time'"
-            ></omegaup-datepicker>
+            ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormEndDateDesc }}</p>
           </div>
         </div>
@@ -309,14 +311,14 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import common_Typeahead from '../common/Typeahead.vue';
-import DatePicker from '../DatePicker.vue';
+import DateTimePicker from '../DateTimePicker.vue';
 import Multiselect from 'vue-multiselect';
 import { types } from '../../api_types';
 
 @Component({
   components: {
     'omegaup-common-typeahead': common_Typeahead,
-    'omegaup-datepicker': DatePicker,
+    'omegaup-datetimepicker': DateTimePicker,
     Multiselect,
   },
 })
@@ -371,7 +373,6 @@ export default class NewForm extends Vue {
   currentContestForTeams = this.contestForTeams;
   currentTeamsGroupAlias = this.teamsGroupAlias;
   titlePlaceHolder = '';
-  dates = { startTime: this.startTime, finishTime: this.finishTime };
 
   @Watch('windowLengthEnabled')
   onPropertyChange(newValue: boolean): void {
