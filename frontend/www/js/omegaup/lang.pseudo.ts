@@ -333,6 +333,7 @@ const translations: { [key: string]: string; } = {
   courseAssignmentProblemsEmpty: "(N0 pr0b13m5)",
   courseAssignmentReorder: "(R30rd3r c0n73n7 fr0m c0ur53)",
   courseAssignmentStartDateBeforeCourseStartDate: "(Th3 57ar7 da73 i5 pr3vi0u5 70 7h3 c0ur53 57ar7 da73)",
+  courseAssignmentTitle: "(%(courseName) - %(assignmentName))",
   courseAssignmentUpdated: "(C0n73n7 upda73d 5ucc355fu11y!)",
   courseBasicInformationNeeded: "(T0 j0in 7h3 c0ur53 y0u mu57 fi11 in y0ur ba5ic inf0rma7i0n. G0 70 [My pr0fi13](/pr0fi13/3di7/))",
   courseCardAboutCourses: "(Ab0u7 c0ur535)",

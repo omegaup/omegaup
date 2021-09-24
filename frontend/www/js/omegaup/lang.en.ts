@@ -333,6 +333,7 @@ const translations: { [key: string]: string; } = {
   courseAssignmentProblemsEmpty: "No problems",
   courseAssignmentReorder: "Reorder content from course",
   courseAssignmentStartDateBeforeCourseStartDate: "The start date is previous to the course start date",
+  courseAssignmentTitle: "%(courseName) - %(assignmentName)",
   courseAssignmentUpdated: "Content updated successfully!",
   courseBasicInformationNeeded: "To join the course you must fill in your basic information. Go to [My profile](/profile/edit/)",
   courseCardAboutCourses: "About courses",

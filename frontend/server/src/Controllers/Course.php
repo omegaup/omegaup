@@ -3727,7 +3727,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the course and specific assignment details
      *
-     * @return array{smartyProperties: array{payload: AssignmentDetailsPayload, fullWidth: bool, title: string}, inContest: bool, entrypoint: string}
+     * @return array{smartyProperties: array{payload: AssignmentDetailsPayload, fullWidth: bool, title: \OmegaUp\TranslationString}, inContest: bool, entrypoint: string}
      */
     private static function getAssignmentDetails(
         \OmegaUp\DAO\VO\Identities $currentIdentity,
@@ -3830,7 +3830,13 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                 ],
                 'fullWidth' => true,
-                'title' => strval($assignment->name),
+                'title' => new \OmegaUp\TranslationString(
+                    'courseAssignmentTitle',
+                    [
+                        'courseName' => $course->name,
+                        'assignmentName' => $assignment->name,
+                    ],
+                ),
             ],
             // Navbar is only hidden during exams.
             'inContest' => $assignment->assignment_type === 'test',
@@ -3951,7 +3957,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Refactor of apiIntroDetails in order to be called from php files and APIs
      *
-     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload|AssignmentDetailsPayload, title: \OmegaUp\TranslationString|string}}
+     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload|AssignmentDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $assignment_alias
      * @omegaup-request-param string $course_alias
