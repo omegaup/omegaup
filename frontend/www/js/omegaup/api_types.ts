@@ -55,6 +55,10 @@ export namespace dao {
     birth_date?: string;
     facebook_user_id?: string;
     git_token?: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
     hide_problem_tags?: boolean;
     in_mailing_list?: boolean;
     is_private?: boolean;
