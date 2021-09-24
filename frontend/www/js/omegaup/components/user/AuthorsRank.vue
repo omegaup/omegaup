@@ -13,7 +13,7 @@
         <thead>
           <tr>
             <th scope="col">#</th>
-            <th scope="col">{{ T.wordsAuthor }}</th>
+            <th scope="col">{{ T.contentCreator }}</th>
             <th scope="col" class="text-right">{{ T.rankScore }}</th>
           </tr>
         </thead>
