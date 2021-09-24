@@ -3,6 +3,11 @@
     <div class="card-body">
       <div class="mb-4">
         <omegaup-markdown :markdown="T.teamsGroupsCsvHelp"></omegaup-markdown>
+        <div class="w-100 text-right">
+          <a href="https://blog.omegaup.com/administracion-de-identidades/">
+            {{ T.teamsGroupsCsvHelpMoreInfo }}
+          </a>
+        </div>
         <div class="card">
           <div class="container">
             <div class="row">
