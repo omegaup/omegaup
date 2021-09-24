@@ -10,7 +10,7 @@
         <a href="/course/home/">{{ T.wordsReadMore }}</a>
       </div>
     </div>
-    <div class="container-lg">
+    <div class="container-fluid">
       <template v-for="(typeCourses, accessMode) in courses">
         <div v-if="typeCourses.activeTab !== ''" :key="accessMode" class="row">
           <div class="col-lg-5 p-3 d-flex" :class="accessMode">

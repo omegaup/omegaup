@@ -23,7 +23,9 @@ import {
   refreshCourseClarifications,
   trackClarifications,
 } from './clarifications';
+import { EventsSocket } from './events_socket';
 import clarificationStore from './clarificationsStore';
+import socketStore from './socketStore';
 import { myRunsStore, runsStore } from './runsStore';
 
 OmegaUp.on('ready', () => {
@@ -79,6 +81,7 @@ OmegaUp.on('ready', () => {
           allRuns: runsStore.state.runs,
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
+          socketStatus: socketStore.state.socketStatus,
         },
         on: {
           'navigate-to-problem': ({
@@ -91,6 +94,7 @@ OmegaUp.on('ready', () => {
               problem,
               target: arenaCourse,
               problems: this.problems,
+              problemsetId: payload.currentAssignment.problemset_id,
             });
           },
           'show-run': (request: SubmissionRequest) => {
@@ -115,6 +119,7 @@ OmegaUp.on('ready', () => {
             problem: types.NavbarProblemsetProblem;
           }) => {
             api.Run.create({
+              problemset_id: payload.currentAssignment.problemset_id,
               problem_alias: problem.alias,
               language: language,
               source: code,
@@ -174,8 +179,6 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          // TODO: Implement the API to search users from course, for
-          // 'update-search-result-users-contest';
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
           },
@@ -221,6 +224,72 @@ OmegaUp.on('ready', () => {
             }
             window.location.replace(`#${request.selectedTab}/${request.alias}`);
           },
+          'submit-promotion': ({
+            solved,
+            tried,
+            quality,
+            difficulty,
+            tags,
+          }: {
+            solved: boolean;
+            tried: boolean;
+            quality: string;
+            difficulty: string;
+            tags: string[];
+          }) => {
+            const contents: {
+              before_ac?: boolean;
+              difficulty?: number;
+              quality?: number;
+              tags?: string[];
+            } = {};
+            if (!solved && tried) {
+              contents.before_ac = true;
+            }
+            if (difficulty !== '') {
+              contents.difficulty = Number.parseInt(difficulty, 10);
+            }
+            if (tags.length > 0) {
+              contents.tags = tags;
+            }
+            if (quality !== '') {
+              contents.quality = Number.parseInt(quality, 10);
+            }
+            api.QualityNomination.create({
+              problem_alias: this.problemInfo?.alias,
+              nomination: 'suggestion',
+              contents: JSON.stringify(contents),
+            })
+              .then(() => {
+                this.popupDisplayed = PopupDisplayed.None;
+                ui.reportEvent('quality-nomination', 'submit');
+                ui.dismissNotifications();
+              })
+              .catch(ui.apiError);
+          },
+          'dismiss-promotion': (
+            solved: boolean,
+            tried: boolean,
+            isDismissed: boolean,
+          ) => {
+            const contents: { before_ac?: boolean } = {};
+            if (!solved && tried) {
+              contents.before_ac = true;
+            }
+            if (!isDismissed) {
+              return;
+            }
+            api.QualityNomination.create({
+              problem_alias: this.problemInfo?.alias,
+              nomination: 'dismissal',
+              contents: JSON.stringify(contents),
+            })
+              .then(() => {
+                ui.reportEvent('quality-nomination', 'dismiss');
+                ui.info(T.qualityNominationRateProblemDesc);
+              })
+              .catch(ui.apiError);
+          },
         },
       });
     },
@@ -251,6 +320,21 @@ OmegaUp.on('ready', () => {
     arenaCourse.guid = showRunMatch?.[1] ?? null;
     arenaCourse.popupDisplayed = PopupDisplayed.RunDetails;
   }
+
+  const socket = new EventsSocket({
+    disableSockets: false,
+    problemsetAlias: payload.courseDetails.alias,
+    locationProtocol: window.location.protocol,
+    locationHost: window.location.host,
+    problemsetId: payload.currentAssignment.problemset_id,
+    scoreboardToken: null,
+    clarificationsOffset: 1,
+    clarificationsRowcount: 30,
+    navbarProblems: arenaCourse.problems,
+    currentUsername: commonPayload.currentUsername,
+    intervalInMilliseconds: 5 * 60 * 1000,
+  });
+  socket.connect();
 
   setInterval(() => {
     refreshCourseClarifications({
