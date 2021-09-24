@@ -11,6 +11,7 @@ describe('Course.vue', () => {
     assignment_type: 'homework',
     description: 'Descripción de la tarea de prueba',
     director: 'Director',
+    problemset_id: 1,
     finish_time: new Date(),
     name: 'Tarea de prueba',
     start_time: new Date(),
