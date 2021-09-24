@@ -262,6 +262,7 @@
                 <div class="dropdown-menu">
                   <button
                     v-if="showDetails"
+                    data-run-details
                     class="btn-link dropdown-item"
                     @click="$emit('details', run)"
                   >
@@ -269,6 +270,7 @@
                   </button>
                   <button
                     v-if="showRejudge"
+                    data-actions-rejudge
                     class="btn-link dropdown-item"
                     @click="$emit('rejudge', run)"
                   >
@@ -277,6 +279,7 @@
                   <div class="dropdown-divider"></div>
                   <button
                     v-if="showDisqualify"
+                    data-actions-disqualify
                     class="btn-link dropdown-item"
                     @click="$emit('disqualify', run)"
                   >

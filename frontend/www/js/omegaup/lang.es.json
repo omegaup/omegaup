@@ -332,6 +332,7 @@
 	"courseAssignmentProblemsEmpty": "No hay problemas",
 	"courseAssignmentReorder": "Reordenar contenido del curso",
 	"courseAssignmentStartDateBeforeCourseStartDate": "La fecha de inicio es previa a la fecha de inicio del curso",
+	"courseAssignmentTitle": "%(courseName) - %(assignmentName)",
 	"courseAssignmentUpdated": "Se actualiz\u00f3 exitosamente",
 	"courseBasicInformationNeeded": "Para unirte al curso debes completar tu informaci\u00f3n b\u00e1sica. Ir a [Mi perfil](/profile/edit/)",
 	"courseCardAboutCourses": "Acerca de cursos",
