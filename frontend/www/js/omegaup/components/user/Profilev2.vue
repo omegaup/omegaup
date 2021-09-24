@@ -1,5 +1,8 @@
 <template>
   <div class="container-fluid p-0 mt-0" data-user-profile-root>
+    <h1 v-if="!profile.is_own_profile && profile.is_private">
+      {{ ui.info(T.userProfileIsPrivate) }}
+    </h1>
     <div class="row">
       <div class="col-md-2">
         <div class="card">
@@ -33,7 +36,10 @@
                 </small>
               </p>
             </div>
-            <div class="mb-3">
+            <div
+              v-if="profile.is_own_profile || !profile.is_private"
+              class="mb-3"
+            >
               <h4 class="m-0">
                 {{ Object.keys(solvedProblems).length }}
               </h4>
@@ -41,7 +47,13 @@
                 <small>{{ T.profileSolvedProblems }}</small>
               </p>
             </div>
-            <div v-if="profile.preferred_language" class="mb-3">
+            <div
+              v-if="
+                profile.preferred_language &&
+                (profile.is_own_profile || !profile.is_private)
+              "
+              class="mb-3"
+            >
               <h5 class="m-0">
                 {{
                   profile.programming_languages[
@@ -54,7 +66,7 @@
               </p>
             </div>
           </div>
-          <div v-if="profile.email" class="mb-3 text-center">
+          <div v-if="profile.is_own_profile" class="mb-3 text-center">
             <a class="btn btn-primary btn-sm" href="/profile/edit/">{{
               T.profileEdit
             }}</a>
@@ -66,6 +78,7 @@
           <div class="card-header">
             <nav class="nav nav-tabs" role="tablist">
               <a
+                v-if="profile.is_own_profile || !profile.is_private"
                 class="nav-item nav-link active"
                 data-toggle="tab"
                 @click="selectedTab = 'badges'"
@@ -76,12 +89,14 @@
                 </span>
               </a>
               <a
+                v-if="profile.is_own_profile || !profile.is_private"
                 class="nav-item nav-link"
                 data-toggle="tab"
                 @click="selectedTab = 'problems'"
                 >{{ T.wordsProblems }}</a
               >
               <a
+                v-if="profile.is_own_profile || !profile.is_private"
                 class="nav-item nav-link"
                 data-toggle="tab"
                 @click="selectedTab = 'contests'"
@@ -98,6 +113,7 @@
                 >{{ T.profilePersonalData }}</a
               >
               <a
+                v-if="profile.is_own_profile || !profile.is_private"
                 class="nav-item nav-link"
                 data-toggle="tab"
                 @click="selectedTab = 'charts'"
@@ -210,6 +226,7 @@ import badge_List from '../badge/List.vue';
 import common_GridPaginator from '../common/GridPaginator.vue';
 import { types } from '../../api_types';
 import * as Highcharts from 'highcharts/highstock';
+import * as ui from '../../ui';
 import { Problem, ContestResult } from '../../linkable_resource';
 
 @Component({
@@ -223,37 +240,39 @@ import { Problem, ContestResult } from '../../linkable_resource';
   },
 })
 export default class UserProfile extends Vue {
-  @Prop() data!: types.ExtraProfileDetails;
+  @Prop() data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
-  contests = this.data.contests
-    ? Object.values(this.data.contests)
-        .map((contest) => {
-          const now = new Date();
-          if (contest.place === null || now <= contest.data.finish_time) {
-            return null;
-          }
-          return new ContestResult(contest);
-        })
-        .filter((contest) => !!contest)
-    : [];
-  charts = this.data.stats;
+  contests = Object.values(
+    this.data?.contests ?? ({} as types.UserProfileContests),
+  )
+    .map((contest) => {
+      const now = new Date();
+      if (contest.place === null || now <= contest.data.finish_time) {
+        return null;
+      }
+      return new ContestResult(contest);
+    })
+    .filter((contest) => Boolean(contest));
+  charts: types.UserProfileStats[] = this.data?.stats ?? [];
   T = T;
+  ui = ui;
   columns = 3;
-  selectedTab = 'badges';
+  selectedTab =
+    !this.profile.is_own_profile && this.profile.is_private ? 'data' : 'badges';
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
 
   get createdProblems(): Problem[] {
-    if (!this.data.createdProblems) return [];
+    if (!this.data?.createdProblems) return [];
     return this.data.createdProblems.map((problem) => new Problem(problem));
   }
   get unsolvedProblems(): Problem[] {
-    if (!this.data.unsolvedProblems) return [];
+    if (!this.data?.unsolvedProblems) return [];
     return this.data.unsolvedProblems.map((problem) => new Problem(problem));
   }
   get solvedProblems(): Problem[] {
-    if (!this.data.solvedProblems) return [];
+    if (!this.data?.solvedProblems) return [];
     return this.data.solvedProblems.map((problem) => new Problem(problem));
   }
   get rank(): string {

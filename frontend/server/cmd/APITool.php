@@ -944,7 +944,26 @@ EOD;
     }
 
     public function generatePythonApi(): void {
-        echo "\"\"\"A Python implementation of the omegaUp API.\"\"\"\n";
+        echo "\"\"\"A Python implementation of an omegaUp API client.\n";
+        echo "\n";
+        echo "The [omegaUp\n";
+        echo "API](https://github.com/omegaup/omegaup/blob/master/frontend/server/src/Controllers/README.md)\n";
+        echo "allows calling it using an API token (see the docs for `User.createAPIToken`)\n";
+        echo "that does not expire.  This API token can then be provided to the `Client`\n";
+        echo "constructor, which will then allow accessing the rest of the API functions.\n";
+        echo "\n";
+        echo "Sample usage:\n";
+        echo "\n";
+        echo "```python\n";
+        echo "import pprint\n";
+        echo "\n";
+        echo "import omegaup.api\n";
+        echo "\n";
+        echo "client = api.Client(api_token='my API token')\n";
+        echo "session = client.session.currentSession()\n";
+        echo "pprint.pprint(session)\n";
+        echo "```\n";
+        echo "\"\"\"\n";
         echo "import datetime\n";
         echo "import logging\n";
         echo "import urllib.parse\n";

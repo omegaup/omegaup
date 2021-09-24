@@ -159,13 +159,19 @@ class ProblemParams {
 
     /**
      * @readonly
+     * @var string|null
+     */
+    public $groupScorePolicy;
+
+    /**
+     * @readonly
      * @var bool
      */
     public $allowUserAddTags;
 
     /**
      * @psalm-suppress RedundantConditionGivenDocblockType
-     * @param array{allow_user_add_tags?: bool, email_clarifications?: bool, extra_wall_time?: int, input_limit?: int, languages?: string, memory_limit?: int, order?: string, output_limit?: int, overall_wall_time_limit?: int, problem_alias: string, problem_level?: string, selected_tags?: string, show_diff?: string, source?: string, time_limit?: int, title?: string, update_published?: \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS, validator?: \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL, validator_time_limit?: int, visibility?: \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED} $params
+     * @param array{allow_user_add_tags?: bool, email_clarifications?: bool, extra_wall_time?: int, group_score_policy?: string, input_limit?: int, languages?: string, memory_limit?: int, order?: string, output_limit?: int, overall_wall_time_limit?: int, problem_alias: string, problem_level?: string, selected_tags?: string, show_diff?: string, source?: string, time_limit?: int, title?: string, update_published?: \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS, validator?: \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL, validator_time_limit?: int, visibility?: \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED} $params
      */
     public function __construct($params, bool $isRequired = true) {
         $isUpdate = !$isRequired;
@@ -193,6 +199,13 @@ class ProblemParams {
                 $params['show_diff'],
                 'show_diff',
                 ['none', 'examples', 'all']
+            );
+        }
+        if (isset($params['group_score_policy'])) {
+            \OmegaUp\Validators::validateInEnum(
+                $params['group_score_policy'],
+                'group_score_policy',
+                ['sum-if-not-zero', 'min']
             );
         }
         if (isset($params['validator'])) {
@@ -287,6 +300,7 @@ class ProblemParams {
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
         $this->order = $params['order'] ?? 'normal';
         $this->showDiff = $params['show_diff'] ?? 'none';
+        $this->groupScorePolicy = $params['group_score_policy'] ?? null;
     }
 
     /**

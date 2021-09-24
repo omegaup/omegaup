@@ -17,7 +17,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ConsentStatement=array{contest_alias: string, privacy_git_object_id?: string, share_user_information: bool|null, statement_type?: string}
  * @psalm-type Clarification=array{answer: null|string, assignment_alias?: null|string, author: null|string, clarification_id: int, contest_alias?: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
- * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, is_extra_problem: bool, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type Signature=array{email: string, name: string, time: \OmegaUp\Timestamp}
  * @psalm-type ProblemVersion=array{author: Signature, commit: string, committer: Signature, message: string, parents: list<string>, tree: array<string, string>, version: string}
  * @psalm-type ProblemsetProblemWithVersions=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, languages: string, letter?: string, order: int, points: float, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, versions: array{log: list<ProblemVersion>, published: string}, visibility: int, visits: int}
@@ -43,7 +43,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
- * @psalm-type ContestDetailsPayload=array{adminPayload?: array{allRuns: list<Run>, users: list<ContestUser>}, clarifications: list<Clarification>, contest: ContestPublicDetails, problems: list<NavbarProblemsetProblem>, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null}
+ * @psalm-type ContestDetailsPayload=array{adminPayload?: array{allRuns: list<Run>, users: list<ContestUser>}, clarifications: list<Clarification>, contest: ContestPublicDetails, original?: array{contest: \OmegaUp\DAO\VO\Contests, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>}, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardEvents: list<ScoreboardEvent>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null}
+ * @psalm-type ContestPracticeDetailsPayload=array{adminPayload?: array{allRuns: list<Run>, users: list<ContestUser>}, clarifications: list<Clarification>, contest: ContestPublicDetails, original?: array{contest: \OmegaUp\DAO\VO\Contests, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>}, problems: list<NavbarProblemsetProblem>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
@@ -755,6 +756,46 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $result['smartyProperties']['title'] = new \OmegaUp\TranslationString(
                 'omegaupTitleContest'
             );
+
+            if (!empty($contest->rerun_id)) {
+                $originalContest = \OmegaUp\DAO\Contests::getByPK(
+                    $contest->rerun_id
+                );
+                if (
+                    is_null(
+                        $originalContest
+                    ) || is_null(
+                        $originalContest->problemset_id
+                    )
+                ) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'contestNotFound'
+                    );
+                }
+                $originalProblemset = \OmegaUp\DAO\Problemsets::getByPK(
+                    $contest->problemset_id
+                );
+                if (is_null($originalProblemset)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'contestNotFound'
+                    );
+                }
+                $result['smartyProperties']['payload']['original'] = [
+                    'contest' => $originalContest,
+                    'scoreboard' => self::getScoreboard(
+                        $originalContest,
+                        $originalProblemset,
+                        $r->identity
+                    ),
+                    'scoreboardEvents' => self::getScoreboardEvents(
+                        $originalContest,
+                        $r->identity
+                    ),
+                ];
+                $result['entrypoint'] = 'arena_contest_virtual';
+                return $result;
+            }
+
             $result['entrypoint'] = 'arena_contest_contestant';
             return $result;
         }
@@ -805,7 +846,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Get all the properties for smarty when user access to a contest in
      * practice mode.
      *
-     * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: ContestDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: ContestPracticeDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $contest_alias
      */

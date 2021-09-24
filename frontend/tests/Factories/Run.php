@@ -2,6 +2,8 @@
 
 namespace OmegaUp\Test\Factories;
 
+use OmegaUp\Exceptions\NotFoundException;
+
 /**
  * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
  * @psalm-type InteractiveSettingsDistrib=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
@@ -58,14 +60,13 @@ class Run {
      * Builds and returns a request object to be used for \OmegaUp\Controllers\Run::apiCreate
      *
      * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
-     * @param array{admin: \OmegaUp\DAO\VO\Identities, assignment: \OmegaUp\DAO\VO\Assignments|null, assignment_alias: string, course: \OmegaUp\DAO\VO\Courses, course_alias: string, problemset_id: int|null, request: \OmegaUp\Request} $courseAssignmentData
      * @param \OmegaUp\DAO\VO\Identities $participant
      * @param string $language
      * @return \OmegaUp\Request
      */
     private static function createRequestCourseAssignmentCommon(
         $problemData,
-        $courseAssignmentData,
+        ?\OmegaUp\DAO\VO\Assignments $assignment,
         $participant,
         \OmegaUp\Test\ScopedLoginToken $login = null,
         $language = 'c11-gcc'
@@ -75,7 +76,7 @@ class Run {
             $login = \OmegaUp\Test\ControllerTestCase::login($participant);
         }
         // Build request
-        if (is_null($courseAssignmentData['assignment'])) {
+        if (is_null($assignment)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'assignmentNotFound'
             );
@@ -83,7 +84,7 @@ class Run {
 
         return new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'problemset_id' => $courseAssignmentData['assignment']->problemset_id,
+            'problemset_id' => $assignment->problemset_id,
             'problem_alias' => $problemData['problem']->alias,
             'language' => $language,
             'source' => self::RUN_SOLUTIONS[$language],
@@ -106,28 +107,107 @@ class Run {
         $participant,
         $language = 'c11-gcc'
     ): array {
+        if (!is_string($courseAssignmentData['request']['course_alias'])) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'course_alias'
+            );
+        }
+
+        if (!is_string($courseAssignmentData['request']['alias'])) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'alias'
+            );
+        }
+
         // Our participant has to open the course before sending a run
         \OmegaUp\Test\Factories\Course::openCourse(
-            $courseAssignmentData,
+            strval($courseAssignmentData['request']['course_alias']),
             $participant
         );
 
         // Our participant has to open the assignment in a course before sending a run
         \OmegaUp\Test\Factories\Course::openAssignmentCourse(
-            $courseAssignmentData,
+            strval($courseAssignmentData['request']['course_alias']),
+            strval($courseAssignmentData['request']['alias']),
             $participant
         );
 
         // Then we need to open the problem
         \OmegaUp\Test\Factories\Course::openProblemInCourseAssignment(
-            $courseAssignmentData,
+            strval($courseAssignmentData['request']['course_alias']),
+            strval($courseAssignmentData['request']['alias']),
             $problemData,
             $participant
         );
 
         $r = self::createRequestCourseAssignmentCommon(
             $problemData,
-            $courseAssignmentData,
+            $courseAssignmentData['assignment'],
+            $participant,
+            /*$login=*/ null,
+            $language
+        );
+
+        // Call API
+        $response = \OmegaUp\Controllers\Run::apiCreate($r);
+
+        return [
+            'request' => $r,
+            'participant' => $participant,
+            'response' => $response
+        ];
+    }
+
+    /**
+     * Creates a run
+     *
+     * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
+     * @param \OmegaUp\DAO\VO\Identities $participant
+     * @param string $language
+     *
+     * @return array{participant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}}
+     */
+    public static function createAssignmentRun(
+        string $courseAlias,
+        string $assignmentAlias,
+        $problemData,
+        $participant,
+        $language = 'c11-gcc'
+    ): array {
+        // Our participant has to open the course before sending a run
+        \OmegaUp\Test\Factories\Course::openCourse(
+            $courseAlias,
+            $participant
+        );
+
+        // Our participant has to open the assignment in a course before sending a run
+        \OmegaUp\Test\Factories\Course::openAssignmentCourse(
+            $courseAlias,
+            $assignmentAlias,
+            $participant
+        );
+
+        // Then we need to open the problem
+        \OmegaUp\Test\Factories\Course::openProblemInCourseAssignment(
+            $courseAlias,
+            $assignmentAlias,
+            $problemData,
+            $participant
+        );
+
+        $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
+        if (is_null($course)) {
+            throw new NotFoundException('courseNotFound');
+        }
+
+        $r = self::createRequestCourseAssignmentCommon(
+            $problemData,
+            \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+                $assignmentAlias,
+                intval($course->course_id)
+            ),
             $participant,
             /*$login=*/ null,
             $language
@@ -160,7 +240,7 @@ class Run {
         // Our contestant has to open the contest before sending a run
         if (!$inPracticeMode) {
             \OmegaUp\Test\Factories\Contest::openContest(
-                $contestData,
+                $contestData['contest'],
                 $contestant
             );
         }

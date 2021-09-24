@@ -278,9 +278,11 @@ CREATE TABLE `Courses` (
   `course_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `description` tinytext NOT NULL,
+  `objective` text,
   `alias` varchar(32) NOT NULL,
   `group_id` int NOT NULL,
   `acl_id` int NOT NULL,
+  `level` enum('introductory','intermediate','advanced') DEFAULT NULL,
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este curso',
   `finish_time` timestamp NULL DEFAULT NULL,
   `admission_mode` enum('private','registration','public') NOT NULL DEFAULT 'private' COMMENT 'Modalidad en la que se registra un curso.',
@@ -736,6 +738,7 @@ CREATE TABLE `Problemset_Problems` (
   `version` char(40) NOT NULL COMMENT 'El hash SHA1 del árbol de la rama private.',
   `points` double NOT NULL DEFAULT '1',
   `order` int NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparición de los problemas en una lista de problemas',
+  `is_extra_problem` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`problemset_id`,`problem_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `problem_id` (`problem_id`),
@@ -1038,12 +1041,12 @@ CREATE TABLE `Team_Groups` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Team_Users` (
   `team_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  PRIMARY KEY (`team_id`,`user_id`),
+  `identity_id` int NOT NULL COMMENT 'Id de la identidad que pertenece al equipo',
+  PRIMARY KEY (`team_id`,`identity_id`),
   KEY `team_id` (`team_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `fk_tut_team_id` FOREIGN KEY (`team_id`) REFERENCES `Teams` (`team_id`),
-  CONSTRAINT `fk_tuu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+  KEY `identity_id` (`identity_id`),
+  CONSTRAINT `fk_tui_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
+  CONSTRAINT `fk_tut_team_id` FOREIGN KEY (`team_id`) REFERENCES `Teams` (`team_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

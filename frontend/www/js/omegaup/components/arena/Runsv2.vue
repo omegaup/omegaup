@@ -21,7 +21,10 @@
               &lt;
             </button>
             {{ filterOffset + 1 }}
-            <button :disabled="runs.length < rowCount" @click="filterOffset++">
+            <button
+              :disabled="runs && runs.length < rowCount"
+              @click="filterOffset++"
+            >
               &gt;
             </button>
 
@@ -100,7 +103,7 @@
 
             <template v-if="showUser">
               <label
-                >{{ T.wordsUser }}:
+                >{{ T.contestParticipant }}:
                 <omegaup-common-typeahead
                   :existing-options="searchResultUsers"
                   :value.sync="filterUsername"
@@ -135,7 +138,7 @@
           <tr>
             <th>{{ T.wordsTime }}</th>
             <th>GUID</th>
-            <th v-if="showUser">{{ T.wordsUser }}</th>
+            <th v-if="showUser">{{ T.contestParticipant }}</th>
             <th v-if="showContest">{{ T.wordsContest }}</th>
             <th v-if="showProblem">{{ T.wordsProblem }}</th>
             <th>{{ T.wordsStatus }}</th>
@@ -349,7 +352,7 @@ export default class Runsv2 extends Vue {
   @Prop({ default: null }) problemsetProblems!: types.ProblemsetProblem[];
   @Prop({ default: null }) username!: string | null;
   @Prop({ default: 100 }) rowCount!: number;
-  @Prop() runs!: types.Run[];
+  @Prop() runs!: null | types.Run[];
   @Prop({ default: false }) globalRuns!: boolean;
   @Prop() searchResultUsers!: types.ListItem[];
 
@@ -407,6 +410,9 @@ export default class Runsv2 extends Vue {
   }
 
   get sortedRuns(): types.Run[] {
+    if (!this.runs) {
+      return [];
+    }
     return this.runs
       .slice()
       .sort((a, b) => b.time.getTime() - a.time.getTime());
@@ -428,7 +434,7 @@ export default class Runsv2 extends Vue {
 
   // eslint-disable-next-line no-undef -- This is defined in TypeScript.
   initProblemAutocomplete(el: JQuery<HTMLElement>) {
-    if (this.problemsetProblems.length !== 0) {
+    if (this.problemsetProblems !== null) {
       typeahead.problemsetProblemTypeahead(
         el,
         () => this.problemsetProblems,

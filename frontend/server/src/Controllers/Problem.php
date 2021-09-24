@@ -12,8 +12,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type InteractiveSettingsDistrib=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
  * @psalm-type ProblemStatement=array{images: array<string, string>, sources: array<string, string>, language: string, markdown: string}
  * @psalm-type InteractiveInterface=array{MakefileRules: list<array{Targets: list<string>, Requisites: list<string>, Compiler: string, Params: string, Debug: bool}>, ExecutableDescription: array{Args: list<string>, Env: array<string, string>}, Files: array<string, string>}
- * @psalm-type ProblemSettings=array{Cases: list<array{Cases: list<array{Name: string, Weight: float}>, Name: string}>, Limits: LimitsSettings, Slow: bool, Validator: array{Lang?: string, Limits?: LimitsSettings, Name: string, Tolerance: float}, Interactive?: array{Interfaces: array<string, array<string, InteractiveInterface>>, Templates: array<string, string>, Main: string, ModuleName: string, ParentLang: string, LibinteractiveVersion: string}}
- * @psalm-type ProblemSettingsDistrib=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettingsDistrib, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, name: string, tolerance?: float}}
+ * @psalm-type ProblemSettings=array{Cases: list<array{Cases: list<array{Name: string, Weight: float}>, Name: string}>, Limits: LimitsSettings, Slow: bool, Validator: array{GroupScorePolicy?: string, Lang?: string, Limits?: LimitsSettings, Name: string, Tolerance: float}, Interactive?: array{Interfaces: array<string, array<string, InteractiveInterface>>, Templates: array<string, string>, Main: string, ModuleName: string, ParentLang: string, LibinteractiveVersion: string}}
+ * @psalm-type ProblemSettingsDistrib=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettingsDistrib, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, group_score_policy?: string, name: string, tolerance?: float}}
  * @psalm-type ProblemsetterInfo=array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}
  * @psalm-type SettingLimits=array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}
  * @psalm-type ProblemInfo=array{accepts_submissions: boolean, commit: string, alias: string, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, points: float, preferred_language: null|string, problem_id: int, problemsetter: ProblemsetterInfo|null, quality_seal: bool, sample_input: null|string, settings: ProblemSettingsDistrib, source: null|string, statement: ProblemStatement, title: string, visibility: int}
@@ -32,10 +32,10 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type Signature=array{email: string, name: string, time: \OmegaUp\Timestamp}
  * @psalm-type ProblemVersion=array{author: Signature, commit: string, committer: Signature, message: string, parents: list<string>, tree: array<string, string>, version: string}
- * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, groupScorePolicy: null|string, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
  * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, allRuns?: list<Run>, clarifications?: list<Clarification>, histogram: Histogram, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus?: string, solvers: list<BestSolvers>, user: UserInfoForProblem}
- * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, groupScorePolicy: null|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemListPayload=array{selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
@@ -120,6 +120,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $problem_level
      * @omegaup-request-param null|string $selected_tags
      * @omegaup-request-param null|string $show_diff
+     * @omegaup-request-param null|string $group_score_policy
      * @omegaup-request-param null|string $source
      * @omegaup-request-param mixed $time_limit
      * @omegaup-request-param null|string $title
@@ -208,6 +209,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $showDiff = $r->ensureOptionalString('show_diff');
         if (!is_null($showDiff)) {
             $params['show_diff'] = $showDiff;
+        }
+        $groupScorePolicy = $r->ensureOptionalString('group_score_policy');
+        if (!is_null($groupScorePolicy)) {
+            $params['group_score_policy'] = $groupScorePolicy;
         }
         if (!is_null($r['allow_user_add_tags'])) {
             $params['allow_user_add_tags'] = $r->ensureOptionalBool(
@@ -422,6 +427,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $problem_level
      * @omegaup-request-param null|string $selected_tags
      * @omegaup-request-param null|string $show_diff
+     * @omegaup-request-param null|string $group_score_policy
      * @omegaup-request-param null|string $source
      * @omegaup-request-param mixed $time_limit
      * @omegaup-request-param null|string $title
@@ -1200,6 +1206,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $redirect
      * @omegaup-request-param null|string $selected_tags
      * @omegaup-request-param null|string $show_diff
+     * @omegaup-request-param null|string $group_score_policy
      * @omegaup-request-param null|string $source
      * @omegaup-request-param mixed $time_limit
      * @omegaup-request-param null|string $title
@@ -1377,8 +1384,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Returns whether $a and $b are different.
      *
-     * @param array{Limits: LimitsSettings, Slow: bool, Validator: array{Lang?: string, Limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, Name: string, Tolerance: float}} $a
-     * @param array{Limits: LimitsSettings, Slow: bool, Validator: array{Lang?: string, Limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, Name: string, Tolerance: float}} $b
+     * @param array{Limits: LimitsSettings, Slow: bool, Validator: array{GroupScorePolicy?: string, Lang?: string, Limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, Name: string, Tolerance: float}} $a
+     * @param array{Limits: LimitsSettings, Slow: bool, Validator: array{GroupScorePolicy?: string, Lang?: string, Limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, Name: string, Tolerance: float}} $b
      */
     private static function diffProblemSettings(array $a, array $b): bool {
         if (self::diffLimitsSettings($a['Limits'], $b['Limits'])) {
@@ -1397,6 +1404,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
             isset($a['Validator']['Tolerance']) &&
             isset($b['Validator']['Tolerance']) &&
             $a['Validator']['Tolerance'] !== $b['Validator']['Tolerance']
+        ) {
+            return true;
+        }
+        if (
+            isset($a['Validator']['GroupScorePolicy']) !==
+            isset($b['Validator']['GroupScorePolicy'])
+        ) {
+            return true;
+        }
+        if (
+            isset($a['Validator']['GroupScorePolicy']) &&
+            isset($b['Validator']['GroupScorePolicy']) &&
+            $a['Validator']['GroupScorePolicy'] !== $b['Validator']['GroupScorePolicy']
         ) {
             return true;
         }
@@ -1456,6 +1476,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ],
             'showDiff' => [
                 'alias' => 'show_diff',
+            ],
+            'groupScorePolicy' => [
+                'alias' => 'group_score_policy',
             ],
             'allowUserAddTags' => [
                 'alias' => 'allow_user_add_tags',
@@ -1764,6 +1787,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $problem_level
      * @omegaup-request-param null|string $selected_tags
      * @omegaup-request-param null|string $show_diff
+     * @omegaup-request-param null|string $group_score_policy
      * @omegaup-request-param null|string $source
      * @omegaup-request-param string $statement
      * @omegaup-request-param mixed $time_limit
@@ -1859,6 +1883,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $problem_level
      * @omegaup-request-param null|string $selected_tags
      * @omegaup-request-param null|string $show_diff
+     * @omegaup-request-param null|string $group_score_policy
      * @omegaup-request-param string $solution
      * @omegaup-request-param null|string $source
      * @omegaup-request-param mixed $time_limit
@@ -4238,7 +4263,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Updates the Problem's settings with the values from the request.
      *
-     * @param array{Limits: LimitsSettings, Slow: bool, Validator: array{Lang?: string, Limits?: LimitsSettings, Name: string, Tolerance: float}} $problemSettings the original problem settings.
+     * @param array{Limits: LimitsSettings, Slow: bool, Validator: array{GroupScorePolicy?: string, Lang?: string, Limits?: LimitsSettings, Name: string, Tolerance: float}} $problemSettings the original problem settings.
      * @param \OmegaUp\ProblemParams $params the params
      * @psalm-suppress ReferenceConstraintViolation for some reason, psalm cannot correctly infer the type for $problemSettings['Validator']['Limit']
      */
@@ -4264,6 +4289,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!is_null($params->validator)) {
             $problemSettings['Validator']['Name'] = "{$params->validator}";
         }
+        if (!is_null($params->groupScorePolicy)) {
+            $problemSettings['Validator']['GroupScorePolicy'] = "{$params->groupScorePolicy}";
+        }
         if ($problemSettings['Validator']['Name'] === 'custom') {
             if (
                 empty(
@@ -4278,7 +4306,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'TimeLimit' => '30s',
                 ];
             }
-            $problemSettings['Validator']['Limits']['TimeLimit'] = "{$params->validatorTimeLimit}ms";
+            if (!is_null($params->validatorTimeLimit)) {
+                $problemSettings['Validator']['Limits']['TimeLimit'] = "{$params->validatorTimeLimit}ms";
+            }
         } else {
             if (!empty($problemSettings['Validator']['Limits'])) {
                 unset($problemSettings['Validator']['Limits']);
@@ -4599,7 +4629,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ProblemListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: ProblemListPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
      *
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param mixed $language
@@ -4690,6 +4720,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblems'
                 ),
+                'fullWidth' => true,
             ],
             'entrypoint' => 'problem_list',
         ];
@@ -4812,6 +4843,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $request
      * @omegaup-request-param null|string $selected_tags
      * @omegaup-request-param null|string $show_diff
+     * @omegaup-request-param null|string $group_score_policy
      * @omegaup-request-param null|string $source
      * @omegaup-request-param mixed $time_limit
      * @omegaup-request-param null|string $title
@@ -4988,7 +5020,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, inputLimit: int, languages: string, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemsetter?: ProblemsetterInfo, showDiff: string, source: string, statement: ProblemStatement, timeLimit: float, title: string, validator: string, validatorTimeLimit: float|int, visibility: int}
+     * @return array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupScorePolicy: null|string, inputLimit: int, languages: string, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemsetter?: ProblemsetterInfo, showDiff: string, source: string, statement: ProblemStatement, timeLimit: float, title: string, validator: string, validatorTimeLimit: float|int, visibility: int}
      */
     private static function getProblemEditDetails(
         \OmegaUp\DAO\VO\Problems $problem,
@@ -5017,6 +5049,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'alias' => $details['alias'],
             'source' => $details['source'] ?? '',
             'showDiff' => $details['show_diff'],
+            'groupScorePolicy' => $validatorSettings['group_score_policy'] ?? null,
             'visibility' => $details['visibility'],
             'emailClarifications' => $details['email_clarifications'],
             'allowUserAddTags' => $details['allow_user_add_tags'],
@@ -5067,6 +5100,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $request
      * @omegaup-request-param null|string $selected_tags
      * @omegaup-request-param null|string $show_diff
+     * @omegaup-request-param null|string $group_score_policy
      * @omegaup-request-param null|string $source
      * @omegaup-request-param null|string $time_limit
      * @omegaup-request-param null|string $title
@@ -5148,6 +5182,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                 'showDiff' => $r->ensureOptionalString(
                                     'show_diff'
                                 ) ?? '',
+                                'groupScorePolicy' => $r->ensureOptionalString(
+                                    'group_score_policy'
+                                ),
                                 'timeLimit' => $r->ensureOptionalString(
                                     'time_limit'
                                 ) ?? '',
@@ -5210,6 +5247,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'selectedTags' => null,
                         'allowUserAddTags' => true,
                         'showDiff' => 'none',
+                        'groupScorePolicy' => null,
                         'timeLimit' => 1000,
                         'validatorTimeLimit' => 1000,
                         'overallWallTimeLimit' => 60000,
@@ -5740,7 +5778,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      *
-     * @return array{smartyProperties: array{payload: CollectionDetailsByLevelPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: CollectionDetailsByLevelPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
      *
      * @omegaup-request-param string $level
      * @omegaup-request-param null|string $difficulty
@@ -5761,6 +5799,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $sort_order
      */
     public static function getCollectionsDetailsByLevelForTypeScript(\OmegaUp\Request $r): array {
+        // Authenticate request
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing, we allow unauthenticated users to use this API
+            $r->identity = null;
+        }
+
         $collectionLevel = $r->ensureString('level');
 
         $frequentTags = [];
@@ -5840,6 +5886,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCollectionsByLevel'
                 ),
+                'fullWidth' => true,
             ],
             'entrypoint' => 'problem_collection_list',
         ];
@@ -5968,7 +6015,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      *
-     * @return array{smartyProperties: array{payload: CollectionDetailsByAuthorPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: CollectionDetailsByAuthorPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
      *
      * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
@@ -5988,6 +6035,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $sort_order
      */
     public static function getCollectionsDetailsByAuthorForTypeScript(\OmegaUp\Request $r): array {
+        // Authenticate request
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing, we allow unauthenticated users to use this API
+            $r->identity = null;
+        }
+
         $authorsRanking = [];
 
         $offset = $r->ensureOptionalInt('offset');
@@ -6060,6 +6115,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCollectionsByAuthor'
                 ),
+                'fullWidth' => true,
             ],
             'entrypoint' => 'problem_collection_list_by_author',
         ];

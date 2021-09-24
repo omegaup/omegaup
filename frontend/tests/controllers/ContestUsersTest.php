@@ -43,7 +43,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         // the list of contest's users.
         ['user' => $nonRegisteredUser, 'identity' => $nonRegisteredIdentity] = \OmegaUp\Test\Factories\User::createUser();
         \OmegaUp\Test\Factories\Contest::openContest(
-            $contestData,
+            $contestData['contest'],
             $nonRegisteredIdentity
         );
 
@@ -76,7 +76,10 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
 
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        \OmegaUp\Test\Factories\Contest::openContest($contestData, $identity);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contestData['contest'],
+            $identity
+        );
 
         $userLogin = self::login($identity);
         \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([

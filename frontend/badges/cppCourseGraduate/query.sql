@@ -43,5 +43,6 @@ HAVING
         INNER JOIN
             Problemset_Problems psp ON psp.problemset_id = ps.problemset_id
         WHERE
-            c.alias = 'introduccion_a_cpp'
+            c.alias = 'introduccion_a_cpp' AND
+            psp.is_extra_problem = 0
     );
