@@ -229,18 +229,30 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'download-teams': (identities: types.Identity[]) => {
+          'download-teams': (
+            identities: {
+              country_id?: string;
+              gender?: string;
+              name?: string;
+              password?: string;
+              school_name?: string;
+              state_id?: string;
+              username: string;
+              participant_username: string;
+              participant_password?: string;
+            }[],
+          ) => {
             downloadCsvFile({
               fileName: `identities_${payload.teamGroup.alias}.csv`,
               columns: [
                 'username',
                 'name',
-                'password',
                 'country_id',
                 'state_id',
                 'gender',
                 'school_name',
-                'usernames',
+                'participant_username',
+                'participant_password',
               ],
               records: identities,
             });

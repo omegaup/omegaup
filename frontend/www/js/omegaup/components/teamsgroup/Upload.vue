@@ -4,7 +4,10 @@
       <div class="mb-4">
         <omegaup-markdown :markdown="T.teamsGroupsCsvHelp"></omegaup-markdown>
         <div class="w-100 text-right">
-          <a href="https://blog.omegaup.com/administracion-de-identidades/">
+          <a
+            target="_blank"
+            href="https://blog.omegaup.com/administracion-de-identidades/"
+          >
             {{ T.teamsGroupsCsvHelpMoreInfo }}
           </a>
         </div>
@@ -95,7 +98,7 @@
           <div>
             <button
               class="btn btn-warning d-inline-block"
-              @click.prevent="$emit('download-teams', identities)"
+              @click.prevent="downloadIdentitiesCSV"
             >
               <font-awesome-icon :icon="['fas', 'download']" />
             </button>
@@ -154,7 +157,9 @@ export default class Upload extends Vue {
 
   T = T;
   identities: types.Identity[] = [];
-  identitiesTeams: { [team: string]: string[] } = {};
+  identitiesTeams: {
+    [team: string]: { username: string; password?: string }[];
+  } = {};
   humanReadable = false;
   selfGeneratedIdentities = false;
   typeaheadUsers: types.ListItem[] = [];
@@ -177,7 +182,19 @@ export default class Upload extends Vue {
     { key: 'password', label: T.loginPassword },
   ];
 
-  get items() {
+  get items(): {
+    country_id?: string;
+    gender?: string;
+    name?: string;
+    password?: string;
+    school_name?: string;
+    state_id?: string;
+    username: string;
+    usernames?: {
+      username: string;
+      password?: string;
+    }[];
+  }[] {
     return this.identities.map((identity) => ({
       ...identity,
       usernames: this.identitiesTeams[identity.username],
@@ -208,12 +225,37 @@ export default class Upload extends Vue {
     });
   }
 
-  onAddUsers(row: BRow): void {
-    this.identitiesTeams[row.item.username] = this.typeaheadUsers.map(
-      (user) => user.key,
-    );
-    Vue.set(row.item, 'usernames', this.identitiesTeams[row.item.username]);
-    row.toggleDetails();
+  downloadIdentitiesCSV() {
+    const participants: {
+      country_id?: string;
+      gender?: string;
+      name?: string;
+      password?: string;
+      school_name?: string;
+      state_id?: string;
+      username: string;
+      participant_username: string;
+      participant_password?: string;
+    }[] = [];
+    for (const team of this.items) {
+      if (!team.usernames) {
+        continue;
+      }
+      for (const participant of team.usernames) {
+        participants.push({
+          country_id: team.country_id,
+          gender: team.gender,
+          name: team.name,
+          school_name: team.school_name,
+          state_id: team.state_id,
+          username: team.username,
+          participant_username: participant.username,
+          participant_password: participant.password,
+        });
+      }
+    }
+
+    this.$emit('download-teams', participants);
   }
 }
 </script>
