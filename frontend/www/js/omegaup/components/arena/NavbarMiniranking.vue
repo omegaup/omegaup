@@ -3,7 +3,7 @@
     <thead>
       <tr>
         <th></th>
-        <th>{{ T.wordsUser }}</th>
+        <th>{{ T.contestParticipant }}</th>
         <th class="total" colspan="2">{{ T.wordsTotal }}</th>
         <th></th>
       </tr>
