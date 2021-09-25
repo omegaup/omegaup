@@ -2,12 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
 
-import course_ViewProgress, {
-  escapeCsv,
-  escapeXml,
-  toOds,
-  toCsv,
-} from './ViewProgress.vue';
+import course_ViewProgress, { escapeXml, toOds } from './ViewProgress.vue';
 import type { types } from '../../api_types';
 
 describe('ViewProgress.vue', () => {
@@ -71,11 +66,6 @@ describe('ViewProgress.vue', () => {
     );
   });
 
-  it('Should handle escaped csv cells', () => {
-    const escapedCell = escapeCsv('Escaped "text"');
-    expect(escapedCell).toBe('"Escaped ""text""');
-  });
-
   it('Should handle escaped xml cells', () => {
     const escapedXml = escapeXml('Escaped <text>');
     expect(escapedXml).toBe('Escaped &lt;text&gt;');
@@ -105,18 +95,5 @@ office:value="${globalScore.value}"><text:p>${globalScore}</text:p>\
 </table:table-cell><table:table-cell office:value-type="float" office:value="\
 ${score}"><text:p>${score}</text:p></table:table-cell></table:table-row>
 </table:table>`);
-  });
-
-  it('Should handle csv content', () => {
-    const wrapper = shallowMount(course_ViewProgress, {
-      propsData: baseViewProgressProps,
-    });
-    const globalScore = wrapper.vm.getGlobalScoreByStudent(student);
-
-    const csvContent = toCsv(wrapper.vm.progressTable);
-    expect(csvContent).toBe(`${T.profileUsername},${T.wordsName},${
-      T.courseProgressGlobalScore
-    },${assignment.name}\r
-${student.username},${student.name},${globalScore},${score.toFixed(2)}`);
   });
 });

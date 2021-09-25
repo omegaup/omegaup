@@ -14,7 +14,7 @@
 {else}
 							<th class="contest">{#wordsContest#}</th>
 {/if}
-							<th class="author">{#wordsAuthor#}</th>
+							<th class="author">{#contentCreator#}</th>
 							<th class="time">{#wordsTime#}</th>
 							<th class="message">{#wordsMessage#}</th>
 							<th class="answer">{#wordsResult#}</th>
