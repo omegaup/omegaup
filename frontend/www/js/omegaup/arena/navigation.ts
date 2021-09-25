@@ -30,6 +30,7 @@ type NavigationForContest = BaseNavigation & {
 
 type NavigationForSingleProblemOrCourse = BaseNavigation & {
   type: NavigationType.ForSingleProblemOrCourse;
+  problemsetId: number;
 };
 
 export type NavigationRequest =
@@ -39,9 +40,12 @@ export type NavigationRequest =
 export async function navigateToProblem(
   request: NavigationRequest,
 ): Promise<void> {
-  let contestAlias;
+  let contestAlias, problemsetId;
   if (request.type === NavigationType.ForContest) {
     contestAlias = request.contestAlias;
+  }
+  if (request.type === NavigationType.ForSingleProblemOrCourse) {
+    problemsetId = request.problemsetId;
   }
   const { target, problem, problems } = request;
   if (
@@ -62,6 +66,7 @@ export async function navigateToProblem(
     problem_alias: problem.alias,
     prevent_problemset_open: false,
     contest_alias: contestAlias,
+    problemset_id: problemsetId,
   })
     .then((problemInfo) => {
       for (const run of problemInfo.runs ?? []) {

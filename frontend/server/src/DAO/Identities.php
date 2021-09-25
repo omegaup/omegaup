@@ -528,4 +528,57 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             )
         ) > 0;
     }
+
+    /**
+     * @return array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null
+     */
+    public static function getTeamIdentity(
+        \OmegaUp\DAO\VO\Identities $identity
+    ) {
+        $sql = 'SELECT
+                    ti.*,
+                    IFNULL(
+                        (
+                            SELECT urc.classname FROM
+                                User_Rank_Cutoffs urc
+                            WHERE
+                                urc.score <= (
+                                        SELECT
+                                            ur.score
+                                        FROM
+                                            User_Rank ur
+                                        WHERE
+                                            ur.user_id = i.user_id
+                                    )
+                            ORDER BY
+                                urc.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        \'user-rank-unranked\'
+                    ) AS classname
+                FROM
+                    Identities i
+                INNER JOIN
+                    Team_Users tu
+                ON
+                    tu.identity_id = i.identity_id
+                INNER JOIN
+                    Teams t
+                ON
+                    t.team_id = tu.team_id
+                INNER JOIN
+                    Identities ti
+                ON
+                    ti.identity_id = t.identity_id
+                WHERE
+                    i.identity_id = ?
+                LIMIT 1;';
+
+        /** @var array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identity->identity_id]
+        );
+    }
 }
