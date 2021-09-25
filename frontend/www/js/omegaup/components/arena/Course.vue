@@ -38,13 +38,43 @@
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :problem="problemInfo"
+              :nomination-status="
+                problemInfo ? problemInfo.nominationStatus : null
+              "
+              :popup-displayed="problemDetailsPopup"
               :active-tab="'problems'"
+              :languages="course.languages"
               :runs="runs"
               :guid="guid"
               :problem-alias="problemAlias"
               :should-show-run-details="shouldShowRunDetails"
               @submit-run="onRunSubmitted"
               @show-run="(source) => $emit('show-run', source)"
+              @update:activeTab="
+                (selectedTab) =>
+                  $emit('reset-hash', {
+                    selectedTab,
+                    alias: activeProblemAlias,
+                  })
+              "
+              @submit-promotion="
+                (qualityPromotionComponent) =>
+                  $emit('submit-promotion', {
+                    solved: qualityPromotionComponent.solved,
+                    tried: qualityPromotionComponent.tried,
+                    quality: qualityPromotionComponent.quality,
+                    difficulty: qualityPromotionComponent.difficulty,
+                    tags: qualityPromotionComponent.tags,
+                  })
+              "
+              @dismiss-promotion="
+                (qualityPromotionComponent, isDismissed) =>
+                  $emit('dismiss-promotion', {
+                    solved: qualityPromotionComponent.solved,
+                    tried: qualityPromotionComponent.tried,
+                    isDismissed,
+                  })
+              "
             >
               <template #quality-nomination-buttons>
                 <div></div>
@@ -159,7 +189,7 @@ export default class ArenaCourse extends Vue {
   @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
   @Prop({ default: null }) problem!: types.NavbarProblemsetProblem | null;
-  @Prop() problemInfo!: types.ProblemInfo;
+  @Prop({ default: null }) problemInfo!: types.ProblemDetails;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() activeTab!: string;
   @Prop({ default: null }) guid!: null | string;
@@ -204,6 +234,45 @@ export default class ArenaCourse extends Vue {
       return T.socketStatusFailed;
     }
     return T.socketStatusWaiting;
+  }
+
+  get problemDetailsPopup(): PopupDisplayed {
+    if (!this.problemInfo) {
+      return this.currentPopupDisplayed;
+    }
+
+    // Problem has not been solved or tried
+    if (
+      !this.problemInfo.nominationStatus.solved &&
+      !this.problemInfo.nominationStatus.tried
+    ) {
+      return this.currentPopupDisplayed;
+    }
+
+    // Problem has been dismissed or has been dismissed beforeAC and has not been solved
+    if (
+      this.problemInfo.nominationStatus.dismissed ||
+      (this.problemInfo.nominationStatus.dismissedBeforeAc &&
+        !this.problemInfo.nominationStatus.solved)
+    ) {
+      return this.currentPopupDisplayed;
+    }
+
+    // Problem has been previously nominated
+    if (
+      this.problemInfo.nominationStatus.nominated ||
+      (this.problemInfo.nominationStatus.nominatedBeforeAc &&
+        !this.problemInfo.nominationStatus.solved)
+    ) {
+      return this.currentPopupDisplayed;
+    }
+
+    // User can't nominate the problem
+    if (!this.problemInfo.nominationStatus.canNominateProblem) {
+      return this.currentPopupDisplayed;
+    }
+
+    return PopupDisplayed.Promotion;
   }
 
   onRunDetails(guid: string): void {
