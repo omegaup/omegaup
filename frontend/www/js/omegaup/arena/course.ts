@@ -41,21 +41,40 @@ OmegaUp.on('ready', async () => {
     window.location.hash = activeTab;
   }
   const { guid, problemAlias } = getOptionsFromLocation(window.location.hash);
-  const runDetailsResponse: { runDetails: null | types.RunDetails } = {
-    runDetails: null,
-  };
-  const problemDetailsResponse: { problemInfo: null | types.ProblemDetails } = {
-    problemInfo: null,
-  };
-  if (problemAlias) {
-    await getProblemDetails({
-      problemAlias,
-      problems: payload.currentAssignment.problems,
-      response: problemDetailsResponse,
-    });
-  }
-  if (guid) {
-    await getRunDetails({ guid, response: runDetailsResponse });
+  let runDetails: null | types.RunDetails = null;
+  let problemDetails: null | types.ProblemDetails = null;
+  if (problemAlias || guid) {
+    try {
+      let problemPromise: Promise<null | types.ProblemDetails> = Promise.resolve(
+        null,
+      );
+      let runPromise: Promise<null | types.RunDetails> = Promise.resolve(null);
+      if (problemAlias) {
+        problemPromise = api.Problem.details({
+          problem_alias: problemAlias,
+          prevent_problemset_open: false,
+        });
+      }
+      if (guid) {
+        runPromise = api.Run.details({ run_alias: guid });
+      }
+      [problemDetails, runDetails] = await Promise.all([
+        problemPromise,
+        runPromise,
+      ]);
+      if (problemDetails != null) {
+        for (const run of problemDetails.runs ?? []) {
+          trackRun({ run });
+        }
+        const currentProblem = payload.currentAssignment.problems?.find(
+          ({ alias }: { alias: string }) => alias === problemDetails?.alias,
+        );
+        problemDetails.title = currentProblem?.text ?? '';
+        problemsStore.commit('addProblem', problemDetails);
+      }
+    } catch (e) {
+      ui.apiError(e);
+    }
   }
 
   trackClarifications(payload.courseDetails.clarifications);
@@ -74,9 +93,8 @@ OmegaUp.on('ready', async () => {
       guid: null as null | string,
       problemAlias: null as null | string,
       searchResultUsers: [] as types.ListItem[],
-      runDetailsData: null as types.RunDetails | null,
-      nextSubmissionTimestamp:
-        problemDetailsResponse.problemInfo?.nextSubmissionTimestamp,
+      runDetailsData: runDetails,
+      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-course', {
@@ -250,51 +268,6 @@ OmegaUp.on('ready', async () => {
   // on the `navigate-to-problem` callback being invoked, and that is
   // not the case if this is set a priori.
   Object.assign(arenaCourse, getOptionsFromLocation(window.location.hash));
-
-  async function getRunDetails({
-    guid,
-    response,
-  }: {
-    guid: string;
-    response: { runDetails: null | types.RunDetails };
-  }): Promise<void> {
-    return api.Run.details({ run_alias: guid })
-      .then((runDetails) => {
-        response.runDetails = runDetails;
-      })
-      .catch((error) => {
-        ui.apiError(error);
-      });
-  }
-
-  async function getProblemDetails({
-    problemAlias,
-    problems,
-    response,
-  }: {
-    problemAlias: string;
-    problems: types.NavbarProblemsetProblem[];
-    response: { problemInfo: null | types.ProblemInfo };
-  }): Promise<void> {
-    return api.Problem.details({
-      problem_alias: problemAlias,
-      prevent_problemset_open: false,
-    })
-      .then((problemInfo) => {
-        for (const run of problemInfo.runs ?? []) {
-          trackRun({ run });
-        }
-        const currentProblem = problems?.find(
-          ({ alias }: { alias: string }) => alias === problemInfo.alias,
-        );
-        problemInfo.title = currentProblem?.text ?? '';
-        response.problemInfo = problemInfo;
-        problemsStore.commit('addProblem', problemInfo);
-      })
-      .catch(() => {
-        ui.dismissNotifications();
-      });
-  }
 
   function getSelectedValidTab(tab: string, isAdmin: boolean): string {
     const validTabs = ['problems', 'ranking', 'runs', 'clarifications'];
