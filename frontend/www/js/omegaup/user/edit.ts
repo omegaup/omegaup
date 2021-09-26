@@ -6,7 +6,7 @@ import * as ui from '../ui';
 import { types } from '../api_types';
 import T from '../lang';
 
- import user_Edit from '../components/user/Edit.vue';
+import user_Edit from '../components/user/Edit.vue';
 
 OmegaUp.on('ready', () => {
   const commonPayload = types.payloadParsers.CommonPayload();
@@ -25,10 +25,7 @@ OmegaUp.on('ready', () => {
           inProduction: commonPayload.inProduction,
         },
         on: {
-          'update-user': (
-            user: types.UserProfileInfo,
-          ) => {
-
+          'update-user': (user: types.UserProfileInfo) => {
             if (user.username && user.username?.length > 50) {
               ui.error(T.userEditNameTooLong);
               return;
@@ -39,13 +36,15 @@ OmegaUp.on('ready', () => {
             api.User.update(request)
               .then(() => {
                 ui.success(T.userEditSuccess);
-                
               })
               .catch(ui.apiError);
           },
-          'update-password': (oldPassword: string, newPassword1: string, newPassword2: string) => {
-
-            if(newPassword1 !== newPassword2) {
+          'update-password': (
+            oldPassword: string,
+            newPassword1: string,
+            newPassword2: string,
+          ) => {
+            if (newPassword1 !== newPassword2) {
               ui.error(T.passwordMismatch);
               return;
             }
@@ -68,7 +67,7 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-        }
+        },
       });
     },
   });

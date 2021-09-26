@@ -2,47 +2,55 @@
   <div class="container-fluid p-0 mt-0" data-user-profile-root>
     <div class="row">
       <div class="col-md-2">
-        <omegaup-user-maininfo
-          :profile="profile"
-          :data="data"
-          :edit="true"
-        />
+        <omegaup-user-maininfo :profile="profile" :data="data" :edit="true" />
       </div>
       <div class="col-md-10">
-        <div class="card"> 
-          <div class="card-header"> 
-            <h3 class="card-title">{{T.userEditEditProfile}}</h3>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">{{ T.userEditEditProfile }}</h3>
           </div>
-         <form role="form" class="card-body" @submit.prevent="onUpdateUser">
+          <form role="form" class="card-body" @submit.prevent="onUpdateUser">
             <div class="form-group">
-              <label>{{T.username}}</label>
-              <input class="form-control" v-model="selectedProfileInfo.username"/>
+              <label>{{ T.username }}</label>
+              <input
+                class="form-control"
+                v-model="selectedProfileInfo.username"
+              />
             </div>
             <div class="form-group">
-              <label>{{T.wordsName}}</label>
-              <input class="form-control" v-model="selectedProfileInfo.name"/>
+              <label>{{ T.wordsName }}</label>
+              <input class="form-control" v-model="selectedProfileInfo.name" />
             </div>
             <div class="form-group">
-              <label
-              >{{ T.userEditBirthDate }}</label>
+              <label>{{ T.userEditBirthDate }}</label>
               <font-awesome-icon
                 :title="T.courseNewFormStartDateDesc"
                 icon="info-circle"
               />
-              <omegaup-datepicker v-model="selectedProfileInfo.birth_date"></omegaup-datepicker>
+              <omegaup-datepicker
+                v-model="selectedProfileInfo.birth_date"
+              ></omegaup-datepicker>
             </div>
             <div class="form-group">
-              <label>{{T.wordsGender}}</label>
-              <select name="gender" v-model="selectedProfileInfo.gender" class="form-control" >
-                <option value="female">{{T.wordsGenderFemale}}</option>
-                <option value="male">{{T.wordsGenderMale}}</option>
-                <option value="other">{{T.wordsGenderOther}}</option>
-                <option value="decline">{{T.wordsGenderDecline}}</option>
+              <label>{{ T.wordsGender }}</label>
+              <select
+                name="gender"
+                v-model="selectedProfileInfo.gender"
+                class="form-control"
+              >
+                <option value="female">{{ T.wordsGenderFemale }}</option>
+                <option value="male">{{ T.wordsGenderMale }}</option>
+                <option value="other">{{ T.wordsGenderOther }}</option>
+                <option value="decline">{{ T.wordsGenderDecline }}</option>
               </select>
             </div>
             <div class="form-group">
-              <label>{{T.wordsCountry}}</label>
-              <select v-model="selectedProfileInfo.country_id"  name="country_id" class="form-control">
+              <label>{{ T.wordsCountry }}</label>
+              <select
+                v-model="selectedProfileInfo.country_id"
+                name="country_id"
+                class="form-control"
+              >
                 <option
                   v-for="country in countries"
                   :key="country.country_id"
@@ -50,13 +58,16 @@
                 >
                   {{ country.name }}
                 </option>
-							</select>
+              </select>
             </div>
             <div class="form-group">
               <label>
                 {{ T.profileState }}
               </label>
-              <select v-model="selectedProfileInfo.state_id" class="form-control">
+              <select
+                v-model="selectedProfileInfo.state_id"
+                class="form-control"
+              >
                 <option
                   v-for="[code, state] in Object.entries(countryStates)"
                   :key="code"
@@ -65,7 +76,7 @@
                   {{ state.name }}
                 </option>
               </select>
-					  </div>
+            </div>
             <div class="form-group">
               <label class="d-block">
                 {{ T.profileSchool }}
@@ -94,110 +105,209 @@
               </label>
             </div>
             <div class="form-group">
-              <label for="locale" class="control-label">{{T.userEditLanguage}}</label>
-              
-              <select name='locale' v-model="selectedProfileInfo.locale" class="form-control" >
-                <option value="es">{{T.wordsSpanish}}</option>
-                <option value="en">{{T.wordsEnglish}}</option>
-                <option value="pt">{{T.wordsPortuguese}}</option>
+              <label for="locale" class="control-label">{{
+                T.userEditLanguage
+              }}</label>
+
+              <select
+                name="locale"
+                v-model="selectedProfileInfo.locale"
+                class="form-control"
+              >
+                <option value="es">{{ T.wordsSpanish }}</option>
+                <option value="en">{{ T.wordsEnglish }}</option>
+                <option value="pt">{{ T.wordsPortuguese }}</option>
                 <option :v-if="!inProduction" value="pseudo">pseudo-loc</option>
                 {/if} -->
               </select>
             </div>
             <div class="form-group">
-              <label for="scholar_degree" class="control-label">{{T.userEditSchoolGrade}}</label>
-                <select name="scholar_degree" v-model="selectedProfileInfo.scholar_degree" class="form-control">
-                  <option value="none">{{T.userEditNone}}</option>
-                  <option value="early_childhood">{{T.userEditEarlyChildhood}}</option>
-                  <option value="pre_primary">{{T.userEditPrePrimary}}</option>
-                  <option value="primary">{{T.userEditPrimary}}</option>
-                  <option value="lower_secondary">{{T.userEditLowerSecondary}}</option>
-                  <option value="upper_secondary">{{T.userEditUpperSecondary}}</option>
-                  <option value="post_secondary">{{T.userEditPostSecondary}}</option>
-                  <option value="tertiary">{{T.userEditTertiary}}</option>
-                  <option value="bachelors">{{T.userEditBachelors}}</option>
-                  <option value="master">{{T.userEditMaster}}</option>
-                  <option value="doctorate">{{T.userEditDoctorate}}</option>
-                </select>
+              <label for="scholar_degree" class="control-label">{{
+                T.userEditSchoolGrade
+              }}</label>
+              <select
+                name="scholar_degree"
+                v-model="selectedProfileInfo.scholar_degree"
+                class="form-control"
+              >
+                <option value="none">{{ T.userEditNone }}</option>
+                <option value="early_childhood">
+                  {{ T.userEditEarlyChildhood }}
+                </option>
+                <option value="pre_primary">{{ T.userEditPrePrimary }}</option>
+                <option value="primary">{{ T.userEditPrimary }}</option>
+                <option value="lower_secondary">
+                  {{ T.userEditLowerSecondary }}
+                </option>
+                <option value="upper_secondary">
+                  {{ T.userEditUpperSecondary }}
+                </option>
+                <option value="post_secondary">
+                  {{ T.userEditPostSecondary }}
+                </option>
+                <option value="tertiary">{{ T.userEditTertiary }}</option>
+                <option value="bachelors">{{ T.userEditBachelors }}</option>
+                <option value="master">{{ T.userEditMaster }}</option>
+                <option value="doctorate">{{ T.userEditDoctorate }}</option>
+              </select>
             </div>
             <div class="form-group">
-              <label for="programming_language" class="control-label">{{T.userEditPreferredProgrammingLanguage}}</label>
-              <select name="programming_language" v-model="selectedProfileInfo.preferred_language" class="form-control" >
+              <label for="programming_language" class="control-label">{{
+                T.userEditPreferredProgrammingLanguage
+              }}</label>
+              <select
+                name="programming_language"
+                v-model="selectedProfileInfo.preferred_language"
+                class="form-control"
+              >
                 <option value=""></option>
                 <option
-                  v-for="[extension, name] in Object.entries(programmingLanguages)"
+                  v-for="[extension, name] in Object.entries(
+                    programmingLanguages,
+                  )"
                   :key="extension"
                   :value="extension"
                 >
                   {{ name }}
                 </option>
               </select>
-						</div>
+            </div>
             <div class="form-group">
-              <label
-              >{{ T.userEditGraduationDate }}</label>
-             <font-awesome-icon
+              <label>{{ T.userEditGraduationDate }}</label>
+              <font-awesome-icon
                 :title="T.courseNewFormStartDateDesce"
                 icon="info-circle"
               />
-              <omegaup-datepicker v-model="selectedProfileInfo.graduation_date"></omegaup-datepicker>
+              <omegaup-datepicker
+                v-model="selectedProfileInfo.graduation_date"
+              ></omegaup-datepicker>
             </div>
 
             <div class="form-group">
-              <label class="control-label">{{T.userEditProfileImage}}</label>
-              <a href="http://www.gravatar.com" target="_blank" class="btn btn-link">{{T.userEditGravatar}} {{selectedProfileInfo.email}}</a>
+              <label class="control-label">{{ T.userEditProfileImage }}</label>
+              <a
+                href="http://www.gravatar.com"
+                target="_blank"
+                class="btn btn-link"
+                >{{ T.userEditGravatar }} {{ selectedProfileInfo.email }}</a
+              >
             </div>
 
             <div class="form-group">
               <span class="control-label">&nbsp;</span>
-                <input type="checkbox" name="is_private" :checked="selectedProfileInfo.is_private" v-model="selectedProfileInfo.is_private">
-                <label for="is_private" style="display: inline;">{{T.userEditPrivateProfile}}</label>
+              <input
+                type="checkbox"
+                name="is_private"
+                :checked="selectedProfileInfo.is_private"
+                v-model="selectedProfileInfo.is_private"
+              />
+              <label for="is_private" style="display: inline">{{
+                T.userEditPrivateProfile
+              }}</label>
             </div>
 
             <div class="form-group">
               <span class="control-label">&nbsp;</span>
-                <input type="checkbox" name="hide_problem_tags" v-model="selectedProfileInfo.hide_problem_tags" :checked="selectedProfileInfo.hide_problem_tags">
-                <label for="hide_problem_tags">{{T.userEditHideProblemTags}}</label>
+              <input
+                type="checkbox"
+                name="hide_problem_tags"
+                v-model="selectedProfileInfo.hide_problem_tags"
+                :checked="selectedProfileInfo.hide_problem_tags"
+              />
+              <label for="hide_problem_tags">{{
+                T.userEditHideProblemTags
+              }}</label>
             </div>
 
             <div class="col-md-offset-6 col-md-6 col-xs-12">
-              <button type="submit" class="btn btn-primary col-xs-offset-1 col-xs-5">{{T.wordsSaveChanges}}</button>
-              <a href="/profile" class="btn col-xs-5 btn-cancel">{{T.wordsCancel}}</a>
+              <button
+                type="submit"
+                class="btn btn-primary col-xs-offset-1 col-xs-5"
+              >
+                {{ T.wordsSaveChanges }}
+              </button>
+              <a href="/profile" class="btn col-xs-5 btn-cancel">{{
+                T.wordsCancel
+              }}</a>
             </div>
           </form>
         </div>
-        <omegaup-user-manage-identities 
+        <omegaup-user-manage-identities
           :identities="identities"
-          @add-identity="(username, password) => this.$emit('add-identity',username, password)"
+          @add-identity="
+            (username, password) =>
+              this.$emit('add-identity', username, password)
+          "
         />
         <form rol="form" class="card">
           <div class="card-header">
-            <h3 class="card-title">{{T.userEditChangePassword}}</h3>
+            <h3 class="card-title">{{ T.userEditChangePassword }}</h3>
           </div>
           <div class="card-body">
-            <form class="form-horizontal" role="form" @submit.prevent="onUpdatePassword">
+            <form
+              class="form-horizontal"
+              role="form"
+              @submit.prevent="onUpdatePassword"
+            >
               <div class="form-group">
-                <label for="name" class="col-md-4 control-label">{{T.userEditChangePasswordOldPassword}}</label>
+                <label for="name" class="col-md-4 control-label">{{
+                  T.userEditChangePasswordOldPassword
+                }}</label>
                 <div class="col-md-7">
-                  <input name='name' value='' required type='password' size='30' class="form-control" v-model="oldPassword">
+                  <input
+                    name="name"
+                    value=""
+                    required
+                    type="password"
+                    size="30"
+                    class="form-control"
+                    v-model="oldPassword"
+                  />
                 </div>
               </div>
               <div class="form-group">
-                <label for="name" class="col-md-4 control-label">{{T.userEditChangePasswordNewPassword}}</label>
+                <label for="name" class="col-md-4 control-label">{{
+                  T.userEditChangePasswordNewPassword
+                }}</label>
                 <div class="col-md-7">
-                  <input name='name' value='' required type='password' size='30' class="form-control" v-model="newPassword1">
+                  <input
+                    name="name"
+                    value=""
+                    required
+                    type="password"
+                    size="30"
+                    class="form-control"
+                    v-model="newPassword1"
+                  />
                 </div>
               </div>
               <div class="form-group">
-                <label for="name" class="col-md-4 control-label">{{T.userEditChangePasswordRepeatNewPassword}}</label>
+                <label for="name" class="col-md-4 control-label">{{
+                  T.userEditChangePasswordRepeatNewPassword
+                }}</label>
                 <div class="col-md-7">
-                  <input name='name' value='' required type='password' size='30' class="form-control" v-model="newPassword2">
+                  <input
+                    name="name"
+                    value=""
+                    required
+                    type="password"
+                    size="30"
+                    class="form-control"
+                    v-model="newPassword2"
+                  />
                 </div>
               </div>
 
               <div class="col-md-offset-6 col-md-6 col-xs-12">
-                <button type="submit" class="btn btn-primary col-xs-offset-1 col-xs-5">{{T.wordsSaveChanges}}</button>
-                <a href="/profile/" class="btn col-xs-5 btn-cancel">{{T.wordsCancel}}</a>
+                <button
+                  type="submit"
+                  class="btn btn-primary col-xs-offset-1 col-xs-5"
+                >
+                  {{ T.wordsSaveChanges }}
+                </button>
+                <a href="/profile/" class="btn col-xs-5 btn-cancel">{{
+                  T.wordsCancel
+                }}</a>
               </div>
             </form>
           </div>
@@ -205,7 +315,6 @@
       </div>
     </div>
   </div>
-
 </template>
 
 <script lang="ts">
@@ -214,7 +323,7 @@ import T from '../../lang';
 import user_MainInfo from './MainInfo.vue';
 import DatePicker from '../DatePicker.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import user_ManageIdentities from './ManageIdentities.vue'
+import user_ManageIdentities from './ManageIdentities.vue';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
 import * as typeahead from '../../typeahead';
 import common_Typeahead from '../common/Typeahead.vue';
@@ -229,20 +338,19 @@ import { types } from '../../api_types';
   },
 })
 export default class UserProfileEdit extends Vue {
-  @Prop() data!: types.UserProfileEditDetailsPayload| null;
+  @Prop() data!: types.UserProfileEditDetailsPayload | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop() identities!: types.Identity[];
   @Prop() schools!: types.School[];
   @Prop() inProduction!: boolean;
 
-
   T = T;
   typeahead = typeahead;
   countries = this.data?.countries;
   programmingLanguages = this.profile.programming_languages;
-  oldPassword = "";
-  newPassword1 = "";
-  newPassword2 = "";
+  oldPassword = '';
+  newPassword1 = '';
+  newPassword2 = '';
 
   selectedProfileInfo = Object.assign(
     {
@@ -265,7 +373,7 @@ export default class UserProfileEdit extends Vue {
       scholar_degree: '',
       verified: true,
       programming_languages: {},
-      rankinfo: ''
+      rankinfo: '',
     } as types.UserProfileInfo,
     this.profile,
   );
@@ -273,27 +381,24 @@ export default class UserProfileEdit extends Vue {
   get countryStates(): iso3166.Subdivisions {
     const countryId = this.selectedProfileInfo.country_id || 'MX';
     const countrySelected = iso3166.country(countryId);
-    let subdivisions =  Object.entries(countrySelected.sub).sort((a,b) =>  Intl.Collator().compare(a[0], b[0])).reduce((r, [code, name]:any) => ({ ...r, [code]: name}), {});;
+    let subdivisions = Object.entries(countrySelected.sub)
+      .sort((a, b) => Intl.Collator().compare(a[0], b[0]))
+      .reduce((r, [code, name]: any) => ({ ...r, [code]: name }), {});
     return subdivisions as iso3166.Subdivisions;
   }
 
-
   onUpdateUser(): void {
-    this.$emit(
-      'update-user',
-      this.selectedProfileInfo,
-    );
+    this.$emit('update-user', this.selectedProfileInfo);
   }
   onUpdatePassword(): void {
     this.$emit(
       'update-password',
       this.oldPassword,
       this.newPassword1,
-      this.newPassword2
+      this.newPassword2,
     );
   }
 }
-
 </script>
 
 <style lang="scss" scoped>

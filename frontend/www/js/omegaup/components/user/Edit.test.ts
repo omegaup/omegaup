@@ -30,7 +30,6 @@ describe('Edit.vue', () => {
           is_own_profile: true,
         } as types.UserProfileInfo,
         inProduction: true,
-        
       },
     });
     expect(wrapper.find('a[href="/profile/"]').exists()).toBe(true);

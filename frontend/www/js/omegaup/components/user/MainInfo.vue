@@ -30,10 +30,7 @@
           </small>
         </p>
       </div>
-      <div
-        v-if="profile.is_own_profile || !profile.is_private"
-        class="mb-3"
-      >
+      <div v-if="profile.is_own_profile || !profile.is_private" class="mb-3">
         <h4 class="m-0">
           {{ Object.keys(solvedProblems).length }}
         </h4>
@@ -50,9 +47,9 @@
       >
         <h5 class="m-0">
           {{
-            profile.programming_languages[
-              profile.preferred_language
-            ].split(' ')[0]
+            profile.programming_languages[profile.preferred_language].split(
+              ' ',
+            )[0]
           }}
         </h5>
         <p>
@@ -61,12 +58,11 @@
       </div>
     </div>
     <div v-if="profile.is_own_profile" class="mb-3 text-center">
-      <a class="btn btn-primary btn-sm" :href="buttonUrl">{{
-        buttonText
-      }}</a>
+      <a class="btn btn-primary btn-sm" :href="buttonUrl">{{ buttonText }}</a>
     </div>
   </div>
 </template>
+
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
@@ -88,10 +84,10 @@ export default class UserProfileEdit extends Vue {
 
   T = T;
   get buttonText(): string {
-    return this.edit ? T.userEditSeeProfile : T.profileEdit 
+    return this.edit ? T.userEditSeeProfile : T.profileEdit;
   }
   get buttonUrl(): string {
-    return this.edit ? "/profile/": "/profile/edit/";
+    return this.edit ? '/profile/' : '/profile/edit/';
   }
   get solvedProblems(): Problem[] {
     if (!this.data?.solvedProblems) return [];
