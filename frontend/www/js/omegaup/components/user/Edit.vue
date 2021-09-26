@@ -13,13 +13,13 @@
             <div class="form-group">
               <label>{{ T.username }}</label>
               <input
-                class="form-control"
                 v-model="selectedProfileInfo.username"
+                class="form-control"
               />
             </div>
             <div class="form-group">
               <label>{{ T.wordsName }}</label>
-              <input class="form-control" v-model="selectedProfileInfo.name" />
+              <input v-model="selectedProfileInfo.name" class="form-control" />
             </div>
             <div class="form-group">
               <label>{{ T.userEditBirthDate }}</label>
@@ -34,8 +34,8 @@
             <div class="form-group">
               <label>{{ T.wordsGender }}</label>
               <select
-                name="gender"
                 v-model="selectedProfileInfo.gender"
+                name="gender"
                 class="form-control"
               >
                 <option value="female">{{ T.wordsGenderFemale }}</option>
@@ -110,8 +110,8 @@
               }}</label>
 
               <select
-                name="locale"
                 v-model="selectedProfileInfo.locale"
+                name="locale"
                 class="form-control"
               >
                 <option value="es">{{ T.wordsSpanish }}</option>
@@ -126,8 +126,8 @@
                 T.userEditSchoolGrade
               }}</label>
               <select
-                name="scholar_degree"
                 v-model="selectedProfileInfo.scholar_degree"
+                name="scholar_degree"
                 class="form-control"
               >
                 <option value="none">{{ T.userEditNone }}</option>
@@ -156,8 +156,8 @@
                 T.userEditPreferredProgrammingLanguage
               }}</label>
               <select
-                name="programming_language"
                 v-model="selectedProfileInfo.preferred_language"
+                name="programming_language"
                 class="form-control"
               >
                 <option value=""></option>
@@ -175,7 +175,7 @@
             <div class="form-group">
               <label>{{ T.userEditGraduationDate }}</label>
               <font-awesome-icon
-                :title="T.courseNewFormStartDateDesce"
+                :title="T.courseNewFormStartDateDesc"
                 icon="info-circle"
               />
               <omegaup-datepicker
@@ -196,10 +196,10 @@
             <div class="form-group">
               <span class="control-label">&nbsp;</span>
               <input
+                v-model="selectedProfileInfo.is_private"
                 type="checkbox"
                 name="is_private"
                 :checked="selectedProfileInfo.is_private"
-                v-model="selectedProfileInfo.is_private"
               />
               <label for="is_private" style="display: inline">{{
                 T.userEditPrivateProfile
@@ -209,9 +209,9 @@
             <div class="form-group">
               <span class="control-label">&nbsp;</span>
               <input
+                v-model="selectedProfileInfo.hide_problem_tags"
                 type="checkbox"
                 name="hide_problem_tags"
-                v-model="selectedProfileInfo.hide_problem_tags"
                 :checked="selectedProfileInfo.hide_problem_tags"
               />
               <label for="hide_problem_tags">{{
@@ -255,13 +255,13 @@
                 }}</label>
                 <div class="col-md-7">
                   <input
+                    v-model="oldPassword"
                     name="name"
                     value=""
                     required
                     type="password"
                     size="30"
                     class="form-control"
-                    v-model="oldPassword"
                   />
                 </div>
               </div>
@@ -271,13 +271,13 @@
                 }}</label>
                 <div class="col-md-7">
                   <input
+                    v-model="newPassword1"
                     name="name"
                     value=""
                     required
                     type="password"
                     size="30"
                     class="form-control"
-                    v-model="newPassword1"
                   />
                 </div>
               </div>
@@ -287,13 +287,13 @@
                 }}</label>
                 <div class="col-md-7">
                   <input
+                    v-model="newPassword2"
                     name="name"
                     value=""
                     required
                     type="password"
                     size="30"
                     class="form-control"
-                    v-model="newPassword2"
                   />
                 </div>
               </div>

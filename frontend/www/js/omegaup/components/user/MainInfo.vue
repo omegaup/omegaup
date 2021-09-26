@@ -80,7 +80,7 @@ import { Problem } from '../../linkable_resource';
 export default class UserProfileEdit extends Vue {
   @Prop() data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
-  @Prop() edit!: Boolean;
+  @Prop() edit!: boolean;
 
   T = T;
   get buttonText(): string {

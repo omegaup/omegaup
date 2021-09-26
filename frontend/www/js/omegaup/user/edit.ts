@@ -62,7 +62,7 @@ OmegaUp.on('ready', () => {
               username: username,
               password: password,
             })
-              .then(function (data) {
+              .then(function () {
                 ui.success(T.profileIdentityAdded);
               })
               .catch(ui.apiError);

@@ -4,8 +4,6 @@ import user_Edit from './Edit.vue';
 
 describe('Edit.vue', () => {
   it('Should show cancel button href', () => {
-    const badge_alias = 'contestManager';
-    const badges = ['100SolvedProblems'];
     const wrapper = shallowMount(user_Edit, {
       propsData: {
         profile: {
