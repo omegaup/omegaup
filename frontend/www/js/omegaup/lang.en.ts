@@ -1288,6 +1288,7 @@ const translations: { [key: string]: string; } = {
   userEditPrivateProfile: "Would you like to hide profile details from others?",
   userEditProfileImage: "Profile image",
   userEditSchoolGrade: "School grade",
+  userEditSeeProfile: "See my profile",
   userEditSuccess: "Profile successfully updated.",
   userEditSuccessfulEmailUpdate: "Email updated successfully! In a few minutes, you will receive more instructions in your email. Don't forget to check your Spam folder.",
   userEditTertiary: "Community College",
