@@ -10,7 +10,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank, pagerItems: list<PageItem>}
  * @psalm-type Badge=array{assignation_time: \OmegaUp\Timestamp|null, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}
  * @psalm-type AssociatedIdentity=array{username: string, default: bool}
- * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL128: string, gravatarURL51: string, currentEmail: string, currentName: null|string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL128: string, gravatarURL51: string, currentEmail: string, currentName: null|string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string, inProduction?: bool}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
@@ -29,6 +29,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>}
  * @psalm-type UserProfileDetailsPayload=array{privateProfile: bool, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
+ * @psalm-type UserProfileEditDetailsPayload=array{schools: list<\OmegaUp\DAO\VO\Schools>, countries: list<\OmegaUp\DAO\VO\Countries>, programming_languages: array<string, string>, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
@@ -3961,9 +3962,10 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: UserProfileEditDetails, title: \OmegaUp\TranslationString}}
+     *
      * @omegaup-request-param null|string $username
      *
-     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{COUNTRIES: list<\OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: UserProfileInfo}, template: string}
      */
     public static function getProfileEditDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
@@ -3976,29 +3978,69 @@ class User extends \OmegaUp\Controllers\Controller {
                     'Identity'
                 );
             }
-            $smartyProperties = [
-                'profile' => self::getProfileDetails($r->identity, $identity),
-                'PROGRAMMING_LANGUAGES' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
-                'COUNTRIES' => \OmegaUp\DAO\Countries::getAll(
+            $response = [
+                'smartyProperties' => [
+                    'title' => new \OmegaUp\TranslationString(
+                        'userEditEditProfile'
+                    ),
+                ],
+                'entrypoint' => 'user_edit',
+            ];
+            $ownedBadges = [];
+            $user = null;
+            if (!is_null($user)) {
+                $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
+                    $user
+                );
+            }
+            $ownedBadges = [];
+            if (!is_null($user)) {
+                $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
+                    $user
+                );
+            }
+            $response['smartyProperties']['payload'] = [
+                'countries' => \OmegaUp\DAO\Countries::getAll(
                     null,
                     100,
                     'name'
                 ),
+                'schools' => \OmegaUp\DAO\Schools::getAll(
+                    null,
+                    100,
+                    'name'
+                ),
+                'programming_languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+                'profile' => self::getProfileDetails($r->identity, $identity),
+                'extraProfileDetails' => [
+                    'contests' => self::getContestStats($identity),
+                    'solvedProblems' => self::getSolvedProblems(
+                        $identity->identity_id
+                    ),
+                    'unsolvedProblems' => self::getUnsolvedProblems(
+                        $identity->identity_id
+                    ),
+                    'createdProblems' => self::getCreatedProblems(
+                        $identity->identity_id
+                    ),
+                    'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
+                        $identity->identity_id
+                    ),
+                    'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
+                    'ownedBadges' => $ownedBadges,
+                ],
             ];
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             \OmegaUp\ApiCaller::logException($e);
-            $smartyProperties = [
+            $response['smartyProperties'] = [
                 'STATUS_ERROR' => $e->getErrorMessage(),
             ];
         }
-        $template = 'user.edit.tpl';
         if (is_null($r->identity) || is_null($r->identity->password)) {
-            $template = 'user.basicedit.tpl';
+            $response['entrypoint'] = 'user_basic_edit';
         }
-        return [
-            'smartyProperties' => $smartyProperties,
-            'template' => $template,
-        ];
+        // print_r($response);
+        return $response;
     }
 
     /**
