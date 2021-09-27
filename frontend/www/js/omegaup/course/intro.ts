@@ -29,12 +29,18 @@ OmegaUp.on('ready', () => {
           loggedIn: headerPayload.isLoggedIn,
         },
         on: {
-          submit: (source: course_Intro) => {
+          submit: ({
+            shareUserInformation,
+            acceptTeacher,
+          }: {
+            shareUserInformation: boolean;
+            acceptTeacher: boolean;
+          }) => {
             api.Course.addStudent({
               course_alias: payload.course.alias,
               usernameOrEmail: headerPayload.currentUsername,
-              share_user_information: source.shareUserInformation,
-              accept_teacher: source.acceptTeacher,
+              share_user_information: shareUserInformation,
+              accept_teacher: acceptTeacher,
               privacy_git_object_id: payload.statements.privacy?.gitObjectId,
               accept_teacher_git_object_id:
                 payload.statements.acceptTeacher?.gitObjectId,

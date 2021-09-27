@@ -170,7 +170,10 @@ export default class CourseIntro extends Vue {
   }
 
   onSubmit(): void {
-    this.$emit('submit', this);
+    this.$emit('submit', {
+      shareUserInformation: this.shareUserInformation,
+      acceptTeacher: this.acceptTeacher,
+    });
   }
 }
 </script>
