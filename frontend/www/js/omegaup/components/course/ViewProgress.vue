@@ -134,44 +134,9 @@ import JSZip from 'jszip';
 import common_SortControls from '../common/SortControls.vue';
 import course_StudentProgress from './StudentProgress.vue';
 import common_Paginator from '../common/Paginatorv2.vue';
+import { toCsv, TableCell, Percentage } from '../../csv';
 
 Vue.use(AsyncComputedPlugin);
-
-class Percentage {
-  value: number;
-
-  constructor(value: number) {
-    this.value = value;
-  }
-
-  toString() {
-    return `${this.value.toFixed(2)}%`;
-  }
-}
-
-type TableCell = undefined | null | number | string | Percentage;
-
-export function escapeCsv(cell: TableCell): string {
-  if (typeof cell === 'undefined' || cell === null) {
-    return '';
-  }
-  if (cell instanceof Percentage) {
-    cell = cell.toString();
-  } else if (typeof cell === 'number') {
-    cell = cell.toFixed(2);
-  }
-  if (typeof cell !== 'string') {
-    cell = JSON.stringify(cell);
-  }
-  if (
-    cell.indexOf(',') === -1 &&
-    cell.indexOf('"') === -1 &&
-    cell.indexOf("'") === -1
-  ) {
-    return cell;
-  }
-  return '"' + cell.replace('"', '""') + '"';
-}
 
 export function escapeXml(cell: TableCell): string {
   if (typeof cell !== 'string') return '';
@@ -181,10 +146,6 @@ export function escapeXml(cell: TableCell): string {
     .replace(/>/g, '&gt;')
     .replace(/'/g, '&apos;')
     .replace(/"/g, '&quot;');
-}
-
-export function toCsv(table: TableCell[][]): string {
-  return table.map((row) => row.map(escapeCsv).join(',')).join('\r\n');
 }
 
 export function toOds(courseName: string, table: TableCell[][]): string {
@@ -277,7 +238,7 @@ export default class CourseViewProgress extends Vue {
       const row: TableCell[] = [
         student.username,
         student.name || '',
-        new Percentage(student.courseProgress),
+        new Percentage(student.courseProgress / 100),
       ];
       for (const assignment of this.assignmentsProblems) {
         row.push(

@@ -169,6 +169,12 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals(3, $results['totalRows']);
+        $this->assertEquals(
+            $results['totalRows'],
+            count(
+                $results['studentsProgress']
+            )
+        );
 
         $this->assertEquals(
             $participants[0]->name,
@@ -349,6 +355,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Then test studentsProgress info
         $this->assertCount(1, $results['studentsProgress']);
+
         $this->assertEquals(
             $participant->username,
             $results['studentsProgress'][0]['username']
@@ -518,11 +525,33 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         [
             'user' => $user,
             'identity' => $participant
-        ] = \OmegaUp\Test\Factories\User::createUser();
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'username' => 'userA',
+                'name' => 'userA',
+            ])
+        );
 
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $courseData,
             $participant
+        );
+
+        // Add extra student to course who will have
+        // 0 course progress and score.
+        [
+            'user' => $extraUser,
+            'identity' => $extraParticipant
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'username' => 'userB',
+                'name' => 'userB',
+            ])
+        );
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $extraParticipant
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
@@ -539,7 +568,14 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             100
         );
 
-        $this->assertEquals(1, $results['totalRows']);
+        $this->assertEquals(2, $results['totalRows']);
+        $this->assertEquals(
+            $results['totalRows'],
+            count(
+                $results['studentsProgress']
+            )
+        );
+
         $this->assertEquals(
             $participant->name,
             $results['studentsProgress'][0]['name']
@@ -551,6 +587,19 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             100,
             $results['studentsProgress'][0]['assignments'][$assignment]['problems'][$problemData['problem']->alias]['score']
+        );
+
+        $this->assertEquals(
+            $extraParticipant->name,
+            $results['studentsProgress'][1]['name']
+        );
+        $this->assertEquals(
+            0.0,
+            $results['studentsProgress'][1]['courseScore']
+        );
+        $this->assertEquals(
+            0.0,
+            $results['studentsProgress'][1]['courseProgress']
         );
     }
 }

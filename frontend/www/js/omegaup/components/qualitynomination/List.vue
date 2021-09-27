@@ -85,7 +85,7 @@
               ></omegaup-common-sort-controls>
             </th>
             <th v-if="!myView">{{ T.wordsNominator }}</th>
-            <th>{{ T.wordsAuthor }}</th>
+            <th>{{ T.qualityNominationReportedBy }}</th>
             <th>
               {{ T.wordsSubmissionDate }}
               <omegaup-common-sort-controls
@@ -187,7 +187,7 @@ export default class QualityNominationList extends Vue {
   columns = {
     problem_alias: T.wordsProblem,
     nominator_username: T.wordsNominator,
-    author_username: T.wordsAuthor,
+    author_username: T.qualityNominationReportedBy,
   };
 
   get orderedNominations(): types.NominationListItem[] {

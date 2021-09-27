@@ -22,5 +22,6 @@ describe('Links.vue', () => {
     expect(wrapper.text()).toContain(T.contestPrintableVersion);
     expect(wrapper.text()).toContain(T.contestScoreboardLink);
     expect(wrapper.text()).toContain(T.contestScoreboardAdminLink);
+    expect(wrapper.text()).toContain(T.contestScoreboardDownloadCsvFile);
   });
 });
