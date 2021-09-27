@@ -17,6 +17,8 @@ import {
   identityRequiredFields,
 } from '../groups';
 
+type Team = types.Identity & { usernames: string };
+
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.TeamGroupEditPayload();
   const teamsGroupEdit = new Vue({
@@ -93,7 +95,7 @@ OmegaUp.on('ready', () => {
             identity,
           }: {
             originalUsername: string;
-            identity: types.Identity;
+            identity: Team;
           }) => {
             api.Identity.updateIdentityTeam({
               ...identity,
@@ -168,7 +170,7 @@ OmegaUp.on('ready', () => {
             identities,
             identitiesTeams,
           }: {
-            identities: types.Identity[];
+            identities: Team[];
             identitiesTeams: { [team: string]: string[] };
           }) => {
             api.Identity.bulkCreateForTeams({
@@ -229,19 +231,7 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'download-teams': (
-            identities: {
-              country_id?: string;
-              gender?: string;
-              name?: string;
-              password?: string;
-              school_name?: string;
-              state_id?: string;
-              username: string;
-              participant_username: string;
-              participant_password?: string;
-            }[],
-          ) => {
+          'download-teams': (identities: types.Participant[]) => {
             downloadCsvFile({
               fileName: `identities_${payload.teamGroup.alias}.csv`,
               columns: [
@@ -268,7 +258,7 @@ OmegaUp.on('ready', () => {
             identitiesTeams: {
               [team: string]: { username: string; password?: string }[];
             };
-            identities: types.Identity[];
+            identities: Team[];
             file: File;
             humanReadable: boolean;
             selfGeneratedIdentities: boolean;
@@ -279,7 +269,7 @@ OmegaUp.on('ready', () => {
                 ui.error(T.groupsInvalidCsv);
                 return;
               }
-              const records = getCSVRecords<types.Identity>({
+              const records = getCSVRecords<Team>({
                 fields: dataset.fields,
                 records: dataset.records,
                 requiredFields: identityRequiredFields,

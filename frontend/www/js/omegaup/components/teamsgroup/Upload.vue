@@ -139,6 +139,10 @@ Vue.use(ButtonPlugin);
 Vue.use(BadgePlugin);
 Vue.use(CardPlugin);
 
+type Team = types.Identity & {
+  usernames: { username: string; password?: string }[];
+};
+
 library.add(faDownload, faUserPlus);
 @Component({
   components: {
@@ -182,19 +186,7 @@ export default class Upload extends Vue {
     { key: 'password', label: T.loginPassword },
   ];
 
-  get items(): {
-    country_id?: string;
-    gender?: string;
-    name?: string;
-    password?: string;
-    school_name?: string;
-    state_id?: string;
-    username: string;
-    usernames?: {
-      username: string;
-      password?: string;
-    }[];
-  }[] {
+  get items(): Team[] {
     return this.identities.map((identity) => ({
       ...identity,
       usernames: this.identitiesTeams[identity.username],
@@ -226,17 +218,7 @@ export default class Upload extends Vue {
   }
 
   downloadIdentitiesCSV() {
-    const participants: {
-      country_id?: string;
-      gender?: string;
-      name?: string;
-      password?: string;
-      school_name?: string;
-      state_id?: string;
-      username: string;
-      participant_username: string;
-      participant_password?: string;
-    }[] = [];
+    const participants: types.Participant[] = [];
     for (const team of this.items) {
       if (!team.usernames) {
         continue;

@@ -5,6 +5,8 @@ import T from '../../lang';
 
 import teamsgroup_Upload from './Upload.vue';
 
+type Team = types.Identity & { usernames: string };
+
 describe('Upload.vue', () => {
   it('Should handle upload teams view with identities', async () => {
     const wrapper = shallowMount(teamsgroup_Upload, {
@@ -15,7 +17,7 @@ describe('Upload.vue', () => {
 
     expect(wrapper.text()).toContain(T.groupsUploadCsvFile);
 
-    const identities: types.Identity[] = [
+    const identities: Team[] = [
       {
         username: 'teams:group:team_1',
         name: 'user 1',
