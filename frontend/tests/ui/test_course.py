@@ -20,7 +20,8 @@ def _setup_course(driver: conftest.Driver, course_alias: str, school_name: str,
         util.create_problem(
             driver,
             problem_alias,
-            resource_path='frontend/tests/resources/testproblem.zip')
+            resource_path='frontend/tests/resources/testproblem.zip',
+            private=True)
         create_course(driver, course_alias, school_name)
         add_students_course(driver, [driver.user_username])
         add_assignment_with_problem(driver, assignment_alias, problem_alias)
@@ -68,15 +69,14 @@ def test_user_ranking_course(driver):
         _click_on_problem(driver, problem)
 
         # When user has tried or solved a problem, feedback popup will be shown
-        with util.dismiss_status(driver):
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR,
-                     '.popup button.close'))).click()
-            driver.wait.until(
-                EC.invisibility_of_element_located(
-                    (By.CSS_SELECTOR,
-                     '.popup button.close')))
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, '[data-overlay-popup] button.close')
+            )).click()
+        driver.wait.until(
+            EC.invisibility_of_element_located(
+                (By.CSS_SELECTOR, '[data-overlay-popup] button.close')
+            ))
 
         _click_on_problem(driver, problem)
         driver.wait.until(
@@ -158,16 +158,12 @@ def show_run_details_course(driver: conftest.Driver, course_alias: str,
     enter_course_assignments_page(driver, course_alias)
     with driver.page_transition():
         driver.wait.until(EC.element_to_be_clickable(
-            (By.XPATH, '//a[@href = "/course/%s/assignment/%s/admin/"]'
+            (By.XPATH, '//a[@href = "/course/%s/assignment/%s/"]'
              % (course_alias, assignment_alias)))).click()
 
-    util.show_run_details(driver,
-                          table_classname='local',
-                          dropdown_classname='open',
-                          code='#include <iostream>',
-                          has_been_migrated=False)
+    util.show_run_details(driver, code='#include <iostream>')
 
-    driver.browser.find_element_by_css_selector('#overlay').click()
+    driver.browser.find_element_by_css_selector('div[data-overlay]').click()
 
 
 def test_create_identities_for_course(driver):
@@ -212,6 +208,11 @@ def test_create_identities_for_course(driver):
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
                  'button[data-run-details]'))).click()
+
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS_SELECTOR,
+                 '.show form[data-run-details-view] .CodeMirror-code')))
 
         assert (('show-run:') in
                 driver.browser.current_url), driver.browser.current_url
@@ -454,3 +455,8 @@ def enter_course(driver, course_alias, assignment_alias, *, first_time=True):
             driver.browser.current_url), driver.browser.current_url
 
     driver.wait.until(EC.url_contains('#problems'))
+
+    # Verify the socket status logo
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, 'sup.socket-status-ok')))

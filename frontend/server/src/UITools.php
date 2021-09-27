@@ -298,7 +298,11 @@ class UITools {
             ) {
                 $titleVar = $smartyProperties['title']->message;
                 /** @var string */
-                $smartyProperties['title'] = $smarty->getConfigVars($titleVar);
+                $translationString = $smarty->getConfigVars($titleVar);
+                $smartyProperties['title'] = \OmegaUp\ApiUtils::formatString(
+                    $translationString,
+                    $smartyProperties['title']->args
+                );
             } elseif (
                 !isset($smartyProperties['title']) ||
                 !is_string($smartyProperties['title'])
