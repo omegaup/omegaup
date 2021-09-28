@@ -1,6 +1,9 @@
 import { types } from '../api_types';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import clarificationsStore from './clarificationsStore';
+import * as api from '../api';
+import { trackRun } from './submissions';
+import problemsStore from './problemStore';
 
 export interface LocationOptions {
   problem: types.NavbarProblemsetProblem | null;
@@ -38,11 +41,11 @@ export function getOptionsFromLocation(location: string): LocationOptions {
         maxScore: 0,
         hasRuns: false,
       };
+      response.problemAlias = match?.groups?.alias;
       if (match.groups.popup === 'new-run') {
         response.popupDisplayed = PopupDisplayed.RunSubmit;
       } else if (match.groups.popup?.startsWith('show-run')) {
         response.guid = match.groups.popup.split(':')[1];
-        response.problemAlias = response.problem.alias;
         response.popupDisplayed = PopupDisplayed.RunDetails;
       }
       break;
@@ -62,4 +65,52 @@ export function getOptionsFromLocation(location: string): LocationOptions {
   }
 
   return response;
+}
+
+export async function getProblemAndRunDetails({
+  location,
+  contestAlias,
+  problems,
+}: {
+  location: string;
+  contestAlias?: string;
+  problems?: types.NavbarProblemsetProblem[];
+}): Promise<{
+  runDetails: null | types.RunDetails;
+  problemDetails: null | types.ProblemDetails;
+}> {
+  const { guid, problemAlias } = getOptionsFromLocation(location);
+  let problemPromise: Promise<null | types.ProblemDetails> = Promise.resolve(
+    null,
+  );
+  let runPromise: Promise<null | types.RunDetails> = Promise.resolve(null);
+
+  if (problemAlias) {
+    problemPromise = api.Problem.details({
+      problem_alias: problemAlias,
+      prevent_problemset_open: false,
+      contest_alias: contestAlias || undefined,
+    });
+  }
+  if (guid) {
+    runPromise = api.Run.details({ run_alias: guid });
+  }
+
+  const [problemDetails, runDetails] = await Promise.all([
+    problemPromise,
+    runPromise,
+  ]);
+
+  if (problemDetails != null) {
+    for (const run of problemDetails.runs ?? []) {
+      trackRun({ run });
+    }
+    const currentProblem = problems?.find(
+      ({ alias }: { alias: string }) => alias === problemDetails?.alias,
+    );
+    problemDetails.title = currentProblem?.text ?? '';
+    problemsStore.commit('addProblem', problemDetails);
+  }
+
+  return { problemDetails, runDetails };
 }

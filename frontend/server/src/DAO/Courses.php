@@ -14,6 +14,8 @@ namespace OmegaUp\DAO;
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseCardPublic=array{alias: string, lessonsCount: int, level: null|string, name: string, studentsCount: int}
+ * @psalm-type AssignmentsProblemsPoints=array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
+ * @psalm-type StudentProgressInCourse=array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
@@ -469,9 +471,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
-     * Returns a list of students within a course with their score and progress
-     * by problem
-     * @return array{allProgress: list<array{classname: string, country_id: null|string, name: null|string, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}>, problemTitles: array<string, string>, totalRows: int}
+     * Returns the list of assignments with their problems and points.
+     *
+     * @return array{assignmentsProblems: list<AssignmentsProblemsPoints>, studentsProgress: list<StudentProgressInCourse>, totalRows: int}
      */
     public static function getStudentsProgressPerAssignment(
         int $courseId,
@@ -479,120 +481,181 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         int $page,
         int $rowsPerPage
     ): array {
+        $sqlAssignmentsProblems = '
+            SELECT
+                a.alias AS assignment_alias,
+                a.name AS assignment_name,
+                a.`order` AS assignment_order,
+                p.title AS problem_title,
+                p.alias AS problem_alias,
+                psp.is_extra_problem,
+                psp.points AS problem_points,
+                psp.`order` AS problem_order
+            FROM
+                Assignments a
+            INNER JOIN
+                Problemsets ps ON a.problemset_id = ps.problemset_id
+            INNER JOIN
+                Problemset_Problems psp ON psp.problemset_id = ps.problemset_id
+            INNER JOIN
+                Problems p ON p.problem_id = psp.problem_id
+            WHERE
+                a.course_id = ?
+            ORDER BY
+                a.`order`, psp.`order`';
+
+        $coursePoints = 0.0;
+        $assignmentsProblems = [];
+        /** @var list<array{assignment_alias: string, assignment_name: string, assignment_order: int, is_extra_problem: bool, problem_alias: string, problem_order: int, problem_points: float, problem_title: string}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sqlAssignmentsProblems,
+            [ $courseId ]
+        );
+        foreach ($rs as $row) {
+            if (!isset($assignmentsProblems[$row['assignment_alias']])) {
+                $assignmentsProblems[$row['assignment_alias']] = [
+                    'alias' => $row['assignment_alias'],
+                    'name' => $row['assignment_name'],
+                    'points' => 0.0,
+                    'problems' => [],
+                    'order' => $row['assignment_order'],
+                ];
+            }
+
+            if (!$row['is_extra_problem']) {
+                $assignmentsProblems[$row['assignment_alias']]['points'] += $row['problem_points'];
+                $coursePoints += $row['problem_points'];
+            }
+
+            $assignmentsProblems[$row['assignment_alias']]['problems'][$row['problem_alias']] = [
+                'alias' => $row['problem_alias'],
+                'title' => $row['problem_title'],
+                'isExtraProblem' => $row['is_extra_problem'],
+                'points' => $row['problem_points'],
+                'order' => $row['problem_order'],
+            ];
+        }
+
         $offset = ($page - 1) * $rowsPerPage;
 
-        // Gets the total number of students in a course
-        $sqlCount = '
+        // Gets all the students in a course
+        $sqlUsers = '
             SELECT
-                COUNT(*)
+                i.username,
+                i.name,
+                i.country_id,
+                IFNULL(
+                    (
+                        SELECT urc.classname FROM
+                            User_Rank_Cutoffs urc
+                        WHERE
+                            urc.score <= (
+                                    SELECT
+                                        ur.score
+                                    FROM
+                                        User_Rank ur
+                                    WHERE
+                                        ur.user_id = i.user_id
+                                )
+                        ORDER BY
+                            urc.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) AS classname
             FROM
                 Groups_Identities AS gi
-            INNER JOIN Identities i
-                ON i.identity_id = gi.identity_id
+            INNER JOIN
+                Identities i ON i.identity_id = gi.identity_id
             WHERE
                 gi.group_id = ?';
 
+        /** @var list<array{classname: string, country_id: null|string, name: null|string, username: string}> */
+        $courseUsers = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sqlUsers,
+            [ $groupId ]
+        );
+
         // Gets on each row:
         // - the students with their information;
-        // - the problem and the points the problem gives;
+        // - the problem they solved;
         // - the alias of the assignment of the problem;
-        // - the max score gotten by the user in the problem
-        //
-        // This is done joining two querys:
-        // - the one information of users and the runs made by them,
-        // - the one with the information of the problem in the assignment/course.
-        $sql = '
-                SELECT
-                    students.username,
-                    students.name,
-                    students.country_id,
-                    pr.assignment_alias,
-                    pr.problem_alias,
-                    pr.problem_title,
-                    problem_points,
-                    MAX(r.contest_score) AS problem_score,
-                    students.classname
-                FROM
-                    (
-                        SELECT
-                            i.identity_id,
-                            i.username,
-                            i.name,
-                            i.country_id,
-                            IFNULL(
-                                (
-                                    SELECT urc.classname FROM
-                                        User_Rank_Cutoffs urc
-                                    WHERE
-                                        urc.score <= (
-                                                SELECT
-                                                    ur.score
-                                                FROM
-                                                    User_Rank ur
-                                                WHERE
-                                                    ur.user_id = i.user_id
-                                            )
-                                    ORDER BY
-                                        urc.percentile ASC
-                                    LIMIT
-                                        1
-                                ),
-                                "user-rank-unranked"
-                            ) AS classname
-                        FROM
-                            Groups_Identities AS gi
-                        INNER JOIN Identities i
-                            ON i.identity_id = gi.identity_id
-                        WHERE
-                            gi.group_id = ?
-                        LIMIT ?, ?
-                    ) AS students
-                CROSS JOIN
-                    (
-                        SELECT
-                            a.assignment_id,
-                            a.alias AS assignment_alias,
-                            a.problemset_id,
-                            p.problem_id,
-                            p.title AS problem_title,
-                            p.alias AS problem_alias,
-                            `psp`.`order`,
-                            psp.points AS problem_points
-                        FROM
-                            Assignments a
-                        INNER JOIN
-                            Problemsets ps ON a.problemset_id = ps.problemset_id
-                        INNER JOIN
-                            Problemset_Problems psp ON psp.problemset_id = ps.problemset_id
-                        INNER JOIN
-                            Problems p ON p.problem_id = psp.problem_id
-                        WHERE
-                            a.course_id = ?
-                        GROUP BY
-                            a.assignment_id, p.problem_id
-                    ) AS pr
-                LEFT JOIN
-                    Submissions s
-                ON
-                    s.problem_id = pr.problem_id
-                    AND s.identity_id = students.identity_id
-                    AND s.problemset_id = pr.problemset_id
-                LEFT JOIN
-                    Runs r ON r.run_id = s.current_run_id
-                GROUP BY
-                    students.identity_id, pr.assignment_id, pr.problem_id
-                ORDER BY
-                    `pr`.`order`';
+        // - the max score the users got in the submission for the problem.
+        $sqlStudentsProgress = '
+            SELECT
+                students.username,
+                students.name,
+                students.country_id,
+                students.classname,
+                a.alias AS assignment_alias,
+                p.alias AS problem_alias,
+                IFNULL(
+                    MAX(r.contest_score),
+                    0.0
+                ) AS problem_score,
+                psp.is_extra_problem
+            FROM
+                (
+                    SELECT
+                        i.identity_id,
+                        i.username,
+                        i.name,
+                        i.country_id,
+                        IFNULL(
+                            (
+                                SELECT urc.classname FROM
+                                    User_Rank_Cutoffs urc
+                                WHERE
+                                    urc.score <= (
+                                            SELECT
+                                                ur.score
+                                            FROM
+                                                User_Rank ur
+                                            WHERE
+                                                ur.user_id = i.user_id
+                                        )
+                                ORDER BY
+                                    urc.percentile ASC
+                                LIMIT
+                                    1
+                            ),
+                            "user-rank-unranked"
+                        ) AS classname
+                    FROM
+                        Groups_Identities AS gi
+                    INNER JOIN
+                        Identities i ON i.identity_id = gi.identity_id
+                    WHERE
+                        gi.group_id = ?
+                    LIMIT ?, ?
+                ) AS students
+            INNER JOIN
+                Submissions s ON s.identity_id = students.identity_id
+            INNER JOIN
+                Runs r ON r.run_id = s.current_run_id
+            INNER JOIN
+                Problemsets ps ON ps.problemset_id = s.problemset_id
+            INNER JOIN
+                Problemset_Problems psp ON psp.problemset_id = ps.problemset_id
+            INNER JOIN
+                Problems p ON p.problem_id = s.problem_id AND p.problem_id = psp.problem_id
+            INNER JOIN
+                Assignments a ON a.problemset_id = s.problemset_id
+            WHERE
+                a.course_id = ?
+            GROUP BY
+                students.identity_id, a.assignment_id, p.problem_id
+            HAVING
+                MAX(r.contest_score) IS NOT NULL
+            ORDER BY
+                a.`order`, psp.`order`
+        ';
 
-        /** @var int */
-        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            $sqlCount,
-            [ $groupId ]
-        ) ?? 0;
-
-        /** @var list<array{assignment_alias: string, classname: string, country_id: null|string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, problem_title: string, username: string}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
+        $studentsProgress = [];
+        /** @var list<array{assignment_alias: string, classname: string, country_id: null|string, is_extra_problem: bool, name: null|string, problem_alias: string, problem_score: float, username: string}> */
+        $rs  = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sqlStudentsProgress,
             [
                 $groupId,
                 $offset,
@@ -600,67 +663,115 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 $courseId,
             ]
         );
-
-        $allProgress = [];
-        $problemTitles = [];
         foreach ($rs as $row) {
             $username = $row['username'];
-            if (!isset($allProgress[$username])) {
-                $allProgress[$username] = [
-                    'classname' => $row['classname'],
-                    'country_id' => $row['country_id'],
-                    'name' => $row['name'],
-                    'progress' => [],
-                    'points' => [],
-                    'score' => [],
+            $assignmentAlias = $row['assignment_alias'];
+            $problemAlias = $row['problem_alias'];
+            $problemScore = $row['problem_score'];
+
+            if (!isset($studentsProgress[$username])) {
+                $studentsProgress[$username] = [
                     'username' => $username,
+                    'name' => $row['name'],
+                    'country_id' => $row['country_id'],
+                    'classname' => $row['classname'],
+                    'courseScore' => 0.0,
+                    'courseProgress' => 0.0,
+                    'assignments' => [],
                 ];
             }
 
-            $assignmentAlias = $row['assignment_alias'];
-            $problemAlias = $row['problem_alias'];
+            // Course score considers every problem in the course, including the extra problems.
+            $studentsProgress[$username]['courseScore'] += $problemScore;
+            $studentsProgress[$username]['courseProgress'] += $coursePoints !== 0.0 ? $problemScore / $coursePoints * 100 : 0.0;
+            // Ensure always to not surpass 100%
+            $studentsProgress[$username]['courseProgress'] = min(
+                100,
+                $studentsProgress[$username]['courseProgress']
+            );
 
-            if (!isset($problemTitles[$problemAlias])) {
-                $problemTitles[$problemAlias] =  $row['problem_title'];
+            if (
+                !isset(
+                    $studentsProgress[$username]['assignments'][$assignmentAlias]
+                )
+            ) {
+                $studentsProgress[$username]['assignments'][$assignmentAlias] = [
+                    'score' => 0.0,
+                    'progress' => 0.0,
+                    'problems' => [],
+                ];
             }
 
-            if (!isset($allProgress[$username]['progress'][$assignmentAlias])) {
-                $allProgress[$username]['progress'][$assignmentAlias] = [];
-            }
+            // Assignment score doesn't consider the extra problems.
+            $studentsProgress[$username]['assignments'][$assignmentAlias]['score'] += !$row['is_extra_problem'] ? $problemScore : 0.0;
+            $studentsProgress[$username]['assignments'][$assignmentAlias]['progress'] += (
+                !$row['is_extra_problem'] && $assignmentsProblems[$assignmentAlias]['points'] !== 0.0 ? (
+                    $problemScore / $assignmentsProblems[$assignmentAlias]['points'] * 100
+                 ) : 0.0
+            );
 
-            $allProgress[$username]['progress'][$assignmentAlias][$problemAlias] = (
-                $row['problem_points'] == 0
-            ) ? 0.0 :
-            floatval($row['problem_score']) / $row['problem_points'] * 100;
-
-            if (!isset($allProgress[$username]['points'][$assignmentAlias])) {
-                $allProgress[$username]['points'][$assignmentAlias] = [];
-            }
-
-            $allProgress[$username]['points'][$assignmentAlias][$problemAlias] = $row['problem_points'] ?: 0.0;
-
-            if (!isset($allProgress[$username]['score'][$assignmentAlias])) {
-                $allProgress[$username]['score'][$assignmentAlias] = [];
-            }
-
-            $allProgress[$username]['score'][$assignmentAlias][$problemAlias] = $row['problem_score'] ?: 0.0;
+            $studentsProgress[$username]['assignments'][$assignmentAlias]['problems'][$problemAlias] = [
+                'score' => $problemScore,
+                'progress' => $assignmentsProblems[$assignmentAlias]['problems'][$problemAlias]['points'] !== 0.0 ? $problemScore / $assignmentsProblems[$assignmentAlias]['problems'][$problemAlias]['points'] * 100 : 0.0,
+            ];
         }
 
+        foreach ($courseUsers as $user) {
+            if (isset($studentsProgress[$user['username']])) {
+                continue;
+            }
+            $studentsProgress[$user['username']] = [
+                'username' => $user['username'],
+                'name' => $user['name'],
+                'country_id' => $user['country_id'],
+                'classname' => $user['classname'],
+                'courseScore' => 0.0,
+                'courseProgress' => 0.0,
+                'assignments' => [],
+            ];
+        }
+
+        /** @var array<string, array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}> */
+        $assignmentsProblems = array_map(
+            function (array $assignmentProblems) {
+                usort(
+                    $assignmentProblems['problems'],
+                    /**
+                     * @param array{alias: string, title: string, isExtraProblem: bool, order: int, points: float} $a
+                     * @param array{alias: string, title: string, isExtraProblem: bool, order: int, points: float} $b
+                     */
+                    fn (array $a, array $b) => $a['order'] - $b['order']
+                );
+                return $assignmentProblems;
+            },
+            $assignmentsProblems
+        );
+
         usort(
-            $allProgress,
+            $assignmentsProblems,
             /**
-             * @param array{classname: string, country_id: null|string, name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string} $a
-             * @param array{classname: string, country_id: null|string, name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string} $b
+             * @param array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int} $a
+             * @param array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int} $b
+             */
+            fn (array $a, array $b) => $a['order'] - $b['order']
+        );
+
+        usort(
+            $studentsProgress,
+            /**
+             * @param array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string} $a
+             * @param array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string} $b
              */
             fn (array $a, array $b) => strcasecmp(
-                !empty($a['name']) ? $a['name'] : $a['username'],
-                !empty($b['name']) ? $b['name'] : $b['username']
+                !is_null($a['name']) ? $a['name'] : $a['username'],
+                !is_null($b['name']) ? $b['name'] : $b['username']
             )
         );
+
         return [
-            'totalRows' => $totalRows,
-            'allProgress' => $allProgress,
-            'problemTitles' => $problemTitles,
+            'assignmentsProblems' => $assignmentsProblems,
+            'studentsProgress' => $studentsProgress,
+            'totalRows' => count($courseUsers),
         ];
     }
 
