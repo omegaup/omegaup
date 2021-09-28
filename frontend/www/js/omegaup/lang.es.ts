@@ -354,7 +354,6 @@ const translations: { [key: string]: string; } = {
   courseCloneGenerateLinkTitle: "Generar liga para clonar",
   courseContentEmpty: "No hay contenido",
   courseContentNewFormTypeDesc: "El tipo de contenido es usado para distinguir una tarea de una lecci\u00f3n o examen visualmente en los cursos.",
-  courseDetails: "Detalles del curso",
   courseDoesNotAdmitRegistration: "El curso no admite registro de usuarios",
   courseDoesNotHaveUnlimitedDuration: "No se puede establecer duraci\u00f3n ilimitada al contenido de un curso que no es de duraci\u00f3n ilimitada.",
   courseEdit: "Editar curso",

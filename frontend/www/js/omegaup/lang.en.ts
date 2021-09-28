@@ -354,7 +354,6 @@ const translations: { [key: string]: string; } = {
   courseCloneGenerateLinkTitle: "Generate clone link",
   courseContentEmpty: "No content",
   courseContentNewFormTypeDesc: "The content type is used to distinguish tests from homeworks or lessons visually.",
-  courseDetails: "Course details",
   courseDoesNotAdmitRegistration: "Course doesn't admit user registration",
   courseDoesNotHaveUnlimitedDuration: "It is not possible to set an unlimited duration if the course is a non-unlimited duration.",
   courseEdit: "Edit course",
