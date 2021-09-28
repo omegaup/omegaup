@@ -13,7 +13,8 @@ namespace OmegaUp\DAO;
  *
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CourseCardPublic=array{alias: string, lessonsCount: int, level: null|string, name: string, studentsCount: int}
+ * @psalm-type CourseCardPublic=array{alias: string, lessonsCount: int, level: null|string, name: string, school_name: null|string, studentsCount: int}
+ * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
@@ -238,12 +239,13 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * @return list<CourseCardPublic>
      */
-    public static function getPublicCoursesForTab() {
+    public static function getPublicCoursesForTab(): array {
         $sql = '
             SELECT
                 c.alias,
                 c.name,
                 c.level,
+                s.name as school_name,
                 IFNULL(
                     (
                         SELECT
@@ -271,6 +273,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ) AS lessonsCount
             FROM
                 Courses c
+            LEFT JOIN
+                Schools s ON c.school_id = s.school_id
             WHERE
                 c.admission_mode = ? AND
                 c.finish_time IS NULL AND
@@ -278,7 +282,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 c.name IS NOT NULL AND
                 c.archived = 0;';
 
-        /** @var list<array{alias: null|string, lessonsCount: int, level: null|string, name: null|string, studentsCount: int}> */
+        /** @var list<array{alias: null|string, lessonsCount: int, level: null|string, name: null|string, school_name: null|string, studentsCount: int}> */
         $rs =  \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
@@ -295,6 +299,87 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $results[] = $row;
         }
         return $results;
+    }
+
+    /**
+     * @return list<CourseCardEnrolled>
+     */
+    public static function getEnrolledCoursesForTab(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): array {
+        $sql = 'SELECT
+                    c.alias,
+                    c.name,
+                    s.name as school_name,
+                    IFNULL(pr.progress, 0.0) AS progress
+                FROM
+                    Courses c
+                INNER JOIN (
+                    SELECT
+                        g.group_id
+                    FROM
+                        Groups_Identities gi
+                    INNER JOIN
+                        `Groups_` AS g ON g.group_id = gi.group_id
+                    WHERE
+                        gi.identity_id = ?
+                ) gg ON gg.group_id = c.group_id
+                LEFT JOIN
+                    Schools s ON c.school_id = s.school_id
+                LEFT JOIN (
+                    -- we want a score even if there are no submissions yet
+                    -- and that score should not be greater than 100%
+                    SELECT
+                        cbpr.course_id,
+                        MIN(100, ROUND(SUM(cbpr.total_assignment_score) / SUM(cbpr.max_points) * 100, 2)) AS progress
+                    FROM (
+                        -- aggregate all runs per assignment
+                        SELECT
+                            bpr.alias,
+                            bpr.course_id,
+                            bpr.assignment_id,
+                            SUM(best_score_of_problem) AS total_assignment_score,
+                            bpr.max_points
+                        FROM (
+                            -- get all runs belonging to an identity and get the best score
+                            SELECT
+                                a.alias,
+                                a.course_id,
+                                a.assignment_id,
+                                psp.problem_id,
+                                s.identity_id,
+                                MAX(r.contest_score) AS best_score_of_problem,
+                                a.max_points,
+                            FROM
+                                Assignments a
+                            INNER JOIN
+                                Problemset_Problems psp ON a.problemset_id = psp.problemset_id
+                            INNER JOIN
+                                Submissions s ON s.problem_id = psp.problem_id AND s.problemset_id = a.problemset_id
+                            INNER JOIN
+                                Runs r ON r.run_id = s.current_run_id
+                            WHERE
+                                s.identity_id = ?
+                            GROUP BY
+                                a.assignment_id, psp.problem_id, s.identity_id
+                        ) bpr
+                        GROUP BY bpr.assignment_id
+                    ) cbpr
+                    GROUP BY cbpr.course_id
+                ) pr ON c.course_id = pr.course_id
+                WHERE
+                    c.archived = 0
+                ORDER BY
+                    c.name ASC, c.finish_time DESC;';
+
+        /** @var list<array{alias: string, name: string, progress: float, school_name: null|string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [
+                $identity->identity_id,
+                $identity->identity_id,
+            ]
+        );
     }
 
     /**

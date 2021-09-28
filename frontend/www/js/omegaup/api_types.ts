@@ -2295,6 +2295,7 @@ export namespace types {
     lessonsCount: number;
     level?: string;
     name: string;
+    school_name?: string;
     studentsCount: number;
   }
 
