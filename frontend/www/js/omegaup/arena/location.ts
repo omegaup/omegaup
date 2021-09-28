@@ -78,8 +78,6 @@ export async function getProblemAndRunDetails({
   problemDetails: null | types.ProblemDetails;
 }> {
   const { guid, problemAlias } = getOptionsFromLocation(location);
-  let runDetails: null | types.RunDetails = null;
-  let problemDetails: null | types.ProblemDetails = null;
   let problemPromise: Promise<null | types.ProblemDetails> = Promise.resolve(
     null,
   );
@@ -95,7 +93,7 @@ export async function getProblemAndRunDetails({
     runPromise = api.Run.details({ run_alias: guid });
   }
 
-  [problemDetails, runDetails] = await Promise.all([
+  const [problemDetails, runDetails] = await Promise.all([
     problemPromise,
     runPromise,
   ]);
