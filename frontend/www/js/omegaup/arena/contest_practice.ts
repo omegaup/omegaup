@@ -5,15 +5,13 @@ import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
 import arena_ContestPractice from '../components/arena/ContestPractice.vue';
-import problemsStore from './problemStore';
 import {
   showSubmission,
   SubmissionRequest,
   submitRun,
   submitRunFailed,
-  trackRun,
 } from './submissions';
-import { getOptionsFromLocation } from './location';
+import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import {
   ContestClarification,
   ContestClarificationType,
@@ -39,31 +37,24 @@ OmegaUp.on('ready', async () => {
     problemAlias,
     showNewClarificationPopup,
   } = getOptionsFromLocation(window.location.hash);
-  const runDetailsResponse: { runDetails: null | types.RunDetails } = {
-    runDetails: null,
-  };
-  const problemDetailsResponse: { problemInfo: null | types.ProblemDetails } = {
-    problemInfo: null,
-  };
-  if (problemAlias) {
-    await getProblemDetails({
-      problemAlias,
+  let runDetails: null | types.RunDetails = null;
+  let problemDetails: null | types.ProblemDetails = null;
+  try {
+    ({ runDetails, problemDetails } = await getProblemAndRunDetails({
       contestAlias: payload.contest.alias,
       problems: payload.problems,
-      response: problemDetailsResponse,
-    });
-    if (guid) {
-      await getRunDetails({ guid, response: runDetailsResponse });
-    }
+      location: window.location.hash,
+    }));
+  } catch (e) {
+    ui.apiError(e);
   }
-
   trackClarifications(payload.clarifications);
 
   const contestPractice = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
     data: () => ({
-      problemInfo: problemDetailsResponse.problemInfo,
+      problemInfo: problemDetails,
       problem,
       problems: payload.problems,
       popupDisplayed,
@@ -71,9 +62,8 @@ OmegaUp.on('ready', async () => {
       guid,
       problemAlias,
       isAdmin: false,
-      runDetailsData: runDetailsResponse.runDetails,
-      nextSubmissionTimestamp:
-        problemDetailsResponse.problemInfo?.nextSubmissionTimestamp,
+      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      runDetailsData: runDetails,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
@@ -92,8 +82,8 @@ OmegaUp.on('ready', async () => {
           problemAlias: this.problemAlias,
           isAdmin: this.isAdmin,
           runs: myRunsStore.state.runs,
-          runDetailsData: this.runDetailsData,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          runDetailsData: this.runDetailsData,
         },
         on: {
           'navigate-to-problem': ({
@@ -109,16 +99,18 @@ OmegaUp.on('ready', async () => {
               contestAlias: payload.contest.alias,
             });
           },
-          'show-run': async (source: SubmissionRequest) => {
-            await getRunDetails({
-              guid: source.request.guid,
-              response: runDetailsResponse,
-            });
-            const runDetails = runDetailsResponse.runDetails;
-            if (runDetails == null) {
-              return;
-            }
-            showSubmission({ source, runDetails });
+          'show-run': (source: SubmissionRequest) => {
+            api.Run.details({ run_alias: source.request.guid })
+              .then((response) => {
+                showSubmission({ source, runDetails: response });
+              })
+              .catch((run) => {
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
+              });
           },
           'submit-run': ({
             problem,
@@ -202,54 +194,6 @@ OmegaUp.on('ready', async () => {
       });
     },
   });
-
-  async function getRunDetails({
-    guid,
-    response,
-  }: {
-    guid: string;
-    response: { runDetails: null | types.RunDetails };
-  }): Promise<void> {
-    return api.Run.details({ run_alias: guid })
-      .then((runDetails) => {
-        response.runDetails = runDetails;
-      })
-      .catch((error) => {
-        ui.apiError(error);
-      });
-  }
-
-  async function getProblemDetails({
-    problemAlias,
-    contestAlias,
-    problems,
-    response,
-  }: {
-    problemAlias: string;
-    contestAlias: string;
-    problems: types.NavbarProblemsetProblem[];
-    response: { problemInfo: null | types.ProblemInfo };
-  }): Promise<void> {
-    return api.Problem.details({
-      problem_alias: problemAlias,
-      prevent_problemset_open: false,
-      contest_alias: contestAlias,
-    })
-      .then((problemInfo) => {
-        for (const run of problemInfo.runs ?? []) {
-          trackRun({ run });
-        }
-        const currentProblem = problems?.find(
-          ({ alias }: { alias: string }) => alias === problemInfo.alias,
-        );
-        problemInfo.title = currentProblem?.text ?? '';
-        response.problemInfo = problemInfo;
-        problemsStore.commit('addProblem', problemInfo);
-      })
-      .catch(() => {
-        ui.dismissNotifications();
-      });
-  }
 
   setInterval(() => {
     refreshContestClarifications({

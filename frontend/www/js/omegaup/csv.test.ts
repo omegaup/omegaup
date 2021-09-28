@@ -1,9 +1,10 @@
 import { shallowMount } from '@vue/test-utils';
-import T from '../../lang';
-import course_ViewProgress, { escapeXml, toOds } from './ViewProgress.vue';
-import type { types } from '../../api_types';
+import T from './lang';
+import course_ViewProgress from './components/course/ViewProgress.vue';
+import type { types } from './api_types';
+import { escapeCsv, toCsv } from './csv';
 
-describe('ViewProgress.vue', () => {
+describe('csv_utils', () => {
   if (typeof window.URL.createObjectURL === 'undefined') {
     Object.defineProperty(window.URL, 'createObjectURL', {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -76,59 +77,27 @@ describe('ViewProgress.vue', () => {
     page: 1,
     length: 1,
   };
+
   const student = baseViewProgressProps.students[0];
   const assignment = baseViewProgressProps.assignmentsProblems[0];
-  const courseName = baseViewProgressProps.course.name;
 
-  it('Should handle scores', async () => {
+  it('Should handle escaped csv cells', () => {
+    const escapedCell = escapeCsv('Escaped "text"');
+    expect(escapedCell).toBe('"Escaped ""text""');
+  });
+
+  it('Should handle csv content', () => {
     const wrapper = shallowMount(course_ViewProgress, {
       propsData: baseViewProgressProps,
     });
-    expect(wrapper.text()).toContain(
-      T.courseStudentsProgressExportToSpreadsheet,
-    );
-  });
+    const globalScore = `${student.courseProgress.toFixed(2)}%`;
 
-  it('Should handle escaped xml cells', () => {
-    const escapedXml = escapeXml('Escaped <text>');
-    expect(escapedXml).toBe('Escaped &lt;text&gt;');
-  });
-
-  it('Should handle ods content', () => {
-    const wrapper = shallowMount(course_ViewProgress, {
-      propsData: baseViewProgressProps,
-    });
-    const odsContent = toOds(courseName, wrapper.vm.progressTable);
-    expect(odsContent).toBe(`<table:table table:name="${courseName}">
-<table:table-column table:number-columns-repeated="4"/>
-<table:table-row>
-<table:table-cell office:value-type="string"><text:p>${
-      T.profileUsername
-    }</text:p>\
-</table:table-cell><table:table-cell office:value-type="string"><text:p>${
-      T.wordsName
-    }\
-</text:p></table:table-cell><table:table-cell office:value-type="string"><text:p>\
-${T.courseProgressGlobalScore}</text:p></table:table-cell><table:table-cell \
-office:value-type="string"><text:p>${
-      assignment.name
-    }</text:p></table:table-cell>\
-</table:table-row>
-<table:table-row>
-<table:table-cell office:value-type="string"><text:p>${
-      student.username
-    }</text:p>\
-</table:table-cell><table:table-cell office:value-type="string"><text:p>${
-      student.name
-    }\
-</text:p></table:table-cell><table:table-cell office:value-type="percentage" \
-office:value="${
-      student.courseProgress / 100
-    }"><text:p>${student.courseProgress.toFixed(2)}%</text:p>\
-</table:table-cell><table:table-cell office:value-type="float" office:value="\
-${student.assignments[assignment.alias].score}"><text:p>${
-      student.assignments[assignment.alias].score
-    }</text:p></table:table-cell></table:table-row>
-</table:table>`);
+    const csvContent = toCsv(wrapper.vm.progressTable);
+    expect(csvContent).toBe(`${T.profileUsername},${T.wordsName},${
+      T.courseProgressGlobalScore
+    },${assignment.name}\r
+${student.username},${student.name},${globalScore},${student.assignments[
+      assignment.alias
+    ].score.toFixed(2)}`);
   });
 });

@@ -1040,12 +1040,12 @@ CREATE TABLE `Team_Groups` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Team_Users` (
   `team_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  PRIMARY KEY (`team_id`,`user_id`),
+  `identity_id` int NOT NULL COMMENT 'Id de la identidad que pertenece al equipo',
+  PRIMARY KEY (`team_id`,`identity_id`),
   KEY `team_id` (`team_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `fk_tut_team_id` FOREIGN KEY (`team_id`) REFERENCES `Teams` (`team_id`),
-  CONSTRAINT `fk_tuu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+  KEY `identity_id` (`identity_id`),
+  CONSTRAINT `fk_tui_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
+  CONSTRAINT `fk_tut_team_id` FOREIGN KEY (`team_id`) REFERENCES `Teams` (`team_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1132,6 +1132,10 @@ CREATE TABLE `Users` (
   `git_token` varchar(128) DEFAULT NULL COMMENT 'Token de acceso para git, usando Argon2i',
   `main_email_id` int DEFAULT NULL,
   `main_identity_id` int DEFAULT NULL COMMENT 'Identidad principal del usuario',
+  `has_learning_objective` tinyint(1) DEFAULT NULL COMMENT 'Dice si el usuario expresó tener el objetivo de usar omegaUp para aprender.',
+  `has_teaching_objective` tinyint(1) DEFAULT NULL COMMENT 'Dice si el usuario expresó tener el objetivo de usar omegaUp para enseñar.',
+  `has_scholar_objective` tinyint(1) DEFAULT NULL COMMENT 'Dice si el usuario expresó tener el objetivo de usar omegaUp para la escuela.',
+  `has_competitive_objective` tinyint(1) DEFAULT NULL COMMENT 'Dice si el usuario expresó tener el objetivo de usar omegaUp para programación competitiva.',
   `scholar_degree` enum('none','early_childhood','pre_primary','primary','lower_secondary','upper_secondary','post_secondary','tertiary','bachelors','master','doctorate') DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
   `verified` tinyint(1) NOT NULL DEFAULT '0',

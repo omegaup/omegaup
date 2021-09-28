@@ -36,6 +36,10 @@ abstract class Users {
                 `git_token` = ?,
                 `main_email_id` = ?,
                 `main_identity_id` = ?,
+                `has_learning_objective` = ?,
+                `has_teaching_objective` = ?,
+                `has_scholar_objective` = ?,
+                `has_competitive_objective` = ?,
                 `scholar_degree` = ?,
                 `birth_date` = ?,
                 `verified` = ?,
@@ -62,6 +66,26 @@ abstract class Users {
                 is_null($Users->main_identity_id) ?
                 null :
                 intval($Users->main_identity_id)
+            ),
+            (
+                is_null($Users->has_learning_objective) ?
+                null :
+                intval($Users->has_learning_objective)
+            ),
+            (
+                is_null($Users->has_teaching_objective) ?
+                null :
+                intval($Users->has_teaching_objective)
+            ),
+            (
+                is_null($Users->has_scholar_objective) ?
+                null :
+                intval($Users->has_scholar_objective)
+            ),
+            (
+                is_null($Users->has_competitive_objective) ?
+                null :
+                intval($Users->has_competitive_objective)
             ),
             $Users->scholar_degree,
             $Users->birth_date,
@@ -105,6 +129,10 @@ abstract class Users {
                 `Users`.`git_token`,
                 `Users`.`main_email_id`,
                 `Users`.`main_identity_id`,
+                `Users`.`has_learning_objective`,
+                `Users`.`has_teaching_objective`,
+                `Users`.`has_scholar_objective`,
+                `Users`.`has_competitive_objective`,
                 `Users`.`scholar_degree`,
                 `Users`.`birth_date`,
                 `Users`.`verified`,
@@ -201,6 +229,10 @@ abstract class Users {
                 `Users`.`git_token`,
                 `Users`.`main_email_id`,
                 `Users`.`main_identity_id`,
+                `Users`.`has_learning_objective`,
+                `Users`.`has_teaching_objective`,
+                `Users`.`has_scholar_objective`,
+                `Users`.`has_competitive_objective`,
                 `Users`.`scholar_degree`,
                 `Users`.`birth_date`,
                 `Users`.`verified`,
@@ -265,6 +297,10 @@ abstract class Users {
                     `git_token`,
                     `main_email_id`,
                     `main_identity_id`,
+                    `has_learning_objective`,
+                    `has_teaching_objective`,
+                    `has_scholar_objective`,
+                    `has_competitive_objective`,
                     `scholar_degree`,
                     `birth_date`,
                     `verified`,
@@ -276,6 +312,10 @@ abstract class Users {
                     `is_private`,
                     `preferred_language`
                 ) VALUES (
+                    ?,
+                    ?,
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -303,6 +343,26 @@ abstract class Users {
                 is_null($Users->main_identity_id) ?
                 null :
                 intval($Users->main_identity_id)
+            ),
+            (
+                is_null($Users->has_learning_objective) ?
+                null :
+                intval($Users->has_learning_objective)
+            ),
+            (
+                is_null($Users->has_teaching_objective) ?
+                null :
+                intval($Users->has_teaching_objective)
+            ),
+            (
+                is_null($Users->has_scholar_objective) ?
+                null :
+                intval($Users->has_scholar_objective)
+            ),
+            (
+                is_null($Users->has_competitive_objective) ?
+                null :
+                intval($Users->has_competitive_objective)
             ),
             $Users->scholar_degree,
             $Users->birth_date,

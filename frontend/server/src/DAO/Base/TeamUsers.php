@@ -30,21 +30,21 @@ abstract class TeamUsers {
      */
     final public static function getByPK(
         ?int $team_id,
-        ?int $user_id
+        ?int $identity_id
     ): ?\OmegaUp\DAO\VO\TeamUsers {
         $sql = '
             SELECT
                 `Team_Users`.`team_id`,
-                `Team_Users`.`user_id`
+                `Team_Users`.`identity_id`
             FROM
                 `Team_Users`
             WHERE
                 (
                     `team_id` = ? AND
-                    `user_id` = ?
+                    `identity_id` = ?
                 )
             LIMIT 1;';
-        $params = [$team_id, $user_id];
+        $params = [$team_id, $identity_id];
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
@@ -80,11 +80,11 @@ abstract class TeamUsers {
             WHERE
                 (
                     `team_id` = ? AND
-                    `user_id` = ?
+                    `identity_id` = ?
                 );';
         $params = [
             $Team_Users->team_id,
-            $Team_Users->user_id
+            $Team_Users->identity_id
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -121,7 +121,7 @@ abstract class TeamUsers {
         $sql = '
             SELECT
                 `Team_Users`.`team_id`,
-                `Team_Users`.`user_id`
+                `Team_Users`.`identity_id`
             FROM
                 `Team_Users`
         ';
@@ -173,7 +173,7 @@ abstract class TeamUsers {
             INSERT INTO
                 `Team_Users` (
                     `team_id`,
-                    `user_id`
+                    `identity_id`
                 ) VALUES (
                     ?,
                     ?
@@ -185,9 +185,9 @@ abstract class TeamUsers {
                 intval($Team_Users->team_id)
             ),
             (
-                is_null($Team_Users->user_id) ?
+                is_null($Team_Users->identity_id) ?
                 null :
-                intval($Team_Users->user_id)
+                intval($Team_Users->identity_id)
             ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

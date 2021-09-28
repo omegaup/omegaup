@@ -55,6 +55,10 @@ export namespace dao {
     birth_date?: string;
     facebook_user_id?: string;
     git_token?: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
     hide_problem_tags?: boolean;
     in_mailing_list?: boolean;
     is_private?: boolean;
@@ -1094,6 +1098,14 @@ export namespace types {
       );
     }
 
+    export function CourseTabsPayload(
+      elementId: string = 'payload',
+    ): types.CourseTabsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function GroupEditPayload(
       elementId: string = 'payload',
     ): types.GroupEditPayload {
@@ -1777,6 +1789,20 @@ export namespace types {
     [key: string]: types.Progress;
   }
 
+  export interface AssignmentsProblemsPoints {
+    alias: string;
+    name: string;
+    order: number;
+    points: number;
+    problems: {
+      alias: string;
+      isExtraProblem: boolean;
+      order: number;
+      points: number;
+      title: string;
+    }[];
+  }
+
   export interface AssociatedIdentity {
     default: boolean;
     username: string;
@@ -2278,6 +2304,14 @@ export namespace types {
     start_time: Date;
   }
 
+  export interface CourseCardPublic {
+    alias: string;
+    lessonsCount: number;
+    level?: string;
+    name: string;
+    studentsCount: number;
+  }
+
   export interface CourseClarificationsPayload {
     clarifications: types.Clarification[];
     length: number;
@@ -2302,8 +2336,10 @@ export namespace types {
     is_admin: boolean;
     is_curator: boolean;
     languages?: string[];
+    level?: string;
     name: string;
     needs_basic_information: boolean;
+    objective?: string;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;
@@ -2426,6 +2462,14 @@ export namespace types {
   export interface CourseSubmissionsListPayload {
     solvedProblems: { [key: string]: types.CourseProblemTried[] };
     unsolvedProblems: { [key: string]: types.CourseProblemTried[] };
+  }
+
+  export interface CourseTabsPayload {
+    courses: {
+      enrolled: types.CourseCardPublic[];
+      finished: types.CourseCardPublic[];
+      general: types.CourseCardPublic[];
+    };
   }
 
   export interface CoursesByAccessMode {
@@ -3426,6 +3470,22 @@ export namespace types {
     username: string;
   }
 
+  export interface StudentProgressInCourse {
+    assignments: {
+      [key: string]: {
+        problems: { [key: string]: { progress: number; score: number } };
+        progress: number;
+        score: number;
+      };
+    };
+    classname: string;
+    country_id?: string;
+    courseProgress: number;
+    courseScore: number;
+    name?: string;
+    username: string;
+  }
+
   export interface StudentProgressPayload {
     course: types.CourseDetails;
     student: string;
@@ -3433,12 +3493,12 @@ export namespace types {
   }
 
   export interface StudentsProgressPayload {
+    assignmentsProblems: types.AssignmentsProblemsPoints[];
     course: types.CourseDetails;
     length: number;
     page: number;
     pagerItems: types.PageItem[];
-    problemTitles: { [key: string]: string };
-    students: types.StudentProgress[];
+    students: types.StudentProgressInCourse[];
     totalRows: number;
   }
 

@@ -58,15 +58,21 @@
               @show-run="onRunDetails"
               @submit-promotion="
                 (qualityPromotionComponent) =>
-                  $emit('submit-promotion', qualityPromotionComponent)
+                  $emit('submit-promotion', {
+                    solved: qualityPromotionComponent.solved,
+                    tried: qualityPromotionComponent.tried,
+                    quality: qualityPromotionComponent.quality,
+                    difficulty: qualityPromotionComponent.difficulty,
+                    tags: qualityPromotionComponent.tags,
+                  })
               "
               @dismiss-promotion="
                 (qualityPromotionComponent, isDismissed) =>
-                  $emit(
-                    'dismiss-promotion',
-                    qualityPromotionComponent,
+                  $emit('dismiss-promotion', {
+                    solved: qualityPromotionComponent.solved,
+                    tried: qualityPromotionComponent.tried,
                     isDismissed,
-                  )
+                  })
               "
             >
               <template #quality-nomination-buttons>
@@ -184,7 +190,7 @@ export default class ArenaCourse extends Vue {
   @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
   @Prop({ default: null }) problem!: types.NavbarProblemsetProblem | null;
-  @Prop() problemInfo!: types.ProblemDetails;
+  @Prop({ default: null }) problemInfo!: types.ProblemDetails;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() activeTab!: string;
   @Prop({ default: null }) guid!: null | string;
@@ -233,29 +239,42 @@ export default class ArenaCourse extends Vue {
   }
 
   get problemDetailsPopup(): PopupDisplayed {
-    if (
-      this.problemInfo &&
-      // Problem has been solved or tried
-      (this.problemInfo.nominationStatus.solved ||
-        this.problemInfo.nominationStatus.tried) &&
-      // And has not been dismissed
-      !(
-        this.problemInfo.nominationStatus.dismissed ||
-        (this.problemInfo.nominationStatus.dismissedBeforeAc &&
-          !this.problemInfo.nominationStatus.solved)
-      ) &&
-      // And has not been previously nominated
-      !(
-        this.problemInfo.nominationStatus.nominated ||
-        (this.problemInfo.nominationStatus.nominatedBeforeAc &&
-          !this.problemInfo.nominationStatus.solved)
-      ) &&
-      // And user can nominate the problem
-      this.problemInfo.nominationStatus.canNominateProblem
-    ) {
-      return PopupDisplayed.Promotion;
+    if (!this.problemInfo) {
+      return this.currentPopupDisplayed;
     }
-    return this.currentPopupDisplayed;
+
+    // Problem has not been solved or tried
+    if (
+      !this.problemInfo.nominationStatus.solved &&
+      !this.problemInfo.nominationStatus.tried
+    ) {
+      return this.currentPopupDisplayed;
+    }
+
+    // Problem has been dismissed or has been dismissed beforeAC and has not been solved
+    if (
+      this.problemInfo.nominationStatus.dismissed ||
+      (this.problemInfo.nominationStatus.dismissedBeforeAc &&
+        !this.problemInfo.nominationStatus.solved)
+    ) {
+      return this.currentPopupDisplayed;
+    }
+
+    // Problem has been previously nominated
+    if (
+      this.problemInfo.nominationStatus.nominated ||
+      (this.problemInfo.nominationStatus.nominatedBeforeAc &&
+        !this.problemInfo.nominationStatus.solved)
+    ) {
+      return this.currentPopupDisplayed;
+    }
+
+    // User can't nominate the problem
+    if (!this.problemInfo.nominationStatus.canNominateProblem) {
+      return this.currentPopupDisplayed;
+    }
+
+    return PopupDisplayed.Promotion;
   }
 
   onPopupDismissed(): void {

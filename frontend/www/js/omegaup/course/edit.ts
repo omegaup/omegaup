@@ -123,8 +123,10 @@ OmegaUp.on('ready', () => {
                 const params: messages.CourseUpdateRequest = {
                   name: source.name,
                   description: source.description,
+                  objective: source.objective,
                   start_time: source.startTime,
                   alias: source.alias,
+                  level: source.level,
                   languages: source.selectedLanguages,
                   show_scoreboard: source.showScoreboard,
                   needs_basic_information: source.needsBasicInformation,

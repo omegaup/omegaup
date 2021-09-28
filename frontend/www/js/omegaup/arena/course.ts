@@ -7,8 +7,7 @@ import T from '../lang';
 
 import Vue from 'vue';
 import arena_Course from '../components/arena/Course.vue';
-import { getOptionsFromLocation } from './location';
-import problemsStore from './problemStore';
+import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import {
   showSubmission,
   SubmissionRequest,
@@ -18,14 +17,15 @@ import {
   updateRunFallback,
 } from './submissions';
 import { PopupDisplayed } from '../components/problem/Details.vue';
-import qualitynomination_Promotion from '../components/qualitynomination/PromotionPopup.vue';
 import { navigateToProblem, NavigationType } from './navigation';
 import {
   CourseClarificationType,
   refreshCourseClarifications,
   trackClarifications,
 } from './clarifications';
+import { EventsSocket } from './events_socket';
 import clarificationStore from './clarificationsStore';
+import socketStore from './socketStore';
 import { myRunsStore, runsStore } from './runsStore';
 
 OmegaUp.on('ready', async () => {
@@ -48,22 +48,17 @@ OmegaUp.on('ready', async () => {
     problemAlias,
     showNewClarificationPopup,
   } = getOptionsFromLocation(window.location.hash);
-  const runDetailsResponse: { runDetails: null | types.RunDetails } = {
-    runDetails: null,
-  };
-  const problemDetailsResponse: { problemInfo: null | types.ProblemDetails } = {
-    problemInfo: null,
-  };
-  if (problemAlias) {
-    await getProblemDetails({
-      problemAlias,
+  let runDetails: null | types.RunDetails = null;
+  let problemDetails: null | types.ProblemDetails = null;
+  try {
+    ({ runDetails, problemDetails } = await getProblemAndRunDetails({
       problems: payload.currentAssignment.problems,
-      response: problemDetailsResponse,
-    });
+      location: window.location.hash,
+    }));
+  } catch (e) {
+    ui.apiError(e);
   }
-  if (guid) {
-    await getRunDetails({ guid, response: runDetailsResponse });
-  }
+
   trackClarifications(payload.courseDetails.clarifications);
 
   const arenaCourse = new Vue({
@@ -72,7 +67,7 @@ OmegaUp.on('ready', async () => {
       'omegaup-arena-course': arena_Course,
     },
     data: () => ({
-      problemInfo: problemDetailsResponse.problemInfo,
+      problemInfo: problemDetails,
       problem,
       problems: payload.currentAssignment.problems,
       popupDisplayed,
@@ -80,9 +75,8 @@ OmegaUp.on('ready', async () => {
       guid,
       problemAlias,
       searchResultUsers: [] as types.ListItem[],
-      runDetailsData: runDetailsResponse.runDetails,
-      nextSubmissionTimestamp:
-        problemDetailsResponse.problemInfo?.nextSubmissionTimestamp,
+      runDetailsData: runDetails,
+      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-course', {
@@ -105,6 +99,7 @@ OmegaUp.on('ready', async () => {
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          socketStatus: socketStore.state.socketStatus,
         },
         on: {
           'navigate-to-problem': ({
@@ -117,29 +112,30 @@ OmegaUp.on('ready', async () => {
               problem,
               target: arenaCourse,
               problems: this.problems,
+              problemsetId: payload.currentAssignment.problemset_id,
             });
           },
-          'show-run': async (source: SubmissionRequest) => {
-            await getRunDetails({
-              guid: source.request.guid,
-              response: runDetailsResponse,
-            });
-            const runDetails = runDetailsResponse.runDetails;
-            if (runDetails == null) {
-              return;
-            }
-            showSubmission({ source, runDetails });
+          'show-run': (source: SubmissionRequest) => {
+            api.Run.details({ run_alias: source.request.guid })
+              .then((response) => {
+                showSubmission({ source, runDetails: response });
+              })
+              .catch((run) => {
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
+              });
           },
           'submit-run': ({
             problem,
             code,
             language,
-            target,
           }: {
             code: string;
             language: string;
             problem: types.NavbarProblemsetProblem;
-            target: Vue & { currentNextSubmissionTimestamp: Date };
           }) => {
             api.Run.create({
               problemset_id: payload.currentAssignment.problemset_id,
@@ -157,8 +153,6 @@ OmegaUp.on('ready', async () => {
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
                 });
-                target.currentNextSubmissionTimestamp =
-                  response.nextSubmissionTimestamp;
               })
               .catch((run) => {
                 submitRunFailed({
@@ -204,8 +198,6 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.apiError);
           },
-          // TODO: Implement the API to search users from course, for
-          // 'update-search-result-users-contest';
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
           },
@@ -238,24 +230,36 @@ OmegaUp.on('ready', async () => {
             }
             window.location.replace(`#${request.selectedTab}/${request.alias}`);
           },
-          'submit-promotion': (source: qualitynomination_Promotion) => {
+          'submit-promotion': ({
+            solved,
+            tried,
+            quality,
+            difficulty,
+            tags,
+          }: {
+            solved: boolean;
+            tried: boolean;
+            quality: string;
+            difficulty: string;
+            tags: string[];
+          }) => {
             const contents: {
               before_ac?: boolean;
               difficulty?: number;
               quality?: number;
               tags?: string[];
             } = {};
-            if (!source.solved && source.tried) {
+            if (!solved && tried) {
               contents.before_ac = true;
             }
-            if (source.difficulty !== '') {
-              contents.difficulty = Number.parseInt(source.difficulty, 10);
+            if (difficulty !== '') {
+              contents.difficulty = Number.parseInt(difficulty, 10);
             }
-            if (source.tags.length > 0) {
-              contents.tags = source.tags;
+            if (tags.length > 0) {
+              contents.tags = tags;
             }
-            if (source.quality !== '') {
-              contents.quality = Number.parseInt(source.quality, 10);
+            if (quality !== '') {
+              contents.quality = Number.parseInt(quality, 10);
             }
             api.QualityNomination.create({
               problem_alias: this.problemInfo?.alias,
@@ -270,11 +274,12 @@ OmegaUp.on('ready', async () => {
               .catch(ui.apiError);
           },
           'dismiss-promotion': (
-            source: qualitynomination_Promotion,
+            solved: boolean,
+            tried: boolean,
             isDismissed: boolean,
           ) => {
             const contents: { before_ac?: boolean } = {};
-            if (!source.solved && source.tried) {
+            if (!solved && tried) {
               contents.before_ac = true;
             }
             if (!isDismissed) {
@@ -296,51 +301,6 @@ OmegaUp.on('ready', async () => {
     },
   });
 
-  async function getRunDetails({
-    guid,
-    response,
-  }: {
-    guid: string;
-    response: { runDetails: null | types.RunDetails };
-  }): Promise<void> {
-    return api.Run.details({ run_alias: guid })
-      .then((runDetails) => {
-        response.runDetails = runDetails;
-      })
-      .catch((error) => {
-        ui.apiError(error);
-      });
-  }
-
-  async function getProblemDetails({
-    problemAlias,
-    problems,
-    response,
-  }: {
-    problemAlias: string;
-    problems: types.NavbarProblemsetProblem[];
-    response: { problemInfo: null | types.ProblemInfo };
-  }): Promise<void> {
-    return api.Problem.details({
-      problem_alias: problemAlias,
-      prevent_problemset_open: false,
-    })
-      .then((problemInfo) => {
-        for (const run of problemInfo.runs ?? []) {
-          trackRun({ run });
-        }
-        const currentProblem = problems?.find(
-          ({ alias }: { alias: string }) => alias === problemInfo.alias,
-        );
-        problemInfo.title = currentProblem?.text ?? '';
-        response.problemInfo = problemInfo;
-        problemsStore.commit('addProblem', problemInfo);
-      })
-      .catch(() => {
-        ui.dismissNotifications();
-      });
-  }
-
   function getSelectedValidTab(tab: string, isAdmin: boolean): string {
     const validTabs = ['problems', 'ranking', 'runs', 'clarifications'];
     const defaultTab = 'problems';
@@ -354,6 +314,21 @@ OmegaUp.on('ready', async () => {
       trackRun({ run });
     }
   }
+
+  const socket = new EventsSocket({
+    disableSockets: false,
+    problemsetAlias: payload.courseDetails.alias,
+    locationProtocol: window.location.protocol,
+    locationHost: window.location.host,
+    problemsetId: payload.currentAssignment.problemset_id,
+    scoreboardToken: null,
+    clarificationsOffset: 1,
+    clarificationsRowcount: 30,
+    navbarProblems: arenaCourse.problems,
+    currentUsername: commonPayload.currentUsername,
+    intervalInMilliseconds: 5 * 60 * 1000,
+  });
+  socket.connect();
 
   setInterval(() => {
     refreshCourseClarifications({

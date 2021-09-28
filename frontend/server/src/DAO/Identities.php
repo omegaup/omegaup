@@ -114,7 +114,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         string $usernameOrEmail,
         \OmegaUp\DAO\VO\Identities $currentIdentity
     ): ?\OmegaUp\DAO\VO\Identities {
-        if (is_null($currentIdentity->user_id)) {
+        if (is_null($currentIdentity->identity_id)) {
             return null;
         }
         $sql = '(
@@ -145,7 +145,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     ON
                         tu.team_id = t.team_id
                     WHERE
-                        tu.user_id = ?
+                        tu.identity_id = ?
                         AND i.username = ?
                 )
                 LIMIT 1;';
@@ -153,7 +153,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             $currentIdentity->user_id,
             $usernameOrEmail,
             $usernameOrEmail,
-            $currentIdentity->user_id,
+            $currentIdentity->identity_id,
             $usernameOrEmail,
         ];
 
@@ -428,17 +428,21 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             ON
                 tu.team_id = t.team_id
             INNER JOIN
+                Identities it
+            ON
+                tu.identity_id = it.identity_id
+            INNER JOIN
                 Users u
             ON
-                tu.user_id = u.user_id
+                it.user_id = u.user_id
             WHERE
-                u.user_id = ?
+                it.identity_id = ?
                 ';
 
         /** @var list<array{identity_id: int, main_identity_id: int|null, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$identity->user_id, $identity->user_id]
+            [$identity->user_id, $identity->identity_id]
         );
         $result = [];
         foreach ($rs as $identity) {
@@ -523,5 +527,58 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 [$identity->identity_id]
             )
         ) > 0;
+    }
+
+    /**
+     * @return array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null
+     */
+    public static function getTeamIdentity(
+        \OmegaUp\DAO\VO\Identities $identity
+    ) {
+        $sql = 'SELECT
+                    ti.*,
+                    IFNULL(
+                        (
+                            SELECT urc.classname FROM
+                                User_Rank_Cutoffs urc
+                            WHERE
+                                urc.score <= (
+                                        SELECT
+                                            ur.score
+                                        FROM
+                                            User_Rank ur
+                                        WHERE
+                                            ur.user_id = i.user_id
+                                    )
+                            ORDER BY
+                                urc.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        \'user-rank-unranked\'
+                    ) AS classname
+                FROM
+                    Identities i
+                INNER JOIN
+                    Team_Users tu
+                ON
+                    tu.identity_id = i.identity_id
+                INNER JOIN
+                    Teams t
+                ON
+                    t.team_id = tu.team_id
+                INNER JOIN
+                    Identities ti
+                ON
+                    ti.identity_id = t.identity_id
+                WHERE
+                    i.identity_id = ?
+                LIMIT 1;';
+
+        /** @var array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identity->identity_id]
+        );
     }
 }
