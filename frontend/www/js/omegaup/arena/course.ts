@@ -13,6 +13,7 @@ import {
   SubmissionRequest,
   submitRun,
   submitRunFailed,
+  trackRun,
   updateRunFallback,
 } from './submissions';
 import { PopupDisplayed } from '../components/problem/Details.vue';
