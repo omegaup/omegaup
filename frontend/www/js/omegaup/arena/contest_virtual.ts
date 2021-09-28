@@ -6,7 +6,7 @@ import * as ui from '../ui';
 import Vue from 'vue';
 import arena_Contest from '../components/arena/Contest.vue';
 import { PopupDisplayed } from '../components/problem/Details.vue';
-import { getOptionsFromLocation } from './location';
+import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import problemsStore from './problemStore';
 import {
   ContestClarification,
@@ -22,7 +22,6 @@ import {
   SubmissionRequest,
   submitRun,
   submitRunFailed,
-  trackRun,
 } from './submissions';
 import { onVirtualRankingChanged } from './ranking';
 import { EventsSocket } from './events_socket';
@@ -37,30 +36,16 @@ OmegaUp.on('ready', async () => {
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
-  const { guid, problemAlias } = getOptionsFromLocation(window.location.hash);
   let runDetails: null | types.RunDetails = null;
   let problemDetails: null | types.ProblemDetails = null;
-  if (problemAlias) {
-    try {
-      [problemDetails, runDetails] = await Promise.all([
-        api.Problem.details({
-          problem_alias: problemAlias,
-          prevent_problemset_open: false,
-          contest_alias: payload.contest.alias,
-        }),
-        guid ? api.Run.details({ run_alias: guid }) : Promise.resolve(null),
-      ]);
-      for (const run of problemDetails.runs ?? []) {
-        trackRun({ run });
-      }
-      const currentProblem = payload.problems?.find(
-        ({ alias }: { alias: string }) => alias === problemDetails?.alias,
-      );
-      problemDetails.title = currentProblem?.text ?? '';
-      problemsStore.commit('addProblem', problemDetails);
-    } catch (e) {
-      ui.apiError(e);
-    }
+  try {
+    ({ runDetails, problemDetails } = await getProblemAndRunDetails({
+      contestAlias: payload.contest.alias,
+      problems: payload.problems,
+      location: window.location.hash,
+    }));
+  } catch (e) {
+    ui.apiError(e);
   }
   trackClarifications(payload.clarifications);
 

@@ -37,12 +37,14 @@ OmegaUp.on('ready', async () => {
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
+  let runDetails: null | types.RunDetails = null;
+  let problemDetails: null | types.ProblemDetails = null;
   try {
-    const { runDetails, problemDetails } = await getProblemAndRunDetails({
+    ({ runDetails, problemDetails } = await getProblemAndRunDetails({
       contestAlias: payload.contest.alias,
       problems: payload.problems,
       location: window.location.hash,
-    });
+    }));
   } catch (e) {
     ui.apiError(e);
   }
