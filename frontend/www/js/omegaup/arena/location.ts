@@ -82,24 +82,25 @@ export async function getProblemAndRunDetails({
   const { guid, problemAlias } = getOptionsFromLocation(location);
   let runDetails: null | types.RunDetails = null;
   let problemDetails: null | types.ProblemDetails = null;
-  if (problemAlias) {
-    [problemDetails, runDetails] = await Promise.all([
-      api.Problem.details({
-        problem_alias: problemAlias,
-        prevent_problemset_open: false,
-        contest_alias: contestAlias,
-      }),
-      guid ? api.Run.details({ run_alias: guid }) : Promise.resolve(null),
-    ]);
-    for (const run of problemDetails.runs ?? []) {
-      trackRun({ run });
-    }
-    const currentProblem = problems?.find(
-      ({ alias }: { alias: string }) => alias === problemDetails?.alias,
-    );
-    problemDetails.title = currentProblem?.text ?? '';
-    problemsStore.commit('addProblem', problemDetails);
+  if (!problemAlias) {
+    return { problemDetails, runDetails };
   }
+  [problemDetails, runDetails] = await Promise.all([
+    api.Problem.details({
+      problem_alias: problemAlias,
+      prevent_problemset_open: false,
+      contest_alias: contestAlias,
+    }),
+    guid ? api.Run.details({ run_alias: guid }) : Promise.resolve(null),
+  ]);
+  for (const run of problemDetails.runs ?? []) {
+    trackRun({ run });
+  }
+  const currentProblem = problems?.find(
+    ({ alias }: { alias: string }) => alias === problemDetails?.alias,
+  );
+  problemDetails.title = currentProblem?.text ?? '';
+  problemsStore.commit('addProblem', problemDetails);
 
   return { problemDetails, runDetails };
 }
