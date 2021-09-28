@@ -7,14 +7,12 @@ import T from '../lang';
 
 import Vue from 'vue';
 import arena_Course from '../components/arena/Course.vue';
-import { getOptionsFromLocation } from './location';
-import problemsStore from './problemStore';
+import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import {
   showSubmission,
   SubmissionRequest,
   submitRun,
   submitRunFailed,
-  trackRun,
   updateRunFallback,
 } from './submissions';
 import { PopupDisplayed } from '../components/problem/Details.vue';
@@ -42,41 +40,15 @@ OmegaUp.on('ready', async () => {
   if (activeTab !== locationHash[0]) {
     window.location.hash = activeTab;
   }
-  const { guid, problemAlias } = getOptionsFromLocation(window.location.hash);
   let runDetails: null | types.RunDetails = null;
   let problemDetails: null | types.ProblemDetails = null;
-  if (problemAlias || guid) {
-    try {
-      let problemPromise: Promise<null | types.ProblemDetails> = Promise.resolve(
-        null,
-      );
-      let runPromise: Promise<null | types.RunDetails> = Promise.resolve(null);
-      if (problemAlias) {
-        problemPromise = api.Problem.details({
-          problem_alias: problemAlias,
-          prevent_problemset_open: false,
-        });
-      }
-      if (guid) {
-        runPromise = api.Run.details({ run_alias: guid });
-      }
-      [problemDetails, runDetails] = await Promise.all([
-        problemPromise,
-        runPromise,
-      ]);
-      if (problemDetails != null) {
-        for (const run of problemDetails.runs ?? []) {
-          trackRun({ run });
-        }
-        const currentProblem = payload.currentAssignment.problems?.find(
-          ({ alias }: { alias: string }) => alias === problemDetails?.alias,
-        );
-        problemDetails.title = currentProblem?.text ?? '';
-        problemsStore.commit('addProblem', problemDetails);
-      }
-    } catch (e) {
-      ui.apiError(e);
-    }
+  try {
+    ({ runDetails, problemDetails } = await getProblemAndRunDetails({
+      problems: payload.currentAssignment.problems,
+      location: window.location.hash,
+    }));
+  } catch (e) {
+    ui.apiError(e);
   }
 
   trackClarifications(payload.courseDetails.clarifications);
