@@ -69,9 +69,11 @@ export function getOptionsFromLocation(location: string): LocationOptions {
 
 export async function getProblemAndRunDetails({
   location,
+  contestAlias,
   problems,
 }: {
   location: string;
+  contestAlias?: string;
   problems?: types.NavbarProblemsetProblem[];
 }): Promise<{
   runDetails: null | types.RunDetails;
@@ -84,10 +86,17 @@ export async function getProblemAndRunDetails({
   let runPromise: Promise<null | types.RunDetails> = Promise.resolve(null);
 
   if (problemAlias) {
-    problemPromise = api.Problem.details({
-      problem_alias: problemAlias,
-      prevent_problemset_open: false,
-    });
+    const params = contestAlias
+      ? {
+          problem_alias: problemAlias,
+          prevent_problemset_open: false,
+        }
+      : {
+          problem_alias: problemAlias,
+          prevent_problemset_open: false,
+          contest_alias: contestAlias,
+        };
+    problemPromise = api.Problem.details(params);
   }
   if (guid) {
     runPromise = api.Run.details({ run_alias: guid });
