@@ -170,8 +170,10 @@ OmegaUp.on('ready', () => {
             identities,
             identitiesTeams,
           }: {
-            identities: CsvTeam[];
-            identitiesTeams: { [team: string]: string[] };
+            identities: types.Identity[];
+            identitiesTeams: {
+              [team: string]: { username: string; password?: string };
+            };
           }) => {
             api.Identity.bulkCreateForTeams({
               team_identities: JSON.stringify(
