@@ -86,17 +86,11 @@ export async function getProblemAndRunDetails({
   let runPromise: Promise<null | types.RunDetails> = Promise.resolve(null);
 
   if (problemAlias) {
-    const params = contestAlias
-      ? {
-          problem_alias: problemAlias,
-          prevent_problemset_open: false,
-        }
-      : {
-          problem_alias: problemAlias,
-          prevent_problemset_open: false,
-          contest_alias: contestAlias,
-        };
-    problemPromise = api.Problem.details(params);
+    problemPromise = api.Problem.details({
+      problem_alias: problemAlias,
+      prevent_problemset_open: false,
+      contest_alias: contestAlias || undefined,
+    });
   }
   if (guid) {
     runPromise = api.Run.details({ run_alias: guid });
