@@ -1,7 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
 import T from './lang';
-import { omegaup } from './omegaup';
-
 import course_ViewProgress from './components/course/ViewProgress.vue';
 import type { types } from './api_types';
 import { escapeCsv, toCsv } from './csv';
@@ -19,43 +17,69 @@ describe('csv_utils', () => {
       alias: 'hello',
       name: 'Hello course',
     } as types.CourseDetails,
-    assignments: [
+    assignmentsProblems: [
       {
-        alias: 'assignment',
-        assignment_type: 'homework',
-        description: 'Assignment',
-        start_time: new Date(0),
-        finish_time: new Date(),
-        name: 'Assignment',
-        order: 1,
-        scoreboard_url: '',
-        scoreboard_url_admin: '',
-        max_points: 200,
-      } as omegaup.Assignment,
-    ] as omegaup.Assignment[],
+        alias: 'test-assignment-a',
+        name: 'Test assignment A',
+        points: 200,
+        problems: [
+          {
+            alias: 'test-problem-a',
+            title: 'Test problem A',
+            isExtraProblem: false,
+            points: 100,
+            order: 1,
+          },
+          {
+            alias: 'test-problem-b',
+            title: 'Test problem B',
+            isExtraProblem: false,
+            points: 100,
+            order: 2,
+          },
+        ],
+      },
+    ] as types.AssignmentsProblemsPoints[],
     students: [
       {
-        name: 'student',
+        username: 'test_user',
+        name: '',
+        country_id: '',
         classname: 'user-rank-unranked',
-        points: {
-          ['assignment']: { ['problem1']: 100, ['problem2']: 100 },
+        courseScore: 100,
+        courseProgress: 50,
+        assignments: {
+          'test-assignment-a': {
+            score: 90,
+            progress: 50,
+            problems: {
+              'test-problem-a': {
+                score: 90,
+                progress: 90,
+              },
+              'test-problem-b': {
+                score: 1,
+                progress: 1,
+              },
+            },
+          },
         },
-        progress: {
-          ['assignment']: { ['problem1']: 55, ['problem2']: 44 },
-        },
-        score: {
-          ['assignment']: { ['problem1']: 55, ['problem2']: 44 },
-        },
-        username: 'student',
-      } as types.StudentProgress,
-    ] as types.StudentProgress[],
+      },
+    ] as types.StudentProgressInCourse[],
+    pagerItems: [
+      {
+        class: 'disabled',
+        label: '«',
+        page: 0,
+      },
+    ] as types.PageItem[],
+    totalRows: 1,
+    page: 1,
+    length: 1,
   };
+
   const student = baseViewProgressProps.students[0];
-  const assignment = baseViewProgressProps.assignments[0];
-  const score = Object.values(student.score[assignment.alias]).reduce(
-    (accumulator: number, currentValue: number) => accumulator + currentValue,
-    0,
-  );
+  const assignment = baseViewProgressProps.assignmentsProblems[0];
 
   it('Should handle escaped csv cells', () => {
     const escapedCell = escapeCsv('Escaped "text"');
@@ -66,12 +90,14 @@ describe('csv_utils', () => {
     const wrapper = shallowMount(course_ViewProgress, {
       propsData: baseViewProgressProps,
     });
-    const globalScore = wrapper.vm.getGlobalScoreByStudent(student);
+    const globalScore = `${student.courseProgress.toFixed(2)}%`;
 
     const csvContent = toCsv(wrapper.vm.progressTable);
     expect(csvContent).toBe(`${T.profileUsername},${T.wordsName},${
       T.courseProgressGlobalScore
     },${assignment.name}\r
-${student.username},${student.name},${globalScore},${score.toFixed(2)}`);
+${student.username},${student.name},${globalScore},${student.assignments[
+      assignment.alias
+    ].score.toFixed(2)}`);
   });
 });
