@@ -5,7 +5,7 @@ import T from '../../lang';
 
 import teamsgroup_Upload from './Upload.vue';
 
-type Team = types.Identity & { usernames: string };
+export type Team = types.Identity & { usernames: string };
 
 describe('Upload.vue', () => {
   it('Should handle upload teams view with identities', async () => {

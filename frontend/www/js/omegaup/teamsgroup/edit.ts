@@ -1,6 +1,7 @@
 import teamsgroup_Edit, {
   AvailableTabs,
 } from '../components/teamsgroup/Edit.vue';
+import { Team } from '../components/teamsgroup/Upload.test';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
@@ -16,8 +17,6 @@ import {
   identityOptionalFields,
   identityRequiredFields,
 } from '../groups';
-
-type Team = types.Identity & { usernames: string };
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.TeamGroupEditPayload();
