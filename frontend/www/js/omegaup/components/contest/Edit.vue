@@ -242,7 +242,12 @@
         ></omegaup-contest-group-admins>
       </div>
       <div v-if="showTab === 'links'" class="tab-pane active">
-        <omegaup-contest-links :data="details"></omegaup-contest-links>
+        <omegaup-contest-links
+          :data="details"
+          @download-csv-scoreboard="
+            (contestAlias) => $emit('download-csv-scoreboard', contestAlias)
+          "
+        ></omegaup-contest-links>
       </div>
       <div v-if="showTab === 'clone'" class="tab-pane active">
         <omegaup-contest-clone

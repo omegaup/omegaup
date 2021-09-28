@@ -314,7 +314,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
         $encodedTeamIdentities = $r->ensureString('team_identities');
 
-        /** @var list<array{country_id: string, gender: string, identityUsernames: list<string>|null, name: string, password: string, school_name: string, state_id: string, username: string, usernames: string}>|null $teamIdentities */
+        /** @var list<array{country_id: string, gender: string, identityUsernames: list<array{password?: string, username: string}>|null, name: string, password: string, school_name: string, state_id: string, username: string, usernames: string}>|null $teamIdentities */
         $teamIdentities = json_decode($encodedTeamIdentities, true);
         if (!is_array($teamIdentities) || empty($teamIdentities)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -340,25 +340,32 @@ class Identity extends \OmegaUp\Controllers\Controller {
             }
             // When usernames are provided we need to avoid duplicated users in
             // different teams.
-            $identitiesUsernames = explode(';', $teamIdentity['usernames']);
+            /** @var list<array{password?: string, username: string}> */
+            $identities = json_decode($teamIdentity['usernames'], true);
             if (
                 count(
-                    $identitiesUsernames
+                    $identities
                 ) > $teamGroup->number_of_contestants
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'teamMemberExceededNumberOfContestants'
                 );
             }
-            foreach ($identitiesUsernames as $identityMemberUsername) {
-                if (isset($seenMemberUsernames[$identityMemberUsername])) {
+            foreach ($identities as $identityMember) {
+                if (
+                    isset(
+                        $seenMemberUsernames[$identityMember['username']]
+                    ) && !empty(
+                        $identityMember['username']
+                    )
+                ) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                         'teamMemberUsernameInUse'
                     );
                 }
-                $seenMemberUsernames[$identityMemberUsername] = true;
+                $seenMemberUsernames[$identityMember['username']] = true;
             }
-            $teamIdentities[$username]['identityUsernames'] = $identitiesUsernames;
+            $teamIdentities[$username]['identityUsernames'] = $identities;
         }
 
         // Save objects into DB
@@ -408,9 +415,36 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     !is_null($teamIdentity['identityUsernames'])
                     && !is_null($team->team_id)
                 ) {
+                    /** @var list<array{password: string, username: string}> $selfGeneratedIdentities */
+                    $selfGeneratedIdentities = array_filter(
+                        $teamIdentity['identityUsernames'],
+                        fn ($user) => isset(
+                            $user['password']
+                        )
+                    );
+
+                    foreach ($selfGeneratedIdentities as $selfGeneratedIdentity) {
+                        $newIdentity = self::createIdentity(
+                            $selfGeneratedIdentity['username'],
+                            /*$name=*/ null,
+                            $selfGeneratedIdentity['password'],
+                            $countryId,
+                            $stateId,
+                            /*$gender=*/ 'decline',
+                            $teamGroup->alias
+                        );
+                        \OmegaUp\DAO\Identities::create($newIdentity);
+                    }
                     \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
                         $team->team_id,
-                        $teamIdentity['identityUsernames']
+                        array_map(
+                            /**
+                             * @param array{password?: string, username: string} $user
+                             * @return string
+                             */
+                            fn ($user) => $user['username'],
+                            $teamIdentity['identityUsernames']
+                        )
                     );
                 }
 

@@ -21,6 +21,10 @@ class Users extends \OmegaUp\DAO\VO\VO {
         'git_token' => true,
         'main_email_id' => true,
         'main_identity_id' => true,
+        'has_learning_objective' => true,
+        'has_teaching_objective' => true,
+        'has_scholar_objective' => true,
+        'has_competitive_objective' => true,
         'scholar_degree' => true,
         'birth_date' => true,
         'verified' => true,
@@ -66,6 +70,26 @@ class Users extends \OmegaUp\DAO\VO\VO {
         if (isset($data['main_identity_id'])) {
             $this->main_identity_id = intval(
                 $data['main_identity_id']
+            );
+        }
+        if (isset($data['has_learning_objective'])) {
+            $this->has_learning_objective = boolval(
+                $data['has_learning_objective']
+            );
+        }
+        if (isset($data['has_teaching_objective'])) {
+            $this->has_teaching_objective = boolval(
+                $data['has_teaching_objective']
+            );
+        }
+        if (isset($data['has_scholar_objective'])) {
+            $this->has_scholar_objective = boolval(
+                $data['has_scholar_objective']
+            );
+        }
+        if (isset($data['has_competitive_objective'])) {
+            $this->has_competitive_objective = boolval(
+                $data['has_competitive_objective']
             );
         }
         if (isset($data['scholar_degree'])) {
@@ -162,6 +186,34 @@ class Users extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $main_identity_id = null;
+
+    /**
+     * Dice si el usuario expresó tener el objetivo de usar omegaUp para aprender.
+     *
+     * @var bool|null
+     */
+    public $has_learning_objective = null;
+
+    /**
+     * Dice si el usuario expresó tener el objetivo de usar omegaUp para enseñar.
+     *
+     * @var bool|null
+     */
+    public $has_teaching_objective = null;
+
+    /**
+     * Dice si el usuario expresó tener el objetivo de usar omegaUp para la escuela.
+     *
+     * @var bool|null
+     */
+    public $has_scholar_objective = null;
+
+    /**
+     * Dice si el usuario expresó tener el objetivo de usar omegaUp para programación competitiva.
+     *
+     * @var bool|null
+     */
+    public $has_competitive_objective = null;
 
     /**
      * [Campo no documentado]
