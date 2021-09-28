@@ -274,4 +274,121 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             100
         );
     }
+
+    /**
+     * Basic apiMyProgress test.
+     */
+    public function testStudentOneHoundredAssignmentProgress() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
+            /*$nAssignments=*/            1
+        );
+        $studentsInCourse = 2;
+
+        // Prepare assignment. Create 1 problem
+        $adminLogin = self::login($courseData['admin']);
+        $problems = [];
+        $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // All problems will be assigned to the assignment
+        foreach ($problems as $index => $problemData) {
+            $assignmentAliasIndex = 0;
+            \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_aliases'][
+                    $assignmentAliasIndex
+                ],
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+        }
+
+        // Add students to course
+        $students = [];
+        for ($i = 0; $i < $studentsInCourse; $i++) {
+            $students[] = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData
+            );
+        }
+
+        $submissionSource = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
+        {
+            $firstStudentLogin = \OmegaUp\Test\ControllerTestCase::login(
+                $students[0]
+            );
+
+            $secondStudentLogin = \OmegaUp\Test\ControllerTestCase::login(
+                $students[1]
+            );
+
+            // Add one AC run for the first student
+            $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $firstStudentLogin->auth_token,
+                'problemset_id' => $courseData['assignment_problemset_ids'][0],
+                'problem_alias' => $problems[0]['problem']->alias,
+                'language' => 'c11-gcc',
+                'source' => $submissionSource,
+            ]));
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                /*$runData=*/                null,
+                1,
+                'AC',
+                null,
+                $runResponse['guid']
+            );
+
+            // Add a WA runs for the second student
+            $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $secondStudentLogin->auth_token,
+                'problemset_id' => $courseData['assignment_problemset_ids'][0],
+                'problem_alias' => $problems[0]['problem']->alias,
+                'language' => 'c11-gcc',
+                'source' => $submissionSource,
+            ]));
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                /*$runData=*/                null,
+                0.9,
+                'PA',
+                null,
+                $runResponse['guid']
+            );
+
+            $firstResponse = \OmegaUp\Controllers\Course::apiMyProgress(
+                new \OmegaUp\Request([
+                    'auth_token' => $firstStudentLogin->auth_token,
+                    'alias' => $courseData['course_alias'],
+                    'usernameOrEmail' => $students[0]->username,
+                ])
+            );
+
+            $secondResponse = \OmegaUp\Controllers\Course::apiMyProgress(
+                new \OmegaUp\Request([
+                    'auth_token' => $secondStudentLogin->auth_token,
+                    'alias' => $courseData['course_alias'],
+                    'usernameOrEmail' => $students[1]->username,
+                ])
+            );
+        }
+
+        // The first student solved the problem in the assignment, so
+        // 100% of progress for that problem was achived
+        $this->assertEquals(
+            $firstResponse['assignments'][$courseData['assignment_aliases'][0]]['score'],
+            100
+        );
+        $this->assertEquals(
+            $firstResponse['assignments'][$courseData['assignment_aliases'][0]]['max_score'],
+            100
+        );
+
+        // The second student got a PA, so 90% of progress
+        // for that problem was achived
+        $this->assertEquals(
+            $secondResponse['assignments'][$courseData['assignment_aliases'][0]]['score'],
+            90
+        );
+        $this->assertEquals(
+            $secondResponse['assignments'][$courseData['assignment_aliases'][0]]['max_score'],
+            100
+        );
+    }
 }

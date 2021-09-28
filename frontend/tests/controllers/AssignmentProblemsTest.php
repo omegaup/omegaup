@@ -523,7 +523,6 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
 
         //First student will solve problem0, second student will only get 90%
 
-
         $this->assertEquals($assignmentAlias, $results[0]['assignment_alias']);
         // Variance of the first problem must be greater than 0
         // Variance of the second one should be 0, all users solved it
