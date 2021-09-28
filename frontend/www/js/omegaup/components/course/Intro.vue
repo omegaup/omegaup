@@ -90,7 +90,7 @@
       </template>
     </div>
     <div class="mt-4">
-      <div class="mb-4">
+      <div v-if="course.objective" class="mb-4">
         <h5 class="intro-subtitle pb-1">{{ T.courseIntroWhatYouWillLearn }}</h5>
         <omegaup-markdown
           :markdown="course.objective"
