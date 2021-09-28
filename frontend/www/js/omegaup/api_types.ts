@@ -2290,6 +2290,18 @@ export namespace types {
     start_time: Date;
   }
 
+  export interface CourseCardEnrolled {
+    alias: string;
+    name: string;
+    progress: number;
+    school_name?: string;
+  }
+
+  export interface CourseCardFinished {
+    alias: string;
+    name: string;
+  }
+
   export interface CourseCardPublic {
     alias: string;
     lessonsCount: number;
@@ -2453,8 +2465,8 @@ export namespace types {
 
   export interface CourseTabsPayload {
     courses: {
-      enrolled: types.CourseCardPublic[];
-      finished: types.CourseCardPublic[];
+      enrolled: types.CourseCardEnrolled[];
+      finished: types.CourseCardFinished[];
       general: types.CourseCardPublic[];
     };
   }

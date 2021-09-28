@@ -15,6 +15,7 @@ namespace OmegaUp\DAO;
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseCardPublic=array{alias: string, lessonsCount: int, level: null|string, name: string, school_name: null|string, studentsCount: int}
  * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
+ * @psalm-type CourseCardFinished=array{alias: string, name: string}
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
@@ -302,9 +303,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
-     * @return list<CourseCardEnrolled>
+     * @return array{enrolled: list<CourseCardEnrolled>, finished: list<CourseCardFinished>}
      */
-    public static function getEnrolledCoursesForTab(
+    public static function getEnrolledAndFinishedCoursesForTabs(
         \OmegaUp\DAO\VO\Identities $identity
     ): array {
         $sql = 'SELECT
@@ -331,7 +332,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     -- and that score should not be greater than 100%
                     SELECT
                         cbpr.course_id,
-                        MIN(100, ROUND(SUM(cbpr.total_assignment_score) / SUM(cbpr.max_points) * 100, 2)) AS progress
+                        LEAST(100, ROUND(SUM(cbpr.total_assignment_score) / SUM(cbpr.max_points) * 100, 2)) AS progress
                     FROM (
                         -- aggregate all runs per assignment
                         SELECT
@@ -349,7 +350,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                                 psp.problem_id,
                                 s.identity_id,
                                 MAX(r.contest_score) AS best_score_of_problem,
-                                a.max_points,
+                                a.max_points
                             FROM
                                 Assignments a
                             INNER JOIN
@@ -372,14 +373,32 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ORDER BY
                     c.name ASC, c.finish_time DESC;';
 
-        /** @var list<array{alias: string, name: string, progress: float, school_name: null|string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [
-                $identity->identity_id,
-                $identity->identity_id,
-            ]
-        );
+        $courses = [
+            'enrolled' => [],
+            'finished' => [],
+        ];
+
+        /** @var array{alias: string, name: string, progress: float, school_name: null|string} */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [
+                    $identity->identity_id,
+                    $identity->identity_id,
+                ]
+            ) as $row
+        ) {
+            // TODO: Determine the exact percentage to consider the course as finished.
+            if ($row['progress'] == 100) {
+                unset($row['progress']);
+                unset($row['school_name']);
+                $courses['finished'][] = $row;
+                continue;
+            }
+            $courses['enrolled'][] = $row;
+        }
+
+        return $courses;
     }
 
     /**
