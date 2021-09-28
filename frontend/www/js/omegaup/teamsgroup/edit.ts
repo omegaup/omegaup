@@ -1,7 +1,6 @@
 import teamsgroup_Edit, {
   AvailableTabs,
 } from '../components/teamsgroup/Edit.vue';
-import { Team } from '../components/teamsgroup/Upload.test';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
@@ -17,6 +16,8 @@ import {
   identityOptionalFields,
   identityRequiredFields,
 } from '../groups';
+
+export type CsvTeam = types.Identity & { usernames: string };
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.TeamGroupEditPayload();
@@ -94,7 +95,7 @@ OmegaUp.on('ready', () => {
             identity,
           }: {
             originalUsername: string;
-            identity: Team;
+            identity: CsvTeam;
           }) => {
             api.Identity.updateIdentityTeam({
               ...identity,
@@ -169,7 +170,7 @@ OmegaUp.on('ready', () => {
             identities,
             identitiesTeams,
           }: {
-            identities: Team[];
+            identities: CsvTeam[];
             identitiesTeams: { [team: string]: string[] };
           }) => {
             api.Identity.bulkCreateForTeams({
@@ -257,7 +258,7 @@ OmegaUp.on('ready', () => {
             identitiesTeams: {
               [team: string]: { username: string; password?: string }[];
             };
-            identities: Team[];
+            identities: CsvTeam[];
             file: File;
             humanReadable: boolean;
             selfGeneratedIdentities: boolean;
@@ -268,7 +269,7 @@ OmegaUp.on('ready', () => {
                 ui.error(T.groupsInvalidCsv);
                 return;
               }
-              const records = getCSVRecords<Team>({
+              const records = getCSVRecords<CsvTeam>({
                 fields: dataset.fields,
                 records: dataset.records,
                 requiredFields: identityRequiredFields,

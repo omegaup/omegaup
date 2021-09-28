@@ -139,7 +139,7 @@ Vue.use(ButtonPlugin);
 Vue.use(BadgePlugin);
 Vue.use(CardPlugin);
 
-type CsvTeam = types.Identity & {
+type TeamIdentity = types.Identity & {
   usernames: { username: string; password?: string }[];
 };
 
@@ -186,7 +186,7 @@ export default class Upload extends Vue {
     { key: 'password', label: T.loginPassword },
   ];
 
-  get items(): CsvTeam[] {
+  get items(): TeamIdentity[] {
     return this.identities.map((identity) => ({
       ...identity,
       usernames: this.identitiesTeams[identity.username],

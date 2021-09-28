@@ -5,7 +5,7 @@ import T from '../../lang';
 
 import teamsgroup_Upload from './Upload.vue';
 
-export type Team = types.Identity & { usernames: string };
+import { CsvTeam } from '../../teamsgroup/edit';
 
 describe('Upload.vue', () => {
   it('Should handle upload teams view with identities', async () => {
@@ -17,7 +17,7 @@ describe('Upload.vue', () => {
 
     expect(wrapper.text()).toContain(T.groupsUploadCsvFile);
 
-    const identities: Team[] = [
+    const identities: CsvTeam[] = [
       {
         username: 'teams:group:team_1',
         name: 'user 1',
