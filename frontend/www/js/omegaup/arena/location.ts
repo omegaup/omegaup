@@ -80,27 +80,37 @@ export async function getProblemAndRunDetails({
   problemDetails: null | types.ProblemDetails;
 }> {
   const { guid, problemAlias } = getOptionsFromLocation(location);
-  let runDetails: null | types.RunDetails = null;
-  let problemDetails: null | types.ProblemDetails = null;
-  if (!problemAlias) {
-    return { problemDetails, runDetails };
-  }
-  [problemDetails, runDetails] = await Promise.all([
-    api.Problem.details({
+  let problemPromise: Promise<null | types.ProblemDetails> = Promise.resolve(
+    null,
+  );
+  let runPromise: Promise<null | types.RunDetails> = Promise.resolve(null);
+
+  if (problemAlias) {
+    problemPromise = api.Problem.details({
       problem_alias: problemAlias,
       prevent_problemset_open: false,
-      contest_alias: contestAlias,
-    }),
-    guid ? api.Run.details({ run_alias: guid }) : Promise.resolve(null),
-  ]);
-  for (const run of problemDetails.runs ?? []) {
-    trackRun({ run });
+      contest_alias: contestAlias || undefined,
+    });
   }
-  const currentProblem = problems?.find(
-    ({ alias }: { alias: string }) => alias === problemDetails?.alias,
-  );
-  problemDetails.title = currentProblem?.text ?? '';
-  problemsStore.commit('addProblem', problemDetails);
+  if (guid) {
+    runPromise = api.Run.details({ run_alias: guid });
+  }
+
+  const [problemDetails, runDetails] = await Promise.all([
+    problemPromise,
+    runPromise,
+  ]);
+
+  if (problemDetails != null) {
+    for (const run of problemDetails.runs ?? []) {
+      trackRun({ run });
+    }
+    const currentProblem = problems?.find(
+      ({ alias }: { alias: string }) => alias === problemDetails?.alias,
+    );
+    problemDetails.title = currentProblem?.text ?? '';
+    problemsStore.commit('addProblem', problemDetails);
+  }
 
   return { problemDetails, runDetails };
 }
