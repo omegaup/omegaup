@@ -67,7 +67,7 @@
                   }"
                   role="tab"
                   :data-problem-alias="problem.alias"
-                  @click="selectedProblem = problem"
+                  @click="onChangeSelectedProblem(problem)"
                 >
                   <template v-if="problem.runs.length &gt; 0">
                     {{ bestScore(problem) * problem.points }} /
@@ -291,6 +291,11 @@ export default class CourseViewStudent extends Vue {
     });
     this.feedback = '';
     this.showFeedbackForm = false;
+  }
+
+  onChangeSelectedProblem(problem: types.CourseProblem): void {
+    this.selectedProblem = problem;
+    this.selectedRun = problem.runs?.[0] ?? null;
   }
 
   @Watch('selectedStudent')
