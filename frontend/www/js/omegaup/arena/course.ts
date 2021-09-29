@@ -7,7 +7,7 @@ import T from '../lang';
 
 import Vue from 'vue';
 import arena_Course from '../components/arena/Course.vue';
-import { getOptionsFromLocation } from './location';
+import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import {
   showSubmission,
   SubmissionRequest,
@@ -28,7 +28,7 @@ import clarificationStore from './clarificationsStore';
 import socketStore from './socketStore';
 import { myRunsStore, runsStore } from './runsStore';
 
-OmegaUp.on('ready', () => {
+OmegaUp.on('ready', async () => {
   time.setSugarLocale();
 
   const commonPayload = types.payloadParsers.CommonPayload();
@@ -40,6 +40,16 @@ OmegaUp.on('ready', () => {
   const activeTab = getSelectedValidTab(locationHash[0], courseAdmin);
   if (activeTab !== locationHash[0]) {
     window.location.hash = activeTab;
+  }
+  let runDetails: null | types.RunDetails = null;
+  let problemDetails: null | types.ProblemDetails = null;
+  try {
+    ({ runDetails, problemDetails } = await getProblemAndRunDetails({
+      problems: payload.currentAssignment.problems,
+      location: window.location.hash,
+    }));
+  } catch (e) {
+    ui.apiError(e);
   }
 
   trackClarifications(payload.courseDetails.clarifications);
@@ -53,13 +63,13 @@ OmegaUp.on('ready', () => {
       popupDisplayed: PopupDisplayed.None,
       problemInfo: null as types.ProblemInfo | null,
       problem: null as types.NavbarProblemsetProblem | null,
-      problems: payload.currentAssignment
-        .problems as types.NavbarProblemsetProblem[],
+      problems: payload.currentAssignment.problems,
       showNewClarificationPopup: false,
       guid: null as null | string,
       problemAlias: null as null | string,
       searchResultUsers: [] as types.ListItem[],
-      runDetailsData: null as types.RunDetails | null,
+      runDetailsData: runDetails,
+      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-course', {
@@ -81,6 +91,7 @@ OmegaUp.on('ready', () => {
           allRuns: runsStore.state.runs,
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
+          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           socketStatus: socketStore.state.socketStatus,
         },
         on: {

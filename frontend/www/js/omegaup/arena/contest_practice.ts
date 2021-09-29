@@ -12,7 +12,7 @@ import {
   submitRun,
   submitRunFailed,
 } from './submissions';
-import { getOptionsFromLocation } from './location';
+import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import {
   ContestClarification,
   ContestClarificationType,
@@ -24,14 +24,24 @@ import clarificationStore from './clarificationsStore';
 import { navigateToProblem, NavigationType } from './navigation';
 import { myRunsStore } from './runsStore';
 
-OmegaUp.on('ready', () => {
+OmegaUp.on('ready', async () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestPracticeDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
-
+  let runDetails: null | types.RunDetails = null;
+  let problemDetails: null | types.ProblemDetails = null;
+  try {
+    ({ runDetails, problemDetails } = await getProblemAndRunDetails({
+      contestAlias: payload.contest.alias,
+      problems: payload.problems,
+      location: window.location.hash,
+    }));
+  } catch (e) {
+    ui.apiError(e);
+  }
   trackClarifications(payload.clarifications);
 
   const contestPractice = new Vue({
@@ -40,12 +50,14 @@ OmegaUp.on('ready', () => {
     data: () => ({
       problemInfo: null as types.ProblemInfo | null,
       problem: null as types.NavbarProblemsetProblem | null,
-      problems: payload.problems as types.NavbarProblemsetProblem[],
+      problems: payload.problems,
       popupDisplayed: PopupDisplayed.None,
       showNewClarificationPopup: false,
       guid: null as null | string,
       problemAlias: null as null | string,
       isAdmin: false,
+      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      runDetailsData: runDetails,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
@@ -64,6 +76,8 @@ OmegaUp.on('ready', () => {
           problemAlias: this.problemAlias,
           isAdmin: this.isAdmin,
           runs: myRunsStore.state.runs,
+          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          runDetailsData: this.runDetailsData,
         },
         on: {
           'navigate-to-problem': ({
