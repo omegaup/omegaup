@@ -6,7 +6,7 @@ import * as ui from '../ui';
 import Vue from 'vue';
 import arena_Contest from '../components/arena/Contest.vue';
 import { PopupDisplayed } from '../components/problem/Details.vue';
-import { getOptionsFromLocation } from './location';
+import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import problemsStore from './problemStore';
 import {
   ContestClarification,
@@ -29,13 +29,24 @@ import rankingStore from './rankingStore';
 import socketStore from './socketStore';
 import { myRunsStore } from './runsStore';
 
-OmegaUp.on('ready', () => {
+OmegaUp.on('ready', async () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
+  let runDetails: null | types.RunDetails = null;
+  let problemDetails: null | types.ProblemDetails = null;
+  try {
+    ({ runDetails, problemDetails } = await getProblemAndRunDetails({
+      contestAlias: payload.contest.alias,
+      problems: payload.problems,
+      location: window.location.hash,
+    }));
+  } catch (e) {
+    ui.apiError(e);
+  }
   trackClarifications(payload.clarifications);
 
   // Refresh after time T
@@ -108,13 +119,15 @@ OmegaUp.on('ready', () => {
     data: () => ({
       problemInfo: null as types.ProblemInfo | null,
       problem: null as types.NavbarProblemsetProblem | null,
-      problems: payload.problems as types.NavbarProblemsetProblem[],
+      problems: payload.problems,
       popupDisplayed: PopupDisplayed.None,
       showNewClarificationPopup: false,
       guid: null as null | string,
       problemAlias: null as null | string,
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
+      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      runDetailsData: runDetails,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
@@ -139,6 +152,8 @@ OmegaUp.on('ready', () => {
           showPenalty: this.showPenalty,
           socketStatus: socketStore.state.socketStatus,
           runs: myRunsStore.state.runs,
+          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          runDetailsData: this.runDetailsData,
         },
         on: {
           'navigate-to-problem': ({
