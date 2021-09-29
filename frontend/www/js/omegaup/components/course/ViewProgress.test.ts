@@ -113,11 +113,12 @@ describe('ViewProgress.vue', () => {
     }\
 </text:p></table:table-cell><table:table-cell office:value-type="string"><text:p>\
 ${T.courseProgressGlobalScore}</text:p></table:table-cell><table:table-cell \
-office:value-type="string"><text:p>${
-      assignment.name
-    } ${formatString(T.studentProgressPoints, {
-      points: assignment.points,
-    })}</text:p></table:table-cell>\
+office:value-type="string"><text:p>${assignment.name} ${formatString(
+      T.studentProgressPoints,
+      {
+        points: assignment.points,
+      },
+    )}</text:p></table:table-cell>\
 </table:table-row>
 <table:table-row>
 <table:table-cell office:value-type="string"><text:p>${
