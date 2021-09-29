@@ -1198,6 +1198,7 @@
 	"studentCourseInformationDescription": "Aqu\u00ed encontrar\u00e1s la lista de los cursos en los que te has inscrito.",
 	"studentCoursesModal": "- Cada que comienzas un curso lo podr\u00e1s ver y continuar en esta lista.\n- Tambi\u00e9n podr\u00e1s ver los cursos a los que te invitan las y los docentes de tu escuela.\n- Se mostrar\u00e1n solo tus cursos m\u00e1s recientes, para ver m\u00e1s ve a \"Ver todos los cursos\".",
 	"studentProgressDescriptionTotalPoints": "(%(points) puntos)",
+	"studentProgressExtraProblem": "(extra)",
 	"studentProgressOnlyLecturesDescription": "Este contenido s\u00f3lo incluye lecturas",
 	"studentProgressTooltipDescription": "%(problem):\n\n%(score) de %(points) puntos (%(progress)% de progreso)",
 	"studentsProgressRangeHeader": "Progreso de los estudiantes (del %(lowCount) al %(highCount))",

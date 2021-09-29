@@ -1199,6 +1199,7 @@ const translations: { [key: string]: string; } = {
   studentCourseInformationDescription: "Aqui voc\u00ea encontrar\u00e1 a lista de cursos nos quais est\u00e1 matriculado.",
   studentCoursesModal: "- Cada vez que voc\u00ea iniciar um curso, poder\u00e1 v\u00ea\\-lo e continuar nesta lista.\n- Voc\u00ea tamb\u00e9m poder\u00e1 ver os cursos para os quais os professores de sua escola o convidam.\n- Apenas os cursos mais recentes ser\u00e3o exibidos, para ver mais v\u00e1 para \"Ver todos os cursos\".",
   studentProgressDescriptionTotalPoints: "(%(points) pontos)",
+  studentProgressExtraProblem: "(extra)",
   studentProgressOnlyLecturesDescription: "Este conte\u00fado inclui apenas leituras",
   studentProgressTooltipDescription: "%(problem):\n\n%(score) of %(points) pontos (%(progress)% de progresso)",
   studentsProgressRangeHeader: "Progresso dos estudantes (do %(lowCount) ao %(highCount))",
