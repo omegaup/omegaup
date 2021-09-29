@@ -11,7 +11,13 @@
       }}</sup>
     </template>
     <template #clock>
-      <div class="clock">{{ clock }}</div>
+      <div v-if="isAssignmentFinished" class="clock">{{ clock }}</div>
+      <omegaup-countdown
+        v-else
+        class="clock"
+        :target-time="deadline"
+        @finish="now = Date.now()"
+      ></omegaup-countdown>
     </template>
     <template #arena-problems>
       <div data-contest-practice>
@@ -167,6 +173,7 @@ import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import arena_Scoreboard from './Scoreboard.vue';
 import arena_Summary from './Summary.vue';
+import omegaup_Countdown from '../Countdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { SocketStatus } from '../../arena/events_socket';
 
@@ -181,6 +188,7 @@ import { SocketStatus } from '../../arena/events_socket';
     'omegaup-arena-scoreboard': arena_Scoreboard,
     'omegaup-arena-summary': arena_Summary,
     'omegaup-problem-details': problem_Details,
+    'omegaup-countdown': omegaup_Countdown,
   },
 })
 export default class ArenaCourse extends Vue {
@@ -211,6 +219,7 @@ export default class ArenaCourse extends Vue {
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
   clock = '00:00:00';
+  now = new Date();
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;
@@ -234,6 +243,14 @@ export default class ArenaCourse extends Vue {
       return T.socketStatusFailed;
     }
     return T.socketStatusWaiting;
+  }
+
+  get deadline(): null | Date {
+    return this.currentAssignment.finish_time ?? this.now;
+  }
+
+  get isAssignmentFinished(): boolean {
+    return this.deadline ? this.deadline < this.now : false;
   }
 
   get problemDetailsPopup(): PopupDisplayed {
