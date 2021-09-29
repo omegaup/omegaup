@@ -54,7 +54,6 @@
           ></omegaup-arena-summary>
           <div v-else class="problem main">
             <omegaup-problem-details
-              ref="problem-details"
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :next-submission-timestamp="currentNextSubmissionTimestamp"
               :languages="contest.languages.split(',')"
@@ -134,7 +133,7 @@
 
 <script lang="ts">
 import * as Highcharts from 'highcharts/highstock';
-import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -166,7 +165,6 @@ import { SubmissionRequest } from '../../arena/submissions';
   },
 })
 export default class ArenaContest extends Vue {
-  @Ref('problem-details') readonly problemDetails!: Vue;
   @Prop() contest!: types.ContestPublicDetails;
   @Prop() contestAdmin!: boolean;
   @Prop() problems!: types.NavbarProblemsetProblem[];

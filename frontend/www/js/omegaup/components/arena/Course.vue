@@ -36,7 +36,6 @@
           ></omegaup-arena-summary>
           <div v-else class="problem main">
             <omegaup-problem-details
-              ref="problem-details"
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :next-submission-timestamp="currentNextSubmissionTimestamp"
               :problem="problemInfo"
@@ -155,7 +154,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import arena_Arena from './Arena.vue';
@@ -184,7 +183,6 @@ import { SubmissionRequest } from '../../arena/submissions';
   },
 })
 export default class ArenaCourse extends Vue {
-  @Ref('problem-details') readonly problemDetails!: Vue;
   @Prop() course!: types.CourseDetails;
   @Prop() currentAssignment!: types.ArenaAssignment;
   @Prop() problems!: types.NavbarProblemsetProblem[];
