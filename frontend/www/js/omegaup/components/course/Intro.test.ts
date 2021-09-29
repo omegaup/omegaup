@@ -5,7 +5,7 @@ import type { types } from '../../api_types';
 
 import course_Intro from './Intro.vue';
 
-const courseDetails = {
+const courseDetails: types.CourseDetails = {
   admission_mode: 'registration',
   alias: 'test-course',
   archived: false,
@@ -19,16 +19,21 @@ const courseDetails = {
   is_curator: true,
   is_admin: true,
   name: 'Course name',
-  public: true,
   requests_user_information: 'yes',
   school_name: '',
   show_scoreboard: false,
   start_time: new Date(),
   student_count: 1,
   unlimited_duration: false,
-} as types.CourseDetails;
+};
 
-const statements = {
+const statements: {
+  [name: string]: {
+    gitObjectId?: string;
+    markdown?: string;
+    statementType?: string;
+  };
+} = {
   acceptTeacher: {
     markdown:
       '¿Deseas agregar a los organizadores del curso como tus profesores/profesoras?\n\nSi los aceptas, podrán ver la lista de los problemas que has resuelto y de los que has intentado resolver',
