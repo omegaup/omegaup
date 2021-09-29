@@ -12,6 +12,7 @@
     </template>
     <template #clock>
       <div v-if="isAssignmentFinished" class="clock">{{ clock }}</div>
+      <div v-else-if="!deadline" class="clock">{{ INF }}</div>
       <omegaup-countdown
         v-else
         class="clock"
@@ -219,6 +220,7 @@ export default class ArenaCourse extends Vue {
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
   clock = '00:00:00';
+  INF = '∞';
   now = new Date();
 
   get activeProblemAlias(): null | string {
@@ -246,7 +248,7 @@ export default class ArenaCourse extends Vue {
   }
 
   get deadline(): null | Date {
-    return this.currentAssignment.finish_time ?? this.now;
+    return this.currentAssignment.finish_time ?? null;
   }
 
   get isAssignmentFinished(): boolean {
