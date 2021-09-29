@@ -14,7 +14,7 @@ namespace OmegaUp\DAO;
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseCardPublic=array{alias: string, lessonsCount: int, level: null|string, name: string, studentsCount: int}
- * @psalm-type AssignmentsProblemsPoints=array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
+ * @psalm-type AssignmentsProblemsPoints=array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
  * @psalm-type StudentProgressInCourse=array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
@@ -517,6 +517,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     'alias' => $row['assignment_alias'],
                     'name' => $row['assignment_name'],
                     'points' => 0.0,
+                    'extraPoints' => 0.0,
                     'problems' => [],
                     'order' => $row['assignment_order'],
                 ];
@@ -525,6 +526,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             if (!$row['is_extra_problem']) {
                 $assignmentsProblems[$row['assignment_alias']]['points'] += $row['problem_points'];
                 $coursePoints += $row['problem_points'];
+            } else {
+                $assignmentsProblems[$row['assignment_alias']]['extraPoints'] += $row['problem_points'];
             }
 
             $assignmentsProblems[$row['assignment_alias']]['problems'][$row['problem_alias']] = [
@@ -702,10 +705,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ];
             }
 
-            // Assignment score doesn't consider the extra problems.
-            $studentsProgress[$username]['assignments'][$assignmentAlias]['score'] += !$row['is_extra_problem'] ? $problemScore : 0.0;
+            // Assignment score considers the extra problems.
+            $studentsProgress[$username]['assignments'][$assignmentAlias]['score'] += $problemScore;
             $studentsProgress[$username]['assignments'][$assignmentAlias]['progress'] += (
-                !$row['is_extra_problem'] && $assignmentsProblems[$assignmentAlias]['points'] !== 0.0 ? (
+                $assignmentsProblems[$assignmentAlias]['points'] !== 0.0 ? (
                     $problemScore / $assignmentsProblems[$assignmentAlias]['points'] * 100
                  ) : 0.0
             );
@@ -731,7 +734,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ];
         }
 
-        /** @var array<string, array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}> */
+        /** @var array<string, array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}> */
         $assignmentsProblems = array_map(
             function (array $assignmentProblems) {
                 usort(
@@ -750,8 +753,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         usort(
             $assignmentsProblems,
             /**
-             * @param array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int} $a
-             * @param array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int} $b
+             * @param array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int} $a
+             * @param array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int} $b
              */
             fn (array $a, array $b) => $a['order'] - $b['order']
         );

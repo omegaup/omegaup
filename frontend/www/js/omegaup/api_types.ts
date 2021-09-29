@@ -1791,6 +1791,7 @@ export namespace types {
 
   export interface AssignmentsProblemsPoints {
     alias: string;
+    extraPoints: number;
     name: string;
     order: number;
     points: number;

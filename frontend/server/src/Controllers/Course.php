@@ -40,7 +40,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseStudent=array{name: null|string, username: string}
  * @psalm-type StudentProgress=array{classname: string, country_id: null|string, name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}
  * @psalm-type StudentProgressInCourse=array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}
- * @psalm-type AssignmentsProblemsPoints=array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
+ * @psalm-type AssignmentsProblemsPoints=array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
  * @psalm-type CourseNewPayload=array{is_admin: bool, is_curator: bool, languages: array<string, string>}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, allLanguages: array<string, string>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
@@ -3083,23 +3083,29 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $studentsProgress = \OmegaUp\Cache::getFromCacheOrSet(
-            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
-            "{$courseAlias}-{$page}-{$length}",
-            function () use ($course, $page, $length) {
-                if (is_null($course->course_id) || is_null($course->group_id)) {
-                    throw new \OmegaUp\Exceptions\NotFoundException(
-                        'courseNotFound'
-                    );
-                }
-                return \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
-                    $course->course_id,
-                    $course->group_id,
-                    $page,
-                    $length
-                );
-            },
-            60 * 60 * 12 // 12 hours
+        // $studentsProgress = \OmegaUp\Cache::getFromCacheOrSet(
+        //     \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
+        //     "{$courseAlias}-{$page}-{$length}",
+        //     function () use ($course, $page, $length) {
+        //         if (is_null($course->course_id) || is_null($course->group_id)) {
+        //             throw new \OmegaUp\Exceptions\NotFoundException(
+        //                 'courseNotFound'
+        //             );
+        //         }
+        //         return \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
+        //             $course->course_id,
+        //             $course->group_id,
+        //             $page,
+        //             $length
+        //         );
+        //     },
+        //     60 * 60 * 12 // 12 hours
+        // );
+        $studentsProgress = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
+            intval($course->course_id),
+            intval($course->group_id),
+            $page,
+            $length
         );
 
         return [
