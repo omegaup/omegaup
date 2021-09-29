@@ -3400,14 +3400,15 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function getCourseTabsForTypeScript(
         \OmegaUp\Request $r
     ): array {
-        // Check who is visiting, but a not logged user can still
-        // view the list of public courses.
+        /** @var array{enrolled: list<CourseCardEnrolled>, finished: list<CourseCardFinished>, general: list<CourseCardPublic>} $courses */
         $courses = [
             'enrolled' => [],
             'finished' => [],
             'general' => \OmegaUp\DAO\Courses::getPublicCoursesForTab(),
         ];
 
+        // Check who is visiting, but a not logged user can still
+        // view the list of public courses.
         try {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {

@@ -390,7 +390,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ]
             ) as $row
         ) {
-            // TODO: Determine the exact percentage to consider the course as finished.
+            // TODO: Define the exact percentage to consider the course as finished.
             if ($row['progress'] == 100) {
                 unset($row['progress']);
                 unset($row['school_name']);
