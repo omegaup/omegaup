@@ -3083,29 +3083,23 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        // $studentsProgress = \OmegaUp\Cache::getFromCacheOrSet(
-        //     \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
-        //     "{$courseAlias}-{$page}-{$length}",
-        //     function () use ($course, $page, $length) {
-        //         if (is_null($course->course_id) || is_null($course->group_id)) {
-        //             throw new \OmegaUp\Exceptions\NotFoundException(
-        //                 'courseNotFound'
-        //             );
-        //         }
-        //         return \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
-        //             $course->course_id,
-        //             $course->group_id,
-        //             $page,
-        //             $length
-        //         );
-        //     },
-        //     60 * 60 * 12 // 12 hours
-        // );
-        $studentsProgress = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
-            intval($course->course_id),
-            intval($course->group_id),
-            $page,
-            $length
+        $studentsProgress = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
+            "{$courseAlias}-{$page}-{$length}",
+            function () use ($course, $page, $length) {
+                if (is_null($course->course_id) || is_null($course->group_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'courseNotFound'
+                    );
+                }
+                return \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
+                    $course->course_id,
+                    $course->group_id,
+                    $page,
+                    $length
+                );
+            },
+            60 * 60 * 12 // 12 hours
         );
 
         return [
