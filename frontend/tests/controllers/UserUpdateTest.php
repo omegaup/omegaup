@@ -22,10 +22,6 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'birth_date' => strtotime('1988-01-01'),
             'graduation_date' => strtotime('2016-02-02'),
             'locale' => $locale->name,
-            'has_competitive_objective' => true,
-            'has_learning_objective' => true,
-            'has_scholar_objective' => false,
-            'has_teaching_objective' => false,
         ]);
 
         \OmegaUp\Controllers\User::apiUpdate($r);
@@ -59,22 +55,6 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Graduation date without school is not saved on database.
         $this->assertNull($graduationDate);
         $this->assertEquals($locale->language_id, $identityDb['language_id']);
-        $this->assertEquals(
-            $r['has_competitive_objective'],
-            $userDb->has_competitive_objective
-        );
-        $this->assertEquals(
-            $r['has_learning_objective'],
-            $userDb->has_learning_objective
-        );
-        $this->assertEquals(
-            $r['has_scholar_objective'],
-            $userDb->has_scholar_objective
-        );
-        $this->assertEquals(
-            $r['has_teaching_objective'],
-            $userDb->has_teaching_objective
-        );
 
         // Edit all fields again with diff values
         $locale = \OmegaUp\DAO\Languages::getByName('pseudo');
@@ -89,10 +69,6 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'birth_date' => strtotime('2000-02-02'),
             'graduation_date' => strtotime('2026-03-03'),
             'locale' => $locale->name,
-            'has_competitive_objective' => false,
-            'has_learning_objective' => false,
-            'has_scholar_objective' => true,
-            'has_teaching_objective' => true,
         ]);
 
         \OmegaUp\Controllers\User::apiUpdate($r);
@@ -126,22 +102,6 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Graduation date without school is not saved on database.
         $this->assertNull($graduationDate);
         $this->assertEquals($locale->language_id, $identityDb['language_id']);
-        $this->assertEquals(
-            $r['has_competitive_objective'],
-            $userDb->has_competitive_objective
-        );
-        $this->assertEquals(
-            $r['has_learning_objective'],
-            $userDb->has_learning_objective
-        );
-        $this->assertEquals(
-            $r['has_scholar_objective'],
-            $userDb->has_scholar_objective
-        );
-        $this->assertEquals(
-            $r['has_teaching_objective'],
-            $userDb->has_teaching_objective
-        );
 
         // Double check language update with the appropiate API
         $identity = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
@@ -532,16 +492,70 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUpdateObjectives() {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
         $login = self::login($identity);
 
-        $response = \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+        $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'has_competitive_objective' => true,
             'has_learning_objective' => true,
-            'has_scholar_objective' => true,
+            'has_scholar_objective' => false,
             'has_teaching_objective' => false,
-        ]));
-        $this->assertEquals('ok', $response['status']);
+        ]);
+        \OmegaUp\Controllers\User::apiUpdate($r);
+
+        // Check user from db
+        $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
+        $this->assertEquals(
+            $r['has_competitive_objective'],
+            $userDb->has_competitive_objective
+        );
+        $this->assertEquals(
+            $r['has_learning_objective'],
+            $userDb->has_learning_objective
+        );
+        $this->assertEquals(
+            $r['has_scholar_objective'],
+            $userDb->has_scholar_objective
+        );
+        $this->assertEquals(
+            $r['has_teaching_objective'],
+            $userDb->has_teaching_objective
+        );
+
+        // Edit objectives again with diff values
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'has_competitive_objective' => false,
+            'has_learning_objective' => false,
+            'has_scholar_objective' => true,
+            'has_teaching_objective' => true,
+        ]);
+        \OmegaUp\Controllers\User::apiUpdate($r);
+
+        // Check user from apiProfile
+        $r2 = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $identity->username
+        ]);
+        $response = \OmegaUp\Controllers\User::apiProfile($r2);
+
+        $this->assertEquals(
+            $r['has_competitive_objective'],
+            $response['has_competitive_objective']
+        );
+        $this->assertEquals(
+            $r['has_learning_objective'],
+            $response['has_learning_objective']
+        );
+        $this->assertEquals(
+            $r['has_scholar_objective'],
+            $response['has_scholar_objective']
+        );
+        $this->assertEquals(
+            $r['has_teaching_objective'],
+            $response['has_teaching_objective']
+        );
     }
 
     /**

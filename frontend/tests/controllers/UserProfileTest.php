@@ -182,7 +182,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      * User can see his own objectives
      */
     public function testUserCanSeeSelfObjectives() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
