@@ -29,6 +29,9 @@ export default class Countdown extends Vue {
   get formattedTimeLeft(): string {
     switch (this.countdownFormat) {
       case omegaup.CountdownFormat.EventCountdown:
+        if (this.timeLeft < 0) {
+          return '00:00:00';
+        }
         return time.formatDelta(this.timeLeft);
       case omegaup.CountdownFormat.WaitBetweenUploadsSeconds:
         return ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {

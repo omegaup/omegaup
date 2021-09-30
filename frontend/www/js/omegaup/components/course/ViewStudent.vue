@@ -335,6 +335,11 @@ export default class CourseViewStudent extends Vue {
     this.selectedProblem = found;
     this.selectedRun = found.runs?.[0] ?? null;
   }
+
+  @Watch('selectedProblem')
+  onSelectedProblemChange(newVal: types.CourseProblem) {
+    this.selectedRun = newVal.runs?.[0] ?? null;
+  }
 }
 </script>
 
