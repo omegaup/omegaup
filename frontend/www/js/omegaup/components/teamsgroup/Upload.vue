@@ -98,6 +98,7 @@
           <div>
             <button
               class="btn btn-warning d-inline-block"
+              data-download-csv-button
               @click.prevent="downloadIdentitiesCSV"
             >
               <font-awesome-icon :icon="['fas', 'download']" />
