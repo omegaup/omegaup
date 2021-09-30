@@ -16,7 +16,6 @@
         v-else
         class="clock"
         :target-time="deadline"
-        @finish="now = new Date()"
       ></omegaup-countdown>
     </template>
     <template #arena-problems>
@@ -236,7 +235,6 @@ export default class ArenaCourse extends Vue {
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
   INF = '∞';
-  now = new Date();
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;
