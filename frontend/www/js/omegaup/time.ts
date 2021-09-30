@@ -18,6 +18,9 @@ export function formatFutureDateRelative(futureDate: Date): string {
 }
 
 export function formatDelta(delta: number): string {
+  if (delta < 0) {
+    return '00:00:00';
+  }
   const months = delta / (30 * 24 * 60 * 60 * 1000);
   if (months >= 1.0) {
     return formatFutureDateRelative(new Date(delta + Date.now()));

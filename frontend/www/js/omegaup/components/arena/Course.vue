@@ -11,13 +11,12 @@
       }}</sup>
     </template>
     <template #clock>
-      <div v-if="isAssignmentFinished" class="clock">{{ clock }}</div>
-      <div v-else-if="!deadline" class="clock">{{ INF }}</div>
+      <div v-if="!deadline" class="clock">{{ INF }}</div>
       <omegaup-countdown
         v-else
         class="clock"
         :target-time="deadline"
-        @finish="now = Date.now()"
+        @finish="now = new Date()"
       ></omegaup-countdown>
     </template>
     <template #arena-problems>
@@ -249,10 +248,6 @@ export default class ArenaCourse extends Vue {
 
   get deadline(): null | Date {
     return this.currentAssignment.finish_time ?? null;
-  }
-
-  get isAssignmentFinished(): boolean {
-    return this.deadline ? this.deadline < this.now : false;
   }
 
   get problemDetailsPopup(): PopupDisplayed {
