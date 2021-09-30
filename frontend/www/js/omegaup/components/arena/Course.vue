@@ -56,6 +56,7 @@
               :nomination-status="
                 problemInfo ? problemInfo.nominationStatus : null
               "
+              :in-course="true"
               :popup-displayed="problemDetailsPopup"
               :active-tab="'problems'"
               :languages="course.languages"
@@ -63,6 +64,7 @@
               :guid="guid"
               :problem-alias="problemAlias"
               :should-show-run-details="shouldShowRunDetails"
+              @set-feedback="(request) => $emit('set-feedback', request)"
               @submit-run="onRunSubmitted"
               @show-run="(source) => $emit('show-run', source)"
               @update:activeTab="
@@ -136,6 +138,8 @@
           <omegaup-arena-rundetails-popup
             v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
             :data="currentRunDetailsData"
+            :in-course="true"
+            @set-feedback="(request) => $emit('set-feedback', request)"
             @dismiss="onPopupDismissed"
           ></omegaup-arena-rundetails-popup>
         </template>
