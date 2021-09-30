@@ -145,7 +145,6 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => self::login($identity)->auth_token,
             ])
         );
-        print_r($response);
 
         $this->assertCount(
             1,
