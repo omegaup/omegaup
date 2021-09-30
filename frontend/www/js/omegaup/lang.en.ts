@@ -912,6 +912,7 @@ const translations: { [key: string]: string; } = {
   problemTagMonotoneStack: "Monotone stack",
   problemTagNearestNeighbors: "Nearest neighbors",
   problemTagNumberTheory: "Number theory",
+  problemTagNumericalMethods: "Numerical methods",
   problemTagNumericalSeries: "Numerical series",
   problemTagOMI: "OMI",
   problemTagOMIAguascalientes: "OMI Aguascalientes",
