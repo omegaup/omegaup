@@ -95,6 +95,19 @@ OmegaUp.on('ready', async () => {
           socketStatus: socketStore.state.socketStatus,
         },
         on: {
+          'navigate-to-assignment': ({
+            assignmentAliasToShow,
+            courseAlias,
+            isAdmin,
+          }: {
+            assignmentAliasToShow: string;
+            courseAlias: string;
+            isAdmin: boolean;
+          }) => {
+            window.location.pathname = `/course/${courseAlias}/assignment/${assignmentAliasToShow}/${
+              isAdmin ? 'admin/' : ''
+            }`;
+          },
           'navigate-to-problem': ({
             problem,
           }: {
