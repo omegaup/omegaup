@@ -51,7 +51,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>, shouldShowFirstAssociatedIdentityRunWarning: bool}
- * @psalm-type IntroDetailsPayload=array{alias: string, archived: boolean, description: string, details?: CourseDetails, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
+ * @psalm-type IntroDetailsPayload=array{course: CourseDetails, isFirstTimeAccess: bool, needsBasicInformation: bool, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
  * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
  * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, problemset_id: int, runs: null|list<Run>, start_time: \OmegaUp\Timestamp}
  * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard: Scoreboard, courseDetails: CourseDetails, currentAssignment: ArenaAssignment}
@@ -3860,8 +3860,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         bool $hasSharedUserInformation = false,
         array $registrationResponse = []
     ): array {
-        $courseDetails = self::getBasicCourseDetails($course);
-        $commonDetails = [];
         if (
             is_null($identity) &&
             $shouldShowIntro &&
@@ -3869,11 +3867,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         ) {
             \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
         }
-        if ($course->admission_mode !== self::ADMISSION_MODE_PRIVATE) {
-            $commonDetails = [
-                'details' => self::getCommonCourseDetails($course, $identity),
-            ];
-        }
+
+        $courseDetails = self::getCommonCourseDetails($course, $identity);
+
         $requestUserInformation = $courseDetails['requests_user_information'];
         $needsBasicInformation = false;
         $privacyStatementMarkdown = null;
@@ -3929,15 +3925,9 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $coursePayload = array_merge(
             $registrationResponse,
-            $commonDetails,
             [
-                'name' => $courseDetails['name'],
-                'description' => $courseDetails['description'],
-                'alias' => $courseDetails['alias'],
-                'archived' => $courseDetails['archived'],
+                'course' => $courseDetails,
                 'needsBasicInformation' => $needsBasicInformation,
-                'requestsUserInformation' =>
-                    $courseDetails['requests_user_information'],
                 'shouldShowAcceptTeacher' => !$hasAcceptedTeacher,
                 'statements' => $statements,
                 'isFirstTimeAccess' => !$hasSharedUserInformation,
