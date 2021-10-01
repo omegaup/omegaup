@@ -37,7 +37,8 @@ abstract class Certificates {
                 `certificate_type` = ?,
                 `course_id` = ?,
                 `contest_id` = ?,
-                `verification_code` = ?
+                `verification_code` = ?,
+                `contest_place` = ?
             WHERE
                 (
                     `certificate_id` = ?
@@ -63,6 +64,11 @@ abstract class Certificates {
                 intval($Certificates->contest_id)
             ),
             $Certificates->verification_code,
+            (
+                is_null($Certificates->contest_place) ?
+                null :
+                intval($Certificates->contest_place)
+            ),
             intval($Certificates->certificate_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -90,7 +96,8 @@ abstract class Certificates {
                 `Certificates`.`certificate_type`,
                 `Certificates`.`course_id`,
                 `Certificates`.`contest_id`,
-                `Certificates`.`verification_code`
+                `Certificates`.`verification_code`,
+                `Certificates`.`contest_place`
             FROM
                 `Certificates`
             WHERE
@@ -178,7 +185,8 @@ abstract class Certificates {
                 `Certificates`.`certificate_type`,
                 `Certificates`.`course_id`,
                 `Certificates`.`contest_id`,
-                `Certificates`.`verification_code`
+                `Certificates`.`verification_code`,
+                `Certificates`.`contest_place`
             FROM
                 `Certificates`
         ';
@@ -234,8 +242,10 @@ abstract class Certificates {
                     `certificate_type`,
                     `course_id`,
                     `contest_id`,
-                    `verification_code`
+                    `verification_code`,
+                    `contest_place`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -264,6 +274,11 @@ abstract class Certificates {
                 intval($Certificates->contest_id)
             ),
             $Certificates->verification_code,
+            (
+                is_null($Certificates->contest_place) ?
+                null :
+                intval($Certificates->contest_place)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
