@@ -3597,6 +3597,10 @@ export namespace types {
     gender?: string;
     graduation_date?: Date;
     gravatar_92: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
     hide_problem_tags: boolean;
     is_own_profile: boolean;
     is_private: boolean;
@@ -3631,6 +3635,10 @@ export namespace types {
     gender?: string;
     graduation_date?: Date | string;
     gravatar_92?: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
     hide_problem_tags: boolean;
     is_own_profile: boolean;
     is_private: boolean;
