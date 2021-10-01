@@ -433,7 +433,27 @@ class Identity extends \OmegaUp\Controllers\Controller {
                             /*$gender=*/ 'decline',
                             $teamGroup->alias
                         );
-                        \OmegaUp\DAO\Identities::create($newIdentity);
+
+                        $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(
+                            $selfGeneratedIdentity['username']
+                        );
+                        if (is_null($preexistingIdentity)) {
+                            \OmegaUp\DAO\Identities::create($newIdentity);
+                        } else {
+                            // Check password
+                            \OmegaUp\SecurityTools::testStrongPassword(
+                                $selfGeneratedIdentity['password']
+                            );
+                            $hashedPassword = \OmegaUp\SecurityTools::hashString(
+                                $selfGeneratedIdentity['password']
+                            );
+                            $preexistingIdentity->password = $hashedPassword;
+
+                            \OmegaUp\DAO\Identities::update(
+                                $preexistingIdentity
+                            );
+                            $newIdentity = $preexistingIdentity;
+                        }
                     }
                     \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
                         $team->team_id,
@@ -448,13 +468,25 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     );
                 }
 
-                // Create IdentitySchool
-                $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
-                    'identity_id' => $newIdentity->identity_id,
-                    'school_id' => $schoolId,
-                ]);
+                $preexistingIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByIdentityAndSchoolId(
+                    $newIdentity,
+                    $schoolId
+                );
 
-                \OmegaUp\DAO\IdentitiesSchools::create($identitySchool);
+                if (is_null($preexistingIdentitySchool)) {
+                    // Create IdentitySchool
+                    $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
+                        'identity_id' => $newIdentity->identity_id,
+                        'school_id' => $schoolId,
+                    ]);
+
+                    \OmegaUp\DAO\IdentitiesSchools::create($identitySchool);
+                } else {
+                    \OmegaUp\DAO\IdentitiesSchools::update(
+                        $preexistingIdentitySchool
+                    );
+                    $identitySchool = $preexistingIdentitySchool;
+                }
 
                 // Save current_identity_school_id on Identity
                 $newIdentity->current_identity_school_id = $identitySchool->identity_school_id;
