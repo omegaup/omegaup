@@ -2404,6 +2404,7 @@ export namespace types {
     assignment_alias: string;
     average?: number;
     avg_runs?: number;
+    completed_score_percentage?: number;
     high_score_percentage?: number;
     low_score_percentage?: number;
     max_points: number;

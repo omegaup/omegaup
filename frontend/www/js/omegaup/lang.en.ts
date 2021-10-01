@@ -429,6 +429,7 @@ const translations: { [key: string]: string; } = {
   courseStatisticsMinimumScore: "Minimum score",
   courseStatisticsScoreVariance: "Score variance",
   courseStatisticsStudentsAbove: "Students scored above 60%",
+  courseStatisticsStudentsCompleted: "Students with a score equal to 100%",
   courseStatisticsStudentsScored: "Students scored at 0%",
   courseStatisticsVariance: "Variance",
   courseStatisticsVerdicts: "Verdict distribution",
