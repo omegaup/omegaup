@@ -1216,39 +1216,34 @@ export namespace types {
       elementId: string = 'payload',
     ): types.IntroDetailsPayload {
       return ((x) => {
-        if (x.details)
-          x.details = ((x) => {
-            x.assignments = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                if (x.finish_time)
-                  x.finish_time = ((x: number) => new Date(x * 1000))(
-                    x.finish_time,
-                  );
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
+        x.course = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
                 );
-                return x;
-              });
-            })(x.assignments);
-            x.clarifications = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                x.time = ((x: number) => new Date(x * 1000))(x.time);
-                return x;
-              });
-            })(x.clarifications);
-            if (x.finish_time)
-              x.finish_time = ((x: number) => new Date(x * 1000))(
-                x.finish_time,
-              );
-            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-            return x;
-          })(x.details);
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
         return x;
       })(
         JSON.parse(
@@ -1787,6 +1782,20 @@ export namespace types {
 
   export interface AssignmentProgress {
     [key: string]: types.Progress;
+  }
+
+  export interface AssignmentsProblemsPoints {
+    alias: string;
+    name: string;
+    order: number;
+    points: number;
+    problems: {
+      alias: string;
+      isExtraProblem: boolean;
+      order: number;
+      points: number;
+      title: string;
+    }[];
   }
 
   export interface AssociatedIdentity {
@@ -2682,14 +2691,9 @@ export namespace types {
   }
 
   export interface IntroDetailsPayload {
-    alias: string;
-    archived: boolean;
-    description: string;
-    details?: types.CourseDetails;
+    course: types.CourseDetails;
     isFirstTimeAccess: boolean;
-    name: string;
     needsBasicInformation: boolean;
-    requestsUserInformation: string;
     shouldShowAcceptTeacher: boolean;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     shouldShowResults: boolean;
@@ -3456,6 +3460,22 @@ export namespace types {
     username: string;
   }
 
+  export interface StudentProgressInCourse {
+    assignments: {
+      [key: string]: {
+        problems: { [key: string]: { progress: number; score: number } };
+        progress: number;
+        score: number;
+      };
+    };
+    classname: string;
+    country_id?: string;
+    courseProgress: number;
+    courseScore: number;
+    name?: string;
+    username: string;
+  }
+
   export interface StudentProgressPayload {
     course: types.CourseDetails;
     student: string;
@@ -3463,12 +3483,12 @@ export namespace types {
   }
 
   export interface StudentsProgressPayload {
+    assignmentsProblems: types.AssignmentsProblemsPoints[];
     course: types.CourseDetails;
     length: number;
     page: number;
     pagerItems: types.PageItem[];
-    problemTitles: { [key: string]: string };
-    students: types.StudentProgress[];
+    students: types.StudentProgressInCourse[];
     totalRows: number;
   }
 
