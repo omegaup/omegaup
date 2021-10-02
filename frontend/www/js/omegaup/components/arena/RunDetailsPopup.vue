@@ -2,56 +2,7 @@
   <omegaup-overlay-popup @dismiss="$emit('dismiss')">
     <form data-run-details-view>
       <div v-if="data">
-        <div v-if="inCourse && (data.admin || data.feedback)">
-          <h3>{{ T.feedbackTitle }}</h3>
-          <pre><code>{{
-            data.feedback ? data.feedback.feedback : T.feedbackNotSentYet
-          }}</code></pre>
-          <div v-if="data.feedback">
-            {{
-              ui.formatString(T.feedbackLeftBy, {
-                date: time.formatDate(data.feedback.date),
-              })
-            }}
-            <omegaup-user-username
-              :username="data.feedback.author"
-              :classname="data.feedback.author_classname"
-              :linkify="true"
-            ></omegaup-user-username>
-          </div>
-          <div v-if="data.admin" class="feedback-section">
-            <a role="button" @click="showFeedbackForm = !showFeedbackForm">{{
-              data.feedback === null
-                ? T.submissionFeedbackSendButton
-                : T.submissionFeedbackUpdateButton
-            }}</a>
-            <div v-show="showFeedbackForm" class="form-group">
-              <textarea
-                v-model="feedback"
-                class="form-control"
-                rows="3"
-                maxlength="200"
-              ></textarea>
-              <button
-                class="btn btn-sm btn-primary"
-                :disabled="!feedback"
-                @click.prevent="
-                  $emit('set-feedback', {
-                    guid: data.guid,
-                    feedback,
-                    isUpdate: data.feedback !== null,
-                  })
-                "
-              >
-                {{
-                  data.feedback === null
-                    ? T.submissionSendFeedback
-                    : T.submissionUpdateFeedback
-                }}
-              </button>
-            </div>
-          </div>
-        </div>
+        <slot name="feedback" :data="data"></slot>
         <div v-if="data.groups">
           <h3>{{ T.wordsCases }}</h3>
           <div></div>
@@ -215,12 +166,9 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as ui from '../../ui';
-import * as time from '../../time';
 import arena_CodeView from './CodeView.vue';
 import arena_DiffView from './DiffView.vue';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
-import user_Username from '../user/Username.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -243,20 +191,14 @@ const EMPTY_FIELD = '∅';
     'omegaup-arena-code-view': arena_CodeView,
     'omegaup-arena-diff-view': arena_DiffView,
     'omegaup-overlay-popup': omegaup_OverlayPopup,
-    'omegaup-user-username': user_Username,
   },
 })
 export default class ArenaRunDetailsPopup extends Vue {
   @Prop() data!: types.RunDetails;
-  @Prop({ default: false }) inCourse!: boolean;
 
   EMPTY_FIELD = EMPTY_FIELD;
   T = T;
-  ui = ui;
-  time = time;
   groupVisible: GroupVisibility = {};
-  showFeedbackForm = false;
-  feedback = this.data?.feedback?.feedback ?? null;
 
   toggle(group: string): void {
     const visible = this.groupVisible[group];
@@ -287,18 +229,3 @@ export default class ArenaRunDetailsPopup extends Vue {
   }
 }
 </script>
-
-<style lang="scss">
-@import '../../../../sass/main.scss';
-.feedback-section {
-  margin-top: 1.5em;
-
-  .form-group {
-    margin-top: 0.5em;
-
-    button {
-      margin-top: 1em;
-    }
-  }
-}
-</style>

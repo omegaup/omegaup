@@ -56,7 +56,6 @@
               :nomination-status="
                 problemInfo ? problemInfo.nominationStatus : null
               "
-              :in-course="true"
               :popup-displayed="problemDetailsPopup"
               :active-tab="'problems'"
               :languages="course.languages"
@@ -64,7 +63,6 @@
               :guid="guid"
               :problem-alias="problemAlias"
               :should-show-run-details="shouldShowRunDetails"
-              @set-feedback="(request) => $emit('set-feedback', request)"
               @submit-run="onRunSubmitted"
               @show-run="(source) => $emit('show-run', source)"
               @update:activeTab="
@@ -98,6 +96,14 @@
               </template>
               <template #best-solvers-list>
                 <div></div>
+              </template>
+              <template #feedback="data">
+                <omegaup-submission-feedback
+                  :guid="data.data.data.guid"
+                  :is-admin="data.data.data.admin"
+                  :feedback-options="data.data.data.feedback"
+                  @set-feedback="(request) => $emit('set-feedback', request)"
+                ></omegaup-submission-feedback>
               </template>
             </omegaup-problem-details>
           </div>
@@ -138,10 +144,17 @@
           <omegaup-arena-rundetails-popup
             v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
             :data="currentRunDetailsData"
-            :in-course="true"
-            @set-feedback="(request) => $emit('set-feedback', request)"
             @dismiss="onPopupDismissed"
-          ></omegaup-arena-rundetails-popup>
+          >
+            <template #feedback="data">
+              <omegaup-submission-feedback
+                :guid="data.data.guid"
+                :is-admin="data.data.admin"
+                :feedback-options="data.data.feedback"
+                @set-feedback="(request) => $emit('set-feedback', request)"
+              ></omegaup-submission-feedback>
+            </template>
+          </omegaup-arena-rundetails-popup>
         </template>
       </omegaup-overlay>
     </template>
@@ -188,6 +201,7 @@ import omegaup_Overlay from '../Overlay.vue';
 import arena_Scoreboard from './Scoreboard.vue';
 import arena_Summary from './Summary.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
+import submission_Feedback from '../submissions/Feedback.vue';
 import { SocketStatus } from '../../arena/events_socket';
 
 @Component({
@@ -202,6 +216,7 @@ import { SocketStatus } from '../../arena/events_socket';
     'omegaup-arena-scoreboard': arena_Scoreboard,
     'omegaup-arena-summary': arena_Summary,
     'omegaup-problem-details': problem_Details,
+    'omegaup-submission-feedback': submission_Feedback,
   },
 })
 export default class ArenaCourse extends Vue {

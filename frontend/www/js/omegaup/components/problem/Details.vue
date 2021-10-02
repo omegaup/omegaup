@@ -121,10 +121,12 @@
             <omegaup-arena-rundetails-popup
               v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
               :data="currentRunDetailsData"
-              :in-course="inCourse"
               @dismiss="onPopupDismissed"
-              @set-feedback="(request) => $emit('set-feedback', request)"
-            ></omegaup-arena-rundetails-popup>
+            >
+              <template #feedback="data">
+                <slot name="feedback" :data="data"></slot>
+              </template>
+            </omegaup-arena-rundetails-popup>
             <omegaup-quality-nomination-promotion-popup
               v-show="currentPopupDisplayed === PopupDisplayed.Promotion"
               :solved="nominationStatus && nominationStatus.solved"
@@ -388,7 +390,6 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: null }) languages!: null | string[];
-  @Prop({ default: false }) inCourse!: boolean;
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
