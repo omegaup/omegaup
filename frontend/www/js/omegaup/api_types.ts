@@ -2625,7 +2625,6 @@ export namespace types {
     state?: string;
     state_id?: string;
     username: string;
-    usernames?: string;
   }
 
   export interface IdentityExt {
@@ -2808,6 +2807,18 @@ export namespace types {
     label: string;
     page: number;
     url?: string;
+  }
+
+  export interface Participant {
+    country_id?: string;
+    gender?: string;
+    name?: string;
+    participant_password?: string;
+    participant_username: string;
+    password?: string;
+    school_name?: string;
+    state_id?: string;
+    username: string;
   }
 
   export interface PrivacyStatement {
