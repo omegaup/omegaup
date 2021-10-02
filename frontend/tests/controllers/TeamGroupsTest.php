@@ -1586,22 +1586,6 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             /*$autogernerateIdentities=*/ true
         );
 
-        $teamIdentitiesDecoded = json_decode($teamIdentities, true);
-
-        $teamIdentitiesMapping = [];
-        foreach ($teamIdentitiesDecoded as $team) {
-            $teamIdentitiesMapping[$team['username']] = [];
-            $members = json_decode($team['usernames'], true);
-            foreach ($members as $member) {
-                $teamIdentitiesMapping[$team['username']][] = [
-                    'username' => $member['username'],
-                    'password' => \OmegaUp\SecurityTools::hashString(
-                        $member['password']
-                    ),
-                ];
-            }
-        }
-
         // Call api using identity creator group member
         \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
             new \OmegaUp\Request([
@@ -1639,5 +1623,36 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->assertStringContainsString('Team', $identity['name']);
         }
+
+        // Upload again to update passwords
+        $teamIdentities = \OmegaUp\Test\Factories\Identity::getCsvData(
+            'team_identities_with_no_members.csv',
+            $teamGroup->alias,
+            /*$password=*/ null,
+            /*$forTeams=*/ true,
+            $teamGroup->number_of_contestants,
+            /*$autogernerateIdentities=*/ true
+        );
+
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiBulkCreateForTeams(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'team_identities' => $teamIdentities,
+                'team_group_alias' => $teamGroup->alias,
+            ])
+        );
+
+        [
+            'identities' => $identities,
+        ] = \OmegaUp\Controllers\TeamsGroup::getTeamGroupEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'team_group_alias' => $teamGroup->alias,
+                'auth_token' => $creatorLogin->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        // The number of identities per group reamin the same
+        $this->assertCount(5, $identities);
     }
 }
