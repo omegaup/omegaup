@@ -23,6 +23,7 @@ class Certificates extends \OmegaUp\DAO\VO\VO {
         'course_id' => true,
         'contest_id' => true,
         'verification_code' => true,
+        'contest_place' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -80,6 +81,11 @@ class Certificates extends \OmegaUp\DAO\VO\VO {
                 $data['verification_code']
             ) ? strval($data['verification_code']) : '';
         }
+        if (isset($data['contest_place'])) {
+            $this->contest_place = intval(
+                $data['contest_place']
+            );
+        }
     }
 
     /**
@@ -132,4 +138,11 @@ class Certificates extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $verification_code = null;
+
+    /**
+     * Se guarda el lugar en el que quedo un estudiante si es menor o igual a certificate_cutoff
+     *
+     * @var int|null
+     */
+    public $contest_place = null;
 }

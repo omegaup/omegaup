@@ -4688,22 +4688,26 @@ Update user profile
 
 ### Parameters
 
-| Name                | Type                                         | Description |
-| ------------------- | -------------------------------------------- | ----------- |
-| `birth_date`        | `string`                                     |             |
-| `country_id`        | `string`                                     |             |
-| `graduation_date`   | `string`                                     |             |
-| `locale`            | `string`                                     |             |
-| `state_id`          | `string`                                     |             |
-| `auth_token`        | `mixed`                                      |             |
-| `gender`            | `'decline'\|'female'\|'male'\|'other'\|null` |             |
-| `hide_problem_tags` | `bool\|null`                                 |             |
-| `is_private`        | `bool\|null`                                 |             |
-| `name`              | `null\|string`                               |             |
-| `scholar_degree`    | `null\|string`                               |             |
-| `school_id`         | `int\|null`                                  |             |
-| `school_name`       | `mixed`                                      |             |
-| `username`          | `mixed`                                      |             |
+| Name                        | Type                                         | Description |
+| --------------------------- | -------------------------------------------- | ----------- |
+| `birth_date`                | `string`                                     |             |
+| `country_id`                | `string`                                     |             |
+| `graduation_date`           | `string`                                     |             |
+| `locale`                    | `string`                                     |             |
+| `state_id`                  | `string`                                     |             |
+| `auth_token`                | `mixed`                                      |             |
+| `gender`                    | `'decline'\|'female'\|'male'\|'other'\|null` |             |
+| `has_competitive_objective` | `bool\|null`                                 |             |
+| `has_learning_objective`    | `bool\|null`                                 |             |
+| `has_scholar_objective`     | `bool\|null`                                 |             |
+| `has_teaching_objective`    | `bool\|null`                                 |             |
+| `hide_problem_tags`         | `bool\|null`                                 |             |
+| `is_private`                | `bool\|null`                                 |             |
+| `name`                      | `null\|string`                               |             |
+| `scholar_degree`            | `null\|string`                               |             |
+| `school_id`                 | `int\|null`                                  |             |
+| `school_name`               | `mixed`                                      |             |
+| `username`                  | `mixed`                                      |             |
 
 ### Returns
 
