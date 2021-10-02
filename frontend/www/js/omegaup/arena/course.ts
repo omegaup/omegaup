@@ -102,6 +102,19 @@ OmegaUp.on('ready', async () => {
           socketStatus: socketStore.state.socketStatus,
         },
         on: {
+          'navigate-to-assignment': ({
+            assignmentAliasToShow,
+            courseAlias,
+            isAdmin,
+          }: {
+            assignmentAliasToShow: string;
+            courseAlias: string;
+            isAdmin: boolean;
+          }) => {
+            window.location.pathname = `/course/${courseAlias}/assignment/${assignmentAliasToShow}/${
+              isAdmin ? 'admin/' : ''
+            }`;
+          },
           'navigate-to-problem': ({
             problem,
           }: {
@@ -295,6 +308,31 @@ OmegaUp.on('ready', async () => {
                 ui.info(T.qualityNominationRateProblemDesc);
               })
               .catch(ui.apiError);
+          },
+          'set-feedback': ({
+            guid,
+            feedback,
+            isUpdate,
+          }: {
+            guid: string;
+            feedback: string;
+            isUpdate: boolean;
+          }) => {
+            api.Submission.setFeedback({
+              guid,
+              course_alias: payload.courseDetails.alias,
+              assignment_alias: payload.currentAssignment.alias,
+              feedback,
+            })
+              .then(() => {
+                this.popupDisplayed = PopupDisplayed.None;
+                ui.success(
+                  isUpdate
+                    ? T.feedbackSuccesfullyUpdated
+                    : T.feedbackSuccesfullyAdded,
+                );
+              })
+              .catch(ui.error);
           },
         },
       });

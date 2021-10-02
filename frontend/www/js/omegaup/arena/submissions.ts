@@ -4,7 +4,7 @@ import * as ui from '../ui';
 import * as time from '../time';
 import { types } from '../api_types';
 import { myRunsStore, runsStore } from './runsStore';
-import { omegaup, OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup';
 import JSZip from 'jszip';
 import type problem_Details from '../components/problem/Details.vue';
 import T from '../lang';
@@ -204,7 +204,7 @@ function displayRunDetails({
       source_name: `Main.${runDetails.language}`,
       groups: groups,
       show_diff: request.isAdmin ? runDetails.show_diff : 'none',
-      feedback: omegaup.SubmissionFeedback.None as omegaup.SubmissionFeedback,
+      feedback: runDetails.feedback,
     }),
   );
   window.location.hash = request.hash;

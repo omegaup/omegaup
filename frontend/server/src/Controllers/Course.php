@@ -51,7 +51,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>, shouldShowFirstAssociatedIdentityRunWarning: bool}
- * @psalm-type IntroDetailsPayload=array{alias: string, archived: boolean, description: string, details?: CourseDetails, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
+ * @psalm-type IntroDetailsPayload=array{course: CourseDetails, isFirstTimeAccess: bool, needsBasicInformation: bool, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
  * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
  * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, problemset_id: int, runs: null|list<Run>, start_time: \OmegaUp\Timestamp}
  * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard: Scoreboard, courseDetails: CourseDetails, currentAssignment: ArenaAssignment}
@@ -60,8 +60,10 @@ namespace OmegaUp\Controllers;
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
  * @psalm-type CourseClarificationsPayload=array{page: int, length: int, pagerItems: list<PageItem>, clarifications: list<Clarification>}
- * @psalm-type CourseCardPublic=array{alias: string, lessonsCount: int, level: null|string, name: string, studentsCount: int}
- * @psalm-type CourseTabsPayload=array{courses: array{enrolled: list<CourseCardPublic>, finished: list<CourseCardPublic>, general: list<CourseCardPublic>}}
+ * @psalm-type CourseCardPublic=array{alias: string, lessonsCount: int, level: null|string, name: string, school_name: null|string, studentsCount: int}
+ * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
+ * @psalm-type CourseCardFinished=array{alias: string, name: string}
+ * @psalm-type CourseTabsPayload=array{courses: array{enrolled: list<CourseCardEnrolled>, finished: list<CourseCardFinished>, general: list<CourseCardPublic>}}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -3398,14 +3400,15 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function getCourseTabsForTypeScript(
         \OmegaUp\Request $r
     ): array {
-        // Check who is visiting, but a not logged user can still
-        // view the list of public courses.
+        /** @var array{enrolled: list<CourseCardEnrolled>, finished: list<CourseCardFinished>, general: list<CourseCardPublic>} $courses */
         $courses = [
             'enrolled' => [],
             'finished' => [],
             'general' => \OmegaUp\DAO\Courses::getPublicCoursesForTab(),
         ];
 
+        // Check who is visiting, but a not logged user can still
+        // view the list of public courses.
         try {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
@@ -3420,7 +3423,12 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'entrypoint' => 'course_list',
             ];
         }
-        // TODO: Add the courses enrolled and finished for student
+        [
+            'enrolled' => $courses['enrolled'],
+            'finished' => $courses['finished'],
+        ] = \OmegaUp\DAO\Courses::getEnrolledAndFinishedCoursesForTabs(
+            $r->identity
+        );
         return [
             'smartyProperties' => [
                 'payload' => [
@@ -3860,8 +3868,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         bool $hasSharedUserInformation = false,
         array $registrationResponse = []
     ): array {
-        $courseDetails = self::getBasicCourseDetails($course);
-        $commonDetails = [];
         if (
             is_null($identity) &&
             $shouldShowIntro &&
@@ -3869,11 +3875,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         ) {
             \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
         }
-        if ($course->admission_mode !== self::ADMISSION_MODE_PRIVATE) {
-            $commonDetails = [
-                'details' => self::getCommonCourseDetails($course, $identity),
-            ];
-        }
+
+        $courseDetails = self::getCommonCourseDetails($course, $identity);
+
         $requestUserInformation = $courseDetails['requests_user_information'];
         $needsBasicInformation = false;
         $privacyStatementMarkdown = null;
@@ -3929,15 +3933,9 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $coursePayload = array_merge(
             $registrationResponse,
-            $commonDetails,
             [
-                'name' => $courseDetails['name'],
-                'description' => $courseDetails['description'],
-                'alias' => $courseDetails['alias'],
-                'archived' => $courseDetails['archived'],
+                'course' => $courseDetails,
                 'needsBasicInformation' => $needsBasicInformation,
-                'requestsUserInformation' =>
-                    $courseDetails['requests_user_information'],
                 'shouldShowAcceptTeacher' => !$hasAcceptedTeacher,
                 'statements' => $statements,
                 'isFirstTimeAccess' => !$hasSharedUserInformation,

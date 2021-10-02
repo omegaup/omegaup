@@ -19,7 +19,7 @@
         v-else
         class="clock"
         :target-time="deadline"
-        @finish="now = Date.now()"
+        @finish="now = new Date()"
       ></omegaup-countdown>
     </template>
     <template #arena-problems>

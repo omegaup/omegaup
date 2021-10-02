@@ -261,7 +261,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, hide_problem_tags: bool, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null
+     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null
      */
     final public static function getExtendedProfileDataByPk(?int $identityId): ?array {
         if (is_null($identityId)) {
@@ -276,6 +276,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     l.`name` AS locale,
                     u.`birth_date`,
                     u.`scholar_degree`,
+                    u.`has_learning_objective`,
+                    u.`has_teaching_objective`,
+                    u.`has_scholar_objective`,
+                    u.`has_competitive_objective`,
                     u.`hide_problem_tags`,
                     u.`verified`,
                     i.`gender`,
@@ -319,7 +323,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     i.`identity_id` = ?
                 LIMIT
                     1;';
-        /** @var array{birth_date: null|string, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, hide_problem_tags: bool|null, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null */
+        /** @var array{birth_date: null|string, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null */
         $identity = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$identityId]
@@ -328,6 +332,18 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             return null;
         }
 
+        $identity['has_learning_objective'] = boolval(
+            $identity['has_learning_objective']
+        );
+        $identity['has_teaching_objective'] = boolval(
+            $identity['has_teaching_objective']
+        );
+        $identity['has_scholar_objective'] = boolval(
+            $identity['has_scholar_objective']
+        );
+        $identity['has_competitive_objective'] = boolval(
+            $identity['has_competitive_objective']
+        );
         $identity['hide_problem_tags'] = boolval(
             $identity['hide_problem_tags']
         );
