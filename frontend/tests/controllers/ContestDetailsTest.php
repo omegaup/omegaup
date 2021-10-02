@@ -1047,7 +1047,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
-                    /*$password=*/ '',
+                    /*$password=*/ null,
                     /*$forTeams=*/ true
                 ),
                 'team_group_alias' => $teamGroup->alias,

@@ -60,8 +60,10 @@ namespace OmegaUp\Controllers;
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
  * @psalm-type CourseClarificationsPayload=array{page: int, length: int, pagerItems: list<PageItem>, clarifications: list<Clarification>}
- * @psalm-type CourseCardPublic=array{alias: string, lessonsCount: int, level: null|string, name: string, studentsCount: int}
- * @psalm-type CourseTabsPayload=array{courses: array{enrolled: list<CourseCardPublic>, finished: list<CourseCardPublic>, general: list<CourseCardPublic>}}
+ * @psalm-type CourseCardPublic=array{alias: string, lessonsCount: int, level: null|string, name: string, school_name: null|string, studentsCount: int}
+ * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
+ * @psalm-type CourseCardFinished=array{alias: string, name: string}
+ * @psalm-type CourseTabsPayload=array{courses: array{enrolled: list<CourseCardEnrolled>, finished: list<CourseCardFinished>, general: list<CourseCardPublic>}}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -3398,14 +3400,15 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function getCourseTabsForTypeScript(
         \OmegaUp\Request $r
     ): array {
-        // Check who is visiting, but a not logged user can still
-        // view the list of public courses.
+        /** @var array{enrolled: list<CourseCardEnrolled>, finished: list<CourseCardFinished>, general: list<CourseCardPublic>} $courses */
         $courses = [
             'enrolled' => [],
             'finished' => [],
             'general' => \OmegaUp\DAO\Courses::getPublicCoursesForTab(),
         ];
 
+        // Check who is visiting, but a not logged user can still
+        // view the list of public courses.
         try {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
@@ -3420,7 +3423,12 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'entrypoint' => 'course_list',
             ];
         }
-        // TODO: Add the courses enrolled and finished for student
+        [
+            'enrolled' => $courses['enrolled'],
+            'finished' => $courses['finished'],
+        ] = \OmegaUp\DAO\Courses::getEnrolledAndFinishedCoursesForTabs(
+            $r->identity
+        );
         return [
             'smartyProperties' => [
                 'payload' => [
