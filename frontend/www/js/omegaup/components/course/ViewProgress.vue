@@ -39,7 +39,6 @@
                           T.studentProgressDescriptionTotalPoints,
                           {
                             points: courseTotalPoints,
-                            extraPoints: courseTotalExtraPoints,
                           },
                         )
                       }}</span>
@@ -60,17 +59,10 @@
                       {{ assignment.name }}
                       <span class="d-block"
                         >{{
-                          assignment.extraPoints > 0
-                            ? ui.formatString(
-                                T.studentProgressDescriptionTotalPoints,
-                                {
-                                  points: assignment.points,
-                                  extraPoints: assignment.extraPoints,
-                                },
-                              )
-                            : ui.formatString(T.studentProgressPoints, {
-                                points: assignment.points,
-                              })
+                          ui.formatString(
+                            T.studentProgressDescriptionTotalPoints,
+                            { points: assignment.points },
+                          )
                         }}
                         <a
                           v-if="assignment.points === 0"
@@ -163,7 +155,9 @@ export function toOds(courseName: string, table: TableCell[][]): string {
     result += '<table:table-row>\n';
     for (const cell of row) {
       if (cell instanceof Percentage) {
-        result += `<table:table-cell office:value-type="percentage" office:value="${cell.toString()}"><text:p>${cell.toString()}</text:p></table:table-cell>`;
+        result += `<table:table-cell office:value-type="percentage" office:value="${
+          cell.value
+        }"><text:p>${cell.toString()}</text:p></table:table-cell>`;
       } else if (typeof cell === 'number') {
         const num: number = cell;
         result += `<table:table-cell office:value-type="float" office:value="${num}"><text:p>${num.toPrecision(
@@ -236,18 +230,7 @@ export default class CourseViewProgress extends Vue {
     ];
     header.push();
     for (const assignment of this.assignmentsProblems) {
-      header.push(
-        `${assignment.name} ${
-          assignment.extraPoints > 0
-            ? ui.formatString(T.studentProgressDescriptionTotalPoints, {
-                points: assignment.points,
-                extraPoints: assignment.extraPoints,
-              })
-            : ui.formatString(T.studentProgressPoints, {
-                points: assignment.points,
-              })
-        }`,
-      );
+      header.push(assignment.name);
     }
     table.push(header);
 
@@ -260,9 +243,7 @@ export default class CourseViewProgress extends Vue {
       for (const assignment of this.assignmentsProblems) {
         row.push(
           assignment.alias in student.assignments
-            ? new Percentage(
-                student.assignments[assignment.alias].progress / 100,
-              )
+            ? student.assignments[assignment.alias].score
             : 0,
         );
       }
@@ -281,13 +262,6 @@ export default class CourseViewProgress extends Vue {
 
   get courseTotalPoints(): number {
     return this.assignmentsProblems.reduce((acc, curr) => acc + curr.points, 0);
-  }
-
-  get courseTotalExtraPoints(): number {
-    return this.assignmentsProblems.reduce(
-      (acc, curr) => acc + curr.extraPoints,
-      0,
-    );
   }
 
   @AsyncComputed()

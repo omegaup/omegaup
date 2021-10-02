@@ -13,7 +13,7 @@
     <td data-global-score class="text-center font-weight-bold align-middle">
       <span class="d-block">{{ studentProgress.courseProgress }}%</span>
       <span class="d-block">{{
-        ui.formatString(T.studentProgressPoints, {
+        ui.formatString(T.studentProgressDescriptionTotalPoints, {
           points: studentProgress.courseScore,
         })
       }}</span>
@@ -83,7 +83,7 @@ export default class StudentProgress extends Vue {
       assignmentAlias in this.studentProgress.assignments
         ? this.studentProgress.assignments[assignmentAlias].score
         : 0;
-    return ui.formatString(T.studentProgressPoints, {
+    return ui.formatString(T.studentProgressDescriptionTotalPoints, {
       points: score.toFixed(0),
     });
   }

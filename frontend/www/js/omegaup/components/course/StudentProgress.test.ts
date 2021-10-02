@@ -13,7 +13,6 @@ describe('StudentProgress.vue', () => {
             alias: 'test-assignment-a',
             name: 'Test assignment A',
             points: 200,
-            extraPoints: 100,
             problems: [
               {
                 alias: 'test-problem-a',
@@ -35,7 +34,6 @@ describe('StudentProgress.vue', () => {
             alias: 'test-assignment-b',
             name: 'Test assignment B',
             points: 0,
-            extraPoints: 0,
             problems: [],
           },
         ] as types.AssignmentsProblemsPoints[],
@@ -70,7 +68,7 @@ describe('StudentProgress.vue', () => {
     expect(wrapper.find('div.bg-red').exists()).toBe(true);
     expect(wrapper.find('td[data-global-score]').text()).toBe(
       '50% ' +
-        ui.formatString(T.studentProgressPoints, {
+        ui.formatString(T.studentProgressDescriptionTotalPoints, {
           points: 100,
         }),
     );
