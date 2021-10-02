@@ -2299,11 +2299,24 @@ export namespace types {
     start_time: Date;
   }
 
+  export interface CourseCardEnrolled {
+    alias: string;
+    name: string;
+    progress: number;
+    school_name?: string;
+  }
+
+  export interface CourseCardFinished {
+    alias: string;
+    name: string;
+  }
+
   export interface CourseCardPublic {
     alias: string;
     lessonsCount: number;
     level?: string;
     name: string;
+    school_name?: string;
     studentsCount: number;
   }
 
@@ -2461,8 +2474,8 @@ export namespace types {
 
   export interface CourseTabsPayload {
     courses: {
-      enrolled: types.CourseCardPublic[];
-      finished: types.CourseCardPublic[];
+      enrolled: types.CourseCardEnrolled[];
+      finished: types.CourseCardFinished[];
       general: types.CourseCardPublic[];
     };
   }
@@ -3597,6 +3610,10 @@ export namespace types {
     gender?: string;
     graduation_date?: Date;
     gravatar_92: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
     hide_problem_tags: boolean;
     is_own_profile: boolean;
     is_private: boolean;
@@ -3631,6 +3648,10 @@ export namespace types {
     gender?: string;
     graduation_date?: Date | string;
     gravatar_92?: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
     hide_problem_tags: boolean;
     is_own_profile: boolean;
     is_private: boolean;
