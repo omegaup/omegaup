@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isAdmin || feedbackOptions">
+  <div v-if="isAdmin || feedbackOptions" data-submission-feedback>
     <h3>{{ T.feedbackTitle }}</h3>
     <pre><code>{{
       feedbackOptions ? feedbackOptions.feedback : T.feedbackNotSentYet
