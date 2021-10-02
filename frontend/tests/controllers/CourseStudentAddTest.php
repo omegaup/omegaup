@@ -99,7 +99,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         // Asserting isFirstTimeAccess
         $this->assertEquals(
             'optional',
-            $details['requestsUserInformation']
+            $details['course']['requests_user_information']
         );
         $this->assertEquals(1, $details['isFirstTimeAccess']);
 

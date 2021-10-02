@@ -55,6 +55,10 @@ export namespace dao {
     birth_date?: string;
     facebook_user_id?: string;
     git_token?: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
     hide_problem_tags?: boolean;
     in_mailing_list?: boolean;
     is_private?: boolean;
@@ -1212,39 +1216,34 @@ export namespace types {
       elementId: string = 'payload',
     ): types.IntroDetailsPayload {
       return ((x) => {
-        if (x.details)
-          x.details = ((x) => {
-            x.assignments = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                if (x.finish_time)
-                  x.finish_time = ((x: number) => new Date(x * 1000))(
-                    x.finish_time,
-                  );
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
+        x.course = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
                 );
-                return x;
-              });
-            })(x.assignments);
-            x.clarifications = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                x.time = ((x: number) => new Date(x * 1000))(x.time);
-                return x;
-              });
-            })(x.clarifications);
-            if (x.finish_time)
-              x.finish_time = ((x: number) => new Date(x * 1000))(
-                x.finish_time,
-              );
-            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-            return x;
-          })(x.details);
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
         return x;
       })(
         JSON.parse(
@@ -1785,6 +1784,20 @@ export namespace types {
     [key: string]: types.Progress;
   }
 
+  export interface AssignmentsProblemsPoints {
+    alias: string;
+    name: string;
+    order: number;
+    points: number;
+    problems: {
+      alias: string;
+      isExtraProblem: boolean;
+      order: number;
+      points: number;
+      title: string;
+    }[];
+  }
+
   export interface AssociatedIdentity {
     default: boolean;
     username: string;
@@ -2286,11 +2299,24 @@ export namespace types {
     start_time: Date;
   }
 
+  export interface CourseCardEnrolled {
+    alias: string;
+    name: string;
+    progress: number;
+    school_name?: string;
+  }
+
+  export interface CourseCardFinished {
+    alias: string;
+    name: string;
+  }
+
   export interface CourseCardPublic {
     alias: string;
     lessonsCount: number;
     level?: string;
     name: string;
+    school_name?: string;
     studentsCount: number;
   }
 
@@ -2448,8 +2474,8 @@ export namespace types {
 
   export interface CourseTabsPayload {
     courses: {
-      enrolled: types.CourseCardPublic[];
-      finished: types.CourseCardPublic[];
+      enrolled: types.CourseCardEnrolled[];
+      finished: types.CourseCardFinished[];
       general: types.CourseCardPublic[];
     };
   }
@@ -2677,14 +2703,9 @@ export namespace types {
   }
 
   export interface IntroDetailsPayload {
-    alias: string;
-    archived: boolean;
-    description: string;
-    details?: types.CourseDetails;
+    course: types.CourseDetails;
     isFirstTimeAccess: boolean;
-    name: string;
     needsBasicInformation: boolean;
-    requestsUserInformation: string;
     shouldShowAcceptTeacher: boolean;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     shouldShowResults: boolean;
@@ -3463,6 +3484,22 @@ export namespace types {
     username: string;
   }
 
+  export interface StudentProgressInCourse {
+    assignments: {
+      [key: string]: {
+        problems: { [key: string]: { progress: number; score: number } };
+        progress: number;
+        score: number;
+      };
+    };
+    classname: string;
+    country_id?: string;
+    courseProgress: number;
+    courseScore: number;
+    name?: string;
+    username: string;
+  }
+
   export interface StudentProgressPayload {
     course: types.CourseDetails;
     student: string;
@@ -3470,12 +3507,12 @@ export namespace types {
   }
 
   export interface StudentsProgressPayload {
+    assignmentsProblems: types.AssignmentsProblemsPoints[];
     course: types.CourseDetails;
     length: number;
     page: number;
     pagerItems: types.PageItem[];
-    problemTitles: { [key: string]: string };
-    students: types.StudentProgress[];
+    students: types.StudentProgressInCourse[];
     totalRows: number;
   }
 
@@ -3584,6 +3621,10 @@ export namespace types {
     gender?: string;
     graduation_date?: Date;
     gravatar_92: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
     hide_problem_tags: boolean;
     is_own_profile: boolean;
     is_private: boolean;
@@ -3618,6 +3659,10 @@ export namespace types {
     gender?: string;
     graduation_date?: Date | string;
     gravatar_92?: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
     hide_problem_tags: boolean;
     is_own_profile: boolean;
     is_private: boolean;

@@ -52,6 +52,10 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertArrayNotHasKey('password', $response);
         $this->assertArrayNotHasKey('email', $response);
+        $this->assertArrayNotHasKey('has_competitive_objective', $response);
+        $this->assertArrayNotHasKey('has_learning_objective', $response);
+        $this->assertArrayNotHasKey('has_scholar_objective', $response);
+        $this->assertArrayNotHasKey('has_teaching_objective', $response);
         $this->assertEquals(
             $identity2->username,
             $response['username']
@@ -141,6 +145,10 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $this->assertArrayHasKey('email', $response);
+        $this->assertArrayHasKey('has_competitive_objective', $response);
+        $this->assertArrayHasKey('has_learning_objective', $response);
+        $this->assertArrayHasKey('has_scholar_objective', $response);
+        $this->assertArrayHasKey('has_teaching_objective', $response);
         $visibleAttributes = ['email', 'gravatar_92', 'name', 'username', 'rankinfo'];
         foreach ($response as $k => $v) {
             if (in_array($k, $visibleAttributes)) {
@@ -168,6 +176,25 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
         $this->assertArrayHasKey('email', $response);
+    }
+
+    /*
+     * User can see his own objectives
+     */
+    public function testUserCanSeeSelfObjectives() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $identity->username
+        ]);
+        $response = \OmegaUp\Controllers\User::apiProfile($r);
+
+        $this->assertArrayHasKey('has_competitive_objective', $response);
+        $this->assertArrayHasKey('has_learning_objective', $response);
+        $this->assertArrayHasKey('has_scholar_objective', $response);
+        $this->assertArrayHasKey('has_teaching_objective', $response);
     }
 
     /*
