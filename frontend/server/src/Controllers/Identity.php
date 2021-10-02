@@ -440,14 +440,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                         if (is_null($preexistingIdentity)) {
                             \OmegaUp\DAO\Identities::create($newIdentity);
                         } else {
-                            // Check password
-                            \OmegaUp\SecurityTools::testStrongPassword(
-                                $selfGeneratedIdentity['password']
-                            );
-                            $hashedPassword = \OmegaUp\SecurityTools::hashString(
-                                $selfGeneratedIdentity['password']
-                            );
-                            $preexistingIdentity->password = $hashedPassword;
+                            $preexistingIdentity->password = $newIdentity->password;
 
                             \OmegaUp\DAO\Identities::update(
                                 $preexistingIdentity
@@ -482,9 +475,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
                     \OmegaUp\DAO\IdentitiesSchools::create($identitySchool);
                 } else {
-                    \OmegaUp\DAO\IdentitiesSchools::update(
-                        $preexistingIdentitySchool
-                    );
                     $identitySchool = $preexistingIdentitySchool;
                 }
 
