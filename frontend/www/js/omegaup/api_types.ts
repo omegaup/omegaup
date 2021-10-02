@@ -2402,16 +2402,16 @@ export namespace types {
 
   export interface CourseProblemStatistics {
     assignment_alias: string;
-    average: number;
-    avg_runs: number;
-    completed_score_percentage: number;
-    high_score_percentage: number;
-    low_score_percentage: number;
+    average?: number;
+    avg_runs?: number;
+    completed_score_percentage?: number;
+    high_score_percentage?: number;
+    low_score_percentage?: number;
     max_points: number;
-    maximum: number;
-    minimum: number;
+    maximum?: number;
+    minimum?: number;
     problem_alias: string;
-    variance: number;
+    variance?: number;
   }
 
   export interface CourseProblemTried {
