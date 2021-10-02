@@ -124,7 +124,12 @@
               @dismiss="onPopupDismissed"
             >
               <template #feedback="data">
-                <slot name="feedback" :data="data"></slot>
+                <slot
+                  name="feedback"
+                  :feedback="data.feedback"
+                  :guid="data.guid"
+                  :is-admin="data.admin"
+                ></slot>
               </template>
             </omegaup-arena-rundetails-popup>
             <omegaup-quality-nomination-promotion-popup

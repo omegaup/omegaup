@@ -102,11 +102,11 @@
               <template #best-solvers-list>
                 <div></div>
               </template>
-              <template #feedback="data">
+              <template #feedback="{ guid, isAdmin, feedback }">
                 <omegaup-submission-feedback
-                  :guid="data.data.data.guid"
-                  :is-admin="data.data.data.admin"
-                  :feedback-options="data.data.data.feedback"
+                  :guid="guid"
+                  :is-admin="isAdmin"
+                  :feedback-options="feedback"
                   @set-feedback="(request) => $emit('set-feedback', request)"
                 ></omegaup-submission-feedback>
               </template>
@@ -151,11 +151,11 @@
             :data="currentRunDetailsData"
             @dismiss="onPopupDismissed"
           >
-            <template #feedback="data">
+            <template #feedback="{ guid, isAdmin, feedback }">
               <omegaup-submission-feedback
-                :guid="data.data.guid"
-                :is-admin="data.data.admin"
-                :feedback-options="data.data.feedback"
+                :guid="guid"
+                :is-admin="isAdmin"
+                :feedback-options="feedback"
                 @set-feedback="(request) => $emit('set-feedback', request)"
               ></omegaup-submission-feedback>
             </template>
