@@ -189,15 +189,15 @@
 			{
 				"api": "/course/create/",
 				"params": {
-					"visibility": 1,
 					"name": "Curso de prueba",
 					"alias": "curso-prueba",
 					"description": "Curso de prueba",
 					"start_time": "$NOW$",
-					"finish_time": "$NOW$+18000",
-					"admission_mode": "private",
+					"unlimited_duration": "true",
+					"admission_mode": "public",
+					"level": "introductory",
 					"school_id": 1,
-					"needs_basic_information": 0,
+					"needs_basic_information": "false",
 					"requests_user_information": "required",
 					"languages": "py2,py3"
 				}
@@ -210,7 +210,7 @@
 					"alias": "tarea-prueba",
 					"description": "Tarea de prueba",
 					"start_time": "$NOW$",
-					"finish_time": "$NOW$+18000",
+					"unlimited_duration": "true",
 					"assignment_type": "homework",
 					"max_points": 0,
 					"order": 1,
@@ -225,7 +225,7 @@
 					"alias": "examen-prueba",
 					"description": "Examen de prueba",
 					"start_time": "$NOW$",
-					"finish_time": "$NOW$+18000",
+					"unlimited_duration": "true",
 					"assignment_type": "test",
 					"max_points": 0,
 					"order": 1,
