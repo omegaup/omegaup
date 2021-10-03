@@ -445,7 +445,7 @@ const translations: { [key: string]: string; } = {
   courseSubmissionsList: "Course submissions list",
   courseTabEnrolled: "Enrolled courses",
   courseTabFinished: "Finished courses",
-  courseTabGeneral: "Explore courses",
+  courseTabPublic: "Explore courses",
   courseUnarchivedSuccess: "Course unarchived succesfully.",
   courseUpdateAlreadyHasRuns: "The duration can't be changed once a solution has been judged.",
   courseWithoutProblems: "Without problems",

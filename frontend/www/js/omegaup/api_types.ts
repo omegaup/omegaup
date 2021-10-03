@@ -2476,7 +2476,7 @@ export namespace types {
     courses: {
       enrolled: types.CourseCardEnrolled[];
       finished: types.CourseCardFinished[];
-      general: types.CourseCardPublic[];
+      public: types.CourseCardPublic[];
     };
   }
 
