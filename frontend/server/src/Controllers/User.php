@@ -4087,6 +4087,67 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param string $auth_token
+     *
+     * @return list<string>
+     */
+    public static function getUserTypes(
+        int $user_id,
+        ?\OmegaUp\Request $r
+    ): array {
+        $session = is_null($r)
+            ? \OmegaUp\Controllers\Session::getCurrentSession()
+            : \OmegaUp\Controllers\Session::getCurrentSession($r);
+
+        $identity = $session['identity'];
+        if (
+            is_null($identity)
+            || (!$session['is_admin'] && $identity->user_id !== $user_id)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $user = \OmegaUp\DAO\Users::getByPK($user_id);
+        if (is_null($user) || is_null($user->main_identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        $userTypes = [];
+
+        if (
+            is_null($user->has_competitive_objective)
+            || is_null($user->has_learning_objective)
+            || is_null($user->has_scholar_objective)
+            || is_null($user->has_teaching_objective)
+        ) {
+            return $userTypes;
+        }
+
+        if ($user->has_learning_objective && $user->has_scholar_objective) {
+            $userTypes[] = 'student';
+        }
+        if ($user->has_learning_objective && $user->has_competitive_objective) {
+            $userTypes[] = 'contestant';
+        }
+        if ($user->has_teaching_objective && $user->has_scholar_objective) {
+            $userTypes[] = 'teacher';
+        }
+        if ($user->has_teaching_objective && $user->has_competitive_objective) {
+            $userTypes[] = 'coach';
+        }
+        if ($user->has_learning_objective && !$user->has_scholar_objective && !$user->has_competitive_objective) {
+            $userTypes[] = 'self-taught';
+        }
+        if ($user->has_teaching_objective && !$user->has_scholar_objective && !$user->has_competitive_objective) {
+            $userTypes[] = 'independent-teacher';
+        }
+        if (!$user->has_learning_objective && !$user->has_teaching_objective) {
+            $userTypes[] = 'curious';
+        }
+        return $userTypes;
+    }
+
+    /**
      * @param list<array{country_id: string, email: null|string, rank?: int, time: string, user_id?: int, username: string}> $coders
      *
      * @return CoderOfTheMonthList
