@@ -4093,11 +4093,9 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function getUserTypes(
         int $user_id,
-        \OmegaUp\Request $r = null
+        ?\OmegaUp\Request $r = null
     ): array {
-        $session = is_null($r)
-            ? \OmegaUp\Controllers\Session::getCurrentSession()
-            : \OmegaUp\Controllers\Session::getCurrentSession($r);
+        $session = \OmegaUp\Controllers\Session::getCurrentSession($r);
 
         $identity = $session['identity'];
         if (
