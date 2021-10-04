@@ -1,18 +1,17 @@
 <template>
-  <div class="navbar-assignments">
+  <div class="w-100 mt-2">
     <button
-      class="btn btn-primary col-md-12 col-sm-12 col-xs-12"
+      class="btn btn-primary col-md-12 col-sm-12 col-xs-12 mb-2"
       :disabled="previousAssignment === null"
       :title="previousAssignment !== null ? previousAssignment.name : ''"
       role="button"
       @click="$emit('navigate-to-assignment', previousAssignment.alias)"
     >
-      <span
+      <font-awesome-icon
         v-if="previousAssignment !== null"
-        class="glyphicon glyphicon-chevron-left"
-        aria-hidden="true"
-      ></span
-      >{{ previousAssignment !== null ? previousAssignment.name : '-' }}
+        :icon="['fas', 'chevron-circle-left']"
+      />
+      {{ previousAssignment !== null ? previousAssignment.name : '-' }}
     </button>
     <button
       class="btn btn-primary col-md-12 col-sm-12 col-xs-12"
@@ -21,12 +20,11 @@
       role="button"
       @click="$emit('navigate-to-assignment', nextAssignment.alias)"
     >
-      {{ nextAssignment !== null ? nextAssignment.name : '-'
-      }}<span
+      {{ nextAssignment !== null ? nextAssignment.name : '-' }}
+      <font-awesome-icon
         v-if="nextAssignment !== null"
-        class="glyphicon glyphicon-chevron-right"
-        aria-hidden="true"
-      ></span>
+        :icon="['fas', 'chevron-circle-right']"
+      />
     </button>
   </div>
 </template>
@@ -36,7 +34,20 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 
-@Component
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faChevronCircleLeft,
+  faChevronCircleRight,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faChevronCircleLeft);
+library.add(faChevronCircleRight);
+
+@Component({
+  components: {
+    FontAwesomeIcon,
+  },
+})
 export default class ArenaNavbarAssignments extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() currentAssignment!: omegaup.Assignment;
