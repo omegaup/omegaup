@@ -314,6 +314,31 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.apiError);
           },
+          'set-feedback': ({
+            guid,
+            feedback,
+            isUpdate,
+          }: {
+            guid: string;
+            feedback: string;
+            isUpdate: boolean;
+          }) => {
+            api.Submission.setFeedback({
+              guid,
+              course_alias: payload.courseDetails.alias,
+              assignment_alias: payload.currentAssignment.alias,
+              feedback,
+            })
+              .then(() => {
+                this.popupDisplayed = PopupDisplayed.None;
+                ui.success(
+                  isUpdate
+                    ? T.feedbackSuccesfullyUpdated
+                    : T.feedbackSuccesfullyAdded,
+                );
+              })
+              .catch(ui.error);
+          },
         },
       });
     },

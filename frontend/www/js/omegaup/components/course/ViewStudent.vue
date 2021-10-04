@@ -69,11 +69,19 @@
                   :data-problem-alias="problem.alias"
                   @click="selectedProblem = problem"
                 >
-                  <template v-if="problem.runs.length &gt; 0">
+                  <template v-if="problem.runs.length > 0">
                     {{ bestScore(problem) * problem.points }} /
-                    {{ problem.points }} - </template
-                  >{{ problem.title }} ({{ problem.runs.length }})</a
-                >
+                    {{ problem.points }}
+                  </template>
+                  <template v-if="problem.is_extra_problem">
+                    {{ T.studentProgressExtraProblem }}
+                  </template>
+                  <template
+                    v-if="problem.runs.length > 0 || problem.is_extra_problem"
+                    >-</template
+                  >
+                  {{ problem.title }} ({{ problem.runs.length }})
+                </a>
               </li>
             </ul>
           </div>
