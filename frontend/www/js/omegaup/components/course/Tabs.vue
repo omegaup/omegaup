@@ -24,6 +24,7 @@
       </li>
     </ul>
     <div class="tab-content">
+      <!-- TODO: Add search input. -->
       <div
         v-for="tab in tabs"
         :key="tab.id"
@@ -35,10 +36,10 @@
         role="tabpanel"
       >
         <div
-          class="row justify-content-between row-cols-1 row-cols-md-2 row-cols-lg-3"
+          class="row justify-content-between row-cols-1 row-cols-md-2 row-cols-xl-3"
         >
           <omegaup-course-card
-            v-for="course in expectedCourses(tab)"
+            v-for="course in courses[tab.id]"
             :key="course.alias"
             :course="course"
             :type="tab.id"
@@ -73,9 +74,11 @@ export enum Tabs {
   },
 })
 export default class CourseTabs extends Vue {
-  @Prop() enrolledCourses!: types.CourseCardEnrolled[];
-  @Prop() publicCourses!: types.CourseCardPublic[];
-  @Prop() finishedCourses!: types.CourseCardFinished[];
+  @Prop() courses!: {
+    enrolled: types.CourseCardEnrolled[];
+    public: types.CourseCardPublic[];
+    finished: types.CourseCardFinished[];
+  };
 
   T = T;
   Tabs = Tabs;
@@ -94,22 +97,5 @@ export default class CourseTabs extends Vue {
     },
   };
   selectedTab = this.tabs.public.id;
-
-  expectedCourses(tab: {
-    id: string;
-    name: string;
-  }):
-    | types.CourseCardEnrolled[]
-    | types.CourseCardPublic[]
-    | types.CourseCardFinished[] {
-    switch (tab.id) {
-      case Tabs.Enrolled:
-        return this.enrolledCourses;
-      case Tabs.Finished:
-        return this.finishedCourses;
-      default:
-        return this.publicCourses;
-    }
-  }
 }
 </script>

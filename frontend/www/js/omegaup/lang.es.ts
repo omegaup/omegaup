@@ -1086,6 +1086,7 @@ const translations: { [key: string]: string; } = {
   profileStatisticsYear: "A\u00f1o",
   profileUnsolvedProblems: "Problemas intentados (pero no resueltos)",
   profileUsername: "Nombre de usuario",
+  publicCourseCardMetrics: "%(nLessons) lecciones | %(nStudents)K estudiantes",
   publicCourseInformationDescription: "Cursos de programaci\u00f3n bajo demanda que omegaUp ofrece de forma gratuita.",
   publicCoursesModal: "- Estos cursos son bajo demanda, es decir puedes inscribirte y completarlos cuando t\u00fa quieras.\n- No tienen ning\u00fan costo.\n- Puedes obtener retroalimentaci\u00f3n instant\u00e1nea sobre tus soluciones.\n- Incluyen lecturas.",
   publicTagsPlaceholder: "Ej. Recursi\u00f3n, \u00c1rboles de segmentos, B\u00fasqueda binaria",

@@ -2,53 +2,35 @@
   <div class="col mb-3">
     <div class="card">
       <div class="row no-gutters">
-        <div class="col-sm-2 col-lg-3" :class="`${type}-course-card`"></div>
-        <div class="col-sm-10 col-lg-9">
-          <div class="card-body">
-            <h5 class="card-title mb-0">{{ course.name }}</h5>
-            <p v-if="type === CourseType.Public"><small>{{ course.school_name }}</small></p>
-            <omegaup-markdown
-              v-else-if="type === CourseType.Enrolled"
-              class="card-text text-trimmed"
-              :markdown="
-                ui.formatString(T.courseCardImpartedBy, {
-                  school_name: course.school_name,
-                })
-              "
-            ></omegaup-markdown>
-            <div
-              v-if="type === CourseType.Student"
-              class="row no-gutters justify-content-start align-items-center mb-4"
-            >
-              <div class="col-4">{{ T.wordsProgress }}:</div>
-              <div class="col-8 mt-1">
-                <div class="progress">
-                  <div
-                    class="progress-bar progress-bar-striped bg-warning text-dark"
-                    role="progressbar"
-                    :style="`width: ${course.progress}%`"
-                    :aria-valuenow="course.progress"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                  >
-                    {{ `${course.progress}%` }}
-                  </div>
-                </div>
+        <div class="col-sm-2" :class="`${type}-course-card`"></div>
+        <div class="col-sm-10">
+          <div
+            class="card-body d-flex flex-column h-100 justify-content-between"
+          >
+            <div>
+              <h5 class="card-title mb-0">{{ course.name }}</h5>
+              <p class="card-text">
+                <small>{{ course.school_name }}</small>
+              </p>
+            </div>
+            <div class="card-text course-data">
+              <p class="mb-0">
+                {{
+                  ui.formatString(T.publicCourseCardMetrics, {
+                    nLessons: course.lessonsCount,
+                    nStudents: (course.studentsCount / 1000).toFixed(1),
+                  })
+                }}
+              </p>
+              <p class="mb-0">{{ courseLevelText(course.level) }}</p>
+              <div class="text-center mt-1">
+                <a
+                  class="btn btn-primary text-white"
+                  role="button"
+                  :href="`/course/${course.alias}/`"
+                  >{{ buttonMessage }}</a
+                >
               </div>
-            </div>
-            <div
-              v-if="type === CourseType.Finished"
-              class="text-center mb-4 course-star"
-            >
-              ⭐
-            </div>
-            <div class="text-center mt-1">
-              <a
-                class="btn btn-primary text-white"
-                role="button"
-                :href="`/course/${course.alias}/`"
-                >{{ buttonMessage }}</a
-              >
             </div>
           </div>
         </div>
@@ -77,7 +59,10 @@ export enum CourseType {
   },
 })
 export default class CourseCard extends Vue {
-  @Prop() course!: types.CourseCardEnrolled[] | types.CourseCardPublic[] | types.CourseCardFinished[];
+  @Prop() course!:
+    | types.CourseCardEnrolled[]
+    | types.CourseCardPublic[]
+    | types.CourseCardFinished[];
   @Prop() type!: CourseType;
 
   T = T;
@@ -94,6 +79,19 @@ export default class CourseCard extends Vue {
         return T.wordsStart;
     }
   }
+
+  courseLevelText(level: null | string): string {
+    switch (level) {
+      case 'introductory':
+        return `★ ${T.courseLevelIntroductory}`;
+      case 'intermediate':
+        return `★★ ${T.courseLevelIntroductory}`;
+      case 'advanced':
+        return `★★★ ${T.courseLevelAdvanced}`;
+      default:
+        return '';
+    }
+  }
 }
 </script>
 
@@ -102,10 +100,11 @@ export default class CourseCard extends Vue {
 
 .card > .row.no-gutters {
   background-color: $omegaup-white;
+  height: 12.5rem;
+  overflow-y: auto;
 
-  .text-trimmed {
-    height: 50px;
-    overflow-y: hidden;
+  .course-data p {
+    font-size: 0.9rem;
   }
 
   .public-course-card {
@@ -119,14 +118,5 @@ export default class CourseCard extends Vue {
   .finished-course-card {
     background-color: $omegaup-grey--lighter;
   }
-
-  .card-long-text {
-    overflow-y: scroll;
-    max-height: 250px;
-  }
-}
-
-.course-star {
-  font-size: 3rem;
 }
 </style>
