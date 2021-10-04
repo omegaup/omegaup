@@ -4093,7 +4093,7 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function getUserTypes(
         int $user_id,
-        ?\OmegaUp\Request $r
+        \OmegaUp\Request $r = null
     ): array {
         $session = is_null($r)
             ? \OmegaUp\Controllers\Session::getCurrentSession()
