@@ -41,7 +41,6 @@
                   $emit('navigate-to-assignment', {
                     assignmentAliasToShow,
                     courseAlias: course.alias,
-                    isAdmin,
                   })
               "
             ></omegaup-arena-navbar-assignments>
