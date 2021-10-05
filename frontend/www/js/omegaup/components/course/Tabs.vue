@@ -66,9 +66,6 @@ export enum Tabs {
 
 @Component({
   components: {
-    // 'font-awesome-icon': FontAwesomeIcon,
-    // 'font-awesome-layers': FontAwesomeLayers,
-    // 'font-awesome-layers-text': FontAwesomeLayersText,
     'omegaup-course-card': course_Card,
     'omegaup-markdown': omegaup_Markdown,
   },

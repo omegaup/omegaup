@@ -1086,7 +1086,7 @@ const translations: { [key: string]: string; } = {
   profileStatisticsYear: "(Y3ar)",
   profileUnsolvedProblems: "(Pr0b13m5 7ri3d (bu7 n07 501v3d))",
   profileUsername: "(U53rnam3)",
-  publicCourseCardMetrics: "(%(nLessons) 13550n5 | %(nStudents)K 57ud3n75)",
+  publicCourseCardMetrics: "(%(nLessons) 13550n5 | %(nStudents) 57ud3n75)",
   publicCourseInformationDescription: "(On-d3mand c0ur535 7ha7 0m3gaUp 0ff3r5 f0r fr33.)",
   publicCoursesModal: "(- Th353 c0ur535 ar3 0n-d3mand. Y0u can 3nr011 and c0mp1373 i7 any7im3 y0u wan7.\n- Th3y ar3 fr33.\n- Y0u can g37 in57an7 f33dback 0n y0ur 501u7i0n5.\n- L3c7ur35 ar3 inc1ud3d.)",
   publicTagsPlaceholder: "(Ex. R3cur5i0n, S3gm3n7 Tr335, Binary S3arch)",

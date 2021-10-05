@@ -1085,7 +1085,7 @@
 	"profileStatisticsYear": "Year",
 	"profileUnsolvedProblems": "Problems tried (but not solved)",
 	"profileUsername": "Username",
-	"publicCourseCardMetrics": "%(nLessons) lessons | %(nStudents)K students",
+	"publicCourseCardMetrics": "%(nLessons) lessons | %(nStudents) students",
 	"publicCourseInformationDescription": "On-demand courses that omegaUp offers for free.",
 	"publicCoursesModal": "- These courses are on-demand. You can enroll and complete it anytime you want.\n- They are free.\n- You can get instant feedback on your solutions.\n- Lectures are included.",
 	"publicTagsPlaceholder": "Ex. Recursion, Segment Trees, Binary Search",

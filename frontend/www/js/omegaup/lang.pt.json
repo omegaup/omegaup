@@ -1085,7 +1085,7 @@
 	"profileStatisticsYear": "Ano",
 	"profileUnsolvedProblems": "Problemas tentados (mas n\u00e3o resolvidos)",
 	"profileUsername": "Nome de usu\u00e1rio",
-	"publicCourseCardMetrics": "%(nLessons) li\u00e7\u00f5es | %(nStudents)K estudantes",
+	"publicCourseCardMetrics": "%(nLessons) li\u00e7\u00f5es | %(nStudents) estudantes",
 	"publicCourseInformationDescription": "Cursos sob demanda que o omegaUp oferece gratuitamente.",
 	"publicCoursesModal": "- Esses cursos s\u00e3o sob demanda, ou seja, voc\u00ea pode se inscrever e conclu\u00ed-los sempre que quiser.\n- Eles s\u00e3o gratuitos.\n- Voc\u00ea pode obter feedback instant\u00e2neo sobre suas solu\u00e7\u00f5es.\n- Eles incluem leituras.",
 	"publicTagsPlaceholder": "Ex. Recurs\u00e3o, \u00c1rvore de segmentos, Pesquisa Bin\u00e1ria",

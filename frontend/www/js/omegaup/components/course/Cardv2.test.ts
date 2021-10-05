@@ -8,11 +8,11 @@ import course_Card from './Cardv2.vue';
 describe('Card.vue', () => {
   const publicCourse: types.CourseCardPublic = {
     alias: 'test-course',
-    lessonsCount: 2,
+    lessonCount: 2,
     level: undefined,
     name: 'Test course',
     school_name: 'Test course school',
-    studentsCount: 2,
+    studentCount: '2.0k',
   };
 
   it('Should render information for public course', () => {
@@ -27,8 +27,8 @@ describe('Card.vue', () => {
     expect(wrapper.text()).toContain(publicCourse.school_name);
     expect(wrapper.text()).toContain(
       ui.formatString(T.publicCourseCardMetrics, {
-        nLessons: publicCourse.lessonsCount,
-        nStudents: (publicCourse.studentsCount / 1000).toFixed(1),
+        nLessons: publicCourse.lessonCount,
+        nStudents: publicCourse.studentCount,
       }),
     );
   });
