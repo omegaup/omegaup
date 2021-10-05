@@ -346,7 +346,10 @@ export default class ArenaCourse extends Vue {
 
   @Watch('problem')
   onActiveProblemChanged(newValue: types.NavbarProblemsetProblem | null): void {
-    if (!newValue) {
+    const currentProblem = this.currentAssignment.problems?.find(
+      ({ alias }: { alias: string }) => alias === newValue?.alias,
+    );
+    if (!newValue || !currentProblem) {
       this.activeProblem = null;
       return;
     }
