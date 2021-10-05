@@ -8,15 +8,11 @@ class UserGetTypesTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testEmptyUserTypes() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $login = self::login($identity);
-
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-        ]);
+        self::login($identity);
 
         $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
+            $user,
+            $identity
         );
         $this->assertEmpty($userTypes);
     }
@@ -25,16 +21,12 @@ class UserGetTypesTest extends \OmegaUp\Test\ControllerTestCase {
      * Test only admin and owner can get user types
      */
     public function testOnlyAllowedUsersCanGetUserTypes() {
-        ['identity' => $identity1] = \OmegaUp\Test\Factories\User::createUser();
-        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
-        $login = self::login($identity2);
-
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-        ]);
+        ['user' => $user] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identityUser2] = \OmegaUp\Test\Factories\User::createUser();
+        self::login($identityUser2);
 
         try {
-            \OmegaUp\Controllers\User::getUserTypes($identity1->user_id, $r);
+            \OmegaUp\Controllers\User::getUserTypes($user, $identityUser2);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
@@ -42,399 +34,76 @@ class UserGetTypesTest extends \OmegaUp\Test\ControllerTestCase {
 
         //Admin can get user types
         ['identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
-        $adminLogin = self::login(($identityAdmin));
-        $r = new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-        ]);
+        self::login(($identityAdmin));
 
         $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $identity1->user_id,
-            $r
+            $user,
+            $identityAdmin
         );
         $this->assertEmpty($userTypes);
     }
 
     /**
-     * Get user types when learning objective is true
+     * A PHPUnit data provider for the test get correct user types
+     *
+     * @return list<array{0: bool, 1: bool, 2: bool, 3: bool, 4: list<string>}>
+     * {has_competitive_objective, has_learning_objective, has_scholar_objective, has_teaching_objective, {user types}}
      */
-    public function testLearningObjectiveUserTypes() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $login = self::login($identity);
+    public function userObjectivesAndTypes(): array {
+        return [
+            // User types when learning objective is true
+            [false, true, true, false, [\OmegaUp\Controllers\User::USER_TYPE_STUDENT]],
+            [true, true, false, false, [\OmegaUp\Controllers\User::USER_TYPE_CONTESTANT]],
+            [true, true, true, false, [\OmegaUp\Controllers\User::USER_TYPE_STUDENT, \OmegaUp\Controllers\User::USER_TYPE_CONTESTANT]],
+            [false, true, false, false, [\OmegaUp\Controllers\User::USER_TYPE_SELF_TAUGHT]],
 
-        //should only get 'student' type
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => false,
-            'has_learning_objective' => true,
-            'has_scholar_objective' => true,
-            'has_teaching_objective' => false,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
+            // User types when teaching objective is true
+            [false, false, true, true, [\OmegaUp\Controllers\User::USER_TYPE_TEACHER]],
+            [true, false, false, true, [\OmegaUp\Controllers\User::USER_TYPE_COACH]],
+            [true, false, true, true, [\OmegaUp\Controllers\User::USER_TYPE_TEACHER, \OmegaUp\Controllers\User::USER_TYPE_COACH]],
+            [false, false, false, true, [\OmegaUp\Controllers\User::USER_TYPE_INDEPENDENT_TEACHER]],
 
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertContains('student', $userTypes);
-        $this->assertNotContains('contestant', $userTypes);
-        $this->assertNotContains('teacher', $userTypes);
-        $this->assertNotContains('coach', $userTypes);
-        $this->assertNotContains('self-taught', $userTypes);
-        $this->assertNotContains('independent-teacher', $userTypes);
-        $this->assertNotContains('curious', $userTypes);
+            // User types when both learning and teaching objectives are true
+            [false, true, true, true, [\OmegaUp\Controllers\User::USER_TYPE_STUDENT, \OmegaUp\Controllers\User::USER_TYPE_TEACHER]],
+            [true, true, false, true, [\OmegaUp\Controllers\User::USER_TYPE_CONTESTANT, \OmegaUp\Controllers\User::USER_TYPE_COACH]],
+            [true, true, true, true, [\OmegaUp\Controllers\User::USER_TYPE_STUDENT, \OmegaUp\Controllers\User::USER_TYPE_CONTESTANT,
+                                        \OmegaUp\Controllers\User::USER_TYPE_TEACHER, \OmegaUp\Controllers\User::USER_TYPE_COACH]],
+            [false, true, false, true, [\OmegaUp\Controllers\User::USER_TYPE_SELF_TAUGHT, \OmegaUp\Controllers\User::USER_TYPE_INDEPENDENT_TEACHER]],
 
-        //should only get 'contestant' type
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => true,
-            'has_learning_objective' => true,
-            'has_scholar_objective' => false,
-            'has_teaching_objective' => false,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertNotContains('student', $userTypes);
-        $this->assertContains('contestant', $userTypes);
-        $this->assertNotContains('teacher', $userTypes);
-        $this->assertNotContains('coach', $userTypes);
-        $this->assertNotContains('self-taught', $userTypes);
-        $this->assertNotContains('independent-teacher', $userTypes);
-        $this->assertNotContains('curious', $userTypes);
-
-        //should only get 'contestant' and 'student' types
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => true,
-            'has_learning_objective' => true,
-            'has_scholar_objective' => true,
-            'has_teaching_objective' => false,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertContains('student', $userTypes);
-        $this->assertContains('contestant', $userTypes);
-        $this->assertNotContains('teacher', $userTypes);
-        $this->assertNotContains('coach', $userTypes);
-        $this->assertNotContains('self-taught', $userTypes);
-        $this->assertNotContains('independent-teacher', $userTypes);
-        $this->assertNotContains('curious', $userTypes);
-
-        //should only get 'self-taught' type
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => false,
-            'has_learning_objective' => true,
-            'has_scholar_objective' => false,
-            'has_teaching_objective' => false,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertNotContains('student', $userTypes);
-        $this->assertNotContains('contestant', $userTypes);
-        $this->assertNotContains('teacher', $userTypes);
-        $this->assertNotContains('coach', $userTypes);
-        $this->assertContains('self-taught', $userTypes);
-        $this->assertNotContains('independent-teacher', $userTypes);
-        $this->assertNotContains('curious', $userTypes);
+            // 'curious' type when neither learning nor teaching objectives are true
+            [false, false, true, false, [\OmegaUp\Controllers\User::USER_TYPE_CURIOUS]],
+            [true, false, false, false, [\OmegaUp\Controllers\User::USER_TYPE_CURIOUS]],
+            [true, false, true, false, [\OmegaUp\Controllers\User::USER_TYPE_CURIOUS]],
+            [false, false, false, false, [\OmegaUp\Controllers\User::USER_TYPE_CURIOUS]],
+        ];
     }
 
     /**
-     * Get user types when teaching objective is true
+     * @dataProvider userObjectivesAndTypes
      */
-    public function testTeachingObjectiveUserTypes() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+    public function testCorrectGetUserTypes(
+        bool $has_competitive_objective,
+        bool $has_learning_objective,
+        bool $has_scholar_objective,
+        bool $has_teaching_objective,
+        array $expectedUserTypes
+    ) {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        //should only get 'teacher' type
-        $r = new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'has_competitive_objective' => false,
-            'has_learning_objective' => false,
-            'has_scholar_objective' => true,
-            'has_teaching_objective' => true,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
+            'has_competitive_objective' => $has_competitive_objective,
+            'has_learning_objective' => $has_learning_objective,
+            'has_scholar_objective' => $has_scholar_objective,
+            'has_teaching_objective' => $has_teaching_objective,
+        ]));
 
+        $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
         $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
+            $user,
+            $identity
         );
-        $this->assertNotContains('student', $userTypes);
-        $this->assertNotContains('contestant', $userTypes);
-        $this->assertContains('teacher', $userTypes);
-        $this->assertNotContains('coach', $userTypes);
-        $this->assertNotContains('self-taught', $userTypes);
-        $this->assertNotContains('independent-teacher', $userTypes);
-        $this->assertNotContains('curious', $userTypes);
-
-        //should only get 'coach' type
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => true,
-            'has_learning_objective' => false,
-            'has_scholar_objective' => false,
-            'has_teaching_objective' => true,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertNotContains('student', $userTypes);
-        $this->assertNotContains('contestant', $userTypes);
-        $this->assertNotContains('teacher', $userTypes);
-        $this->assertContains('coach', $userTypes);
-        $this->assertNotContains('self-taught', $userTypes);
-        $this->assertNotContains('independent-teacher', $userTypes);
-        $this->assertNotContains('curious', $userTypes);
-
-        //should only get 'teacher' and 'coach' types
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => true,
-            'has_learning_objective' => false,
-            'has_scholar_objective' => true,
-            'has_teaching_objective' => true,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertNotContains('student', $userTypes);
-        $this->assertNotContains('contestant', $userTypes);
-        $this->assertContains('teacher', $userTypes);
-        $this->assertContains('coach', $userTypes);
-        $this->assertNotContains('self-taught', $userTypes);
-        $this->assertNotContains('independent-teacher', $userTypes);
-        $this->assertNotContains('curious', $userTypes);
-
-        //should only get 'independent-teacher' type
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => false,
-            'has_learning_objective' => false,
-            'has_scholar_objective' => false,
-            'has_teaching_objective' => true,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertNotContains('student', $userTypes);
-        $this->assertNotContains('contestant', $userTypes);
-        $this->assertNotContains('teacher', $userTypes);
-        $this->assertNotContains('coach', $userTypes);
-        $this->assertNotContains('self-taught', $userTypes);
-        $this->assertContains('independent-teacher', $userTypes);
-        $this->assertNotContains('curious', $userTypes);
-    }
-
-    /**
-     * Get user types when learning and teaching objectives are true
-     */
-    public function testLearningAndTeachingObjectivesUserTypes() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $login = self::login($identity);
-
-        //should only get 'student' and 'teacher' types
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => false,
-            'has_learning_objective' => true,
-            'has_scholar_objective' => true,
-            'has_teaching_objective' => true,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertContains('student', $userTypes);
-        $this->assertNotContains('contestant', $userTypes);
-        $this->assertContains('teacher', $userTypes);
-        $this->assertNotContains('coach', $userTypes);
-        $this->assertNotContains('self-taught', $userTypes);
-        $this->assertNotContains('independent-teacher', $userTypes);
-        $this->assertNotContains('curious', $userTypes);
-
-        //should only get 'contestant' and 'coach' types
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => true,
-            'has_learning_objective' => true,
-            'has_scholar_objective' => false,
-            'has_teaching_objective' => true,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertNotContains('student', $userTypes);
-        $this->assertContains('contestant', $userTypes);
-        $this->assertNotContains('teacher', $userTypes);
-        $this->assertContains('coach', $userTypes);
-        $this->assertNotContains('self-taught', $userTypes);
-        $this->assertNotContains('independent-teacher', $userTypes);
-        $this->assertNotContains('curious', $userTypes);
-
-        //should only get 'student', 'contestant', 'teacher' and 'coach' types
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => true,
-            'has_learning_objective' => true,
-            'has_scholar_objective' => true,
-            'has_teaching_objective' => true,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertContains('student', $userTypes);
-        $this->assertContains('contestant', $userTypes);
-        $this->assertContains('teacher', $userTypes);
-        $this->assertContains('coach', $userTypes);
-        $this->assertNotContains('self-taught', $userTypes);
-        $this->assertNotContains('independent-teacher', $userTypes);
-        $this->assertNotContains('curious', $userTypes);
-
-        //should only get 'self-taught' and 'independent-teacher' types
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => false,
-            'has_learning_objective' => true,
-            'has_scholar_objective' => false,
-            'has_teaching_objective' => true,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertNotContains('student', $userTypes);
-        $this->assertNotContains('contestant', $userTypes);
-        $this->assertNotContains('teacher', $userTypes);
-        $this->assertNotContains('coach', $userTypes);
-        $this->assertContains('self-taught', $userTypes);
-        $this->assertContains('independent-teacher', $userTypes);
-        $this->assertNotContains('curious', $userTypes);
-    }
-
-    /**
-     * Get user types when neither learning nor teaching objectives are true
-     */
-    public function testCuriousUserType() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $login = self::login($identity);
-
-        //should only get 'curious' type
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => false,
-            'has_learning_objective' => false,
-            'has_scholar_objective' => true,
-            'has_teaching_objective' => false,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertNotContains('student', $userTypes);
-        $this->assertNotContains('contestant', $userTypes);
-        $this->assertNotContains('teacher', $userTypes);
-        $this->assertNotContains('coach', $userTypes);
-        $this->assertNotContains('self-taught', $userTypes);
-        $this->assertNotContains('independent-teacher', $userTypes);
-        $this->assertContains('curious', $userTypes);
-
-        //should only get 'curious' type
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => true,
-            'has_learning_objective' => false,
-            'has_scholar_objective' => false,
-            'has_teaching_objective' => false,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertNotContains('student', $userTypes);
-        $this->assertNotContains('contestant', $userTypes);
-        $this->assertNotContains('teacher', $userTypes);
-        $this->assertNotContains('coach', $userTypes);
-        $this->assertNotContains('self-taught', $userTypes);
-        $this->assertNotContains('independent-teacher', $userTypes);
-        $this->assertContains('curious', $userTypes);
-
-        //should only get 'curious' type
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => true,
-            'has_learning_objective' => false,
-            'has_scholar_objective' => true,
-            'has_teaching_objective' => false,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertNotContains('student', $userTypes);
-        $this->assertNotContains('contestant', $userTypes);
-        $this->assertNotContains('teacher', $userTypes);
-        $this->assertNotContains('coach', $userTypes);
-        $this->assertNotContains('self-taught', $userTypes);
-        $this->assertNotContains('independent-teacher', $userTypes);
-        $this->assertContains('curious', $userTypes);
-
-        //should only get 'curious' type
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'has_competitive_objective' => false,
-            'has_learning_objective' => false,
-            'has_scholar_objective' => false,
-            'has_teaching_objective' => false,
-        ]);
-        \OmegaUp\Controllers\User::apiUpdate($r);
-
-        $userTypes = \OmegaUp\Controllers\User::getUserTypes(
-            $user->user_id,
-            $r
-        );
-        $this->assertNotContains('student', $userTypes);
-        $this->assertNotContains('contestant', $userTypes);
-        $this->assertNotContains('teacher', $userTypes);
-        $this->assertNotContains('coach', $userTypes);
-        $this->assertNotContains('self-taught', $userTypes);
-        $this->assertNotContains('independent-teacher', $userTypes);
-        $this->assertContains('curious', $userTypes);
+        $this->assertEqualsCanonicalizing($expectedUserTypes, $userTypes);
     }
 }

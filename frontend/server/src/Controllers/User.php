@@ -68,6 +68,15 @@ class User extends \OmegaUp\Controllers\Controller {
         'all', 'female',
     ];
 
+    // User types
+    const USER_TYPE_STUDENT = 'student';
+    const USER_TYPE_CONTESTANT = 'contestant';
+    const USER_TYPE_TEACHER = 'teacher';
+    const USER_TYPE_COACH = 'coach';
+    const USER_TYPE_SELF_TAUGHT = 'self-taught';
+    const USER_TYPE_INDEPENDENT_TEACHER = 'independent-teacher';
+    const USER_TYPE_CURIOUS = 'curious';
+
     /**
      * Entry point for Create a User API
      *
@@ -4087,26 +4096,24 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param string $auth_token
-     *
      * @return list<string>
      */
     public static function getUserTypes(
-        int $user_id,
-        ?\OmegaUp\Request $r = null
+        \OmegaUp\DAO\VO\Users $user,
+        ?\OmegaUp\DAO\VO\Identities $loggedIdentity = null
     ): array {
-        $session = \OmegaUp\Controllers\Session::getCurrentSession($r);
-
-        $identity = $session['identity'];
+        if (is_null($loggedIdentity)) {
+            $loggedIdentity = \OmegaUp\Controllers\Session::getCurrentSession()['identity'];
+        }
         if (
-            is_null($identity)
-            || (!$session['is_admin'] && $identity->user_id !== $user_id)
+            is_null($loggedIdentity)
+            || (!\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
+                && $loggedIdentity->user_id !== $user->user_id)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $user = \OmegaUp\DAO\Users::getByPK($user_id);
-        if (is_null($user) || is_null($user->main_identity_id)) {
+        if (is_null($user->main_identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
@@ -4122,25 +4129,25 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         if ($user->has_learning_objective && $user->has_scholar_objective) {
-            $userTypes[] = 'student';
+            $userTypes[] = self::USER_TYPE_STUDENT;
         }
         if ($user->has_learning_objective && $user->has_competitive_objective) {
-            $userTypes[] = 'contestant';
+            $userTypes[] = self::USER_TYPE_CONTESTANT;
         }
         if ($user->has_teaching_objective && $user->has_scholar_objective) {
-            $userTypes[] = 'teacher';
+            $userTypes[] = self::USER_TYPE_TEACHER;
         }
         if ($user->has_teaching_objective && $user->has_competitive_objective) {
-            $userTypes[] = 'coach';
+            $userTypes[] = self::USER_TYPE_COACH;
         }
         if ($user->has_learning_objective && !$user->has_scholar_objective && !$user->has_competitive_objective) {
-            $userTypes[] = 'self-taught';
+            $userTypes[] = self::USER_TYPE_SELF_TAUGHT;
         }
         if ($user->has_teaching_objective && !$user->has_scholar_objective && !$user->has_competitive_objective) {
-            $userTypes[] = 'independent-teacher';
+            $userTypes[] = self::USER_TYPE_INDEPENDENT_TEACHER;
         }
         if (!$user->has_learning_objective && !$user->has_teaching_objective) {
-            $userTypes[] = 'curious';
+            $userTypes[] = self::USER_TYPE_CURIOUS;
         }
         return $userTypes;
     }
