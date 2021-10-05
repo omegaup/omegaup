@@ -12,7 +12,7 @@ describe('Card.vue', () => {
     level: undefined,
     name: 'Test course',
     school_name: 'Test course school',
-    studentCount: '2.0k',
+    studentCount: 2000,
   };
 
   it('Should render information for public course', () => {
@@ -28,7 +28,10 @@ describe('Card.vue', () => {
     expect(wrapper.text()).toContain(
       ui.formatString(T.publicCourseCardMetrics, {
         nLessons: publicCourse.lessonCount,
-        nStudents: publicCourse.studentCount,
+        nStudents:
+          publicCourse.studentCount >= 1000
+            ? `${(publicCourse.studentCount / 1000).toFixed(1)}k`
+            : publicCourse.studentCount,
       }),
     );
   });

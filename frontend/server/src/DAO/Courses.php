@@ -15,7 +15,7 @@ namespace OmegaUp\DAO;
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
  * @psalm-type CourseCardFinished=array{alias: string, name: string}
- * @psalm-type CourseCardPublic=array{alias: string, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: string}
+ * @psalm-type CourseCardPublic=array{alias: string, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}
  * @psalm-type AssignmentsProblemsPoints=array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
  * @psalm-type StudentProgressInCourse=array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}
  */
@@ -299,10 +299,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             if (is_null($row['alias']) || is_null($row['name'])) {
                 continue;
             }
-            $row['studentCount'] = number_format(
-                $row['studentCount'] / 1000,
-                1
-            ) . 'k';
             $results[] = $row;
         }
         return $results;

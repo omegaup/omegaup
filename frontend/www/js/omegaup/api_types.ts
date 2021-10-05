@@ -2318,7 +2318,7 @@ export namespace types {
     level?: string;
     name: string;
     school_name?: string;
-    studentCount: string;
+    studentCount: number;
   }
 
   export interface CourseClarificationsPayload {
