@@ -5127,6 +5127,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+    * @return array{smartyProperties: array{payload: ProblemFormPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+    */
+    public static function getCreatorForTypescript(
+        \OmegaUp\Request $r
+    ): array {
+        return [
+            'smartyProperties' => [
+                'payload' => [],
+                'title' => new \OmegaUp\TranslationString('omegaupTitleProblemCreator')
+            ],
+            'entrypoint' => 'problem_creator'
+        ];
+    }
+    /**
      * @return array{smartyProperties: array{payload: ProblemFormPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param bool|null $allow_user_add_tags
