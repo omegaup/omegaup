@@ -350,6 +350,7 @@ export default class ArenaCourse extends Vue {
     );
     if (!newValue || !currentProblem) {
       this.activeProblem = null;
+      this.$emit('reset-hash', { selectedTab: 'problems', alias: null });
       return;
     }
     this.onNavigateToProblem(newValue);
