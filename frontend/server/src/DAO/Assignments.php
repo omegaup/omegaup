@@ -55,7 +55,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             bpr.assignment_alias,
             bpr.problem_alias,
             IFNULL(VARIANCE(bpr.max_user_score_for_problem), 0) AS variance,
-            AVG(IFNULL(bpr.max_user_score_for_problem), 0) AS average,
+            IFNULL(AVG(bpr.max_user_score_for_problem), 0) AS average,
             AVG(
                 CASE WHEN IFNULL(bpr.max_user_percent_for_problem, 0) >= 1 THEN 1 ELSE 0 END
             ) * 100 AS completed_score_percentage,
