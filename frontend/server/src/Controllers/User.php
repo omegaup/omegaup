@@ -4100,15 +4100,11 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function getUserTypes(
         \OmegaUp\DAO\VO\Users $user,
-        ?\OmegaUp\DAO\VO\Identities $loggedIdentity = null
+        \OmegaUp\DAO\VO\Identities $loggedIdentity
     ): array {
-        if (is_null($loggedIdentity)) {
-            $loggedIdentity = \OmegaUp\Controllers\Session::getCurrentSession()['identity'];
-        }
         if (
-            is_null($loggedIdentity)
-            || (!\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
-                && $loggedIdentity->user_id !== $user->user_id)
+            !\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
+                && $loggedIdentity->user_id !== $user->user_id
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
