@@ -5135,7 +5135,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return [
             'smartyProperties' => [
                 'payload' => [],
-                'title' => new \OmegaUp\TranslationString('omegaupTitleProblemCreator')
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleProblemCreator'
+                )
             ],
             'entrypoint' => 'problem_creator'
         ];

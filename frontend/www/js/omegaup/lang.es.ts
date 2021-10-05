@@ -676,6 +676,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleMyProblemsList: "Mis problemas",
   omegaupTitlePrivacyPolicy: "Pol\u00edtica de privacidad",
   omegaupTitleProblem: "Problema",
+  omegaupTitleProblemCreator: "Creador de Problemas",
   omegaupTitleProblemEdit: "Editar problema",
   omegaupTitleProblemNew: "Problema nuevo",
   omegaupTitleProblemStats: "Estad\u00edsticas de problema",

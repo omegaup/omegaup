@@ -1,16 +1,15 @@
-import problem_creator from "../../components/problem/creator/Creator.vue"
-import {omegaup, OmegaUp} from "../../omegaup"
-import T from '../../lang'
+import problem_creator from '../../components/problem/creator/Creator.vue';
+import { OmegaUp } from '../../omegaup';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
-  const creator = new Vue({
+  new Vue({
     el: '#main-container',
     components: {
       'creator-main': problem_creator,
     },
-    render: function(createElement) {
-      return createElement('creator-main')
-    }
-  })
-})
+    render: function (createElement) {
+      return createElement('creator-main');
+    },
+  });
+});

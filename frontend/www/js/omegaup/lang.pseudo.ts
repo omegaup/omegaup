@@ -676,6 +676,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleMyProblemsList: "(MyPr0b13m5Li57)",
   omegaupTitlePrivacyPolicy: "(Privacy P01icy)",
   omegaupTitleProblem: "(Pr0b13m)",
+  omegaupTitleProblemCreator: "(Pr0b13m Cr3a70r)",
   omegaupTitleProblemEdit: "(Edi7 pr0b13m)",
   omegaupTitleProblemNew: "(N3w pr0b13m)",
   omegaupTitleProblemStats: "(Pr0b13m 57a75)",
