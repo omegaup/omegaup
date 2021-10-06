@@ -123,7 +123,7 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
             [$teamsGroupId]
         );
 
-        /** @var list<array{classname: string, name: null|string, isMainUserIdentity: int, team_alias: string, team_name: null|string, username: string}> $teamsUsers */
+        /** @var list<array{classname: string, isMainUserIdentity: int, name: null|string, team_alias: string, team_name: null|string, username: string}> */
         $teamsUsers = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql . $sqlLimit,
             [$teamsGroupId, $offset, $pageSize]

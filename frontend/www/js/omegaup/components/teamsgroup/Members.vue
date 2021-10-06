@@ -66,6 +66,7 @@
                 <button
                   type="button"
                   class="btn btn-link"
+                  :data-save-new-password-identity="identity.username"
                   :title="T.groupEditMembersChangePassword"
                   @click="onChangePasswordMember"
                 >
