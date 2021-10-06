@@ -1,6 +1,4 @@
 import { shallowMount } from '@vue/test-utils';
-import { omegaup } from '../../omegaup';
-
 import course_StudentProgress from './StudentProgress.vue';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
@@ -10,50 +8,60 @@ describe('StudentProgress.vue', () => {
   it('Should handle scores', async () => {
     const wrapper = shallowMount(course_StudentProgress, {
       propsData: {
-        course: {
-          alias: 'hello',
-        },
-        assignments: [
+        assignmentsProblems: [
           {
-            alias: 'assignment',
-            assignment_type: 'homework',
-            description: 'Assignment',
-            start_time: new Date(0),
-            finish_time: new Date(),
-            name: 'Assignment',
-            order: 1,
-            scoreboard_url: '',
-            scoreboard_url_admin: '',
-            max_points: 200,
-          } as omegaup.Assignment,
-        ] as omegaup.Assignment[],
-        student: {
-          name: 'student',
+            alias: 'test-assignment-a',
+            name: 'Test assignment A',
+            points: 200,
+            problems: [
+              {
+                alias: 'test-problem-a',
+                title: 'Test problem A',
+                isExtraProblem: false,
+                points: 100,
+                order: 1,
+              },
+              {
+                alias: 'test-problem-b',
+                title: 'Test problem B',
+                isExtraProblem: false,
+                points: 100,
+                order: 2,
+              },
+            ],
+          },
+          {
+            alias: 'test-assignment-b',
+            name: 'Test assignment B',
+            points: 0,
+            problems: [],
+          },
+        ] as types.AssignmentsProblemsPoints[],
+        courseAlias: 'course',
+        studentProgress: {
+          username: 'test_user',
+          name: '',
+          country_id: '',
           classname: 'user-rank-unranked',
-          points: {
-            ['assignment']: {
-              ['problem1']: 100,
-              ['problem2']: 100,
+          courseScore: 100,
+          courseProgress: 50,
+          assignments: {
+            'test-assignment-a': {
+              score: 100,
+              progress: 50,
+              problems: {
+                'test-problem-a': {
+                  score: 100,
+                  progress: 100,
+                },
+                'test-problem-b': {
+                  score: 1,
+                  progress: 1,
+                },
+              },
             },
           },
-          progress: {
-            ['assignment']: {
-              ['problem1']: 55,
-              ['problem2']: 45,
-            },
-          },
-          score: {
-            ['assignment']: {
-              ['problem1']: 55,
-              ['problem2']: 45,
-            },
-          },
-          username: 'student',
-        } as types.StudentProgress,
-        problemTitles: {
-          problem1: 'Problem 1',
-          problem2: 'Problem 2',
-        },
+        } as types.StudentProgressInCourse,
       },
     });
     expect(wrapper.find('a.bg-yellow').exists()).toBe(true);

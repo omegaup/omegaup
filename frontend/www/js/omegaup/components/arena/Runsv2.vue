@@ -103,7 +103,7 @@
 
             <template v-if="showUser">
               <label
-                >{{ T.wordsUser }}:
+                >{{ T.contestParticipant }}:
                 <omegaup-common-typeahead
                   :existing-options="searchResultUsers"
                   :value.sync="filterUsername"
@@ -138,7 +138,7 @@
           <tr>
             <th>{{ T.wordsTime }}</th>
             <th>GUID</th>
-            <th v-if="showUser">{{ T.wordsUser }}</th>
+            <th v-if="showUser">{{ T.contestParticipant }}</th>
             <th v-if="showContest">{{ T.wordsContest }}</th>
             <th v-if="showProblem">{{ T.wordsProblem }}</th>
             <th>{{ T.wordsStatus }}</th>
@@ -262,6 +262,7 @@
                 <div class="dropdown-menu">
                   <button
                     v-if="showDetails"
+                    data-run-details
                     class="btn-link dropdown-item"
                     @click="$emit('details', run)"
                   >
@@ -269,6 +270,7 @@
                   </button>
                   <button
                     v-if="showRejudge"
+                    data-actions-rejudge
                     class="btn-link dropdown-item"
                     @click="$emit('rejudge', run)"
                   >
@@ -277,6 +279,7 @@
                   <div class="dropdown-divider"></div>
                   <button
                     v-if="showDisqualify"
+                    data-actions-disqualify
                     class="btn-link dropdown-item"
                     @click="$emit('disqualify', run)"
                   >
@@ -434,7 +437,7 @@ export default class Runsv2 extends Vue {
 
   // eslint-disable-next-line no-undef -- This is defined in TypeScript.
   initProblemAutocomplete(el: JQuery<HTMLElement>) {
-    if (this.problemsetProblems.length !== 0) {
+    if (this.problemsetProblems !== null) {
       typeahead.problemsetProblemTypeahead(
         el,
         () => this.problemsetProblems,

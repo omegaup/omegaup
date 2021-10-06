@@ -55,6 +55,10 @@ export namespace dao {
     birth_date?: string;
     facebook_user_id?: string;
     git_token?: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
     hide_problem_tags?: boolean;
     in_mailing_list?: boolean;
     is_private?: boolean;
@@ -1094,6 +1098,14 @@ export namespace types {
       );
     }
 
+    export function CourseTabsPayload(
+      elementId: string = 'payload',
+    ): types.CourseTabsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function GroupEditPayload(
       elementId: string = 'payload',
     ): types.GroupEditPayload {
@@ -1204,39 +1216,34 @@ export namespace types {
       elementId: string = 'payload',
     ): types.IntroDetailsPayload {
       return ((x) => {
-        if (x.details)
-          x.details = ((x) => {
-            x.assignments = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                if (x.finish_time)
-                  x.finish_time = ((x: number) => new Date(x * 1000))(
-                    x.finish_time,
-                  );
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
+        x.course = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
                 );
-                return x;
-              });
-            })(x.assignments);
-            x.clarifications = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                x.time = ((x: number) => new Date(x * 1000))(x.time);
-                return x;
-              });
-            })(x.clarifications);
-            if (x.finish_time)
-              x.finish_time = ((x: number) => new Date(x * 1000))(
-                x.finish_time,
-              );
-            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-            return x;
-          })(x.details);
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
         return x;
       })(
         JSON.parse(
@@ -1708,6 +1715,7 @@ export namespace types {
   export interface AddedProblem {
     alias: string;
     commit?: string;
+    is_extra_problem?: boolean;
     points: number;
   }
 
@@ -1731,6 +1739,7 @@ export namespace types {
     finish_time?: Date;
     name?: string;
     problems: types.NavbarProblemsetProblem[];
+    problemset_id: number;
     runs?: types.Run[];
     start_time: Date;
   }
@@ -1795,6 +1804,21 @@ export namespace types {
 
   export interface AssignmentProgress {
     [key: string]: types.Progress;
+  }
+
+  export interface AssignmentsProblemsPoints {
+    alias: string;
+    extraPoints: number;
+    name: string;
+    order: number;
+    points: number;
+    problems: {
+      alias: string;
+      isExtraProblem: boolean;
+      order: number;
+      points: number;
+      title: string;
+    }[];
   }
 
   export interface AssociatedIdentity {
@@ -2298,6 +2322,27 @@ export namespace types {
     start_time: Date;
   }
 
+  export interface CourseCardEnrolled {
+    alias: string;
+    name: string;
+    progress: number;
+    school_name?: string;
+  }
+
+  export interface CourseCardFinished {
+    alias: string;
+    name: string;
+  }
+
+  export interface CourseCardPublic {
+    alias: string;
+    lessonsCount: number;
+    level?: string;
+    name: string;
+    school_name?: string;
+    studentsCount: number;
+  }
+
   export interface CourseClarificationsPayload {
     clarifications: types.Clarification[];
     length: number;
@@ -2322,8 +2367,10 @@ export namespace types {
     is_admin: boolean;
     is_curator: boolean;
     languages?: string[];
+    level?: string;
     name: string;
     needs_basic_information: boolean;
+    objective?: string;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;
@@ -2391,15 +2438,16 @@ export namespace types {
 
   export interface CourseProblemStatistics {
     assignment_alias: string;
-    average?: number;
-    avg_runs?: number;
-    high_score_percentage?: number;
-    low_score_percentage?: number;
+    average: number;
+    avg_runs: number;
+    completed_score_percentage: number;
+    high_score_percentage: number;
+    low_score_percentage: number;
     max_points: number;
-    maximum?: number;
-    minimum?: number;
+    maximum: number;
+    minimum: number;
     problem_alias: string;
-    variance?: number;
+    variance: number;
   }
 
   export interface CourseProblemTried {
@@ -2446,6 +2494,14 @@ export namespace types {
   export interface CourseSubmissionsListPayload {
     solvedProblems: { [key: string]: types.CourseProblemTried[] };
     unsolvedProblems: { [key: string]: types.CourseProblemTried[] };
+  }
+
+  export interface CourseTabsPayload {
+    courses: {
+      enrolled: types.CourseCardEnrolled[];
+      finished: types.CourseCardFinished[];
+      general: types.CourseCardPublic[];
+    };
   }
 
   export interface CoursesByAccessMode {
@@ -2593,7 +2649,6 @@ export namespace types {
     state?: string;
     state_id?: string;
     username: string;
-    usernames?: string;
   }
 
   export interface IdentityExt {
@@ -2672,14 +2727,9 @@ export namespace types {
   }
 
   export interface IntroDetailsPayload {
-    alias: string;
-    archived: boolean;
-    description: string;
-    details?: types.CourseDetails;
+    course: types.CourseDetails;
     isFirstTimeAccess: boolean;
-    name: string;
     needsBasicInformation: boolean;
-    requestsUserInformation: string;
     shouldShowAcceptTeacher: boolean;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     shouldShowResults: boolean;
@@ -2783,6 +2833,18 @@ export namespace types {
     url?: string;
   }
 
+  export interface Participant {
+    country_id?: string;
+    gender?: string;
+    name?: string;
+    participant_password?: string;
+    participant_username: string;
+    password?: string;
+    school_name?: string;
+    state_id?: string;
+    username: string;
+  }
+
   export interface PrivacyStatement {
     gitObjectId?: string;
     markdown: string;
@@ -2822,6 +2884,7 @@ export namespace types {
     letter?: string;
     limits: types.SettingLimits;
     nextSubmissionTimestamp?: Date;
+    nominationStatus: types.NominationStatus;
     order: string;
     points: number;
     preferred_language?: string;
@@ -3124,6 +3187,7 @@ export namespace types {
     difficulty: number;
     has_submissions: boolean;
     input_limit: number;
+    is_extra_problem: boolean;
     languages: string;
     letter?: string;
     order: number;
@@ -3444,6 +3508,22 @@ export namespace types {
     username: string;
   }
 
+  export interface StudentProgressInCourse {
+    assignments: {
+      [key: string]: {
+        problems: { [key: string]: { progress: number; score: number } };
+        progress: number;
+        score: number;
+      };
+    };
+    classname: string;
+    country_id?: string;
+    courseProgress: number;
+    courseScore: number;
+    name?: string;
+    username: string;
+  }
+
   export interface StudentProgressPayload {
     assignment: string;
     course: types.CourseDetails;
@@ -3453,12 +3533,12 @@ export namespace types {
   }
 
   export interface StudentsProgressPayload {
+    assignmentsProblems: types.AssignmentsProblemsPoints[];
     course: types.CourseDetails;
     length: number;
     page: number;
     pagerItems: types.PageItem[];
-    problemTitles: { [key: string]: string };
-    students: types.StudentProgress[];
+    students: types.StudentProgressInCourse[];
     totalRows: number;
   }
 
@@ -3567,6 +3647,10 @@ export namespace types {
     gender?: string;
     graduation_date?: Date;
     gravatar_92: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
     hide_problem_tags: boolean;
     is_own_profile: boolean;
     is_private: boolean;
@@ -3601,6 +3685,10 @@ export namespace types {
     gender?: string;
     graduation_date?: Date | string;
     gravatar_92?: string;
+    has_competitive_objective?: boolean;
+    has_learning_objective?: boolean;
+    has_scholar_objective?: boolean;
+    has_teaching_objective?: boolean;
     hide_problem_tags: boolean;
     is_own_profile: boolean;
     is_private: boolean;

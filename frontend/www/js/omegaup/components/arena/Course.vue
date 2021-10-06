@@ -11,7 +11,12 @@
       }}</sup>
     </template>
     <template #clock>
-      <div class="clock">{{ clock }}</div>
+      <div v-if="!deadline" class="clock">{{ INF }}</div>
+      <omegaup-countdown
+        v-else
+        class="clock"
+        :target-time="deadline"
+      ></omegaup-countdown>
     </template>
     <template #arena-problems>
       <div data-contest-practice>
@@ -20,11 +25,25 @@
             <omegaup-arena-navbar-problems
               :problems="problems"
               :active-problem="activeProblemAlias"
-              :in-assignment="false"
+              :in-assignment="true"
+              :course-alias="course.alias"
+              :course-name="course.name"
+              :current-assignment="currentAssignment"
               :digits-after-decimal-point="2"
               @disable-active-problem="activeProblem = null"
               @navigate-to-problem="onNavigateToProblem"
             ></omegaup-arena-navbar-problems>
+            <omegaup-arena-navbar-assignments
+              :assignments="course.assignments"
+              :current-assignment="currentAssignment"
+              @navigate-to-assignment="
+                (assignmentAliasToShow) =>
+                  $emit('navigate-to-assignment', {
+                    assignmentAliasToShow,
+                    courseAlias: course.alias,
+                  })
+              "
+            ></omegaup-arena-navbar-assignments>
           </div>
           <omegaup-arena-summary
             v-if="activeProblem === null"
@@ -38,19 +57,57 @@
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
               :problem="problemInfo"
+              :nomination-status="
+                problemInfo ? problemInfo.nominationStatus : null
+              "
+              :popup-displayed="problemDetailsPopup"
               :active-tab="'problems'"
+              :languages="course.languages"
               :runs="runs"
               :guid="guid"
               :problem-alias="problemAlias"
               :should-show-run-details="shouldShowRunDetails"
               @submit-run="onRunSubmitted"
               @show-run="(source) => $emit('show-run', source)"
+              @update:activeTab="
+                (selectedTab) =>
+                  $emit('reset-hash', {
+                    selectedTab,
+                    alias: activeProblemAlias,
+                  })
+              "
+              @submit-promotion="
+                (qualityPromotionComponent) =>
+                  $emit('submit-promotion', {
+                    solved: qualityPromotionComponent.solved,
+                    tried: qualityPromotionComponent.tried,
+                    quality: qualityPromotionComponent.quality,
+                    difficulty: qualityPromotionComponent.difficulty,
+                    tags: qualityPromotionComponent.tags,
+                  })
+              "
+              @dismiss-promotion="
+                (qualityPromotionComponent, isDismissed) =>
+                  $emit('dismiss-promotion', {
+                    solved: qualityPromotionComponent.solved,
+                    tried: qualityPromotionComponent.tried,
+                    isDismissed,
+                  })
+              "
             >
               <template #quality-nomination-buttons>
                 <div></div>
               </template>
               <template #best-solvers-list>
                 <div></div>
+              </template>
+              <template #feedback="{ guid, isAdmin, feedback }">
+                <omegaup-submission-feedback
+                  :guid="guid"
+                  :is-admin="isAdmin"
+                  :feedback-options="feedback"
+                  @set-feedback="(request) => $emit('set-feedback', request)"
+                ></omegaup-submission-feedback>
               </template>
             </omegaup-problem-details>
           </div>
@@ -92,7 +149,16 @@
             v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
             :data="currentRunDetailsData"
             @dismiss="onPopupDismissed"
-          ></omegaup-arena-rundetails-popup>
+          >
+            <template #feedback="{ guid, isAdmin, feedback }">
+              <omegaup-submission-feedback
+                :guid="guid"
+                :is-admin="isAdmin"
+                :feedback-options="feedback"
+                @set-feedback="(request) => $emit('set-feedback', request)"
+              ></omegaup-submission-feedback>
+            </template>
+          </omegaup-arena-rundetails-popup>
         </template>
       </omegaup-overlay>
     </template>
@@ -131,19 +197,23 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
+import arena_NavbarAssignments from './NavbarAssignments.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_Runs from './Runsv2.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import arena_Scoreboard from './Scoreboard.vue';
 import arena_Summary from './Summary.vue';
+import omegaup_Countdown from '../Countdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
+import submission_Feedback from '../submissions/Feedback.vue';
 import { SocketStatus } from '../../arena/events_socket';
 
 @Component({
   components: {
     'omegaup-arena': arena_Arena,
     'omegaup-arena-clarification-list': arena_ClarificationList,
+    'omegaup-arena-navbar-assignments': arena_NavbarAssignments,
     'omegaup-arena-navbar-problems': arena_NavbarProblems,
     'omegaup-arena-runs': arena_Runs,
     'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
@@ -151,6 +221,8 @@ import { SocketStatus } from '../../arena/events_socket';
     'omegaup-arena-scoreboard': arena_Scoreboard,
     'omegaup-arena-summary': arena_Summary,
     'omegaup-problem-details': problem_Details,
+    'omegaup-submission-feedback': submission_Feedback,
+    'omegaup-countdown': omegaup_Countdown,
   },
 })
 export default class ArenaCourse extends Vue {
@@ -159,7 +231,7 @@ export default class ArenaCourse extends Vue {
   @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
   @Prop({ default: null }) problem!: types.NavbarProblemsetProblem | null;
-  @Prop() problemInfo!: types.ProblemInfo;
+  @Prop({ default: null }) problemInfo!: types.ProblemDetails;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() activeTab!: string;
   @Prop({ default: null }) guid!: null | string;
@@ -180,7 +252,7 @@ export default class ArenaCourse extends Vue {
   shouldShowRunDetails = false;
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
-  clock = '00:00:00';
+  INF = '∞';
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;
@@ -204,6 +276,49 @@ export default class ArenaCourse extends Vue {
       return T.socketStatusFailed;
     }
     return T.socketStatusWaiting;
+  }
+
+  get deadline(): null | Date {
+    return this.currentAssignment.finish_time ?? null;
+  }
+
+  get problemDetailsPopup(): PopupDisplayed {
+    if (!this.problemInfo) {
+      return this.currentPopupDisplayed;
+    }
+
+    // Problem has not been solved or tried
+    if (
+      !this.problemInfo.nominationStatus.solved &&
+      !this.problemInfo.nominationStatus.tried
+    ) {
+      return this.currentPopupDisplayed;
+    }
+
+    // Problem has been dismissed or has been dismissed beforeAC and has not been solved
+    if (
+      this.problemInfo.nominationStatus.dismissed ||
+      (this.problemInfo.nominationStatus.dismissedBeforeAc &&
+        !this.problemInfo.nominationStatus.solved)
+    ) {
+      return this.currentPopupDisplayed;
+    }
+
+    // Problem has been previously nominated
+    if (
+      this.problemInfo.nominationStatus.nominated ||
+      (this.problemInfo.nominationStatus.nominatedBeforeAc &&
+        !this.problemInfo.nominationStatus.solved)
+    ) {
+      return this.currentPopupDisplayed;
+    }
+
+    // User can't nominate the problem
+    if (!this.problemInfo.nominationStatus.canNominateProblem) {
+      return this.currentPopupDisplayed;
+    }
+
+    return PopupDisplayed.Promotion;
   }
 
   onRunDetails(guid: string): void {
@@ -230,8 +345,12 @@ export default class ArenaCourse extends Vue {
 
   @Watch('problem')
   onActiveProblemChanged(newValue: types.NavbarProblemsetProblem | null): void {
-    if (!newValue) {
+    const currentProblem = this.currentAssignment.problems?.find(
+      ({ alias }: { alias: string }) => alias === newValue?.alias,
+    );
+    if (!newValue || !currentProblem) {
       this.activeProblem = null;
+      this.$emit('reset-hash', { selectedTab: 'problems', alias: null });
       return;
     }
     this.onNavigateToProblem(newValue);

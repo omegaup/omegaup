@@ -248,12 +248,14 @@
             <label>{{ T.wordsLanguages }}</label
             ><br />
             <multiselect
-              v-model="languages"
+              :value="languages"
               :options="Object.keys(allLanguages)"
               :multiple="true"
               :placeholder="T.contestNewFormLanguages"
               :close-on-select="false"
               :allow-empty="false"
+              @remove="onRemove"
+              @select="onSelect"
             >
             </multiselect>
             <p class="help-block">{{ T.contestNewFormLanguages }}</p>
@@ -345,6 +347,7 @@ export default class NewForm extends Vue {
   @Prop({ default: null }) teamsGroupAlias!: null | string;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop({ default: false }) contestForTeams!: boolean;
+  @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
 
   T = T;
   alias = this.initialAlias;
@@ -484,6 +487,31 @@ export default class NewForm extends Vue {
       return;
     }
     this.$emit('create-contest', request);
+  }
+
+  get catLanguageBlocked(): boolean {
+    if (!this.problems) {
+      return false;
+    }
+    for (const problem of this.problems) {
+      if (problem.languages.split(',').includes('cat')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  onRemove(language: string) {
+    if (this.catLanguageBlocked && language == 'cat') {
+      this.$emit('language-remove-blocked', language);
+      return;
+    }
+    const index = this.languages.indexOf(language);
+    this.languages.splice(index, 1);
+  }
+
+  onSelect(language: string) {
+    this.languages.push(language);
   }
 }
 </script>

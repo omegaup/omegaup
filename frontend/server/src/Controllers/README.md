@@ -1429,6 +1429,7 @@ Adds a problem to an assignment
 | `points`           | `float`        |             |
 | `problem_alias`    | `string`       |             |
 | `commit`           | `null\|string` |             |
+| `is_extra_problem` | `null\|bool`   |             |
 
 ### Returns
 
@@ -1649,21 +1650,23 @@ Create new course API
 
 ### Parameters
 
-| Name                        | Type         | Description |
-| --------------------------- | ------------ | ----------- |
-| `admission_mode`            | `mixed`      |             |
-| `alias`                     | `mixed`      |             |
-| `description`               | `mixed`      |             |
-| `finish_time`               | `mixed`      |             |
-| `languages`                 | `mixed`      |             |
-| `name`                      | `mixed`      |             |
-| `needs_basic_information`   | `mixed`      |             |
-| `public`                    | `mixed`      |             |
-| `requests_user_information` | `mixed`      |             |
-| `school_id`                 | `mixed`      |             |
-| `show_scoreboard`           | `mixed`      |             |
-| `start_time`                | `mixed`      |             |
-| `unlimited_duration`        | `bool\|null` |             |
+| Name                        | Type           | Description |
+| --------------------------- | -------------- | ----------- |
+| `admission_mode`            | `mixed`        |             |
+| `alias`                     | `mixed`        |             |
+| `description`               | `mixed`        |             |
+| `finish_time`               | `mixed`        |             |
+| `languages`                 | `mixed`        |             |
+| `level`                     | `string\|null` |             |
+| `name`                      | `mixed`        |             |
+| `needs_basic_information`   | `mixed`        |             |
+| `objective`                 | `string\|null` |             |
+| `public`                    | `mixed`        |             |
+| `requests_user_information` | `mixed`        |             |
+| `school_id`                 | `mixed`        |             |
+| `show_scoreboard`           | `mixed`        |             |
+| `start_time`                | `mixed`        |             |
+| `unlimited_duration`        | `bool\|null`   |             |
 
 ### Returns
 
@@ -2077,8 +2080,10 @@ Edit Course contents
 | `admission_mode`            | `'private'\|'public'\|'registration'\|null` |             |
 | `description`               | `null\|string`                              |             |
 | `finish_time`               | `OmegaUp\Timestamp\|null`                   |             |
+| `level`                     | `null\|string`                              |             |
 | `name`                      | `null\|string`                              |             |
 | `needs_basic_information`   | `bool\|null`                                |             |
+| `objective`                 | `null\|string`                              |             |
 | `requests_user_information` | `'no'\|'optional'\|'required'\|null`        |             |
 | `show_scoreboard`           | `bool\|null`                                |             |
 | `start_time`                | `OmegaUp\Timestamp\|null`                   |             |
@@ -4683,22 +4688,26 @@ Update user profile
 
 ### Parameters
 
-| Name                | Type                                         | Description |
-| ------------------- | -------------------------------------------- | ----------- |
-| `birth_date`        | `string`                                     |             |
-| `country_id`        | `string`                                     |             |
-| `graduation_date`   | `string`                                     |             |
-| `locale`            | `string`                                     |             |
-| `state_id`          | `string`                                     |             |
-| `auth_token`        | `mixed`                                      |             |
-| `gender`            | `'decline'\|'female'\|'male'\|'other'\|null` |             |
-| `hide_problem_tags` | `bool\|null`                                 |             |
-| `is_private`        | `bool\|null`                                 |             |
-| `name`              | `null\|string`                               |             |
-| `scholar_degree`    | `null\|string`                               |             |
-| `school_id`         | `int\|null`                                  |             |
-| `school_name`       | `mixed`                                      |             |
-| `username`          | `mixed`                                      |             |
+| Name                        | Type                                         | Description |
+| --------------------------- | -------------------------------------------- | ----------- |
+| `birth_date`                | `string`                                     |             |
+| `country_id`                | `string`                                     |             |
+| `graduation_date`           | `string`                                     |             |
+| `locale`                    | `string`                                     |             |
+| `state_id`                  | `string`                                     |             |
+| `auth_token`                | `mixed`                                      |             |
+| `gender`                    | `'decline'\|'female'\|'male'\|'other'\|null` |             |
+| `has_competitive_objective` | `bool\|null`                                 |             |
+| `has_learning_objective`    | `bool\|null`                                 |             |
+| `has_scholar_objective`     | `bool\|null`                                 |             |
+| `has_teaching_objective`    | `bool\|null`                                 |             |
+| `hide_problem_tags`         | `bool\|null`                                 |             |
+| `is_private`                | `bool\|null`                                 |             |
+| `name`                      | `null\|string`                               |             |
+| `scholar_degree`            | `null\|string`                               |             |
+| `school_id`                 | `int\|null`                                  |             |
+| `school_name`               | `mixed`                                      |             |
+| `username`                  | `mixed`                                      |             |
 
 ### Returns
 

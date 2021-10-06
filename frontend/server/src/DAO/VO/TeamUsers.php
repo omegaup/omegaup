@@ -17,7 +17,7 @@ namespace OmegaUp\DAO\VO;
 class TeamUsers extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'team_id' => true,
-        'user_id' => true,
+        'identity_id' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -35,9 +35,9 @@ class TeamUsers extends \OmegaUp\DAO\VO\VO {
                 $data['team_id']
             );
         }
-        if (isset($data['user_id'])) {
-            $this->user_id = intval(
-                $data['user_id']
+        if (isset($data['identity_id'])) {
+            $this->identity_id = intval(
+                $data['identity_id']
             );
         }
     }
@@ -51,10 +51,10 @@ class TeamUsers extends \OmegaUp\DAO\VO\VO {
     public $team_id = null;
 
     /**
-     * [Campo no documentado]
+     * Id de la identidad que pertenece al equipo
      * Llave Primaria
      *
      * @var int|null
      */
-    public $user_id = null;
+    public $identity_id = null;
 }
