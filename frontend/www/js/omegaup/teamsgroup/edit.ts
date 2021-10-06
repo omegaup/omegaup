@@ -134,6 +134,23 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'change-password-identity': ({
+            username,
+            newPassword,
+          }: {
+            username: string;
+            newPassword: string;
+          }) => {
+            api.Identity.changePassword({
+              group_alias: payload.teamGroup.alias,
+              password: newPassword,
+              username: username,
+            })
+              .then(() => {
+                ui.success(T.teamsGroupEditTeamsPasswordUpdated);
+              })
+              .catch(ui.apiError);
+          },
           remove: (username: string) => {
             api.Group.removeUser({
               group_alias: payload.teamGroup.alias,

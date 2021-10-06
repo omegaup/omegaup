@@ -52,7 +52,7 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
     }
 
     /**
-     * @return array{pageNumber: int, teamsUsers: list<array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}>, totalRows: int}
+     * @return array{pageNumber: int, teamsUsers: list<array{classname: string, isMainUserIdentity: bool, name: null|string, team_alias: string, team_name: null|string, username: string}>, totalRows: int}
      */
     public static function getByTeamGroupId(
         int $teamsGroupId,
@@ -66,6 +66,7 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
                     i.name,
                     it.username AS team_alias,
                     it.name AS team_name,
+                    CAST(IFNULL(i.user_id, FALSE) AS UNSIGNED) AS isMainUserIdentity,
                     IFNULL(
                         (
                             SELECT urc.classname FROM
@@ -122,15 +123,20 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
             [$teamsGroupId]
         );
 
-        /** @var list<array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}> $teamsUsers */
+        /** @var list<array{classname: string, name: null|string, isMainUserIdentity: int, team_alias: string, team_name: null|string, username: string}> $teamsUsers */
         $teamsUsers = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql . $sqlLimit,
             [$teamsGroupId, $offset, $pageSize]
         );
+        $result = [];
+        foreach ($teamsUsers as $row) {
+            $row['isMainUserIdentity'] = boolval($row['isMainUserIdentity']);
+            $result[] = $row;
+        }
 
         return [
             'pageNumber' => $page,
-            'teamsUsers' => $teamsUsers,
+            'teamsUsers' => $result,
             'totalRows' => $totalRows,
         ];
     }

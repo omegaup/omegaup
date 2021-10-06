@@ -1238,6 +1238,7 @@ const translations: { [key: string]: string; } = {
   teamsGroupEditTitleWithName: "Editar grupo de equipos %(name)",
   teamsGroupFormCreate: "Crear grupo de equipos",
   teamsGroupFormUpdate: "Actualizar grupo de equipos",
+  teamsGroupMemberChangePassword: "Escribe la nueva contrase\u00f1a",
   teamsGroupNewFormDescription: "Descripci\u00f3n grupo de equipos",
   teamsGroupTeamName: "Nombre de equipo",
   teamsGroupTeamsAdvancedOptions: "Opciones avanzadas",
