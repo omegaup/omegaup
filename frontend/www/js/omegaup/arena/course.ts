@@ -126,8 +126,8 @@ OmegaUp.on('ready', async () => {
           },
           'show-run': (source: SubmissionRequest) => {
             api.Run.details({ run_alias: source.request.guid })
-              .then((response) => {
-                showSubmission({ source, runDetails: response });
+              .then((runDetails) => {
+                showSubmission({ source, runDetails });
               })
               .catch((run) => {
                 submitRunFailed({

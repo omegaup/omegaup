@@ -337,7 +337,7 @@ export default class ArenaCourse extends Vue {
 
   onRunAdminDetails(guid: string): void {
     this.$emit('show-run', {
-      request: { guid, isAdmin: this.isAdmin, hash: `#runs/show-run:${guid}/` },
+      request: { guid, isAdmin: this.isAdmin, hash: `#runs/show-run:${guid}` },
       target: this,
     });
     this.currentPopupDisplayed = PopupDisplayed.RunDetails;
@@ -350,7 +350,7 @@ export default class ArenaCourse extends Vue {
         ...source.request,
         hash: `#problems/${
           this.activeProblemAlias ?? source.request.problemAlias
-        }/show-run:${source.request.guid}/`,
+        }/show-run:${source.request.guid}`,
       },
     });
   }

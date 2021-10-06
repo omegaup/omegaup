@@ -27,7 +27,7 @@ export function getOptionsFromLocation(location: string): LocationOptions {
   // - `#problems/${alias}/new-run`
   // - `#problems/${alias}/show-run:${guid}`
   // - `#clarifications/${alias}/new`
-  // - `#runs/show-run:${alias}/`
+  // - `#runs/show-run:${guid}`
   // and all the matching forms in the following regex
   const match = /#(?<tab>\w+)\/(?<alias>[^/]+)(?:\/(?<popup>[^/]+))?/g.exec(
     location,

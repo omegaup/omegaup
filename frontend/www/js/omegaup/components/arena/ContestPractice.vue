@@ -186,7 +186,7 @@ export default class ArenaContestPractice extends Vue {
         ...source.request,
         hash: `#problems/${
           this.activeProblemAlias ?? source.request.problemAlias
-        }/show-run:${source.request.guid}/`,
+        }/show-run:${source.request.guid}`,
       },
     });
   }

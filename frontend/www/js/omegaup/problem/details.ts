@@ -2,6 +2,10 @@ import Vue from 'vue';
 import problem_Details, {
   PopupDisplayed,
 } from '../components/problem/Details.vue';
+import {
+  getOptionsFromLocation,
+  getProblemAndRunDetails,
+} from '../arena/location';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../components/qualitynomination/PromotionPopup.vue';
 import { myRunsStore, runsStore, RunFilters } from '../arena/runsStore';
@@ -28,12 +32,22 @@ import {
   updateRunFallback,
 } from '../arena/submissions';
 
-OmegaUp.on('ready', () => {
+OmegaUp.on('ready', async () => {
   const payload = types.payloadParsers.ProblemDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
   const runs =
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
+
+  const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
+  let runDetails: null | types.RunDetails = null;
+  try {
+    ({ runDetails } = await getProblemAndRunDetails({
+      location: window.location.hash,
+    }));
+  } catch (e) {
+    ui.apiError(e);
+  }
 
   trackClarifications(payload.clarifications ?? []);
 
@@ -43,8 +57,8 @@ OmegaUp.on('ready', () => {
       'omegaup-problem-details': problem_Details,
     },
     data: () => ({
-      popupDisplayed: PopupDisplayed.None,
-      runDetailsData: null as types.RunDetails | null,
+      popupDisplayed,
+      runDetailsData: runDetails,
       solutionStatus: payload.solutionStatus,
       solution: null as types.ProblemStatement | null,
       availableTokens: 0,
@@ -55,7 +69,7 @@ OmegaUp.on('ready', () => {
         payload.nominationStatus?.nominated ||
         (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
-      guid: null as null | string,
+      guid,
       nextSubmissionTimestamp: payload.problem.nextSubmissionTimestamp,
       searchResultUsers: [] as types.ListItem[],
     }),
@@ -90,6 +104,7 @@ OmegaUp.on('ready', () => {
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           shouldShowTabs: true,
           searchResultUsers: this.searchResultUsers,
+          problemAlias: payload.problem.alias,
         },
         on: {
           'show-run': (source: SubmissionRequest) => {
@@ -97,9 +112,12 @@ OmegaUp.on('ready', () => {
               .then((runDetails) => {
                 showSubmission({ source, runDetails });
               })
-              .catch((error) => {
-                ui.apiError(error);
-                this.popupDisplayed = PopupDisplayed.None;
+              .catch((run) => {
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
               });
           },
           'apply-filter': (

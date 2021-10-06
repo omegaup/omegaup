@@ -498,7 +498,7 @@ export default class ProblemDetails extends Vue {
     this.$emit('show-run', {
       request: {
         guid,
-        hash: `#problems/show-run:${guid}/`,
+        hash: `#problems/${this.problemAlias}/show-run:${guid}`,
         isAdmin: this.isAdmin,
         problemAlias: this.problem.alias,
       },
@@ -658,9 +658,6 @@ export default class ProblemDetails extends Vue {
     if (newValue === PopupDisplayed.Promotion) {
       ui.reportEvent('quality-nomination', 'shown');
       return;
-    }
-    if (newValue === PopupDisplayed.RunDetails && this.guid) {
-      this.onRunDetails(this.guid);
     }
   }
 
