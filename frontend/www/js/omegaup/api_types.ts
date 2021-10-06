@@ -3445,7 +3445,7 @@ export namespace types {
   }
 
   export interface StudentProgressPayload {
-    assignment?: string;
+    assignment: string;
     course: types.CourseDetails;
     problems: types.CourseProblem[];
     student: string;

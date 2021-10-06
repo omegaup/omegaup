@@ -45,7 +45,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp}
  * @psalm-type CourseRun=array{feedback: null|SubmissionFeedback, guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<CourseRun>}
- * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string, problems: list<CourseProblem>, assignment: null|string}
+ * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string, problems: list<CourseProblem>, assignment: string}
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>, shouldShowFirstAssociatedIdentityRunWarning: bool}
