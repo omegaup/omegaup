@@ -44,7 +44,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     /**
      * Returns each problem with the statistics of the runs submmited by the students
      *
-     * @return list<array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}>
+     * @return list<array{assignment_alias: string, average: float, avg_runs: float, completed_score_percentage: float, high_score_percentage: float, low_score_percentage: float, max_points: float, maximum: float, minimum: float, problem_alias: string, variance: float}>
      */
     public static function getAssignmentsProblemsStatistics(
         int $courseId,
@@ -54,18 +54,21 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         SELECT
             bpr.assignment_alias,
             bpr.problem_alias,
-            VARIANCE(bpr.max_user_score_for_problem) AS variance,
-            AVG(bpr.max_user_score_for_problem) AS average,
-            AVG(
+            IFNULL(VARIANCE(bpr.max_user_score_for_problem), 0) AS variance,
+            IFNULL(AVG(bpr.max_user_score_for_problem), 0) AS average,
+            IFNULL(AVG(
+                CASE WHEN bpr.max_user_percent_for_problem >= 1 THEN 1 ELSE 0 END
+            ) * 100, 0) AS completed_score_percentage,
+            IFNULL(AVG(
                 CASE WHEN bpr.max_user_percent_for_problem > 0.6 THEN 1 ELSE 0 END
-            ) * 100 AS high_score_percentage,
-            AVG(
+            ) * 100, 0) AS high_score_percentage,
+            IFNULL(AVG(
                 CASE WHEN bpr.max_user_percent_for_problem = 0 THEN 1 ELSE 0 END
-            ) * 100 AS low_score_percentage,
-            MIN(bpr.max_user_score_for_problem) as minimum,
-            MAX(bpr.max_user_score_for_problem) as maximum,
+            ) * 100, 0) AS low_score_percentage,
+            IFNULL(MIN(bpr.max_user_score_for_problem), 0) as minimum,
+            IFNULL(MAX(bpr.max_user_score_for_problem), 0) as maximum,
             bpr.max_points,
-            AVG(bpr.run_count) AS avg_runs
+            IFNULL(AVG(bpr.run_count), 0) AS avg_runs
         FROM (
             SELECT
                 pr.assignment_id,
@@ -74,9 +77,9 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 pr.problem_id,
                 pr.order,
                 pr.max_points,
-                COALESCE(MAX(`r`.`contest_score`), 0) AS max_user_score_for_problem,
-                COALESCE(MAX(`r`.`score`), 0) AS max_user_percent_for_problem,
-                COALESCE(COUNT(`r`.`submission_id`), 0) AS run_count
+                IFNULL(MAX(`r`.`contest_score`), 0) AS max_user_score_for_problem,
+                IFNULL(MAX(`r`.`score`), 0) AS max_user_percent_for_problem,
+                IFNULL(COUNT(`r`.`submission_id`), 0) AS run_count
             FROM
                 `Groups_Identities` AS `gi`
             CROSS JOIN
@@ -124,7 +127,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             bpr.assignment_id, bpr.order, bpr.problem_id;
         ';
 
-        /** @var list<array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}> */
+        /** @var list<array{assignment_alias: string, average: float, avg_runs: float, completed_score_percentage: float, high_score_percentage: float, low_score_percentage: float, max_points: float, maximum: float, minimum: float, problem_alias: string, variance: float}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [ $courseId, $groupId ]

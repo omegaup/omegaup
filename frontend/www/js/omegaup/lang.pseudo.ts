@@ -429,6 +429,7 @@ const translations: { [key: string]: string; } = {
   courseStatisticsMinimumScore: "(Minimum 5c0r3)",
   courseStatisticsScoreVariance: "(Sc0r3 varianc3)",
   courseStatisticsStudentsAbove: "(S7ud3n75 5c0r3d ab0v3 60%)",
+  courseStatisticsStudentsCompleted: "(S7ud3n75 wi7h a 5c0r3 3qua1 70 100%)",
   courseStatisticsStudentsScored: "(S7ud3n75 5c0r3d a7 0%)",
   courseStatisticsVariance: "(Varianc3)",
   courseStatisticsVerdicts: "(V3rdic7 di57ribu7i0n)",

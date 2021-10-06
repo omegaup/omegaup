@@ -429,6 +429,7 @@ const translations: { [key: string]: string; } = {
   courseStatisticsMinimumScore: "Pontua\u00e7\u00e3o m\u00ednima",
   courseStatisticsScoreVariance: "Vari\u00e2ncia de pontua\u00e7\u00e3o",
   courseStatisticsStudentsAbove: "Estudantes com pontua\u00e7\u00e3o maior do que 60%",
+  courseStatisticsStudentsCompleted: "Estudentes com pontua\u00e7\u00e3o igual a 100%",
   courseStatisticsStudentsScored: "Estudantes com pontua\u00e7\u00e3o de 0%",
   courseStatisticsVariance: "Vari\u00e2ncia",
   courseStatisticsVerdicts: "Distribui\u00e7\u00e3o dos veredictos",
