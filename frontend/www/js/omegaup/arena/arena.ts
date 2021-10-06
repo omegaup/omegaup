@@ -526,33 +526,6 @@ export class Arena {
             props: {
               data: this.data,
             },
-            on: {
-              'set-feedback': ({
-                guid,
-                feedback,
-                isUpdate,
-              }: {
-                guid: string;
-                feedback: string;
-                isUpdate: boolean;
-              }) => {
-                api.Submission.setFeedback({
-                  guid,
-                  course_alias: self.options.courseAlias,
-                  assignment_alias: self.options.assignmentAlias,
-                  feedback,
-                })
-                  .then(() => {
-                    ui.success(
-                      isUpdate
-                        ? T.feedbackSuccesfullyUpdated
-                        : T.feedbackSuccesfullyAdded,
-                    );
-                    self.hideOverlay();
-                  })
-                  .catch(ui.error);
-              },
-            },
           });
         },
       });

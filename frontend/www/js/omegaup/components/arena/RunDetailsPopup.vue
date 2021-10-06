@@ -2,6 +2,12 @@
   <omegaup-overlay-popup @dismiss="$emit('dismiss')">
     <form data-run-details-view>
       <div v-if="data">
+        <slot
+          name="feedback"
+          :feedback="data.feedback"
+          :guid="data.guid"
+          :is-admin="data.admin"
+        ></slot>
         <div v-if="data.groups">
           <h3>{{ T.wordsCases }}</h3>
           <div></div>
