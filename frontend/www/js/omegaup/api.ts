@@ -784,35 +784,32 @@ export const Course = {
     messages._CourseIntroDetailsServerResponse,
     messages.CourseIntroDetailsResponse
   >('/api/course/introDetails/', (x) => {
-    if (x.details)
-      x.details = ((x) => {
-        x.assignments = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            if (x.finish_time)
-              x.finish_time = ((x: number) => new Date(x * 1000))(
-                x.finish_time,
-              );
-            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-            return x;
-          });
-        })(x.assignments);
-        x.clarifications = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            x.time = ((x: number) => new Date(x * 1000))(x.time);
-            return x;
-          });
-        })(x.clarifications);
-        if (x.finish_time)
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-        return x;
-      })(x.details);
+    x.course = ((x) => {
+      x.assignments = ((x) => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map((x) => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        });
+      })(x.assignments);
+      x.clarifications = ((x) => {
+        if (!Array.isArray(x)) {
+          return x;
+        }
+        return x.map((x) => {
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        });
+      })(x.clarifications);
+      if (x.finish_time)
+        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+      x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+      return x;
+    })(x.course);
     return x;
   }),
   listAssignments: apiCall<

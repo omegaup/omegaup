@@ -18,9 +18,13 @@ export function formatFutureDateRelative(futureDate: Date): string {
 }
 
 export function formatDelta(delta: number): string {
+  const sign = delta < 0 ? '−' : '';
+  if (delta < 0) {
+    delta = -delta;
+  }
   const months = delta / (30 * 24 * 60 * 60 * 1000);
   if (months >= 1.0) {
-    return formatFutureDateRelative(new Date(delta + Date.now()));
+    return sign + formatFutureDateRelative(new Date(delta + Date.now()));
   }
 
   const days = Math.floor(delta / (24 * 60 * 60 * 1000));
@@ -31,14 +35,14 @@ export function formatDelta(delta: number): string {
   delta -= minutes * (60 * 1000);
   const seconds = Math.floor(delta / 1000);
 
-  let clock = '';
-
+  let clock = sign;
   if (days > 0) {
     clock += `${days}:`;
   }
-  clock += `${String(hours).padStart(2, '0')}:`;
-  clock += `${String(minutes).padStart(2, '0')}:`;
-  clock += `${String(seconds).padStart(2, '0')}`;
+  clock += `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+    2,
+    '0',
+  )}:${String(seconds).padStart(2, '0')}`;
 
   return clock;
 }
@@ -111,8 +115,11 @@ export function parseDateTimeLocal(dateString: string): Date {
   if (matches !== null) {
     result.setFullYear(Number.parseInt(matches[1], 10));
     // Months in JavaScript start at 0.
-    result.setMonth(Number.parseInt(matches[2], 10) - 1);
-    result.setDate(Number.parseInt(matches[3], 10));
+    // Specifying optional param 'date' so the method won't use the value from 'getDate()'.
+    result.setMonth(
+      Number.parseInt(matches[2], 10) - 1,
+      Number.parseInt(matches[3], 10),
+    );
     result.setHours(Number.parseInt(matches[4], 10));
     result.setMinutes(Number.parseInt(matches[5], 10));
   }

@@ -123,8 +123,10 @@ OmegaUp.on('ready', () => {
                 const params: messages.CourseUpdateRequest = {
                   name: source.name,
                   description: source.description,
+                  objective: source.objective,
                   start_time: source.startTime,
                   alias: source.alias,
+                  level: source.level,
                   languages: source.selectedLanguages,
                   show_scoreboard: source.showScoreboard,
                   needs_basic_information: source.needsBasicInformation,
@@ -290,6 +292,7 @@ OmegaUp.on('ready', () => {
               assignment_alias: assignment.alias,
               problem_alias: problem.alias,
               points: problem.points,
+              is_extra_problem: problem.is_extra_problem,
             };
             if (problem.commit) {
               problemParams.commit = problem.commit;

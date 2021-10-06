@@ -7,7 +7,7 @@ import T from '../lang';
 
 import Vue from 'vue';
 import arena_Course from '../components/arena/Course.vue';
-import { getOptionsFromLocation } from './location';
+import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import {
   showSubmission,
   SubmissionRequest,
@@ -23,10 +23,12 @@ import {
   refreshCourseClarifications,
   trackClarifications,
 } from './clarifications';
+import { EventsSocket } from './events_socket';
 import clarificationStore from './clarificationsStore';
+import socketStore from './socketStore';
 import { myRunsStore, runsStore } from './runsStore';
 
-OmegaUp.on('ready', () => {
+OmegaUp.on('ready', async () => {
   time.setSugarLocale();
 
   const commonPayload = types.payloadParsers.CommonPayload();
@@ -38,6 +40,16 @@ OmegaUp.on('ready', () => {
   const activeTab = getSelectedValidTab(locationHash[0], courseAdmin);
   if (activeTab !== locationHash[0]) {
     window.location.hash = activeTab;
+  }
+  let runDetails: null | types.RunDetails = null;
+  let problemDetails: null | types.ProblemDetails = null;
+  try {
+    ({ runDetails, problemDetails } = await getProblemAndRunDetails({
+      problems: payload.currentAssignment.problems,
+      location: window.location.hash,
+    }));
+  } catch (e) {
+    ui.apiError(e);
   }
 
   trackClarifications(payload.courseDetails.clarifications);
@@ -51,13 +63,13 @@ OmegaUp.on('ready', () => {
       popupDisplayed: PopupDisplayed.None,
       problemInfo: null as types.ProblemInfo | null,
       problem: null as types.NavbarProblemsetProblem | null,
-      problems: payload.currentAssignment
-        .problems as types.NavbarProblemsetProblem[],
+      problems: payload.currentAssignment.problems,
       showNewClarificationPopup: false,
       guid: null as null | string,
       problemAlias: null as null | string,
       searchResultUsers: [] as types.ListItem[],
-      runDetailsData: null as types.RunDetails | null,
+      runDetailsData: runDetails,
+      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-course', {
@@ -79,8 +91,19 @@ OmegaUp.on('ready', () => {
           allRuns: runsStore.state.runs,
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
+          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          socketStatus: socketStore.state.socketStatus,
         },
         on: {
+          'navigate-to-assignment': ({
+            assignmentAliasToShow,
+            courseAlias,
+          }: {
+            assignmentAliasToShow: string;
+            courseAlias: string;
+          }) => {
+            window.location.pathname = `/course/${courseAlias}/assignment/${assignmentAliasToShow}/`;
+          },
           'navigate-to-problem': ({
             problem,
           }: {
@@ -91,6 +114,7 @@ OmegaUp.on('ready', () => {
               problem,
               target: arenaCourse,
               problems: this.problems,
+              problemsetId: payload.currentAssignment.problemset_id,
             });
           },
           'show-run': (request: SubmissionRequest) => {
@@ -115,6 +139,7 @@ OmegaUp.on('ready', () => {
             problem: types.NavbarProblemsetProblem;
           }) => {
             api.Run.create({
+              problemset_id: payload.currentAssignment.problemset_id,
               problem_alias: problem.alias,
               language: language,
               source: code,
@@ -174,8 +199,6 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          // TODO: Implement the API to search users from course, for
-          // 'update-search-result-users-contest';
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
           },
@@ -221,6 +244,97 @@ OmegaUp.on('ready', () => {
             }
             window.location.replace(`#${request.selectedTab}/${request.alias}`);
           },
+          'submit-promotion': ({
+            solved,
+            tried,
+            quality,
+            difficulty,
+            tags,
+          }: {
+            solved: boolean;
+            tried: boolean;
+            quality: string;
+            difficulty: string;
+            tags: string[];
+          }) => {
+            const contents: {
+              before_ac?: boolean;
+              difficulty?: number;
+              quality?: number;
+              tags?: string[];
+            } = {};
+            if (!solved && tried) {
+              contents.before_ac = true;
+            }
+            if (difficulty !== '') {
+              contents.difficulty = Number.parseInt(difficulty, 10);
+            }
+            if (tags.length > 0) {
+              contents.tags = tags;
+            }
+            if (quality !== '') {
+              contents.quality = Number.parseInt(quality, 10);
+            }
+            api.QualityNomination.create({
+              problem_alias: this.problemInfo?.alias,
+              nomination: 'suggestion',
+              contents: JSON.stringify(contents),
+            })
+              .then(() => {
+                this.popupDisplayed = PopupDisplayed.None;
+                ui.reportEvent('quality-nomination', 'submit');
+                ui.dismissNotifications();
+              })
+              .catch(ui.apiError);
+          },
+          'dismiss-promotion': (
+            solved: boolean,
+            tried: boolean,
+            isDismissed: boolean,
+          ) => {
+            const contents: { before_ac?: boolean } = {};
+            if (!solved && tried) {
+              contents.before_ac = true;
+            }
+            if (!isDismissed) {
+              return;
+            }
+            api.QualityNomination.create({
+              problem_alias: this.problemInfo?.alias,
+              nomination: 'dismissal',
+              contents: JSON.stringify(contents),
+            })
+              .then(() => {
+                ui.reportEvent('quality-nomination', 'dismiss');
+                ui.info(T.qualityNominationRateProblemDesc);
+              })
+              .catch(ui.apiError);
+          },
+          'set-feedback': ({
+            guid,
+            feedback,
+            isUpdate,
+          }: {
+            guid: string;
+            feedback: string;
+            isUpdate: boolean;
+          }) => {
+            api.Submission.setFeedback({
+              guid,
+              course_alias: payload.courseDetails.alias,
+              assignment_alias: payload.currentAssignment.alias,
+              feedback,
+            })
+              .then(() => {
+                this.popupDisplayed = PopupDisplayed.None;
+                ui.success(
+                  isUpdate
+                    ? T.feedbackSuccesfullyUpdated
+                    : T.feedbackSuccesfullyAdded,
+                );
+              })
+              .catch(ui.error);
+          },
         },
       });
     },
@@ -251,6 +365,21 @@ OmegaUp.on('ready', () => {
     arenaCourse.guid = showRunMatch?.[1] ?? null;
     arenaCourse.popupDisplayed = PopupDisplayed.RunDetails;
   }
+
+  const socket = new EventsSocket({
+    disableSockets: false,
+    problemsetAlias: payload.courseDetails.alias,
+    locationProtocol: window.location.protocol,
+    locationHost: window.location.host,
+    problemsetId: payload.currentAssignment.problemset_id,
+    scoreboardToken: null,
+    clarificationsOffset: 1,
+    clarificationsRowcount: 30,
+    navbarProblems: arenaCourse.problems,
+    currentUsername: commonPayload.currentUsername,
+    intervalInMilliseconds: 5 * 60 * 1000,
+  });
+  socket.connect();
 
   setInterval(() => {
     refreshCourseClarifications({

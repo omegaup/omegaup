@@ -4,7 +4,7 @@
       {{ T.wordsProblems }}
     </h5>
     <div class="table-responsive">
-      <table class="table mb-0 table-fixed d-block">
+      <table class="table mb-0 table-fixed">
         <thead>
           <tr>
             <th scope="col" class="align-middle text-nowrap">
@@ -303,8 +303,16 @@ export default class BaseList extends Vue {
   top: 4rem;
 }
 
-.table-fixed {
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-responsive {
   max-height: 80vh;
+}
+
+.table-fixed {
   overflow: auto;
   thead {
     th {
@@ -312,6 +320,7 @@ export default class BaseList extends Vue {
       top: 0;
       z-index: 1;
       background: white;
+      border-bottom: 0;
       &:nth-child(2) {
         position: sticky;
         left: 0;
