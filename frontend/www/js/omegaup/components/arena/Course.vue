@@ -102,6 +102,14 @@
               <template #best-solvers-list>
                 <div></div>
               </template>
+              <template #feedback="{ guid, isAdmin, feedback }">
+                <omegaup-submission-feedback
+                  :guid="guid"
+                  :is-admin="isAdmin"
+                  :feedback-options="feedback"
+                  @set-feedback="(request) => $emit('set-feedback', request)"
+                ></omegaup-submission-feedback>
+              </template>
             </omegaup-problem-details>
           </div>
         </div>
@@ -142,7 +150,16 @@
             v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
             :data="currentRunDetailsData"
             @dismiss="onPopupDismissed"
-          ></omegaup-arena-rundetails-popup>
+          >
+            <template #feedback="{ guid, isAdmin, feedback }">
+              <omegaup-submission-feedback
+                :guid="guid"
+                :is-admin="isAdmin"
+                :feedback-options="feedback"
+                @set-feedback="(request) => $emit('set-feedback', request)"
+              ></omegaup-submission-feedback>
+            </template>
+          </omegaup-arena-rundetails-popup>
         </template>
       </omegaup-overlay>
     </template>
@@ -190,6 +207,7 @@ import arena_Scoreboard from './Scoreboard.vue';
 import arena_Summary from './Summary.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
+import submission_Feedback from '../submissions/Feedback.vue';
 import { SocketStatus } from '../../arena/events_socket';
 
 @Component({
@@ -204,6 +222,7 @@ import { SocketStatus } from '../../arena/events_socket';
     'omegaup-arena-scoreboard': arena_Scoreboard,
     'omegaup-arena-summary': arena_Summary,
     'omegaup-problem-details': problem_Details,
+    'omegaup-submission-feedback': submission_Feedback,
     'omegaup-countdown': omegaup_Countdown,
   },
 })

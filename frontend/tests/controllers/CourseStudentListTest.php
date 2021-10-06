@@ -388,8 +388,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Now add two extra problems and make the user solve them
-        // Only the global score should be different, all the previous
-        // results should be mantained.
+        // Only the global score should be less than the 100%.
         for ($i = 0; $i < 2; $i++) {
             $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
@@ -442,6 +441,10 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $resultsWithExtraProblem['assignmentsProblems'][0]['points']
         );
         $this->assertEquals(
+            200, // 2 extra problems
+            $resultsWithExtraProblem['assignmentsProblems'][0]['points']
+        );
+        $this->assertEquals(
             count($results['assignmentsProblems'][0]['problems']) + 2,
             count(
                 $resultsWithExtraProblem['assignmentsProblems'][0]['problems']
@@ -486,11 +489,11 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals(
-            $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['score'],
+            $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['score'] + 200, // 2 extra problems solved
             $resultsWithExtraProblem['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['score']
         );
         $this->assertEquals(
-            $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['progress'],
+            $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['progress'] + 100,
             $resultsWithExtraProblem['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['progress']
         );
 
