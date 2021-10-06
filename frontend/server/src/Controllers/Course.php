@@ -3420,7 +3420,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'title' => new \OmegaUp\TranslationString('courseList'),
                     'fullWidth' => true,
                 ],
-                'entrypoint' => 'course_list',
+                'entrypoint' => 'course_tabs',
             ];
         }
         [
@@ -3437,7 +3437,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString('courseList'),
                 'fullWidth' => true,
             ],
-            'entrypoint' => 'course_list',
+            'entrypoint' => 'course_tabs',
         ];
     }
 
