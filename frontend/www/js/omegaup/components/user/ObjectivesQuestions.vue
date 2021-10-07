@@ -1,107 +1,102 @@
 <template>
-    <div>
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#objectivesQuestionsModal">
-            Launch demo modal
-        </button>
-        <div class="modal" tabindex="-1" id="objectivesQuestionsModal">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <h5 class="modal-title font-weight-bold mb-3">{{ T.userObjectivesModalTitle }}</h5>
-                        <p v-if="isFirstModal" class="text-right text-primary">
-                            {{ ui.formatString(T.userObjectivesModalCounter, { current: 1, last: 2 }) }}
-                        </p>
-                        <p v-else class="text-right text-primary">
-                            {{ ui.formatString(T.userObjectivesModalCounter, { current: 2, last: 2 }) }}
-                        </p>
-                        <p class="font-weight-bold">{{ description }}</p>
-                        <div v-if="isFirstModal" class="mb-3">
-                            <label class="d-block"
-                                ><input
-                                class="mr-3"
-                                v-model="objective"
-                                type="radio"
-                                :value="value_learning"
-                                />{{ T.userObjectivesModalAnswerLearning }}</label
-                            >
-                            <label class="d-block"
-                                ><input
-                                class="mr-3"
-                                v-model="objective"
-                                type="radio"
-                                :value="value_teaching"
-                                />{{ T.userObjectivesModalAnswerTeaching }}</label
-                            >
-                            <label class="d-block"
-                                ><input
-                                class="mr-3"
-                                v-model="objective"
-                                type="radio"
-                                :value="value_learning_teaching"
-                                />{{ T.userObjectivesModalAnswerLearningAndTeaching }}</label
-                            >
-                            <label class="d-block"
-                                ><input
-                                class="mr-3"
-                                v-model="objective"
-                                type="radio"
-                                :value="value_none"
-                                />{{ T.userObjectivesModalAnswerNone }}</label
-                            >
-                        </div>
-                        <div v-else class="mb-3">
-                            <label class="d-block"
-                                ><input
-                                class="mr-3"
-                                v-model="objective"
-                                type="radio"
-                                :value="value_scholar"
-                                />{{ T.userObjectivesModalAnswerScholar }}</label
-                            >
-                            <label class="d-block"
-                                ><input
-                                class="mr-3"
-                                v-model="objective"
-                                type="radio"
-                                :value="value_competitive"
-                                />{{ T.userObjectivesModalAnswerCompetitive }}</label
-                            >
-                            <label class="d-block"
-                                ><input
-                                class="mr-3"
-                                v-model="objective"
-                                type="radio"
-                                :value="value_scholar_competitive"
-                                />{{ T.userObjectivesModalAnswerScholarAndCompetitive }}</label
-                            >
-                            <label class="d-block"
-                                ><input
-                                class="mr-3"
-                                v-model="objective"
-                                type="radio"
-                                :value="value_other"
-                                />{{ T.userObjectivesModalAnswerOther }}</label
-                            >
-                        </div>
-                        <button v-if="isFirstModal" type="button" class="btn btn-next-previous float-right pr-0" @click="onChangeModal">
-                            {{ T.userObjectivesModalButtonNext }}
+    <div class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h5 class="modal-title font-weight-bold mb-3">{{ T.userObjectivesModalTitle }}</h5>
+                    <p v-if="isFirstModal" class="text-right text-primary">
+                        {{ ui.formatString(T.userObjectivesModalCounter, { current: 1, last: 2 }) }}
+                    </p>
+                    <p v-else class="text-right text-primary">
+                        {{ ui.formatString(T.userObjectivesModalCounter, { current: 2, last: 2 }) }}
+                    </p>
+                    <p class="font-weight-bold">{{ description }}</p>
+                    <div v-if="isFirstModal" class="mb-3">
+                        <label class="d-block"
+                            ><input
+                            class="mr-3"
+                            v-model="objective"
+                            type="radio"
+                            :value="value_learning"
+                            />{{ T.userObjectivesModalAnswerLearning }}</label
+                        >
+                        <label class="d-block"
+                            ><input
+                            class="mr-3"
+                            v-model="objective"
+                            type="radio"
+                            :value="value_teaching"
+                            />{{ T.userObjectivesModalAnswerTeaching }}</label
+                        >
+                        <label class="d-block"
+                            ><input
+                            class="mr-3"
+                            v-model="objective"
+                            type="radio"
+                            :value="value_learning_teaching"
+                            />{{ T.userObjectivesModalAnswerLearningAndTeaching }}</label
+                        >
+                        <label class="d-block"
+                            ><input
+                            class="mr-3"
+                            v-model="objective"
+                            type="radio"
+                            :value="value_none"
+                            />{{ T.userObjectivesModalAnswerNone }}</label
+                        >
+                    </div>
+                    <div v-else class="mb-3">
+                        <label class="d-block"
+                            ><input
+                            class="mr-3"
+                            v-model="objective"
+                            type="radio"
+                            :value="value_scholar"
+                            />{{ T.userObjectivesModalAnswerScholar }}</label
+                        >
+                        <label class="d-block"
+                            ><input
+                            class="mr-3"
+                            v-model="objective"
+                            type="radio"
+                            :value="value_competitive"
+                            />{{ T.userObjectivesModalAnswerCompetitive }}</label
+                        >
+                        <label class="d-block"
+                            ><input
+                            class="mr-3"
+                            v-model="objective"
+                            type="radio"
+                            :value="value_scholar_competitive"
+                            />{{ T.userObjectivesModalAnswerScholarAndCompetitive }}</label
+                        >
+                        <label class="d-block"
+                            ><input
+                            class="mr-3"
+                            v-model="objective"
+                            type="radio"
+                            :value="value_other"
+                            />{{ T.userObjectivesModalAnswerOther }}</label
+                        >
+                    </div>
+                    <button v-if="isFirstModal" type="button" class="btn btn-next-previous float-right pr-0" @click="onChangeModal">
+                        {{ T.userObjectivesModalButtonNext }}
+                        <font-awesome-icon
+                            class="ml-1"
+                            icon="greater-than"
+                        />
+                    </button>
+                    <div v-else>
+                        <button type="button" class="btn btn-next-previous float-left pl-0" @click="onPrevious">
                             <font-awesome-icon
-                                class="ml-1"
-                                icon="greater-than"
+                                class="mr-1"
+                                icon="less-than"
                             />
+                            {{ T.userObjectivesModalButtonPrevious }}
                         </button>
-                        <div v-else>
-                            <button type="button" class="btn btn-next-previous float-left pl-0" @click="onPrevious">
-                                <font-awesome-icon
-                                    class="mr-1"
-                                    icon="less-than"
-                                />
-                                {{ T.userObjectivesModalButtonPrevious }}
-                            </button>
-                            <button type="button" class="btn btn-primary float-right w-25" @click="onSubmit" data-dismiss="modal">
-                                {{ T.userObjectivesModalButtonSend }}
-                            </button>
-                        </div>
+                        <button type="button" class="btn btn-primary float-right w-25" @click="onSubmit" data-dismiss="modal">
+                            {{ T.userObjectivesModalButtonSend }}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -110,7 +105,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
 
