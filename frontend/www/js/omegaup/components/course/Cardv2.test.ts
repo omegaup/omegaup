@@ -28,10 +28,7 @@ describe('Card.vue', () => {
     expect(wrapper.text()).toContain(
       ui.formatString(T.publicCourseCardMetrics, {
         nLessons: publicCourse.lessonCount,
-        nStudents:
-          publicCourse.studentCount >= 1000
-            ? `${(publicCourse.studentCount / 1000).toFixed(1)}k`
-            : publicCourse.studentCount,
+        nStudents: '2.0k'
       }),
     );
   });
