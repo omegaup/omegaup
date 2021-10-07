@@ -26,32 +26,32 @@
           <div v-if="isFirstModal" class="mb-3">
             <label class="d-block"
               ><input
-                class="mr-3"
                 v-model="objective"
+                class="mr-3"
                 type="radio"
                 :value="value_learning"
               />{{ T.userObjectivesModalAnswerLearning }}</label
             >
             <label class="d-block"
               ><input
-                class="mr-3"
                 v-model="objective"
+                class="mr-3"
                 type="radio"
                 :value="value_teaching"
               />{{ T.userObjectivesModalAnswerTeaching }}</label
             >
             <label class="d-block"
               ><input
-                class="mr-3"
                 v-model="objective"
+                class="mr-3"
                 type="radio"
                 :value="value_learning_teaching"
               />{{ T.userObjectivesModalAnswerLearningAndTeaching }}</label
             >
             <label class="d-block"
               ><input
-                class="mr-3"
                 v-model="objective"
+                class="mr-3"
                 type="radio"
                 :value="value_none"
               />{{ T.userObjectivesModalAnswerNone }}</label
@@ -60,32 +60,32 @@
           <div v-else class="mb-3">
             <label class="d-block"
               ><input
-                class="mr-3"
                 v-model="objective"
+                class="mr-3"
                 type="radio"
                 :value="value_scholar"
               />{{ T.userObjectivesModalAnswerScholar }}</label
             >
             <label class="d-block"
               ><input
-                class="mr-3"
                 v-model="objective"
+                class="mr-3"
                 type="radio"
                 :value="value_competitive"
               />{{ T.userObjectivesModalAnswerCompetitive }}</label
             >
             <label class="d-block"
               ><input
-                class="mr-3"
                 v-model="objective"
+                class="mr-3"
                 type="radio"
                 :value="value_scholar_competitive"
               />{{ T.userObjectivesModalAnswerScholarAndCompetitive }}</label
             >
             <label class="d-block"
               ><input
-                class="mr-3"
                 v-model="objective"
+                class="mr-3"
                 type="radio"
                 :value="value_other"
               />{{ T.userObjectivesModalAnswerOther }}</label
@@ -112,8 +112,8 @@
             <button
               type="button"
               class="btn btn-primary float-right w-25"
-              @click="onSubmit"
               data-dismiss="modal"
+              @click="onSubmit"
             >
               {{ T.userObjectivesModalButtonSend }}
             </button>
