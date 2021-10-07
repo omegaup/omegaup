@@ -28,7 +28,7 @@ describe('Card.vue', () => {
     expect(wrapper.text()).toContain(
       ui.formatString(T.publicCourseCardMetrics, {
         nLessons: publicCourse.lessonCount,
-        nStudents: '2.0k'
+        nStudents: '2.0k',
       }),
     );
   });
