@@ -47,7 +47,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp}
  * @psalm-type CourseRun=array{feedback: null|SubmissionFeedback, guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<CourseRun>}
- * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string, problems: list<CourseProblem>, assignment: string}
+ * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string, problems: list<CourseProblem>}
+ * @psalm-type StudentProgressByAssignmentPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string, problems: list<CourseProblem>, assignment: string}
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>, shouldShowFirstAssociatedIdentityRunWarning: bool}
@@ -3153,11 +3154,72 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{smartyProperties: array{payload: StudentProgressPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
-     * @omegaup-request-param null|string $assignment_alias
      * @omegaup-request-param string $course
      * @omegaup-request-param string $student
      */
     public static function getStudentProgressForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureIdentity();
+        $courseAlias = $r->ensureString(
+            'course',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        \OmegaUp\Validators::validateStringNonEmpty($r['student'], 'student');
+
+        $course = self::validateCourseExists($courseAlias);
+
+        if (is_null($course->course_id) || is_null($course->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        ['allProgress' => $studentsProgress] = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
+            $courseAlias,
+            function () use ($course) {
+                if (is_null($course->course_id) || is_null($course->group_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'courseNotFound'
+                    );
+                }
+                return \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+                    $course->course_id,
+                    $course->group_id
+                );
+            },
+            60 * 60 * 12 // 12 hours
+        );
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'course' => self::getCommonCourseDetails(
+                        $course,
+                        $r->identity
+                    ),
+                    // TODO: Get progress only for the given student, rather than every student.
+                    'students' => $studentsProgress,
+                    'student' => $r['student']
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleStudentsProgress'
+                ),
+            ],
+            'entrypoint' => 'course_student'
+        ];
+    }
+
+    /**
+     * @return array{smartyProperties: array{payload: StudentProgressByAssignmentPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $course
+     * @omegaup-request-param string $student
+     */
+    public static function getStudentProgressByAssignmentForTypeScript(
         \OmegaUp\Request $r
     ): array {
         $r->ensureIdentity();
@@ -3249,9 +3311,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'omegaupTitleStudentsProgress'
                 ),
             ],
-            'entrypoint' => 'course_student'
+            'entrypoint' => 'course_student_with_assignment'
         ];
     }
+
      /**
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size

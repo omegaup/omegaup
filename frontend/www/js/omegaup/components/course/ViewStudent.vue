@@ -33,7 +33,7 @@
               :key="assignment.alias"
               :value="assignment.alias"
             >
-              {{ assignment.name }}
+              {{ assignment.name || initialAssignment }}
             </option>
           </select>
         </div>
@@ -256,6 +256,8 @@ export default class CourseViewStudent extends Vue {
   }
 
   mounted(): void {
+    console.log(this.initialAssignment);
+    console.log(this.initialProblem);
     window.addEventListener('popstate', (ev: PopStateEvent) => {
       if (this.selectedStudent !== null) {
         return;

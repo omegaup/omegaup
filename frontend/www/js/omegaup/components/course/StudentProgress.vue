@@ -1,7 +1,7 @@
 <template>
   <tr>
     <th scope="row" class="text-center align-middle">
-      <a :href="`/course/${courseAlias}/student/${studentProgress.username}/`">
+      <a :href="studentProgressUrl">
         <omegaup-user-username
           :classname="studentProgress.classname"
           :username="studentProgress.username"
@@ -30,21 +30,10 @@
       }}</span>
       <span class="d-block">{{ getPointsByAssignment(assignment.alias) }}</span>
       <div class="d-flex justify-content-center mt-1">
-        <div
-          v-if="
-            Object.prototype.hasOwnProperty.call(
-              student.progress,
-              assignment.alias,
-            )
-          "
-          class="d-flex"
-          :class="{ invisible: points(assignment.alias) === 0 }"
-        >
+        <div class="d-flex" :class="{ invisible: assignment.points === 0 }">
           <a
-            v-for="(problem, index) in Object.keys(
-              student.points[assignment.alias],
-            )"
-            :key="index"
+            v-for="problem in assignment.problems"
+            :key="problem.alias"
             v-tooltip="getProgressTooltipDescription(assignment.alias, problem)"
             :class="getProblemColor(assignment.alias, problem)"
             data-toggle="tooltip"
@@ -52,11 +41,10 @@
             :href="
               getStudentProgressUrlWithAssignmentAndProblem(
                 assignment.alias,
-                problem,
+                problem.alias,
               )
             "
-          >
-          </a>
+          ></a>
         </div>
       </div>
     </td>
@@ -184,14 +172,14 @@ export default class StudentProgress extends Vue {
   }
 
   get studentProgressUrl(): string {
-    return `/course/${this.course.alias}/student/${this.student.username}/`;
+    return `/course/${this.courseAlias}/student/${this.studentProgress.username}/`;
   }
 
   getStudentProgressUrlWithAssignmentAndProblem(
     selectedAssignment: string,
     selectedProblem: string,
   ): string {
-    return `/course/${this.course.alias}/student/${this.student.username}/assignment/${selectedAssignment}/#${selectedProblem}`;
+    return `/course/${this.courseAlias}/student/${this.studentProgress.username}/assignment/${selectedAssignment}/#${selectedProblem}`;
   }
 }
 </script>
