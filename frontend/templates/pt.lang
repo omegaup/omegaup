@@ -1231,6 +1231,7 @@ teamMemberExceededNumberOfContestants = "O número de competidores em uma das eq
 teamMemberUsernameInUse = "Há pelo menos um nome de usuário duplicado nas equipes do grupo. Corrija as informações."
 teamsGroupAliasMustBeRequired = "Em um concurso para equipes, o alias deve ser exigido"
 teamsGroupCreateIdentitiesAsTeams = "Criar identidades como equipes"
+teamsGroupCreatingIdentitiesAsTeams = "Criando identidades como equipes"
 teamsGroupEditGroupUpdated = "O grupo de equipes foi atualizado com sucesso."
 teamsGroupEditTeams = "Equipes"
 teamsGroupEditTeamsPasswordUpdated = "Senha atualizada corretamente!"
