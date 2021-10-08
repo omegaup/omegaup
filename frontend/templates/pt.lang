@@ -1206,6 +1206,7 @@ studentCoursesModal = "- Cada vez que você iniciar um curso, poderá vê\-lo e 
 studentProgressDescriptionTotalPoints = "(%(points) pontos)"
 studentProgressExtraProblem = "(extra)"
 studentProgressOnlyLecturesDescription = "Este conteúdo inclui apenas leituras"
+studentProgressPoints = "(%(points) pontos)"
 studentProgressTooltipDescription = "%(problem):\n\n%(score) of %(points) pontos (%(progress)% de progresso)"
 studentsProgressRangeHeader = "Progresso dos estudantes (do %(lowCount) ao %(highCount))"
 submissionFeedbackAlreadyExists = "Já existe um feedback para esta submisão."

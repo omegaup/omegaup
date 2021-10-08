@@ -2,7 +2,8 @@ import { shallowMount } from '@vue/test-utils';
 import T from './lang';
 import course_ViewProgress from './components/course/ViewProgress.vue';
 import type { types } from './api_types';
-import { escapeCsv, toCsv } from './csv';
+import { escapeCsv, toCsv, Percentage } from './csv';
+import { formatString } from './ui';
 
 describe('csv_utils', () => {
   if (typeof window.URL.createObjectURL === 'undefined') {
@@ -95,9 +96,11 @@ describe('csv_utils', () => {
     const csvContent = toCsv(wrapper.vm.progressTable);
     expect(csvContent).toBe(`${T.profileUsername},${T.wordsName},${
       T.courseProgressGlobalScore
-    },${assignment.name}\r
-${student.username},${student.name},${globalScore},${student.assignments[
-      assignment.alias
-    ].score.toFixed(2)}`);
+    },${assignment.name} ${formatString(T.studentProgressPoints, {
+      points: assignment.points,
+    })}\r
+${student.username},${student.name},${globalScore},${new Percentage(
+      student.assignments[assignment.alias].progress / 100,
+    ).toString()}`);
   });
 });

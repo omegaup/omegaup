@@ -1208,6 +1208,7 @@ const translations: { [key: string]: string; } = {
   studentProgressDescriptionTotalPoints: "((%(points) p0in75))",
   studentProgressExtraProblem: "((3x7ra))",
   studentProgressOnlyLecturesDescription: "(Thi5 c0n73n7 0n1y inc1ud35 13c7ur35)",
+  studentProgressPoints: "((%(points) p0in75))",
   studentProgressTooltipDescription: "(%(problem):\n\n%(score) 0f %(points) p0in75 (%(progress)% pr0gr355))",
   studentsProgressRangeHeader: "(S7ud3n75 pr0gr355 (fr0m %(lowCount) 70 %(highCount)))",
   submissionFeedbackAlreadyExists: "(Th3 f33dback f0r 7hi5 5ubmi55i0n a1r3ady 3xi575.)",

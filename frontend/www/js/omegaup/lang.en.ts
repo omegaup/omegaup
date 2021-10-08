@@ -1208,6 +1208,7 @@ const translations: { [key: string]: string; } = {
   studentProgressDescriptionTotalPoints: "(%(points) points)",
   studentProgressExtraProblem: "(extra)",
   studentProgressOnlyLecturesDescription: "This content only includes lectures",
+  studentProgressPoints: "(%(points) points)",
   studentProgressTooltipDescription: "%(problem):\n\n%(score) of %(points) points (%(progress)% progress)",
   studentsProgressRangeHeader: "Students progress (from %(lowCount) to %(highCount))",
   submissionFeedbackAlreadyExists: "The feedback for this submission already exists.",
