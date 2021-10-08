@@ -41,7 +41,6 @@
                   $emit('navigate-to-assignment', {
                     assignmentAliasToShow,
                     courseAlias: course.alias,
-                    isAdmin,
                   })
               "
             ></omegaup-arena-navbar-assignments>
@@ -346,8 +345,12 @@ export default class ArenaCourse extends Vue {
 
   @Watch('problem')
   onActiveProblemChanged(newValue: types.NavbarProblemsetProblem | null): void {
-    if (!newValue) {
+    const currentProblem = this.currentAssignment.problems?.find(
+      ({ alias }: { alias: string }) => alias === newValue?.alias,
+    );
+    if (!newValue || !currentProblem) {
       this.activeProblem = null;
+      this.$emit('reset-hash', { selectedTab: 'problems', alias: null });
       return;
     }
     this.onNavigateToProblem(newValue);

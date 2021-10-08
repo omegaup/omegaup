@@ -68,6 +68,15 @@ class User extends \OmegaUp\Controllers\Controller {
         'all', 'female',
     ];
 
+    // User types
+    const USER_TYPE_STUDENT = 'student';
+    const USER_TYPE_CONTESTANT = 'contestant';
+    const USER_TYPE_TEACHER = 'teacher';
+    const USER_TYPE_COACH = 'coach';
+    const USER_TYPE_SELF_TAUGHT = 'self-taught';
+    const USER_TYPE_INDEPENDENT_TEACHER = 'independent-teacher';
+    const USER_TYPE_CURIOUS = 'curious';
+
     /**
      * Entry point for Create a User API
      *
@@ -4084,6 +4093,59 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         return $response;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function getUserTypes(
+        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $loggedIdentity
+    ): array {
+        if (
+            !\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
+                && $loggedIdentity->user_id !== $user->user_id
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        if (is_null($user->main_identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        $userTypes = [];
+
+        if (
+            is_null($user->has_competitive_objective)
+            || is_null($user->has_learning_objective)
+            || is_null($user->has_scholar_objective)
+            || is_null($user->has_teaching_objective)
+        ) {
+            return $userTypes;
+        }
+
+        if ($user->has_learning_objective && $user->has_scholar_objective) {
+            $userTypes[] = self::USER_TYPE_STUDENT;
+        }
+        if ($user->has_learning_objective && $user->has_competitive_objective) {
+            $userTypes[] = self::USER_TYPE_CONTESTANT;
+        }
+        if ($user->has_teaching_objective && $user->has_scholar_objective) {
+            $userTypes[] = self::USER_TYPE_TEACHER;
+        }
+        if ($user->has_teaching_objective && $user->has_competitive_objective) {
+            $userTypes[] = self::USER_TYPE_COACH;
+        }
+        if ($user->has_learning_objective && !$user->has_scholar_objective && !$user->has_competitive_objective) {
+            $userTypes[] = self::USER_TYPE_SELF_TAUGHT;
+        }
+        if ($user->has_teaching_objective && !$user->has_scholar_objective && !$user->has_competitive_objective) {
+            $userTypes[] = self::USER_TYPE_INDEPENDENT_TEACHER;
+        }
+        if (!$user->has_learning_objective && !$user->has_teaching_objective) {
+            $userTypes[] = self::USER_TYPE_CURIOUS;
+        }
+        return $userTypes;
     }
 
     /**
