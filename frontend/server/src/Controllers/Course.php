@@ -2850,8 +2850,43 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $course_alias
      */
     public static function getCourseDetailsForTypeScript(\OmegaUp\Request $r): array {
-        // TODO: Replace the getIntroDetails() content directly here.
-        return self::getIntroDetails($r);
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Not logged user can still view the public course's contents,
+            // including courses with registration mode
+            $r->identity = null;
+        }
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
+        );
+        $course = self::validateCourseExists($courseAlias);
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+        $group = self::resolveGroup($course);
+        $assignmentAlias = $r->ensureOptionalString(
+            'assignment_alias',
+            /*$required=*/false,
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        if (is_null($r->identity)) {
+            return self::getIntroDetailsForCourse($course);
+        }
+
+        if (is_null($assignmentAlias)) {
+            return self::getCourseDetails($r, $course, $group, false);
+        }
+
+        return self::getAssignmentDetails(
+            $r->identity,
+            $course,
+            $group,
+            $assignmentAlias
+        );
     }
 
     /**
