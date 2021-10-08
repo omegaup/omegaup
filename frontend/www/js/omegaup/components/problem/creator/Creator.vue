@@ -1,5 +1,5 @@
 <template>
-  <div>Creator Path</div>
+  <div>Creator Path Test</div>
 </template>
 
 <script lang="ts">
