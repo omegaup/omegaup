@@ -2,7 +2,7 @@
   <b-row class="mb-3">
     <b-col class="d-flex align-items-center">
       <span class="mr-2">Nombre: </span>
-      <b-form-input size="sm" v-model="name" placeholder="Nuevo Problema" />
+      <b-form-input v-model="name" size="sm" placeholder="Nuevo Problema" />
     </b-col>
     <b-col class="d-flex justify-content-end">
       <b-button class="mr-2" variant="light" size="sm">
@@ -27,5 +27,3 @@ import { Component, Vue } from 'vue-property-decorator';
 @Component({})
 export default class Header extends Vue {}
 </script>
-
-<style lang="scss"></style>

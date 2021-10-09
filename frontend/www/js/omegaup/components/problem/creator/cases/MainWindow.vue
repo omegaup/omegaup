@@ -29,5 +29,3 @@ export default class Cases extends Vue {
   NIL = NIL;
 }
 </script>
-
-<style lang="scss"></style>

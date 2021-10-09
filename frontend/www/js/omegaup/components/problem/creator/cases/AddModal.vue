@@ -3,12 +3,12 @@
     id="add-problem"
     title="Agregar"
     ok-title="Agregar"
-    @ok="handleOk"
-    @keydown.native.enter="handleSubmit"
     cancel-title="Cancelar"
     hide-header-close
+    @ok="handleOk"
+    @keydown.enter="handleSubmit"
   >
-    <b-tabs small pills v-model="tabIndex">
+    <b-tabs v-model="tabIndex" small pills>
       <b-tab title="Caso">
         <form @submit.stop.prevent="handleSubmit">
           <CaseInput ref="caseInput" />

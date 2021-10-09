@@ -1,6 +1,5 @@
 import { types } from '../types';
 import { Module } from 'vuex';
-// @ts-ignore
 import { NIL, v4 } from 'uuid';
 
 export interface CasesState {

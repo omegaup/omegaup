@@ -3,10 +3,10 @@
     :id="`edit-group-${groupId}`"
     :title="`Editar Grupo | ${name}`"
     ok-title="Editar"
-    @ok="handleOk"
-    @keydown.native.enter="handleSubmit"
     cancel-title="Cancelar"
     hide-header-close
+    @ok="handleOk"
+    @keydown.enter="handleSubmit"
   >
     <form @submit.stop.prevent="handleSubmit">
       <GroupInput
@@ -86,4 +86,50 @@ export default class EditGroupModal extends Vue {
 }
 </script>
 
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
+
+<style lang="scss"></style>
 <style lang="scss"></style>

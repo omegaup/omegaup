@@ -11,9 +11,9 @@
           <span class="ml-2">{{ name }}</span>
         </div>
         <b-badge
+          v-if="groupId !== NIL"
           size="sm"
           :variant="defined ? 'success' : 'primary'"
-          v-if="groupId !== NIL"
           >{{ points.toFixed(2) }} PTS
         </b-badge>
       </b-col>
@@ -24,8 +24,8 @@
           </template>
           <div v-if="groupId !== NIL">
             <b-dropdown-item
-              @click="openEditModal"
               class="menu-item d-flex align-items-center"
+              @click="openEditModal"
             >
               <BIconPencilSquare font-scale="1" />
               <span class="ml-2">Editar Grupo</span>
@@ -36,7 +36,7 @@
                 :group-id="groupId"
               />
             </b-dropdown-item>
-            <b-dropdown-item @click="openDeleteModal" class="menu-item">
+            <b-dropdown-item class="menu-item" @click="openDeleteModal">
               <BIconTrash2 />
               <span class="ml-2">Eliminar Grupo</span>
               <b-modal
@@ -53,7 +53,7 @@
               </b-modal>
             </b-dropdown-item>
           </div>
-          <b-dropdown-item @click="openDeleteGroupCasesModal" class="menu-item">
+          <b-dropdown-item class="menu-item" @click="openDeleteGroupCasesModal">
             <BIconFileArrowDown />
             <span class="ml-2">Borrar todos los casos</span>
             <b-modal

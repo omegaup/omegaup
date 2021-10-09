@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div class="w-100" v-for="group in groups" :key="group.groupId">
+    <div v-for="group in groups" :key="group.groupId" class="w-100">
       <Group
         v-if="group.groupId === NIL ? group.cases.length !== 0 : true"
         :name="group.name"
         :points="group.points"
         :defined="group.defined"
-        :groupId="group.groupId"
+        :group-id="group.groupId"
       />
     </div>
   </div>
@@ -28,5 +28,3 @@ export default class Groups extends Vue {
   NIL = NIL;
 }
 </script>
-
-<style lang="scss"></style>

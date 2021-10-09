@@ -6,15 +6,10 @@
       label-for="case-name"
       class="mb-4"
     >
-      <b-form-input
-        id="case-name"
-        v-model="caseName"
-        required
-        autocomplete="off"
-      />
+      <b-form-input v-model="caseName" required autocomplete="off" />
     </b-form-group>
     <b-form-group label="Nombre del grupo" label-for="case-group">
-      <b-form-select id="case-group" v-model="caseGroup" :options="options" />
+      <b-form-select v-model="caseGroup" :options="options" />
     </b-form-group>
 
     <b-form-group
@@ -25,13 +20,12 @@
       label-for="case-points"
     >
       <b-form-input
+        v-model="casePoints"
         :disabled="autoPoints"
         type="number"
         number
         min="0"
         max="100"
-        id="case-points"
-        v-model="casePoints"
       />
     </b-form-group>
     <b-form-checkbox v-model="autoPoints" name="auto-points">
@@ -75,5 +69,3 @@ export default class CaseInput extends Vue {
   // options = [{ value: NIL, text: "sin_grupo" }];
 }
 </script>
-
-<style lang="scss"></style>

@@ -4,10 +4,10 @@
       <h5 class="mb-0 d-none d-md-inline">Grupos</h5>
       <div>
         <b-button
+          v-b-toggle.layout-drawer
           size="sm"
           variant="primary"
           class="mr-2"
-          v-b-toggle.layout-drawer
         >
           <BIconLayoutSidebar />
         </b-button>
@@ -44,5 +44,3 @@ export default class Sidebar extends Vue {
   }
 }
 </script>
-
-<style lang="scss"></style>

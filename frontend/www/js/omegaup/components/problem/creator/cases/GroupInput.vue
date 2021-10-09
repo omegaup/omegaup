@@ -6,12 +6,7 @@
       label-for="group-name"
       class="mb-4"
     >
-      <b-form-input
-        id="group-name"
-        v-model="groupName"
-        required
-        autocomplete="off"
-      />
+      <b-form-input v-model="groupName" required autocomplete="off" />
     </b-form-group>
     <b-form-group
       label="Puntaje"
@@ -21,13 +16,12 @@
       label-for="group-points"
     >
       <b-form-input
+        v-model="groupPoints"
         :disabled="autoPoints"
         type="number"
         number
         min="0"
         max="100"
-        id="case-points"
-        v-model="groupPoints"
       />
     </b-form-group>
     <b-form-checkbox v-model="autoPoints" name="auto-points">
@@ -60,5 +54,3 @@ export default class GroupInput extends Vue {
   }
 }
 </script>
-
-<style lang="scss"></style>

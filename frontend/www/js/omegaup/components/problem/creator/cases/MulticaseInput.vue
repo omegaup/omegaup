@@ -3,12 +3,12 @@
     <b-row>
       <b-col>
         <b-form-group label="Prefijo" label-for="prefix" class="mb-4">
-          <b-form-input id="prefix" v-model="prefix" autocomplete="off" />
+          <b-form-input v-model="prefix" autocomplete="off" />
         </b-form-group>
       </b-col>
       <b-col>
         <b-form-group label="Sufijo" label-for="suffix" class="mb-4">
-          <b-form-input id="suffix" v-model="suffix" autocomplete="off" />
+          <b-form-input v-model="suffix" autocomplete="off" />
         </b-form-group>
       </b-col>
     </b-row>
@@ -17,16 +17,10 @@
       :description="'Tus casos tendran el nombre: ' + caseNamePreview"
       label-for="case-points"
     >
-      <b-form-input
-        type="number"
-        number
-        min="0"
-        id="case-num"
-        v-model="caseNum"
-      />
+      <b-form-input v-model="caseNum" type="number" number min="0" />
     </b-form-group>
     <b-form-group label="Nombre del grupo" label-for="case-group">
-      <b-form-select id="case-group" v-model="casesGroup" :options="options" />
+      <b-form-select v-model="casesGroup" :options="options" />
     </b-form-group>
   </div>
 </template>
@@ -55,5 +49,3 @@ export default class MulticaseInput extends Vue {
   }
 }
 </script>
-
-<style lang="scss"></style>

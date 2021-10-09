@@ -1,13 +1,13 @@
 <template>
   <div :class="noGroup ? 'w-100' : undefined">
     <b-button
-      @click="setSelected({ caseId, groupId })"
       :variant="selected.caseId === caseId ? 'light' : 'link'"
       :pressed="selected.caseId === caseId"
       :class="[
         { 'd-flex align-items-center justify-content-between': noGroup },
         'w-100 mx-1 text-decoration-none text-dark',
       ]"
+      @click="setSelected({ caseId, groupId })"
     >
       <span>{{ name }}</span>
       <div v-if="noGroup">
@@ -44,5 +44,3 @@ export default class Case extends Vue {
   @Prop() readonly groupId!: string;
 }
 </script>
-
-<style lang="scss"></style>
