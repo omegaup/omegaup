@@ -1,0 +1,171 @@
+<template>
+  <div>
+    <b-row class="bottom-divider my-2 py-2">
+      <b-col
+        class="group d-flex justify-content-between align-items-center py-2"
+        @click="toggleOpen"
+      >
+        <div>
+          <BIconChevronDown v-if="isOpen" />
+          <BIconChevronUp v-if="!isOpen" />
+          <span class="ml-2">{{ name }}</span>
+        </div>
+        <b-badge
+          size="sm"
+          :variant="defined ? 'success' : 'primary'"
+          v-if="groupId !== NIL"
+          >{{ points.toFixed(2) }} PTS
+        </b-badge>
+      </b-col>
+      <b-col cols="2" class="p-0 my-auto">
+        <b-dropdown size="sm" variant="outline" no-caret>
+          <template #button-content>
+            <!-- <BIconThreeDotsVertical font-scale="1" /> -->
+          </template>
+          <div v-if="groupId !== NIL">
+            <b-dropdown-item
+              @click="openEditModal"
+              class="menu-item d-flex align-items-center"
+            >
+              <BIconPencilSquare font-scale="1" />
+              <span class="ml-2">Editar Grupo</span>
+              <EditGroup
+                :name="name"
+                :points="points"
+                :defined="defined"
+                :group-id="groupId"
+              />
+            </b-dropdown-item>
+            <b-dropdown-item @click="openDeleteModal" class="menu-item">
+              <BIconTrash2 />
+              <span class="ml-2">Eliminar Grupo</span>
+              <b-modal
+                :id="`delete-modal-${groupId}`"
+                :title="`Borrar Grupo | ${name}`"
+                ok-variant="danger"
+                ok-title="Borrar"
+                cancel-title="Cancelar"
+                @ok="handleDeleteGroup"
+              >
+                ¿Estas seguro que deseas borrar <strong>{{ name }}</strong
+                >? Todos los casos del grupo se borrarán. Esta opción no se
+                puede deshacer
+              </b-modal>
+            </b-dropdown-item>
+          </div>
+          <b-dropdown-item @click="openDeleteGroupCasesModal" class="menu-item">
+            <BIconFileArrowDown />
+            <span class="ml-2">Borrar todos los casos</span>
+            <b-modal
+              :id="`delete-group-cases-modal-${groupId}`"
+              :title="`Borrar Casos | ${name}`"
+              ok-variant="danger"
+              ok-title="Borrar"
+              cancel-title="Cancelar"
+              @ok="handleDeleteGroupCases"
+            >
+              ¿Estas seguro que deseas borrar todos los casos
+              <strong>{{ name }}</strong
+              >? Esta opción no se puede deshacer
+            </b-modal>
+          </b-dropdown-item>
+        </b-dropdown>
+      </b-col>
+    </b-row>
+    <div v-if="isOpen" class="">
+      <div
+        v-for="_case in getCasesFromGroup(groupId)"
+        :key="_case.caseId"
+        :class="_case.groupId === NIL ? 'd-block' : 'd-inline-block'"
+      >
+        <Case
+          :case-id="_case.caseId"
+          :group-id="groupId"
+          :name="_case.name"
+          :points="_case.points"
+          :defined="_case.defined"
+          :no-group="_case.groupId === NIL"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import { types } from '../../../../problem/creator/types';
+import { namespace } from 'vuex-class';
+import { NIL } from 'uuid';
+import EditGroup from './EditGroup.vue';
+import Case from './Case.vue';
+
+const caseStore = namespace('casesStore');
+
+@Component({
+  components: { EditGroup, Case },
+})
+export default class Group extends Vue {
+  @caseStore.Mutation('deleteGroup') deleteGroup!: (payload: string) => void;
+  @caseStore.Mutation('deleteGroupCases') deleteGroupCases!: (
+    payload: string,
+  ) => void;
+
+  @Prop() readonly name!: string;
+  @Prop() readonly points!: number;
+  @Prop() readonly defined!: boolean;
+  @Prop() readonly groupId!: string;
+
+  @caseStore.Getter('getCasesFromGroup') getCasesFromGroup!: (
+    groupId: string,
+  ) => types.Case[];
+
+  isOpen = true;
+  NIL = NIL;
+
+  handleDeleteGroup() {
+    this.deleteGroup(this.groupId);
+  }
+  handleDeleteGroupCases() {
+    this.deleteGroupCases(this.groupId);
+  }
+  toggleOpen() {
+    this.isOpen = !this.isOpen;
+  }
+
+  openEditModal() {
+    this.$bvModal.show(`edit-group-${this.groupId}`);
+  }
+
+  openDeleteModal() {
+    this.$bvModal.show(`delete-modal-${this.groupId}`);
+  }
+
+  openDeleteGroupCasesModal() {
+    this.$bvModal.show(`delete-group-cases-modal-${this.groupId}`);
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.bottom-divider {
+  margin: 0 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.not-defined {
+  opacity: 50%;
+}
+
+.group {
+  cursor: pointer;
+  padding-right: 0;
+  &:hover {
+    border-left: 2px solid rgba(0, 0, 0, 0.1);
+  }
+}
+
+.menu-item {
+  font-size: 14px;
+  //margin: 5px 0;
+}
+</style>
