@@ -1,6 +1,6 @@
 <template>
   <b-modal
-    :id="`edit-group-${groupId}`"
+    ref="modal"
     :title="`Editar Grupo | ${name}`"
     ok-title="Editar"
     cancel-title="Cancelar"
@@ -42,6 +42,8 @@ export default class EditGroupModal extends Vue {
 
   @Ref('groupInput') readonly groupInput!: GroupInput;
 
+  @Ref('modal') readonly modal!: any;
+
   handleOk(bvModalEvt: any) {
     bvModalEvt.preventDefault();
     this.handleSubmit();
@@ -80,56 +82,9 @@ export default class EditGroupModal extends Vue {
 
   hideModal() {
     this.$nextTick(() => {
-      this.$bvModal.hide(`edit-group-${this.groupId}`);
+      this.modal.hide();
+      // this.$bvModal.hide(`edit-group-${this.groupId}`);
     });
   }
 }
 </script>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>
-
-<style lang="scss"></style>
-<style lang="scss"></style>

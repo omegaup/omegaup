@@ -30,6 +30,7 @@
               <BIconPencilSquare font-scale="1" />
               <span class="ml-2">Editar Grupo</span>
               <EditGroup
+                ref="editGroupRef"
                 :name="name"
                 :points="points"
                 :defined="defined"
@@ -40,7 +41,7 @@
               <BIconTrash2 />
               <span class="ml-2">Eliminar Grupo</span>
               <b-modal
-                :id="`delete-modal-${groupId}`"
+                ref="deleteGroupRef"
                 :title="`Borrar Grupo | ${name}`"
                 ok-variant="danger"
                 ok-title="Borrar"
@@ -57,7 +58,7 @@
             <BIconFileArrowDown />
             <span class="ml-2">Borrar todos los casos</span>
             <b-modal
-              :id="`delete-group-cases-modal-${groupId}`"
+              ref="deleteGroupCasesRef"
               :title="`Borrar Casos | ${name}`"
               ok-variant="danger"
               ok-title="Borrar"
@@ -92,7 +93,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Ref, Vue } from 'vue-property-decorator';
 import { types } from '../../../../problem/creator/types';
 import { namespace } from 'vuex-class';
 import { NIL } from 'uuid';
@@ -115,6 +116,10 @@ export default class Group extends Vue {
   @Prop() readonly defined!: boolean;
   @Prop() readonly groupId!: string;
 
+  @Ref('editGroupRef') editGroupRef!: EditGroup;
+  @Ref('deleteGroupRef') deleteGroupRef!: any;
+  @Ref('deleteGroupCasesRef') deleteGroupCasesRef!: any;
+
   @caseStore.Getter('getCasesFromGroup') getCasesFromGroup!: (
     groupId: string,
   ) => types.Case[];
@@ -133,15 +138,18 @@ export default class Group extends Vue {
   }
 
   openEditModal() {
-    this.$bvModal.show(`edit-group-${this.groupId}`);
+    this.editGroupRef.modal.show();
+    // this.$bvModal.show(`edit-group-${this.groupId}`);
   }
 
   openDeleteModal() {
-    this.$bvModal.show(`delete-modal-${this.groupId}`);
+    this.deleteGroupRef.show();
+    // this.$bvModal.show(`delete-modal-${this.groupId}`);
   }
 
   openDeleteGroupCasesModal() {
-    this.$bvModal.show(`delete-group-cases-modal-${this.groupId}`);
+    this.deleteGroupCasesRef.show();
+    // this.$bvModal.show(`delete-group-cases-modal-${this.groupId}`);
   }
 }
 </script>

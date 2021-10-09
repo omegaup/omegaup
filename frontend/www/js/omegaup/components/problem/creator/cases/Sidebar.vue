@@ -20,7 +20,7 @@
         </b-button>
       </div>
       <!-- Modal-->
-      <AddModal />
+      <AddModal ref="addModalRef" />
       <!-- Drawer -->
       <!-- <LayoutDrawer /> -->
     </div>
@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Ref, Vue } from 'vue-property-decorator';
 import AddModal from './AddModal.vue';
 import Groups from './Groups.vue';
 
@@ -37,10 +37,12 @@ import Groups from './Groups.vue';
   components: { AddModal, Groups },
 })
 export default class Sidebar extends Vue {
+  @Ref('addModalRef') addModalRef!: AddModal;
   visible = false;
 
   openModal() {
-    this.$bvModal.show('add-problem');
+    this.addModalRef.modal.show();
+    // this.$bvModal.show('add-problem');
   }
 }
 </script>

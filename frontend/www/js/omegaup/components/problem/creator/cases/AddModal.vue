@@ -1,6 +1,6 @@
 <template>
   <b-modal
-    id="add-problem"
+    ref="modal"
     title="Agregar"
     ok-title="Agregar"
     cancel-title="Cancelar"
@@ -62,6 +62,8 @@ export default class AddModal extends Vue {
   @Ref('caseInput') readonly caseInput!: CaseInput;
   @Ref('groupInput') readonly groupInput!: GroupInput;
   @Ref('multiInput') readonly multicaseInput!: MulticaseInput;
+
+  @Ref('modal') readonly modal!: any;
 
   tabIndex = 0;
 
@@ -154,7 +156,8 @@ export default class AddModal extends Vue {
 
   hideModal() {
     this.$nextTick(() => {
-      this.$bvModal.hide('add-problem');
+      this.modal.hide();
+      // this.$bvModal.hide('add-problem');
     });
   }
 }
