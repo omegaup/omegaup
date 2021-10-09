@@ -165,3 +165,6 @@ export default class AddModal extends Vue {
 
 <style lang="scss"></style>
 <style lang="scss"></style>
+
+<style lang="scss"></style>
+<style lang="scss"></style>
