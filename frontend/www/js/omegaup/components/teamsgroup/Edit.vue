@@ -90,6 +90,7 @@
         <omegaup-teams-group-upload
           :team-error-row="teamErrorRow"
           :search-result-users="searchResultUsers"
+          :number-of-contestants="numberOfContestants"
           @bulk-identities="
             (identities) => $emit('bulk-identities', identities)
           "

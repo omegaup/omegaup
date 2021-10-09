@@ -19,11 +19,8 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-course-intro', {
         props: {
-          course: payload.details,
-          name: payload.name,
-          description: payload.description,
+          course: payload.course,
           needsBasicInformation: payload.needsBasicInformation,
-          requestsUserInformation: payload.requestsUserInformation,
           shouldShowAcceptTeacher: payload.shouldShowAcceptTeacher,
           statements: payload.statements,
           userRegistrationRequested: this.userRegistrationRequested,
@@ -32,24 +29,30 @@ OmegaUp.on('ready', () => {
           loggedIn: headerPayload.isLoggedIn,
         },
         on: {
-          submit: (source: course_Intro) => {
+          submit: ({
+            shareUserInformation,
+            acceptTeacher,
+          }: {
+            shareUserInformation: boolean;
+            acceptTeacher: boolean;
+          }) => {
             api.Course.addStudent({
-              course_alias: payload.alias,
+              course_alias: payload.course.alias,
               usernameOrEmail: headerPayload.currentUsername,
-              share_user_information: source.shareUserInformation,
-              accept_teacher: source.acceptTeacher,
+              share_user_information: shareUserInformation,
+              accept_teacher: acceptTeacher,
               privacy_git_object_id: payload.statements.privacy?.gitObjectId,
               accept_teacher_git_object_id:
                 payload.statements.acceptTeacher?.gitObjectId,
               statement_type: payload.statements.privacy?.statementType,
             })
               .then(() => {
-                window.location.replace(`/course/${payload.alias}/`);
+                window.location.replace(`/course/${payload.course.alias}/`);
               })
               .catch(ui.apiError);
           },
           'request-access-course': () => {
-            api.Course.registerForCourse({ course_alias: payload.alias })
+            api.Course.registerForCourse({ course_alias: payload.course.alias })
               .then(() => {
                 courseIntro.userRegistrationRequested = true;
               })
