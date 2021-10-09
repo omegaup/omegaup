@@ -51,15 +51,6 @@ export namespace dao {
     username?: string;
   }
 
-  export interface Schools {
-    country_id?: string;
-    name?: string;
-    ranking?: number;
-    school_id?: number;
-    score?: number;
-    state_id?: string;
-  }
-
   export interface Users {
     birth_date?: string;
     facebook_user_id?: string;
@@ -3731,7 +3722,6 @@ export namespace types {
     extraProfileDetails?: types.ExtraProfileDetails;
     profile: types.UserProfileInfo;
     programming_languages: { [key: string]: string };
-    schools: dao.Schools[];
   }
 
   export interface UserProfileInfo {

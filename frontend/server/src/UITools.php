@@ -226,6 +226,7 @@ class UITools {
             'is_admin' => $isAdmin,
             'associated_identities' => $associatedIdentities,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
+        /** @psalm-suppress TypeDoesNotContainType OMEGAUP_ENVIRONMENT is a configurable value. */
         return [
             'omegaUpLockDown' => OMEGAUP_LOCKDOWN,
             'bootstrap4' => self::useBootstrap4($supportsBootstrap4),
@@ -265,7 +266,6 @@ class UITools {
             'isAdmin' => $isAdmin,
             'lockDownImage' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA6UlEQVQ4jd2TMYoCMRiFv5HBwnJBsFqEiGxtISps6RGmFD2CZRr7aQSPIFjmCGsnrFYeQJjGytJKRERsfp2QmahY+iDk5c97L/wJCchBFCclYAD8SmkBTI1WB1cb5Ji/gT+g7mxtgK7RausNiOIEYAm0pHSWOZR5BbSNVndPwTmlaZnnQFnGXGot0XgDfiw+NlrtjVZ7YOzRZAJCix893NZkAi4eYejRpJcYxckQ6AENKf0DO+EVoCN8DcyMVhM3eQR8WesO+WgAVWDituC28wiFDHkXHxBgv0IfKL7oO+UF1Ei/7zMsbuQKTFoqpb8KS2AAAAAASUVORK5CYII=',
             'navbarSection' => $navbarSection,
-            /** @psalm-suppress TypeDoesNotContainType OMEGAUP_ENVIRONMENT is a configurable value. */
             'inProduction' => defined(
                 'OMEGAUP_ENVIRONMENT'
             ) && OMEGAUP_ENVIRONMENT === 'production',

@@ -29,7 +29,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>}
  * @psalm-type UserProfileDetailsPayload=array{privateProfile: bool, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
- * @psalm-type UserProfileEditDetailsPayload=array{schools: list<\OmegaUp\DAO\VO\Schools>, countries: list<\OmegaUp\DAO\VO\Countries>, programming_languages: array<string, string>, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
+ * @psalm-type UserProfileEditDetailsPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, programming_languages: array<string, string>, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
@@ -3995,84 +3995,64 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: UserProfileEditDetails, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: UserProfileEditDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $username
      *
      */
     public static function getProfileEditDetailsForTypeScript(\OmegaUp\Request $r) {
-        try {
-            self::authenticateOrAllowUnauthenticatedRequest($r);
-
-            $identity = self::resolveTargetIdentity($r);
-            if (is_null($identity)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterNotFound',
-                    'Identity'
-                );
-            }
-            $response = [
-                'smartyProperties' => [
-                    'title' => new \OmegaUp\TranslationString(
-                        'userEditEditProfile'
-                    ),
-                ],
-                'entrypoint' => 'user_edit',
-            ];
-            $ownedBadges = [];
-            $user = null;
-            if (!is_null($user)) {
-                $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
-                    $user
-                );
-            }
-            $ownedBadges = [];
-            if (!is_null($user)) {
-                $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
-                    $user
-                );
-            }
-            $response['smartyProperties']['payload'] = [
-                'countries' => \OmegaUp\DAO\Countries::getAll(
-                    null,
-                    100,
-                    'name'
-                ),
-                'schools' => \OmegaUp\DAO\Schools::getAll(
-                    null,
-                    100,
-                    'name'
-                ),
-                'programming_languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
-                'profile' => self::getProfileDetails($r->identity, $identity),
-                'extraProfileDetails' => [
-                    'contests' => self::getContestStats($identity),
-                    'solvedProblems' => self::getSolvedProblems(
-                        $identity->identity_id
-                    ),
-                    'unsolvedProblems' => self::getUnsolvedProblems(
-                        $identity->identity_id
-                    ),
-                    'createdProblems' => self::getCreatedProblems(
-                        $identity->identity_id
-                    ),
-                    'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
-                        $identity->identity_id
-                    ),
-                    'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
-                    'ownedBadges' => $ownedBadges,
-                ],
-            ];
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            \OmegaUp\ApiCaller::logException($e);
-            $response['smartyProperties'] = [
-                'STATUS_ERROR' => $e->getErrorMessage(),
-            ];
+        $r->ensureIdentity();
+        $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'Identity'
+            );
         }
-        if (is_null($r->identity) || is_null($r->identity->password)) {
+        $response = [
+            'smartyProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'userEditEditProfile'
+                ),
+            ],
+            'entrypoint' => 'user_edit',
+        ];
+        $ownedBadges = [];
+        $user = $r->user;
+        if (!is_null($user)) {
+            $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
+                $user
+            );
+        }
+        $response['smartyProperties']['payload'] = [
+            'countries' => \OmegaUp\DAO\Countries::getAll(
+                null,
+                100,
+                'name'
+            ),
+            'programming_languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+            'profile' => self::getProfileDetails($r->identity, $identity),
+            'extraProfileDetails' => [
+                'contests' => self::getContestStats($identity),
+                'solvedProblems' => self::getSolvedProblems(
+                    $identity->identity_id
+                ),
+                'unsolvedProblems' => self::getUnsolvedProblems(
+                    $identity->identity_id
+                ),
+                'createdProblems' => self::getCreatedProblems(
+                    $identity->identity_id
+                ),
+                'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
+                    $identity->identity_id
+                ),
+                'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
+                'ownedBadges' => $ownedBadges,
+            ],
+        ];
+        if (is_null($r->identity->password)) {
             $response['entrypoint'] = 'user_basic_edit';
         }
-        // print_r($response);
         return $response;
     }
 
