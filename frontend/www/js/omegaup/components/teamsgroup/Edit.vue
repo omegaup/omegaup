@@ -94,6 +94,7 @@
           :team-error-row="teamErrorRow"
           :search-result-users="searchResultUsers"
           :number-of-contestants="numberOfContestants"
+          :is-loading.sync="isLoading"
           @bulk-identities="
             (identities) => $emit('bulk-identities', identities)
           "
@@ -143,6 +144,7 @@ export default class TeamsGroupEdit extends Vue {
   @Prop({ default: () => [] }) teamsMembers!: types.TeamMember[];
   @Prop() teamErrorRow!: null | string;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() isLoading!: boolean;
 
   T = T;
   ui = ui;
