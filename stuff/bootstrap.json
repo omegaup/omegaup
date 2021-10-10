@@ -328,6 +328,15 @@
 				"api": "/course/addProblem/",
 				"params": {
 					"course_alias": "curso-publico",
+					"assignment_alias": "tarea-ilimitada",
+					"problem_alias": "karel-helloworld",
+					"is_extra_problem": "true"
+				}
+			},
+			{
+				"api": "/course/addProblem/",
+				"params": {
+					"course_alias": "curso-publico",
 					"assignment_alias": "examen-ilimitado",
 					"problem_alias": "sumas"
 				}
