@@ -3991,54 +3991,6 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Refactor of apiIntroDetails in order to be called from php files and APIs
-     *
-     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload|AssignmentDetailsPayload, title: \OmegaUp\TranslationString}}
-     *
-     * @omegaup-request-param null|string $assignment_alias
-     * @omegaup-request-param string $course_alias
-     */
-    public static function getIntroDetails(\OmegaUp\Request $r): array {
-        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
-        try {
-            $r->ensureIdentity();
-        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            // Not logged user can still view the public course's contents,
-            // including courses with registration mode
-            $r->identity = null;
-        }
-        $courseAlias = $r->ensureString(
-            'course_alias',
-            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
-        );
-        $course = self::validateCourseExists($courseAlias);
-        if (is_null($course->course_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
-        }
-        $group = self::resolveGroup($course);
-        $assignmentAlias = $r->ensureOptionalString(
-            'assignment_alias',
-            /*$required=*/false,
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
-
-        if (is_null($r->identity)) {
-            return self::getIntroDetailsForCourse($course);
-        }
-
-        if (is_null($assignmentAlias)) {
-            return self::getCourseDetails($r, $course, $group, false);
-        }
-
-        return self::getAssignmentDetails(
-            $r->identity,
-            $course,
-            $group,
-            $assignmentAlias
-        );
-    }
-
-    /**
      * @return array{status: string}
      *
      * @omegaup-request-param string $course_alias
