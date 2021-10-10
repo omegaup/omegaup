@@ -17,8 +17,8 @@
               <p class="mb-0">
                 {{
                   ui.formatString(T.publicCourseCardMetrics, {
-                    nLessons: course.lessonCount,
-                    nStudents:
+                    lessonCount: course.lessonCount,
+                    studentCount:
                       course.studentCount >= 1000
                         ? `${(course.studentCount / 1000).toFixed(1)}k`
                         : course.studentCount,
