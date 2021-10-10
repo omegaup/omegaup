@@ -75,6 +75,9 @@
           @change-password-identity-team="
             (request) => $emit('change-password-identity-team', request)
           "
+          @change-password-identity="
+            (request) => $emit('change-password-identity', request)
+          "
           @add-members="(request) => $emit('add-members', request)"
           @remove-member="(request) => $emit('remove-member', request)"
           @remove="(name) => $emit('remove', name)"
