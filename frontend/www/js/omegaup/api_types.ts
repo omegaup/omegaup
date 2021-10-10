@@ -3577,6 +3577,7 @@ export namespace types {
 
   export interface TeamMember {
     classname: string;
+    isMainUserIdentity: boolean;
     name?: string;
     team_alias: string;
     team_name?: string;

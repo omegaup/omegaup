@@ -38,14 +38,6 @@
             </button>
             <button
               class="btn btn-link"
-              :data-change-password-identity="identity.username"
-              :title="T.groupEditMembersChangePassword"
-              @click="onChangePass(identity.username)"
-            >
-              <font-awesome-icon :icon="['fas', 'lock']" />
-            </button>
-            <button
-              class="btn btn-link"
               :data-add-members-identity="identity.username"
               :title="T.groupEditMembersAddMembers"
               @click="onAddMembers(identity.username)"
@@ -88,6 +80,9 @@
         (query) => $emit('update-search-result-users', query)
       "
       @cancel="onCancel"
+      @change-password-identity="
+        (request) => $emit('change-password-identity', request)
+      "
       @add-members="(request) => $emit('add-members', request)"
       @remove-member="(request) => $emit('remove-member', request)"
     ></omegaup-identity-members>
