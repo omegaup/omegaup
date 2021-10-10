@@ -6,7 +6,6 @@ import { types } from '../api_types';
 import { myRunsStore, runsStore } from './runsStore';
 import { OmegaUp } from '../omegaup';
 import JSZip from 'jszip';
-import type problem_Details from '../components/problem/Details.vue';
 import T from '../lang';
 
 interface RunSubmit {
@@ -19,18 +18,15 @@ interface RunSubmit {
 }
 
 interface SubmissionResponse {
-  source: SubmissionRequest;
+  request: SubmissionRequest;
   runDetails: types.RunDetails;
 }
 
 export interface SubmissionRequest {
-  request: {
-    guid: string;
-    hash: string;
-    isAdmin: boolean;
-    problemAlias: string;
-  };
-  target: problem_Details;
+  guid: string;
+  hash: string;
+  isAdmin: boolean;
+  problemAlias: string;
 }
 
 export function submitRun({
@@ -76,15 +72,17 @@ export function submitRunFailed({
   }
 }
 
-export function showSubmission({ source, runDetails }: SubmissionResponse) {
-  if (runDetails.show_diff === 'none' || !source.request.isAdmin) {
-    displayRunDetails({
-      source,
+export function showSubmission({
+  request,
+  runDetails,
+}: SubmissionResponse): types.RunDetails {
+  if (runDetails.show_diff === 'none' || !request.isAdmin) {
+    return displayRunDetails({
+      request,
       runDetails,
     });
-    return;
   }
-  fetch(`/api/run/download/run_alias/${source.request.guid}/show_diff/true/`)
+  fetch(`/api/run/download/run_alias/${request.guid}/show_diff/true/`)
     .then((response) => {
       if (!response.ok) {
         return Promise.reject(new Error(response.statusText));
@@ -127,9 +125,13 @@ export function showSubmission({ source, runDetails }: SubmissionResponse) {
           }
         });
       });
-      displayRunDetails({ source, runDetails });
+      return displayRunDetails({ request, runDetails });
     })
     .catch(ui.apiError);
+  return displayRunDetails({
+    request,
+    runDetails,
+  });
 }
 
 function numericSort<T extends { [key: string]: any }>(key: string) {
@@ -159,9 +161,9 @@ function numericSort<T extends { [key: string]: any }>(key: string) {
 }
 
 function displayRunDetails({
-  source: { request, target },
+  request,
   runDetails,
-}: SubmissionResponse): void {
+}: SubmissionResponse): types.RunDetails {
   let sourceHTML,
     sourceLink = false;
   if (runDetails.source?.indexOf('data:') === 0) {
@@ -190,10 +192,9 @@ function displayRunDetails({
     groups = detailsGroups;
   }
 
-  Vue.set(
-    target,
-    'currentRunDetailsData',
-    Object.assign({}, runDetails, {
+  return {
+    ...runDetails,
+    ...{
       logs: runDetails.logs || '',
       judged_by: runDetails.judged_by || '',
       source: sourceHTML,
@@ -202,12 +203,11 @@ function displayRunDetails({
         new Blob([runDetails.source || ''], { type: 'text/plain' }),
       ),
       source_name: `Main.${runDetails.language}`,
-      groups: groups,
+      groups,
       show_diff: request.isAdmin ? runDetails.show_diff : 'none',
       feedback: runDetails.feedback,
-    }),
-  );
-  window.location.hash = request.hash;
+    },
+  };
 }
 
 export function updateRun({ run }: { run: types.Run }): void {

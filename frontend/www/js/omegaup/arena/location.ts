@@ -27,7 +27,8 @@ export function getOptionsFromLocation(location: string): LocationOptions {
   // - `#problems/${alias}/new-run`
   // - `#problems/${alias}/show-run:${guid}`
   // - `#clarifications/${alias}/new`
-  // - `#runs/show-run:${guid}`
+  // - `#runs/${alias}|all/show-run:${guid}` 'all' flag indicates we are located
+  //   inside arena
   // and all the matching forms in the following regex
   const match = /#(?<tab>\w+)\/(?<alias>[^/]+)(?:\/(?<popup>[^/]+))?/g.exec(
     location,
@@ -61,8 +62,8 @@ export function getOptionsFromLocation(location: string): LocationOptions {
       }
       break;
     case 'runs':
-      if (match.groups.alias?.startsWith('show-run')) {
-        response.guid = match.groups.alias.split(':')[1];
+      if (match.groups.popup?.startsWith('show-run')) {
+        response.guid = match.groups.popup.split(':')[1];
         response.popupDisplayed = PopupDisplayed.RunDetails;
       }
       break;

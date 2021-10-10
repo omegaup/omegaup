@@ -99,7 +99,7 @@ OmegaUp.on('ready', async () => {
           selectedPrivateTags: payload.selectedPrivateTags,
           hasBeenNominated: this.hasBeenNominated,
           guid: this.guid,
-          isAdmin: commonPayload.isAdmin,
+          isAdmin: payload.user.admin,
           showVisibilityIndicators: true,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           shouldShowTabs: true,
@@ -107,10 +107,11 @@ OmegaUp.on('ready', async () => {
           problemAlias: payload.problem.alias,
         },
         on: {
-          'show-run': (source: SubmissionRequest) => {
-            api.Run.details({ run_alias: source.request.guid })
+          'show-run': (request: SubmissionRequest) => {
+            api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
-                showSubmission({ source, runDetails });
+                this.runDetailsData = showSubmission({ request, runDetails });
+                window.location.hash = request.hash;
               })
               .catch((run) => {
                 submitRunFailed({

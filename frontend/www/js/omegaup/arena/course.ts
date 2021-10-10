@@ -124,10 +124,11 @@ OmegaUp.on('ready', async () => {
               problemsetId: payload.currentAssignment.problemset_id,
             });
           },
-          'show-run': (source: SubmissionRequest) => {
-            api.Run.details({ run_alias: source.request.guid })
+          'show-run': (request: SubmissionRequest) => {
+            api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
-                showSubmission({ source, runDetails });
+                this.runDetailsData = showSubmission({ request, runDetails });
+                window.location.hash = request.hash;
               })
               .catch((run) => {
                 submitRunFailed({

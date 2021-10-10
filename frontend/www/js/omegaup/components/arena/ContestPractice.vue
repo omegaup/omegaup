@@ -41,7 +41,7 @@
               :guid="guid"
               :problem-alias="problemAlias"
               :contest-alias="contest.alias"
-              :run-details-data="runDetailsData"
+              :run-details-data="currentRunDetailsData"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', {
@@ -161,6 +161,7 @@ export default class ArenaContestPractice extends Vue {
   ContestClarificationType = ContestClarificationType;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
   currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+  currentRunDetailsData = this.runDetailsData;
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;
@@ -179,15 +180,12 @@ export default class ArenaContestPractice extends Vue {
     });
   }
 
-  onRunDetails(source: SubmissionRequest): void {
+  onRunDetails(request: SubmissionRequest): void {
     this.$emit('show-run', {
-      ...source,
-      request: {
-        ...source.request,
-        hash: `#problems/${
-          this.activeProblemAlias ?? source.request.problemAlias
-        }/show-run:${source.request.guid}`,
-      },
+      ...request,
+      hash: `#problems/${
+        this.activeProblemAlias ?? request.problemAlias
+      }/show-run:${request.guid}`,
     });
   }
 
@@ -223,6 +221,11 @@ export default class ArenaContestPractice extends Vue {
   @Watch('clarifications')
   onClarificationsChanged(newValue: types.Clarification[]): void {
     this.currentClarifications = newValue;
+  }
+
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 }
 </script>

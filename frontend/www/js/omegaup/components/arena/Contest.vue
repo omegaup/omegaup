@@ -62,7 +62,7 @@
               :runs="runs"
               :popup-displayed="popupDisplayed"
               :guid="guid"
-              :run-details-data="runDetailsData"
+              :run-details-data="currentRunDetailsData"
               :contest-alias="contest.alias"
               :is-contest-finished="isContestFinished"
               @update:activeTab="
@@ -202,6 +202,7 @@ export default class ArenaContest extends Vue {
   currentClarifications = this.clarifications;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
   currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+  currentRunDetailsData = this.runDetailsData;
   now = new Date();
 
   get socketClass(): string {
@@ -253,15 +254,12 @@ export default class ArenaContest extends Vue {
     });
   }
 
-  onRunDetails(source: SubmissionRequest): void {
+  onRunDetails(request: SubmissionRequest): void {
     this.$emit('show-run', {
-      ...source,
-      request: {
-        ...source.request,
-        hash: `#problems/${
-          this.activeProblemAlias ?? source.request.problemAlias
-        }/show-run:${source.request.guid}/`,
-      },
+      ...request,
+      hash: `#problems/${
+        this.activeProblemAlias ?? request.problemAlias
+      }/show-run:${request.guid}`,
     });
   }
 
@@ -286,6 +284,11 @@ export default class ArenaContest extends Vue {
   @Watch('clarifications')
   onClarificationsChanged(newValue: types.Clarification[]): void {
     this.currentClarifications = newValue;
+  }
+
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 }
 </script>

@@ -152,10 +152,11 @@ OmegaUp.on('ready', async () => {
               contestAlias: payload.contest.alias,
             });
           },
-          'show-run': (source: SubmissionRequest) => {
-            api.Run.details({ run_alias: source.request.guid })
-              .then((response) => {
-                showSubmission({ source, runDetails: response });
+          'show-run': (request: SubmissionRequest) => {
+            api.Run.details({ run_alias: request.guid })
+              .then((runDetails) => {
+                this.runDetailsData = showSubmission({ request, runDetails });
+                window.location.hash = request.hash;
               })
               .catch((run) => {
                 submitRunFailed({

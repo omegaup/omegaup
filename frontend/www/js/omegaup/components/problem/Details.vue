@@ -236,7 +236,7 @@
           :show-disqualify="true"
           :problemset-problems="[]"
           :search-result-users="searchResultUsers"
-          @details="(run) => onRunDetails(run.guid)"
+          @details="(run) => onRunAdminDetails(run.guid)"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
           @filter-changed="
@@ -496,13 +496,20 @@ export default class ProblemDetails extends Vue {
   onRunDetails(guid: string): void {
     this.currentPopupDisplayed = PopupDisplayed.RunDetails;
     this.$emit('show-run', {
-      request: {
-        guid,
-        hash: `#problems/${this.problemAlias}/show-run:${guid}`,
-        isAdmin: this.isAdmin,
-        problemAlias: this.problem.alias,
-      },
-      target: this,
+      guid,
+      hash: `#problems/${this.problemAlias}/show-run:${guid}`,
+      isAdmin: this.isAdmin,
+      problemAlias: this.problem.alias,
+    });
+  }
+
+  onRunAdminDetails(guid: string): void {
+    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+    this.$emit('show-run', {
+      guid,
+      hash: `#runs/${this.problemAlias}/show-run:${guid}`,
+      isAdmin: this.isAdmin,
+      problemAlias: this.problem.alias,
     });
   }
 
@@ -665,6 +672,11 @@ export default class ProblemDetails extends Vue {
   onClarificationsChanged(newValue: types.Clarification[]): void {
     if (this.selectedTab === 'clarifications' || newValue.length === 0) return;
     this.hasUnreadClarifications = true;
+  }
+
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 }
 </script>

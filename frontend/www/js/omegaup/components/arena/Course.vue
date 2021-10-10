@@ -123,6 +123,7 @@
     <template #arena-runs>
       <omegaup-arena-runs
         v-if="isAdmin"
+        :show-all-runs="true"
         :contest-alias="currentAssignment.alias"
         :runs="allRuns"
         :show-problem="true"
@@ -337,21 +338,19 @@ export default class ArenaCourse extends Vue {
 
   onRunAdminDetails(guid: string): void {
     this.$emit('show-run', {
-      request: { guid, isAdmin: this.isAdmin, hash: `#runs/show-run:${guid}` },
-      target: this,
+      guid,
+      isAdmin: this.isAdmin,
+      hash: `#runs/all/show-run:${guid}`,
     });
     this.currentPopupDisplayed = PopupDisplayed.RunDetails;
   }
 
-  onRunDetails(source: SubmissionRequest): void {
+  onRunDetails(request: SubmissionRequest): void {
     this.$emit('show-run', {
-      ...source,
-      request: {
-        ...source.request,
-        hash: `#problems/${
-          this.activeProblemAlias ?? source.request.problemAlias
-        }/show-run:${source.request.guid}`,
-      },
+      ...request,
+      hash: `#problems/${
+        this.activeProblemAlias ?? request.problemAlias
+      }/show-run:${request.guid}`,
     });
   }
 
@@ -375,6 +374,11 @@ export default class ArenaCourse extends Vue {
     }
     this.currentNextSubmissionTimestamp =
       newValue.nextSubmissionTimestamp ?? null;
+  }
+
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 }
 </script>
