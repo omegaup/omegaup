@@ -1233,6 +1233,7 @@ const translations: { [key: string]: string; } = {
   teamMemberUsernameInUse: "H\u00e1 pelo menos um nome de usu\u00e1rio duplicado nas equipes do grupo. Corrija as informa\u00e7\u00f5es.",
   teamsGroupAliasMustBeRequired: "Em um concurso para equipes, o alias deve ser exigido",
   teamsGroupCreateIdentitiesAsTeams: "Criar identidades como equipes",
+  teamsGroupCreatingIdentitiesAsTeams: "Criando identidades como equipes",
   teamsGroupEditGroupUpdated: "O grupo de equipes foi atualizado com sucesso.",
   teamsGroupEditTeams: "Equipes",
   teamsGroupEditTeamsPasswordUpdated: "Senha atualizada corretamente!",

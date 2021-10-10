@@ -1232,6 +1232,7 @@
 	"teamMemberUsernameInUse": "Existe al menos un nombre de usuario duplicado en los equipos del grupo. Por favor corrige la informaci\u00f3n.",
 	"teamsGroupAliasMustBeRequired": "En un concurso para equipos, el alias debe ser requerido.",
 	"teamsGroupCreateIdentitiesAsTeams": "Crear identidades como equipos",
+	"teamsGroupCreatingIdentitiesAsTeams": "Creando identidades como equipos",
 	"teamsGroupEditGroupUpdated": "El grupo de equipos se actualiz\u00f3 correctamente.",
 	"teamsGroupEditTeams": "Equipos",
 	"teamsGroupEditTeamsPasswordUpdated": "Contrase\u00f1a actualizada correctamente",

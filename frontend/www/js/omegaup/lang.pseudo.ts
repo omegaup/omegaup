@@ -1233,6 +1233,7 @@ const translations: { [key: string]: string; } = {
   teamMemberUsernameInUse: "(Th3r3 i5 a7 13a57 0n3 dup1ica73 u53rnam3 in 7h3 73am5 0f 7h3 gr0up. P13a53 fix 7h3 inf0rma7i0n.)",
   teamsGroupAliasMustBeRequired: "(In a c0n7357 f0r 73am5, a1ia5 mu57 b3 r3quir3d)",
   teamsGroupCreateIdentitiesAsTeams: "(Cr3a73 id3n7i7i35 a5 73am5)",
+  teamsGroupCreatingIdentitiesAsTeams: "(Cr3a7ing id3n7i7i35 a5 73am5)",
   teamsGroupEditGroupUpdated: "(Th3 73am5 gr0up ha5 b33n 5ucc355fu11y upda73d.)",
   teamsGroupEditTeams: "(T3am5)",
   teamsGroupEditTeamsPasswordUpdated: "(Pa55w0rd 5ucc355fu11y upda73d!)",

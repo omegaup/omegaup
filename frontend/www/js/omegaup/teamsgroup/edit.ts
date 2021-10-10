@@ -34,6 +34,7 @@ OmegaUp.on('ready', () => {
       teamsMembers: payload.teamsMembers,
       userErrorRow: null,
       searchResultUsers: [] as types.ListItem[],
+      isLoading: false,
     }),
     methods: {
       refreshTeamsList: (): void => {
@@ -68,6 +69,7 @@ OmegaUp.on('ready', () => {
           teamsMembers: this.teamsMembers,
           userErrorRow: this.userErrorRow,
           searchResultUsers: this.searchResultUsers,
+          isLoading: this.isLoading,
         },
         on: {
           'update-teams-group': ({
@@ -175,6 +177,7 @@ OmegaUp.on('ready', () => {
               [team: string]: { username: string; password?: string };
             };
           }) => {
+            this.isLoading = true;
             api.Identity.bulkCreateForTeams({
               team_identities: JSON.stringify(
                 identities.map((identity) => ({
@@ -194,6 +197,9 @@ OmegaUp.on('ready', () => {
               .catch((data) => {
                 ui.error(data.error);
                 this.userErrorRow = data.parameter;
+              })
+              .finally(() => {
+                this.isLoading = false;
               });
           },
           'invalid-file': () => {
