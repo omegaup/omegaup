@@ -193,11 +193,13 @@ OmegaUp.on('ready', () => {
                 window.location.hash = `#${AvailableTabs.Teams}`;
                 this.tab = AvailableTabs.Teams;
                 ui.success(T.groupsIdentitiesSuccessfullyCreated);
-                this.isLoading = false;
               })
               .catch((data) => {
                 ui.error(data.error);
                 this.userErrorRow = data.parameter;
+              })
+              .finally(() => {
+                this.isLoading = false;
               });
           },
           'invalid-file': () => {
