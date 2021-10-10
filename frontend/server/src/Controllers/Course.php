@@ -35,12 +35,12 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses}
  * @psalm-type CourseProblemVerdict=array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: null|string}
- * @psalm-type CourseProblemStatistics=array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}
+ * @psalm-type CourseProblemStatistics=array{assignment_alias: string, average: float, avg_runs: float, completed_score_percentage: float, high_score_percentage: float, low_score_percentage: float, max_points: float, maximum: float, minimum: float, problem_alias: string, variance: float}
  * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemStats: list<CourseProblemStatistics>, verdicts: list<CourseProblemVerdict>}
  * @psalm-type CourseStudent=array{name: null|string, username: string}
  * @psalm-type StudentProgress=array{classname: string, country_id: null|string, name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}
  * @psalm-type StudentProgressInCourse=array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}
- * @psalm-type AssignmentsProblemsPoints=array{alias: string, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
+ * @psalm-type AssignmentsProblemsPoints=array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
  * @psalm-type CourseNewPayload=array{is_admin: bool, is_curator: bool, languages: array<string, string>}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, allLanguages: array<string, string>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
@@ -3420,7 +3420,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'title' => new \OmegaUp\TranslationString('courseList'),
                     'fullWidth' => true,
                 ],
-                'entrypoint' => 'course_list',
+                'entrypoint' => 'course_tabs',
             ];
         }
         [
@@ -3437,7 +3437,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString('courseList'),
                 'fullWidth' => true,
             ],
-            'entrypoint' => 'course_list',
+            'entrypoint' => 'course_tabs',
         ];
     }
 

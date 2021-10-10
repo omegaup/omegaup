@@ -1786,6 +1786,7 @@ export namespace types {
 
   export interface AssignmentsProblemsPoints {
     alias: string;
+    extraPoints: number;
     name: string;
     order: number;
     points: number;
@@ -2415,15 +2416,16 @@ export namespace types {
 
   export interface CourseProblemStatistics {
     assignment_alias: string;
-    average?: number;
-    avg_runs?: number;
-    high_score_percentage?: number;
-    low_score_percentage?: number;
+    average: number;
+    avg_runs: number;
+    completed_score_percentage: number;
+    high_score_percentage: number;
+    low_score_percentage: number;
     max_points: number;
-    maximum?: number;
-    minimum?: number;
+    maximum: number;
+    minimum: number;
     problem_alias: string;
-    variance?: number;
+    variance: number;
   }
 
   export interface CourseProblemTried {
@@ -3575,6 +3577,7 @@ export namespace types {
 
   export interface TeamMember {
     classname: string;
+    isMainUserIdentity: boolean;
     name?: string;
     team_alias: string;
     team_name?: string;

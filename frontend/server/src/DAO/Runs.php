@@ -438,7 +438,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                         i.username,
                         i.name,
                         IFNULL(i.country_id, 'xx') AS country_id,
-                        IFNULL(ri.is_invited, FALSE) AS is_invited,
+                        CAST(IFNULL(ri.is_invited, FALSE) AS UNSIGNED) AS is_invited,
                         $classNameQuery
                     FROM
                         (

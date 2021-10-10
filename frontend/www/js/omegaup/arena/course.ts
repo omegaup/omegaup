@@ -98,15 +98,11 @@ OmegaUp.on('ready', async () => {
           'navigate-to-assignment': ({
             assignmentAliasToShow,
             courseAlias,
-            isAdmin,
           }: {
             assignmentAliasToShow: string;
             courseAlias: string;
-            isAdmin: boolean;
           }) => {
-            window.location.pathname = `/course/${courseAlias}/assignment/${assignmentAliasToShow}/${
-              isAdmin ? 'admin/' : ''
-            }`;
+            window.location.pathname = `/course/${courseAlias}/assignment/${assignmentAliasToShow}/`;
           },
           'navigate-to-problem': ({
             problem,
