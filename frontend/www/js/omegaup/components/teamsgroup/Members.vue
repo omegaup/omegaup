@@ -52,8 +52,7 @@
           <td v-if="!identity.isMainUserIdentity">
             <template
               v-if="
-                shouldEnableChangePasswordInput &&
-                username === identity.username
+                changePasswordInputEnabled && username === identity.username
               "
             >
               <div class="input-group">
@@ -136,7 +135,7 @@ export default class Members extends Vue {
   ui = ui;
   typeaheadContestants: null | types.ListItem[] = null;
   username: null | string = null;
-  shouldEnableChangePasswordInput = false;
+  changePasswordInputEnabled = false;
   password: null | string = null;
 
   onSubmit(): void {
@@ -149,7 +148,7 @@ export default class Members extends Vue {
   }
 
   onChangePass(username: string): void {
-    this.shouldEnableChangePasswordInput = true;
+    this.changePasswordInputEnabled = true;
     this.username = username;
   }
 
@@ -158,7 +157,7 @@ export default class Members extends Vue {
       username: this.username,
       newPassword: this.password,
     });
-    this.shouldEnableChangePasswordInput = false;
+    this.changePasswordInputEnabled = false;
     this.username = null;
     this.password = null;
   }
