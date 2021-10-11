@@ -11,7 +11,9 @@
       </a>
     </th>
     <td data-global-score class="text-center font-weight-bold align-middle">
-      <span class="d-block">{{ studentProgress.courseProgress }}%</span>
+      <span class="d-block"
+        >{{ studentProgress.courseProgress.toFixed(0) }}%</span
+      >
       <span class="d-block">{{
         ui.formatString(T.studentProgressPoints, {
           points: studentProgress.courseScore,
