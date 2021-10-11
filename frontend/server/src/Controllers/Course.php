@@ -3254,9 +3254,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $assignmentAlias = $r->ensureOptionalString(
+        $assignmentAlias = $r->ensureString(
             'assignment_alias',
-            /*required=*/true,
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 

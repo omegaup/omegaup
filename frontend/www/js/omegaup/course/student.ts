@@ -13,16 +13,11 @@ OmegaUp.on('ready', () => {
     (student) => payload.student === student.username,
   );
 
-  const problems: types.CourseProblem[] = payload.problems;
-
   const viewStudent = new Vue({
     el: '#main-container',
     components: {
       'omegaup-course-viewstudent': course_ViewStudent,
     },
-    data: () => ({
-      problems,
-    }),
     methods: {
       refreshStudentProgress: (
         student: string,
@@ -33,11 +28,7 @@ OmegaUp.on('ready', () => {
           course_alias: payload.course.alias,
           assignment_alias: assignmentAlias,
           usernameOrEmail: student,
-        })
-          .then((data) => {
-            viewStudent.problems = data.problems;
-          })
-          .catch(ui.apiError);
+        });
       },
     },
     render: function (createElement) {
@@ -46,7 +37,7 @@ OmegaUp.on('ready', () => {
           assignments: payload.course.assignments,
           course: payload.course,
           initialStudent,
-          problems: this.problems,
+
           students: payload.students,
         },
         on: {
@@ -83,11 +74,7 @@ OmegaUp.on('ready', () => {
                   course_alias: payload.course.alias,
                   assignment_alias: assignmentAlias,
                   usernameOrEmail: studentUsername,
-                })
-                  .then((data) => {
-                    viewStudent.problems = data.problems;
-                  })
-                  .catch(ui.apiError);
+                });
               })
               .catch(ui.error);
           },
