@@ -240,6 +240,47 @@
         </div>
       </div>
     </div>
+    <!-- DESDE AQUÍ VA LO NUEVO -->
+    <ul class="nav nav-tabs" role="tablist">
+      <li
+        v-for="tab in tabs"
+        :key="tab.id"
+        class="nav-item"
+        role="presentation"
+      >
+        <a
+          class="nav-link"
+          :href="`#${tab.id}`"
+          :class="{ active: selectedTab === tab.id }"
+          data-toggle="tab"
+          role="tab"
+          @click="selectedTab = tab.id"
+          >{{ tab.name }}</a
+        >
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div
+        class="tab-pane fade py-4 px-2"
+        :class="{
+          show: selectedTab === tabs.information.id,
+          active: selectedTab === tabs.information.id,
+        }"
+        role="tabpanel"
+      >
+        Information
+      </div>
+      <div
+        class="tab-pane fade py-4 px-2"
+        :class="{
+          show: selectedTab === tabs.content.id,
+          active: selectedTab === tabs.content.id,
+        }"
+        role="tabpanel"
+      >
+        Contenido
+      </div>
+    </div>
   </div>
 </template>
 
@@ -272,6 +313,11 @@ library.add(
   faListAlt,
 );
 
+export enum Tabs {
+  Information = 'information',
+  Content = 'content',
+}
+
 @Component({
   components: {
     FontAwesomeIcon,
@@ -286,6 +332,18 @@ export default class CourseDetails extends Vue {
 
   T = T;
   ui = ui;
+  Tabs = Tabs;
+  tabs = {
+    information: {
+      id: Tabs.Information,
+      name: T.courseDetailsTabInformation,
+    },
+    content: {
+      id: Tabs.Content,
+      name: T.courseDetailsTabContent,
+    },
+  };
+  selectedTab = this.tabs.information.id;
 
   get overallCompletedPercentage(): string {
     let score = 0;

@@ -357,6 +357,8 @@ const translations: { [key: string]: string; } = {
   courseContentEmpty: "No hay contenido",
   courseContentNewFormTypeDesc: "El tipo de contenido es usado para distinguir una tarea de una lecci\u00f3n o examen visualmente en los cursos.",
   courseDetailsProgress: "Progreso del curso",
+  courseDetailsTabContent: "Contenido",
+  courseDetailsTabInformation: "Informaci\u00f3n general",
   courseDoesNotAdmitRegistration: "El curso no admite registro de usuarios",
   courseDoesNotHaveUnlimitedDuration: "No se puede establecer duraci\u00f3n ilimitada al contenido de un curso que no es de duraci\u00f3n ilimitada.",
   courseEdit: "Editar curso",
