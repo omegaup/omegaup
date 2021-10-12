@@ -1,6 +1,9 @@
+import { CasesState } from './modules/cases';
+
 export namespace types {
   export interface RootState {
     problemName: string;
+    casesStore: CasesState;
   }
 
   export type LineType = 'line' | 'multiline' | 'array' | 'matrix';

@@ -29,6 +29,23 @@ export const casesStore: Module<CasesState, types.RootState> = {
     hide: false,
   },
   mutations: {
+    resetStore(state) {
+      state.groups = [
+        {
+          groupId: NIL,
+          name: T.problemCreatorNoGroup,
+          defined: false,
+          points: 100,
+          cases: [],
+        },
+      ];
+      state.selected = {
+        caseId: NIL,
+        groupId: NIL,
+      };
+      state.layout = [];
+      state.hide = false;
+    },
     addGroup(state, payload: types.Group) {
       state.groups.push(payload);
       state = calculatePoints(state);
