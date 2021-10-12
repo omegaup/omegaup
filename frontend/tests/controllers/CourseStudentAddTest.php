@@ -352,7 +352,7 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
             'accept_teacher_git_object_id' => $gitObjectId,
             'accept_teacher' => true,
         ]));
-        $details = \OmegaUp\Controllers\Course::getIntroDetails(new \OmegaUp\Request([
+        $details = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
