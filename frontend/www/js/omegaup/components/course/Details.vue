@@ -8,10 +8,7 @@
         <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
     </h3>
-    <div v-if="course.is_admin" class="mb-5">
-      <div class="my-4 markdown">
-        <omegaup-markdown :markdown="course.description"></omegaup-markdown>
-      </div>
+    <div v-if="course.is_admin" class="my-5">
       <span>{{
         ui.formatString(T.courseStudentCountLabel, {
           student_count: course.student_count,
@@ -108,9 +105,6 @@
           {{ T.courseDetailsProgress }}
         </p>
       </div>
-      <div class="my-4 markdown">
-        <omegaup-markdown :markdown="course.description"></omegaup-markdown>
-      </div>
       <div class="d-flex justify-content-end">
         <a
           :href="`/course/${course.alias}/clarification/`"
@@ -120,107 +114,24 @@
         >
       </div>
     </template>
-    <div class="mt-4 card">
-      <h5 class="card-header">{{ T.wordsContent }}</h5>
-      <div class="table-responsive">
-        <table class="table table-striped table-hover mb-0">
-          <thead>
-            <tr>
-              <th class="text-center" scope="col">{{ T.wordsContentType }}</th>
-              <th class="text-center" scope="col">{{ T.wordsName }}</th>
-              <th v-if="!course.is_admin" class="text-center" scope="col">
-                {{ T.wordsCompletedPercentage }}
-              </th>
-              <th class="text-center" scope="col">{{ T.wordsDueDate }}</th>
-              <th v-if="course.is_admin" class="text-center" scope="col">
-                {{ T.wordsActions }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="!course.assignments.length">
-              <td class="empty-table-message" colspan="5">
-                {{ T.courseContentEmpty }}
-              </td>
-            </tr>
-            <tr
-              v-for="assignment in course.assignments"
-              v-else
-              :key="assignment.alias"
-              :data-content-alias="assignment.alias"
-            >
-              <td class="text-center">
-                <template v-if="assignment.assignment_type === 'homework'">
-                  <font-awesome-icon icon="file-alt" />
-                  <span class="ml-2">{{ T.wordsHomework }}</span>
-                </template>
-                <template v-else-if="assignment.assignment_type === 'lesson'">
-                  <font-awesome-icon icon="chalkboard-teacher" />
-                  <span class="ml-2">{{ T.wordsLesson }}</span>
-                </template>
-                <template v-else>
-                  <font-awesome-icon icon="list-alt" />
-                  <span class="ml-2">{{ T.wordsExam }}</span>
-                </template>
-              </td>
-              <td>
-                <a
-                  class="text-center"
-                  :href="`/course/${course.alias}/assignment/${assignment.alias}/`"
-                >
-                  {{ assignment.name }}
-                </a>
-              </td>
-              <td v-if="!course.is_admin" class="text-center">
-                {{ getAssignmentProgress(progress[assignment.alias]) }}
-              </td>
-              <td class="text-center">
-                {{ getFormattedTime(assignment.finish_time) }}
-              </td>
-              <td v-if="course.is_admin" class="text-center">
-                <a
-                  class="mr-2"
-                  :href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
-                >
-                  <font-awesome-icon :icon="['fas', 'link']" />{{
-                    T.courseActionScoreboard
-                  }}</a
-                >
-                <a
-                  class="mr-2"
-                  :href="`/course/${course.alias}/assignment/${assignment.alias}/#runs`"
-                >
-                  <font-awesome-icon :icon="['fas', 'tachometer-alt']" />
-                  {{ T.wordsRuns }}
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
     <div
       v-if="course.admission_mode === 'public'"
-      class="accordion"
+      class="accordion my-3"
       data-accordion-clone
     >
       <div class="card">
-        <div class="card-header" data-heading-clone>
-          <h2 class="mb-0">
-            <button
-              class="btn btn-link btn-block text-right"
-              type="button"
-              data-toggle="collapse"
-              data-target="[data-accordion-collapse]"
-              aria-expanded="false"
-              aria-controls="data-accordion-collapse"
-            >
-              {{ T.wordsCloneThisCourse }}
-            </button>
-          </h2>
-        </div>
-
+        <h2 class="mb-0" data-heading-clone>
+          <button
+            class="btn btn-link btn-block text-left"
+            type="button"
+            data-toggle="collapse"
+            data-target="[data-accordion-collapse]"
+            aria-expanded="false"
+            aria-controls="data-accordion-collapse"
+          >
+            {{ T.wordsCloneThisCourse }}
+          </button>
+        </h2>
         <div
           data-accordion-collapse
           class="collapse hide"
@@ -240,7 +151,6 @@
         </div>
       </div>
     </div>
-    <!-- DESDE AQUÍ VA LO NUEVO -->
     <ul class="nav nav-tabs" role="tablist">
       <li
         v-for="tab in tabs"
@@ -268,7 +178,28 @@
         }"
         role="tabpanel"
       >
-        Information
+        <omegaup-markdown
+          :markdown="course.description"
+          :full-width="true"
+        ></omegaup-markdown>
+        <div class="row m-0 mt-4">
+          <div v-if="course.objective" class="col-md-8 mb-4 p-0">
+            <h5 class="intro-subtitle pb-1">{{ T.courseNewFormObjective }}</h5>
+            <omegaup-markdown
+              :markdown="course.objective"
+              :full-width="true"
+            ></omegaup-markdown>
+          </div>
+          <div
+            v-if="course.school_id && course.school_name"
+            class="col-md-4 p-0"
+          >
+            <h5 class="intro-subtitle pb-1 mb-2">
+              {{ T.courseIntroImpartedBy }}
+            </h5>
+            {{ course.school_name }}
+          </div>
+        </div>
       </div>
       <div
         class="tab-pane fade py-4 px-2"
@@ -278,7 +209,93 @@
         }"
         role="tabpanel"
       >
-        Contenido
+        <div class="table-responsive">
+          <table class="table table-striped table-hover mb-0">
+            <thead>
+              <tr>
+                <th class="text-center" scope="col">
+                  {{ T.wordsContentType }}
+                </th>
+                <th class="text-center" scope="col">{{ T.wordsName }}</th>
+                <th v-if="!course.is_admin" class="text-center" scope="col">
+                  {{ T.wordsCompletedPercentage }}
+                </th>
+                <th v-if="course.is_admin" class="text-center" scope="col">
+                  {{ T.wordsActions }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="!course.assignments.length">
+                <td class="empty-table-message" colspan="5">
+                  {{ T.courseContentEmpty }}
+                </td>
+              </tr>
+              <tr
+                v-for="assignment in course.assignments"
+                v-else
+                :key="assignment.alias"
+                :data-content-alias="assignment.alias"
+              >
+                <td class="text-center">
+                  <template v-if="assignment.assignment_type === 'homework'">
+                    <font-awesome-icon icon="file-alt" />
+                    <span class="ml-2">{{ T.wordsHomework }}</span>
+                  </template>
+                  <template v-else-if="assignment.assignment_type === 'lesson'">
+                    <font-awesome-icon icon="chalkboard-teacher" />
+                    <span class="ml-2">{{ T.wordsLesson }}</span>
+                  </template>
+                  <template v-else>
+                    <font-awesome-icon icon="list-alt" />
+                    <span class="ml-2">{{ T.wordsExam }}</span>
+                  </template>
+                </td>
+                <td>
+                  <a
+                    class="text-center"
+                    :href="`/course/${course.alias}/assignment/${assignment.alias}/`"
+                  >
+                    {{ assignment.name }}
+                  </a>
+                </td>
+                <td v-if="!course.is_admin" class="text-center">
+                  <div class="progress mx-auto">
+                    <div
+                      class="progress-bar bg-warning"
+                      role="progressbar"
+                      :aria-valuenow="
+                        getAssignmentProgress(progress[assignment.alias])
+                      "
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                      :style="`width: ${getAssignmentProgress(
+                        progress[assignment.alias],
+                      )}%`"
+                    ></div>
+                  </div>
+                </td>
+                <td v-if="course.is_admin" class="text-center">
+                  <a
+                    class="mr-2"
+                    :href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
+                  >
+                    <font-awesome-icon :icon="['fas', 'link']" />{{
+                      T.courseActionScoreboard
+                    }}</a
+                  >
+                  <a
+                    class="mr-2"
+                    :href="`/course/${course.alias}/assignment/${assignment.alias}/#runs`"
+                  >
+                    <font-awesome-icon :icon="['fas', 'tachometer-alt']" />
+                    {{ T.wordsRuns }}
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -381,7 +398,15 @@ export default class CourseDetails extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .progress-text {
   font-size: 0.75rem;
+}
+
+h5.intro-subtitle {
+  color: $omegaup-grey;
+  width: 20rem;
+  border-bottom: 4px solid $omegaup-primary--accent;
 }
 </style>

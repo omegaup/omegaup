@@ -132,9 +132,6 @@ describe('Details.vue', () => {
       },
     });
 
-    expect(
-      wrapper.find('[data-content-alias="test-assignment"]').text(),
-    ).toContain('—');
     expect(wrapper.text()).toContain(T.wordsCloneThisCourse);
   });
 });
