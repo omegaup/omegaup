@@ -2314,11 +2314,11 @@ export namespace types {
 
   export interface CourseCardPublic {
     alias: string;
-    lessonsCount: number;
+    lessonCount: number;
     level?: string;
     name: string;
     school_name?: string;
-    studentsCount: number;
+    studentCount: number;
   }
 
   export interface CourseClarificationsPayload {
@@ -2478,7 +2478,7 @@ export namespace types {
     courses: {
       enrolled: types.CourseCardEnrolled[];
       finished: types.CourseCardFinished[];
-      general: types.CourseCardPublic[];
+      public: types.CourseCardPublic[];
     };
   }
 
