@@ -109,11 +109,13 @@ export default class ArenaScoreboard extends Vue {
   @Prop() lastUpdated!: Date;
   @Prop({ default: true }) showInvitedUsersFilter!: boolean;
   @Prop({ default: true }) showPenalty!: boolean;
+  @Prop({ default: false }) showAllContestants!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
 
   T = T;
   ui = ui;
-  onlyShowExplicitlyInvited = true;
+  onlyShowExplicitlyInvited =
+    !this.showAllContestants && this.showInvitedUsersFilter;
 
   get lastUpdatedString(): null | string {
     if (!this.lastUpdated) return null;

@@ -1,27 +1,37 @@
 <template>
-  <div class="panel panel-primary">
-    <div class="panel-body">
-      <form class="publish-form" @submit.prevent="onSubmit">
+  <div class="card">
+    <div class="card-body">
+      <form class="form" @submit.prevent="onSubmit">
         <div class="form-group">
           <label>{{ T.contestNewFormAdmissionMode }}</label>
           <select
-            v-model="admissionMode"
+            v-model="currentAdmissionMode"
             class="form-control"
             name="admission-mode"
           >
-            <option value="private">
+            <option :value="AdmissionMode.Private">
               {{ T.wordsPrivate }}
             </option>
-            <option value="registration">
+            <option :value="AdmissionMode.Registration">
               {{ T.wordsRegistration }}
             </option>
-            <option v-if="shouldShowPublicOption" value="public">
+            <option v-if="shouldShowPublicOption" :value="AdmissionMode.Public">
               {{ T.wordsPublic }}
             </option>
           </select>
-          <omegaup-markdown
-            :markdown="admissionModeDescription"
-          ></omegaup-markdown>
+          <p class="form-text text-muted">
+            <omegaup-markdown
+              :markdown="admissionModeDescription"
+            ></omegaup-markdown>
+          </p>
+        </div>
+        <div class="form-group">
+          <omegaup-toggle-switch
+            v-if="currentAdmissionMode !== AdmissionMode.Private"
+            :value.sync="currentShowAllContestantsAtFirstTimeInScoreboard"
+            :checked-value="currentShowAllContestantsAtFirstTimeInScoreboard"
+            :text-description="'Mostrar a todos los concursantes en el scoreboard por defecto'"
+          ></omegaup-toggle-switch>
         </div>
         <button class="btn btn-primary change-admission-mode" type="submit">
           {{ T.wordsSaveChanges }}
@@ -33,30 +43,46 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
+
 import omegaup_Markdown from '../Markdown.vue';
+import omegaup_ToggleSwitch from '../ToggleSwitch.vue';
+
+export enum AdmissionMode {
+  Private = 'private',
+  Registration = 'registration',
+  Public = 'public',
+}
 
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-toggle-switch': omegaup_ToggleSwitch,
   },
 })
 export default class Publish extends Vue {
-  @Prop() initialAdmissionMode!: omegaup.AdmissionMode;
+  @Prop() admissionMode!: AdmissionMode;
   @Prop() admissionModeDescription!: string;
   @Prop() shouldShowPublicOption!: boolean;
+  @Prop({ default: false }) showAllContestantsAtFirstTimeInScoreboard!: boolean;
 
   T = T;
-  admissionMode = this.initialAdmissionMode;
+  AdmissionMode = AdmissionMode;
+  currentAdmissionMode = this.admissionMode;
+  currentShowAllContestantsAtFirstTimeInScoreboard = this
+    .showAllContestantsAtFirstTimeInScoreboard;
 
   onSubmit(): void {
-    this.$emit('emit-update-admission-mode', this);
+    this.$emit('update-admission-mode', {
+      admissionMode: this.currentAdmissionMode,
+      showAllContestantsAtFirstTimeInScoreboard: this
+        .currentShowAllContestantsAtFirstTimeInScoreboard,
+    });
   }
 
-  @Watch('initialAdmissionMode')
-  onCourseChange(): void {
-    this.admissionMode = this.initialAdmissionMode;
+  @Watch('admissionMode')
+  onCourseChange(newValue: AdmissionMode): void {
+    this.currentAdmissionMode = newValue;
   }
 }
 </script>

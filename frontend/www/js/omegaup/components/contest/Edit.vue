@@ -171,11 +171,14 @@
       </div>
       <div v-if="showTab === 'publish'" class="tab-pane active">
         <omegaup-common-publish
-          :initial-admission-mode="details.admission_mode"
+          :show-all-contestants-at-first-time-in-scoreboard="
+            details.show_all_contestants_at_first_time_in_scoreboard
+          "
+          :admission-mode="details.admission_mode"
           :should-show-public-option="true"
           :admission-mode-description="T.contestAdmissionModeDescription"
-          @emit-update-admission-mode="
-            (admissionMode) => $emit('update-admission-mode', admissionMode)
+          @update-admission-mode="
+            (request) => $emit('update-admission-mode', request)
           "
         ></omegaup-common-publish>
       </div>
@@ -288,7 +291,7 @@ import contest_Groups from './Groups.vue';
 import contest_TeamsGroups from './TeamsGroup.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
-import common_Publish from '../common/Publishv2.vue';
+import common_Publish from '../common/Publish.vue';
 
 @Component({
   components: {

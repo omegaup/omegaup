@@ -90,7 +90,12 @@
         :last-updated="lastUpdated"
         :digits-after-decimal-point="digitsAfterDecimalPoint"
         :show-penalty="showPenalty"
-        :show-invited-users-filter="true"
+        :show-invited-users-filter="
+          contest.admission_mode !== AdmissionMode.Private
+        "
+        :show-all-contestants="
+          contest.show_all_contestants_at_first_time_in_scoreboard
+        "
       ></omegaup-arena-scoreboard>
     </template>
     <template #arena-clarifications>
@@ -149,6 +154,7 @@ import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { omegaup } from '../../omegaup';
 import { ContestClarificationType } from '../../arena/clarifications';
 import { SocketStatus } from '../../arena/events_socket';
+import { AdmissionMode } from '../common/Publish.vue';
 
 @Component({
   components: {
@@ -195,6 +201,7 @@ export default class ArenaContest extends Vue {
 
   T = T;
   ui = ui;
+  AdmissionMode = AdmissionMode;
   ContestClarificationType = ContestClarificationType;
   currentClarifications = this.clarifications;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
