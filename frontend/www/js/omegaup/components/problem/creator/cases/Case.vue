@@ -12,6 +12,7 @@
       <span>{{ name }}</span>
       <div v-if="noGroup">
         <b-badge
+          data-testid="case-points"
           size="sm"
           :variant="defined ? 'success' : 'primary'"
           class="ml-2"

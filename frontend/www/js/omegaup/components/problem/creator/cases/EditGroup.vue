@@ -1,9 +1,9 @@
 <template>
   <b-modal
     ref="modal"
-    :title="`Editar Grupo | ${name}`"
-    ok-title="Editar"
-    cancel-title="Cancelar"
+    :title="`${T.problemCreatorEditGroup} | ${name}`"
+    :ok-title="T.problemCreatorEdit"
+    :cancel-title="T.problemCreatorCancel"
     hide-header-close
     @ok="handleOk"
     @keydown.enter="handleSubmit"
@@ -25,6 +25,7 @@ import { Component, Prop, Ref, Vue } from 'vue-property-decorator';
 import { namespace } from 'vuex-class';
 import { types } from '../../../../problem/creator/types';
 import GroupInput from './GroupInput.vue';
+import T from '../../../../lang';
 
 const caseStore = namespace('casesStore');
 
@@ -43,6 +44,8 @@ export default class EditGroupModal extends Vue {
   @Ref('groupInput') readonly groupInput!: GroupInput;
 
   @Ref('modal') readonly modal!: any;
+
+  T = T;
 
   handleOk(bvModalEvt: any) {
     bvModalEvt.preventDefault();

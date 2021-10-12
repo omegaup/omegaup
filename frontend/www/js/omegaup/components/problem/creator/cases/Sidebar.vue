@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="d-flex align-items-center justify-content-between">
-      <h5 class="mb-0 d-none d-md-inline">Grupos</h5>
+      <h5 class="mb-0 d-none d-lg-inline">{{ T.problemCreatorGroups }}</h5>
       <div>
         <b-button
           v-b-toggle.layout-drawer
@@ -12,10 +12,10 @@
           <BIconLayoutSidebar />
         </b-button>
         <b-button size="sm" variant="success" class="mr-2" @click="openModal">
-          <span class="d-none d-xl-inline">Agregar</span>
+          <span class="d-none d-xl-inline">{{ T.problemCreatorAdd }}</span>
           <BIconPlusCircle class="d-inline d-xl-none" />
         </b-button>
-        <b-button variant="light" class="mt-2" size="sm">
+        <b-button variant="light" size="sm">
           <BIconThreeDotsVertical />
         </b-button>
       </div>
@@ -32,6 +32,7 @@
 import { Component, Ref, Vue } from 'vue-property-decorator';
 import AddModal from './AddModal.vue';
 import Groups from './Groups.vue';
+import T from '../../../../lang';
 
 @Component({
   components: { AddModal, Groups },
@@ -39,6 +40,7 @@ import Groups from './Groups.vue';
 export default class Sidebar extends Vue {
   @Ref('addModalRef') addModalRef!: AddModal;
   visible = false;
+  T = T;
 
   openModal() {
     this.addModalRef.modal.show();

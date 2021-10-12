@@ -1,28 +1,28 @@
 <template>
   <b-modal
     ref="modal"
-    title="Agregar"
-    ok-title="Agregar"
-    cancel-title="Cancelar"
+    :title="T.problemCreatorAdd"
+    :ok-title="T.problemCreatorAdd"
+    :cancel-title="T.problemCreatorCancel"
     hide-header-close
     @ok="handleOk"
     @keydown.enter="handleSubmit"
   >
     <b-tabs v-model="tabIndex" small pills>
-      <b-tab title="Caso">
+      <b-tab :title="T.problemCreatorCase">
         <form @submit.stop.prevent="handleSubmit">
           <CaseInput ref="caseInput" />
           <input type="submit" style="visibility: hidden" />
           <!-- Trick to be able to submit when pressing 'enter'-->
         </form>
       </b-tab>
-      <b-tab title="Múltiples Casos">
+      <b-tab :title="T.problemCreatorMulticase">
         <form @submit.stop.prevent="handleSubmit">
           <MulticaseInput ref="multiInput" />
           <input type="submit" style="visibility: hidden" />
         </form>
       </b-tab>
-      <b-tab title="Grupo">
+      <b-tab :title="T.problemCreatorGroup">
         <form @submit.stop.prevent="handleSubmit">
           <GroupInput ref="groupInput" />
           <input type="submit" style="visibility: hidden" />
@@ -40,6 +40,7 @@ import { namespace } from 'vuex-class';
 import GroupInput from './GroupInput.vue';
 import MulticaseInput from './MulticaseInput.vue';
 import CaseInput from './CaseInput.vue';
+import T from '../../../../lang';
 
 const caseStore = namespace('casesStore');
 
@@ -66,6 +67,8 @@ export default class AddModal extends Vue {
   @Ref('modal') readonly modal!: any;
 
   tabIndex = 0;
+
+  T = T;
 
   handleOk(bvModalEvt: any) {
     bvModalEvt.preventDefault();

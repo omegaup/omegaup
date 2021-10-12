@@ -1,22 +1,20 @@
 <template>
   <div class="mt-3">
     <b-form-group
-      description="En minúsculas y sin espacios"
-      label="Nombre del caso"
+      :description="T.problemCreatorCaseNameHint"
+      :label="T.problemCreatorCaseName"
       label-for="case-name"
       class="mb-4"
     >
       <b-form-input v-model="caseName" required autocomplete="off" />
     </b-form-group>
-    <b-form-group label="Nombre del grupo" label-for="case-group">
+    <b-form-group :label="T.problemCreatorGroupName" label-for="case-group">
       <b-form-select v-model="caseGroup" :options="options" />
     </b-form-group>
 
     <b-form-group
-      label="Puntaje"
-      :description="
-        autoPoints ? 'El programa calculará automáticamente el puntaje' : ''
-      "
+      :label="T.problemCreatorPoints"
+      :description="autoPoints ? T.problemCreatorPointsHint : ''"
       label-for="case-points"
     >
       <b-form-input
@@ -29,7 +27,7 @@
       />
     </b-form-group>
     <b-form-checkbox v-model="autoPoints" name="auto-points">
-      Puntaje Automático</b-form-checkbox
+      {{ T.problemCreatorAutoPoints }}</b-form-checkbox
     >
   </div>
 </template>
@@ -39,7 +37,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { NIL } from 'uuid';
 import { namespace } from 'vuex-class';
 import { types } from '../../../../problem/creator/types';
-
+import T from '../../../../lang';
 const caseStore = namespace('casesStore');
 
 @Component({})
@@ -55,6 +53,8 @@ export default class CaseInput extends Vue {
   caseGroup = NIL;
   casePoints: number | '' = ''; // Inde
   autoPoints = true;
+
+  T = T;
 
   mounted() {
     this.caseGroup = this.group;

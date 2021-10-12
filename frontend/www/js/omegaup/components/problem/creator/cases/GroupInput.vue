@@ -1,18 +1,16 @@
 <template>
   <div class="mt-3">
     <b-form-group
-      description="En minúsculas y sin espacios"
-      label="Nombre del grupo"
+      :description="T.problemCreatorCaseNameHint"
+      :label="T.problemCreatorGroupName"
       label-for="group-name"
       class="mb-4"
     >
       <b-form-input v-model="groupName" required autocomplete="off" />
     </b-form-group>
     <b-form-group
-      label="Puntaje"
-      :description="
-        autoPoints ? 'El programa calculará automáticamente el puntaje' : ''
-      "
+      :label="T.problemCreatorPoints"
+      :description="autoPoints ? T.problemCreatorPointsHint : ''"
       label-for="group-points"
     >
       <b-form-input
@@ -25,13 +23,14 @@
       />
     </b-form-group>
     <b-form-checkbox v-model="autoPoints" name="auto-points">
-      Puntaje Automático</b-form-checkbox
+      {{ T.problemCreatorAutoPoints }}</b-form-checkbox
     >
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import T from '../../../../lang';
 
 @Component({})
 export default class GroupInput extends Vue {
@@ -42,6 +41,8 @@ export default class GroupInput extends Vue {
   groupName = '';
   groupPoints: number | '' = '';
   autoPoints = true;
+
+  T = T;
 
   mounted() {
     this.groupName = this.name;

@@ -12,6 +12,7 @@
         </div>
         <b-badge
           v-if="groupId !== NIL"
+          data-testid="group-points"
           size="sm"
           :variant="defined ? 'success' : 'primary'"
           >{{ points.toFixed(2) }} PTS
@@ -28,7 +29,7 @@
               @click="openEditModal"
             >
               <BIconPencilSquare font-scale="1" />
-              <span class="ml-2">Editar Grupo</span>
+              <span class="ml-2">{{ T.problemCreatorEditGroup }}</span>
               <EditGroup
                 ref="editGroupRef"
                 :name="name"
@@ -39,35 +40,33 @@
             </b-dropdown-item>
             <b-dropdown-item class="menu-item" @click="openDeleteModal">
               <BIconTrash2 />
-              <span class="ml-2">Eliminar Grupo</span>
+              <span class="ml-2">{{ T.problemCreatorDeleteGroup }}</span>
               <b-modal
                 ref="deleteGroupRef"
-                :title="`Borrar Grupo | ${name}`"
+                :title="`${T.problemCreatorDeleteGroup} | ${name}`"
                 ok-variant="danger"
-                ok-title="Borrar"
-                cancel-title="Cancelar"
+                :ok-title="T.problemCreatorDelete"
+                :cancel-title="T.problemCreatorCancel"
                 @ok="handleDeleteGroup"
               >
-                ¿Estas seguro que deseas borrar <strong>{{ name }}</strong
-                >? Todos los casos del grupo se borrarán. Esta opción no se
-                puede deshacer
+                {{ T.problemCreatorDeleteGroupConfirmation }}
+                {{ T.problemCreatorCantUndo }}
               </b-modal>
             </b-dropdown-item>
           </div>
           <b-dropdown-item class="menu-item" @click="openDeleteGroupCasesModal">
             <BIconFileArrowDown />
-            <span class="ml-2">Borrar todos los casos</span>
+            <span class="ml-2">{{ T.problemCreatorDeleteAllCases }}</span>
             <b-modal
               ref="deleteGroupCasesRef"
-              :title="`Borrar Casos | ${name}`"
+              :title="`${T.problemCreatorDeleteAllCases} | ${name}`"
               ok-variant="danger"
-              ok-title="Borrar"
-              cancel-title="Cancelar"
+              :ok-title="T.problemCreatorDelete"
+              :cancel-title="T.problemCreatorCancel"
               @ok="handleDeleteGroupCases"
             >
-              ¿Estas seguro que deseas borrar todos los casos
-              <strong>{{ name }}</strong
-              >? Esta opción no se puede deshacer
+              {{ T.problemCreatorDeleteGroupCasesConfirmation }}
+              {{ T.problemCreatorCantUndo }}
             </b-modal>
           </b-dropdown-item>
         </b-dropdown>
@@ -99,6 +98,7 @@ import { namespace } from 'vuex-class';
 import { NIL } from 'uuid';
 import EditGroup from './EditGroup.vue';
 import Case from './Case.vue';
+import T from '../../../../lang';
 
 const caseStore = namespace('casesStore');
 
@@ -126,6 +126,8 @@ export default class Group extends Vue {
 
   isOpen = true;
   NIL = NIL;
+
+  T = T;
 
   handleDeleteGroup() {
     this.deleteGroup(this.groupId);

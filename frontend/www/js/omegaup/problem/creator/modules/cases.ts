@@ -1,7 +1,7 @@
 import { types } from '../types';
 import { Module } from 'vuex';
 import { NIL, v4 } from 'uuid';
-
+import T from '../../../lang';
 export interface CasesState {
   groups: types.Group[];
   selected: types.CaseGroupID;
@@ -15,7 +15,7 @@ export const casesStore: Module<CasesState, types.RootState> = {
     groups: [
       {
         groupId: NIL,
-        name: 'sin_grupo',
+        name: T.problemCreatorNoGroup,
         defined: false,
         points: 100,
         cases: [],
