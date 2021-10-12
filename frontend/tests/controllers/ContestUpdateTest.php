@@ -80,6 +80,52 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Update from private to public.
+     * And choosing show_all_contestants_at_first_time_in_scoreboard option
+     */
+    public function testUpdateShowAllContestantsAtFirstTimeOption() {
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Update to public
+        $login = self::login($contestData['director']);
+
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+        $this->assertFalse(
+            $contest->show_all_contestants_at_first_time_in_scoreboard
+        );
+
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'admission_mode' => 'public',
+            'show_all_contestants_at_first_time_in_scoreboard' => true,
+        ]));
+
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+        $this->assertTrue(
+            $contest->show_all_contestants_at_first_time_in_scoreboard
+        );
+    }
+
+    /**
      * Update from private to public with problems added
      */
     public function testUpdatePrivateContestToPublicWithProblems() {

@@ -44,6 +44,7 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         'certificate_cutoff' => true,
         'certificates_status' => true,
         'contest_for_teams' => true,
+        'show_all_contestants_at_first_time_in_scoreboard' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -224,6 +225,11 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         if (isset($data['contest_for_teams'])) {
             $this->contest_for_teams = boolval(
                 $data['contest_for_teams']
+            );
+        }
+        if (isset($data['show_all_contestants_at_first_time_in_scoreboard'])) {
+            $this->show_all_contestants_at_first_time_in_scoreboard = boolval(
+                $data['show_all_contestants_at_first_time_in_scoreboard']
             );
         }
     }
@@ -425,4 +431,11 @@ class Contests extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $contest_for_teams = false;
+
+    /**
+     * Bandera que indica si en el scoreboard se mostrarán todos los concursantes por defecto.
+     *
+     * @var bool
+     */
+    public $show_all_contestants_at_first_time_in_scoreboard = false;
 }

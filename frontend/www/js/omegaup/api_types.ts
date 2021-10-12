@@ -25,6 +25,7 @@ export namespace dao {
     recommended?: boolean;
     rerun_id?: number;
     scoreboard?: number;
+    show_all_contestants_at_first_time_in_scoreboard?: boolean;
     show_scoreboard_after?: boolean;
     start_time?: Date;
     submissions_gap?: number;
@@ -2062,6 +2063,7 @@ export namespace types {
     scoreboard: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
+    show_all_contestants_at_first_time_in_scoreboard: boolean;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
     start_time: Date;
@@ -2099,6 +2101,7 @@ export namespace types {
     scoreboard: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
+    show_all_contestants_at_first_time_in_scoreboard: boolean;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
     start_time: Date;
@@ -2237,6 +2240,7 @@ export namespace types {
     problemset_id: number;
     rerun_id?: number;
     scoreboard: number;
+    show_all_contestants_at_first_time_in_scoreboard: boolean;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
     start_time: Date;
