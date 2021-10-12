@@ -112,7 +112,7 @@ describe('Course.vue', () => {
     title: 'omegaUp',
   };
 
-  const problemInfo: null | types.ProblemDetails = {
+  const problemInfo: types.ProblemDetails = {
     accepted: 4,
     accepts_submissions: true,
     alias: 'test',
@@ -179,7 +179,7 @@ describe('Course.vue', () => {
     visits: 5,
   };
 
-  const problem: null | types.NavbarProblemsetProblem = {
+  const problem: types.NavbarProblemsetProblem = {
     acceptsSubmissions: true,
     alias: 'test',
     bestScore: 100,

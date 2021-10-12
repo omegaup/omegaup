@@ -27,8 +27,8 @@ export function getOptionsFromLocation(location: string): LocationOptions {
   // - `#problems/${alias}/new-run`
   // - `#problems/${alias}/show-run:${guid}`
   // - `#clarifications/${alias}/new`
-  // - `#runs/${alias}|all/show-run:${guid}` 'all' flag indicates we are located
-  //   inside arena
+  // - `#runs/${alias}/show-run:${guid}` the alias can be "all" when admin runs
+  //   tab is shown.
   // and all the matching forms in the following regex
   const match = /#(?<tab>\w+)\/(?<alias>[^/]+)(?:\/(?<popup>[^/]+))?/g.exec(
     location,
