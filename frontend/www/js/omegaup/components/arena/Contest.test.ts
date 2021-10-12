@@ -43,6 +43,7 @@ describe('Contest.vue', () => {
     problemset_id: 1,
     scoreboard: 100,
     show_penalty: true,
+    show_all_contestants_at_first_time_in_scoreboard: false,
     show_scoreboard_after: true,
     start_time: currentDate,
     submissions_gap: 1200,
