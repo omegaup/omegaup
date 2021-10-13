@@ -1,6 +1,9 @@
 <template>
   <div class="card">
-    <table class="table table-striped" data-table-identities>
+    <div v-if="teams.length === 0" class="empty-table-message py-2">
+      {{ T.teamsGroupTeamsEmptyList }}
+    </div>
+    <table v-else class="table table-striped" data-table-identities>
       <thead>
         <tr>
           <th>{{ T.teamsGroupTeamName }}</th>
@@ -32,14 +35,6 @@
               @click="onEdit(identity)"
             >
               <font-awesome-icon :icon="['fas', 'edit']" />
-            </button>
-            <button
-              class="btn btn-link"
-              :data-change-password-identity="identity.username"
-              :title="T.groupEditMembersChangePassword"
-              @click="onChangePass(identity.username)"
-            >
-              <font-awesome-icon :icon="['fas', 'lock']" />
             </button>
             <button
               class="btn btn-link"
@@ -85,6 +80,9 @@
         (query) => $emit('update-search-result-users', query)
       "
       @cancel="onCancel"
+      @change-password-identity="
+        (request) => $emit('change-password-identity', request)
+      "
       @add-members="(request) => $emit('add-members', request)"
       @remove-member="(request) => $emit('remove-member', request)"
     ></omegaup-identity-members>

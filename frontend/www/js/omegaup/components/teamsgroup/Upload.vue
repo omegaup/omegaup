@@ -3,23 +3,56 @@
     <div class="card-body">
       <div class="mb-4">
         <omegaup-markdown :markdown="T.teamsGroupsCsvHelp"></omegaup-markdown>
-        <div class="form-check mb-4">
-          <label class="form-check-label">
-            <input
-              v-model="humanReadable"
-              class="form-check-input"
-              type="checkbox"
-            />
-            {{ T.passwordHumanReadable }}
-          </label>
+        <div class="w-100 text-right">
+          <a
+            target="_blank"
+            href="https://blog.omegaup.com/administracion-de-identidades/"
+          >
+            {{ T.teamsGroupsCsvHelpMoreInfo }}
+          </a>
         </div>
-        {{ T.groupsUploadCsvFile }}
-        <input
-          name="identities"
-          type="file"
-          accept=".csv,.txt"
-          @change="readCsv"
-        />
+        <div class="card">
+          <div class="container">
+            <div class="row">
+              <div class="col-sm form-check m-4">
+                {{ T.groupsUploadCsvFile }}
+                <input
+                  name="identities"
+                  type="file"
+                  accept=".csv,.txt"
+                  @change="readCsv"
+                />
+              </div>
+              <div class="col-sm form-check my-4">
+                <div class="container">
+                  <h5 class="row">
+                    {{ T.teamsGroupTeamsAdvancedOptions }}
+                  </h5>
+                  <div class="row">
+                    <label class="form-check-label">
+                      <input
+                        v-model="humanReadable"
+                        class="form-check-input"
+                        type="checkbox"
+                      />
+                      {{ T.passwordHumanReadable }}
+                    </label>
+                  </div>
+                  <div class="row">
+                    <label class="form-check-label">
+                      <input
+                        v-model="selfGeneratedIdentities"
+                        class="form-check-input"
+                        type="checkbox"
+                      />
+                      {{ T.teamsGroupTeamsSelfGenerateIdentities }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <template v-if="identities.length > 0">
         <h3 class="card-header">{{ T.teamsGroupEditTeams }}</h3>
@@ -41,38 +74,13 @@
           <template #row-details="row">
             <b-form @submit.prevent="onAddUsers(row)">
               <b-card>
-                <b-row class="mb-2">
-                  <b-col sm="3" class="text-sm-right">
-                    <b>{{ T.teamsGroupUsernames }}:</b>
-                  </b-col>
-                  <b-col>
-                    <b-badge
-                      v-for="username of row.item.usernames"
-                      :key="username"
-                      variant="primary"
-                      class="ml-2"
-                    >
-                      {{ username }}
-                    </b-badge>
-                  </b-col>
-                </b-row>
-                <b-row>
-                  <omegaup-common-multi-typeahead
-                    :existing-options="searchResultUsers"
-                    :value.sync="typeaheadUsers"
-                    @update-existing-options="
-                      (query) => $emit('update-search-result-users', query)
-                    "
-                  >
-                  </omegaup-common-multi-typeahead>
-                  <b-button
-                    type="submit"
-                    variant="primary"
-                    class="d-inline-block mb-2"
-                  >
-                    {{ T.teamsGroupAddUsersDone }}
-                  </b-button>
-                </b-row>
+                <b-table
+                  responsive
+                  striped
+                  hover
+                  :items="row.item.usernames"
+                  :fields="identitiesColumns"
+                ></b-table>
               </b-card>
             </b-form>
           </template>
@@ -81,16 +89,27 @@
           <button
             class="btn btn-primary d-inline-block mb-2"
             name="create-identities"
+            :disabled="isLoading"
             @click.prevent="
               $emit('bulk-identities', { identities, identitiesTeams })
             "
           >
-            {{ T.teamsGroupCreateIdentitiesAsTeams }}
+            {{
+              !isLoading
+                ? T.teamsGroupCreateIdentitiesAsTeams
+                : T.teamsGroupCreatingIdentitiesAsTeams
+            }}
+            <font-awesome-icon
+              v-if="isLoading"
+              :icon="['fas', 'spinner']"
+              class="ml-2 fa-spin"
+            ></font-awesome-icon>
           </button>
           <div>
             <button
               class="btn btn-warning d-inline-block"
-              @click.prevent="$emit('download-teams', identities)"
+              data-download-csv-button
+              @click.prevent="downloadIdentitiesCSV"
             >
               <font-awesome-icon :icon="['fas', 'download']" />
             </button>
@@ -109,7 +128,11 @@ import T from '../../lang';
 import omegaup_Markdown from '../Markdown.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faDownload, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import {
+  faDownload,
+  faUserPlus,
+  faSpinner,
+} from '@fortawesome/free-solid-svg-icons';
 import common_MultiTypeahead from '../common/MultiTypeahead.vue';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
@@ -131,7 +154,11 @@ Vue.use(ButtonPlugin);
 Vue.use(BadgePlugin);
 Vue.use(CardPlugin);
 
-library.add(faDownload, faUserPlus);
+type TeamIdentity = types.Identity & {
+  usernames: { username: string; password?: string }[];
+};
+
+library.add(faDownload, faUserPlus, faSpinner);
 @Component({
   components: {
     FontAwesomeIcon,
@@ -145,11 +172,16 @@ library.add(faDownload, faUserPlus);
 export default class Upload extends Vue {
   @Prop({ default: null }) userErrorRow!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop() numberOfContestants!: number;
+  @Prop() isLoading!: boolean;
 
   T = T;
   identities: types.Identity[] = [];
-  identitiesTeams: { [team: string]: string[] } = {};
+  identitiesTeams: {
+    [team: string]: { username: string; password?: string }[];
+  } = {};
   humanReadable = false;
+  selfGeneratedIdentities = false;
   typeaheadUsers: types.ListItem[] = [];
   columns = [
     {
@@ -159,15 +191,18 @@ export default class Upload extends Vue {
       isRowHeader: true,
     },
     { key: 'name', label: T.profile },
-    { key: 'password', label: T.loginPassword },
     { key: 'country_id', label: T.profileCountry },
     { key: 'state_id', label: T.profileState },
     { key: 'gender', label: T.wordsGender },
     { key: 'school_name', label: T.profileSchool },
     { key: 'usernames', label: T.teamsGroupUsernames },
   ];
+  identitiesColumns = [
+    { key: 'username', label: T.profileUsername },
+    { key: 'password', label: T.loginPassword },
+  ];
 
-  get items() {
+  get items(): TeamIdentity[] {
     return this.identities.map((identity) => ({
       ...identity,
       usernames: this.identitiesTeams[identity.username],
@@ -193,15 +228,32 @@ export default class Upload extends Vue {
       identities: this.identities,
       file: file,
       humanReadable: this.humanReadable,
+      selfGeneratedIdentities: this.selfGeneratedIdentities,
+      numberOfContestants: this.numberOfContestants,
     });
   }
 
-  onAddUsers(row: BRow): void {
-    this.identitiesTeams[row.item.username] = this.typeaheadUsers.map(
-      (user) => user.key,
-    );
-    Vue.set(row.item, 'usernames', this.identitiesTeams[row.item.username]);
-    row.toggleDetails();
+  downloadIdentitiesCSV() {
+    const participants: types.Participant[] = [];
+    for (const team of this.items) {
+      if (!team.usernames) {
+        continue;
+      }
+      for (const participant of team.usernames) {
+        participants.push({
+          country_id: team.country_id,
+          gender: team.gender,
+          name: team.name,
+          school_name: team.school_name,
+          state_id: team.state_id,
+          username: team.username,
+          participant_username: participant.username,
+          participant_password: participant.password,
+        });
+      }
+    }
+
+    this.$emit('download-teams', participants);
   }
 }
 </script>

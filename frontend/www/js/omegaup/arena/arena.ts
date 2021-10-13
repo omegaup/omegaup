@@ -13,7 +13,6 @@ import JSZip from 'jszip';
 import * as markdown from '../markdown';
 
 import arena_ContestSummary from '../components/arena/ContestSummary.vue';
-import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
@@ -216,8 +215,6 @@ export class Arena {
   };
 
   notificationsClarifications: types.Clarification[] = [];
-
-  navbarAssignments: Vue | null = null;
 
   navbarProblems:
     | (Vue & {
@@ -441,11 +438,7 @@ export class Arena {
             props: {
               problems: this.problems,
               activeProblem: this.activeProblem,
-              inAssignment: !!options.courseAlias,
               digitsAfterDecimalPoint: options.partialScore ? 2 : 0,
-              courseAlias: options.courseAlias,
-              courseName: options.courseName,
-              currentAssignment: self.currentProblemset,
             },
             on: {
               'navigate-to-problem': (
@@ -532,34 +525,6 @@ export class Arena {
           return createElement('omegaup-arena-rundetails', {
             props: {
               data: this.data,
-              inCourse: self.options.courseAlias !== null,
-            },
-            on: {
-              'set-feedback': ({
-                guid,
-                feedback,
-                isUpdate,
-              }: {
-                guid: string;
-                feedback: string;
-                isUpdate: boolean;
-              }) => {
-                api.Submission.setFeedback({
-                  guid,
-                  course_alias: self.options.courseAlias,
-                  assignment_alias: self.options.assignmentAlias,
-                  feedback,
-                })
-                  .then(() => {
-                    ui.success(
-                      isUpdate
-                        ? T.feedbackSuccesfullyUpdated
-                        : T.feedbackSuccesfullyAdded,
-                    );
-                    self.hideOverlay();
-                  })
-                  .catch(ui.error);
-              },
             },
           });
         },
@@ -660,8 +625,6 @@ export class Arena {
     if (problemStatementElement) {
       this.markdownView.$mount(problemStatementElement);
     }
-
-    this.navbarAssignments = null;
   }
 
   installProblemArtifactHooks(): void {
@@ -880,35 +843,6 @@ export class Arena {
       this.elements.loadingOverlay.style.display = 'none';
     }
     $('#root').fadeIn('slow');
-
-    if (
-      typeof problemset.courseAssignments !== 'undefined' &&
-      document.getElementById('arena-navbar-assignments') !== null &&
-      this.navbarAssignments === null
-    ) {
-      const courseAlias = this.options.courseAlias;
-      this.navbarAssignments = new Vue({
-        el: '#arena-navbar-assignments',
-        components: {
-          'omegaup-arena-navbar-assignments': arena_Navbar_Assignments,
-        },
-        render: function (createElement) {
-          return createElement('omegaup-arena-navbar-assignments', {
-            props: {
-              assignments: problemset.courseAssignments,
-              currentAssignment: problemset,
-            },
-            on: {
-              'navigate-to-assignment': (assignmentAlias: string) => {
-                window.location.pathname = `/course/${courseAlias}/assignment/${assignmentAlias}/${
-                  problemset.admin ? 'admin/' : ''
-                }`;
-              },
-            },
-          });
-        },
-      });
-    }
   }
 
   initProblems(problemset: types.ArenaProblemset): void {
@@ -1565,9 +1499,7 @@ export class Arena {
         updateRuns(problem.runs);
         this.showQualityNominationPopup();
 
-        if (!this.options.courseAlias) {
-          this.initSubmissionCountdown();
-        }
+        this.initSubmissionCountdown();
       };
 
       if (problemChanged) {
@@ -1966,9 +1898,7 @@ export class Arena {
         } else {
           this.hideOverlay();
         }
-        if (!this.options.courseAlias) {
-          this.initSubmissionCountdown();
-        }
+        this.initSubmissionCountdown();
       })
       .catch((run) => {
         alert(run.error ?? run);

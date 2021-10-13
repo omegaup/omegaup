@@ -41,6 +41,7 @@ rewrite ^/contest/([a-zA-Z0-9_+-]+)/stats/?$ /contests/stats.php?contest_alias=$
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/virtual/?$ /contests/virtual.php?contest_alias=$1  last;
 rewrite ^/course/?$ /course/list.php last;
 rewrite ^/course/home/?$ /course/home.php last;
+rewrite ^/course/listv2/?$ /course/tabs.php last;
 rewrite ^/course/mine/?$ /course/mine.php last;
 rewrite ^/course/([a-zA-Z0-9_+-]+)/activity/?$ /course/activity.php?course=$1 last;
 rewrite ^/course/new/?$ /course/new.php last;
@@ -72,6 +73,7 @@ rewrite ^/nomination/([0-9]+)/?$ /qualitynomination/details.php?qualitynominatio
 rewrite ^/nomination/mine/?$ /qualitynomination/my_list.php last;
 rewrite ^/permissions/?$ /permissions.php last;
 rewrite ^/problem/?$ /problems/list.php last;
+rewrite ^/problem/creator/?$ /problems/creator.php last;
 rewrite ^/problem/collection/?$ /problems/collection.php last;
 rewrite ^/problem/collection/author/?$ /problems/collection_details_by_author.php last;
 rewrite ^/problem/collection/([a-zA-Z0-9_+-]+)/?$ /problems/collection_details_by_level.php?level=$1 last;
