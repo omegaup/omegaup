@@ -65,7 +65,6 @@ module.exports = {
     course_single_list: './frontend/www/js/omegaup/course/single_list.ts',
     course_statistics: './frontend/www/js/omegaup/course/statistics.ts',
     course_student: './frontend/www/js/omegaup/course/student.ts',
-    course_student_with_assignment: './frontend/www/js/omegaup/course/studentWithAssignment.ts',
     course_students: './frontend/www/js/omegaup/course/students.ts',
     course_submissions_list:
       './frontend/www/js/omegaup/course/submissions_list.ts',
