@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, mount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -13,6 +13,13 @@ describe('Card.vue', () => {
     name: 'Test course',
     school_name: 'Test course school',
     studentCount: 2000,
+  };
+
+  const enrolledCourse: types.CourseCardEnrolled = {
+    alias: 'test-enrolled-course',
+    name: 'Enrolled course name',
+    progress: 25,
+    school_name: 'Test course school',
   };
 
   it('Should render information for public course', () => {
@@ -31,5 +38,17 @@ describe('Card.vue', () => {
         studentCount: '2.0k',
       }),
     );
+  });
+
+  it('Should render information for enrolled course', () => {
+    const wrapper = mount(course_Card, {
+      propsData: {
+        course: enrolledCourse,
+        type: 'enrolled',
+      },
+    });
+
+    expect(wrapper.text()).toContain(enrolledCourse.name);
+    expect(wrapper.text()).toContain(enrolledCourse.school_name);
   });
 });

@@ -35,9 +35,7 @@
         }"
         role="tabpanel"
       >
-        <div
-          class="row justify-content-between row-cols-1 row-cols-md-2 row-cols-xl-3"
-        >
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3">
           <omegaup-course-card
             v-for="course in courses[tab.id]"
             :key="course.alias"

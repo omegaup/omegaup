@@ -343,6 +343,7 @@
 	"courseCardDescriptionCourses": "Os cursos do omegaUp s\u00e3o para:\n\n*   Professores que desejam criar cursos online\n*   Alunos participando dos cursos de suas aulas\n*   Qualquer usu\u00e1rio que deseja aprender mais sobre programa\u00e7\u00e3o participando de cursos p\u00fablicos",
 	"courseCardDueDate": "Termina %(due_date)",
 	"courseCardImpartedBy": "Ministrado por: **%(school_name)**",
+	"courseCardProgress": "Progresso:",
 	"courseCardSeeContent": "Ver conte\u00fado",
 	"courseCardShowTopics": "Mostrar t\u00f3picos",
 	"courseCardsListSearch": "\ud83d\udd0d Nome do curso",

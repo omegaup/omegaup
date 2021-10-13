@@ -5,27 +5,61 @@
         <div class="col-sm-2" :class="`${type}-course-card`"></div>
         <div class="col-sm-10">
           <div
-            class="card-body d-flex flex-column h-100 justify-content-between"
+            class="card-body d-flex flex-column h-100"
+            :class="{ 'justify-content-between': type === CourseType.Public }"
           >
             <div>
               <h5 class="card-title mb-0">{{ course.name }}</h5>
-              <p class="card-text">
+              <p v-if="type === CourseType.Public" class="card-text">
                 <small>{{ course.school_name }}</small>
               </p>
             </div>
-            <div class="card-text course-data">
-              <p class="mb-0">
-                {{
-                  ui.formatString(T.publicCourseCardMetrics, {
-                    lessonCount: course.lessonCount,
-                    studentCount:
-                      course.studentCount >= 1000
-                        ? `${(course.studentCount / 1000).toFixed(1)}k`
-                        : course.studentCount,
-                  })
-                }}
-              </p>
-              <p class="mb-0">{{ courseLevelText(course.level) }}</p>
+            <div
+              class="card-text course-data"
+              :class="{
+                'mt-3 h-100 d-flex flex-column justify-content-around':
+                  type === CourseType.Enrolled,
+              }"
+            >
+              <template v-if="type === CourseType.Public">
+                <p class="mb-0">
+                  {{
+                    ui.formatString(T.publicCourseCardMetrics, {
+                      lessonCount: course.lessonCount,
+                      studentCount:
+                        course.studentCount >= 1000
+                          ? `${(course.studentCount / 1000).toFixed(1)}k`
+                          : course.studentCount,
+                    })
+                  }}
+                </p>
+                <p class="mb-0">{{ courseLevelText(course.level) }}</p>
+              </template>
+              <div v-else-if="type === CourseType.Enrolled">
+                <omegaup-markdown
+                  v-if="course.school_name"
+                  :full-width="true"
+                  :markdown="
+                    ui.formatString(T.courseCardImpartedBy, {
+                      school_name: course.school_name,
+                    })
+                  "
+                >
+                </omegaup-markdown>
+                <div class="d-flex justify-content-between align-items-center">
+                  {{ T.courseCardProgress }}
+                  <div class="progress w-75">
+                    <div
+                      class="progress-bar"
+                      role="progressbar"
+                      :aria-valuenow="course.progress"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                      :style="`width: ${course.progress}%`"
+                    ></div>
+                  </div>
+                </div>
+              </div>
               <div class="text-center mt-1">
                 <a
                   class="btn btn-primary text-white"
@@ -114,12 +148,16 @@ export default class CourseCard extends Vue {
     background-color: $omegaup-blue;
   }
 
-  .student-course-card {
+  .enrolled-course-card {
     background-color: $omegaup-pink--lighter;
   }
 
   .finished-course-card {
     background-color: $omegaup-grey--lighter;
+  }
+
+  .progress-bar {
+    background-color: $omegaup-yellow;
   }
 }
 </style>
