@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-2">
+  <div class="mt-2" data-runs>
     <!-- TODO: This code should be removed when we stop using jquery and the
       migration to vue was over -->
     <!-- id-lint off -->
@@ -11,7 +11,13 @@
       <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
     </div>
     <div class="table-responsive">
-      <table class="runs table table-striped">
+      <table
+        class="runs table table-striped"
+        :class="{
+          'single-problem-runs': !showAllRuns,
+          'all-runs': showAllRuns,
+        }"
+      >
         <caption>
           {{
             T.wordsSubmissions
@@ -242,7 +248,7 @@
             <td v-if="showDetails && !showDisqualify && !showRejudge">
               <button
                 class="details btn-outline-dark btn-sm"
-                data-run-details
+                :data-run-details="run.guid"
                 @click="$emit('details', run)"
               >
                 <font-awesome-icon :icon="['fas', 'search-plus']" />
@@ -262,7 +268,7 @@
                 <div class="dropdown-menu">
                   <button
                     v-if="showDetails"
-                    data-run-details
+                    :data-run-details="run.guid"
                     class="btn-link dropdown-item"
                     @click="$emit('details', run)"
                   >
@@ -358,6 +364,7 @@ export default class Runsv2 extends Vue {
   @Prop() runs!: null | types.Run[];
   @Prop({ default: false }) globalRuns!: boolean;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: false }) showAllRuns!: boolean;
 
   T = T;
   time = time;
