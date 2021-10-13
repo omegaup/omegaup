@@ -1454,68 +1454,6 @@ export namespace types {
       );
     }
 
-    export function StudentProgressByAssignmentPayload(
-      elementId: string = 'payload',
-    ): types.StudentProgressByAssignmentPayload {
-      return ((x) => {
-        x.course = ((x) => {
-          x.assignments = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              if (x.finish_time)
-                x.finish_time = ((x: number) => new Date(x * 1000))(
-                  x.finish_time,
-                );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.assignments);
-          x.clarifications = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              x.time = ((x: number) => new Date(x * 1000))(x.time);
-              return x;
-            });
-          })(x.clarifications);
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        })(x.course);
-        x.problems = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            x.runs = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                if (x.feedback)
-                  x.feedback = ((x) => {
-                    x.date = ((x: number) => new Date(x * 1000))(x.date);
-                    return x;
-                  })(x.feedback);
-                x.time = ((x: number) => new Date(x * 1000))(x.time);
-                return x;
-              });
-            })(x.runs);
-            return x;
-          });
-        })(x.problems);
-        return x;
-      })(
-        JSON.parse(
-          (document.getElementById(elementId) as HTMLElement).innerText,
-        ),
-      );
-    }
-
     export function StudentProgressPayload(
       elementId: string = 'payload',
     ): types.StudentProgressPayload {
@@ -3546,14 +3484,6 @@ export namespace types {
     progress: { [key: string]: { [key: string]: number } };
     score: { [key: string]: { [key: string]: number } };
     username: string;
-  }
-
-  export interface StudentProgressByAssignmentPayload {
-    assignment: string;
-    course: types.CourseDetails;
-    problems: types.CourseProblem[];
-    student: string;
-    students: types.StudentProgress[];
   }
 
   export interface StudentProgressInCourse {
