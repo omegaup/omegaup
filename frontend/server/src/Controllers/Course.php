@@ -44,6 +44,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseNewPayload=array{is_admin: bool, is_curator: bool, languages: array<string, string>}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, allLanguages: array<string, string>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
+ * @psalm-type StudentsProgressPayload=array{course: CourseDetails, assignmentsProblems: list<AssignmentsProblemsPoints>, students: list<StudentProgressInCourse>, totalRows: int, page: int, length: int, pagerItems: list<PageItem>}
  * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp}
  * @psalm-type CourseRun=array{feedback: null|SubmissionFeedback, guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<CourseRun>}
@@ -2152,6 +2153,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
             $problems[] = $problem;
         }
+
         return [
             'problems' => $problems,
         ];
