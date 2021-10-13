@@ -341,7 +341,6 @@ export default class ArenaCourse extends Vue {
       ...request,
       isAdmin: this.isAdmin,
       hash: `#runs/all/show-run:${request.guid}`,
-      problemAlias: undefined,
     });
     this.currentPopupDisplayed = PopupDisplayed.RunDetails;
   }
@@ -349,9 +348,7 @@ export default class ArenaCourse extends Vue {
   onRunDetails(request: SubmissionRequest): void {
     this.$emit('show-run', {
       ...request,
-      hash: `#problems/${
-        this.activeProblemAlias ?? request.problemAlias
-      }/show-run:${request.guid}`,
+      hash: `#problems/${this.activeProblemAlias}/show-run:${request.guid}`,
     });
   }
 

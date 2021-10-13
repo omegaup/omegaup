@@ -282,7 +282,6 @@ describe('Course.vue', () => {
           guid: '78099022574726af861839e1b4210188',
           hash: '#problems/test/show-run:78099022574726af861839e1b4210188',
           isAdmin: false,
-          problemAlias: 'test',
         },
       ],
     ]);

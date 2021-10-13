@@ -608,7 +608,6 @@ export default class Runsv2 extends Vue {
     this.$emit('details', {
       guid: run.guid,
       isAdmin: true,
-      problemAlias: run.alias,
       hash: `#runs/all/show-run:${run.guid}`,
     });
     this.currentPopupDisplayed = PopupDisplayed.RunDetails;

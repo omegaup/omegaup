@@ -500,7 +500,6 @@ export default class ProblemDetails extends Vue {
       ...request,
       hash: `#problems/${this.problemAlias}/show-run:${request.guid}`,
       isAdmin: this.isAdmin,
-      problemAlias: this.problem.alias,
     });
   }
 
@@ -510,7 +509,6 @@ export default class ProblemDetails extends Vue {
       ...request,
       hash: `#runs/${this.problemAlias}/show-run:${request.guid}`,
       isAdmin: this.isAdmin,
-      problemAlias: this.problem.alias,
     });
   }
 
