@@ -39,10 +39,10 @@ OmegaUp.on('ready', () => {
           assignment_alias: assignmentAlias,
           usernameOrEmail: student,
         })
-        .then((data) => {
-          viewStudent.problems = data.problems;
-        })
-        .catch(ui.apiError);
+          .then((data) => {
+            viewStudent.problems = data.problems;
+          })
+          .catch(ui.apiError);
       },
     },
     render: function (createElement) {
@@ -89,10 +89,10 @@ OmegaUp.on('ready', () => {
                   assignment_alias: assignmentAlias,
                   usernameOrEmail: studentUsername,
                 })
-                .then((data) => {
-                  viewStudent.problems = data.problems;
-                })
-                .catch(ui.apiError);
+                  .then((data) => {
+                    viewStudent.problems = data.problems;
+                  })
+                  .catch(ui.apiError);
               })
               .catch(ui.error);
           },
