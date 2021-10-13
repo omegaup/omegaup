@@ -3229,7 +3229,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'course_student'
         ];
     }
-
      /**
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
