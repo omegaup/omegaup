@@ -77,7 +77,7 @@ import { Problem } from '../../linkable_resource';
     'omegaup-user-username': user_Username,
   },
 })
-export default class UserProfileEdit extends Vue {
+export default class UserMainInfo extends Vue {
   @Prop() data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop() edit!: boolean;

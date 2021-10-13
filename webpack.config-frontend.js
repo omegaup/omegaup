@@ -104,7 +104,6 @@ module.exports = {
     teams_group_list: './frontend/www/js/omegaup/teamsgroup/list.ts',
     teams_group_new: './frontend/www/js/omegaup/teamsgroup/new.ts',
     user_basic_edit: './frontend/www/js/omegaup/user/basicedit.js',
-    user_edit: './frontend/www/js/omegaup/user/edit.ts',
     user_edit_email_form: './frontend/www/js/omegaup/user/emailedit.js',
     user_manage_identities:
       './frontend/www/js/omegaup/user/manage_identities.js',
