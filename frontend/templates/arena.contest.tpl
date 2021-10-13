@@ -22,7 +22,6 @@
 			<div id="problems" class="tab navleft">
 				<div class="navbar">
 					<div id="arena-navbar-problems"></div>
-					<div id="arena-navbar-assignments"></div>
 					<div id="arena-navbar-miniranking"></div>
 					<script type="text/json" id="arena-navbar-payload">{$showRanking|json_encode}</script>
 				</div>

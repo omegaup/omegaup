@@ -22,7 +22,10 @@ class Clarification {
         ?string $receiver = null
     ): array {
         // Our contestant has to open the contest before sending a clarification
-        \OmegaUp\Test\Factories\Contest::openContest($contestData, $contestant);
+        \OmegaUp\Test\Factories\Contest::openContest(
+            $contestData['contest'],
+            $contestant
+        );
 
         // Then we need to open the problem
         \OmegaUp\Test\Factories\Contest::openProblemInContest(

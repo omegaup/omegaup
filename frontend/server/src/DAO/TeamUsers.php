@@ -19,13 +19,13 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
     public static function getByTeamId(int $teamId): array {
         $sql = 'SELECT
                     `team_id`,
-                    `user_id`
+                    `identity_id`
                 FROM
                     `Team_Users`
                 WHERE
                     `team_id` = ?
                 LIMIT 100;';
-        /** @var list<array{team_id: int, user_id: int}> */
+        /** @var list<array{identity_id: int, team_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$teamId]);
         $usersTeams = [];
         foreach ($rs as $row) {
@@ -43,19 +43,16 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
     ): int {
         $placeholders = array_fill(0, count($usernames), '?');
         $placeholders = join(',', $placeholders);
-        $sql = "REPLACE INTO Team_Users (team_id, user_id)
-                SELECT ? AS team_id, user_id FROM Identities
-                WHERE username IN ($placeholders) AND user_id IS NOT NULL;";
-
-        \OmegaUp\MySQLConnection::getInstance()->Execute(
-            $sql,
-            array_merge([$teamId], $usernames)
-        );
+        $sql = "REPLACE INTO Team_Users (team_id, identity_id)
+                SELECT ? AS team_id, identity_id FROM Identities
+                WHERE username IN ($placeholders);";
+        $params = array_merge([$teamId], $usernames);
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
     /**
-     * @return array{pageNumber: int, teamsUsers: list<array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}>, totalRows: int}
+     * @return array{pageNumber: int, teamsUsers: list<array{classname: string, isMainUserIdentity: bool, name: null|string, team_alias: string, team_name: null|string, username: string}>, totalRows: int}
      */
     public static function getByTeamGroupId(
         int $teamsGroupId,
@@ -69,6 +66,7 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
                     i.name,
                     it.username AS team_alias,
                     it.name AS team_name,
+                    CAST(IFNULL(i.user_id, FALSE) AS UNSIGNED) AS isMainUserIdentity,
                     IFNULL(
                         (
                             SELECT urc.classname FROM
@@ -80,7 +78,7 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
                                         FROM
                                             User_Rank ur
                                         WHERE
-                                            ur.user_id = tu.user_id
+                                            ur.user_id = u.user_id
                                     )
                             ORDER BY
                                 urc.percentile ASC
@@ -98,11 +96,15 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
                 INNER JOIN
                     Identities i
                 ON
-                    i.user_id = tu.user_id
+                    i.identity_id = tu.identity_id
                 INNER JOIN
                     Identities it
                 ON
                     it.identity_id = t.identity_id
+                LEFT JOIN
+                    Users u
+                ON
+                    i.user_id = u.user_id
                 WHERE
                     team_group_id = ?
                 ';
@@ -121,15 +123,20 @@ class TeamUsers extends \OmegaUp\DAO\Base\TeamUsers {
             [$teamsGroupId]
         );
 
-        /** @var list<array{classname: string, name: null|string, team_alias: string, team_name: null|string, username: string}> $teamsUsers */
+        /** @var list<array{classname: string, isMainUserIdentity: int, name: null|string, team_alias: string, team_name: null|string, username: string}> */
         $teamsUsers = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql . $sqlLimit,
             [$teamsGroupId, $offset, $pageSize]
         );
+        $result = [];
+        foreach ($teamsUsers as $row) {
+            $row['isMainUserIdentity'] = boolval($row['isMainUserIdentity']);
+            $result[] = $row;
+        }
 
         return [
             'pageNumber' => $page,
-            'teamsUsers' => $teamsUsers,
+            'teamsUsers' => $result,
             'totalRows' => $totalRows,
         ];
     }

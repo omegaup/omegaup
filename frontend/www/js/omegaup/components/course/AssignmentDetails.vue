@@ -52,6 +52,7 @@
                   'is-invalid': invalidParameterName === 'assignment_type',
                 }"
                 required
+                @change="onChangeSelect($event)"
               >
                 <option value="lesson">
                   {{ T.wordsLesson }}
@@ -104,7 +105,7 @@
                   :disabled="!unlimitedDurationCourse"
                 />{{ T.wordsYes }}</label
               >
-              <label class="radio-inline"
+              <label class="radio-inline ml-3"
                 ><input
                   v-model="unlimitedDuration"
                   type="radio"
@@ -325,6 +326,10 @@ export default class CourseAssignmentDetails extends Vue {
 
   onSubmit(): void {
     this.$emit('submit', this, this.scheduledProblemList?.problems ?? []);
+  }
+
+  onChangeSelect(event: Event): void {
+    this.assignment.assignment_type = (event.target as HTMLSelectElement).value;
   }
 }
 </script>

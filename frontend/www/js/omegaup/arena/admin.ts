@@ -14,18 +14,29 @@ import {
   updateRunFallback,
 } from './submissions';
 import { types } from '../api_types';
+import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 
-OmegaUp.on('ready', () => {
-  const locationHash = window.location.hash.substr(1).split('/');
-  const runsList = new Vue({
+OmegaUp.on('ready', async () => {
+  time.setSugarLocale();
+  const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
+  let runDetails: null | types.RunDetails = null;
+  try {
+    ({ runDetails } = await getProblemAndRunDetails({
+      location: window.location.hash,
+    }));
+  } catch (e) {
+    ui.apiError(e);
+  }
+  new Vue({
     el: '#main-container',
     components: {
       'omegaup-arena-runs': arena_Runsv2,
     },
     data: () => ({
       searchResultUsers: [] as types.ListItem[],
-      popupDisplayed: PopupDisplayed.None,
-      guid: null as null | string,
+      popupDisplayed,
+      guid,
+      runDetailsData: runDetails,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-runs', {
@@ -43,13 +54,14 @@ OmegaUp.on('ready', () => {
           guid: this.guid,
           globalRuns: true,
           searchResultUsers: this.searchResultUsers,
+          runDetailsData: this.runDetailsData,
         },
         on: {
           details: (request: SubmissionRequest) => {
-            const hash = `/show-run:${request.request.guid}/`;
-            api.Run.details({ run_alias: request.request.guid })
+            api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
-                showSubmission({ request, runDetails, hash });
+                this.runDetailsData = showSubmission({ request, runDetails });
+                window.location.hash = request.hash;
               })
               .catch((error) => {
                 ui.apiError(error);
@@ -138,11 +150,4 @@ OmegaUp.on('ready', () => {
   setInterval(() => {
     refreshRuns();
   }, 5 * 60 * 1000);
-
-  if (locationHash[1] && locationHash[1].includes('show-run:')) {
-    const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
-    const showRunMatch = window.location.hash.match(showRunRegex);
-    runsList.guid = showRunMatch ? showRunMatch[1] : null;
-    runsList.popupDisplayed = PopupDisplayed.RunDetails;
-  }
 });

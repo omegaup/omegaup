@@ -113,7 +113,7 @@
             <omegaup-arena-runsubmit-popup
               v-show="currentPopupDisplayed === PopupDisplayed.RunSubmit"
               :preferred-language="problem.preferred_language"
-              :languages="problem.languages"
+              :languages="filteredLanguages"
               :next-submission-timestamp="nextSubmissionTimestamp || new Date()"
               @dismiss="onPopupDismissed"
               @submit-run="onRunSubmitted"
@@ -122,7 +122,16 @@
               v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
               :data="currentRunDetailsData"
               @dismiss="onPopupDismissed"
-            ></omegaup-arena-rundetails-popup>
+            >
+              <template #feedback="data">
+                <slot
+                  name="feedback"
+                  :feedback="data.feedback"
+                  :guid="data.guid"
+                  :is-admin="data.admin"
+                ></slot>
+              </template>
+            </omegaup-arena-rundetails-popup>
             <omegaup-quality-nomination-promotion-popup
               v-show="currentPopupDisplayed === PopupDisplayed.Promotion"
               :solved="nominationStatus && nominationStatus.solved"
@@ -176,7 +185,7 @@
             :show-details="true"
             :problemset-problems="[]"
             :is-contest-finished="isContestFinished"
-            @details="(run) => onRunDetails(run.guid)"
+            @details="onRunDetails"
             @update-search-result-users-contest="
               (request) => $emit('update-search-result-users-contest', request)
             "
@@ -227,7 +236,7 @@
           :show-disqualify="true"
           :problemset-problems="[]"
           :search-result-users="searchResultUsers"
-          @details="(run) => onRunDetails(run.guid)"
+          @details="onRunAdminDetails"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
           @filter-changed="
@@ -282,7 +291,7 @@ import * as time from '../../time';
 import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
-import arena_Runs from '../arena/Runs.vue';
+import arena_Runs from '../arena/Runsv2.vue';
 import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import arena_Solvers from '../arena/Solvers.vue';
@@ -305,6 +314,7 @@ import {
   faBan,
   faExternalLinkAlt,
 } from '@fortawesome/free-solid-svg-icons';
+import { SubmissionRequest } from '../../arena/submissions';
 library.add(
   faExclamationTriangle,
   faEdit,
@@ -377,14 +387,14 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
-  @Prop() isAdmin!: boolean;
+  @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop() nextSubmissionTimestamp!: null | Date;
   @Prop({ default: false }) shouldShowTabs!: boolean;
-  @Prop({ default: false }) shouldShowRunDetails!: boolean;
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: null }) languages!: null | string[];
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
@@ -466,6 +476,16 @@ export default class ProblemDetails extends Vue {
     return this.runs.filter((run) => run.alias === this.problem.alias);
   }
 
+  get filteredLanguages(): string[] {
+    if (!this.languages) {
+      return this.problem.languages;
+    }
+    const languagesSet = new Set(this.languages);
+    return this.problem.languages.filter((language) =>
+      languagesSet.has(language),
+    );
+  }
+
   onNewSubmission(): void {
     if (!this.user.loggedIn) {
       this.$emit('redirect-login-page');
@@ -474,16 +494,24 @@ export default class ProblemDetails extends Vue {
     this.currentPopupDisplayed = PopupDisplayed.RunSubmit;
   }
 
-  onRunDetails(guid: string): void {
-    this.$emit('show-run', {
-      request: {
-        guid,
-        isAdmin: this.isAdmin,
-        problemAlias: this.problem.alias,
-      },
-      target: this,
-    });
+  onRunDetails(request: SubmissionRequest): void {
     this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+    this.$emit('show-run', {
+      ...request,
+      hash: `#problems/${this.problemAlias}/show-run:${request.guid}`,
+      isAdmin: this.isAdmin,
+      problemAlias: this.problem.alias,
+    });
+  }
+
+  onRunAdminDetails(request: SubmissionRequest): void {
+    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+    this.$emit('show-run', {
+      ...request,
+      hash: `#runs/${this.problemAlias}/show-run:${request.guid}`,
+      isAdmin: this.isAdmin,
+      problemAlias: this.problem.alias,
+    });
   }
 
   onNewPromotion(): void {
@@ -639,9 +667,6 @@ export default class ProblemDetails extends Vue {
       ui.reportEvent('quality-nomination', 'shown');
       return;
     }
-    if (newValue === PopupDisplayed.RunDetails && this.guid) {
-      this.onRunDetails(this.guid);
-    }
   }
 
   @Watch('currentClarifications')
@@ -650,18 +675,9 @@ export default class ProblemDetails extends Vue {
     this.hasUnreadClarifications = true;
   }
 
-  @Watch('shouldShowRunDetails')
-  onShouldShowRunDetailsChanged(newValue: boolean): void {
-    if (newValue && this.guid) {
-      this.$emit('show-run', {
-        request: {
-          guid: this.guid,
-          isAdmin: this.isAdmin,
-          problemAlias: this.currentRunDetailsData?.alias,
-        },
-        target: this,
-      });
-    }
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 }
 </script>

@@ -23,9 +23,6 @@ module.exports = {
     admin_user: './frontend/www/js/omegaup/admin/user.ts',
     arena: './frontend/www/js/omegaup/arena/arena.ts',
     arena_admin: './frontend/www/js/omegaup/arena/admin.ts',
-    arena_assignment: './frontend/www/js/omegaup/arena/assignment.ts',
-    arena_assignment_admin:
-      './frontend/www/js/omegaup/arena/assignment_admin.ts',
     arena_contest_contestant:
       './frontend/www/js/omegaup/arena/contest_contestant.ts',
     arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
@@ -34,7 +31,7 @@ module.exports = {
       './frontend/www/js/omegaup/arena/contest_practice.ts',
     arena_course: './frontend/www/js/omegaup/arena/course.ts',
     arena_scoreboard: './frontend/www/js/omegaup/arena/scoreboard.ts',
-    arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
+    arena_contest_virtual: './frontend/www/js/omegaup/arena/contest_virtual.ts',
     authors_rank: './frontend/www/js/omegaup/user/authors_rank.ts',
     badge_details: './frontend/www/js/omegaup/badge/details.ts',
     badge_list: './frontend/www/js/omegaup/badge/list.ts',
@@ -54,6 +51,7 @@ module.exports = {
     contest_report: './frontend/www/js/omegaup/contest/report.js',
     contest_scoreboardmerge:
       './frontend/www/js/omegaup/contest/scoreboardmerge.js',
+    contest_virtual: './frontend/www/js/omegaup/contest/virtual.ts',
     course_clarifications: './frontend/www/js/omegaup/course/clarifications.ts',
     course_clone: './frontend/www/js/omegaup/course/clone.ts',
     course_details: './frontend/www/js/omegaup/course/details.ts',
@@ -70,6 +68,7 @@ module.exports = {
     course_students: './frontend/www/js/omegaup/course/students.ts',
     course_submissions_list:
       './frontend/www/js/omegaup/course/submissions_list.ts',
+    course_tabs: './frontend/www/js/omegaup/course/tabs.ts',
     group_edit: './frontend/www/js/omegaup/group/edit.ts',
     group_list: './frontend/www/js/omegaup/group/list.ts',
     group_new: './frontend/www/js/omegaup/group/new.ts',
@@ -79,6 +78,7 @@ module.exports = {
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
     login_signin: './frontend/www/js/omegaup/login/signin.ts',
     logout: './frontend/www/js/omegaup/login/logout.ts',
+    problem_creator: './frontend/www/js/omegaup/problem/creator/creator.ts',
     problem_collection: './frontend/www/js/omegaup/problem/collection.ts',
     problem_collection_list:
       './frontend/www/js/omegaup/problem/collection_list.ts',

@@ -207,6 +207,11 @@
                 <a class="dropdown-item" href="http://blog.omegaup.com/">{{
                   T.navBlog
                 }}</a>
+                <a
+                  class="dropdown-item text-wrap"
+                  href="https://omegaup.com/img/libropre3.pdf"
+                  >{{ T.navAlgorithmsBook }}</a
+                >
               </div>
             </li>
           </ul>
@@ -327,6 +332,12 @@
                     href="/group/"
                     data-nav-user-groups
                     >{{ T.navMyGroups }}</a
+                  >
+                  <a
+                    class="dropdown-item"
+                    href="/teamsgroup/"
+                    data-nav-user-teams-groups
+                    >{{ T.navMyTeamsGroups }}</a
                   >
                   <a class="dropdown-item" href="/nomination/mine/">{{
                     T.navMyQualityNomination

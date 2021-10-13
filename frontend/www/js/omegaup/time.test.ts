@@ -62,6 +62,15 @@ describe('time', () => {
 
   describe('formatDelta', () => {
     it('Should handle valid dates with countdown time format', () => {
+      expect(time.formatDelta(-2500000000)).toEqual('−28:22:26:40');
+      expect(time.formatDelta(-1000000000)).toEqual('−11:13:46:40');
+      expect(time.formatDelta(-100000000)).toEqual('−1:03:46:40');
+      expect(time.formatDelta(-10000000)).toEqual('−02:46:40');
+      expect(time.formatDelta(-1000000)).toEqual('−00:16:40');
+      expect(time.formatDelta(-100000)).toEqual('−00:01:40');
+      expect(time.formatDelta(-10000)).toEqual('−00:00:10');
+      expect(time.formatDelta(-1000)).toEqual('−00:00:01');
+      expect(time.formatDelta(0)).toEqual('00:00:00');
       expect(time.formatDelta(1000)).toEqual('00:00:01');
       expect(time.formatDelta(10000)).toEqual('00:00:10');
       expect(time.formatDelta(100000)).toEqual('00:01:40');
@@ -142,6 +151,22 @@ describe('time', () => {
         ],
         status: 'ok',
       });
+    });
+  });
+
+  describe('parseDateTimeLocal', () => {
+    const expectedValue = '2021-02-01T08:55';
+
+    it('Should parse dates correctly when given a month that does not have the current day', () => {
+      expect(
+        time.formatDateTimeLocal(time.parseDateTimeLocal(expectedValue)),
+      ).toEqual(expectedValue);
+    });
+
+    it('Should parse dates accordingly when given parameters outside of the expected range', () => {
+      expect(
+        time.formatDateTimeLocal(time.parseDateTimeLocal('2021-02-29T08:55')),
+      ).toEqual('2021-03-01T08:55');
     });
   });
 });

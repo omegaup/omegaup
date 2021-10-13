@@ -167,6 +167,11 @@
               <li>
                 <a href="http://blog.omegaup.com/">{{ T.navBlog }}</a>
               </li>
+              <a
+                class="dropdown-item text-wrap"
+                href="https://omegaup.com/img/libropre3.pdf"
+                >{{ T.navAlgorithmsBook }}</a
+              >
             </ul>
           </li>
         </ul>
@@ -267,6 +272,11 @@
                 </li>
                 <li>
                   <a href="/group/" data-nav-user-groups>{{ T.navMyGroups }}</a>
+                </li>
+                <li>
+                  <a href="/teamsgroup/" data-nav-user-teams-groups>{{
+                    T.navMyTeamsGroups
+                  }}</a>
                 </li>
                 <li>
                   <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>

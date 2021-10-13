@@ -5,6 +5,7 @@ import T from '../lang';
 import contest_Edit from '../components/contest/Edit.vue';
 import * as ui from '../ui';
 import * as api from '../api';
+import { toCsv, TableCell } from '../csv';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestEditPayload();
@@ -65,12 +66,29 @@ OmegaUp.on('ready', () => {
           })
           .catch(ui.apiError);
       },
-      refreshProblems: (): void => {
+      refreshProblems: (problemAdded: boolean): void => {
         api.Contest.problems({
           contest_alias: payload.details.alias,
         })
           .then((response) => {
             contestEdit.problems = response.problems;
+            if (
+              problemAdded &&
+              !contestEdit.details.languages.includes('cat') &&
+              contestEdit.problems.some((problem) =>
+                problem.languages.split(',').includes('cat'),
+              )
+            ) {
+              api.Contest.update({
+                contest_alias: contestEdit.details.alias,
+                languages: contestEdit.details.languages.concat(['cat']),
+              })
+                .then(() => {
+                  contestEdit.details.languages.push('cat');
+                  ui.warning(T.contestEditCatLanguageAddedWarning);
+                })
+                .catch(ui.apiError);
+            }
           })
           .catch(ui.apiError);
       },
@@ -109,6 +127,16 @@ OmegaUp.on('ready', () => {
             contestEdit.groupAdmins = response.group_admins;
           })
           .catch(ui.apiError);
+      },
+      downloadCsvFile: (fileName: string, table: TableCell[][]): void => {
+        const blob = new Blob([toCsv(table)], {
+          type: 'text/csv;charset=utf-8;',
+        });
+        const hiddenElement = document.createElement('a');
+        hiddenElement.href = window.URL.createObjectURL(blob);
+        hiddenElement.target = '_blank';
+        hiddenElement.download = fileName;
+        hiddenElement.click();
       },
     },
     render: function (createElement) {
@@ -249,7 +277,7 @@ OmegaUp.on('ready', () => {
               commit: problem.commit,
             })
               .then(() => {
-                this.refreshProblems();
+                this.refreshProblems(true);
                 if (isUpdate) {
                   ui.success(T.problemSuccessfullyUpdated);
                   return;
@@ -303,7 +331,7 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.problemSuccessfullyRemoved);
-                this.refreshProblems();
+                this.refreshProblems(false);
               })
               .catch(ui.apiError);
           },
@@ -516,6 +544,47 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 this.teamsGroup = { alias, name };
                 ui.success(T.contestEditTeamsGroupReplaced);
+              })
+              .catch(ui.apiError);
+          },
+          'language-remove-blocked': (language: string) => {
+            ui.warning(
+              ui.formatString(T.contestNewFormLanguageRemoveBlockedWarning, {
+                language: language,
+              }),
+            );
+          },
+          'download-csv-scoreboard': (contestAlias: string) => {
+            api.Contest.scoreboard({ contest_alias: contestAlias })
+              .then((result) => {
+                const table: TableCell[][] = [];
+                const header = [
+                  T.profileContestsTablePlace,
+                  T.profileUsername,
+                  T.profileName,
+                ];
+                for (let index = 0; index < result.problems.length; index++) {
+                  header.push(ui.columnName(index));
+                }
+                header.push('Total');
+                table.push(header);
+                for (const user of result.ranking) {
+                  const row: TableCell[] = [
+                    user.place || '',
+                    user.username,
+                    user.name || '',
+                  ];
+                  for (const problem of user.problems) {
+                    if (problem.runs > 0) {
+                      row.push(problem.points.toFixed(2));
+                    } else {
+                      row.push('');
+                    }
+                  }
+                  row.push(user.total.points.toFixed(2));
+                  table.push(row);
+                }
+                this.downloadCsvFile(`${contestAlias}_scoreboard.csv`, table);
               })
               .catch(ui.apiError);
           },

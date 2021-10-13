@@ -19,9 +19,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
         'course_id' => true,
         'name' => true,
         'description' => true,
+        'objective' => true,
         'alias' => true,
         'group_id' => true,
         'acl_id' => true,
+        'level' => true,
         'start_time' => true,
         'finish_time' => true,
         'admission_mode' => true,
@@ -59,6 +61,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
                 $data['description']
             ) ? strval($data['description']) : '';
         }
+        if (isset($data['objective'])) {
+            $this->objective = is_scalar(
+                $data['objective']
+            ) ? strval($data['objective']) : '';
+        }
         if (isset($data['alias'])) {
             $this->alias = is_scalar(
                 $data['alias']
@@ -73,6 +80,11 @@ class Courses extends \OmegaUp\DAO\VO\VO {
             $this->acl_id = intval(
                 $data['acl_id']
             );
+        }
+        if (isset($data['level'])) {
+            $this->level = is_scalar(
+                $data['level']
+            ) ? strval($data['level']) : '';
         }
         if (isset($data['start_time'])) {
             /**
@@ -170,6 +182,13 @@ class Courses extends \OmegaUp\DAO\VO\VO {
      *
      * @var string|null
      */
+    public $objective = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
     public $alias = null;
 
     /**
@@ -185,6 +204,13 @@ class Courses extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $acl_id = null;
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $level = null;
 
     /**
      * Hora de inicio de este curso

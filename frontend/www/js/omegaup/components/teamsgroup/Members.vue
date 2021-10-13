@@ -36,7 +36,8 @@
       <thead>
         <tr>
           <th>{{ T.wordsUser }}</th>
-          <th>{{ T.contestEditRegisteredAdminDelete }}</th>
+          <th>{{ T.loginPassword }}</th>
+          <th>{{ T.wordsActions }}</th>
         </tr>
       </thead>
       <tbody>
@@ -48,7 +49,43 @@
               :username="identity.username"
             ></omegaup-user-username>
           </td>
+          <td v-if="!identity.isMainUserIdentity">
+            <template
+              v-if="
+                changePasswordInputEnabled && username === identity.username
+              "
+            >
+              <div class="input-group">
+                <input
+                  v-model="password"
+                  type="password"
+                  class="form-control"
+                  :placeholder="T.teamsGroupMemberChangePassword"
+                />
+                <button
+                  type="button"
+                  class="btn btn-link"
+                  :data-save-new-password-identity="identity.username"
+                  :title="T.groupEditMembersChangePassword"
+                  @click="onChangePasswordMember"
+                >
+                  <font-awesome-icon :icon="['fas', 'save']" />
+                </button>
+              </div>
+            </template>
+            <input v-else type="password" value="password" disabled="true" />
+          </td>
+          <td v-else></td>
           <td>
+            <button
+              v-if="!identity.isMainUserIdentity"
+              class="btn btn-link"
+              :data-change-password-identity="identity.username"
+              :title="T.groupEditMembersChangePassword"
+              @click="onChangePass(identity.username)"
+            >
+              <font-awesome-icon :icon="['fas', 'lock']" />
+            </button>
             <button
               class="btn btn-link"
               :data-table-remove-member="identity.username"
@@ -79,8 +116,8 @@ import common_MultiTypeahead from '../common/MultiTypeahead.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faEdit, faLock, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-library.add(faEdit, faLock, faTrashAlt);
+import { faLock, faTrashAlt, faSave } from '@fortawesome/free-solid-svg-icons';
+library.add(faLock, faTrashAlt, faSave);
 
 @Component({
   components: {
@@ -97,6 +134,9 @@ export default class Members extends Vue {
   T = T;
   ui = ui;
   typeaheadContestants: null | types.ListItem[] = null;
+  username: null | string = null;
+  changePasswordInputEnabled = false;
+  password: null | string = null;
 
   onSubmit(): void {
     if (!this.typeaheadContestants) return;
@@ -105,6 +145,21 @@ export default class Members extends Vue {
       teamUsername: this.teamUsername,
     });
     this.typeaheadContestants = null;
+  }
+
+  onChangePass(username: string): void {
+    this.changePasswordInputEnabled = true;
+    this.username = username;
+  }
+
+  onChangePasswordMember(): void {
+    this.$emit('change-password-identity', {
+      username: this.username,
+      newPassword: this.password,
+    });
+    this.changePasswordInputEnabled = false;
+    this.username = null;
+    this.password = null;
   }
 }
 </script>

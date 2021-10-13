@@ -123,8 +123,10 @@ OmegaUp.on('ready', () => {
                 const params: messages.CourseUpdateRequest = {
                   name: source.name,
                   description: source.description,
+                  objective: source.objective,
                   start_time: source.startTime,
                   alias: source.alias,
+                  level: source.level,
                   languages: source.selectedLanguages,
                   show_scoreboard: source.showScoreboard,
                   needs_basic_information: source.needsBasicInformation,
@@ -290,13 +292,18 @@ OmegaUp.on('ready', () => {
               assignment_alias: assignment.alias,
               problem_alias: problem.alias,
               points: problem.points,
+              is_extra_problem: problem.is_extra_problem,
             };
             if (problem.commit) {
               problemParams.commit = problem.commit;
             }
             api.Course.addProblem(problemParams)
               .then(() => {
-                ui.success(T.courseAssignmentProblemAdded);
+                if (assignment.assignment_type == 'lesson') {
+                  ui.success(T.courseAssignmentLectureAdded);
+                } else {
+                  ui.success(T.courseAssignmentProblemAdded);
+                }
                 this.refreshProblemList(assignment);
               })
               .catch(ui.apiError);
@@ -323,7 +330,11 @@ OmegaUp.on('ready', () => {
               assignment_alias: assignment.alias,
             })
               .then(() => {
-                ui.success(T.courseAssignmentProblemRemoved);
+                if (assignment.assignment_type == 'lesson') {
+                  ui.success(T.courseAssignmentLectureRemoved);
+                } else {
+                  ui.success(T.courseAssignmentProblemRemoved);
+                }
                 this.refreshProblemList(assignment);
               })
               .catch(ui.apiError);

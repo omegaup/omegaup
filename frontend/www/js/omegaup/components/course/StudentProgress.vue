@@ -1,50 +1,41 @@
 <template>
   <tr>
     <th scope="row" class="text-center align-middle">
-      <a :href="studentProgressUrl">
+      <a :href="`/course/${courseAlias}/student/${studentProgress.username}/`">
         <omegaup-user-username
-          :classname="student.classname"
-          :username="student.username"
-          :name="student.name"
-          :country="student.country_id"
+          :classname="studentProgress.classname"
+          :username="studentProgress.username"
+          :name="studentProgress.name"
+          :country="studentProgress.country_id"
         ></omegaup-user-username>
       </a>
     </th>
     <td data-global-score class="text-center font-weight-bold align-middle">
-      <span class="d-block">{{ globalScore }}%</span>
+      <span class="d-block"
+        >{{ studentProgress.courseProgress.toFixed(0) }}%</span
+      >
       <span class="d-block">{{
-        ui.formatString(T.studentProgressDescriptionTotalPoints, {
-          points: globalPoints,
+        ui.formatString(T.studentProgressPoints, {
+          points: studentProgress.courseScore,
         })
       }}</span>
     </td>
     <td
-      v-for="assignment in assignments"
+      v-for="assignment in assignmentsProblems"
       :key="assignment.alias"
       class="flex-column text-center align-middle text-nowrap justify-content-center align-items-center"
     >
       <span class="d-block">{{
-        getProgressByAssignment(assignment.alias)
+        assignment.points === 0
+          ? T.courseWithoutProblems
+          : getProgressByAssignment(assignment.alias)
       }}</span>
-      <span class="d-block">{{
-        getPointsByAsssignment(assignment.alias)
-      }}</span>
+      <span class="d-block">{{ getPointsByAssignment(assignment.alias) }}</span>
       <div class="d-flex justify-content-center mt-1">
-        <div
-          v-if="
-            Object.prototype.hasOwnProperty.call(
-              student.progress,
-              assignment.alias,
-            )
-          "
-          class="d-flex"
-          :class="{ invisible: points(assignment.alias) === 0 }"
-        >
+        <div class="d-flex" :class="{ invisible: assignment.points === 0 }">
           <div
-            v-for="(problem, index) in Object.keys(
-              student.points[assignment.alias],
-            )"
-            :key="index"
+            v-for="problem in assignment.problems"
+            :key="problem.alias"
             v-tooltip="getProgressTooltipDescription(assignment.alias, problem)"
             :class="getProblemColor(assignment.alias, problem)"
             data-toggle="tooltip"
@@ -63,10 +54,7 @@ import * as ui from '../../ui';
 import T from '../../lang';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
-import * as markdown from '../../markdown';
 import user_Username from '../user/Username.vue';
-
-const markdownConverter = new markdown.Converter();
 
 @Component({
   directives: {
@@ -77,155 +65,106 @@ const markdownConverter = new markdown.Converter();
   },
 })
 export default class StudentProgress extends Vue {
-  @Prop() course!: types.CourseDetails;
-  @Prop() student!: types.StudentProgress;
-  @Prop() assignments!: types.CourseAssignment[];
-  @Prop() problemTitles!: { [key: string]: string };
-  @Prop() pagerItems!: types.PageItem[];
+  @Prop() courseAlias!: string;
+  @Prop() studentProgress!: types.StudentProgressInCourse;
+  @Prop() assignmentsProblems!: types.AssignmentsProblemsPoints[];
 
   T = T;
   ui = ui;
 
-  progress(assignmentAlias: string): number {
-    if (
-      !Object.prototype.hasOwnProperty.call(
-        this.student.progress,
-        assignmentAlias,
-      )
-    ) {
-      return 0;
-    }
-    return (
-      (Object.values(this.student.progress[assignmentAlias]).reduce(
-        (accumulator: number, currentValue: number) =>
-          accumulator + currentValue,
-        0,
-      ) /
-        (Object.values(this.student.progress[assignmentAlias]).length * 100)) *
-      100
-    );
-  }
-
-  score(assignmentAlias: string): number {
-    if (
-      !Object.prototype.hasOwnProperty.call(this.student.score, assignmentAlias)
-    ) {
-      return 0;
-    }
-    return Math.round(
-      Object.values(this.student.score[assignmentAlias]).reduce(
-        (accumulator: number, currentValue: number) =>
-          accumulator + currentValue,
-        0,
-      ),
-    );
-  }
-
-  points(assignmentAlias: string): number {
-    if (
-      !Object.prototype.hasOwnProperty.call(
-        this.student.points,
-        assignmentAlias,
-      )
-    ) {
-      return 0;
-    }
-    return Object.values(this.student.points[assignmentAlias]).reduce(
-      (accumulator: number, currentValue: number) => accumulator + currentValue,
-      0,
-    );
-  }
-
-  get totalPoints(): number {
-    return this.assignments
-      .map((assignment) => assignment.max_points ?? 0)
-      .reduce((acc, curr) => acc + curr, 0);
-  }
-
-  get globalPoints(): string {
-    if (!this.totalPoints) {
-      return '0';
-    }
-
-    return this.assignments
-      .map((assignment) => this.score(assignment.alias))
-      .reduce((acc, curr) => acc + curr, 0)
-      .toFixed(0);
-  }
-
-  get globalScore(): string {
-    if (!this.totalPoints) {
-      return '0.00';
-    }
-
-    return this.assignments
-      .map(
-        (assignment) => (this.score(assignment.alias) * 100) / this.totalPoints,
-      )
-      .reduce((acc, curr) => acc + curr, 0)
-      .toFixed(0);
-  }
-
   getProgressByAssignment(assignmentAlias: string): string {
-    const score = this.score(assignmentAlias);
-    const points = this.points(assignmentAlias);
-    if (points === 0) {
-      return T.courseWithoutProblems;
-    }
-    return (points != 0 ? (score / points) * 100 : 0).toFixed(0);
+    const score =
+      assignmentAlias in this.studentProgress.assignments
+        ? this.studentProgress.assignments[assignmentAlias].progress
+        : 0;
+    return `${score.toFixed(0)}%`;
   }
 
-  getPointsByAsssignment(assignmentAlias: string): string {
-    const points = this.points(assignmentAlias);
-    if (points === 0) {
-      return '';
-    }
-    const score = this.score(assignmentAlias);
-    return ui.formatString(T.studentProgressDescriptionTotalPoints, {
+  getPointsByAssignment(assignmentAlias: string): string {
+    const score =
+      assignmentAlias in this.studentProgress.assignments
+        ? this.studentProgress.assignments[assignmentAlias].score
+        : 0;
+    return ui.formatString(T.studentProgressPoints, {
       points: score.toFixed(0),
     });
   }
 
-  getProblemColor(assignmentAlias: string, problemAlias: string): string {
-    const points = this.getPoints(assignmentAlias, problemAlias);
-    if (points === 0) {
+  getProgressByAssignmentProblem(
+    assignmentAlias: string,
+    problemAlias: string,
+  ): string {
+    const score =
+      assignmentAlias in this.studentProgress.assignments &&
+      problemAlias in this.studentProgress.assignments[assignmentAlias].problems
+        ? this.studentProgress.assignments[assignmentAlias].problems[
+            problemAlias
+          ].progress
+        : 0;
+    return score.toFixed(0);
+  }
+
+  getPointsByAssignmentProblem(
+    assignmentAlias: string,
+    problemAlias: string,
+  ): string {
+    const score =
+      assignmentAlias in this.studentProgress.assignments &&
+      problemAlias in this.studentProgress.assignments[assignmentAlias].problems
+        ? this.studentProgress.assignments[assignmentAlias].problems[
+            problemAlias
+          ].progress
+        : 0;
+    return score.toFixed(0);
+  }
+
+  getProblemColor(
+    assignmentAlias: string,
+    problem: {
+      alias: string;
+      isExtraProblem: boolean;
+      order: number;
+      points: number;
+      title: string;
+    },
+  ): string {
+    if (problem.points === 0) {
       return 'invisible';
     }
-    const problemScore = this.getProgress(assignmentAlias, problemAlias);
-    if (problemScore > 70) return 'box bg-green';
-    if (problemScore >= 50) return 'box bg-yellow';
-    if (problemScore > 0) return 'box bg-red';
+
+    const problemProgress =
+      assignmentAlias in this.studentProgress.assignments &&
+      problem.alias in
+        this.studentProgress.assignments[assignmentAlias].problems
+        ? this.studentProgress.assignments[assignmentAlias].problems[
+            problem.alias
+          ].progress
+        : 0;
+    if (problemProgress > 70) return 'box bg-green';
+    if (problemProgress >= 50) return 'box bg-yellow';
+    if (problemProgress > 0) return 'box bg-red';
     return 'box bg-black';
-  }
-
-  getProgress(assignmentAlias: string, problemAlias: string): number {
-    return Math.round(this.student.progress[assignmentAlias][problemAlias]);
-  }
-
-  getPoints(assignmentAlias: string, problemAlias: string): number {
-    return this.student.points[assignmentAlias][problemAlias];
-  }
-
-  getScore(assignmentAlias: string, problemAlias: string): number {
-    return Math.round(this.student.score[assignmentAlias][problemAlias]);
   }
 
   getProgressTooltipDescription(
     assignmentAlias: string,
-    problemAlias: string,
+    problem: {
+      alias: string;
+      isExtraProblem: boolean;
+      order: number;
+      points: number;
+      title: string;
+    },
   ): string {
-    return markdownConverter.makeHtml(
-      ui.formatString(T.studentProgressTooltipDescription, {
-        problem: this.problemTitles[problemAlias],
-        score: this.getScore(assignmentAlias, problemAlias),
-        points: this.getPoints(assignmentAlias, problemAlias),
-        progress: this.getProgress(assignmentAlias, problemAlias),
-      }),
-    );
-  }
-
-  get studentProgressUrl(): string {
-    return `/course/${this.course.alias}/student/${this.student.username}/`;
+    return ui.formatString(T.studentProgressTooltipDescription, {
+      problem: problem.title,
+      score: this.getPointsByAssignmentProblem(assignmentAlias, problem.alias),
+      progress: this.getProgressByAssignmentProblem(
+        assignmentAlias,
+        problem.alias,
+      ),
+      points: problem.points,
+    });
   }
 }
 </script>

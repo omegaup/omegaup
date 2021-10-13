@@ -2,45 +2,51 @@
   <div class="card" data-course-problemlist>
     <div class="card-header">
       <h5>
-        {{ T.courseAddProblemsAdd }}
+        {{ addCardHeaderTitleLabel }}
       </h5>
-      <span>{{ T.courseAddProblemsEditAssignmentDesc }}</span>
+      <span>{{ addCardHeaderDescLabel }}</span>
     </div>
     <div class="card-body">
       <div v-if="problems.length == 0" class="empty-table-message">
-        {{ T.courseAssignmentProblemsEmpty }}
+        {{ emptyTableLabel }}
       </div>
       <div v-else>
         <table class="table table-striped">
           <thead>
             <tr>
-              <th>{{ T.contestAddproblemProblemOrder }}</th>
-              <th>{{ T.contestAddproblemProblemName }}</th>
-              <th>{{ T.contestAddproblemProblemPoints }}</th>
-              <th>{{ T.contestAddproblemProblemRemove }}</th>
+              <th class="text-center">{{ T.contestAddproblemProblemOrder }}</th>
+              <th class="text-center">{{ problemTableHeaderLabel }}</th>
+              <th class="text-center">{{ pointsTableHeaderLabel }}</th>
+              <th class="text-center">{{ T.courseExtraPointsProblem }}</th>
+              <th class="text-center">
+                {{ T.contestAddproblemProblemRemove }}
+              </th>
             </tr>
           </thead>
           <tbody v-sortable="{ onUpdate: sort }">
             <tr v-for="problem in problems" :key="problem.letter">
-              <td>
+              <td class="text-center">
                 <button
                   class="btn btn-link"
                   type="button"
-                  :title="T.courseAssignmentProblemReorder"
+                  :title="reorderButtonLabel"
                 >
                   <font-awesome-icon icon="arrows-alt" />
                 </button>
               </td>
-              <td class="align-middle">
+              <td class="align-middle text-center">
                 <a :href="`/arena/problem/${problem.alias}/`">{{
                   problem.alias
                 }}</a>
               </td>
               <td class="align-middle">{{ problem.points }}</td>
+              <td class="align-middle text-center">
+                {{ problem.is_extra_problem ? T.wordsYes : T.wordsNo }}
+              </td>
               <td class="button-column">
                 <button
                   class="btn btn-link"
-                  :title="T.courseAssignmentProblemRemove"
+                  :title="removeButtonLabel"
                   @click.prevent="onRemoveProblem(assignment, problem)"
                 >
                   <font-awesome-icon icon="trash" />
@@ -67,50 +73,71 @@
           <div class="col-md-12">
             <div class="row">
               <div class="form-group col-md-5">
-                <label class="w-100"
-                  >{{ T.wordsProblem }}
-                  <omegaup-autocomplete
-                    v-model="problemAlias"
-                    class="form-control"
-                    :init="(el) => typeahead.problemTypeahead(el)"
-                  ></omegaup-autocomplete
-                ></label>
-                <p class="help-block">
-                  {{ T.courseAddProblemsAssignmentsDesc }}
-                </p>
+                <span class="faux-label">{{ problemCardFooterLabel }}</span>
+                <omegaup-autocomplete
+                  v-model="problemAlias"
+                  class="form-control"
+                  :init="(el) => typeahead.problemTypeahead(el)"
+                ></omegaup-autocomplete>
+                <small class="form-text text-muted">
+                  {{ addCardFooterDescLabel }}
+                </small>
               </div>
               <div class="form-group col-md-2">
-                <label class="w-100"
-                  >{{ T.wordsPoints }}
-                  <input v-model="points" type="number" class="form-control" />
-                </label>
+                <span class="faux-label">{{ T.wordsPoints }}</span>
+                <input v-model="points" type="number" class="form-control" />
               </div>
               <div class="form-group col-md-5">
-                <label for="use-latest-version" class="w-100"
-                  >{{ T.contestAddproblemChooseVersion }}
-                  <div class="form-control form-group">
-                    <div class="form-check form-check-inline">
-                      <label class="form-check-label">
-                        <input
-                          v-model="useLatestVersion"
-                          class="form-check-input"
-                          type="radio"
-                          :value="true"
-                        />{{ T.contestAddproblemLatestVersion }}
-                      </label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <label class="form-check-label">
-                        <input
-                          v-model="useLatestVersion"
-                          class="form-check-input"
-                          type="radio"
-                          :value="false"
-                        />{{ T.contestAddproblemOtherVersion }}
-                      </label>
-                    </div>
+                <span class="faux-label"
+                  >{{ T.courseExtraPointsProblemLabel }}
+                  <font-awesome-icon
+                    :title="T.courseExtraPointsProblemDesc"
+                    icon="info-circle"
+                  />
+                </span>
+                <div class="form-control">
+                  <label class="radio-inline"
+                    ><input
+                      v-model="isExtraProblem"
+                      type="radio"
+                      :value="true"
+                    />{{ T.wordsYes }}</label
+                  >
+                  <label class="radio-inline ml-3"
+                    ><input
+                      v-model="isExtraProblem"
+                      type="radio"
+                      :value="false"
+                    />{{ T.wordsNo }}</label
+                  >
+                </div>
+              </div>
+              <div class="form-group col-md-5">
+                <span class="faux-label">{{
+                  T.contestAddproblemChooseVersion
+                }}</span>
+                <div class="form-control form-group">
+                  <div class="form-check form-check-inline">
+                    <label class="form-check-label">
+                      <input
+                        v-model="useLatestVersion"
+                        class="form-check-input"
+                        type="radio"
+                        :value="true"
+                      />{{ T.contestAddproblemLatestVersion }}
+                    </label>
                   </div>
-                </label>
+                  <div class="form-check form-check-inline">
+                    <label class="form-check-label">
+                      <input
+                        v-model="useLatestVersion"
+                        class="form-check-input"
+                        type="radio"
+                        :value="false"
+                      />{{ T.contestAddproblemOtherVersion }}
+                    </label>
+                  </div>
+                </div>
               </div>
               <omegaup-problem-versions
                 v-if="!useLatestVersion"
@@ -132,6 +159,7 @@
                     alias: problemAlias,
                     points: points,
                     commit: selectedRevision.commit,
+                    is_extra_problem: isExtraProblem,
                   })
                 "
               >
@@ -199,6 +227,7 @@ export default class CourseProblemList extends Vue {
   showTopicsAndDifficulty = false;
   problemsOrderChanged = false;
   useLatestVersion = true;
+  isExtraProblem = false;
   versionLog: types.ProblemVersion[] = [];
   publishedRevision: null | types.ProblemVersion = null;
   selectedRevision: null | types.ProblemVersion = null;
@@ -209,6 +238,60 @@ export default class CourseProblemList extends Vue {
     return t;
   }
 
+  get addCardHeaderTitleLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAddLecturesAdd
+      : T.courseAddProblemsAdd;
+  }
+
+  get addCardHeaderDescLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAddLecturesEditAssignmentDesc
+      : T.courseAddProblemsEditAssignmentDesc;
+  }
+
+  get emptyTableLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAssignmentLecturesEmpty
+      : T.courseAssignmentProblemsEmpty;
+  }
+
+  get problemTableHeaderLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.contestAddlectureLectureName
+      : T.contestAddproblemProblemName;
+  }
+
+  get pointsTableHeaderLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.contestAddlectureLecturePoints
+      : T.contestAddproblemProblemPoints;
+  }
+
+  get reorderButtonLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAssignmentLectureReorder
+      : T.courseAssignmentProblemReorder;
+  }
+
+  get removeButtonLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAssignmentLectureRemove
+      : T.courseAssignmentProblemRemove;
+  }
+
+  get problemCardFooterLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.wordsLecture
+      : T.wordsProblem;
+  }
+
+  get addCardFooterDescLabel(): string {
+    return this.assignment.assignment_type === 'lesson'
+      ? T.courseAddLecturesAssignmentsDesc
+      : T.courseAddProblemsAssignmentsDesc;
+  }
+
   get addProblemButtonDisabled(): boolean {
     if (this.useLatestVersion) return this.problemAlias === '';
     return !this.selectedRevision;
@@ -217,8 +300,14 @@ export default class CourseProblemList extends Vue {
   get addProblemButtonLabel(): string {
     for (const problem of this.problems) {
       if (this.problemAlias === problem.alias) {
+        if (this.assignment.assignment_type === 'lesson') {
+          return T.wordsUpdateLecture;
+        }
         return T.wordsUpdateProblem;
       }
+    }
+    if (this.assignment.assignment_type === 'lesson') {
+      return T.wordsAddLecture;
     }
     return T.wordsAddProblem;
   }

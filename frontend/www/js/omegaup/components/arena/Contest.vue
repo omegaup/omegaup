@@ -1,7 +1,7 @@
 <template>
   <omegaup-arena
     :active-tab="activeTab"
-    :contest-title="contest.title"
+    :contest-title="ui.contestTitle(contest)"
     :is-admin="isAdmin"
     :clarifications="currentClarifications"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
@@ -19,7 +19,7 @@
         v-else
         class="clock"
         :target-time="deadline"
-        @finish="now = Date.now()"
+        @finish="now = new Date()"
       ></omegaup-countdown>
     </template>
     <template #arena-problems>
@@ -55,13 +55,14 @@
           <div v-else class="problem main">
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
-              :next-submission-timestamp="nextSubmissionTimestamp"
+              :next-submission-timestamp="currentNextSubmissionTimestamp"
+              :languages="contest.languages.split(',')"
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="runs"
               :popup-displayed="popupDisplayed"
               :guid="guid"
-              :should-show-run-details="shouldShowRunDetails"
+              :run-details-data="currentRunDetailsData"
               :contest-alias="contest.alias"
               :is-contest-finished="isContestFinished"
               @update:activeTab="
@@ -72,7 +73,7 @@
                   })
               "
               @submit-run="onRunSubmitted"
-              @show-run="(source) => $emit('show-run', source)"
+              @show-run="onRunDetails"
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -148,6 +149,7 @@ import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { omegaup } from '../../omegaup';
 import { ContestClarificationType } from '../../arena/clarifications';
 import { SocketStatus } from '../../arena/events_socket';
+import { SubmissionRequest } from '../../arena/submissions';
 
 @Component({
   components: {
@@ -191,14 +193,16 @@ export default class ArenaContest extends Vue {
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: true }) socketConnected!: boolean;
   @Prop({ default: () => [] }) runs!: types.Run[];
+  @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
+  @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
 
   T = T;
   ui = ui;
   ContestClarificationType = ContestClarificationType;
   currentClarifications = this.clarifications;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  shouldShowRunDetails = false;
-  nextSubmissionTimestamp: Date | null = null;
+  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+  currentRunDetailsData = this.runDetailsData;
   now = new Date();
 
   get socketClass(): string {
@@ -250,6 +254,15 @@ export default class ArenaContest extends Vue {
     });
   }
 
+  onRunDetails(request: SubmissionRequest): void {
+    this.$emit('show-run', {
+      ...request,
+      hash: `#problems/${
+        this.activeProblemAlias ?? request.problemAlias
+      }/show-run:${request.guid}`,
+    });
+  }
+
   @Watch('problem')
   onActiveProblemChanged(newValue: types.NavbarProblemsetProblem | null): void {
     if (!newValue) {
@@ -264,7 +277,8 @@ export default class ArenaContest extends Vue {
     if (!newValue) {
       return;
     }
-    this.nextSubmissionTimestamp = newValue.nextSubmissionTimestamp ?? null;
+    this.currentNextSubmissionTimestamp =
+      newValue.nextSubmissionTimestamp ?? null;
   }
 
   @Watch('clarifications')
@@ -272,13 +286,9 @@ export default class ArenaContest extends Vue {
     this.currentClarifications = newValue;
   }
 
-  @Watch('popupDisplayed')
-  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
-    if (newValue === PopupDisplayed.RunDetails) {
-      this.$nextTick(() => {
-        this.shouldShowRunDetails = true;
-      });
-    }
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 }
 </script>

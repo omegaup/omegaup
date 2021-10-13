@@ -34,6 +34,8 @@ describe('Edit.vue', () => {
               },
             ],
             clarifications: [],
+            objective: '',
+            level: '',
             needs_basic_information: false,
             description: '# Test',
             finish_time: undefined,

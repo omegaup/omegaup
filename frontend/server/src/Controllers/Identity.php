@@ -314,7 +314,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
         $encodedTeamIdentities = $r->ensureString('team_identities');
 
-        /** @var list<array{country_id: string, gender: string, identityUsernames: list<string>|null, name: string, password: string, school_name: string, state_id: string, username: string, usernames: string}>|null $teamIdentities */
+        /** @var list<array{country_id: string, gender: string, identityUsernames: list<array{password?: string, username: string}>|null, name: string, password: string, school_name: string, state_id: string, username: string, usernames: string}>|null $teamIdentities */
         $teamIdentities = json_decode($encodedTeamIdentities, true);
         if (!is_array($teamIdentities) || empty($teamIdentities)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -340,25 +340,32 @@ class Identity extends \OmegaUp\Controllers\Controller {
             }
             // When usernames are provided we need to avoid duplicated users in
             // different teams.
-            $identitiesUsernames = explode(';', $teamIdentity['usernames']);
+            /** @var list<array{password?: string, username: string}> */
+            $identities = json_decode($teamIdentity['usernames'], true);
             if (
                 count(
-                    $identitiesUsernames
+                    $identities
                 ) > $teamGroup->number_of_contestants
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'teamMemberExceededNumberOfContestants'
                 );
             }
-            foreach ($identitiesUsernames as $identityMemberUsername) {
-                if (isset($seenMemberUsernames[$identityMemberUsername])) {
+            foreach ($identities as $identityMember) {
+                if (
+                    isset(
+                        $seenMemberUsernames[$identityMember['username']]
+                    ) && !empty(
+                        $identityMember['username']
+                    )
+                ) {
                     throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                         'teamMemberUsernameInUse'
                     );
                 }
-                $seenMemberUsernames[$identityMemberUsername] = true;
+                $seenMemberUsernames[$identityMember['username']] = true;
             }
-            $teamIdentities[$username]['identityUsernames'] = $identitiesUsernames;
+            $teamIdentities[$username]['identityUsernames'] = $identities;
         }
 
         // Save objects into DB
@@ -408,19 +415,68 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     !is_null($teamIdentity['identityUsernames'])
                     && !is_null($team->team_id)
                 ) {
+                    /** @var list<array{password: string, username: string}> $selfGeneratedIdentities */
+                    $selfGeneratedIdentities = array_filter(
+                        $teamIdentity['identityUsernames'],
+                        fn ($user) => isset(
+                            $user['password']
+                        )
+                    );
+
+                    foreach ($selfGeneratedIdentities as $selfGeneratedIdentity) {
+                        $newIdentity = self::createIdentity(
+                            $selfGeneratedIdentity['username'],
+                            /*$name=*/ null,
+                            $selfGeneratedIdentity['password'],
+                            $countryId,
+                            $stateId,
+                            /*$gender=*/ 'decline',
+                            $teamGroup->alias
+                        );
+
+                        $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(
+                            $selfGeneratedIdentity['username']
+                        );
+                        if (is_null($preexistingIdentity)) {
+                            \OmegaUp\DAO\Identities::create($newIdentity);
+                        } else {
+                            $preexistingIdentity->password = $newIdentity->password;
+
+                            \OmegaUp\DAO\Identities::update(
+                                $preexistingIdentity
+                            );
+                            $newIdentity = $preexistingIdentity;
+                        }
+                    }
                     \OmegaUp\DAO\TeamUsers::createTeamUsersBulk(
                         $team->team_id,
-                        $teamIdentity['identityUsernames']
+                        array_map(
+                            /**
+                             * @param array{password?: string, username: string} $user
+                             * @return string
+                             */
+                            fn ($user) => $user['username'],
+                            $teamIdentity['identityUsernames']
+                        )
                     );
                 }
 
-                // Create IdentitySchool
-                $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
-                    'identity_id' => $newIdentity->identity_id,
-                    'school_id' => $schoolId,
-                ]);
+                $preexistingIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::getByIdentityAndSchoolId(
+                    $newIdentity,
+                    $schoolId
+                );
 
-                \OmegaUp\DAO\IdentitiesSchools::create($identitySchool);
+                if (is_null($preexistingIdentitySchool)) {
+                    // Create IdentitySchool
+                    $identitySchool = new \OmegaUp\DAO\VO\IdentitiesSchools([
+                        'identity_id' => $newIdentity->identity_id,
+                        'school_id' => $schoolId,
+                    ]);
+
+                    \OmegaUp\DAO\IdentitiesSchools::create($identitySchool);
+                } else {
+                    $identitySchool = $preexistingIdentitySchool;
+                }
 
                 // Save current_identity_school_id on Identity
                 $newIdentity->current_identity_school_id = $identitySchool->identity_school_id;
@@ -1053,7 +1109,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Get identity profile from cache
      *
-     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: null|string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: string|null, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null}
+     * @return array{birth_date?: \OmegaUp\Timestamp|null, classname: null|string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, has_competitive_objective?: bool|null, has_learning_objective?: bool|null, has_scholar_objective?: bool|null, has_teaching_objective?: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: string|null, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null}
      */
     public static function getProfile(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
@@ -1071,7 +1127,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $response = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::USER_PROFILE,
             $identity->username,
-            /** @return array{birth_date: \OmegaUp\Timestamp|null, classname: null|string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null} */
+            /** @return array{birth_date?: \OmegaUp\Timestamp|null, classname: null|string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null} */
             function () use ($identity, $user) {
                 if (!is_null($user)) {
                     return \OmegaUp\Controllers\User::getProfileImpl(
@@ -1097,15 +1153,22 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 );
         }
 
-        // Do not leak plain emails in case the request is for a profile other than
-        // the logged identity's one. Admins can see emails
+        // Do not leak plain emails, birth dates, genders and user's objectives in case the request is for a profile other than
+        // the logged identity's one. Admins can see emails, birth dates, genders and user's objectives
         if (
             !is_null($loggedIdentity)
             && (\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
                 || $identity->identity_id === $loggedIdentity->identity_id)
         ) {
+            $response['is_own_profile'] = true;
             return $response;
         }
+        unset($response['birth_date']);
+        unset($response['gender']);
+        unset($response['has_learning_objective']);
+        unset($response['has_teaching_objective']);
+        unset($response['has_scholar_objective']);
+        unset($response['has_competitive_objective']);
 
         // Mentors can see current coder of the month email.
         if (
@@ -1125,7 +1188,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the profile of the identity given
      *
-     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: null|string, country: null|string, country_id: null|string, gender: null|string, graduation_date: null|string, gravatar_92: null, hide_problem_tags: bool, is_private: true, locale: string, name: null|string, preferred_language: null, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null}
+     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: null|string, country: null|string, country_id: null|string, gender: null|string, graduation_date: null|string, gravatar_92: null, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: true, locale: string, name: null|string, preferred_language: null, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null}
      */
     private static function getProfileImpl(\OmegaUp\DAO\VO\Identities $identity) {
         $extendedProfile = \OmegaUp\DAO\Identities::getExtendedProfileDataByPk(
@@ -1150,6 +1213,10 @@ class Identity extends \OmegaUp\Controllers\Controller {
             'gender' => $extendedProfile['gender'],
             'graduation_date' => $extendedProfile['graduation_date'],
             'gravatar_92' => null,
+            'has_competitive_objective' => $extendedProfile['has_competitive_objective'],
+            'has_learning_objective' => $extendedProfile['has_learning_objective'],
+            'has_scholar_objective' => $extendedProfile['has_scholar_objective'],
+            'has_teaching_objective' => $extendedProfile['has_teaching_objective'],
             'hide_problem_tags' => $extendedProfile['hide_problem_tags'],
             'scholar_degree' => $extendedProfile['scholar_degree'],
             'verified' => $extendedProfile['verified'],
@@ -1166,6 +1233,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             'locale' => \OmegaUp\Controllers\Identity::convertToSupportedLanguage(
                 $extendedProfile['locale'] ?? ''
             ),
+            'is_own_profile' => false,
         ];
     }
 

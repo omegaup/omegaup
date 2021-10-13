@@ -24,7 +24,7 @@
       data-navbar-problem
     >
       <div class="row">
-        <div class="col-xs-5 problem-type w-50">
+        <div class="col-xs-5 problem-type w-50 pl-4">
           <span v-if="inAssignment">{{
             getProblemTypeTitle(problem.acceptsSubmissions)
           }}</span>
@@ -95,7 +95,7 @@ export default class ArenaNavbarProblems extends Vue {
   @Prop() activeProblem!: string | null;
   @Prop() courseAlias!: string | null;
   @Prop() courseName!: string | null;
-  @Prop() inAssignment!: boolean;
+  @Prop({ default: false }) inAssignment!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   @Prop({ default: null }) currentAssignment!: omegaup.Assignment | null;
 

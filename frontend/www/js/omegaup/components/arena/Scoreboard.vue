@@ -20,7 +20,7 @@
         <tr>
           <th><!-- legend --></th>
           <th><!-- position --></th>
-          <th>{{ T.wordsUser }}</th>
+          <th>{{ T.contestParticipant }}</th>
           <th v-for="(problem, index) in problems" :key="problem.alias">
             <a :href="'#problems/' + problem.alias" :title="problem.alias">{{
               ui.columnName(index)
