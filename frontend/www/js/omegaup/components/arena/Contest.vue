@@ -1,7 +1,8 @@
 <template>
   <omegaup-arena
     :active-tab="activeTab"
-    :contest-title="contest.title"
+    :contest-title="ui.contestTitle(contest)"
+    :is-admin="contestAdmin"
     :clarifications="currentClarifications"
     :should-show-runs="contestAdmin"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
@@ -19,7 +20,7 @@
         v-else
         class="clock"
         :target-time="deadline"
-        @finish="now = Date.now()"
+        @finish="now = new Date()"
       ></omegaup-countdown>
     </template>
     <template #arena-problems>
@@ -55,14 +56,14 @@
           <div v-else class="problem main">
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
-              :next-submission-timestamp="nextSubmissionTimestamp"
+              :next-submission-timestamp="currentNextSubmissionTimestamp"
               :languages="contest.languages.split(',')"
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="runs"
               :popup-displayed="popupDisplayed"
               :guid="guid"
-              :should-show-run-details="shouldShowRunDetails"
+              :run-details-data="currentRunDetailsData"
               :contest-alias="contest.alias"
               :is-contest-finished="isContestFinished"
               @update:activeTab="
@@ -73,7 +74,7 @@
                   })
               "
               @submit-run="onRunSubmitted"
-              @show-run="(source) => $emit('show-run', source)"
+              @show-run="onRunDetails"
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -98,6 +99,7 @@
         v-if="contestAdmin"
         :contest-alias="contest.alias"
         :runs="allRuns"
+        :show-all-runs="true"
         :show-contest="false"
         :show-problem="true"
         :show-details="true"
@@ -109,7 +111,7 @@
         :global-runs="false"
         :is-contest-finished="isContestFinished"
         :search-result-users="searchResultUsers"
-        @details="(run) => onRunDetails(run.guid)"
+        @details="onRunAdminDetails"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
         @update-search-result-users-contest="
@@ -192,6 +194,7 @@ import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { omegaup } from '../../omegaup';
 import { ContestClarificationType } from '../../arena/clarifications';
 import { SocketStatus } from '../../arena/events_socket';
+import { SubmissionRequest } from '../../arena/submissions';
 
 @Component({
   components: {
@@ -211,7 +214,7 @@ import { SocketStatus } from '../../arena/events_socket';
 })
 export default class ArenaContest extends Vue {
   @Prop() contest!: types.ContestPublicDetails;
-  @Prop() contestAdmin!: boolean;
+  @Prop({ default: false }) contestAdmin!: boolean;
   @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop({ default: () => [] }) users!: types.ContestUser[];
   @Prop({ default: null }) problem!: types.NavbarProblemsetProblem | null;
@@ -238,8 +241,9 @@ export default class ArenaContest extends Vue {
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop() searchResultUsers!: types.ListItem[];
-  @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop({ default: false }) shouldShowRunDetailsForAdmin!: boolean;
+  @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
+  @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
 
   T = T;
   ui = ui;
@@ -247,10 +251,9 @@ export default class ArenaContest extends Vue {
   ContestClarificationType = ContestClarificationType;
   currentClarifications = this.clarifications;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  shouldShowRunDetails = false;
-  nextSubmissionTimestamp: Date | null = null;
-  now = new Date();
+  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
   currentRunDetailsData = this.runDetailsData;
+  now = new Date();
   currentPopupDisplayed = this.popupDisplayed;
 
   get socketClass(): string {
@@ -302,12 +305,21 @@ export default class ArenaContest extends Vue {
     });
   }
 
-  onRunDetails(guid: string): void {
-    this.$emit('show-run-all', {
-      request: { guid, isAdmin: this.contestAdmin },
-      target: this,
+  onRunAdminDetails(request: SubmissionRequest): void {
+    this.$emit('show-run', {
+      ...request,
+      hash: `#runs/all/show-run:${request.guid}`,
+      isAdmin: this.contestAdmin,
     });
     this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+  }
+
+  onRunDetails(request: SubmissionRequest): void {
+    this.$emit('show-run', {
+      ...request,
+      hash: `#problems/${this.activeProblemAlias}/show-run:${request.guid}`,
+      isAdmin: this.contestAdmin,
+    });
   }
 
   onPopupDismissed(): void {
@@ -329,7 +341,8 @@ export default class ArenaContest extends Vue {
     if (!newValue) {
       return;
     }
-    this.nextSubmissionTimestamp = newValue.nextSubmissionTimestamp ?? null;
+    this.currentNextSubmissionTimestamp =
+      newValue.nextSubmissionTimestamp ?? null;
   }
 
   @Watch('clarifications')
@@ -337,26 +350,9 @@ export default class ArenaContest extends Vue {
     this.currentClarifications = newValue;
   }
 
-  @Watch('popupDisplayed')
-  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
-    if (newValue !== PopupDisplayed.RunDetails) {
-      return;
-    }
-    if (this.shouldShowRunDetailsForAdmin) {
-      this.$emit('show-run-all', {
-        request: {
-          guid: this.guid,
-          isAdmin: this.contestAdmin,
-          problemAlias: this.currentRunDetailsData?.alias,
-        },
-        target: this,
-      });
-      this.currentPopupDisplayed = newValue;
-      return;
-    }
-    this.$nextTick(() => {
-      this.shouldShowRunDetails = true;
-    });
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 }
 </script>

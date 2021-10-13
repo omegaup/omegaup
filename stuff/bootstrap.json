@@ -32,6 +32,32 @@
 				"api": "/problem/create/",
 				"params": {
 					"visibility": "public",
+					"title": "Solo lectura",
+					"problem_alias": "sololectura",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"show_diff": "examples",
+					"allow_user_add_tags": "true",
+					"languages": "",
+					"email_clarifications": 1,
+					"problem_level": "problemLevelBasicIntroductionToProgramming",
+					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/readonlylecture.zip"
+				}
+			},
+			{
+				"api": "/problem/create/",
+				"params": {
+					"visibility": "public",
 					"title": "Triangulos",
 					"problem_alias": "triangulos",
 					"validator": "token-numeric",
@@ -163,7 +189,6 @@
 			{
 				"api": "/course/create/",
 				"params": {
-					"visibility": 1,
 					"name": "Curso de prueba",
 					"alias": "curso-prueba",
 					"description": "Curso de prueba",
@@ -171,7 +196,7 @@
 					"finish_time": "$NOW$+18000",
 					"admission_mode": "private",
 					"school_id": 1,
-					"needs_basic_information": 0,
+					"needs_basic_information": "false",
 					"requests_user_information": "required",
 					"languages": "py2,py3"
 				}
@@ -235,6 +260,92 @@
 				"params": {
 					"course_alias": "curso-prueba",
 					"assignment_alias": "examen-prueba",
+					"problem_alias": "triangulos"
+				}
+			},
+			{
+				"api": "/course/create/",
+				"params": {
+					"name": "Curso público de prueba",
+					"alias": "curso-publico",
+					"description": "Curso público de prueba",
+					"start_time": "$NOW$",
+					"unlimited_duration": "true",
+					"admission_mode": "public",
+					"school_id": 1,
+					"needs_basic_information": "false",
+					"requests_user_information": "required",
+					"languages": "py2,py3"
+				}
+			},
+			{
+				"api": "/course/createAssignment/",
+				"params": {
+					"course_alias": "curso-publico",
+					"name": "Tarea ilimitada de prueba",
+					"alias": "tarea-ilimitada",
+					"description": "Tarea ilimitada de prueba",
+					"start_time": "$NOW$",
+					"unlimited_duration": "true",
+					"assignment_type": "homework",
+					"max_points": 0,
+					"order": 1,
+					"publish_time_delay": 0
+				}
+			},
+			{
+				"api": "/course/createAssignment/",
+				"params": {
+					"course_alias": "curso-publico",
+					"name": "Examen ilimitado de prueba",
+					"alias": "examen-ilimitado",
+					"description": "Examen ilimitado de prueba",
+					"start_time": "$NOW$",
+					"unlimited_duration": "true",
+					"assignment_type": "test",
+					"max_points": 0,
+					"order": 1,
+					"publish_time_delay": 0
+				}
+			},
+			{
+				"api": "/course/addProblem/",
+				"params": {
+					"course_alias": "curso-publico",
+					"assignment_alias": "tarea-ilimitada",
+					"problem_alias": "sumas"
+				}
+			},
+			{
+				"api": "/course/addProblem/",
+				"params": {
+					"course_alias": "curso-publico",
+					"assignment_alias": "tarea-ilimitada",
+					"problem_alias": "triangulos"
+				}
+			},
+			{
+				"api": "/course/addProblem/",
+				"params": {
+					"course_alias": "curso-publico",
+					"assignment_alias": "tarea-ilimitada",
+					"problem_alias": "karel-helloworld",
+					"is_extra_problem": "true"
+				}
+			},
+			{
+				"api": "/course/addProblem/",
+				"params": {
+					"course_alias": "curso-publico",
+					"assignment_alias": "examen-ilimitado",
+					"problem_alias": "sumas"
+				}
+			},
+			{
+				"api": "/course/addProblem/",
+				"params": {
+					"course_alias": "curso-publico",
+					"assignment_alias": "examen-ilimitado",
 					"problem_alias": "triangulos"
 				}
 			},
@@ -336,6 +447,20 @@
 				"params": {
 					"usernameOrEmail": "course_test_user_2",
 					"course_alias": "curso-prueba"
+				}
+			},
+			{
+				"api": "/course/addStudent/",
+				"params": {
+					"usernameOrEmail": "course_test_user_0",
+					"course_alias": "curso-publico"
+				}
+			},
+			{
+				"api": "/course/addStudent/",
+				"params": {
+					"usernameOrEmail": "course_test_user_1",
+					"course_alias": "curso-publico"
 				}
 			}
 		]
@@ -513,6 +638,28 @@
 				"params": {
 					"problem_alias": "sumas",
 					"problemset_id": 2,
+					"language": "py3",
+					"source": "print(1)"
+				}
+			}
+		]
+	},
+	{
+		"username": "course_test_user_1",
+		"password": "course_test_user_1",
+		"requests": [
+			{
+				"api": "/course/introDetails/",
+				"params": {
+					"course_alias": "curso-publico"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"problemset_id": 4,
 					"language": "py3",
 					"source": "print(1)"
 				}

@@ -185,7 +185,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-6">
             <label>{{ T.wordsFeedback }}</label>
             <select v-model="feedback" class="form-control">
               <option value="none">
@@ -202,7 +202,39 @@
               {{ T.contestNewFormImmediateFeedbackDesc }}
             </p>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-6">
+            <label>{{ T.contestNewFormForTeams }}</label>
+            <div class="checkbox">
+              <label>
+                <input
+                  v-model="currentContestForTeams"
+                  type="checkbox"
+                  :disabled="update"
+                />
+                {{ T.wordsEnable }}
+              </label>
+            </div>
+
+            <omegaup-common-typeahead
+              v-if="currentContestForTeams && !hasSubmissions"
+              :existing-options="searchResultTeamsGroups"
+              :value.sync="currentTeamsGroupAlias"
+              @update-existing-options="
+                (query) => $emit('update-search-result-teams-groups', query)
+              "
+            >
+            </omegaup-common-typeahead>
+            <input
+              v-else
+              class="form-control"
+              disabled
+              :value="currentTeamsGroupAlias"
+            />
+            <p class="help-block">{{ T.contestNewFormForTeamsDesc }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-md-6">
             <label>{{ T.contestNewFormScoreboardAtEnd }}</label>
             <select v-model="showScoreboardAfter" class="form-control">
               <option :value="true">
@@ -214,7 +246,7 @@
             </select>
             <p class="help-block">{{ T.contestNewFormScoreboardAtEndDesc }}</p>
           </div>
-          <div class="form-group col-md-4">
+          <div class="form-group col-md-6">
             <label>{{ T.contestNewFormPartialScore }}</label>
             <select v-model="partialScore" class="form-control">
               <option :value="true">
@@ -248,12 +280,14 @@
             <label>{{ T.wordsLanguages }}</label
             ><br />
             <multiselect
-              v-model="languages"
+              :value="languages"
               :options="Object.keys(allLanguages)"
               :multiple="true"
               :placeholder="T.contestNewFormLanguages"
               :close-on-select="false"
               :allow-empty="false"
+              @remove="onRemove"
+              @select="onSelect"
             >
             </multiselect>
             <p class="help-block">{{ T.contestNewFormLanguages }}</p>
@@ -345,6 +379,7 @@ export default class NewForm extends Vue {
   @Prop({ default: null }) teamsGroupAlias!: null | string;
   @Prop() searchResultTeamsGroups!: types.ListItem[];
   @Prop({ default: false }) contestForTeams!: boolean;
+  @Prop({ default: null }) problems!: types.ProblemsetProblemWithVersions[];
 
   T = T;
   alias = this.initialAlias;
@@ -484,6 +519,31 @@ export default class NewForm extends Vue {
       return;
     }
     this.$emit('create-contest', request);
+  }
+
+  get catLanguageBlocked(): boolean {
+    if (!this.problems) {
+      return false;
+    }
+    for (const problem of this.problems) {
+      if (problem.languages.split(',').includes('cat')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  onRemove(language: string) {
+    if (this.catLanguageBlocked && language == 'cat') {
+      this.$emit('language-remove-blocked', language);
+      return;
+    }
+    const index = this.languages.indexOf(language);
+    this.languages.splice(index, 1);
+  }
+
+  onSelect(language: string) {
+    this.languages.push(language);
   }
 }
 </script>

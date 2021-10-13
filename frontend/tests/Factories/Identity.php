@@ -5,9 +5,11 @@ namespace OmegaUp\Test\Factories;
 class Identity {
     public static function getCsvData(
         string $file,
-        string $group_alias,
-        string $password = '',
-        bool $forTeams = false
+        string $groupAlias,
+        ?string $password = null,
+        bool $forTeams = false,
+        int $numberOfContestants = 3,
+        bool $autogenerateIdentities = false
     ): string {
         /** @var list<array{username: string, name: string, country_id: string, state_id: string, gender: string, school_name: string, password: string, usernames: string}> */
         $identities = [];
@@ -27,7 +29,26 @@ class Identity {
             )) !== false &&
             !is_null($data)
         ) {
-            $username = $forTeams ? "teams:{$group_alias}:{$data[0]}" : "{$group_alias}:{$data[0]}";
+            $username = $forTeams ? "teams:{$groupAlias}:{$data[0]}" : "{$groupAlias}:{$data[0]}";
+            $members = null;
+            if ($autogenerateIdentities) {
+                $members = [];
+                foreach (range(0, $numberOfContestants - 1) as $id) {
+                    $members[] = [
+                        'username' => "{$groupAlias}:{$data[0]}_identity_{$id}",
+                        'password' => \OmegaUp\Test\Utils::createRandomString(),
+                    ];
+                }
+                $members = json_encode($members);
+            } elseif (isset($data[6])) {
+                $usernames = explode(';', $data[6]);
+                $members = json_encode(
+                    array_map(
+                        fn ($username) => ['username' => $username],
+                        $usernames
+                    )
+                );
+            }
             array_push($identities, [
                 'username' => $username,
                 'name' => strval($data[1]),
@@ -35,8 +56,10 @@ class Identity {
                 'state_id' => strval($data[3]),
                 'gender' => strval($data[4]),
                 'school_name' => strval($data[5]),
-                'password' => $password == '' ? \OmegaUp\Test\Utils::createRandomString() : $password,
-                'usernames' => isset($data[6]) ? strval($data[6]) : null,
+                'password' => is_null(
+                    $password
+                ) ? \OmegaUp\Test\Utils::createRandomString() : $password,
+                'usernames' => $members,
             ]);
         }
         fclose($handle);

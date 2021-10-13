@@ -8,6 +8,20 @@
         </div>
       </div>
       <div class="footer-list-section">
+        <h4 class="section-title">{{ T.frontPageFooterSponsors }}</h4>
+        <ul>
+          <li>
+            <a href="https://www.aboutamazon.com/" target="_blank">
+              <img
+                class="sponsor-logo"
+                src="/media/homepage/amazon_logo.png"
+                alt="AmazonLogo"
+              />
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="footer-list-section">
         <h4 class="section-title">{{ T.frontPageFooterSite }}</h4>
         <ul>
           <li>
@@ -80,7 +94,11 @@
     <div class="copy">
       <div class="copy-content">
         <div class="">
-          {{ T.wordsCopyright }}
+          {{
+            ui.formatString(T.frontPageFooterCopyright, {
+              currentYear: new Date().getFullYear(),
+            })
+          }}
         </div>
         <div class="menu">
           <ul>
@@ -104,6 +122,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import * as ui from '../../ui';
 import T from '../../lang';
 import { reportAnIssueURL } from '../../errors';
 
@@ -113,6 +132,7 @@ export default class Footer extends Vue {
   @Prop() omegaUpLockDown!: boolean;
 
   T = T;
+  ui = ui;
   reportAnIssueURL = reportAnIssueURL;
 }
 </script>
@@ -133,14 +153,14 @@ export default class Footer extends Vue {
     padding-top: 20px;
     padding-bottom: 20px;
 
-    @media only screen and (max-width: 767px) {
+    @media only screen and (max-width: 991px) {
       display: table;
     }
 
     .footer-brand {
       max-width: 200px;
 
-      @media only screen and (max-width: 767px) {
+      @media only screen and (max-width: 991px) {
         max-width: 100%;
         margin-bottom: 40px;
       }
@@ -160,7 +180,7 @@ export default class Footer extends Vue {
     }
 
     .footer-list-section {
-      @media only screen and (max-width: 767px) {
+      @media only screen and (max-width: 991px) {
         width: 50%;
         display: inline-grid;
         margin-bottom: 20px;
@@ -195,6 +215,10 @@ export default class Footer extends Vue {
 
       .social-icons {
         margin: 0 auto;
+      }
+
+      img.sponsor-logo {
+        width: 120px;
       }
     }
   }

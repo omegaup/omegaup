@@ -146,7 +146,7 @@
 
         <template v-if="!isUpdate">
           <div class="row">
-            <div class="form-group col-md-12">
+            <div class="form-group col-md-6">
               <label>{{ T.wordsShowCasesDiff }}</label>
               <select
                 v-model="showDiff"
@@ -158,6 +158,23 @@
                 <option value="none">{{ T.problemVersionDiffModeNone }}</option>
                 <option value="examples">{{ T.wordsOnlyExamples }}</option>
                 <option value="all">{{ T.wordsAll }}</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label>{{ T.problemEditGroupScorePolicy }}</label>
+              <select
+                v-model="groupScorePolicy"
+                name="group_score_policy"
+                class="form-control"
+                :class="{ 'is-invalid': errors.includes('group_score_policy') }"
+                :disabled="languages === ''"
+              >
+                <option value="sum-if-not-zero">
+                  {{ T.problemEditGroupScorePolicySumIfNotZero }}
+                </option>
+                <option value="min">
+                  {{ T.problemEditGroupScorePolicyMin }}
+                </option>
               </select>
             </div>
           </div>
@@ -181,7 +198,7 @@
         </template>
 
         <div v-else class="row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-4">
             <label>{{ T.wordsShowCasesDiff }}</label>
             <select
               v-model="showDiff"
@@ -194,7 +211,24 @@
               <option value="all">{{ T.wordsAll }}</option>
             </select>
           </div>
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-4">
+            <label>{{ T.problemEditGroupScorePolicy }}</label>
+            <select
+              v-model="groupScorePolicy"
+              name="group_score_policy"
+              class="form-control"
+              :class="{ 'is-invalid': errors.includes('group_score_policy') }"
+              :disabled="languages === ''"
+            >
+              <option value="sum-if-not-zero">
+                {{ T.problemEditGroupScorePolicySumIfNotZero }}
+              </option>
+              <option value="min">
+                {{ T.problemEditGroupScorePolicyMin }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group col-md-4">
             <label class="control-label">{{
               T.problemEditCommitMessage
             }}</label>
@@ -274,6 +308,7 @@ export default class ProblemForm extends Vue {
   tags = this.data.tags;
   problemLevel = this.data.problem_level || '';
   showDiff = this.data.showDiff;
+  groupScorePolicy = this.data.groupScorePolicy || 'sum-if-not-zero';
   selectedTags = this.data.selectedTags || [];
   message = '';
   hasFile = false;

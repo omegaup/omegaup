@@ -93,7 +93,7 @@
                   :value="contest.alias"
                 />
                 <div class="d-inline-block ml-2">
-                  <a class="mr-1" :href="`/arena/${contest.alias}/`">{{
+                  <a class="mr-1" :href="ui.contestURL(contest)">{{
                     ui.contestTitle(contest)
                   }}</a>
                 </div>
@@ -141,7 +141,7 @@
                     :icon="['fas', 'edit']"
                   />
                 </a>
-                <a class="ml-2" :href="`/arena/${contest.alias}/admin/#runs`">
+                <a class="ml-2" :href="`/arena/${contest.alias}/#runs`">
                   <font-awesome-icon
                     :title="T.contestListSubmissions"
                     :icon="['fas', 'tachometer-alt']"

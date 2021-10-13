@@ -4,6 +4,15 @@ import 'process';
 import '@testing-library/jest-dom';
 import '@testing-library/jest-dom/extend-expect';
 
+import Vue from 'vue';
+import Sortable from 'sortablejs';
+
+Vue.directive('Sortable', {
+  inserted: (el: HTMLElement, binding) => {
+    new Sortable(el, binding.value || {});
+  },
+});
+
 // Intercept all API calls. Only let `API.Session.currentSession()` work and
 // fail everything else.
 import fetchMock from 'jest-fetch-mock';
@@ -38,6 +47,9 @@ declare global {
       $: JQuery;
       jQuery: JQuery;
       document: Document;
+      URL: {
+        createObjectURL: () => string;
+      };
     }
   }
 
@@ -49,6 +61,7 @@ declare global {
 global.jQuery = require('jquery');
 global.$ = global.jQuery;
 window.jQuery = global.jQuery;
+global.URL.createObjectURL = jest.fn();
 
 // This is needed for CodeMirror to work.
 global.document.createRange = () => {

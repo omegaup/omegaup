@@ -2,9 +2,9 @@
   <footer class="common-footer text-center">
     <div class="container-xl">
       <div
-        class="footer-navigation d-table d-md-flex justify-content-between py-5"
+        class="footer-navigation d-table d-lg-flex justify-content-between py-5"
       >
-        <div class="footer-brand mb-4 mb-md-0">
+        <div class="footer-brand mb-4 mb-lg-0">
           <img
             class="footer-logo d-block mx-auto"
             width="120"
@@ -14,7 +14,21 @@
             {{ T.frontPageFooter }}
           </div>
         </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-md-0">
+        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
+          <h4>{{ T.frontPageFooterSponsors }}</h4>
+          <ul>
+            <li class="mt-1">
+              <a href="https://www.aboutamazon.com/" target="_blank">
+                <img
+                  class="sponsor-logo"
+                  src="/media/homepage/amazon_logo.png"
+                  alt="AmazonLogo"
+                />
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
           <h4>{{ T.frontPageFooterSite }}</h4>
           <ul>
             <li class="mt-1">
@@ -34,7 +48,7 @@
             </li>
           </ul>
         </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-md-0">
+        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
           <h4>{{ T.frontPageFooterOrganization }}</h4>
           <ul>
             <li class="mt-1">
@@ -49,7 +63,7 @@
             </li>
           </ul>
         </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-md-0">
+        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
           <h4>{{ T.frontPageDevelopers }}</h4>
           <ul>
             <li class="mt-1">
@@ -75,7 +89,7 @@
             </li>
           </ul>
         </div>
-        <div class="footer-list-section w-50 mb-4 w-md-auto mb-md-0">
+        <div class="footer-list-section w-50 mb-4 w-md-auto mb-lg-0">
           <h4>{{ T.frontPageFooterContact }}</h4>
           <ul>
             <li class="mt-1">
@@ -106,7 +120,11 @@
         class="container-xl d-flex flex-wrap justify-content-between align-items-center py-3"
       >
         <div>
-          {{ T.wordsCopyright }}
+          {{
+            ui.formatString(T.frontPageFooterCopyright, {
+              currentYear: new Date().getFullYear(),
+            })
+          }}
         </div>
         <div class="d-none d-md-block">
           <ul class="m-0 list-unstyled text-right">
@@ -130,6 +148,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import * as ui from '../../ui';
 import T from '../../lang';
 import { reportAnIssueURL } from '../../errors';
 
@@ -152,6 +171,7 @@ export default class Footer extends Vue {
   @Prop() omegaUpLockDown!: boolean;
 
   T = T;
+  ui = ui;
   reportAnIssueURL = reportAnIssueURL;
 }
 </script>
@@ -167,7 +187,7 @@ export default class Footer extends Vue {
     .footer-brand {
       max-width: 200px;
 
-      @media only screen and (max-width: 767px) {
+      @media only screen and (max-width: 991px) {
         max-width: 100%;
       }
 
@@ -182,8 +202,8 @@ export default class Footer extends Vue {
     }
 
     .footer-list-section {
-      // On small sizes, this will work as an inline grid (not 100% width)
-      @media only screen and (max-width: 767px) {
+      // On medium sizes, this will work as an inline grid (not 100% width)
+      @media only screen and (max-width: 991px) {
         display: inline-grid;
       }
 
@@ -206,6 +226,10 @@ export default class Footer extends Vue {
             }
           }
         }
+      }
+
+      img.sponsor-logo {
+        width: 120px;
       }
     }
   }

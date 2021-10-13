@@ -83,7 +83,9 @@
             <slot name="table-title">
               <th class="text-center" scope="col">{{ T.wordsProblem }}</th>
             </slot>
-            <th class="text-center" scope="col">{{ T.wordsAuthor }}</th>
+            <th class="text-center" scope="col">
+              {{ T.clarificationsAskedBy }}
+            </th>
             <th class="text-center" scope="col">{{ T.wordsTime }}</th>
             <th class="text-center" scope="col">{{ T.wordsMessage }}</th>
             <th class="text-center" scope="col">{{ T.wordsResult }}</th>
@@ -106,6 +108,12 @@
           ></omegaup-clarification>
         </tbody>
       </table>
+    </div>
+    <div
+      v-if="filteredClarifications.length === 0"
+      class="empty-table-message py-2"
+    >
+      {{ T.clarificationsEmpty }}
     </div>
     <div v-if="pagerItems" class="card-footer">
       <omegaup-common-paginator

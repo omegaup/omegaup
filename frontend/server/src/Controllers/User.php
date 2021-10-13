@@ -14,14 +14,14 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
- * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, hide_problem_tags: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
+ * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>}
  * @psalm-type CoderOfTheMonth=array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}
  * @psalm-type CoderOfTheMonthList=list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>
  * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
  * @psalm-type CoderOfTheMonthPayload=array{codersOfCurrentMonth: CoderOfTheMonthList, codersOfPreviousMonth: CoderOfTheMonthList, candidatesToCoderOfTheMonth: list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, username: string}>, isMentor: bool, category: string, options?: array{canChooseCoder: bool, coderIsSelected: bool}}
- * @psalm-type UserProfileInfo=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
+ * @psalm-type UserProfileInfo=array{birth_date?: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, has_competitive_objective?: bool|null, has_learning_objective?: bool|null, has_scholar_objective?: bool|null, has_teaching_objective?: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
  * @psalm-type ContestParticipated=array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}
  * @psalm-type UserProfileContests=array<string, array{data: ContestParticipated, place: int}>
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
@@ -67,6 +67,15 @@ class User extends \OmegaUp\Controllers\Controller {
     const ALLOWED_CODER_OF_THE_MONTH_CATEGORIES = [
         'all', 'female',
     ];
+
+    // User types
+    const USER_TYPE_STUDENT = 'student';
+    const USER_TYPE_CONTESTANT = 'contestant';
+    const USER_TYPE_TEACHER = 'teacher';
+    const USER_TYPE_COACH = 'coach';
+    const USER_TYPE_SELF_TAUGHT = 'self-taught';
+    const USER_TYPE_INDEPENDENT_TEACHER = 'independent-teacher';
+    const USER_TYPE_CURIOUS = 'curious';
 
     /**
      * Entry point for Create a User API
@@ -1323,9 +1332,14 @@ class User extends \OmegaUp\Controllers\Controller {
             'preferred_language' => $user->preferred_language,
             'is_private' => $user->is_private,
             'verified' => $user->verified == '1',
+            'has_competitive_objective' => $user->has_competitive_objective,
+            'has_learning_objective' => $user->has_learning_objective,
+            'has_scholar_objective' => $user->has_scholar_objective,
+            'has_teaching_objective' => $user->has_teaching_objective,
             'hide_problem_tags' => is_null(
                 $user->hide_problem_tags
             ) ? false : $user->hide_problem_tags,
+            'is_own_profile' => false,
         ];
 
         $userDb = \OmegaUp\DAO\Users::getExtendedProfileDataByPk(
@@ -1466,6 +1480,10 @@ class User extends \OmegaUp\Controllers\Controller {
             'gender' => null,
             'graduation_date' => null,
             'gravatar_92' => "https://secure.gravatar.com/avatar/{$hashedEmail}?s=92",
+            'has_competitive_objective' => null,
+            'has_learning_objective' => null,
+            'has_scholar_objective' => null,
+            'has_teaching_objective' => null,
             'hide_problem_tags' => false,
             'locale' => null,
             'name' => null,
@@ -1476,6 +1494,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'state' => null,
             'state_id' => null,
             'verified' => null,
+            'is_own_profile' => false,
         ];
     }
 
@@ -1662,8 +1681,12 @@ class User extends \OmegaUp\Controllers\Controller {
             ),
         ];
 
-        // But avoid divulging the email in the response.
+        // But avoid divulging the email and user's objectives in the response.
         unset($response['coderinfo']['email']);
+        unset($response['coderinfo']['has_learning_objective']);
+        unset($response['coderinfo']['has_teaching_objective']);
+        unset($response['coderinfo']['has_scholar_objective']);
+        unset($response['coderinfo']['has_competitive_objective']);
 
         return $response;
     }
@@ -2193,6 +2216,10 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $country_id
      * @omegaup-request-param 'decline'|'female'|'male'|'other'|null $gender
      * @omegaup-request-param string $graduation_date
+     * @omegaup-request-param bool|null $has_competitive_objective
+     * @omegaup-request-param bool|null $has_learning_objective
+     * @omegaup-request-param bool|null $has_scholar_objective
+     * @omegaup-request-param bool|null $has_teaching_objective
      * @omegaup-request-param bool|null $hide_problem_tags
      * @omegaup-request-param bool|null $is_private
      * @omegaup-request-param string $locale
@@ -2372,6 +2399,10 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         $r->ensureOptionalBool('is_private');
+        $r->ensureOptionalBool('has_competitive_objective');
+        $r->ensureOptionalBool('has_learning_objective');
+        $r->ensureOptionalBool('has_scholar_objective');
+        $r->ensureOptionalBool('has_teaching_objective');
         $r->ensureOptionalBool('hide_problem_tags');
         if (!is_null($r['gender'])) {
             $r->identity->gender = $r->ensureOptionalEnum(
@@ -2390,6 +2421,10 @@ class User extends \OmegaUp\Controllers\Controller {
             ],
             'preferred_language',
             'is_private',
+            'has_competitive_objective',
+            'has_learning_objective',
+            'has_scholar_objective',
+            'has_teaching_objective',
             'hide_problem_tags',
         ];
 
@@ -4058,6 +4093,59 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         return $response;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function getUserTypes(
+        \OmegaUp\DAO\VO\Users $user,
+        \OmegaUp\DAO\VO\Identities $loggedIdentity
+    ): array {
+        if (
+            !\OmegaUp\Authorization::isSystemAdmin($loggedIdentity)
+                && $loggedIdentity->user_id !== $user->user_id
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        if (is_null($user->main_identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        $userTypes = [];
+
+        if (
+            is_null($user->has_competitive_objective)
+            || is_null($user->has_learning_objective)
+            || is_null($user->has_scholar_objective)
+            || is_null($user->has_teaching_objective)
+        ) {
+            return $userTypes;
+        }
+
+        if ($user->has_learning_objective && $user->has_scholar_objective) {
+            $userTypes[] = self::USER_TYPE_STUDENT;
+        }
+        if ($user->has_learning_objective && $user->has_competitive_objective) {
+            $userTypes[] = self::USER_TYPE_CONTESTANT;
+        }
+        if ($user->has_teaching_objective && $user->has_scholar_objective) {
+            $userTypes[] = self::USER_TYPE_TEACHER;
+        }
+        if ($user->has_teaching_objective && $user->has_competitive_objective) {
+            $userTypes[] = self::USER_TYPE_COACH;
+        }
+        if ($user->has_learning_objective && !$user->has_scholar_objective && !$user->has_competitive_objective) {
+            $userTypes[] = self::USER_TYPE_SELF_TAUGHT;
+        }
+        if ($user->has_teaching_objective && !$user->has_scholar_objective && !$user->has_competitive_objective) {
+            $userTypes[] = self::USER_TYPE_INDEPENDENT_TEACHER;
+        }
+        if (!$user->has_learning_objective && !$user->has_teaching_objective) {
+            $userTypes[] = self::USER_TYPE_CURIOUS;
+        }
+        return $userTypes;
     }
 
     /**

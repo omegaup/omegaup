@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-2">
+  <div class="mt-2" data-runs>
     <!-- TODO: This code should be removed when we stop using jquery and the
       migration to vue was over -->
     <!-- id-lint off -->
@@ -11,7 +11,13 @@
       <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
     </div>
     <div class="table-responsive">
-      <table class="runs table table-striped">
+      <table
+        class="runs table table-striped"
+        :class="{
+          'single-problem-runs': !showAllRuns,
+          'all-runs': showAllRuns,
+        }"
+      >
         <caption>
           {{
             T.wordsSubmissions
@@ -21,7 +27,10 @@
               &lt;
             </button>
             {{ filterOffset + 1 }}
-            <button :disabled="runs.length < rowCount" @click="filterOffset++">
+            <button
+              :disabled="runs && runs.length < rowCount"
+              @click="filterOffset++"
+            >
               &gt;
             </button>
 
@@ -100,7 +109,7 @@
 
             <template v-if="showUser">
               <label
-                >{{ T.wordsUser }}:
+                >{{ T.contestParticipant }}:
                 <omegaup-common-typeahead
                   :existing-options="searchResultUsers"
                   :value.sync="filterUsername"
@@ -135,7 +144,7 @@
           <tr>
             <th>{{ T.wordsTime }}</th>
             <th>GUID</th>
-            <th v-if="showUser">{{ T.wordsUser }}</th>
+            <th v-if="showUser">{{ T.contestParticipant }}</th>
             <th v-if="showContest">{{ T.wordsContest }}</th>
             <th v-if="showProblem">{{ T.wordsProblem }}</th>
             <th>{{ T.wordsStatus }}</th>
@@ -239,7 +248,7 @@
             <td v-if="showDetails && !showDisqualify && !showRejudge">
               <button
                 class="details btn-outline-dark btn-sm"
-                data-run-details
+                :data-run-details="run.guid"
                 @click="$emit('details', run)"
               >
                 <font-awesome-icon :icon="['fas', 'search-plus']" />
@@ -259,6 +268,7 @@
                 <div class="dropdown-menu">
                   <button
                     v-if="showDetails"
+                    :data-run-details="run.guid"
                     class="btn-link dropdown-item"
                     @click="$emit('details', run)"
                   >
@@ -266,6 +276,7 @@
                   </button>
                   <button
                     v-if="showRejudge"
+                    data-actions-rejudge
                     class="btn-link dropdown-item"
                     @click="$emit('rejudge', run)"
                   >
@@ -274,6 +285,7 @@
                   <div class="dropdown-divider"></div>
                   <button
                     v-if="showDisqualify"
+                    data-actions-disqualify
                     class="btn-link dropdown-item"
                     @click="$emit('disqualify', run)"
                   >
@@ -349,9 +361,10 @@ export default class Runsv2 extends Vue {
   @Prop({ default: null }) problemsetProblems!: types.ProblemsetProblem[];
   @Prop({ default: null }) username!: string | null;
   @Prop({ default: 100 }) rowCount!: number;
-  @Prop() runs!: types.Run[];
+  @Prop() runs!: null | types.Run[];
   @Prop({ default: false }) globalRuns!: boolean;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: false }) showAllRuns!: boolean;
 
   T = T;
   time = time;
@@ -407,6 +420,9 @@ export default class Runsv2 extends Vue {
   }
 
   get sortedRuns(): types.Run[] {
+    if (!this.runs) {
+      return [];
+    }
     return this.runs
       .slice()
       .sort((a, b) => b.time.getTime() - a.time.getTime());
@@ -428,7 +444,7 @@ export default class Runsv2 extends Vue {
 
   // eslint-disable-next-line no-undef -- This is defined in TypeScript.
   initProblemAutocomplete(el: JQuery<HTMLElement>) {
-    if (this.problemsetProblems.length !== 0) {
+    if (this.problemsetProblems !== null) {
       typeahead.problemsetProblemTypeahead(
         el,
         () => this.problemsetProblems,

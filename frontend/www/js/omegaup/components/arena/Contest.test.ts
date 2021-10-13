@@ -41,7 +41,6 @@ describe('Contest.vue', () => {
     penalty_type: 'contest_start',
     points_decay_factor: 0,
     problemset_id: 1,
-    rerun_id: 0,
     scoreboard: 100,
     show_penalty: true,
     show_scoreboard_after: true,
@@ -192,5 +191,51 @@ describe('Contest.vue', () => {
     expect(wrapper.emitted('submit-run')).toBeDefined();
 
     wrapper.destroy();
+  });
+
+  it('Should handle details for a run in a contest', async () => {
+    const run: types.Run = {
+      alias: 'problemOmegaUp',
+      classname: 'user-rank-unranked',
+      contest_score: 100,
+      country: 'xx',
+      guid: '78099022574726af861839e1b4210188',
+      language: 'py3',
+      memory: 0,
+      penalty: 0,
+      runtime: 0,
+      score: 1,
+      status: 'ready',
+      submit_delay: 0,
+      time: new Date(),
+      type: 'normal',
+      username: 'test_user_1',
+      verdict: 'AC',
+    };
+
+    const wrapper = mount(arena_Contest, {
+      propsData: {
+        contest,
+        problems,
+        problem: problems[0],
+        runs: [run],
+        problemInfo,
+      },
+    });
+
+    await wrapper
+      .find(`button[data-run-details="${run.guid}"]`)
+      .trigger('click');
+    expect(wrapper.emitted('show-run')).toEqual([
+      [
+        {
+          guid: '78099022574726af861839e1b4210188',
+          hash:
+            '#problems/problemOmegaUp/show-run:78099022574726af861839e1b4210188',
+          isAdmin: false,
+          problemAlias: 'problemOmegaUp',
+        },
+      ],
+    ]);
   });
 });

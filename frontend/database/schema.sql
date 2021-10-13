@@ -94,6 +94,7 @@ CREATE TABLE `Certificates` (
   `course_id` int DEFAULT NULL,
   `contest_id` int DEFAULT NULL,
   `verification_code` varchar(10) NOT NULL COMMENT 'Código de verificación del diploma',
+  `contest_place` int DEFAULT NULL COMMENT 'Se guarda el lugar en el que quedo un estudiante si es menor o igual a certificate_cutoff',
   PRIMARY KEY (`certificate_id`),
   UNIQUE KEY `verification_code` (`verification_code`),
   KEY `identity_id` (`identity_id`),
@@ -180,7 +181,7 @@ CREATE TABLE `Contests` (
   `finish_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de finalizacion de este concurso',
   `last_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Indica la hora en que se actualizó de privado a público un concurso o viceversa',
   `window_length` int DEFAULT NULL COMMENT 'Indica el tiempo que tiene el usuario para envíar solución, si es NULL entonces será durante todo el tiempo del concurso',
-  `rerun_id` int NOT NULL COMMENT 'Este campo es para las repeticiones de algún concurso, Contiene el id del concurso original.',
+  `rerun_id` int DEFAULT NULL COMMENT 'Este campo es para las repeticiones de algún concurso, Contiene el id del concurso original o null en caso de ser un concurso original.',
   `admission_mode` enum('private','registration','public') NOT NULL DEFAULT 'private' COMMENT 'Modalidad en la que se registra un concurso.',
   `alias` varchar(32) NOT NULL COMMENT 'Almacenará el token necesario para acceder al concurso',
   `scoreboard` int NOT NULL DEFAULT '1' COMMENT 'Entero del 0 al 100, indicando el porcentaje de tiempo que el scoreboard será visible',
@@ -204,7 +205,9 @@ CREATE TABLE `Contests` (
   KEY `rerun_id` (`contest_id`),
   KEY `acl_id` (`acl_id`),
   KEY `fk_cop_problemset_id` (`problemset_id`),
+  KEY `fk_cc_rerun_id` (`rerun_id`),
   FULLTEXT KEY `title` (`title`,`description`),
+  CONSTRAINT `fk_cc_rerun_id` FOREIGN KEY (`rerun_id`) REFERENCES `Contests` (`contest_id`),
   CONSTRAINT `fk_coa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`),
   CONSTRAINT `fk_cop_problemset_id` FOREIGN KEY (`problemset_id`) REFERENCES `Problemsets` (`problemset_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Concursos que se llevan a cabo en el juez.';
@@ -275,9 +278,11 @@ CREATE TABLE `Courses` (
   `course_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `description` tinytext NOT NULL,
+  `objective` text,
   `alias` varchar(32) NOT NULL,
   `group_id` int NOT NULL,
   `acl_id` int NOT NULL,
+  `level` enum('introductory','intermediate','advanced') DEFAULT NULL,
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00' COMMENT 'Hora de inicio de este curso',
   `finish_time` timestamp NULL DEFAULT NULL,
   `admission_mode` enum('private','registration','public') NOT NULL DEFAULT 'private' COMMENT 'Modalidad en la que se registra un curso.',
@@ -733,6 +738,7 @@ CREATE TABLE `Problemset_Problems` (
   `version` char(40) NOT NULL COMMENT 'El hash SHA1 del árbol de la rama private.',
   `points` double NOT NULL DEFAULT '1',
   `order` int NOT NULL DEFAULT '1' COMMENT 'Define el orden de aparición de los problemas en una lista de problemas',
+  `is_extra_problem` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`problemset_id`,`problem_id`),
   KEY `problemset_id` (`problemset_id`),
   KEY `problem_id` (`problem_id`),
@@ -1035,12 +1041,12 @@ CREATE TABLE `Team_Groups` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Team_Users` (
   `team_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  PRIMARY KEY (`team_id`,`user_id`),
+  `identity_id` int NOT NULL COMMENT 'Id de la identidad que pertenece al equipo',
+  PRIMARY KEY (`team_id`,`identity_id`),
   KEY `team_id` (`team_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `fk_tut_team_id` FOREIGN KEY (`team_id`) REFERENCES `Teams` (`team_id`),
-  CONSTRAINT `fk_tuu_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+  KEY `identity_id` (`identity_id`),
+  CONSTRAINT `fk_tui_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`),
+  CONSTRAINT `fk_tut_team_id` FOREIGN KEY (`team_id`) REFERENCES `Teams` (`team_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1127,6 +1133,10 @@ CREATE TABLE `Users` (
   `git_token` varchar(128) DEFAULT NULL COMMENT 'Token de acceso para git, usando Argon2i',
   `main_email_id` int DEFAULT NULL,
   `main_identity_id` int DEFAULT NULL COMMENT 'Identidad principal del usuario',
+  `has_learning_objective` tinyint(1) DEFAULT NULL COMMENT 'Dice si el usuario expresó tener el objetivo de usar omegaUp para aprender.',
+  `has_teaching_objective` tinyint(1) DEFAULT NULL COMMENT 'Dice si el usuario expresó tener el objetivo de usar omegaUp para enseñar.',
+  `has_scholar_objective` tinyint(1) DEFAULT NULL COMMENT 'Dice si el usuario expresó tener el objetivo de usar omegaUp para la escuela.',
+  `has_competitive_objective` tinyint(1) DEFAULT NULL COMMENT 'Dice si el usuario expresó tener el objetivo de usar omegaUp para programación competitiva.',
   `scholar_degree` enum('none','early_childhood','pre_primary','primary','lower_secondary','upper_secondary','post_secondary','tertiary','bachelors','master','doctorate') DEFAULT NULL,
   `birth_date` date DEFAULT NULL,
   `verified` tinyint(1) NOT NULL DEFAULT '0',

@@ -9,7 +9,7 @@
         }}
         <small>
           &ndash;
-          <a :href="`/arena/${details.alias}/`">
+          <a :href="ui.contestURL(details)">
             {{ T.contestDetailsGoToContest }}</a
           >
         </small>
@@ -138,10 +138,14 @@
           :has-submissions="details.has_submissions"
           :update="true"
           :search-result-teams-groups="searchResultTeamsGroups"
+          :problems="problems"
           @update-search-result-teams-groups="
             (query) => $emit('update-search-result-teams-groups', query)
           "
           @update-contest="(contest) => $emit('update-contest', contest)"
+          @language-remove-blocked="
+            (language) => $emit('language-remove-blocked', language)
+          "
         ></omegaup-contest-new-form>
       </div>
       <div v-if="showTab === 'problems'" class="tab-pane active">
@@ -238,7 +242,12 @@
         ></omegaup-contest-group-admins>
       </div>
       <div v-if="showTab === 'links'" class="tab-pane active">
-        <omegaup-contest-links :data="details"></omegaup-contest-links>
+        <omegaup-contest-links
+          :data="details"
+          @download-csv-scoreboard="
+            (contestAlias) => $emit('download-csv-scoreboard', contestAlias)
+          "
+        ></omegaup-contest-links>
       </div>
       <div v-if="showTab === 'clone'" class="tab-pane active">
         <omegaup-contest-clone
