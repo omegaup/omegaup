@@ -222,7 +222,6 @@ export default class CourseViewStudent extends Vue {
 
   T = T;
   time = time;
-
   ui = ui;
   selectedAssignment: string | null = null;
   selectedProblem: Partial<types.CourseProblem> | null = null;
@@ -255,7 +254,8 @@ export default class CourseViewStudent extends Vue {
 
   mounted(): void {
     window.addEventListener('popstate', (ev: PopStateEvent) => {
-      this.selectedStudent = ev.state?.student ?? this.initialStudent;
+      this.selectedStudent =
+        (ev.state && ev.state.student) || this.initialStudent;
     });
   }
 
