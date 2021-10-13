@@ -43,11 +43,10 @@ namespace OmegaUp\Controllers;
  * @psalm-type AssignmentsProblemsPoints=array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
  * @psalm-type CourseNewPayload=array{is_admin: bool, is_curator: bool, languages: array<string, string>}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, allLanguages: array<string, string>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
- * @psalm-type StudentsProgressPayload=array{course: CourseDetails, assignmentsProblems: list<AssignmentsProblemsPoints>, students: list<StudentProgressInCourse>, totalRows: int, page: int, length: int, pagerItems: list<PageItem>}
+ * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
  * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp}
  * @psalm-type CourseRun=array{feedback: null|SubmissionFeedback, guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<CourseRun>}
- * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>, shouldShowFirstAssociatedIdentityRunWarning: bool}
@@ -2103,11 +2102,58 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'assignmentNotFound'
             );
         }
+
+        $rawProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+            $assignment->problemset_id
+        );
+        $letter = 0;
+        $problems = [];
+        foreach ($rawProblems as $problem) {
+            $runsArray = \OmegaUp\DAO\Runs::getForCourseProblemDetails(
+                intval($problem['problem_id']),
+                intval($assignment->problemset_id),
+                intval($resolvedIdentity->identity_id)
+            );
+            $problem['runs'] = [];
+            foreach ($runsArray as $run) {
+                $run['feedback'] = null;
+                if (
+                    !is_null($run['feedback_author']) &&
+                    !is_null($run['feedback_content']) &&
+                    !is_null($run['feedback_date'])
+                ) {
+                    $run['feedback'] = [
+                        'author' => $run['feedback_author'],
+                        'author_classname' => $run['feedback_author_classname'],
+                        'feedback' => $run['feedback_content'],
+                        'date' => $run['feedback_date']
+                    ];
+                }
+                unset($run['feedback_author']);
+                unset($run['feedback_author_classname']);
+                unset($run['feedback_content']);
+                unset($run['feedback_date']);
+
+                try {
+                    $run['source'] = \OmegaUp\Controllers\Submission::getSource(
+                        $run['guid']
+                    );
+                } catch (\Exception $e) {
+                    self::$log->error(
+                        "Error fetching source for {$run['guid']}",
+                        $e
+                    );
+                }
+                $problem['runs'][] = $run;
+            }
+            unset($problem['problem_id']);
+            $problem['letter'] = \OmegaUp\Controllers\Contest::columnName(
+                $letter++
+            );
+            $problems[] = $problem;
+        }
         return [
-            'problems' => self::getProblemsBySelectedAssignment(
-                $assignment,
-                $resolvedIdentity
-            ),
+            'problems' => $problems,
         ];
     }
 
