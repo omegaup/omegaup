@@ -275,28 +275,29 @@
       </div>
       <ul class="nav nav-tabs" role="tablist">
         <li
-          v-for="tab in tabs"
-          :key="tab.id"
+          v-for="(tabName, tabKey) in tabNames"
+          :key="tabKey"
           class="nav-item"
           role="presentation"
         >
           <a
             class="nav-link"
-            :href="`#${tab.id}`"
-            :class="{ active: selectedTab === tab.id }"
+            :href="`#${tabKey}`"
+            :class="{ active: selectedTab === tabKey }"
             data-toggle="tab"
             role="tab"
-            @click="selectedTab = tab.id"
-            >{{ tab.name }}</a
+            @click="selectedTab = tabKey"
+            >{{ tabName }}</a
           >
         </li>
       </ul>
       <div class="tab-content">
         <div
           class="tab-pane fade py-4 px-2"
+          :data-tab="tabNames.information"
           :class="{
-            show: selectedTab === tabs.information.id,
-            active: selectedTab === tabs.information.id,
+            show: selectedTab === Tab.Information,
+            active: selectedTab === Tab.Information,
           }"
           role="tabpanel"
         >
@@ -328,8 +329,8 @@
         <div
           class="tab-pane fade py-4 px-2"
           :class="{
-            show: selectedTab === tabs.content.id,
-            active: selectedTab === tabs.content.id,
+            show: selectedTab === Tab.Content,
+            active: selectedTab === Tab.Content,
           }"
           role="tabpanel"
         >
@@ -457,7 +458,7 @@ library.add(
   faListAlt,
 );
 
-export enum Tabs {
+export enum Tab {
   Information = 'information',
   Content = 'content',
 }
@@ -476,18 +477,12 @@ export default class CourseDetails extends Vue {
 
   T = T;
   ui = ui;
-  Tabs = Tabs;
-  tabs = {
-    information: {
-      id: Tabs.Information,
-      name: T.courseDetailsTabInformation,
-    },
-    content: {
-      id: Tabs.Content,
-      name: T.courseDetailsTabContent,
-    },
+  Tab = Tab;
+  tabNames: Record<Tab, string> = {
+    [Tab.Information]: T.courseDetailsTabInformation,
+    [Tab.Content]: T.courseDetailsTabContent,
   };
-  selectedTab = this.tabs.information.id;
+  selectedTab = Tab.Information;
 
   get overallCompletedPercentage(): string {
     let score = 0;
