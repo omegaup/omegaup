@@ -241,7 +241,6 @@ export default class ArenaContest extends Vue {
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop() searchResultUsers!: types.ListItem[];
-  @Prop({ default: false }) shouldShowRunDetailsForAdmin!: boolean;
   @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
 

@@ -35,11 +35,9 @@ import T from '../lang';
 OmegaUp.on('ready', async () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestDetailsPayload();
-  console.log(payload);
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
   const contestAdmin = Boolean(payload.adminPayload);
-  console.log(contestAdmin);
   const activeTab = getSelectedValidTab(locationHash[0], contestAdmin);
   if (activeTab !== locationHash[0]) {
     window.location.hash = activeTab;
@@ -118,7 +116,6 @@ OmegaUp.on('ready', async () => {
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
       searchResultUsers: [] as types.ListItem[],
-      shouldShowRunDetailsForAdmin: false,
       nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
       runDetailsData: runDetails,
     }),
@@ -148,7 +145,6 @@ OmegaUp.on('ready', async () => {
           allRuns: runsStore.state.runs,
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
-          shouldShowRunDetailsForAdmin: this.shouldShowRunDetailsForAdmin,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
         },
         on: {
@@ -200,7 +196,6 @@ OmegaUp.on('ready', async () => {
               })
               .finally(() => {
                 this.popupDisplayed = PopupDisplayed.None;
-                this.shouldShowRunDetailsForAdmin = false;
               });
           },
           'submit-run': ({
@@ -352,14 +347,6 @@ OmegaUp.on('ready', async () => {
     for (const run of payload.adminPayload.allRuns) {
       trackRun({ run });
     }
-  }
-
-  if (locationHash[1] && locationHash[1].includes('show-run:')) {
-    const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
-    const showRunMatch = window.location.hash.match(showRunRegex);
-    contestContestant.guid = showRunMatch?.[1] ?? null;
-    contestContestant.shouldShowRunDetailsForAdmin = true;
-    contestContestant.popupDisplayed = PopupDisplayed.RunDetails;
   }
 
   setInterval(() => {
