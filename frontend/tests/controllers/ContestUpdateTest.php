@@ -83,7 +83,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      * Update from private to public.
      * And choosing default_show_all_contestants_in_scoreboard option
      */
-    public function testUpdateShowAllContestantsAtFirstTimeOption() {
+    public function testUpdateDefaultShowAllContestantsOption() {
         // Get a contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams(
