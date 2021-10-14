@@ -2,34 +2,36 @@
   <div class="modal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-body">
-          <h5 class="modal-title font-weight-bold mb-3">
+        <div class="modal-header">
+          <h5 class="modal-title font-weight-bold">
             {{ T.userObjectivesModalTitle }}
           </h5>
-          <p v-if="isFirstModal" class="text-right text-primary">
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="text-right text-primary">
             {{
-              ui.formatString(T.userObjectivesModalCounter, {
-                current: 1,
-                last: 2,
-              })
-            }}
-          </p>
-          <p v-else class="text-right text-primary">
-            {{
-              ui.formatString(T.userObjectivesModalCounter, {
-                current: 2,
-                last: 2,
+              ui.formatString(T.userObjectivesModalPageCounter, {
+                current: currentModalPage,
+                last: lastModalPage,
               })
             }}
           </p>
           <p class="font-weight-bold">{{ description }}</p>
-          <div v-if="isFirstModal" class="mb-3">
+          <div v-if="currentModalPage === 1" class="mb-3">
             <label class="d-block"
               ><input
                 v-model="objective"
                 class="mr-3"
                 type="radio"
-                :value="value_learning"
+                :value="ObjectivesAnswers.Learning"
               />{{ T.userObjectivesModalAnswerLearning }}</label
             >
             <label class="d-block"
@@ -37,7 +39,7 @@
                 v-model="objective"
                 class="mr-3"
                 type="radio"
-                :value="value_teaching"
+                :value="ObjectivesAnswers.Teaching"
               />{{ T.userObjectivesModalAnswerTeaching }}</label
             >
             <label class="d-block"
@@ -45,7 +47,7 @@
                 v-model="objective"
                 class="mr-3"
                 type="radio"
-                :value="value_learning_teaching"
+                :value="ObjectivesAnswers.LearningAndTeaching"
               />{{ T.userObjectivesModalAnswerLearningAndTeaching }}</label
             >
             <label class="d-block"
@@ -53,7 +55,7 @@
                 v-model="objective"
                 class="mr-3"
                 type="radio"
-                :value="value_none"
+                :value="ObjectivesAnswers.None"
               />{{ T.userObjectivesModalAnswerNone }}</label
             >
           </div>
@@ -63,7 +65,7 @@
                 v-model="objective"
                 class="mr-3"
                 type="radio"
-                :value="value_scholar"
+                :value="ObjectivesAnswers.Scholar"
               />{{ T.userObjectivesModalAnswerScholar }}</label
             >
             <label class="d-block"
@@ -71,7 +73,7 @@
                 v-model="objective"
                 class="mr-3"
                 type="radio"
-                :value="value_competitive"
+                :value="ObjectivesAnswers.Competitive"
               />{{ T.userObjectivesModalAnswerCompetitive }}</label
             >
             <label class="d-block"
@@ -79,7 +81,7 @@
                 v-model="objective"
                 class="mr-3"
                 type="radio"
-                :value="value_scholar_competitive"
+                :value="ObjectivesAnswers.ScholarAndCompetitive"
               />{{ T.userObjectivesModalAnswerScholarAndCompetitive }}</label
             >
             <label class="d-block"
@@ -87,15 +89,15 @@
                 v-model="objective"
                 class="mr-3"
                 type="radio"
-                :value="value_other"
+                :value="ObjectivesAnswers.Other"
               />{{ T.userObjectivesModalAnswerOther }}</label
             >
           </div>
           <button
-            v-if="isFirstModal"
+            v-if="currentModalPage === 1"
             type="button"
             class="btn btn-next-previous float-right pr-0"
-            @click="onChangeModal"
+            @click="onNextModalPage"
           >
             {{ T.userObjectivesModalButtonNext }}
             <font-awesome-icon class="ml-1" icon="greater-than" />
@@ -104,7 +106,7 @@
             <button
               type="button"
               class="btn btn-next-previous float-left pl-0"
-              @click="onPrevious"
+              @click="onPreviousModalPage"
             >
               <font-awesome-icon class="mr-1" icon="less-than" />
               {{ T.userObjectivesModalButtonPrevious }}
@@ -138,6 +140,17 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
+export enum ObjectivesAnswers {
+  Learning = 'learning',
+  Teaching = 'teaching',
+  LearningAndTeaching = 'learningAndTeaching',
+  None = 'none',
+  Scholar = 'scholar',
+  Competitive = 'competitive',
+  ScholarAndCompetitive = 'scholarAndcompetitive',
+  Other = 'other',
+}
+
 @Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon,
@@ -148,104 +161,108 @@ library.add(fas);
 export default class UserObjectivesQuestions extends Vue {
   T = T;
   ui = ui;
-  value_learning = 0;
-  value_teaching = 1;
-  value_learning_teaching = 2;
-  value_none = 3;
-  value_scholar = 4;
-  value_competitive = 5;
-  value_scholar_competitive = 6;
-  value_other = 7;
-  objective = this.value_learning;
-  previousObjective = this.value_learning;
-  has_competitive_objective = false;
-  has_learning_objective = false;
-  has_scholar_objective = false;
-  has_teaching_objective = false;
-  isFirstModal = true;
+  objective = ObjectivesAnswers.Learning;
+  previousObjective = ObjectivesAnswers.Learning;
+  hasCompetitiveObjective = false;
+  hasLearningObjective = false;
+  hasScholarObjective = false;
+  hasTeachingObjective = false;
+  currentModalPage = 1;
+  lastModalPage = 2;
+  ObjectivesAnswers = ObjectivesAnswers;
 
   get description(): string {
-    if (this.isFirstModal) {
-      return this.T.userObjectivesModalDescUsage;
+    if (this.currentModalPage === 1) {
+      return this.T.userObjectivesModalDescriptionUsage;
     }
-    if (this.has_learning_objective && this.has_teaching_objective) {
-      return this.T.userObjectivesModalDescLearningAndTeaching;
+    if (this.hasLearningObjective && this.hasTeachingObjective) {
+      return this.T.userObjectivesModalDescriptionLearningAndTeaching;
     }
-    if (this.has_learning_objective) {
-      return this.T.userObjectivesModalDescLearning;
+    if (this.hasLearningObjective) {
+      return this.T.userObjectivesModalDescriptionLearning;
     }
-    if (this.has_teaching_objective) {
-      return this.T.userObjectivesModalDescTeaching;
+    if (this.hasTeachingObjective) {
+      return this.T.userObjectivesModalDescriptionTeaching;
     }
-    return this.T.userObjectivesModalDescUsageWhenNone;
+    return this.T.userObjectivesModalDescriptionUsageWhenNone;
   }
 
-  onChangeModal(): void {
+  onNextModalPage(): void {
     switch (this.objective) {
-      case this.value_learning:
-        this.has_learning_objective = true;
-        this.has_teaching_objective = false;
+      case ObjectivesAnswers.Learning:
+        this.hasLearningObjective = true;
+        this.hasTeachingObjective = false;
         break;
-      case this.value_teaching:
-        this.has_learning_objective = false;
-        this.has_teaching_objective = true;
+      case ObjectivesAnswers.Teaching:
+        this.hasLearningObjective = false;
+        this.hasTeachingObjective = true;
         break;
-      case this.value_learning_teaching:
-        this.has_learning_objective = true;
-        this.has_teaching_objective = true;
+      case ObjectivesAnswers.LearningAndTeaching:
+        this.hasLearningObjective = true;
+        this.hasTeachingObjective = true;
         break;
-      case this.value_none:
-        this.has_learning_objective = false;
-        this.has_teaching_objective = false;
+      case ObjectivesAnswers.None:
+        this.hasLearningObjective = false;
+        this.hasTeachingObjective = false;
         break;
     }
     this.previousObjective = this.objective;
-    this.objective = this.value_scholar;
-    this.isFirstModal = false;
+    this.objective = ObjectivesAnswers.Scholar;
+    this.currentModalPage++;
   }
 
-  onPrevious(): void {
+  onPreviousModalPage(): void {
     this.objective = this.previousObjective;
-    this.isFirstModal = true;
+    this.currentModalPage--;
   }
 
   onSubmit(): void {
     switch (this.objective) {
-      case this.value_scholar:
-        this.has_scholar_objective = true;
-        this.has_competitive_objective = false;
+      case ObjectivesAnswers.Scholar:
+        this.hasScholarObjective = true;
+        this.hasCompetitiveObjective = false;
         break;
-      case this.value_competitive:
-        this.has_scholar_objective = false;
-        this.has_competitive_objective = true;
+      case ObjectivesAnswers.Competitive:
+        this.hasScholarObjective = false;
+        this.hasCompetitiveObjective = true;
         break;
-      case this.value_scholar_competitive:
-        this.has_scholar_objective = true;
-        this.has_competitive_objective = true;
+      case ObjectivesAnswers.ScholarAndCompetitive:
+        this.hasScholarObjective = true;
+        this.hasCompetitiveObjective = true;
         break;
-      case this.value_other:
-        this.has_scholar_objective = false;
-        this.has_competitive_objective = false;
+      case ObjectivesAnswers.Other:
+        this.hasScholarObjective = false;
+        this.hasCompetitiveObjective = false;
         break;
     }
+
     this.$emit('submit', {
-      has_competitive_objective: this.has_competitive_objective,
-      has_learning_objective: this.has_learning_objective,
-      has_scholar_objective: this.has_scholar_objective,
-      has_teaching_objective: this.has_teaching_objective,
+      hasCompetitiveObjective: this.hasCompetitiveObjective,
+      hasLearningObjective: this.hasLearningObjective,
+      hasScholarObjective: this.hasScholarObjective,
+      hasTeachingObjective: this.hasTeachingObjective,
     });
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .modal-dialog {
   max-width: 330px;
 }
 
+.modal-header {
+  border-bottom: 0;
+}
+
 .btn-next-previous {
-  color: #6c757d;
-  background-color: white;
-  border-color: white;
+  color: var(--btn-next-previous-font-color);
+}
+
+.btn-next-previous:focus,
+.btn-next-previous.focus {
+  box-shadow: 0 0 0 0;
 }
 </style>
