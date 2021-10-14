@@ -3259,8 +3259,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
-        $problems = [];
-
         $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
             $assignmentAlias,
             $course->course_id
