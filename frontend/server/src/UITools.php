@@ -3,7 +3,7 @@
 namespace OmegaUp;
 
 /**
- * @psalm-type CommonPayload=array{associatedIdentities: list<array{default: bool, username: string}>, bootstrap4: bool, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, inContest: bool, isAdmin: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: null|string, userCountry: string, inProduction?: bool}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<array{default: bool, username: string}>, bootstrap4: bool, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, inContest: bool, isAdmin: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: null|string, userCountry: string, inProduction: bool}
  * @psalm-type AssociatedIdentity=array{username: string, default: bool}
  * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
  */

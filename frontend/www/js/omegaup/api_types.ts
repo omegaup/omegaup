@@ -3721,7 +3721,7 @@ export namespace types {
     countries: dao.Countries[];
     extraProfileDetails?: types.ExtraProfileDetails;
     profile: types.UserProfileInfo;
-    programming_languages: { [key: string]: string };
+    programmingLanguages: { [key: string]: string };
   }
 
   export interface UserProfileInfo {
