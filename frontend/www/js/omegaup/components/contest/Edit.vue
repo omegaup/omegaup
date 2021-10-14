@@ -171,8 +171,8 @@
       </div>
       <div v-if="showTab === 'publish'" class="tab-pane active">
         <omegaup-common-publish
-          :show-all-contestants-at-first-time-in-scoreboard="
-            details.show_all_contestants_at_first_time_in_scoreboard
+          :default-show-all-contestants-in-scoreboard="
+            details.default_show_all_contestants_in_scoreboard
           "
           :admission-mode="details.admission_mode"
           :should-show-public-option="true"

@@ -25,8 +25,10 @@ export function getOptionsFromLocation(location: string): LocationOptions {
   // Location string is of the forms:
   // - `#problems/${alias}`
   // - `#problems/${alias}/new-run`
-  // - `#problems/${alias}/show-run:xyz`
+  // - `#problems/${alias}/show-run:${guid}`
   // - `#clarifications/${alias}/new`
+  // - `#runs/${alias}/show-run:${guid}` the alias can be "all" when admin runs
+  //   tab is shown.
   // and all the matching forms in the following regex
   const match = /#(?<tab>\w+)\/(?<alias>[^/]+)(?:\/(?<popup>[^/]+))?/g.exec(
     location,
@@ -57,6 +59,12 @@ export function getOptionsFromLocation(location: string): LocationOptions {
           'selectClarificationId',
           parseInt(match.groups.alias.split('-')[1]),
         );
+      }
+      break;
+    case 'runs':
+      if (match.groups.popup?.startsWith('show-run')) {
+        response.guid = match.groups.popup.split(':')[1];
+        response.popupDisplayed = PopupDisplayed.RunDetails;
       }
       break;
     default:

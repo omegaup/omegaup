@@ -356,15 +356,15 @@ OmegaUp.on('ready', () => {
           },
           'update-admission-mode': ({
             admissionMode,
-            showAllContestantsAtFirstTimeInScoreboard,
+            defaultShowAllContestantsInScoreboard,
           }: {
             admissionMode: string;
-            showAllContestantsAtFirstTimeInScoreboard: boolean;
+            defaultShowAllContestantsInScoreboard: boolean;
           }) => {
             api.Contest.update({
               contest_alias: payload.details.alias,
               admission_mode: admissionMode,
-              show_all_contestants_at_first_time_in_scoreboard: showAllContestantsAtFirstTimeInScoreboard,
+              default_show_all_contestants_in_scoreboard: defaultShowAllContestantsInScoreboard,
             })
               .then(() => {
                 ui.success(`

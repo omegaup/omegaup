@@ -28,8 +28,8 @@
         <div class="form-group">
           <omegaup-toggle-switch
             v-if="currentAdmissionMode !== AdmissionMode.Private"
-            :value.sync="currentShowAllContestantsAtFirstTimeInScoreboard"
-            :checked-value="currentShowAllContestantsAtFirstTimeInScoreboard"
+            :value.sync="currentDefaultShowAllContestantsInScoreboard"
+            :checked-value="currentDefaultShowAllContestantsInScoreboard"
             :text-description="'Mostrar a todos los concursantes en el scoreboard por defecto'"
           ></omegaup-toggle-switch>
         </div>
@@ -44,7 +44,6 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
-
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_ToggleSwitch from '../ToggleSwitch.vue';
 
@@ -64,19 +63,19 @@ export default class Publish extends Vue {
   @Prop() admissionMode!: AdmissionMode;
   @Prop() admissionModeDescription!: string;
   @Prop() shouldShowPublicOption!: boolean;
-  @Prop({ default: false }) showAllContestantsAtFirstTimeInScoreboard!: boolean;
+  @Prop({ default: false }) defaultShowAllContestantsInScoreboard!: boolean;
 
   T = T;
   AdmissionMode = AdmissionMode;
   currentAdmissionMode = this.admissionMode;
-  currentShowAllContestantsAtFirstTimeInScoreboard = this
-    .showAllContestantsAtFirstTimeInScoreboard;
+  currentDefaultShowAllContestantsInScoreboard = this
+    .defaultShowAllContestantsInScoreboard;
 
   onSubmit(): void {
     this.$emit('update-admission-mode', {
       admissionMode: this.currentAdmissionMode,
-      showAllContestantsAtFirstTimeInScoreboard: this
-        .currentShowAllContestantsAtFirstTimeInScoreboard,
+      defaultShowAllContestantsInScoreboard: this
+        .currentDefaultShowAllContestantsInScoreboard,
     });
   }
 

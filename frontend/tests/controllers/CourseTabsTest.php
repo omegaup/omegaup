@@ -3,7 +3,7 @@
 class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testUnauthenticatedUserTabs() {
         $coursesAliases = [
-            'general' => [],
+            'public' => [],
             'enrolled' => [],
             'finished' => [],
         ];
@@ -39,7 +39,7 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
                 'assignment_type' => 'lesson'
             ])
         );
-        $coursesAliases['general'][] = $courseData['course_alias'];
+        $coursesAliases['public'][] = $courseData['course_alias'];
 
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
             null,
@@ -57,17 +57,17 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertCount(
             1,
-            $response['smartyProperties']['payload']['courses']['general']
+            $response['smartyProperties']['payload']['courses']['public']
         );
         $this->assertEquals(
-            $coursesAliases['general'][0],
-            $response['smartyProperties']['payload']['courses']['general'][0]['alias']
+            $coursesAliases['public'][0],
+            $response['smartyProperties']['payload']['courses']['public'][0]['alias']
         );
     }
 
     public function testAuthenticatedUserTabs() {
         $coursesAliases = [
-            'general' => [],
+            'public' => [],
             'enrolled' => [],
             'finished' => [],
         ];
@@ -105,7 +105,7 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
                 'assignment_type' => 'lesson'
             ])
         );
-        $coursesAliases['general'][] = $courseData['course_alias'];
+        $coursesAliases['public'][] = $courseData['course_alias'];
 
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
             null,
@@ -148,11 +148,11 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(
             1,
-            $response['smartyProperties']['payload']['courses']['general']
+            $response['smartyProperties']['payload']['courses']['public']
         );
         $this->assertEquals(
-            $coursesAliases['general'][0],
-            $response['smartyProperties']['payload']['courses']['general'][0]['alias']
+            $coursesAliases['public'][0],
+            $response['smartyProperties']['payload']['courses']['public'][0]['alias']
         );
         $this->assertEquals(
             $coursesAliases['enrolled'][0],

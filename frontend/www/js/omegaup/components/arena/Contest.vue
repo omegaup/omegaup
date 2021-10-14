@@ -55,14 +55,14 @@
           <div v-else class="problem main">
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
-              :next-submission-timestamp="nextSubmissionTimestamp"
+              :next-submission-timestamp="currentNextSubmissionTimestamp"
               :languages="contest.languages.split(',')"
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="runs"
               :popup-displayed="popupDisplayed"
               :guid="guid"
-              :should-show-run-details="shouldShowRunDetails"
+              :run-details-data="currentRunDetailsData"
               :contest-alias="contest.alias"
               :is-contest-finished="isContestFinished"
               @update:activeTab="
@@ -73,7 +73,7 @@
                   })
               "
               @submit-run="onRunSubmitted"
-              @show-run="(source) => $emit('show-run', source)"
+              @show-run="onRunDetails"
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -94,7 +94,7 @@
           contest.admission_mode !== AdmissionMode.Private
         "
         :show-all-contestants="
-          contest.show_all_contestants_at_first_time_in_scoreboard
+          contest.default_show_all_contestants_in_scoreboard
         "
       ></omegaup-arena-scoreboard>
     </template>
@@ -155,6 +155,7 @@ import { omegaup } from '../../omegaup';
 import { ContestClarificationType } from '../../arena/clarifications';
 import { SocketStatus } from '../../arena/events_socket';
 import { AdmissionMode } from '../common/Publish.vue';
+import { SubmissionRequest } from '../../arena/submissions';
 
 @Component({
   components: {
@@ -198,6 +199,8 @@ export default class ArenaContest extends Vue {
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
   @Prop({ default: true }) socketConnected!: boolean;
   @Prop({ default: () => [] }) runs!: types.Run[];
+  @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
+  @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
 
   T = T;
   ui = ui;
@@ -205,8 +208,8 @@ export default class ArenaContest extends Vue {
   ContestClarificationType = ContestClarificationType;
   currentClarifications = this.clarifications;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  shouldShowRunDetails = false;
-  nextSubmissionTimestamp: Date | null = null;
+  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+  currentRunDetailsData = this.runDetailsData;
   now = new Date();
 
   get socketClass(): string {
@@ -258,6 +261,15 @@ export default class ArenaContest extends Vue {
     });
   }
 
+  onRunDetails(request: SubmissionRequest): void {
+    this.$emit('show-run', {
+      ...request,
+      hash: `#problems/${
+        this.activeProblemAlias ?? request.problemAlias
+      }/show-run:${request.guid}`,
+    });
+  }
+
   @Watch('problem')
   onActiveProblemChanged(newValue: types.NavbarProblemsetProblem | null): void {
     if (!newValue) {
@@ -272,7 +284,8 @@ export default class ArenaContest extends Vue {
     if (!newValue) {
       return;
     }
-    this.nextSubmissionTimestamp = newValue.nextSubmissionTimestamp ?? null;
+    this.currentNextSubmissionTimestamp =
+      newValue.nextSubmissionTimestamp ?? null;
   }
 
   @Watch('clarifications')
@@ -280,13 +293,9 @@ export default class ArenaContest extends Vue {
     this.currentClarifications = newValue;
   }
 
-  @Watch('popupDisplayed')
-  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
-    if (newValue === PopupDisplayed.RunDetails) {
-      this.$nextTick(() => {
-        this.shouldShowRunDetails = true;
-      });
-    }
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 }
 </script>
