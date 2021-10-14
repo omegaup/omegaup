@@ -111,7 +111,7 @@
         :global-runs="false"
         :is-contest-finished="isContestFinished"
         :search-result-users="searchResultUsers"
-        @details="onRunAdminDetails"
+        @details="(run) => onRunAdminDetails(run.guid)"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
         @update-search-result-users-contest="
@@ -304,10 +304,10 @@ export default class ArenaContest extends Vue {
     });
   }
 
-  onRunAdminDetails(request: SubmissionRequest): void {
+  onRunAdminDetails(guid: string): void {
     this.$emit('show-run', {
-      ...request,
-      hash: `#runs/all/show-run:${request.guid}`,
+      guid,
+      hash: `#runs/all/show-run:${guid}`,
       isAdmin: this.contestAdmin,
     });
     this.currentPopupDisplayed = PopupDisplayed.RunDetails;

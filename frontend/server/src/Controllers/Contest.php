@@ -664,14 +664,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'contest_intro',
         ];
 
-        $contestAdmin = \OmegaUp\Authorization::isContestAdmin(
-            $r->identity,
-            $contest
-        );
         // Contest intro for admins is not needed
-        if (!$shouldShowIntro || $contestAdmin) {
+        if (!$shouldShowIntro) {
             [
                 'contest' => $contest,
+                'contest_admin' => $contestAdmin,
                 'problemset' => $problemset,
             ] = self::validateDetails($contestAlias, $r->identity);
 
@@ -810,9 +807,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($r->identity)) {
             // No session, show the intro if public, so that they can login.
             return $result;
-        }
-        if (is_null($contest->problemset_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
         [
@@ -1328,6 +1322,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 return self::isPublic($contest->admission_mode);
             }
             self::validateAccessContest($contest, $identity);
+            $contestAdmin = \OmegaUp\Authorization::isContestAdmin(
+                $identity,
+                $contest
+            );
+            if ($contestAdmin) {
+                return !\OmegaUp\Controllers\Contest::SHOW_INTRO;
+            }
         } catch (\Exception $e) {
             // Could not access contest. Private contests must not be leaked, so
             // unless they were manually added beforehand, show them a 404 error.
