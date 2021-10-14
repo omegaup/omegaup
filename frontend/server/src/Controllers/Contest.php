@@ -663,15 +663,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ],
             'entrypoint' => 'contest_intro',
         ];
-
-        // Contest intro for admins is not needed
         if (!$shouldShowIntro) {
             [
                 'contest' => $contest,
                 'contest_admin' => $contestAdmin,
                 'problemset' => $problemset,
             ] = self::validateDetails($contestAlias, $r->identity);
-
             if (is_null($contest->problemset_id)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'contestNotFound'
