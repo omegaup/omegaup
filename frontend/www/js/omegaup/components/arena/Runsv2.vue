@@ -7,9 +7,11 @@
       <div id="run-details"></div>
     </div>
     <!-- id-lint on -->
-    <div v-if="globalRuns" class="card-header">
-      <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
-    </div>
+    <slot name="title">
+      <div class="card-header">
+        <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
+      </div>
+    </slot>
     <div class="table-responsive">
       <table
         class="runs table table-striped"
@@ -299,7 +301,7 @@
         </tbody>
       </table>
     </div>
-    <slot v-if="globalRuns" name="runs">
+    <slot name="runs">
       <omegaup-overlay
         :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
         @hide-overlay="onPopupDismissed"
@@ -389,7 +391,6 @@ export default class Runsv2 extends Vue {
   @Prop({ default: null }) username!: string | null;
   @Prop({ default: 100 }) rowCount!: number;
   @Prop() runs!: null | types.Run[];
-  @Prop({ default: false }) globalRuns!: boolean;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
@@ -615,7 +616,7 @@ export default class Runsv2 extends Vue {
 
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
-    window.location.replace('#');
+    this.$emit('reset-hash');
   }
 
   @Watch('runDetailsData')

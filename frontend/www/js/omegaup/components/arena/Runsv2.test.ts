@@ -11,7 +11,6 @@ describe('Runsv2.vue', () => {
     const wrapper = shallowMount(arena_Runsv2, {
       propsData: {
         contestAlias: 'admin',
-        globalRuns: true,
         runs: [],
       },
     });
@@ -25,7 +24,6 @@ describe('Runsv2.vue', () => {
     const wrapper = shallowMount(arena_Runsv2, {
       propsData: {
         contestAlias: 'admin',
-        globalRuns: true,
         runs: [
           {
             alias: 'alias',
@@ -85,7 +83,6 @@ describe('Runsv2.vue', () => {
     const wrapper = shallowMount(arena_Runsv2, {
       propsData: {
         contestAlias: 'admin',
-        globalRuns: true,
         runs: [
           {
             ...baseRunData,

@@ -1,153 +1,153 @@
-import Vue from 'vue';
-
-import arena_Runsv2, { PopupDisplayed } from '../components/arena/Runsv2.vue';
 import * as api from '../api';
 import T from '../lang';
+import { Arena, GetOptionsFromLocation } from './arena';
+import ArenaAdmin from './admin_arena';
 import { OmegaUp } from '../omegaup';
 import * as ui from '../ui';
 import * as time from '../time';
-import { runsStore } from './runsStore';
-import {
-  onRefreshRuns,
-  showSubmission,
-  SubmissionRequest,
-  updateRunFallback,
-} from './submissions';
-import { types } from '../api_types';
-import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 
-OmegaUp.on('ready', async () => {
-  time.setSugarLocale();
-  const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
-  let runDetails: null | types.RunDetails = null;
-  try {
-    ({ runDetails } = await getProblemAndRunDetails({
-      location: window.location.hash,
-    }));
-  } catch (e) {
-    ui.apiError(e);
-  }
-  new Vue({
-    el: '#main-container',
-    components: {
-      'omegaup-arena-runs': arena_Runsv2,
-    },
-    data: () => ({
-      searchResultUsers: [] as types.ListItem[],
-      popupDisplayed,
-      guid,
-      runDetailsData: runDetails,
-    }),
-    render: function (createElement) {
-      return createElement('omegaup-arena-runs', {
-        props: {
-          contestAlias: 'admin',
-          popupDisplayed: this.popupDisplayed,
-          runs: runsStore.state.runs,
-          showContest: true,
-          showProblem: true,
-          showDetails: true,
-          showDisqualify: true,
-          showPager: true,
-          showRejudge: true,
-          showUser: true,
-          guid: this.guid,
-          globalRuns: true,
-          searchResultUsers: this.searchResultUsers,
-          runDetailsData: this.runDetailsData,
-        },
-        on: {
-          details: (request: SubmissionRequest) => {
-            api.Run.details({ run_alias: request.guid })
-              .then((runDetails) => {
-                this.runDetailsData = showSubmission({ request, runDetails });
-                window.location.hash = request.hash;
-              })
-              .catch((error) => {
-                ui.apiError(error);
-                this.popupDisplayed = PopupDisplayed.None;
-              });
-          },
-          disqualify: (run: types.Run) => {
-            if (!window.confirm(T.runDisqualifyConfirm)) {
-              return;
-            }
-            api.Run.disqualify({ run_alias: run.guid })
-              .then(() => {
-                run.type = 'disqualified';
-                updateRunFallback({ run });
-              })
-              .catch(ui.ignoreError);
-          },
-          'filter-changed': () => {
-            refreshRuns();
-          },
-          rejudge: (run: types.Run) => {
-            api.Run.rejudge({ run_alias: run.guid, debug: false })
-              .then(() => {
-                run.status = 'rejudging';
-                updateRunFallback({ run });
-              })
-              .catch(ui.ignoreError);
-          },
-          'update-search-result-users': ({ query }: { query: string }) => {
-            api.User.list({ query })
-              .then(({ results }) => {
-                this.searchResultUsers = results.map(
-                  ({ key, value }: types.ListItem) => ({
-                    key,
-                    value: `${ui.escape(key)} (<strong>${ui.escape(
-                      value,
-                    )}</strong>)`,
-                  }),
-                );
-              })
-              .catch(ui.apiError);
-          },
-          'update-search-result-users-contest': ({
-            query,
-            contestAlias,
-          }: {
-            query: string;
-            contestAlias: string;
-          }) => {
-            api.Contest.searchUsers({ query, contest_alias: contestAlias })
-              .then(({ results }) => {
-                this.searchResultUsers = results.map(
-                  ({ key, value }: types.ListItem) => ({
-                    key,
-                    value: `${ui.escape(key)} (<strong>${ui.escape(
-                      value,
-                    )}</strong>)`,
-                  }),
-                );
-              })
-              .catch(ui.apiError);
-          },
-        },
-      });
-    },
-  });
+OmegaUp.on('ready', () => {
+  const arenaInstance = new Arena(GetOptionsFromLocation(window.location));
+  const adminInstance = new ArenaAdmin(arenaInstance);
 
-  function refreshRuns(): void {
-    api.Run.list({
-      show_all: true,
-      offset: runsStore.state.filters?.offset,
-      rowcount: runsStore.state.filters?.rowcount,
-      verdict: runsStore.state.filters?.verdict,
-      language: runsStore.state.filters?.language,
-      username: runsStore.state.filters?.username,
-      status: runsStore.state.filters?.status,
+  window.addEventListener('hashchange', () => arenaInstance.onHashChanged());
+
+  if (arenaInstance.options.contestAlias === 'admin') {
+    $('#runs').show();
+    adminInstance.refreshRuns();
+    setInterval(() => {
+      adminInstance.refreshRuns();
+    }, 5 * 60 * 1000);
+
+    // Trigger the event (useful on page load).
+    arenaInstance.onHashChanged();
+
+    $('#loading').fadeOut('slow');
+    $('#root').fadeIn('slow');
+  } else {
+    api.Contest.adminDetails({
+      contest_alias: arenaInstance.options.contestAlias,
     })
       .then(time.remoteTimeAdapter)
-      .then((response) => {
-        onRefreshRuns({ runs: response.runs });
-      })
-      .catch(ui.apiError);
-  }
+      .then((contest) => {
+        if (!contest.admin) {
+          if (!OmegaUp.loggedIn) {
+            window.location.href = `/login/?redirect=${encodeURIComponent(
+              window.location.pathname,
+            )}`;
+          } else {
+            window.location.href = '/';
+          }
+          return;
+        }
 
-  refreshRuns();
-  setInterval(() => {
-    refreshRuns();
-  }, 5 * 60 * 1000);
+        $('#title .contest-title').text(ui.contestTitle(contest));
+        arenaInstance.updateSummary(contest);
+
+        arenaInstance.submissionGap = contest.submissions_gap;
+        if (!(arenaInstance.submissionGap > 0)) arenaInstance.submissionGap = 0;
+
+        arenaInstance.initProblemsetId(contest);
+        arenaInstance.initProblems(contest);
+        arenaInstance.initClock(contest.start_time, contest.finish_time, null);
+        if (contest.problems) {
+          for (const idx in contest.problems) {
+            const problem = contest.problems[idx];
+            const problemName = `${problem.letter}. ${ui.escape(
+              problem.title,
+            )}`;
+
+            arenaInstance.problems[problem.alias] = {
+              ...problem,
+              languages: problem.languages
+                .split(',')
+                .filter((language) => language !== ''),
+            };
+            if (arenaInstance.navbarProblems) {
+              arenaInstance.navbarProblems.problems.push({
+                alias: problem.alias,
+                acceptsSubmissions: true,
+                text: problemName,
+                bestScore: 0,
+                maxScore: 0,
+                hasRuns: false,
+              });
+            }
+
+            $('#clarification select[name=problem]').append(
+              `<option value="${problem.alias}">${problemName}</option>`,
+            );
+            $('select.runsproblem').append(
+              `<option value="${problem.alias}">${problemName}</option>`,
+            );
+          }
+        }
+
+        api.Contest.users({
+          contest_alias: arenaInstance.options.contestAlias,
+        })
+          .then((data) => {
+            for (const ind in data.users) {
+              const user = data.users[ind];
+              const receiver = user.is_owner
+                ? T.wordsPublic
+                : ui.escape(user.username);
+              $('#clarification select[name=user]').append(
+                `<option value="${ui.escape(
+                  user.username,
+                )}">${receiver}</option>`,
+              );
+            }
+          })
+          .catch(ui.ignoreError);
+
+        arenaInstance.setupPolls();
+        adminInstance.refreshRuns();
+        if (!arenaInstance.socket) {
+          setInterval(() => {
+            adminInstance.refreshRuns();
+          }, 5 * 60 * 1000);
+        }
+
+        // Trigger the event (useful on page load).
+        arenaInstance.onHashChanged();
+
+        $('#loading').fadeOut('slow');
+        $('#root').fadeIn('slow');
+      })
+      .catch(() => {
+        if (!OmegaUp.loggedIn) {
+          window.location.href = `/login/?redirect=${encodeURIComponent(
+            window.location.pathname,
+          )}`;
+        } else {
+          window.location.href = '/';
+        }
+      });
+  }
+  $('#rejudge-problem').on('click', () => {
+    if (
+      confirm(
+        `Deseas rejuecear el problema ${arenaInstance.currentProblem.alias}?`,
+      )
+    ) {
+      api.Problem.rejudge({
+        problem_alias: arenaInstance.currentProblem.alias,
+      })
+        .then(() => {
+          adminInstance.refreshRuns();
+        })
+        .catch(ui.ignoreError);
+    }
+    return false;
+  });
+
+  $('#update-problem').on('submit', () => {
+    $('#update-problem input[name="problem_alias"]').val(
+      arenaInstance.currentProblem.alias,
+    );
+    return confirm(
+      `Deseas actualizar el problema ${arenaInstance.currentProblem.alias}?`,
+    );
+  });
 });

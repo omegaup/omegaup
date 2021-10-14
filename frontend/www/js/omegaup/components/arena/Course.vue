@@ -133,11 +133,13 @@
         :show-rejudge="true"
         :show-user="true"
         :problemset-problems="Object.values(problems)"
-        :global-runs="false"
         @details="onRunAdminDetails"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
-      ></omegaup-arena-runs>
+      >
+        <template #title><div></div></template>
+        <template #runs><div></div></template>
+      </omegaup-arena-runs>
       <omegaup-overlay
         v-if="isAdmin"
         :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
