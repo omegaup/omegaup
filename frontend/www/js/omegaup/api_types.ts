@@ -11,6 +11,7 @@ export namespace dao {
     certificates_status?: string;
     contest_for_teams?: boolean;
     contest_id?: number;
+    default_show_all_contestants_in_scoreboard?: boolean;
     description?: string;
     feedback?: string;
     finish_time?: Date;
@@ -25,7 +26,6 @@ export namespace dao {
     recommended?: boolean;
     rerun_id?: number;
     scoreboard?: number;
-    show_all_contestants_at_first_time_in_scoreboard?: boolean;
     show_scoreboard_after?: boolean;
     start_time?: Date;
     submissions_gap?: number;
@@ -2041,6 +2041,7 @@ export namespace types {
     archived: boolean;
     available_languages: { [key: string]: string };
     contest_for_teams: boolean;
+    default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -2063,7 +2064,6 @@ export namespace types {
     scoreboard: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
-    show_all_contestants_at_first_time_in_scoreboard: boolean;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
     start_time: Date;
@@ -2079,6 +2079,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     contest_for_teams: boolean;
+    default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -2101,7 +2102,6 @@ export namespace types {
     scoreboard: number;
     scoreboard_url?: string;
     scoreboard_url_admin?: string;
-    show_all_contestants_at_first_time_in_scoreboard: boolean;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
     start_time: Date;
@@ -2227,6 +2227,7 @@ export namespace types {
   export interface ContestPublicDetails {
     admission_mode: string;
     alias: string;
+    default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -2240,7 +2241,6 @@ export namespace types {
     problemset_id: number;
     rerun_id?: number;
     scoreboard: number;
-    show_all_contestants_at_first_time_in_scoreboard: boolean;
     show_penalty: boolean;
     show_scoreboard_after: boolean;
     start_time: Date;

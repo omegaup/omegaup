@@ -273,7 +273,7 @@ describe('ranking', () => {
         rerun_id: 0,
         scoreboard: 1,
         show_penalty: false,
-        show_all_contestants_at_first_time_in_scoreboard: false,
+        default_show_all_contestants_in_scoreboard: false,
         show_scoreboard_after: false,
         start_time: new Date(0),
         submissions_gap: 1,

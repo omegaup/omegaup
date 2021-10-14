@@ -200,7 +200,7 @@ CREATE TABLE `Contests` (
   `certificate_cutoff` int DEFAULT NULL COMMENT 'Número de concursantes a premiar con diplomas que mencionan su lugar en el ranking',
   `certificates_status` enum('uninitiated','queued','generated','retryable_error','fatal_error') NOT NULL DEFAULT 'uninitiated' COMMENT 'Estado de la petición de generar diplomas',
   `contest_for_teams` tinyint(1) DEFAULT '0' COMMENT 'Bandera que indica si el concurso es para equipos.',
-  `show_all_contestants_at_first_time_in_scoreboard` tinyint(1) DEFAULT '0' COMMENT 'Bandera que indica si en el scoreboard se mostrarán todos los concursantes por defecto.',
+  `default_show_all_contestants_in_scoreboard` tinyint(1) DEFAULT '0' COMMENT 'Bandera que indica si en el scoreboard se mostrarán todos los concursantes por defecto.',
   PRIMARY KEY (`contest_id`),
   UNIQUE KEY `contests_alias` (`alias`),
   KEY `rerun_id` (`contest_id`),

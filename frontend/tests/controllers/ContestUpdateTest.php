@@ -81,7 +81,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
     /**
      * Update from private to public.
-     * And choosing show_all_contestants_at_first_time_in_scoreboard option
+     * And choosing default_show_all_contestants_in_scoreboard option
      */
     public function testUpdateShowAllContestantsAtFirstTimeOption() {
         // Get a contest
@@ -107,21 +107,21 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['request']['alias']
         );
         $this->assertFalse(
-            $contest->show_all_contestants_at_first_time_in_scoreboard
+            $contest->default_show_all_contestants_in_scoreboard
         );
 
         \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'admission_mode' => 'public',
-            'show_all_contestants_at_first_time_in_scoreboard' => true,
+            'default_show_all_contestants_in_scoreboard' => true,
         ]));
 
         $contest = \OmegaUp\DAO\Contests::getByAlias(
             $contestData['request']['alias']
         );
         $this->assertTrue(
-            $contest->show_all_contestants_at_first_time_in_scoreboard
+            $contest->default_show_all_contestants_in_scoreboard
         );
     }
 
