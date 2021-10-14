@@ -10,7 +10,7 @@
       <div class="col-md-10">
         <div class="card">
           <div class="card-header">
-            <nav class="nav nav-tabs" role="tablist" profile-navtabs>
+            <nav class="nav nav-tabs" role="tablist" data-profile-navtabs>
               <a
                 v-if="profile.is_own_profile || !profile.is_private"
                 class="nav-item nav-link active"

@@ -62,6 +62,6 @@ describe('Profilev2.vue', () => {
         visitorBadges: new Set(badge_alias) as Set<string>,
       },
     });
-    expect(wrapper.find('[profile-navtabs]').exists()).toBe(true);
+    expect(wrapper.find('[data-profile-navtabs]').exists()).toBe(true);
   });
 });

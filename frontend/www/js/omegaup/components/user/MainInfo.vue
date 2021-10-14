@@ -111,9 +111,3 @@ export default class UserMainInfo extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-a:hover {
-  cursor: pointer;
-}
-</style>
