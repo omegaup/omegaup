@@ -5,7 +5,6 @@ import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
 import arena_ContestPractice from '../components/arena/ContestPractice.vue';
-import { PopupDisplayed } from '../components/problem/Details.vue';
 import {
   showSubmission,
   SubmissionRequest,
@@ -31,6 +30,13 @@ OmegaUp.on('ready', async () => {
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
+  const {
+    guid,
+    popupDisplayed,
+    problem,
+    problemAlias,
+    showNewClarificationPopup,
+  } = getOptionsFromLocation(window.location.hash);
   let runDetails: null | types.RunDetails = null;
   let problemDetails: null | types.ProblemDetails = null;
   try {
@@ -48,13 +54,13 @@ OmegaUp.on('ready', async () => {
     el: '#main-container',
     components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
     data: () => ({
-      problemInfo: null as types.ProblemInfo | null,
-      problem: null as types.NavbarProblemsetProblem | null,
+      problemInfo: problemDetails,
+      problem,
       problems: payload.problems,
-      popupDisplayed: PopupDisplayed.None,
-      showNewClarificationPopup: false,
-      guid: null as null | string,
-      problemAlias: null as null | string,
+      popupDisplayed,
+      showNewClarificationPopup,
+      guid,
+      problemAlias,
       isAdmin: false,
       nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
       runDetailsData: runDetails,
@@ -94,26 +100,29 @@ OmegaUp.on('ready', async () => {
             });
           },
           'show-run': (request: SubmissionRequest) => {
-            const hash = `#problems/${
-              this.problemAlias ?? request.request.problemAlias
-            }/show-run:${request.request.guid}/`;
-            api.Run.details({ run_alias: request.request.guid })
+            api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
-                showSubmission({ request, runDetails, hash });
+                this.runDetailsData = showSubmission({ request, runDetails });
+                window.location.hash = request.hash;
               })
-              .catch((error) => {
-                ui.apiError(error);
-                this.popupDisplayed = PopupDisplayed.None;
+              .catch((run) => {
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
               });
           },
           'submit-run': ({
             problem,
             code,
             language,
+            target,
           }: {
             code: string;
             language: string;
             problem: types.NavbarProblemsetProblem;
+            target: Vue & { currentNextSubmissionTimestamp: Date };
           }) => {
             api.Run.create({
               problem_alias: problem.alias,
@@ -130,6 +139,8 @@ OmegaUp.on('ready', async () => {
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
                 });
+                target.currentNextSubmissionTimestamp =
+                  response.nextSubmissionTimestamp;
               })
               .catch((run) => {
                 submitRunFailed({
@@ -184,11 +195,6 @@ OmegaUp.on('ready', async () => {
       });
     },
   });
-
-  // This needs to be set here and not at the top because it depends
-  // on the `navigate-to-problem` callback being invoked, and that is
-  // not the case if this is set a priori.
-  Object.assign(contestPractice, getOptionsFromLocation(window.location.hash));
 
   setInterval(() => {
     refreshContestClarifications({

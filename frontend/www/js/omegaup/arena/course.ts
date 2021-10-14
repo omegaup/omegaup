@@ -41,6 +41,13 @@ OmegaUp.on('ready', async () => {
   if (activeTab !== locationHash[0]) {
     window.location.hash = activeTab;
   }
+  const {
+    guid,
+    popupDisplayed,
+    problem,
+    problemAlias,
+    showNewClarificationPopup,
+  } = getOptionsFromLocation(window.location.hash);
   let runDetails: null | types.RunDetails = null;
   let problemDetails: null | types.ProblemDetails = null;
   try {
@@ -60,13 +67,13 @@ OmegaUp.on('ready', async () => {
       'omegaup-arena-course': arena_Course,
     },
     data: () => ({
-      popupDisplayed: PopupDisplayed.None,
-      problemInfo: null as types.ProblemInfo | null,
-      problem: null as types.NavbarProblemsetProblem | null,
+      problemInfo: problemDetails,
+      problem,
       problems: payload.currentAssignment.problems,
-      showNewClarificationPopup: false,
-      guid: null as null | string,
-      problemAlias: null as null | string,
+      popupDisplayed,
+      showNewClarificationPopup,
+      guid,
+      problemAlias,
       searchResultUsers: [] as types.ListItem[],
       runDetailsData: runDetails,
       nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
@@ -118,15 +125,17 @@ OmegaUp.on('ready', async () => {
             });
           },
           'show-run': (request: SubmissionRequest) => {
-            const hash = `#problems/${
-              this.problemAlias ?? request.request.problemAlias
-            }/show-run:${request.request.guid}/`;
-            api.Run.details({ run_alias: request.request.guid })
+            api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
-                showSubmission({ request, runDetails, hash });
+                this.runDetailsData = showSubmission({ request, runDetails });
+                window.location.hash = request.hash;
               })
-              .catch((error) => {
-                ui.apiError(error);
+              .catch((run) => {
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
               });
           },
           'submit-run': ({
@@ -201,19 +210,6 @@ OmegaUp.on('ready', async () => {
           },
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
-          },
-          'show-run-all': (request: SubmissionRequest) => {
-            const hash = `#runs/show-run:${request.request.guid}/`;
-            api.Run.details({ run_alias: request.request.guid })
-              .then((runDetails) => {
-                showSubmission({ request, runDetails, hash });
-              })
-              .catch((error) => {
-                ui.apiError(error);
-              })
-              .finally(() => {
-                this.popupDisplayed = PopupDisplayed.None;
-              });
           },
           rejudge: (run: types.Run) => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
@@ -340,11 +336,6 @@ OmegaUp.on('ready', async () => {
     },
   });
 
-  // This needs to be set here and not at the top because it depends
-  // on the `navigate-to-problem` callback being invoked, and that is
-  // not the case if this is set a priori.
-  Object.assign(arenaCourse, getOptionsFromLocation(window.location.hash));
-
   function getSelectedValidTab(tab: string, isAdmin: boolean): string {
     const validTabs = ['problems', 'ranking', 'runs', 'clarifications'];
     const defaultTab = 'problems';
@@ -357,13 +348,6 @@ OmegaUp.on('ready', async () => {
     for (const run of payload.currentAssignment.runs) {
       trackRun({ run });
     }
-  }
-
-  if (locationHash[1] && locationHash[1].includes('show-run:')) {
-    const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
-    const showRunMatch = window.location.hash.match(showRunRegex);
-    arenaCourse.guid = showRunMatch?.[1] ?? null;
-    arenaCourse.popupDisplayed = PopupDisplayed.RunDetails;
   }
 
   const socket = new EventsSocket({
