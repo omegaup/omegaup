@@ -806,6 +806,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             // No session, show the intro if public, so that they can login.
             return $result;
         }
+        if (is_null($contest->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
+        }
 
         [
             'needsBasicInformation' => $needsBasicInformation,
