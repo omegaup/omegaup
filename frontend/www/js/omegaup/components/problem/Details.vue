@@ -236,7 +236,7 @@
           :show-disqualify="true"
           :problemset-problems="[]"
           :search-result-users="searchResultUsers"
-          @details="(run) => onRunDetails(run.guid)"
+          @details="(run) => onRunAdminDetails(run.guid)"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
           @filter-changed="
@@ -386,11 +386,10 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
-  @Prop() isAdmin!: boolean;
+  @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop() nextSubmissionTimestamp!: null | Date;
   @Prop({ default: false }) shouldShowTabs!: boolean;
-  @Prop({ default: false }) shouldShowRunDetails!: boolean;
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
@@ -495,15 +494,23 @@ export default class ProblemDetails extends Vue {
   }
 
   onRunDetails(guid: string): void {
-    this.$emit('show-run', {
-      request: {
-        guid,
-        isAdmin: this.isAdmin,
-        problemAlias: this.problem.alias,
-      },
-      target: this,
-    });
     this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+    this.$emit('show-run', {
+      guid,
+      hash: `#problems/${this.problemAlias}/show-run:${guid}`,
+      isAdmin: this.isAdmin,
+      problemAlias: this.problem.alias,
+    });
+  }
+
+  onRunAdminDetails(guid: string): void {
+    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+    this.$emit('show-run', {
+      guid,
+      hash: `#runs/${this.problemAlias}/show-run:${guid}`,
+      isAdmin: this.isAdmin,
+      problemAlias: this.problem.alias,
+    });
   }
 
   onNewPromotion(): void {
@@ -659,9 +666,6 @@ export default class ProblemDetails extends Vue {
       ui.reportEvent('quality-nomination', 'shown');
       return;
     }
-    if (newValue === PopupDisplayed.RunDetails && this.guid) {
-      this.onRunDetails(this.guid);
-    }
   }
 
   @Watch('currentClarifications')
@@ -670,18 +674,9 @@ export default class ProblemDetails extends Vue {
     this.hasUnreadClarifications = true;
   }
 
-  @Watch('shouldShowRunDetails')
-  onShouldShowRunDetailsChanged(newValue: boolean): void {
-    if (newValue && this.guid) {
-      this.$emit('show-run', {
-        request: {
-          guid: this.guid,
-          isAdmin: this.isAdmin,
-          problemAlias: this.currentRunDetailsData?.alias,
-        },
-        target: this,
-      });
-    }
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 }
 </script>

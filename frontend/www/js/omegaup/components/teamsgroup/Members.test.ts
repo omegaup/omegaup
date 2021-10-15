@@ -94,4 +94,48 @@ describe('Members.vue', () => {
 
     wrapper.destroy();
   });
+
+  it('Should handle change password form', async () => {
+    const teamUsername = 'teams:group_alias:team_1';
+    const wrapper = mount(teamsgroup_Members, {
+      attachTo: '#root',
+      propsData: {
+        searchResultUsers: [] as types.ListItem[],
+        teamUsername,
+        teamsMembers: [
+          {
+            classname: 'user-rank-unranked',
+            name: 'user 1',
+            team_alias: teamUsername,
+            team_name: 'team 1',
+            username: 'user_1',
+          },
+        ] as types.TeamMember[],
+      },
+    });
+
+    await wrapper
+      .find('button[data-change-password-identity="user_1"]')
+      .trigger('click');
+
+    await wrapper
+      .find('.input-group input[type="password"]')
+      .setValue('new_pass');
+
+    expect(wrapper.vm.username).toBe('user_1');
+    expect(wrapper.vm.password).toBe('new_pass');
+
+    await wrapper
+      .find('button[data-save-new-password-identity="user_1"]')
+      .trigger('click');
+
+    expect(wrapper.emitted('change-password-identity')).toEqual([
+      [
+        {
+          newPassword: 'new_pass',
+          username: 'user_1',
+        },
+      ],
+    ]);
+  });
 });

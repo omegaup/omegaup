@@ -274,6 +274,11 @@
                   <a href="/group/" data-nav-user-groups>{{ T.navMyGroups }}</a>
                 </li>
                 <li>
+                  <a href="/teamsgroup/" data-nav-user-teams-groups>{{
+                    T.navMyTeamsGroups
+                  }}</a>
+                </li>
+                <li>
                   <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
                 </li>
               </template>

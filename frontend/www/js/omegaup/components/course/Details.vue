@@ -8,10 +8,10 @@
         <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
     </h3>
-    <div class="my-4 markdown">
-      <omegaup-markdown :markdown="course.description"></omegaup-markdown>
-    </div>
     <div v-if="course.is_admin" class="mb-5">
+      <div class="my-4 markdown">
+        <omegaup-markdown :markdown="course.description"></omegaup-markdown>
+      </div>
       <span>{{
         ui.formatString(T.courseStudentCountLabel, {
           student_count: course.student_count,
@@ -93,15 +93,23 @@
       </div>
     </div>
     <template v-else>
-      <div class="text-center align-middle">
-        <span>
-          {{ T.overallCompletedPercentage }}:
-          <progress
-            max="100"
-            :value="overallCompletedPercentage"
-            :title="`${overallCompletedPercentage} %`"
-          ></progress>
-        </span>
+      <div class="my-4">
+        <div class="progress w-50 mx-auto">
+          <div
+            class="progress-bar bg-warning"
+            role="progressbar"
+            :aria-valuenow="overallCompletedPercentage"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            :style="`width: ${overallCompletedPercentage}%`"
+          ></div>
+        </div>
+        <p class="text-center my-0 text-uppercase progress-text">
+          {{ T.courseDetailsProgress }}
+        </p>
+      </div>
+      <div class="my-4 markdown">
+        <omegaup-markdown :markdown="course.description"></omegaup-markdown>
       </div>
       <div class="d-flex justify-content-end">
         <a
@@ -313,3 +321,9 @@ export default class CourseDetails extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.progress-text {
+  font-size: 0.75rem;
+}
+</style>
