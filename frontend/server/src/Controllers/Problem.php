@@ -5127,7 +5127,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-    * @return array{smartyProperties: array{payload: ProblemFormPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+    * @return array{smartyProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString}, entrypoint: string}
     */
     public static function getCreatorForTypescript(
         \OmegaUp\Request $r
