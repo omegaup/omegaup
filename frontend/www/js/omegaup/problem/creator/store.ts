@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Vuex, { StoreOptions } from 'vuex';
+import Vuex, { Module } from 'vuex';
 import { types } from './types';
 import { casesStore } from './modules/cases';
 import T from '../../lang';
@@ -7,13 +7,15 @@ import T from '../../lang';
 Vue.use(Vuex);
 Vue.config.devtools = true;
 
-const store: StoreOptions<types.RootState> = {
-  state: {
-    problemName: T.problemCreatorNamePlaceholder,
-  },
+const state: types.StoreState = {
+  problemName: T.problemCreatorNamePlaceholder,
+} as types.StoreState;
+
+const store: Module<types.StoreState, types.RootState> = {
+  state,
   modules: {
     casesStore,
   },
 };
 
-export default new Vuex.Store<types.RootState>(store);
+export default new Vuex.Store(store);
