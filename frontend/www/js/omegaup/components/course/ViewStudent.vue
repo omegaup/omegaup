@@ -33,7 +33,7 @@
               :key="assignment.alias"
               :value="assignment.alias"
             >
-              {{ assignment.name || initialAssignment }}
+              {{ assignment.name }}
             </option>
           </select>
         </div>
@@ -67,7 +67,7 @@
                   }"
                   role="tab"
                   :data-problem-alias="problem.alias"
-                  @click="selectProblem(problem)"
+                  @click="selectedProblem = problem"
                 >
                   <template v-if="problem.runs.length > 0">
                     {{ bestScore(problem) * problem.points }} /
@@ -217,17 +217,14 @@ export default class CourseViewStudent extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: types.CourseDetails;
   @Prop() initialStudent!: types.StudentProgress;
-  @Prop({ default: null }) initialProblem!: types.CourseProblem | null;
-  @Prop({ default: null }) initialAssignment!: omegaup.Assignment | null;
   @Prop() problems!: types.CourseProblem[];
   @Prop() students!: types.StudentProgress[];
 
   T = T;
   time = time;
-
-  selectedAssignment: string | null = this.initialAssignment?.alias ?? null;
-  selectedProblem: Partial<types.CourseProblem> | null = this.initialProblem;
   ui = ui;
+  selectedAssignment: string | null = null;
+  selectedProblem: Partial<types.CourseProblem> | null = null;
   selectedStudent: Partial<types.StudentProgress> = this.initialStudent || {};
   selectedRun: Partial<types.CourseRun> | null = null;
   showFeedbackForm = false;
@@ -257,10 +254,8 @@ export default class CourseViewStudent extends Vue {
 
   mounted(): void {
     window.addEventListener('popstate', (ev: PopStateEvent) => {
-      if (this.selectedStudent !== null) {
-        return;
-      }
-      this.selectedStudent = ev.state?.student ?? this.initialStudent;
+      this.selectedStudent =
+        (ev.state && ev.state.student) || this.initialStudent;
     });
   }
 
@@ -291,11 +286,6 @@ export default class CourseViewStudent extends Vue {
     return `/course/${this.course.alias}/`;
   }
 
-  selectProblem(selectedProblem: types.CourseProblem) {
-    this.selectedProblem = selectedProblem;
-    window.location.hash = `#${selectedProblem.alias}`;
-  }
-
   sendFeedback(): void {
     if (this.feedback.length < 2) {
       return;
@@ -320,32 +310,16 @@ export default class CourseViewStudent extends Vue {
     if (!newVal || newVal?.username === oldVal?.username) {
       return;
     }
-    let url: string = '';
-    if (this.selectedAssignment !== null) {
-      url = `/course/${this.course.alias}/student/${newVal.username}/assignment/${this.selectedAssignment}/#${this.selectedProblem?.alias}`;
-    } else {
-      url = `/course/${this.course.alias}/student/${newVal.username}/`;
-    }
-    window.history.pushState({ student: newVal }, document.title, url);
+    window.history.pushState(
+      { student: newVal },
+      document.title,
+      `/course/${this.course.alias}/student/${newVal.username}/`,
+    );
   }
 
   @Watch('selectedAssignment')
-  onSelectedAssignmentChange(newVal?: string, oldVal?: string) {
+  onSelectedAssignmentChange() {
     this.$emit('update', this.selectedStudent, this.selectedAssignment);
-    if (!newVal || newVal === oldVal) {
-      return;
-    }
-    let url: string = '';
-    if (this.selectedProblem !== null) {
-      url = `/course/${this.course.alias}/student/${this.selectedStudent.username}/assignment/${newVal}/#${this.selectedProblem.alias}`;
-    } else {
-      url = `/course/${this.course.alias}/student/${this.selectedStudent.username}/assignment/${newVal}/`;
-    }
-    window.history.pushState(
-      { student: this.selectedStudent },
-      document.title,
-      url,
-    );
   }
 
   @Watch('problems')
