@@ -216,16 +216,18 @@ import * as time from '../../time';
 export default class CourseViewStudent extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: types.CourseDetails;
-  @Prop() initialStudent!: types.StudentProgress;
+  @Prop() student!: types.StudentProgress;
+  @Prop() assignment!: types.CourseAssignment;
+  @Prop() problem!: types.CourseProblem;
   @Prop() problems!: types.CourseProblem[];
   @Prop() students!: types.StudentProgress[];
 
   T = T;
   time = time;
   ui = ui;
-  selectedAssignment: string | null = null;
-  selectedProblem: Partial<types.CourseProblem> | null = null;
-  selectedStudent: Partial<types.StudentProgress> = this.initialStudent || {};
+  selectedAssignment: string | null = this.assignment?.alias ?? null;
+  selectedProblem: Partial<types.CourseProblem> | null = this.problem;
+  selectedStudent: Partial<types.StudentProgress> = this.student || {};
   selectedRun: Partial<types.CourseRun> | null = null;
   showFeedbackForm = false;
   feedback = '';
@@ -254,8 +256,10 @@ export default class CourseViewStudent extends Vue {
 
   mounted(): void {
     window.addEventListener('popstate', (ev: PopStateEvent) => {
-      this.selectedStudent =
-        (ev.state && ev.state.student) || this.initialStudent;
+      if (this.selectedStudent !== null) {
+        return;
+      }
+      this.selectedStudent = ev.state?.student ?? this.student;
     });
   }
 
@@ -310,16 +314,32 @@ export default class CourseViewStudent extends Vue {
     if (!newVal || newVal?.username === oldVal?.username) {
       return;
     }
-    window.history.pushState(
-      { student: newVal },
-      document.title,
-      `/course/${this.course.alias}/student/${newVal.username}/`,
-    );
+    let url: string = '';
+    if (this.selectedAssignment !== null) {
+      url = `/course/${this.course.alias}/student/${newVal.username}/assignment/${this.selectedAssignment}/#${this.selectedProblem?.alias}`;
+    } else {
+      url = `/course/${this.course.alias}/student/${newVal.username}/`;
+    }
+    window.history.pushState({ student: newVal }, document.title, url);
   }
 
   @Watch('selectedAssignment')
-  onSelectedAssignmentChange() {
+  onSelectedAssignmentChange(newVal?: string, oldVal?: string) {
     this.$emit('update', this.selectedStudent, this.selectedAssignment);
+    if (!newVal || newVal === oldVal) {
+      return;
+    }
+    let url: string = '';
+    if (this.selectedProblem !== null) {
+      url = `/course/${this.course.alias}/student/${this.selectedStudent.username}/assignment/${newVal}/#${this.selectedProblem.alias}`;
+    } else {
+      url = `/course/${this.course.alias}/student/${this.selectedStudent.username}/assignment/${newVal}/`;
+    }
+    window.history.pushState(
+      { student: this.selectedStudent },
+      document.title,
+      url,
+    );
   }
 
   @Watch('problems')
@@ -339,6 +359,7 @@ export default class CourseViewStudent extends Vue {
   @Watch('selectedProblem')
   onSelectedProblemChange(newVal: types.CourseProblem) {
     this.selectedRun = newVal.runs?.[0] ?? null;
+    window.location.hash = `#${newVal.alias}`;
   }
 }
 </script>
