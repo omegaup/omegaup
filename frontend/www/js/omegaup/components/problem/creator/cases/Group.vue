@@ -66,6 +66,7 @@
               @ok="handleDeleteGroupCases"
             >
               {{ T.problemCreatorDeleteGroupCasesConfirmation }}
+              {{ T.problemCreatorAllGroupCasesWillBeDeleted }}.
               {{ T.problemCreatorCantUndo }}
             </b-modal>
           </b-dropdown-item>
