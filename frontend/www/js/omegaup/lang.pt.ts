@@ -668,6 +668,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleCourseEdit: "Edigar curso",
   omegaupTitleCourseIntro: "Acesse o curso",
   omegaupTitleCourseNew: "Novo curso",
+  omegaupTitleCourseScoreboard: "Painel total do curso",
   omegaupTitleCourseStatistics: "Estat\u00edsticas do curso",
   omegaupTitleCourses: "Cursos",
   omegaupTitleGroups: "Grupos",

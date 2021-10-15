@@ -1546,19 +1546,9 @@ Returns details of a given assignment
 
 ### Returns
 
-| Name                | Type                        |
-| ------------------- | --------------------------- |
-| `admin`             | `boolean`                   |
-| `alias`             | `string`                    |
-| `assignment_type`   | `string`                    |
-| `courseAssignments` | `types.CourseAssignment[]`  |
-| `description`       | `string`                    |
-| `director`          | `string`                    |
-| `finish_time`       | `Date`                      |
-| `name`              | `string`                    |
-| `problems`          | `types.ProblemsetProblem[]` |
-| `problemset_id`     | `number`                    |
-| `start_time`        | `Date`                      |
+```typescript
+types.AssignmentDetails;
+```
 
 ## `/api/course/assignmentScoreboard/`
 
