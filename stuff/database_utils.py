@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 '''Library of utilities to work with MySQL.'''
@@ -11,8 +11,8 @@ import tempfile
 from typing import Optional, Sequence
 
 
-_MYSQL_BINARY = '/usr/bin/mysql'
-_MYSQLDUMP_BINARY = '/usr/bin/mysqldump'
+_MYSQL_BINARY = 'mysql'
+_MYSQLDUMP_BINARY = 'mysqldump'
 
 
 def quote(s: str) -> str:
