@@ -55,7 +55,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
  * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, problemset_id: int, runs: null|list<Run>, start_time: \OmegaUp\Timestamp}
  * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard: Scoreboard, courseDetails: CourseDetails, currentAssignment: ArenaAssignment}
- * @psalm-type AssignmentDetails=array{admin: bool, alias: string, assignment_type: null|string, courseAssignments: list<CourseAssignment>, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemset_id: int, start_time: \OmegaUp\Timestamp}
+ * @psalm-type AssignmentDetails=array{admin: bool, alias: string, assignmentType: string, courseAssignments: list<CourseAssignment>, description: string, director: string, finishTime: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemsetId: int, startTime: \OmegaUp\Timestamp}
  * @psalm-type CourseScoreboardPayload=array{assignment: AssignmentDetails, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardToken:null|string}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float, is_extra_problem?: bool}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
@@ -3027,10 +3027,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'alias' => strval(
                             $tokenAuthenticationResult['assignment']->alias
                         ),
-                        'description' => $tokenAuthenticationResult['assignment']->description,
-                        'assignment_type' => $tokenAuthenticationResult['assignment']->assignment_type,
-                        'start_time' => $tokenAuthenticationResult['assignment']->start_time,
-                        'finish_time' => $tokenAuthenticationResult['assignment']->finish_time,
+                        'description' => $tokenAuthenticationResult['assignment']->description ?? '',
+                        'assignmentType' => $tokenAuthenticationResult['assignment']->assignment_type,
+                        'startTime' => $tokenAuthenticationResult['assignment']->start_time,
+                        'finishTime' => $tokenAuthenticationResult['assignment']->finish_time,
                         'problems' => self::getProblemsByAssignment(
                             $tokenAuthenticationResult['assignment']->alias,
                             $tokenAuthenticationResult['course']->alias,
@@ -3039,7 +3039,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         ),
                         'courseAssignments' => $tokenAuthenticationResult['courseAssignments'],
                         'director' => strval($director->username),
-                        'problemset_id' => $tokenAuthenticationResult['assignment']->problemset_id,
+                        'problemsetId' => $tokenAuthenticationResult['assignment']->problemset_id,
                         'admin' => $tokenAuthenticationResult['courseAdmin'],
                     ],
                     'scoreboard' => $scoreboard->generate(
@@ -4571,7 +4571,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns details of a given assignment
      *
-     * @return AssignmentDetails
+     * @return array{admin: bool, alias: string, assignment_type: null|string, courseAssignments: list<CourseAssignment>, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemset_id: int, start_time: \OmegaUp\Timestamp}
      *
      * @omegaup-request-param string $assignment
      * @omegaup-request-param string $course

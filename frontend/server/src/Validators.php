@@ -8,7 +8,6 @@ namespace OmegaUp;
 class Validators {
     // The maximum length for aliases.
     const ALIAS_MAX_LENGTH = 32;
-    const TOKEN_LENGTH = 30;
 
     /**
      * Check if email is valid
@@ -213,14 +212,8 @@ class Validators {
      *
      * @return boolean
      */
-    public static function token(
-        string $token,
-        int $length = Validators::TOKEN_LENGTH
-    ): bool {
-        return (
-            preg_match('/^[a-zA-Z0-9]+$/', $token) === 1
-            && strlen($token) === $length
-        );
+    public static function token(string $token): bool {
+        return preg_match('/^[a-zA-Z0-9]{30}$/', $token) === 1;
     }
 
     /**

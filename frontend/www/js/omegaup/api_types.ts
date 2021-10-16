@@ -1068,9 +1068,9 @@ export namespace types {
               return x;
             });
           })(x.courseAssignments);
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          if (x.finishTime)
+            x.finishTime = ((x: number) => new Date(x * 1000))(x.finishTime);
+          x.startTime = ((x: number) => new Date(x * 1000))(x.startTime);
           return x;
         })(x.assignment);
         x.scoreboard = ((x) => {
@@ -1814,15 +1814,15 @@ export namespace types {
   export interface AssignmentDetails {
     admin: boolean;
     alias: string;
-    assignment_type?: string;
+    assignmentType: string;
     courseAssignments: types.CourseAssignment[];
-    description?: string;
+    description: string;
     director: string;
-    finish_time?: Date;
+    finishTime?: Date;
     name: string;
     problems: types.ProblemsetProblem[];
-    problemset_id: number;
-    start_time: Date;
+    problemsetId: number;
+    startTime: Date;
   }
 
   export interface AssignmentDetailsPayload {
@@ -4088,7 +4088,19 @@ export namespace messages {
   export type CourseArchiveResponse = {};
   export type CourseAssignmentDetailsRequest = { [key: string]: any };
   export type _CourseAssignmentDetailsServerResponse = any;
-  export type CourseAssignmentDetailsResponse = types.AssignmentDetails;
+  export type CourseAssignmentDetailsResponse = {
+    admin: boolean;
+    alias: string;
+    assignment_type?: string;
+    courseAssignments: types.CourseAssignment[];
+    description?: string;
+    director: string;
+    finish_time?: Date;
+    name: string;
+    problems: types.ProblemsetProblem[];
+    problemset_id: number;
+    start_time: Date;
+  };
   export type CourseAssignmentScoreboardRequest = { [key: string]: any };
   export type _CourseAssignmentScoreboardServerResponse = any;
   export type CourseAssignmentScoreboardResponse = types.Scoreboard;
