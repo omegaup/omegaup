@@ -1,15 +1,22 @@
-import { types } from '../types';
-import { Module } from 'vuex';
+import {
+  Case,
+  CaseGroupID,
+  Group,
+  InLine,
+  MultipleCaseAdd,
+  RootState,
+} from '../types';
+import types, { Module } from 'vuex';
 import { NIL, v4 } from 'uuid';
 import T from '../../../lang';
 export interface CasesState {
-  groups: types.Group[];
-  selected: types.CaseGroupID;
-  layout: types.InLine[];
+  groups: Group[];
+  selected: CaseGroupID;
+  layout: InLine[];
   hide: boolean;
 }
 
-export const casesStore: Module<CasesState, types.RootState> = {
+export const casesStore: Module<CasesState, RootState> = {
   namespaced: true,
   state: {
     groups: [
@@ -46,11 +53,11 @@ export const casesStore: Module<CasesState, types.RootState> = {
       state.layout = [];
       state.hide = false;
     },
-    addGroup(state, payload: types.Group) {
+    addGroup(state, payload: Group) {
       state.groups.push(payload);
       state = calculatePoints(state);
     },
-    addCase(state, payload: types.Case) {
+    addCase(state, payload: Case) {
       const group = state.groups.find(
         (group) => group.groupId === payload.groupId,
       );
@@ -59,7 +66,7 @@ export const casesStore: Module<CasesState, types.RootState> = {
       }
       state = calculatePoints(state);
     },
-    editGroup(state, payload: types.Group) {
+    editGroup(state, payload: Group) {
       const groupTarget = state.groups.find(
         (group) => group.groupId === payload.groupId,
       );
@@ -70,7 +77,7 @@ export const casesStore: Module<CasesState, types.RootState> = {
       }
       state = calculatePoints(state);
     },
-    editCase(state, payload: { oldGroup: string; editedCase: types.Case }) {
+    editCase(state, payload: { oldGroup: string; editedCase: Case }) {
       // Old group
 
       // Find original case
@@ -109,7 +116,7 @@ export const casesStore: Module<CasesState, types.RootState> = {
       state.groups = state.groups.filter((group) => group.groupId !== payload);
       state = calculatePoints(state);
     },
-    deleteCase(state, payload: types.CaseGroupID) {
+    deleteCase(state, payload: CaseGroupID) {
       const groupTarget = state.groups.find(
         (group) => group.groupId == payload.groupId,
       );
@@ -132,7 +139,7 @@ export const casesStore: Module<CasesState, types.RootState> = {
       state = calculatePoints(state);
     },
     addLayoutLine(state) {
-      const payload: types.InLine = {
+      const payload: InLine = {
         lineId: v4(),
         label: 'NEW',
         value: '',
@@ -142,7 +149,7 @@ export const casesStore: Module<CasesState, types.RootState> = {
       };
       state.layout.push(payload);
     },
-    editLayoutLine(state, payload: types.InLine) {
+    editLayoutLine(state, payload: InLine) {
       const lineToEdit = state.layout.find(
         (line) => line.lineId === payload.lineId,
       );
@@ -154,10 +161,10 @@ export const casesStore: Module<CasesState, types.RootState> = {
     removeLayoutLine(state, payload: string) {
       state.layout = state.layout.filter((line) => line.lineId !== payload);
     },
-    setLayout(state, payload: types.InLine[]) {
+    setLayout(state, payload: InLine[]) {
       state.layout = payload;
     },
-    setSelected(state, payload: types.CaseGroupID) {
+    setSelected(state, payload: CaseGroupID) {
       state.selected = payload;
     },
     toggleHide(state) {
@@ -165,11 +172,8 @@ export const casesStore: Module<CasesState, types.RootState> = {
     },
   },
   actions: {
-    addMultipleCases(
-      { commit, getters, state },
-      payload: types.MultipleCaseAdd,
-    ) {
-      const cases: types.Case[] = getters.getCasesFromGroup(payload.groupId);
+    addMultipleCases({ commit, getters, state }, payload: MultipleCaseAdd) {
+      const cases: Case[] = getters.getCasesFromGroup(payload.groupId);
       if (cases !== undefined) {
         let caseNumber = 0;
         for (let i = 0; i < payload.number; i++) {
@@ -182,7 +186,7 @@ export const casesStore: Module<CasesState, types.RootState> = {
               const layoutWithNewIds = state.layout.map((layoutLine) => {
                 return { ...layoutLine, lineId: v4() };
               });
-              const casePayload: types.Case = {
+              const casePayload: Case = {
                 name: name,
                 defined: false,
                 points: 0,
@@ -197,13 +201,13 @@ export const casesStore: Module<CasesState, types.RootState> = {
         }
       }
     },
-    setLines({ getters }, payload: types.InLine[]) {
-      const selectedCase: types.Case = getters.getSelectedCase;
+    setLines({ getters }, payload: InLine[]) {
+      const selectedCase: Case = getters.getSelectedCase;
       selectedCase.lines = payload;
     },
     addNewLine({ getters }) {
-      const selectedCase: types.Case = getters.getSelectedCase;
-      const newLine: types.InLine = {
+      const selectedCase: Case = getters.getSelectedCase;
+      const newLine: InLine = {
         lineId: v4(),
         label: 'NEW',
         value: '',
@@ -213,8 +217,8 @@ export const casesStore: Module<CasesState, types.RootState> = {
       };
       selectedCase.lines.push(newLine);
     },
-    updateLine({ getters }, payload: types.InLine) {
-      const selectedCase: types.Case = getters.getSelectedCase;
+    updateLine({ getters }, payload: InLine) {
+      const selectedCase: Case = getters.getSelectedCase;
       const lineToUpdate = selectedCase.lines.find(
         (line) => line.lineId === payload.lineId,
       );
@@ -227,7 +231,7 @@ export const casesStore: Module<CasesState, types.RootState> = {
       }
     },
     deleteLine({ getters }, payload: string) {
-      const selectedCase: types.Case = getters.getSelectedCase;
+      const selectedCase: Case = getters.getSelectedCase;
       selectedCase.lines = selectedCase.lines.filter(
         (line) => line.lineId !== payload,
       );
@@ -243,7 +247,7 @@ export const casesStore: Module<CasesState, types.RootState> = {
       });
     },
     getAllCases: (state) => {
-      return state.groups.reduce((cases: types.Case[], currCase) => {
+      return state.groups.reduce((cases: Case[], currCase) => {
         return [...cases, ...currCase.cases];
       }, []);
     },
