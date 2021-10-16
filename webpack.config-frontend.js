@@ -78,6 +78,7 @@ module.exports = {
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
     login_signin: './frontend/www/js/omegaup/login/signin.ts',
     logout: './frontend/www/js/omegaup/login/logout.ts',
+    problem_creator: './frontend/www/js/omegaup/problem/creator/creator.ts',
     problem_collection: './frontend/www/js/omegaup/problem/collection.ts',
     problem_collection_list:
       './frontend/www/js/omegaup/problem/collection_list.ts',
