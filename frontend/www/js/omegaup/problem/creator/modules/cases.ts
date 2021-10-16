@@ -6,7 +6,7 @@ import {
   MultipleCaseAdd,
   RootState,
 } from '../types';
-import types, { Module } from 'vuex';
+import { Module } from 'vuex';
 import { NIL, v4 } from 'uuid';
 import T from '../../../lang';
 export interface CasesState {

@@ -5,7 +5,6 @@ import { casesStore } from './modules/cases';
 import T from '../../lang';
 
 Vue.use(Vuex);
-Vue.config.devtools = true;
 
 const state: StoreState = {
   problemName: T.problemCreatorNamePlaceholder,
