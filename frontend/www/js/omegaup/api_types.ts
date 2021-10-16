@@ -2043,7 +2043,6 @@ export namespace types {
     gravatarURL128: string;
     gravatarURL51: string;
     inContest: boolean;
-    inProduction?: boolean;
     isAdmin: boolean;
     isLoggedIn: boolean;
     isMainUserIdentity: boolean;
