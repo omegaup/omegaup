@@ -1,6 +1,6 @@
 import store from '@/js/omegaup/problem/creator/store';
 import { NIL, v4 } from 'uuid';
-import { types } from '../types';
+import { Case, Group } from '../types';
 
 describe('cases.ts', () => {
   it('Should save a case to the store', async () => {
@@ -99,7 +99,7 @@ const generateCasePayload: (
   defined?: boolean,
   groupId?: string,
   caseId?: string,
-) => types.Case = (
+) => Case = (
   name,
   points = 0,
   defined = false,
@@ -121,7 +121,7 @@ const generateGroupPayload: (
   points?: number,
   defined?: boolean,
   groupId?: string,
-) => types.Group = (name, points = 0, defined = false, groupId = v4()) => {
+) => Group = (name, points = 0, defined = false, groupId = v4()) => {
   return {
     groupId: groupId,
     name: name,
