@@ -226,7 +226,6 @@ class UITools {
             'is_admin' => $isAdmin,
             'associated_identities' => $associatedIdentities,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
-        /** @psalm-suppress TypeDoesNotContainType OMEGAUP_ENVIRONMENT is a configurable value. */
         return [
             'omegaUpLockDown' => OMEGAUP_LOCKDOWN,
             'bootstrap4' => self::useBootstrap4($supportsBootstrap4),
