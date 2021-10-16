@@ -8,7 +8,7 @@ import {
 } from '../types';
 import { Module } from 'vuex';
 import { NIL, v4 } from 'uuid';
-import T from '../../../lang';
+// import T from '../../../lang';
 export interface CasesState {
   groups: Group[];
   selected: CaseGroupID;
@@ -22,7 +22,7 @@ export const casesStore: Module<CasesState, RootState> = {
     groups: [
       {
         groupId: NIL,
-        name: T.problemCreatorNoGroup,
+        name: 'sin_grupo',
         defined: false,
         points: 100,
         cases: [],
@@ -40,7 +40,7 @@ export const casesStore: Module<CasesState, RootState> = {
       state.groups = [
         {
           groupId: NIL,
-          name: T.problemCreatorNoGroup,
+          name: 'sin_grupo',
           defined: false,
           points: 100,
           cases: [],
