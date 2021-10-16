@@ -3,7 +3,7 @@
 namespace OmegaUp;
 
 /**
- * @psalm-type CommonPayload=array{associatedIdentities: list<array{default: bool, username: string}>, bootstrap4: bool, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, inContest: bool, isAdmin: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: null|string, userCountry: string}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<array{default: bool, username: string}>, bootstrap4: bool, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, inContest: bool, isAdmin: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: null|string, userCountry: string, inProduction?: bool}
  * @psalm-type AssociatedIdentity=array{username: string, default: bool}
  * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
  */
@@ -265,6 +265,10 @@ class UITools {
             'isAdmin' => $isAdmin,
             'lockDownImage' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA6UlEQVQ4jd2TMYoCMRiFv5HBwnJBsFqEiGxtISps6RGmFD2CZRr7aQSPIFjmCGsnrFYeQJjGytJKRERsfp2QmahY+iDk5c97L/wJCchBFCclYAD8SmkBTI1WB1cb5Ji/gT+g7mxtgK7RausNiOIEYAm0pHSWOZR5BbSNVndPwTmlaZnnQFnGXGot0XgDfiw+NlrtjVZ7YOzRZAJCix893NZkAi4eYejRpJcYxckQ6AENKf0DO+EVoCN8DcyMVhM3eQR8WesO+WgAVWDituC28wiFDHkXHxBgv0IfKL7oO+UF1Ei/7zMsbuQKTFoqpb8KS2AAAAAASUVORK5CYII=',
             'navbarSection' => $navbarSection,
+            /** @psalm-suppress TypeDoesNotContainType OMEGAUP_ENVIRONMENT is a configurable value. */
+            'inProduction' => defined(
+                'OMEGAUP_ENVIRONMENT'
+            ) && OMEGAUP_ENVIRONMENT === 'production',
         ];
     }
 
