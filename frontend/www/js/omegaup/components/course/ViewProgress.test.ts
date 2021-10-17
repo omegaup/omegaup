@@ -1,7 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
 import T from '../../lang';
 import course_ViewProgress, { escapeXml, toOds } from './ViewProgress.vue';
+import { Percentage } from '../../csv';
 import type { types } from '../../api_types';
+import { formatString } from '../../ui';
 
 describe('ViewProgress.vue', () => {
   if (typeof window.URL.createObjectURL === 'undefined') {
@@ -20,6 +22,7 @@ describe('ViewProgress.vue', () => {
       {
         alias: 'test-assignment-a',
         name: 'Test assignment A',
+        extraPoints: 0,
         points: 200,
         problems: [
           {
@@ -110,9 +113,12 @@ describe('ViewProgress.vue', () => {
     }\
 </text:p></table:table-cell><table:table-cell office:value-type="string"><text:p>\
 ${T.courseProgressGlobalScore}</text:p></table:table-cell><table:table-cell \
-office:value-type="string"><text:p>${
-      assignment.name
-    }</text:p></table:table-cell>\
+office:value-type="string"><text:p>${assignment.name} ${formatString(
+      T.studentProgressPoints,
+      {
+        points: assignment.points,
+      },
+    )}</text:p></table:table-cell>\
 </table:table-row>
 <table:table-row>
 <table:table-cell office:value-type="string"><text:p>${
@@ -122,13 +128,17 @@ office:value-type="string"><text:p>${
       student.name
     }\
 </text:p></table:table-cell><table:table-cell office:value-type="percentage" \
-office:value="${
-      student.courseProgress / 100
-    }"><text:p>${student.courseProgress.toFixed(2)}%</text:p>\
-</table:table-cell><table:table-cell office:value-type="float" office:value="\
-${student.assignments[assignment.alias].score}"><text:p>${
-      student.assignments[assignment.alias].score
-    }</text:p></table:table-cell></table:table-row>
+office:value="${new Percentage(
+      student.courseProgress / 100,
+    ).toString()}"><text:p>${new Percentage(
+      student.courseProgress / 100,
+    ).toString()}</text:p>\
+</table:table-cell><table:table-cell office:value-type="percentage" office:value="\
+${new Percentage(
+  student.assignments[assignment.alias].progress / 100,
+).toString()}"><text:p>${new Percentage(
+      student.assignments[assignment.alias].progress / 100,
+    ).toString()}</text:p></table:table-cell></table:table-row>
 </table:table>`);
   });
 });
