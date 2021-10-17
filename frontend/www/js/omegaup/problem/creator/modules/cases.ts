@@ -53,10 +53,6 @@ export const casesStore: Module<CasesState, RootState> = {
       state.layout = [];
       state.hide = false;
     },
-    addGroup(state, payload: Group) {
-      state.groups.push(payload);
-      state = calculatePoints(state);
-    },
     addCase(state, payload: Case) {
       const group = state.groups.find(
         (group) => group.groupId === payload.groupId,
@@ -65,110 +61,6 @@ export const casesStore: Module<CasesState, RootState> = {
         group.cases.push(payload);
       }
       state = calculatePoints(state);
-    },
-    editGroup(state, payload: Group) {
-      const groupTarget = state.groups.find(
-        (group) => group.groupId === payload.groupId,
-      );
-      if (groupTarget !== undefined) {
-        groupTarget.points = payload.points;
-        groupTarget.name = payload.name;
-        groupTarget.defined = payload.defined;
-      }
-      state = calculatePoints(state);
-    },
-    editCase(state, payload: { oldGroup: string; editedCase: Case }) {
-      // Old group
-
-      // Find original case
-      const groupTarget = state.groups.find(
-        (group) => group.groupId === payload.oldGroup,
-      );
-
-      const caseTarget = groupTarget?.cases.find(
-        (_case) => _case.caseId === payload.editedCase.caseId,
-      );
-
-      if (caseTarget?.groupId !== payload.editedCase.groupId) {
-        // If we changed the group
-        if (groupTarget !== undefined) {
-          groupTarget.cases = groupTarget.cases.filter(
-            (_case) => _case.caseId !== payload.editedCase.caseId,
-          );
-          // Find the new group
-          const newGroup = state.groups.find(
-            (group) => group.groupId === payload.editedCase.groupId,
-          );
-          newGroup?.cases.push(payload.editedCase);
-          state.selected.groupId = payload.editedCase.groupId;
-        }
-      } else {
-        if (caseTarget !== undefined) {
-          caseTarget.groupId = payload.editedCase.groupId;
-          caseTarget.points = payload.editedCase.points;
-          caseTarget.defined = payload.editedCase.defined;
-          caseTarget.name = payload.editedCase.name;
-        }
-      }
-      state = calculatePoints(state);
-    },
-    deleteGroup(state, payload: string) {
-      state.groups = state.groups.filter((group) => group.groupId !== payload);
-      state = calculatePoints(state);
-    },
-    deleteCase(state, payload: CaseGroupID) {
-      const groupTarget = state.groups.find(
-        (group) => group.groupId == payload.groupId,
-      );
-      if (groupTarget !== undefined) {
-        groupTarget.cases = groupTarget.cases.filter(
-          (_case) => _case.caseId !== payload.caseId,
-        );
-      }
-      state.selected.caseId = NIL;
-      state.selected.groupId = NIL;
-      state = calculatePoints(state);
-    },
-    deleteGroupCases(state, payload: string) {
-      const groupTarget = state.groups.find(
-        (group) => group.groupId === payload,
-      );
-      if (groupTarget !== undefined) {
-        groupTarget.cases = [];
-      }
-      state = calculatePoints(state);
-    },
-    addLayoutLine(state) {
-      const payload: InLine = {
-        lineId: v4(),
-        label: 'NEW',
-        value: '',
-        type: 'line',
-        arrayData: { size: 0, min: 0, max: 0, distinct: false, arrayVal: '' },
-        matrixData: {},
-      };
-      state.layout.push(payload);
-    },
-    editLayoutLine(state, payload: InLine) {
-      const lineToEdit = state.layout.find(
-        (line) => line.lineId === payload.lineId,
-      );
-      if (lineToEdit !== undefined) {
-        lineToEdit.type = payload.type;
-        lineToEdit.label = payload.label;
-      }
-    },
-    removeLayoutLine(state, payload: string) {
-      state.layout = state.layout.filter((line) => line.lineId !== payload);
-    },
-    setLayout(state, payload: InLine[]) {
-      state.layout = payload;
-    },
-    setSelected(state, payload: CaseGroupID) {
-      state.selected = payload;
-    },
-    toggleHide(state) {
-      state.hide = !state.hide;
     },
   },
   actions: {
