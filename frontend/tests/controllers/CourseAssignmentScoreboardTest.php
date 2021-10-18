@@ -84,6 +84,38 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $i++;
         }
+
+        // User should get the same scoreboard information using the function
+        // getCourseScoreboardDetailsForTypeScript
+        $scoreboard = \OmegaUp\Controllers\Course::getCourseScoreboardDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_alias']
+            ])
+        )['smartyProperties']['payload']['scoreboard'];
+
+        $expectedPlace = 0;
+        $lastScore = 0;
+        $i = 0;
+        foreach ($expectedScores as $username => $score) {
+            if ($lastScore !== $score) {
+                $expectedPlace = $i + 1;
+                $lastScore = $score;
+            }
+
+            $this->assertEquals(
+                $username,
+                $scoreboard['ranking'][$i]['username'],
+                'Scoreboard is not properly sorted by username.'
+            );
+            $this->assertEquals(
+                $expectedPlace,
+                $scoreboard['ranking'][$i]['place'],
+                'Course scoreboard place information is wrong.'
+            );
+            $i++;
+        }
     }
 
     /**
