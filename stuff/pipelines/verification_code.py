@@ -5,7 +5,7 @@
 import os
 import sys
 import random
-from typing import List
+from typing import Optional, List
 
 
 sys.path.insert(
@@ -16,14 +16,19 @@ sys.path.insert(
 _ALPHABET = "23456789CFGHJMPQRVWX"
 
 
-def generate_code(generated_code: List[int] =
-                  random.choices(range(len(_ALPHABET)), k=9)) -> str:
-    '''Función que crea el código de verificación de 10 digitos
-       que llevaran los certificados.
-       El alfabeto usado es "23456789CFGHJMPQRVWX"
-       Se agrega un digito al final que sirve de checksum para
-       distinguir fácilmente códigos mal copiados
-       usando el Noid Check Digit Algorithm (NCDA)'''
+def generate_code(generated_code: Optional[List[int]] = None) -> str:
+    '''Function to create a 10-digit verification code.
+
+       To create a 10-digit code the alphabet "23456789CFGHJMPQRVWX". is used.
+       A digit is added at the end which serves as a checksum to easily
+       distinguish badly copied codes using the Noid Check Digit Digit
+       Algorithm (NCDA).
+
+       generated_code: Optional list of indexes that will
+       determine the first 9 digits from the alphabet.
+    '''
+    if generated_code is None:
+        generated_code = random.choices(range(len(_ALPHABET)), k=9)
     checksum = 0
     for i, xdigit in enumerate(generated_code, start=1):
         checksum += i * xdigit
