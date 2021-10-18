@@ -33,6 +33,7 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       problems,
+      problem,
     }),
     methods: {
       refreshStudentProgress: (

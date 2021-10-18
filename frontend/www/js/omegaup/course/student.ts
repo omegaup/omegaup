@@ -20,6 +20,7 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       problems: [] as types.CourseProblem[],
+      problem: null as null | types.CourseProblem,
     }),
     methods: {
       refreshStudentProgress: (
@@ -45,6 +46,7 @@ OmegaUp.on('ready', () => {
           course: payload.course,
           student,
           problems: this.problems,
+          problem: this.problem,
           students: payload.students,
         },
         on: {

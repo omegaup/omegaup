@@ -331,7 +331,7 @@ export default class CourseViewStudent extends Vue {
     }
     let url: string = '';
     if (this.selectedProblem !== null) {
-      url = `/course/${this.course.alias}/student/${this.selectedStudent.username}/assignment/${newVal}/#${this.selectedProblem.alias}`;
+      url = `/course/${this.course.alias}/student/${this.selectedStudent.username}/assignment/${newVal}/#${this.selectedProblem?.alias}`;
     } else {
       url = `/course/${this.course.alias}/student/${this.selectedStudent.username}/assignment/${newVal}/`;
     }
@@ -354,12 +354,13 @@ export default class CourseViewStudent extends Vue {
     }
     this.selectedProblem = found;
     this.selectedRun = found.runs?.[0] ?? null;
+    window.location.hash = `#${this.selectedProblem.alias}`;
   }
 
   @Watch('selectedProblem')
   onSelectedProblemChange(newVal: types.CourseProblem) {
     this.selectedRun = newVal.runs?.[0] ?? null;
-    window.location.hash = `#${newVal.alias}`;
+    window.location.hash = `#${this.selectedProblem?.alias}`;
   }
 }
 </script>
