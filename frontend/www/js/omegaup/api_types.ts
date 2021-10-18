@@ -1050,6 +1050,44 @@ export namespace types {
       );
     }
 
+    export function CourseScoreboardPayload(
+      elementId: string = 'payload',
+    ): types.CourseScoreboardPayload {
+      return ((x) => {
+        x.assignment = ((x) => {
+          x.courseAssignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.courseAssignments);
+          if (x.finishTime)
+            x.finishTime = ((x: number) => new Date(x * 1000))(x.finishTime);
+          x.startTime = ((x: number) => new Date(x * 1000))(x.startTime);
+          return x;
+        })(x.assignment);
+        x.scoreboard = ((x) => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.scoreboard);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function CourseStatisticsPayload(
       elementId: string = 'payload',
     ): types.CourseStatisticsPayload {
@@ -1835,6 +1873,20 @@ export namespace types {
     title?: string;
   }
 
+  export interface AssignmentDetails {
+    admin: boolean;
+    alias: string;
+    assignmentType: string;
+    courseAssignments: types.CourseAssignment[];
+    description: string;
+    director: string;
+    finishTime?: Date;
+    name: string;
+    problems: types.ProblemsetProblem[];
+    problemsetId: number;
+    startTime: Date;
+  }
+
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
     currentAssignment: types.ArenaAssignment;
@@ -2518,6 +2570,13 @@ export namespace types {
     submit_delay: number;
     time: Date;
     verdict: string;
+  }
+
+  export interface CourseScoreboardPayload {
+    assignment: types.AssignmentDetails;
+    problems: types.NavbarProblemsetProblem[];
+    scoreboard: types.Scoreboard;
+    scoreboardToken?: string;
   }
 
   export interface CourseStatisticsPayload {
