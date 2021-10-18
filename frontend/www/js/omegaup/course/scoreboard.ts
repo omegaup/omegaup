@@ -1,4 +1,4 @@
-import course_Scoreboard from '../components/course/Scoreboard.vue';
+import course_Scoreboard from '../components/common/Scoreboard.vue';
 import { OmegaUp } from '../omegaup';
 import { EventsSocket } from '../arena/events_socket';
 import socketStore from '../arena/socketStore';
@@ -41,7 +41,8 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-course-scoreboard', {
         props: {
           problems: this.problems,
-          assignment: payload.assignment,
+          name: payload.assignment.name,
+          finishTime: payload.assignment.finishTime,
           isAdmin: payload.assignment.admin,
           socketStatus: socketStore.state.socketStatus,
           ranking: rankingStore.state.ranking,
@@ -56,7 +57,7 @@ OmegaUp.on('ready', () => {
     problemsetAlias: payload.assignment.alias,
     locationProtocol: window.location.protocol,
     locationHost: window.location.host,
-    problemsetId: payload.assignment.problemset_id,
+    problemsetId: payload.assignment.problemsetId,
     scoreboardToken: null,
     clarificationsOffset: 1,
     clarificationsRowcount: 30,
@@ -69,7 +70,7 @@ OmegaUp.on('ready', () => {
 
   setInterval(() => {
     api.Problemset.scoreboard({
-      problemset_id: payload.assignment.problemset_id,
+      problemset_id: payload.assignment.problemsetId,
       token: payload.scoreboardToken,
     })
       .then(time.remoteTimeAdapter)

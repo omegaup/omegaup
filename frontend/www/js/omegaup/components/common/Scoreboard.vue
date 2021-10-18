@@ -2,7 +2,7 @@
   <omegaup-arena
     :active-tab="'ranking'"
     :show-tabs="false"
-    :contest-title="assignment.name"
+    :title="name"
     :is-admin="isAdmin"
   >
     <template #socket-status>
@@ -46,8 +46,9 @@ import { SocketStatus } from '../../arena/events_socket';
     'omegaup-countdown': omegaup_Countdown,
   },
 })
-export default class CourseScoreboard extends Vue {
-  @Prop() assignment!: types.AssignmentDetails;
+export default class ProblemsetScoreboard extends Vue {
+  @Prop() name!: string;
+  @Prop() finishTime!: Date;
   @Prop() ranking!: types.ScoreboardRankingEntry[];
   @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop() lastUpdated!: Date;
@@ -81,7 +82,7 @@ export default class CourseScoreboard extends Vue {
   }
 
   get deadline(): null | Date {
-    return this.assignment.finish_time ?? null;
+    return this.finishTime ?? null;
   }
 }
 </script>

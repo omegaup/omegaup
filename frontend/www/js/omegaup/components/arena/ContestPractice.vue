@@ -1,7 +1,7 @@
 <template>
   <omegaup-arena
     :active-tab="activeTab"
-    :contest-title="contest.title"
+    :title="contest.title"
     :should-show-runs="contestAdmin"
     :background-class="'practice'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
