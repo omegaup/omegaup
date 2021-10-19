@@ -1,11 +1,11 @@
-import { Case, CaseGroupID, Group, InLine, RootState } from '../types';
+import { Case, CaseGroupID, Group, CaseLine, RootState } from '../types';
 import { Module } from 'vuex';
 import { NIL, v4 } from 'uuid';
-// import T from '../../../lang';
+import T from '../../../lang';
 export interface CasesState {
   groups: Group[];
   selected: CaseGroupID;
-  layout: InLine[];
+  layout: CaseLine[];
   hide: boolean;
 }
 
@@ -15,7 +15,7 @@ export const casesStore: Module<CasesState, RootState> = {
     groups: [
       {
         groupId: NIL,
-        name: 'sin_grupo',
+        name: T.problemCreatorNoGroup,
         defined: false,
         points: 100,
         cases: [],
@@ -33,7 +33,7 @@ export const casesStore: Module<CasesState, RootState> = {
       state.groups = [
         {
           groupId: NIL,
-          name: 'sin_grupo',
+          name: T.problemCreatorNoGroup,
           defined: false,
           points: 100,
           cases: [],
@@ -132,29 +132,29 @@ export const casesStore: Module<CasesState, RootState> = {
       state = calculatePoints(state);
     },
     addLayoutLine(state) {
-      const payload: InLine = {
+      const payload: CaseLine = {
         lineId: v4(),
         label: 'NEW',
-        value: '',
-        type: 'line',
-        arrayData: { size: 0, min: 0, max: 0, distinct: false, arrayVal: '' },
-        matrixData: {},
+        data: {
+          kind: 'line',
+          value: '',
+        },
       };
       state.layout.push(payload);
     },
-    editLayoutLine(state, payload: InLine) {
+    editLayoutLine(state, payload: CaseLine) {
       const lineToEdit = state.layout.find(
         (line) => line.lineId === payload.lineId,
       );
       if (lineToEdit !== undefined) {
-        lineToEdit.type = payload.type;
+        lineToEdit.data.kind = payload.data.kind;
         lineToEdit.label = payload.label;
       }
     },
     removeLayoutLine(state, payload: string) {
       state.layout = state.layout.filter((line) => line.lineId !== payload);
     },
-    setLayout(state, payload: InLine[]) {
+    setLayout(state, payload: CaseLine[]) {
       state.layout = payload;
     },
     setSelected(state, payload: CaseGroupID) {

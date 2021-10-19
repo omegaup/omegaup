@@ -25,17 +25,40 @@ export interface RootState {
 }
 
 /**
- * Linetype
- * Type of line in the editor
- * @alias Linetype
- * @typedef {string}
+ * CaseLineData
+ * Contains the type and the corresponding parameters for each type
  */
-export type LineType = 'line' | 'multiline' | 'array' | 'matrix';
+export type CaseLineData =
+  | {
+      kind: 'line';
+      value: string;
+    }
+  | {
+      kind: 'multiline';
+      value: string | string[];
+    }
+  | {
+      kind: 'array';
+      size: number;
+      min: number;
+      max: number;
+      distinct: boolean;
+      arrayVal: number[];
+    }
+  | {
+      kind: 'matrix';
+      rows: number;
+      cols: number;
+      min: number;
+      max: number;
+      distinct: 'none' | 'rows' | 'cols' | 'both';
+      matrixVal: number[][];
+    };
 
 /**
  * InLine
  * Line in the editor
- * @alias InLine
+ * @alias CaseLine
  * @typedef {object}
  * @property {string} lineId UUID of the line
  * @property {string} label Label of the line
@@ -44,13 +67,10 @@ export type LineType = 'line' | 'multiline' | 'array' | 'matrix';
  * @property {ArrayData} arrayData Object containig all the logic for the Array Generator
  * @property {object} matrixData Object containig all the logic for the Matrix Generator
  */
-export interface InLine {
+export interface CaseLine {
   lineId: string;
   label: string;
-  value: string;
-  type: LineType;
-  arrayData: ArrayData;
-  matrixData: any;
+  data: CaseLineData;
 }
 
 /**
@@ -71,7 +91,7 @@ export interface Case {
   name: string;
   points: number;
   defined: boolean;
-  lines: InLine[];
+  lines: CaseLine[];
 }
 
 /**
@@ -107,16 +127,16 @@ export interface Option {
 }
 
 /**
- * MultipleCaseAdd
+ * MultipleCaseAddRequest
  * Object containing all the information to add multiple cases in the store
- * @alias MultipleCaseAdd
+ * @alias MultipleCaseAddRequest
  * @typedef {object}
  * @property {string} prefix Prefix of the name of all the cases
  * @property {string} suffix Suffix of the name of all the cases
  * @property {number} number Number of cases to add
  * @property {string} groupId UUID of the group
  */
-export interface MultipleCaseAdd {
+export interface MultipleCaseAddRequest {
   prefix: string;
   suffix: string;
   number: number;
@@ -124,7 +144,7 @@ export interface MultipleCaseAdd {
 }
 
 /**
- * CaseGrouID
+ * CaseGroupID
  * Identifier of a case containing both groupId and caseId
  * @alias CaseGroupID
  * @typedef {object}
@@ -134,24 +154,4 @@ export interface MultipleCaseAdd {
 export interface CaseGroupID {
   groupId: string;
   caseId: string;
-}
-
-/**
- * Array Data
- * Array Data used in the Array Generator
- * @alias ArrayData
- * @typedef {object}
- * @property {size} size Size of the array
- * @property {number} min Minimum permitted value of the array
- * @property {number} max Maximum permitted value of the array
- * @property {boolean} distinct Whether the array values are distinct or not
- * @property {string} arrayVal Value of the array represented in a string
- *
- */
-export interface ArrayData {
-  size: number;
-  min: number;
-  max: number;
-  distinct: boolean;
-  arrayVal: string;
 }

@@ -2,12 +2,12 @@ import Vue from 'vue';
 import Vuex, { Module } from 'vuex';
 import { StoreState, RootState } from './types';
 import { casesStore } from './modules/cases';
-// import T from '../../lang';
+import T from '../../lang';
 
 Vue.use(Vuex);
 
 const state: StoreState = {
-  problemName: 'Nuevo Problema',
+  problemName: T.problemCreatorNewProblem,
 } as StoreState;
 
 const store: Module<StoreState, RootState> = {
