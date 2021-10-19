@@ -169,7 +169,6 @@ describe('ContestPractice.vue', () => {
           hash:
             '#problems/problemOmegaUp/show-run:78099022574726af861839e1b4210188',
           isAdmin: false,
-          problemAlias: 'problemOmegaUp',
         },
       ],
     ]);

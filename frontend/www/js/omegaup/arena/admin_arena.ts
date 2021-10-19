@@ -4,7 +4,6 @@ import * as api from '../api';
 import { types } from '../api_types';
 import T from '../lang';
 import arena_Runs from '../components/arena/Runs.vue';
-import arena_Runsv2 from '../components/arena/Runsv2.vue';
 import * as ui from '../ui';
 import * as time from '../time';
 
@@ -22,13 +21,12 @@ export default class ArenaAdmin {
 
     this.arena = arena;
     this.arena.problemsetAdmin = true;
-    const globalRuns = this.arena.options.contestAlias === 'admin';
 
     this.setUpPagers();
     this.runsList = new Vue({
-      el: globalRuns ? '#main-container' : '#runs table.runs',
+      el: '#runs table.runs',
       components: {
-        'omegaup-arena-runs': globalRuns ? arena_Runsv2 : arena_Runs,
+        'omegaup-arena-runs': arena_Runs,
       },
       data: () => ({
         searchResultUsers: [] as types.ListItem[],
@@ -38,7 +36,7 @@ export default class ArenaAdmin {
           props: {
             contestAlias: arena.options.contestAlias,
             runs: runsStore.state.runs,
-            showContest: arena.options.contestAlias == 'admin',
+            showContest: false,
             showProblem: true,
             showDetails: true,
             showDisqualify: true,
@@ -46,7 +44,7 @@ export default class ArenaAdmin {
             showRejudge: true,
             showUser: true,
             problemsetProblems: Object.values(arena.problems),
-            globalRuns: globalRuns,
+            globalRuns: false,
             searchResultUsers: this.searchResultUsers,
           },
           on: {
@@ -194,12 +192,7 @@ export default class ArenaAdmin {
       status: runsListComponent.filterStatus || undefined,
     };
 
-    if (this.arena.options.contestAlias === 'admin') {
-      api.Run.list(options)
-        .then(time.remoteTimeAdapter)
-        .then((response) => this.runsChanged(response))
-        .catch(ui.ignoreError);
-    } else if (this.arena.options.contestAlias != null) {
+    if (this.arena.options.contestAlias != null) {
       options.contest_alias = this.arena.options.contestAlias;
       api.Contest.runs(options)
         .then(time.remoteTimeAdapter)
