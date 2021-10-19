@@ -1187,6 +1187,7 @@
 	"scoreboardShowOnlyInvitedIdentities": "Show official contestants only",
 	"searchUser": "Search user",
 	"selectProblemLevelDesc": "In order to add the problem, you must to choose its corresponding level",
+	"serviceUnavailableError": "Oops. The service is currently unavailable. Please try again.",
 	"showLinks": "Links",
 	"showTotalScoreboard": "Show total scoreboard",
 	"singleUserAddSuccess": "Usu\u00e1rio adicionado com sucesso.",
