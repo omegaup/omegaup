@@ -23,6 +23,7 @@
         :show-invited-users-filter="false"
         :problems="problems"
         :ranking="ranking"
+        :ranking-chart-options="rankingChartOptions"
         :last-updated="lastUpdated"
       ></omegaup-arena-scoreboard>
     </template>
@@ -30,6 +31,7 @@
 </template>
 
 <script lang="ts">
+import * as Highcharts from 'highcharts/highstock';
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
@@ -50,6 +52,7 @@ export default class ProblemsetScoreboard extends Vue {
   @Prop() name!: string;
   @Prop() finishTime!: Date;
   @Prop() ranking!: types.ScoreboardRankingEntry[];
+  @Prop() rankingChartOptions!: Highcharts.Options;
   @Prop() problems!: types.NavbarProblemsetProblem[];
   @Prop() lastUpdated!: Date;
   @Prop({ default: false }) isAdmin!: boolean;
