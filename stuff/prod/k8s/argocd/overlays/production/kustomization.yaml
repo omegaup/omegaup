@@ -8,3 +8,10 @@ bases:
 
 resources:
 - ingress.yaml
+
+generators:
+- argocd-aws-credentials.yaml
+
+patchesStrategicMerge:
+- argocd-cm.yaml
+- argo-cd-repo-server-ksops-patch.yaml
