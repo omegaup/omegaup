@@ -7,9 +7,11 @@
       <div id="run-details"></div>
     </div>
     <!-- id-lint on -->
-    <div v-if="globalRuns" class="card-header">
-      <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
-    </div>
+    <slot name="title">
+      <div class="card-header">
+        <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
+      </div>
+    </slot>
     <div class="table-responsive">
       <table
         class="runs table table-striped"
@@ -249,7 +251,7 @@
               <button
                 class="details btn-outline-dark btn-sm"
                 :data-run-details="run.guid"
-                @click="$emit('details', run)"
+                @click="onRunDetails(run)"
               >
                 <font-awesome-icon :icon="['fas', 'search-plus']" />
               </button>
@@ -270,7 +272,7 @@
                     v-if="showDetails"
                     :data-run-details="run.guid"
                     class="btn-link dropdown-item"
-                    @click="$emit('details', run)"
+                    @click="onRunDetails(run)"
                   >
                     {{ T.wordsDetails }}
                   </button>
@@ -299,6 +301,20 @@
         </tbody>
       </table>
     </div>
+    <slot name="runs">
+      <omegaup-overlay
+        :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
+        @hide-overlay="onPopupDismissed"
+      >
+        <template #popup>
+          <omegaup-arena-rundetails-popup
+            v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
+            :data="currentRunDetailsData"
+            @dismiss="onPopupDismissed"
+          ></omegaup-arena-rundetails-popup>
+        </template>
+      </omegaup-overlay>
+    </slot>
   </div>
 </template>
 
@@ -310,6 +326,8 @@ import * as time from '../../time';
 import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
+import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
+import omegaup_Overlay from '../Overlay.vue';
 
 import Autocomplete from '../Autocomplete.vue';
 
@@ -337,12 +355,23 @@ declare global {
   }
 }
 
+export enum PopupDisplayed {
+  None,
+  RunSubmit,
+  RunDetails,
+  Promotion,
+  Demotion,
+  Reviewer,
+}
+
 @Component({
   components: {
     FontAwesomeIcon,
+    'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-autocomplete': Autocomplete,
-    'omegaup-user-username': user_Username,
+    'omegaup-overlay': omegaup_Overlay,
     'omegaup-common-typeahead': common_Typeahead,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class Runsv2 extends Vue {
@@ -358,14 +387,17 @@ export default class Runsv2 extends Vue {
   @Prop({ default: false }) showUser!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop({ default: null }) problemAlias!: string | null;
-  @Prop({ default: null }) problemsetProblems!: types.ProblemsetProblem[];
+  @Prop({ default: () => [] }) problemsetProblems!: types.ProblemsetProblem[];
   @Prop({ default: null }) username!: string | null;
   @Prop({ default: 100 }) rowCount!: number;
   @Prop() runs!: null | types.Run[];
-  @Prop({ default: false }) globalRuns!: boolean;
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
+  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
+  @Prop({ default: null }) guid!: null | string;
   @Prop({ default: false }) showAllRuns!: boolean;
 
+  PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
   typeahead = typeahead;
@@ -378,6 +410,8 @@ export default class Runsv2 extends Vue {
   filterVerdict: string = '';
   filterContest: string = '';
   filters: { name: string; value: string }[] = [];
+  currentRunDetailsData = this.runDetailsData;
+  currentPopupDisplayed = this.popupDisplayed;
 
   get filteredRuns(): types.Run[] {
     if (
@@ -569,6 +603,25 @@ export default class Runsv2 extends Vue {
     const verdictHelp = T[`verdictHelp${run.verdict}`];
 
     return `${verdict}: ${verdictHelp}`;
+  }
+
+  onRunDetails(run: types.Run): void {
+    this.$emit('details', {
+      guid: run.guid,
+      isAdmin: true,
+      hash: `#runs/all/show-run:${run.guid}`,
+    });
+    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+  }
+
+  onPopupDismissed(): void {
+    this.currentPopupDisplayed = PopupDisplayed.None;
+    this.$emit('reset-hash');
+  }
+
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 
   @Watch('username')

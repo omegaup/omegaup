@@ -58,7 +58,8 @@ abstract class Contests {
                 `archived` = ?,
                 `certificate_cutoff` = ?,
                 `certificates_status` = ?,
-                `contest_for_teams` = ?
+                `contest_for_teams` = ?,
+                `default_show_all_contestants_in_scoreboard` = ?
             WHERE
                 (
                     `contest_id` = ?
@@ -117,6 +118,7 @@ abstract class Contests {
             ),
             $Contests->certificates_status,
             intval($Contests->contest_for_teams),
+            intval($Contests->default_show_all_contestants_in_scoreboard),
             intval($Contests->contest_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -165,7 +167,8 @@ abstract class Contests {
                 `Contests`.`archived`,
                 `Contests`.`certificate_cutoff`,
                 `Contests`.`certificates_status`,
-                `Contests`.`contest_for_teams`
+                `Contests`.`contest_for_teams`,
+                `Contests`.`default_show_all_contestants_in_scoreboard`
             FROM
                 `Contests`
             WHERE
@@ -274,7 +277,8 @@ abstract class Contests {
                 `Contests`.`archived`,
                 `Contests`.`certificate_cutoff`,
                 `Contests`.`certificates_status`,
-                `Contests`.`contest_for_teams`
+                `Contests`.`contest_for_teams`,
+                `Contests`.`default_show_all_contestants_in_scoreboard`
             FROM
                 `Contests`
         ';
@@ -351,8 +355,10 @@ abstract class Contests {
                     `archived`,
                     `certificate_cutoff`,
                     `certificates_status`,
-                    `contest_for_teams`
+                    `contest_for_teams`,
+                    `default_show_all_contestants_in_scoreboard`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -435,6 +441,7 @@ abstract class Contests {
             ),
             $Contests->certificates_status,
             intval($Contests->contest_for_teams),
+            intval($Contests->default_show_all_contestants_in_scoreboard),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

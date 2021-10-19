@@ -558,9 +558,14 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
         ]);
 
-        // Call admin api. This should succeed.
-        $detailsResponse = \OmegaUp\Controllers\Contest::apiAdminDetails($r);
+        // Call apiDetails and apiAdminDetails. Now both calls should succeed.
+        $detailsResponse = \OmegaUp\Controllers\Contest::apiDetails($r);
         $this->assertContestDetails($contestData, [], $detailsResponse);
+
+        $adminDetailsResponse = \OmegaUp\Controllers\Contest::apiAdminDetails(
+            $r
+        );
+        $this->assertContestDetails($contestData, [], $adminDetailsResponse);
     }
 
     /**

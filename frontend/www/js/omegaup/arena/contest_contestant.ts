@@ -303,17 +303,28 @@ OmegaUp.on('ready', async () => {
               .catch(ui.ignoreError);
           },
           'update:activeTab': (tabName: string) => {
-            window.location.replace(`#${tabName}`);
+            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
           },
-          'reset-hash': (request: {
+          'reset-hash': ({
+            selectedTab,
+            alias,
+          }: {
             selectedTab: string;
-            alias: null | string;
+            alias: string;
           }) => {
-            if (!request.alias) {
-              window.location.replace(`#${request.selectedTab}`);
+            if (!alias) {
+              history.replaceState(
+                { selectedTab },
+                'resetHash',
+                `#${selectedTab}`,
+              );
               return;
             }
-            window.location.replace(`#${request.selectedTab}/${request.alias}`);
+            history.replaceState(
+              { selectedTab, alias },
+              'resetHash',
+              `#${selectedTab}/${alias}`,
+            );
           },
         },
       });

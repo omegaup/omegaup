@@ -120,7 +120,10 @@
         @update-search-result-users="
           (request) => $emit('update-search-result-users', request)
         "
-      ></omegaup-arena-runs>
+      >
+        <template #title><div></div></template>
+        <template #runs><div></div></template>
+      </omegaup-arena-runs>
       <omegaup-overlay
         v-if="contestAdmin"
         :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"

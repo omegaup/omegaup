@@ -32,6 +32,7 @@ module.exports = {
     arena_course: './frontend/www/js/omegaup/arena/course.ts',
     arena_scoreboard: './frontend/www/js/omegaup/arena/scoreboard.ts',
     arena_contest_virtual: './frontend/www/js/omegaup/arena/contest_virtual.ts',
+    arena_global_runs: './frontend/www/js/omegaup/arena/global_runs.ts',
     authors_rank: './frontend/www/js/omegaup/user/authors_rank.ts',
     badge_details: './frontend/www/js/omegaup/badge/details.ts',
     badge_list: './frontend/www/js/omegaup/badge/list.ts',
