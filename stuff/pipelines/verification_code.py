@@ -19,13 +19,13 @@ _ALPHABET = "23456789CFGHJMPQRVWX"
 def generate_code(generated_code: Optional[List[int]] = None) -> str:
     '''Function to create a 10-digit verification code.
 
-       To create a 10-digit code the alphabet "23456789CFGHJMPQRVWX". is used.
-       A digit is added at the end which serves as a checksum to easily
-       distinguish badly copied codes using the Noid Check Digit Digit
-       Algorithm (NCDA).
+    To create a 10-digit code, the alphabet "23456789CFGHJMPQRVWX" is used.
+    A digit is added at the end which serves as a checksum to easily
+    distinguish badly copied codes using the Noid Check Digit
+    Algorithm (NCDA).
 
-       generated_code: Optional list of indexes that will
-       determine the first 9 digits from the alphabet.
+    generated_code: Optional list of indexes that will
+      determine the first 9 digits from the alphabet.
     '''
     if generated_code is None:
         generated_code = random.choices(range(len(_ALPHABET)), k=9)
