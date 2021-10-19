@@ -11,7 +11,7 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  *
- * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problem_count: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
  * @psalm-type CourseCardFinished=array{alias: string, name: string}
@@ -59,7 +59,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             SELECT
                 a.*,
                 COUNT(s.submission_id) AS has_runs,
-                COUNT(p.problem_id) AS problem_count,
+                COUNT(p.problem_id) AS problemCount,
                 ps.scoreboard_url,
                 ps.scoreboard_url_admin
             FROM
@@ -91,7 +91,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ORDER BY
                 `order`, start_time;";
 
-        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problem_count: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);
 
         $ar = [];
