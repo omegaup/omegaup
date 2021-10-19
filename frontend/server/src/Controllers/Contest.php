@@ -43,6 +43,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
+ * @psalm-type ContestScoreboardPayload=array{contest: ContestDetails, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardEvents: list<ScoreboardEvent>, scoreboardToken:null|string}
  * @psalm-type ContestDetailsPayload=array{adminPayload?: array{allRuns: list<Run>, users: list<ContestUser>}, clarifications: list<Clarification>, contest: ContestPublicDetails, original?: array{contest: \OmegaUp\DAO\VO\Contests, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>}, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardEvents: list<ScoreboardEvent>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null}
  * @psalm-type ContestPracticeDetailsPayload=array{adminPayload?: array{allRuns: list<Run>, users: list<ContestUser>}, clarifications: list<Clarification>, contest: ContestPublicDetails, contestAdmin: bool, original?: array{contest: \OmegaUp\DAO\VO\Contests, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>}, problems: list<NavbarProblemsetProblem>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
@@ -3909,6 +3910,102 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $scoreboard = new \OmegaUp\Scoreboard($params);
 
         return $scoreboard->generate();
+    }
+
+    /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: ContestScoreboardPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param null|string $scoreboard_token
+     */
+    public static function getContestScoreboardDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        $identity = null;
+        try {
+            $r->ensureIdentity();
+            $identity = $r->identity;
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing.
+        }
+
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $scoreboardToken = $r->ensureOptionalString(
+            'scoreboard_token',
+            /*$required=*/ false,
+            fn (string $token) => \OmegaUp\Validators::token($token)
+        );
+        [
+            'contest' => $contest,
+            'contest_admin' => $contestAdmin,
+            'problemset' => $problemset
+        ] = self::validateDetails($contestAlias, $identity);
+
+        if (is_null($problemset->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemsetNotFound'
+            );
+        }
+
+        $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+            $problemset->problemset_id
+        );
+
+        $problemsResponseArray = [];
+        $letter = 0;
+        foreach ($problemsInContest as $problem) {
+            $problem['letter'] = \OmegaUp\Controllers\Contest::columnName(
+                $letter++
+            );
+            $problem['accepts_submissions'] = !empty(
+                $problem['languages']
+            );
+            $problemsResponseArray[] = [
+                'acceptsSubmissions' => $problem['accepts_submissions'],
+                'alias' => strval($problem['alias']),
+                'text' => "{$problem['letter']}. {$problem['title']}",
+                'bestScore' => 0,
+                'maxScore' => floatval($problem['points']),
+                'hasRuns' => false,
+            ];
+        }
+
+        $contestDetails = self::getContestDetails(
+            $contest,
+            $contestAdmin,
+            $identity
+        );
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'contest' => $contestDetails,
+                    'contestAdmin' => $contestAdmin,
+                    'scoreboardToken' => $scoreboardToken,
+                    'scoreboard' => self::getScoreboard(
+                        $contest,
+                        $problemset,
+                        $identity,
+                        $scoreboardToken
+                    ),
+                    'scoreboardEvents' => self::getScoreboardEvents(
+                        $contest,
+                        $identity
+                    ),
+                    'problems' => $problemsResponseArray,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleContestScoreboard'
+                ),
+            ],
+            'entrypoint' => 'contest_scoreboard',
+        ];
     }
 
     /**
