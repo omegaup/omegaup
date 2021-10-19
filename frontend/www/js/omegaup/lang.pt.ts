@@ -42,7 +42,7 @@ const translations: { [key: string]: string; } = {
   arenaContestEndedUsePractice: "Este concurso terminou. Para continuar a enviar solu\u00e7\u00f5es use o Modo de Pr\u00e1tica clicando aqui.",
   arenaContestNotOpened: "Voc\u00ea precisa abrir o conjunto de problemas no modo n\u00e3o administrativo para fazer envios.",
   arenaContestOrganizer: "Organizador",
-  arenaContestPracticeOriginalRunsText: "Para ver as solu\u00e7\u00f5es do concurso original, clique [aqui](/arena/%(contestAlias)/admin/#runs)",
+  arenaContestPracticeOriginalRunsText: "Para ver as solu\u00e7\u00f5es do concurso original, clique [aqui](/arena/%(contestAlias)/#runs)",
   arenaContestPracticeOriginalScoreboardText: "Para ver o painel de avalia\u00e7\u00e3o, clique [aqui](/arena/%(contestAlias)/#ranking)",
   arenaContestWindowLength: "Tempo de resolver todos os problemas",
   arenaCurrentContests: "Concursos atuais",

@@ -2392,6 +2392,7 @@ export namespace types {
     adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
+    contestAdmin: boolean;
     original?: {
       contest: dao.Contests;
       scoreboard?: types.Scoreboard;
