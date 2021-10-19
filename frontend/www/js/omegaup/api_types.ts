@@ -2513,7 +2513,7 @@ export namespace types {
   export interface CourseCloneDetailsPayload {
     creator: { classname: string; username: string };
     details: types.CourseDetails;
-    token: string;
+    token?: string;
   }
 
   export interface CourseDetails {
