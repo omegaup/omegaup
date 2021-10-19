@@ -253,6 +253,39 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             $response['ranking'][0]['problems'][1]['penalty']
         );
         $this->assertEquals(1, $response['ranking'][0]['problems'][1]['runs']);
+
+        // getContestScoreboardDetailsForTypeScript function can get the
+        // ranking too
+        $ranking = \OmegaUp\Controllers\Contest::getContestScoreboardDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' =>  $testData['contestData']['contest']->alias,
+            ])
+        )['smartyProperties']['payload']['scoreboard']['ranking'];
+
+        // Validate that we have ranking
+        $this->assertEquals(3, count($ranking));
+        $this->assertEquals(
+            $testData['contestants'][0]->username,
+            $ranking[0]['username']
+        );
+
+        //Check totals
+        $this->assertEquals(200, $ranking[0]['total']['points']);
+        $this->assertEquals(260, $ranking[0]['total']['penalty']);
+
+        // Check places
+        $this->assertEquals(1, $ranking[0]['place']);
+        $this->assertEquals(2, $ranking[1]['place']);
+        $this->assertEquals(3, $ranking[2]['place']);
+
+        // Check data per problem
+        $this->assertEquals(100, $ranking[0]['problems'][0]['points']);
+        $this->assertEquals(60, $ranking[0]['problems'][0]['penalty']);
+        $this->assertEquals(1, $ranking[0]['problems'][0]['runs']);
+        $this->assertEquals(100, $ranking[0]['problems'][1]['points']);
+        $this->assertEquals(200, $ranking[0]['problems'][1]['penalty']);
+        $this->assertEquals(1, $ranking[0]['problems'][1]['runs']);
     }
 
     /**
@@ -823,6 +856,28 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             $runMap[5],
             $testData,
             $response['events'],
+            false /*sholdBeIn*/
+        );
+
+        // getContestScoreboardDetailsForTypeScript function can get the
+        // scoreboardEvents too
+        $events = \OmegaUp\Controllers\Contest::getContestScoreboardDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' =>  $testData['contestData']['contest']->alias,
+            ])
+        )['smartyProperties']['payload']['scoreboardEvents'];
+
+        // From the map above, there are 4 meaningful combinations for events
+        $this->assertEquals(4, count($events));
+        $this->assertRunMapEntryIsOnEvents($runMap[1], $testData, $events);
+        $this->assertRunMapEntryIsOnEvents($runMap[2], $testData, $events);
+        $this->assertRunMapEntryIsOnEvents($runMap[3], $testData, $events);
+        $this->assertRunMapEntryIsOnEvents($runMap[4], $testData, $events);
+        $this->assertRunMapEntryIsOnEvents(
+            $runMap[5],
+            $testData,
+            $events,
             false /*sholdBeIn*/
         );
     }
