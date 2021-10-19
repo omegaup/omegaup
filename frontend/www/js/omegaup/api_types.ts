@@ -11,6 +11,7 @@ export namespace dao {
     certificates_status?: string;
     contest_for_teams?: boolean;
     contest_id?: number;
+    default_show_all_contestants_in_scoreboard?: boolean;
     description?: string;
     feedback?: string;
     finish_time?: Date;
@@ -2218,6 +2219,7 @@ export namespace types {
     archived: boolean;
     available_languages: { [key: string]: string };
     contest_for_teams: boolean;
+    default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -2255,6 +2257,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     contest_for_teams: boolean;
+    default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -2402,6 +2405,7 @@ export namespace types {
   export interface ContestPublicDetails {
     admission_mode: string;
     alias: string;
+    default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
     feedback: string;
