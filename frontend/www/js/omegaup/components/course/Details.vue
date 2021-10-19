@@ -213,7 +213,7 @@
       </div>
     </div>
     <template v-else>
-      <div class="my-4">
+      <div class="mt-4 mb-1">
         <div class="progress w-50 mx-auto">
           <div
             class="progress-bar"
