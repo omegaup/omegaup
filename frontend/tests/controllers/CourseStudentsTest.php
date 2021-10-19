@@ -274,4 +274,90 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             100
         );
     }
+
+    /**
+     * Basic getStudentProgressByAssignmentForTypeScript test.
+     */
+    public function testStudentProgressByAssignment() {
+        // Create 3 problems
+        $problemsData = [];
+        for ($i = 0; $i < 3; $i++) {
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        // Create course with one assignment
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $courseAlias = $courseData['course_alias'];
+        $assignmentAlias = $courseData['assignment_alias'];
+
+        // Create admin login
+        $login = self::login($courseData['admin']);
+
+        // Add problems to assignment
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignmentAlias,
+            [$problemsData[0], $problemsData[1], $problemsData[2]]
+        );
+
+        // Create one student for the course
+        $identities = [];
+        [
+            'user' => $user,
+            'identity' => $identities[]
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identities[0]
+        );
+
+        // The student will solve problem1, fail (90%) on problem0 and won't try problem2
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[0],
+            $courseData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0.9, 'PA');
+
+        // Create request
+        $login = self::login($courseData['admin']);
+        $response = \OmegaUp\Controllers\Course::getStudentProgressByAssignmentForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'course' => $courseAlias,
+                'assignment_alias' => $assignmentAlias,
+                'student' => $identities[0]->username,
+            ])
+        );
+
+        // Test results
+        // The studen only get 90 points in the first problem,
+        // so 90% of progress is expected
+        $this->assertEquals(
+            $response['smartyProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[0]['problem']->alias],
+            90
+        );
+
+        // The studen got AC points in the second problem,
+        // so 100% of progress is expected
+        $this->assertEquals(
+            $response['smartyProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[1]['problem']->alias],
+            100
+        );
+
+        // The studen didn't try third problem,
+        // so 0% of progress is expected
+        $this->assertEquals(
+            $response['smartyProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[2]['problem']->alias],
+            0
+        );
+    }
 }
