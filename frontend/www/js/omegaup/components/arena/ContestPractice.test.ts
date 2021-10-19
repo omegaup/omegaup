@@ -25,6 +25,7 @@ describe('ContestPractice.vue', () => {
     problemset_id: 1,
     scoreboard: 100,
     show_penalty: true,
+    default_show_all_contestants_in_scoreboard: false,
     show_scoreboard_after: true,
     start_time: date,
     submissions_gap: 1200,
