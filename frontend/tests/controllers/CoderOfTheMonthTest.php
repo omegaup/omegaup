@@ -508,6 +508,13 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         ] = \OmegaUp\Test\Factories\User::createUser();
         self::updateIdentity($identity, $gender);
 
+        // User "B" is always the second one in the ranking based on score
+        [
+            'user' => $userBLastyear,
+            'identity' => $identityB,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        self::updateIdentity($identityB, $gender);
+
         // Using the first day of the month as "today" to avoid failures near
         // certain dates.
         $today = date('Y-m-01', \OmegaUp\Time::get());
@@ -521,6 +528,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
         $this->createRuns($identity, $runCreationDate, 10 /*numRuns*/);
+        $this->createRuns($identityB, $runCreationDate, 5 /*numRuns*/);
         \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
 
         $runCreationDate = date_create($runCreationDate);
@@ -532,9 +540,11 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
         $this->createRuns($identity, $runCreationDate, 10 /*numRuns*/);
+        $this->createRuns($identityB, $runCreationDate, 5 /*numRuns*/);
         \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
 
         $this->createRuns($identity, $today, 10 /*numRuns*/);
+        $this->createRuns($identityB, $runCreationDate, 5 /*numRuns*/);
         \OmegaUp\Test\Utils::runUpdateRanks($today);
 
         // Getting Coder Of The Month
@@ -553,7 +563,11 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             '-11 month',
             $category
         );
-        $this->assertNull($responseCoder['coderinfo']);
+        // IdentityB is the CotM as Identity has already been selected.
+        $this->assertEquals(
+            $identityB->username,
+            $responseCoder['coderinfo']['username']
+        );
 
         $responseCoder = $this->getCoderOfTheMonth(
             $today,
