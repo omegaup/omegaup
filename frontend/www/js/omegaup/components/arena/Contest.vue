@@ -257,9 +257,7 @@ export default class ArenaContest extends Vue {
   onRunDetails(request: SubmissionRequest): void {
     this.$emit('show-run', {
       ...request,
-      hash: `#problems/${
-        this.activeProblemAlias ?? request.problemAlias
-      }/show-run:${request.guid}`,
+      hash: `#problems/${this.activeProblemAlias}/show-run:${request.guid}`,
     });
   }
 
