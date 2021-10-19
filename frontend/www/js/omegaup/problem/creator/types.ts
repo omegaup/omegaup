@@ -35,7 +35,7 @@ export type CaseLineData =
     }
   | {
       kind: 'multiline';
-      value: string | string[];
+      value: string;
     }
   | {
       kind: 'array';
