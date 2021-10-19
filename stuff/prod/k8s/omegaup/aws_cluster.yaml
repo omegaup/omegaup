@@ -4,7 +4,7 @@ kind: ClusterConfig
 metadata:
   name: omegaup-eks-cluster
   region: us-east-1
-  version: "1.20"
+  version: "1.21"
   tags: { k8s: "" }
 
 vpc:
@@ -35,8 +35,8 @@ secretsEncryption:
 
 addons:
 - name: vpc-cni
-  version: 1.8.0
+  version: 1.9.1
 - name: coredns
-  version: 1.8.3
+  version: 1.8.4
 - name: kube-proxy
-  version: 1.19.6
+  version: 1.21.2
