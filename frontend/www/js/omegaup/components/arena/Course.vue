@@ -41,7 +41,6 @@
                   $emit('navigate-to-assignment', {
                     assignmentAliasToShow,
                     courseAlias: course.alias,
-                    isAdmin,
                   })
               "
             ></omegaup-arena-navbar-assignments>
@@ -57,6 +56,7 @@
           <div v-else class="problem main">
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
+              :next-submission-timestamp="currentNextSubmissionTimestamp"
               :problem="problemInfo"
               :nomination-status="
                 problemInfo ? problemInfo.nominationStatus : null
@@ -66,17 +66,14 @@
               :languages="course.languages"
               :runs="runs"
               :guid="guid"
+              :run-details-data="runDetailsData"
               :problem-alias="problemAlias"
-              :should-show-run-details="shouldShowRunDetails"
-              @submit-run="onRunSubmitted"
-              @show-run="(source) => $emit('show-run', source)"
               @update:activeTab="
                 (selectedTab) =>
-                  $emit('reset-hash', {
-                    selectedTab,
-                    alias: activeProblemAlias,
-                  })
+                  $emit('reset-hash', { selectedTab, problemAlias })
               "
+              @submit-run="onRunSubmitted"
+              @show-run="onRunDetails"
               @submit-promotion="
                 (qualityPromotionComponent) =>
                   $emit('submit-promotion', {
@@ -102,6 +99,14 @@
               <template #best-solvers-list>
                 <div></div>
               </template>
+              <template #feedback="{ guid, isAdmin, feedback }">
+                <omegaup-submission-feedback
+                  :guid="guid"
+                  :is-admin="isAdmin"
+                  :feedback-options="feedback"
+                  @set-feedback="(request) => $emit('set-feedback', request)"
+                ></omegaup-submission-feedback>
+              </template>
             </omegaup-problem-details>
           </div>
         </div>
@@ -118,6 +123,7 @@
     <template #arena-runs>
       <omegaup-arena-runs
         v-if="isAdmin"
+        :show-all-runs="true"
         :contest-alias="currentAssignment.alias"
         :runs="allRuns"
         :show-problem="true"
@@ -128,7 +134,7 @@
         :show-user="true"
         :problemset-problems="Object.values(problems)"
         :global-runs="false"
-        @details="(run) => onRunDetails(run.guid)"
+        @details="(run) => onRunAdminDetails(run.guid)"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
       ></omegaup-arena-runs>
@@ -142,7 +148,16 @@
             v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
             :data="currentRunDetailsData"
             @dismiss="onPopupDismissed"
-          ></omegaup-arena-rundetails-popup>
+          >
+            <template #feedback="{ guid, isAdmin, feedback }">
+              <omegaup-submission-feedback
+                :guid="guid"
+                :is-admin="isAdmin"
+                :feedback-options="feedback"
+                @set-feedback="(request) => $emit('set-feedback', request)"
+              ></omegaup-submission-feedback>
+            </template>
+          </omegaup-arena-rundetails-popup>
         </template>
       </omegaup-overlay>
     </template>
@@ -190,7 +205,9 @@ import arena_Scoreboard from './Scoreboard.vue';
 import arena_Summary from './Summary.vue';
 import omegaup_Countdown from '../Countdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
+import submission_Feedback from '../submissions/Feedback.vue';
 import { SocketStatus } from '../../arena/events_socket';
+import { SubmissionRequest } from '../../arena/submissions';
 
 @Component({
   components: {
@@ -204,6 +221,7 @@ import { SocketStatus } from '../../arena/events_socket';
     'omegaup-arena-scoreboard': arena_Scoreboard,
     'omegaup-arena-summary': arena_Summary,
     'omegaup-problem-details': problem_Details,
+    'omegaup-submission-feedback': submission_Feedback,
     'omegaup-countdown': omegaup_Countdown,
   },
 })
@@ -225,15 +243,16 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
+  @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
 
   T = T;
   PopupDisplayed = PopupDisplayed;
   isAdmin = this.course.is_admin || this.course.is_curator;
   currentClarifications = this.clarifications;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  shouldShowRunDetails = false;
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
+  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
   INF = '∞';
 
   get activeProblemAlias(): null | string {
@@ -303,14 +322,6 @@ export default class ArenaCourse extends Vue {
     return PopupDisplayed.Promotion;
   }
 
-  onRunDetails(guid: string): void {
-    this.$emit('show-run-all', {
-      request: { guid, isAdmin: this.isAdmin },
-      target: this,
-    });
-    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
-  }
-
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
     this.$emit('reset-hash', { selectedTab: 'runs', alias: null });
@@ -325,29 +336,49 @@ export default class ArenaCourse extends Vue {
     this.$emit('submit-run', { ...run, problem: this.activeProblem });
   }
 
+  onRunAdminDetails(guid: string): void {
+    this.$emit('show-run', {
+      guid,
+      isAdmin: this.isAdmin,
+      hash: `#runs/all/show-run:${guid}`,
+    });
+    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+  }
+
+  onRunDetails(request: SubmissionRequest): void {
+    this.$emit('show-run', {
+      ...request,
+      hash: `#problems/${
+        this.activeProblemAlias ?? request.problemAlias
+      }/show-run:${request.guid}`,
+    });
+  }
+
   @Watch('problem')
   onActiveProblemChanged(newValue: types.NavbarProblemsetProblem | null): void {
-    if (!newValue) {
+    const currentProblem = this.currentAssignment.problems?.find(
+      ({ alias }: { alias: string }) => alias === newValue?.alias,
+    );
+    if (!newValue || !currentProblem) {
       this.activeProblem = null;
+      this.$emit('reset-hash', { selectedTab: 'problems', alias: null });
       return;
     }
     this.onNavigateToProblem(newValue);
   }
 
-  @Watch('popupDisplayed')
-  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
-    if (newValue !== PopupDisplayed.RunDetails) {
+  @Watch('problemInfo')
+  onProblemInfoChanged(newValue: types.ProblemInfo | null): void {
+    if (!newValue) {
       return;
     }
-    this.$emit('show-run-all', {
-      request: {
-        guid: this.guid,
-        isAdmin: this.isAdmin,
-        problemAlias: this.currentRunDetailsData?.alias,
-      },
-      target: this,
-    });
-    this.currentPopupDisplayed = newValue;
+    this.currentNextSubmissionTimestamp =
+      newValue.nextSubmissionTimestamp ?? null;
+  }
+
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 }
 </script>

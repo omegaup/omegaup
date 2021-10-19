@@ -47,6 +47,9 @@ declare global {
       $: JQuery;
       jQuery: JQuery;
       document: Document;
+      URL: {
+        createObjectURL: () => string;
+      };
     }
   }
 
@@ -58,6 +61,7 @@ declare global {
 global.jQuery = require('jquery');
 global.$ = global.jQuery;
 window.jQuery = global.jQuery;
+global.URL.createObjectURL = jest.fn();
 
 // This is needed for CodeMirror to work.
 global.document.createRange = () => {
