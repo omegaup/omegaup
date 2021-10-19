@@ -1,7 +1,7 @@
 <template>
   <omegaup-arena
     :active-tab="activeTab"
-    :contest-title="ui.contestTitle(contest)"
+    :title="ui.contestTitle(contest)"
     :is-admin="contestAdmin"
     :clarifications="currentClarifications"
     :should-show-runs="contestAdmin"
