@@ -652,34 +652,6 @@ export namespace types {
       );
     }
 
-    export function ContestScoreboardPayload(
-      elementId: string = 'payload',
-    ): types.ContestScoreboardPayload {
-      return ((x) => {
-        x.contest = ((x) => {
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          if (x.submission_deadline)
-            x.submission_deadline = ((x: number) => new Date(x * 1000))(
-              x.submission_deadline,
-            );
-          return x;
-        })(x.contest);
-        x.scoreboard = ((x) => {
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
-          return x;
-        })(x.scoreboard);
-        return x;
-      })(
-        JSON.parse(
-          (document.getElementById(elementId) as HTMLElement).innerText,
-        ),
-      );
-    }
-
     export function ContestVirtualDetailsPayload(
       elementId: string = 'payload',
     ): types.ContestVirtualDetailsPayload {
@@ -2397,15 +2369,6 @@ export namespace types {
     last_update?: Date;
     request_time: Date;
     username: string;
-  }
-
-  export interface ContestScoreboardPayload {
-    contest: types.ContestDetails;
-    contestAdmin: boolean;
-    problems: types.NavbarProblemsetProblem[];
-    scoreboard: types.Scoreboard;
-    scoreboardEvents: types.ScoreboardEvent[];
-    scoreboardToken?: string;
   }
 
   export interface ContestUser {
