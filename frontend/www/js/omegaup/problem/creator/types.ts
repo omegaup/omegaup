@@ -86,7 +86,7 @@ export interface CaseLine {
  * @property {GroupID} groupID UUID referencing to the parent group
  * @property {stirng} name Name of the case
  * @property {number} points Points of the case
- * @property {boolean} defined Whether the points are defined by the user or not
+ * @property {boolean} pointsDefined Whether the points are defined by the user or not
  * @property {Array<InLine>} lines Lines containing .IN information of the cases
  */
 export interface Case {
@@ -94,7 +94,7 @@ export interface Case {
   groupID: string;
   name: string;
   points: number;
-  defined: boolean;
+  pointsDefined: boolean;
   lines: CaseLine[];
 }
 
@@ -106,14 +106,14 @@ export interface Case {
  * @property {GrouID} groupID UUID of the group
  * @property {string} name Name of the group
  * @property {number} points Points of the group
- * @property {boolean} defined Whether the points are defined by the user or not
+ * @property {boolean} pointsDefined Whether the points are defined by the user or not
  * @property {Array<Case>} cases Cases of the group
  */
 export interface Group {
   groupID: GroupID;
   name: string;
   points: number;
-  defined: boolean;
+  pointsDefined: boolean;
   cases: Case[];
 }
 

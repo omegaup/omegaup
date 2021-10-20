@@ -33,13 +33,13 @@ describe('cases.ts', () => {
     const newCase = generateCase({
       name: 'case1',
       points: 100,
-      defined: true,
+      pointsDefined: true,
       groupID: UUID_NIL,
     });
     const editedCase = generateCase({
       name: 'case2',
       points: 30,
-      defined: true,
+      pointsDefined: true,
       groupID: UUID_NIL,
       caseID: newCase.caseID,
     });
@@ -56,7 +56,7 @@ describe('cases.ts', () => {
     const editedGroup = generateGroupPayload({
       name: 'group2',
       points: 20,
-      defined: true,
+      pointsDefined: true,
       groupID: newGroup.groupID,
     });
     store.commit('casesStore/addGroup', newGroup);
@@ -96,7 +96,7 @@ describe('cases.ts', () => {
 interface generateCaseOptions {
   name: string;
   points?: number;
-  defined?: boolean;
+  pointsDefined?: boolean;
   groupID?: string;
   caseID?: string;
 }
@@ -104,14 +104,14 @@ interface generateCaseOptions {
 function generateCase({
   name,
   points = 0,
-  defined = false,
+  pointsDefined = false,
   groupID = UUID_NIL,
   caseID = uuid(),
 }: generateCaseOptions): Case {
   return {
     caseID: caseID,
     groupID: groupID,
-    defined: defined,
+    pointsDefined: pointsDefined,
     name: name,
     points: points,
     lines: [],
@@ -121,21 +121,21 @@ function generateCase({
 interface generateGroupOptions {
   name: string;
   points?: number;
-  defined?: boolean;
+  pointsDefined?: boolean;
   groupID?: string;
 }
 
 function generateGroupPayload({
   name,
   points = 0,
-  defined = false,
+  pointsDefined = false,
   groupID = uuid(),
 }: generateGroupOptions): Group {
   return {
     groupID: groupID,
     name: name,
     points: points,
-    defined: defined,
+    pointsDefined: pointsDefined,
     cases: [],
   };
 }

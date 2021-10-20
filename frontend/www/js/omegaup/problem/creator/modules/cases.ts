@@ -10,7 +10,6 @@ import {
 import { Module } from 'vuex';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
 import T from '../../../lang';
-import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
 import Vue from 'vue';
 export interface CasesState {
   groups: Group[];
@@ -26,7 +25,7 @@ export const casesStore: Module<CasesState, RootState> = {
       {
         groupID: UUID_NIL,
         name: T.problemCreatorNoGroup,
-        defined: false,
+        pointsDefined: false,
         points: 100,
         cases: [],
       },
@@ -44,7 +43,7 @@ export const casesStore: Module<CasesState, RootState> = {
         {
           groupID: UUID_NIL,
           name: T.problemCreatorNoGroup,
-          defined: false,
+          pointsDefined: false,
           points: 100,
           cases: [],
         },
@@ -76,7 +75,7 @@ export const casesStore: Module<CasesState, RootState> = {
       if (groupTarget) {
         groupTarget.points = groupData.points;
         groupTarget.name = groupData.name;
-        groupTarget.defined = groupData.defined;
+        groupTarget.pointsDefined = groupData.pointsDefined;
       }
       state = assignMissingPoints(state);
     },
@@ -119,7 +118,7 @@ export const casesStore: Module<CasesState, RootState> = {
           });
           caseTarget.groupID = editedCase.groupID;
           caseTarget.points = editedCase.points;
-          caseTarget.defined = editedCase.defined;
+          caseTarget.pointsDefined = editedCase.pointsDefined;
           caseTarget.name = editedCase.name;
         }
       }
@@ -199,14 +198,14 @@ export function assignMissingPoints(state: CasesState): CasesState {
     if (group.groupID === UUID_NIL) {
       // Calculate points of cases without group
       for (const caseElement of group.cases) {
-        if (caseElement.defined) {
+        if (caseElement.pointsDefined) {
           maxPoints -= caseElement?.points ?? 0;
         } else {
           notDefinedCount++;
         }
       }
     } else {
-      if (group.defined) {
+      if (group.pointsDefined) {
         maxPoints -= group?.points ?? 0;
       } else {
         notDefinedCount++;
@@ -220,13 +219,13 @@ export function assignMissingPoints(state: CasesState): CasesState {
   state.groups = state.groups.map((element) => {
     if (element.groupID === UUID_NIL) {
       element.cases = element.cases.map((caseElement) => {
-        if (!caseElement.defined) {
+        if (!caseElement.pointsDefined) {
           caseElement.points = individualPoints;
         }
         return caseElement;
       });
     }
-    if (!element.defined) {
+    if (!element.pointsDefined) {
       element.points = individualPoints;
     }
     return element;
