@@ -112,7 +112,7 @@ export const casesStore: Module<CasesState, RootState> = {
         }
       } else {
         if (caseTarget) {
-          Vue.set(groupTarget.cases, caseIndex, {
+          Vue.set(groupTarget?.cases, caseIndex, {
             ...caseTarget,
             ...editedCase,
           });
