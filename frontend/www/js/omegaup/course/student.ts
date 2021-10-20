@@ -97,6 +97,9 @@ OmegaUp.on('ready', () => {
               assignmentAlias,
             );
           },
+          'push-state': (student: types.StudentProgress, title: string, url: string) => {
+            window.history.pushState(student, title, url);
+          },
         },
       });
     },

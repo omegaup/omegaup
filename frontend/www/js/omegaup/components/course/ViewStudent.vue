@@ -320,7 +320,7 @@ export default class CourseViewStudent extends Vue {
     } else {
       url = `/course/${this.course.alias}/student/${newVal.username}/`;
     }
-    window.history.pushState({ student: newVal }, document.title, url);
+    this.$emit('push-state', { student: newVal }, document.title, url);
   }
 
   @Watch('selectedAssignment')
@@ -335,11 +335,7 @@ export default class CourseViewStudent extends Vue {
     } else {
       url = `/course/${this.course.alias}/student/${this.selectedStudent.username}/assignment/${newVal}/`;
     }
-    window.history.pushState(
-      { student: this.selectedStudent },
-      document.title,
-      url,
-    );
+    this.$emit('push-state', { student: this.selectedStudent }, document.title, url);
   }
 
   @Watch('problems')
