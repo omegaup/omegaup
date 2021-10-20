@@ -59,7 +59,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             SELECT
                 a.*,
                 COUNT(s.submission_id) AS has_runs,
-                COUNT(p.problem_id) AS problemCount,
+                COUNT(p.problem_id) AS problem_count,
                 ps.scoreboard_url,
                 ps.scoreboard_url_admin
             FROM
