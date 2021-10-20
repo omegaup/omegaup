@@ -9,7 +9,7 @@ describe('CardPublic.vue', () => {
   const publicCourse: types.CourseCardPublic = {
     alias: 'test-course',
     lessonCount: 2,
-    level: undefined,
+    level: 'introductory',
     name: 'Test course',
     school_name: 'Test course school',
     studentCount: 2000,
@@ -30,5 +30,6 @@ describe('CardPublic.vue', () => {
         studentCount: '2.0k',
       }),
     );
+    expect(wrapper.text()).toContain(T.courseCardPublicLevelIntroductory);
   });
 });

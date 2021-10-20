@@ -64,7 +64,7 @@ import omegaup_Markdown from '../Markdown.vue';
   },
 })
 export default class CourseCardEnrolled extends Vue {
-  @Prop() course!: types.CourseCardEnrolled[];
+  @Prop() course!: types.CourseCardEnrolled;
 
   T = T;
   ui = ui;

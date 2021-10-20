@@ -56,7 +56,7 @@ import omegaup_Markdown from '../Markdown.vue';
   },
 })
 export default class CourseCardPublic extends Vue {
-  @Prop() course!: types.CourseCardPublic[];
+  @Prop() course!: types.CourseCardPublic;
 
   T = T;
   ui = ui;
@@ -64,11 +64,11 @@ export default class CourseCardPublic extends Vue {
   courseLevelText(level: null | string): string {
     switch (level) {
       case 'introductory':
-        return `★ ${T.courseLevelIntroductory}`;
+        return T.courseCardPublicLevelIntroductory;
       case 'intermediate':
-        return `★★ ${T.courseLevelIntroductory}`;
+        return T.courseCardPublicLevelIntermediate;
       case 'advanced':
-        return `★★★ ${T.courseLevelAdvanced}`;
+        return T.courseCardPublicLevelAdvanced;
       default:
         return '';
     }
