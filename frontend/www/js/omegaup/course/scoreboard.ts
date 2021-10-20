@@ -1,4 +1,4 @@
-import course_Scoreboard from '../components/common/Scoreboard.vue';
+import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import { OmegaUp } from '../omegaup';
 import { EventsSocket } from '../arena/events_socket';
 import socketStore from '../arena/socketStore';
@@ -15,8 +15,8 @@ OmegaUp.on('ready', () => {
   const commonPayload = types.payloadParsers.CommonPayload();
   const getRankingByTokenRefresh = 5 * 60 * 1000; // 5 minutes
 
-  let ranking: types.ScoreboardRankingEntry[];
-  let lastTimeUpdated: null | Date;
+  let ranking: types.ScoreboardRankingEntry[] = [];
+  let lastTimeUpdated: null | Date = null;
   if (payload.scoreboard) {
     const rankingInfo = onRankingChanged({
       scoreboard: payload.scoreboard,
@@ -32,21 +32,21 @@ OmegaUp.on('ready', () => {
   new Vue({
     el: '#main-container',
     components: {
-      'omegaup-course-scoreboard': course_Scoreboard,
+      'omegaup-arena-scoreboard': arena_Scoreboard,
     },
     data: () => ({
       problems: payload.problems,
     }),
     render: function (createElement) {
-      return createElement('omegaup-course-scoreboard', {
+      return createElement('omegaup-arena-scoreboard', {
         props: {
           problems: this.problems,
-          name: payload.assignment.name,
+          title: payload.assignment.name,
           finishTime: payload.assignment.finishTime,
-          isAdmin: payload.assignment.admin,
           socketStatus: socketStore.state.socketStatus,
           ranking: rankingStore.state.ranking,
           lastUpdated: rankingStore.state.lastTimeUpdated,
+          showInvitedUsersFilter: false,
         },
       });
     },
