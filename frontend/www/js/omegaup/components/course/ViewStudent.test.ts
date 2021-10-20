@@ -101,7 +101,7 @@ describe('ViewStudent.vue', () => {
           } as types.CourseProblem,
         ],
         students: [student],
-        initialStudent: student,
+        student: student,
       },
     });
 

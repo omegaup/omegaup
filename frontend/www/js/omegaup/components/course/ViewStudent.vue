@@ -218,7 +218,7 @@ export default class CourseViewStudent extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() student!: types.StudentProgress;
   @Prop() assignment!: types.CourseAssignment;
-  @Prop() problem!: types.CourseProblem;
+  @Prop({ default: null }) problem!: null | types.CourseProblem;
   @Prop() problems!: types.CourseProblem[];
   @Prop() students!: types.StudentProgress[];
 
@@ -354,7 +354,6 @@ export default class CourseViewStudent extends Vue {
     }
     this.selectedProblem = found;
     this.selectedRun = found.runs?.[0] ?? null;
-    window.location.hash = `#${this.selectedProblem.alias}`;
   }
 
   @Watch('selectedProblem')
