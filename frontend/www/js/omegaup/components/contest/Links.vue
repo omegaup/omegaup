@@ -3,7 +3,7 @@
     <h4 class="card-header">{{ T.contestEditAdministrativeLinks }}</h4>
     <div class="card-body">
       <div class="list-group w-50 mx-auto">
-        <a class="list-group-item" :href="`/arena/${contest.alias}/admin/`">{{
+        <a class="list-group-item" :href="`/arena/${contest.alias}/#runs`">{{
           T.wordsSubmissions
         }}</a>
         <a class="list-group-item" :href="`/contest/${contest.alias}/stats/`">{{

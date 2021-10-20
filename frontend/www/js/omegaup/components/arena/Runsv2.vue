@@ -1,12 +1,5 @@
 <template>
   <div class="mt-2" data-runs>
-    <!-- TODO: This code should be removed when we stop using jquery and the
-      migration to vue was over -->
-    <!-- id-lint off -->
-    <div id="overlay">
-      <div id="run-details"></div>
-    </div>
-    <!-- id-lint on -->
     <slot name="title">
       <div class="card-header">
         <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>

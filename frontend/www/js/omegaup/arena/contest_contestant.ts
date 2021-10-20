@@ -21,21 +21,27 @@ import {
   SubmissionRequest,
   submitRun,
   submitRunFailed,
+  trackRun,
+  updateRunFallback,
 } from './submissions';
+import { PopupDisplayed } from '../components/problem/Details.vue';
 import { createChart, onRankingChanged, onRankingEvents } from './ranking';
 import { EventsSocket } from './events_socket';
 import rankingStore from './rankingStore';
 import socketStore from './socketStore';
-import { myRunsStore } from './runsStore';
+import { myRunsStore, runsStore } from './runsStore';
+import T from '../lang';
 
 OmegaUp.on('ready', async () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
+  const locationHash = window.location.hash.substr(1).split('/');
   const contestAdmin = Boolean(payload.adminPayload);
-  const activeTab = window.location.hash
-    ? window.location.hash.substr(1).split('/')[0]
-    : 'problems';
+  const activeTab = getSelectedValidTab(locationHash[0], contestAdmin);
+  if (activeTab !== locationHash[0]) {
+    window.location.hash = activeTab;
+  }
   const {
     guid,
     popupDisplayed,
@@ -109,6 +115,7 @@ OmegaUp.on('ready', async () => {
       problemAlias,
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
+      searchResultUsers: [] as types.ListItem[],
       nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
       runDetailsData: runDetails,
     }),
@@ -135,8 +142,10 @@ OmegaUp.on('ready', async () => {
           showPenalty: this.showPenalty,
           socketStatus: socketStore.state.socketStatus,
           runs: myRunsStore.state.runs,
-          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          allRuns: runsStore.state.runs,
+          searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
+          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
         },
         on: {
           'navigate-to-problem': ({
@@ -152,6 +161,26 @@ OmegaUp.on('ready', async () => {
               contestAlias: payload.contest.alias,
             });
           },
+          'update-search-result-users-contest': ({
+            query,
+            contestAlias,
+          }: {
+            query: string;
+            contestAlias: string;
+          }) => {
+            api.Contest.searchUsers({ query, contest_alias: contestAlias })
+              .then(({ results }) => {
+                this.searchResultUsers = results.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
+              })
+              .catch(ui.apiError);
+          },
           'show-run': (request: SubmissionRequest) => {
             api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
@@ -164,6 +193,9 @@ OmegaUp.on('ready', async () => {
                   errorname: run.errorname,
                   run,
                 });
+              })
+              .finally(() => {
+                this.popupDisplayed = PopupDisplayed.None;
               });
           },
           'submit-run': ({
@@ -251,6 +283,25 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.apiError);
           },
+          rejudge: (run: types.Run) => {
+            api.Run.rejudge({ run_alias: run.guid, debug: false })
+              .then(() => {
+                run.status = 'rejudging';
+                updateRunFallback({ run });
+              })
+              .catch(ui.ignoreError);
+          },
+          disqualify: (run: types.Run) => {
+            if (!window.confirm(T.runDisqualifyConfirm)) {
+              return;
+            }
+            api.Run.disqualify({ run_alias: run.guid })
+              .then(() => {
+                run.type = 'disqualified';
+                updateRunFallback({ run });
+              })
+              .catch(ui.ignoreError);
+          },
           'update:activeTab': (tabName: string) => {
             history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
           },
@@ -261,6 +312,14 @@ OmegaUp.on('ready', async () => {
             selectedTab: string;
             alias: string;
           }) => {
+            if (!alias) {
+              history.replaceState(
+                { selectedTab },
+                'resetHash',
+                `#${selectedTab}`,
+              );
+              return;
+            }
             history.replaceState(
               { selectedTab, alias },
               'resetHash',
@@ -286,6 +345,20 @@ OmegaUp.on('ready', async () => {
     intervalInMilliseconds: 5 * 60 * 1000,
   });
   socket.connect();
+
+  function getSelectedValidTab(tab: string, isAdmin: boolean): string {
+    const validTabs = ['problems', 'ranking', 'runs', 'clarifications'];
+    const defaultTab = 'problems';
+    if (tab === 'runs' && !isAdmin) return defaultTab;
+    const isValidTab = validTabs.includes(tab);
+    return isValidTab ? tab : defaultTab;
+  }
+
+  if (payload.adminPayload?.allRuns) {
+    for (const run of payload.adminPayload.allRuns) {
+      trackRun({ run });
+    }
+  }
 
   setInterval(() => {
     refreshContestClarifications({
