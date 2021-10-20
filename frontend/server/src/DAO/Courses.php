@@ -91,7 +91,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ORDER BY
                 `order`, start_time;";
 
-        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problem_count: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);
 
         $ar = [];
@@ -100,6 +100,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             unset($row['assignment_id']);
             unset($row['course_id']);
             $row['has_runs'] = $row['has_runs'] > 0;
+            $row['problemCount'] = $row['problem_count'];
+            unset($row['problem_count']);
             $ar[] = $row;
         }
         return $ar;

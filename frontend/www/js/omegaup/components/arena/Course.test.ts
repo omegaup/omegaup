@@ -37,6 +37,7 @@ describe('Course.vue', () => {
         order: 1,
         scoreboard_url: 'scoreboard_url',
         scoreboard_url_admin: 'scoreboard_url_admin',
+        problemCount: 0,
       },
     ],
     clarifications: [],

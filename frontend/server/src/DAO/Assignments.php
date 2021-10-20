@@ -328,7 +328,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                `a`.`max_points`,
                `a`.`publish_time_delay`,
                `a`.`order`,
-                COUNT(`p`.`problem_id`) AS `problemCount`,
+                COUNT(`p`.`problem_id`) AS `problem_count`,
                 COUNT(`s`.`submission_id`) AS `has_runs`,
                `ps`.`scoreboard_url`,
                `ps`.`scoreboard_url_admin`
@@ -360,7 +360,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 `a`.`assignment_id` ASC;
         ';
 
-        /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problem_count: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId]
@@ -368,6 +368,8 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         $assignments = [];
         foreach ($rs as $row) {
             $row['has_runs'] = $row['has_runs'] > 0;
+            $row['problemCount'] = $row['problem_count'];
+            unset($row['problem_count']);
             $assignments[] = $row;
         }
         return $assignments;
