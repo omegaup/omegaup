@@ -111,15 +111,15 @@ export const casesStore: Module<CasesState, RootState> = {
           state.selected.groupID = editedCase.groupID;
         }
       } else {
-        if (caseTarget) {
-          Vue.set(groupTarget?.cases, caseIndex, {
+        if (caseTarget && groupTarget) {
+          Vue.set(groupTarget.cases, caseIndex, {
             ...caseTarget,
             ...editedCase,
           });
-          caseTarget.groupID = editedCase.groupID;
-          caseTarget.points = editedCase.points;
-          caseTarget.pointsDefined = editedCase.pointsDefined;
-          caseTarget.name = editedCase.name;
+          // caseTarget.groupID = editedCase.groupID;
+          // caseTarget.points = editedCase.points;
+          // caseTarget.pointsDefined = editedCase.pointsDefined;
+          // caseTarget.name = editedCase.name;
         }
       }
       state = assignMissingPoints(state);
