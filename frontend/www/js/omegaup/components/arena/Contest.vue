@@ -92,7 +92,9 @@
         :digits-after-decimal-point="digitsAfterDecimalPoint"
         :show-penalty="showPenalty"
         :show-invited-users-filter="true"
-      ></omegaup-arena-scoreboard>
+      >
+        <template #scoreboard-header><div></div></template>
+      </omegaup-arena-scoreboard>
     </template>
     <template #arena-runs>
       <omegaup-arena-runs
@@ -240,7 +242,6 @@ export default class ArenaContest extends Vue {
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   @Prop({ default: true }) showPenalty!: boolean;
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
-  @Prop({ default: true }) socketConnected!: boolean;
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop() searchResultUsers!: types.ListItem[];

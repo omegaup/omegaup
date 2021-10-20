@@ -118,7 +118,9 @@
         :problems="scoreboard.problems"
         :ranking="scoreboard.ranking"
         :last-updated="scoreboard.time"
-      ></omegaup-arena-scoreboard>
+      >
+        <template #scoreboard-header><div></div></template>
+      </omegaup-arena-scoreboard>
     </template>
     <template #arena-runs>
       <omegaup-arena-runs
