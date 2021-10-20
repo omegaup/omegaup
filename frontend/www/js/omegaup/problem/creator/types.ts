@@ -1,5 +1,9 @@
 import { CasesState } from './modules/cases';
 
+export type CaseID = string;
+export type GroupID = string;
+export type LineID = string;
+
 /**
  * StoreState
  * Store containing modules
@@ -43,7 +47,7 @@ export type CaseLineData =
       min: number;
       max: number;
       distinct: boolean;
-      arrayVal: number[];
+      value: number[];
     }
   | {
       kind: 'matrix';
@@ -52,7 +56,7 @@ export type CaseLineData =
       min: number;
       max: number;
       distinct: 'none' | 'rows' | 'cols' | 'both';
-      matrixVal: number[][];
+      value: number[][];
     };
 
 /**
@@ -60,7 +64,7 @@ export type CaseLineData =
  * Line in the editor
  * @alias CaseLine
  * @typedef {object}
- * @property {string} lineId UUID of the line
+ * @property {LineID} lineID UUID of the line
  * @property {string} label Label of the line
  * @property {string} value Value of the line
  * @property {LineType} lineType Type of line
@@ -68,7 +72,7 @@ export type CaseLineData =
  * @property {object} matrixData Object containig all the logic for the Matrix Generator
  */
 export interface CaseLine {
-  lineId: string;
+  lineID: LineID;
   label: string;
   data: CaseLineData;
 }
@@ -78,16 +82,16 @@ export interface CaseLine {
  * Contains all the information of a case
  * @alias Case
  * @typedef {object}
- * @property {string} caseId UUID of the case
- * @property {string} groupId UUID referencing to the parent group
+ * @property {CaseID} caseID UUID of the case
+ * @property {GroupID} groupID UUID referencing to the parent group
  * @property {stirng} name Name of the case
  * @property {number} points Points of the case
  * @property {boolean} defined Whether the points are defined by the user or not
  * @property {Array<InLine>} lines Lines containing .IN information of the cases
  */
 export interface Case {
-  caseId: string;
-  groupId: string;
+  caseID: string;
+  groupID: string;
   name: string;
   points: number;
   defined: boolean;
@@ -99,14 +103,14 @@ export interface Case {
  * Contains all the information of a group
  * @alis Group
  * @typedef {object}
- * @property {string} groupId UUID of the group
+ * @property {GrouID} groupID UUID of the group
  * @property {string} name Name of the group
  * @property {number} points Points of the group
  * @property {boolean} defined Whether the points are defined by the user or not
  * @property {Array<Case>} cases Cases of the group
  */
 export interface Group {
-  groupId: string;
+  groupID: GroupID;
   name: string;
   points: number;
   defined: boolean;
@@ -134,24 +138,24 @@ export interface Option {
  * @property {string} prefix Prefix of the name of all the cases
  * @property {string} suffix Suffix of the name of all the cases
  * @property {number} number Number of cases to add
- * @property {string} groupId UUID of the group
+ * @property {GroupID} groupID UUID of the group
  */
 export interface MultipleCaseAddRequest {
   prefix: string;
   suffix: string;
   number: number;
-  groupId: string;
+  groupID: GroupID;
 }
 
 /**
  * CaseGroupID
- * Identifier of a case containing both groupId and caseId
+ * Identifier of a case containing both groupID and caseID
  * @alias CaseGroupID
  * @typedef {object}
- * @property {string} groupId UUID of the group
- * @property {string} caseId UUID of the case
+ * @property {GroupID} groupID UUID of the group
+ * @property {GroupID} caseID UUID of the case
  */
 export interface CaseGroupID {
-  groupId: string;
-  caseId: string;
+  groupID: GroupID;
+  caseID: GroupID;
 }
