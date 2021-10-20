@@ -360,6 +360,7 @@ const translations: { [key: string]: string; } = {
   courseContentEmpty: "Sem conte\u00fado",
   courseContentNewFormTypeDesc: "O tipo de designa\u00e7\u00e3o \u00e9 usado para distinguir visualmete entre uma tarefa de una li\u00e7\u00e3o ou um exame nos cursos.",
   courseDetailsProgress: "Progresso do curso",
+  courseDetailsSettings: "Configura\u00e7\u00f5es",
   courseDetailsTabContent: "Conte\u00fado",
   courseDetailsTabInformation: "Informa\u00e7\u00e3o geral",
   courseDoesNotAdmitRegistration: "Curso n\u00e3o admite cadastro de usu\u00e1rios",
