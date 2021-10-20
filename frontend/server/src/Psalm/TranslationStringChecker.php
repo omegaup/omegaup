@@ -19,6 +19,7 @@ class TranslationStringChecker implements
         'loginRequired',
         'problemDeployerFailed',
         'resourceNotFound',
+        'serviceUnavailableError',
         'unableToVerifyCaptcha',
         'userNotAllowed',
         'usernameOrPassIsWrong',

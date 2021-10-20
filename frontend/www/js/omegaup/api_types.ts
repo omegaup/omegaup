@@ -11,6 +11,7 @@ export namespace dao {
     certificates_status?: string;
     contest_for_teams?: boolean;
     contest_id?: number;
+    default_show_all_contestants_in_scoreboard?: boolean;
     description?: string;
     feedback?: string;
     finish_time?: Date;
@@ -652,6 +653,34 @@ export namespace types {
       );
     }
 
+    export function ContestScoreboardPayload(
+      elementId: string = 'payload',
+    ): types.ContestScoreboardPayload {
+      return ((x) => {
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          if (x.submission_deadline)
+            x.submission_deadline = ((x: number) => new Date(x * 1000))(
+              x.submission_deadline,
+            );
+          return x;
+        })(x.contest);
+        x.scoreboard = ((x) => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.scoreboard);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function ContestVirtualDetailsPayload(
       elementId: string = 'payload',
     ): types.ContestVirtualDetailsPayload {
@@ -1047,6 +1076,44 @@ export namespace types {
     ): types.CourseNewPayload {
       return JSON.parse(
         (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function CourseScoreboardPayload(
+      elementId: string = 'payload',
+    ): types.CourseScoreboardPayload {
+      return ((x) => {
+        x.assignment = ((x) => {
+          x.courseAssignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.courseAssignments);
+          if (x.finishTime)
+            x.finishTime = ((x: number) => new Date(x * 1000))(x.finishTime);
+          x.startTime = ((x: number) => new Date(x * 1000))(x.startTime);
+          return x;
+        })(x.assignment);
+        x.scoreboard = ((x) => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.scoreboard);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -1726,6 +1793,70 @@ export namespace types {
       );
     }
 
+    export function UserProfileEditDetailsPayload(
+      elementId: string = 'payload',
+    ): types.UserProfileEditDetailsPayload {
+      return ((x) => {
+        if (x.extraProfileDetails)
+          x.extraProfileDetails = ((x) => {
+            x.contests = ((x) => {
+              if (x instanceof Object) {
+                Object.keys(x).forEach(
+                  (y) =>
+                    (x[y] = ((x) => {
+                      x.data = ((x) => {
+                        x.finish_time = ((x: number) => new Date(x * 1000))(
+                          x.finish_time,
+                        );
+                        x.last_updated = ((x: number) => new Date(x * 1000))(
+                          x.last_updated,
+                        );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      })(x.data);
+                      return x;
+                    })(x[y])),
+                );
+              }
+              return x;
+            })(x.contests);
+            x.ownedBadges = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.assignation_time)
+                  x.assignation_time = ((x: number) => new Date(x * 1000))(
+                    x.assignation_time,
+                  );
+                if (x.first_assignation)
+                  x.first_assignation = ((x: number) => new Date(x * 1000))(
+                    x.first_assignation,
+                  );
+                return x;
+              });
+            })(x.ownedBadges);
+            return x;
+          })(x.extraProfileDetails);
+        x.profile = ((x) => {
+          if (x.birth_date)
+            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+          if (x.graduation_date)
+            x.graduation_date = ((x: number) => new Date(x * 1000))(
+              x.graduation_date,
+            );
+          return x;
+        })(x.profile);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function UserRankTablePayload(
       elementId: string = 'payload',
     ): types.UserRankTablePayload {
@@ -1833,6 +1964,20 @@ export namespace types {
     submission_deadline?: Date;
     submissions_gap?: number;
     title?: string;
+  }
+
+  export interface AssignmentDetails {
+    admin: boolean;
+    alias: string;
+    assignmentType: string;
+    courseAssignments: types.CourseAssignment[];
+    description: string;
+    director: string;
+    finishTime?: Date;
+    name: string;
+    problems: types.ProblemsetProblem[];
+    problemsetId: number;
+    startTime: Date;
   }
 
   export interface AssignmentDetailsPayload {
@@ -2102,6 +2247,7 @@ export namespace types {
     archived: boolean;
     available_languages: { [key: string]: string };
     contest_for_teams: boolean;
+    default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -2139,6 +2285,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     contest_for_teams: boolean;
+    default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -2273,6 +2420,7 @@ export namespace types {
     adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
+    contestAdmin: boolean;
     original?: {
       contest: dao.Contests;
       scoreboard?: types.Scoreboard;
@@ -2286,6 +2434,7 @@ export namespace types {
   export interface ContestPublicDetails {
     admission_mode: string;
     alias: string;
+    default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -2317,6 +2466,15 @@ export namespace types {
     last_update?: Date;
     request_time: Date;
     username: string;
+  }
+
+  export interface ContestScoreboardPayload {
+    contest: types.ContestDetails;
+    contestAdmin: boolean;
+    problems: types.NavbarProblemsetProblem[];
+    scoreboard: types.Scoreboard;
+    scoreboardEvents: types.ScoreboardEvent[];
+    scoreboardToken?: string;
   }
 
   export interface ContestUser {
@@ -2518,6 +2676,13 @@ export namespace types {
     submit_delay: number;
     time: Date;
     verdict: string;
+  }
+
+  export interface CourseScoreboardPayload {
+    assignment: types.AssignmentDetails;
+    problems: types.NavbarProblemsetProblem[];
+    scoreboard: types.Scoreboard;
+    scoreboardToken?: string;
   }
 
   export interface CourseStatisticsPayload {
@@ -3721,6 +3886,13 @@ export namespace types {
     extraProfileDetails?: types.ExtraProfileDetails;
     privateProfile: boolean;
     profile: types.UserProfileInfo;
+  }
+
+  export interface UserProfileEditDetailsPayload {
+    countries: dao.Countries[];
+    extraProfileDetails?: types.ExtraProfileDetails;
+    profile: types.UserProfileInfo;
+    programmingLanguages: { [key: string]: string };
   }
 
   export interface UserProfileInfo {
