@@ -106,7 +106,7 @@ import Multiselect from 'vue-multiselect';
 })
 export default class ScoreboardMerge extends Vue {
   @Prop() availableContests!: types.ContestListItem[];
-  @Prop() scoreboard!: types.MergedScoreboard[];
+  @Prop() scoreboard!: types.MergedScoreboardEntry[];
   @Prop() showPenalty!: boolean;
   @Prop() aliases!: string[];
 

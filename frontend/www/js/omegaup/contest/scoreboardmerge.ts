@@ -14,7 +14,7 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       contests: payload.contests,
-      scoreboard: [] as types.MergedScoreboard[],
+      scoreboard: [] as types.MergedScoreboardEntry[],
       showPenalty: false,
       aliases: [] as string[],
     }),
@@ -34,7 +34,7 @@ OmegaUp.on('ready', () => {
               .then((response) => {
                 const ranking = response.ranking;
                 const aliases: string[] = [];
-                const scoreboard: types.MergedScoreboard[] = [];
+                const scoreboard: types.MergedScoreboardEntry[] = [];
                 let showPenalty = false;
                 if (ranking.length > 0) {
                   for (const entry of ranking) {
