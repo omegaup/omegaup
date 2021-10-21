@@ -9,7 +9,7 @@
       </h2>
       <slot name="clock"><div class="clock">∞</div></slot>
     </div>
-    <ul v-if="showTabs" class="nav justify-content-center nav-tabs mt-4">
+    <ul class="nav justify-content-center nav-tabs mt-4">
       <li
         v-for="tab in availableTabs"
         :key="tab.name"
@@ -73,8 +73,6 @@ import { Tab } from '../problem/Details.vue';
 @Component
 export default class Arena extends Vue {
   @Prop({ default: false }) shouldShowRuns!: boolean;
-  @Prop({ default: false }) isAdmin!: boolean;
-  @Prop({ default: true }) showTabs!: boolean;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
   @Prop() title!: string;
   @Prop() activeTab!: string;

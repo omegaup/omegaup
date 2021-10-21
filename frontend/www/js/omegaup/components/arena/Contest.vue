@@ -92,7 +92,9 @@
         :digits-after-decimal-point="digitsAfterDecimalPoint"
         :show-penalty="showPenalty"
         :show-invited-users-filter="true"
-      ></omegaup-arena-scoreboard>
+      >
+        <template #scoreboard-header><div></div></template>
+      </omegaup-arena-scoreboard>
     </template>
     <template #arena-runs>
       <omegaup-arena-runs

@@ -1,14 +1,14 @@
-import common_Scoreboard from '../components/common/Scoreboard.vue';
-import * as api from '../api';
-import { types } from '../api_types';
+import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import { OmegaUp } from '../omegaup';
+import { EventsSocket } from './events_socket';
+import socketStore from './socketStore';
+import * as api from '../api';
 import * as ui from '../ui';
 import * as time from '../time';
 import Vue from 'vue';
+import { types } from '../api_types';
 import { createChart, onRankingChanged, onRankingEvents } from './ranking';
 import rankingStore from './rankingStore';
-import { EventsSocket } from './events_socket';
-import socketStore from './socketStore';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestScoreboardPayload();
@@ -16,9 +16,9 @@ OmegaUp.on('ready', () => {
 
   const getRankingByTokenRefresh = 5 * 60 * 1000; // 5 minutes
 
-  let ranking: types.ScoreboardRankingEntry[];
+  let ranking: types.ScoreboardRankingEntry[] = [];
   let rankingChartOptions: Highcharts.Options | null = null;
-  let lastTimeUpdated: null | Date;
+  let lastTimeUpdated: null | Date = null;
   if (payload.scoreboard && payload.scoreboardEvents) {
     const rankingInfo = onRankingChanged({
       scoreboard: payload.scoreboard,
@@ -56,22 +56,22 @@ OmegaUp.on('ready', () => {
   new Vue({
     el: '#main-container',
     components: {
-      'omegaup-common-scoreboard': common_Scoreboard,
+      'omegaup-arena-scoreboard': arena_Scoreboard,
     },
     data: () => ({
       problems: payload.problems,
     }),
     render: function (createElement) {
-      return createElement('omegaup-common-scoreboard', {
+      return createElement('omegaup-arena-scoreboard', {
         props: {
           problems: this.problems,
-          name: payload.contest.title,
+          title: payload.contest.title,
           finishTime: payload.contest.finish_time,
-          isAdmin: payload.contest.admin,
           socketStatus: socketStore.state.socketStatus,
           ranking: rankingStore.state.ranking,
           rankingChartOptions: rankingStore.state.rankingChartOptions,
           lastUpdated: rankingStore.state.lastTimeUpdated,
+          showInvitedUsersFilter: false,
         },
       });
     },
