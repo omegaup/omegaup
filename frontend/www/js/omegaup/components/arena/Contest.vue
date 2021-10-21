@@ -90,7 +90,12 @@
         :last-updated="lastUpdated"
         :digits-after-decimal-point="digitsAfterDecimalPoint"
         :show-penalty="showPenalty"
-        :show-invited-users-filter="true"
+        :show-invited-users-filter="
+          contest.admission_mode !== AdmissionMode.Private
+        "
+        :show-all-contestants="
+          contest.default_show_all_contestants_in_scoreboard
+        "
       >
         <template #scoreboard-header><div></div></template>
       </omegaup-arena-scoreboard>
@@ -198,6 +203,7 @@ import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { omegaup } from '../../omegaup';
 import { ContestClarificationType } from '../../arena/clarifications';
 import { SocketStatus } from '../../arena/events_socket';
+import { AdmissionMode } from '../common/Publish.vue';
 import { SubmissionRequest } from '../../arena/submissions';
 
 @Component({
@@ -241,7 +247,6 @@ export default class ArenaContest extends Vue {
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   @Prop({ default: true }) showPenalty!: boolean;
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
-  @Prop({ default: true }) socketConnected!: boolean;
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop() searchResultUsers!: types.ListItem[];
@@ -250,6 +255,7 @@ export default class ArenaContest extends Vue {
 
   T = T;
   ui = ui;
+  AdmissionMode = AdmissionMode;
   PopupDisplayed = PopupDisplayed;
   ContestClarificationType = ContestClarificationType;
   currentClarifications = this.clarifications;

@@ -1,6 +1,8 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
-import { shallowMount } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
+import { SocketStatus } from '../../arena/events_socket';
+import T from '../../lang';
 
 import { omegaup } from '../../omegaup';
 
@@ -8,7 +10,9 @@ import arena_Scoreboard from './Scoreboard.vue';
 
 const baseScoreboardProps = {
   digitsAfterDecimalPoint: 2,
-  lastUpdated: new Date(),
+  title: 'Scoreboard test',
+  finishTime: new Date(Date.now()),
+  lastUpdated: new Date(Date.now()),
   problems: [
     {
       accepted: 52,
@@ -125,5 +129,47 @@ describe('Scoreboard.vue', () => {
     expect(
       wrapper.find('input[type="checkbox"].toggle-contestants').exists(),
     ).toBeFalsy();
+  });
+
+  it('Should handle scoreboard with limited finishTime', () => {
+    const wrapper = mount(arena_Scoreboard, {
+      propsData: baseScoreboardProps,
+    });
+
+    expect(wrapper.find('.clock').text()).toBe('00:00:00');
+  });
+
+  it('Should handle scoreboard with unlimited finishTime', () => {
+    const wrapper = mount(arena_Scoreboard, {
+      propsData: { ...baseScoreboardProps, ...{ finishTime: null } },
+    });
+
+    expect(wrapper.find('.clock').text()).toBe('∞');
+  });
+
+  it('Should handle scoreboard when socket status changes', async () => {
+    const wrapper = mount(arena_Scoreboard, {
+      propsData: baseScoreboardProps,
+    });
+
+    expect(wrapper.find('.omegaup-scoreboard>div>h2>span').text()).toBe(
+      'Scoreboard test',
+    );
+    const socketElement = wrapper.find('.omegaup-scoreboard>div>h2>sup');
+    expect(socketElement.text()).toBe(SocketStatus.Waiting);
+    expect(socketElement.attributes().class).toBe('socket-status');
+    expect(socketElement.attributes().title).toBe(T.socketStatusWaiting);
+
+    await wrapper.setProps({ socketStatus: SocketStatus.Connected });
+    expect(socketElement.attributes().class).toBe(
+      'socket-status socket-status-ok',
+    );
+    expect(socketElement.attributes().title).toBe(T.socketStatusConnected);
+
+    await wrapper.setProps({ socketStatus: SocketStatus.Failed });
+    expect(socketElement.attributes().class).toBe(
+      'socket-status socket-status-error',
+    );
+    expect(socketElement.attributes().title).toBe(T.socketStatusFailed);
   });
 });
