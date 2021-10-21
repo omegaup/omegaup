@@ -73,12 +73,6 @@ export namespace omegaup {
     AddProblem,
   }
 
-  export enum AdmissionMode {
-    Private = 'private',
-    Registration = 'registration',
-    Public = 'public',
-  }
-
   export enum ColumnType {
     Number = 'number',
     String = 'string',
