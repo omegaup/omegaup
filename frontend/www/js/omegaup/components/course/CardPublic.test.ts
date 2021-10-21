@@ -3,23 +3,22 @@ import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
 
-import course_Card from './Cardv2.vue';
+import course_CardPublic from './CardPublic.vue';
 
-describe('Card.vue', () => {
+describe('CardPublic.vue', () => {
   const publicCourse: types.CourseCardPublic = {
     alias: 'test-course',
     lessonCount: 2,
-    level: undefined,
+    level: 'introductory',
     name: 'Test course',
     school_name: 'Test course school',
     studentCount: 2000,
   };
 
   it('Should render information for public course', () => {
-    const wrapper = shallowMount(course_Card, {
+    const wrapper = shallowMount(course_CardPublic, {
       propsData: {
         course: publicCourse,
-        type: 'public',
       },
     });
 
@@ -31,5 +30,6 @@ describe('Card.vue', () => {
         studentCount: '2.0k',
       }),
     );
+    expect(wrapper.text()).toContain(T.courseCardPublicLevelIntroductory);
   });
 });
