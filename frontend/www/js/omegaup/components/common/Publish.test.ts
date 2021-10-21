@@ -2,7 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
 
-import common_Publish from './Publishv2.vue';
+import common_Publish from './Publish.vue';
 
 describe('Publish.vue', () => {
   it('Should handle initial props', async () => {
