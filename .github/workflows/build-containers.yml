@@ -27,6 +27,7 @@ jobs:
           docker-compose --file=docker-compose.k8s.yml build \
             --build-arg BRANCH=${{ steps.extract_branch.outputs.branch }} \
             frontend \
+            frontend-sidecar \
             nginx \
             php
 
@@ -35,23 +36,24 @@ jobs:
           echo "${{ github.token }}" | \
             docker login https://docker.pkg.github.com "--username=${{ github.actor }}" --password-stdin
 
-          container_name=docker.pkg.github.com/${{ github.repository }}/frontend:${{ github.sha }}
-          docker tag omegaup/frontend:${{ github.sha }} "${container_name}"
-          docker push "${container_name}"
-
-          container_name=docker.pkg.github.com/${{ github.repository }}/nginx:${{ github.sha }}
-          docker tag omegaup/nginx:${{ github.sha }} "${container_name}"
-          docker push "${container_name}"
-
-          container_name=docker.pkg.github.com/${{ github.repository }}/php:${{ github.sha }}
-          docker tag omegaup/php:${{ github.sha }} "${container_name}"
-          docker push "${container_name}"
+          for container in frontend frontend-sidecar nginx php; do
+            for tag in "latest-${{ steps.extract_branch.outputs.branch }}" "${{ github.sha }}"; do
+              container_name="docker.pkg.github.com/${{ github.repository }}/${container}:${tag}"
+              docker tag "omegaup/${container}:${tag}" "${container_name}"
+              docker push "${container_name}"
+            done
+          done
 
       - name: Push containers to Docker registry
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | \
             docker login "--username=${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-          docker push omegaup/frontend:${{ github.sha }}
-          docker push omegaup/nginx:${{ github.sha }}
-          docker push omegaup/php:${{ github.sha }}
+          for container in frontend frontend-sidecar nginx php; do
+            docker push "omegaup/${container}:${tag}"
+
+            container_name="omegaup/${container}:latest-${{ steps.extract_branch.outputs.branch }}"
+            docker tag "omegaup/${container}:${tag}" "${container_name}"
+            docker push "${container_name}"
+            done
+          done
