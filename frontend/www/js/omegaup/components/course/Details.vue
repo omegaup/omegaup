@@ -385,7 +385,6 @@ import * as ui from '../../ui';
 import * as time from '../../time';
 import { types } from '../../api_types';
 
-import course_Clone from './Clone.vue';
 import omegaup_Markdown from '../Markdown.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -416,7 +415,6 @@ export enum Tab {
   components: {
     FontAwesomeIcon,
     'omegaup-markdown': omegaup_Markdown,
-    'omegaup-course-clone': course_Clone,
   },
 })
 export default class CourseDetails extends Vue {
