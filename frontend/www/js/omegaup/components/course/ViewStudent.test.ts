@@ -30,10 +30,22 @@ describe('ViewStudent.vue', () => {
     feedback: 'Test feedback',
   } as types.SubmissionFeedback;
 
-  const assignment = {
-    alias: 'assignment',
+  const assignment_a = {
+    alias: 'assignment_a',
     assignment_type: 'homework',
-    description: 'Assignment description',
+    description: 'Assignment description A',
+    start_time: new Date(0),
+    finish_time: new Date(),
+    name: 'Assignment',
+    order: 1,
+    scoreboard_url: '',
+    scoreboard_url_admin: '',
+  } as omegaup.Assignment;
+
+  const assignment_b = {
+    alias: 'assignment_b',
+    assignment_type: 'homework',
+    description: 'Assignment description B',
     start_time: new Date(0),
     finish_time: new Date(),
     name: 'Assignment',
@@ -57,11 +69,11 @@ describe('ViewStudent.vue', () => {
         course: {
           alias: 'hello',
         },
-        assignments: [assignment],
+        assignments: [assignment_a, assignment_b],
         problems: [
           {
             accepted: 1,
-            alias: 'problem',
+            alias: 'problem_a',
             commit: '',
             letter: 'A',
             order: 1,
@@ -99,6 +111,46 @@ describe('ViewStudent.vue', () => {
             title: 'problem_1',
             visits: 1,
           } as types.CourseProblem,
+          {
+            accepted: 1,
+            alias: 'problem_b',
+            commit: '',
+            letter: 'A',
+            order: 1,
+            points: 1,
+            runs: [
+              {
+                guid: 'guid-1',
+                language: 'cpp',
+                memory: 200,
+                penalty: 0,
+                score: 1,
+                status: 'ready',
+                runtime: 1,
+                submit_delay: 1,
+                source: 'print(3)',
+                time: expectedDate,
+                verdict: 'AC',
+              } as types.CourseRun,
+              {
+                guid: 'guid-2',
+                language: 'cpp',
+                memory: 200,
+                penalty: 0,
+                score: 1,
+                status: 'ready',
+                runtime: 1,
+                submit_delay: 1,
+                source: 'print(3)',
+                time: expectedDate,
+                verdict: 'AC',
+                feedback: submissionFeedback,
+              } as types.CourseRun,
+            ],
+            submissions: 1,
+            title: 'problem_2',
+            visits: 1,
+          } as types.CourseProblem,
         ],
         students: [student],
         student: student,
@@ -107,12 +159,25 @@ describe('ViewStudent.vue', () => {
 
     const assignments = wrapper.find('select[data-assignment]')
       .element as HTMLInputElement;
-    assignments.value = 'assignment';
+    assignments.value = 'assignment_b';
     await assignments.dispatchEvent(new Event('change'));
     expect(wrapper.find('div[data-markdown-statement]').text()).toBe(
-      'Assignment description',
+      'Assignment description B',
     );
-    await wrapper.find('a[data-problem-alias="problem"]').trigger('click');
+
+    assignments.value = 'assignment_a';
+    await assignments.dispatchEvent(new Event('change'));
+    expect(wrapper.find('div[data-markdown-statement]').text()).toBe(
+      'Assignment description A',
+    );
+
+    await wrapper.find('a[data-problem-alias="problem_a"]').trigger('click');
+
+    expect(wrapper.find('table tbody td').text()).toBe(
+      expectedDate.toLocaleString(T.locale),
+    );
+
+    await wrapper.find('a[data-problem-alias="problem_b"]').trigger('click');
 
     expect(wrapper.find('table tbody td').text()).toBe(
       expectedDate.toLocaleString(T.locale),
@@ -134,7 +199,7 @@ describe('ViewStudent.vue', () => {
           guid: 'guid-1',
           feedback: submissionFeedback.feedback,
           isUpdate: false,
-          assignmentAlias: assignment.alias,
+          assignmentAlias: assignment_a.alias,
           studentUsername: student.username,
         },
       ],
