@@ -1,13 +1,23 @@
 import contest_ScoreboardMerge from '../components/contest/ScoreboardMerge.vue';
-import { OmegaUp } from '../omegaup-legacy';
-import T from '../lang';
+import { OmegaUp } from '../omegaup';
 import * as ui from '../ui';
 import * as api from '../api';
 import Vue from 'vue';
+import { types } from '../api_types';
 
-OmegaUp.on('ready', function () {
-  var scoreboardMerge = new Vue({
-    el: '#scoreboard-merge',
+OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.ScoreboardMergePayload();
+  const scoreboardMerge = new Vue({
+    el: '#main-container',
+    components: {
+      'omegaup-contest-scoreboardmerge': contest_ScoreboardMerge,
+    },
+    data: () => ({
+      contests: payload.contests,
+      scoreboard: [] as types.MergedScoreboard[],
+      showPenalty: 0,
+      aliases: [] as string[],
+    }),
     render: function (createElement) {
       return createElement('omegaup-contest-scoreboardmerge', {
         props: {
@@ -17,21 +27,21 @@ OmegaUp.on('ready', function () {
           aliases: this.aliases,
         },
         on: {
-          'get-scoreboard': function (contestAliases) {
+          'get-scoreboard': (contestAliases: string[]) => {
             api.Contest.scoreboardMerge({
               contest_aliases: contestAliases.map(encodeURIComponent).join(','),
             })
-              .then(function (ranks) {
-                const ranking = ranks.ranking;
-                let scoreboard = [],
-                  aliases = [],
-                  showPenalty = 0;
+              .then((response) => {
+                const ranking = response.ranking;
+                const aliases: string[] = [];
+                const scoreboard: types.MergedScoreboard[] = [];
+                let showPenalty = 0;
                 if (ranking.length > 0) {
                   for (const entry of ranking) {
-                    showPenalty |= !!entry.total.penalty;
+                    showPenalty |= entry.total.penalty;
                   }
                   // Get aliases for indexing in the same order all rows
-                  for (var entry in ranking[0].contests) {
+                  for (const entry in ranking[0].contests) {
                     aliases.push(entry);
                   }
                   // Fill scoreboard object
@@ -40,14 +50,7 @@ OmegaUp.on('ready', function () {
                       continue;
                     const place = parseInt(index) + 1;
                     const entry = ranking[index];
-                    scoreboard.push({
-                      place: place,
-                      username: entry.username,
-                      name: entry.name,
-                      contests: entry.contests,
-                      totalPoints: entry.total.points,
-                      totalPenalty: entry.total.penalty,
-                    });
+                    scoreboard.push({ ...entry, place });
                   }
                 }
                 // Update the props values
@@ -59,22 +62,6 @@ OmegaUp.on('ready', function () {
           },
         },
       });
-    },
-    mounted: function () {
-      api.Contest.list()
-        .then(function (contests) {
-          scoreboardMerge.contests = contests.results;
-        })
-        .catch(ui.apiError);
-    },
-    data: {
-      contests: [],
-      scoreboard: [],
-      showPenalty: 0,
-      aliases: [],
-    },
-    components: {
-      'omegaup-contest-scoreboardmerge': contest_ScoreboardMerge,
     },
   });
 });

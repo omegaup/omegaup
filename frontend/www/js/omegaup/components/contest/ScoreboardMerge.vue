@@ -1,79 +1,93 @@
 <template>
-  <div>
-    <div class="post">
-      <legend>
-        {{ T.wordsContest }}:
-        <select
-          v-model="selectedContests"
-          class="contests"
-          multiple="multiple"
-          size="10"
-        >
-          <option
-            v-for="contest in availableContests"
-            :key="contest.alias"
-            :value="contest.alias"
-          >
-            {{ ui.contestTitle(contest) }}
-          </option>
-        </select>
-      </legend>
-      <button class="btn" type="button" @click.prevent="onDisplayTable">
-        {{ T.showTotalScoreboard }}
-      </button>
+  <div class="card">
+    <div class="card-header panel-heading">
+      <h3 class="card-title mb-0">{{ T.omegaupTitleScoreboardmerge }}</h3>
     </div>
-    <div class="post">
-      <table v-if="scoreboard.length &gt; 0" class="merged-scoreboard">
-        <tr>
-          <td></td>
-          <td>
-            <strong>{{ T.username }}</strong>
-          </td>
-          <td v-for="alias in aliases" :key="alias" colspan="2">
-            <strong>{{ alias }}</strong>
-          </td>
-          <td colspan="2">
-            <strong>{{ T.wordsTotal }}</strong>
-          </td>
-        </tr>
-        <tr v-for="rank in scoreboard" :key="rank.username">
-          <td>
-            <strong>{{ rank.place }}</strong>
-          </td>
-          <td>
-            <div class="username">
-              {{ rank.username }}
-            </div>
-            <div class="name">
-              {{ rank.username != rank.name ? rank.name : ' ' }}
-            </div>
-          </td>
-          <td v-for="alias in aliases" :key="alias" class="numeric" colspan="2">
-            {{ rank.contests[alias].points
-            }}<span v-if="showPenalty" class="scoreboard-penalty"
-              >({{ rank.contests[alias].penalty }})</span
-            >
-          </td>
-          <td class="numeric" colspan="2">
-            {{ rank.totalPoints
-            }}<span v-if="showPenalty" class="scoreboard-penalty"
-              >({{ rank.totalPenalty }})</span
-            >
-          </td>
-        </tr>
-      </table>
-
-      <table v-else class="merged-scoreboard">
-        <tr>
-          <td></td>
-          <td>
-            <strong>{{ T.username }}</strong>
-          </td>
-          <td colspan="2">
-            <strong>{{ T.wordsTotal }}</strong>
-          </td>
-        </tr>
-      </table>
+    <div class="card-body">
+      <div class="row">
+        <div class="form-group col-md-9">
+          <label>{{ T.wordsContest }}:</label>
+          <multiselect
+            :value="selectedContests"
+            :options="contestAliases"
+            :multiple="true"
+            :close-on-select="false"
+            :allow-empty="true"
+            :placeholder="T.contestScoreboardMergeChoseContests"
+            @remove="onRemove"
+            @select="onSelect"
+          ></multiselect>
+        </div>
+        <div class="form-group col-md-3 text-right">
+          <button
+            class="btn btn-secondary"
+            type="button"
+            :disabled="!selectedContests.length"
+            @click.prevent="onDisplayTable"
+          >
+            {{ T.showTotalScoreboard }}
+          </button>
+        </div>
+      </div>
+      <div v-if="scoreboard.length" class="row post">
+        <table class="table table-striped text-center">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">{{ T.username }}</th>
+              <th v-for="alias in aliases" :key="alias" colspan="2" scope="col">
+                {{ alias }}
+              </th>
+              <th colspan="2" scope="col">{{ T.wordsTotal }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="rank in scoreboard" :key="rank.username">
+              <th>{{ rank.place }}</th>
+              <th>
+                <div class="username">
+                  {{ rank.username }}
+                </div>
+                <div class="name">
+                  {{ rank.username != rank.name ? rank.name : ' ' }}
+                </div>
+              </th>
+              <th
+                v-for="alias in aliases"
+                :key="alias"
+                class="numeric"
+                colspan="2"
+              >
+                {{ rank.contests[alias].points }}
+                <span v-if="showPenalty" class="scoreboard-penalty">
+                  ({{ rank.contests[alias].penalty }})
+                </span>
+              </th>
+              <th class="numeric" colspan="2">
+                {{ rank.total.points }}
+                <span v-if="showPenalty" class="scoreboard-penalty">
+                  ({{ rank.total.penalty }})
+                </span>
+              </th>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-else>
+        <table class="table table-striped text-center">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">
+                {{ T.username }}
+              </th>
+              <th colspan="2" scope="col">
+                {{ T.wordsTotal }}
+              </th>
+            </tr>
+          </thead>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -83,49 +97,58 @@ import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
 import { types } from '../../api_types';
+import Multiselect from 'vue-multiselect';
 
-interface Scoreboard {
-  contests: types.ContestAdminDetails[];
-  name: string;
-  place: number;
-  totalPenalty: number;
-  totalPoints: number;
-}
-
-@Component
+@Component({
+  components: {
+    Multiselect,
+  },
+})
 export default class ScoreboardMerge extends Vue {
-  @Prop() availableContests!: types.ContestAdminDetails[];
-  @Prop() scoreboard!: Scoreboard[];
+  @Prop() availableContests!: types.ContestListItem[];
+  @Prop() scoreboard!: types.MergedScoreboard[];
   @Prop() showPenalty!: boolean;
-  @Prop() aliases!: Array<string>;
+  @Prop() aliases!: string[];
 
   T = T;
   ui = ui;
-  selectedContests: Array<string> = [];
+  selectedContests: string[] = [];
+
+  get contestAliases(): string[] {
+    return this.availableContests.map((contest) => contest.alias);
+  }
+
+  onRemove(contest: string) {
+    const index = this.selectedContests.indexOf(contest);
+    this.selectedContests.splice(index, 1);
+  }
+
+  onSelect(contest: string) {
+    this.selectedContests.push(contest);
+  }
 
   @Emit('get-scoreboard')
-  onDisplayTable(): Array<string> {
+  onDisplayTable(): string[] {
     return this.selectedContests;
   }
 }
 </script>
 
-<style>
-.merged-scoreboard {
-  background: white;
-}
-
-.merged-scoreboard td {
-  text-align: center;
-}
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+@import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
 
 .scoreboard-penalty {
   padding-left: 0.5em;
   opacity: 0.7;
-  color: red;
+  color: var(--arena-scoreboard-penalty-color);
 }
 
 .post {
   overflow-x: scroll;
+}
+
+.multiselect__tag {
+  background: var(--multiselect-tag-background-color);
 }
 </style>

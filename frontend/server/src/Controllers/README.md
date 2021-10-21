@@ -1210,9 +1210,9 @@ Gets the accomulative scoreboard for an array of contests
 
 ### Returns
 
-| Name      | Type                                                                                                                                                     |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ranking` | `{ contests: { [key: string]: { penalty: number; points: number; }; }; name: string; total: { penalty: number; points: number; }; username: string; }[]` |
+| Name      | Type                       |
+| --------- | -------------------------- |
+| `ranking` | `types.MergedScoreboard[]` |
 
 ## `/api/contest/searchUsers/`
 

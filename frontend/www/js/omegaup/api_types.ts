@@ -1505,6 +1505,34 @@ export namespace types {
       );
     }
 
+    export function ScoreboardMergePayload(
+      elementId: string = 'payload',
+    ): types.ScoreboardMergePayload {
+      return ((x) => {
+        x.contests = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
+            x.original_finish_time = ((x: number) => new Date(x * 1000))(
+              x.original_finish_time,
+            );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          });
+        })(x.contests);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function StatsPayload(
       elementId: string = 'payload',
     ): types.StatsPayload {
@@ -2966,6 +2994,14 @@ export namespace types {
     validateRecaptcha: boolean;
   }
 
+  export interface MergedScoreboard {
+    contests: { [key: string]: { penalty: number; points: number } };
+    name?: string;
+    place?: number;
+    total: { penalty: number; points: number };
+    username: string;
+  }
+
   export interface NavbarProblemsetProblem {
     acceptsSubmissions: boolean;
     alias: string;
@@ -3638,6 +3674,10 @@ export namespace types {
     username: string;
   }
 
+  export interface ScoreboardMergePayload {
+    contests: types.ContestListItem[];
+  }
+
   export interface ScoreboardRankingEntry {
     classname: string;
     country: string;
@@ -4205,12 +4245,7 @@ export namespace messages {
   };
   export type ContestScoreboardMergeRequest = { [key: string]: any };
   export type ContestScoreboardMergeResponse = {
-    ranking: {
-      contests: { [key: string]: { penalty: number; points: number } };
-      name?: string;
-      total: { penalty: number; points: number };
-      username: string;
-    }[];
+    ranking: types.MergedScoreboard[];
   };
   export type ContestSearchUsersRequest = { [key: string]: any };
   export type ContestSearchUsersResponse = { results: types.ListItem[] };

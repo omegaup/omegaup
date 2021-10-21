@@ -51,6 +51,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
  * @psalm-type Contestant=array{name: null|string, username: string, email: null|string, gender: null|string, state: null|string, country: null|string, school: null|string}
  * @psalm-type ListItem=array{key: string, value: string}
+ * @psalm-type ScoreboardMergePayload=array{contests: list<ContestListItem>}
+ * @psalm-type MergedScoreboard=array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}, place?: int}
  */
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
@@ -4011,7 +4013,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the accomulative scoreboard for an array of contests
      *
-     * @return array{ranking: list<array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}>}
+     * @return array{ranking: list<MergedScoreboard>}
      *
      * @omegaup-request-param string $contest_aliases
      * @omegaup-request-param mixed $contest_params
@@ -4059,7 +4061,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @param list<string> $usernamesFilter
      * @param array<string, array{only_ac: bool, weight: float}> $contestParams
      *
-     * @return list<array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}>
+     * @return list<MergedScoreboard>
      */
     public static function getMergedScoreboard(
         array $contestAliases,
@@ -4103,7 +4105,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $scoreboards[strval($contest->alias)] = $s->generate();
         }
 
-        /** @var array<string, array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}> */
+        /** @var array<string, MergedScoreboard> */
         $mergedScoreboard = [];
 
         // Merge
@@ -4165,8 +4167,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         usort(
             $mergedScoreboard,
             /**
-             * @param array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}} $a
-             * @param array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}} $b
+             * @param MergedScoreboard $a
+             * @param MergedScoreboard $b
              */
             function ($a, $b): int {
                 if ($a['total']['points'] == $b['total']['points']) {
@@ -4181,7 +4183,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
         );
 
-        /** @var list<array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}> */
+        /** @var list<MergedScoreboard> */
         return $mergedScoreboard;
     }
 
@@ -5012,6 +5014,40 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'common_stats',
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: ScoreboardMergePayload, title: \OmegaUp\TranslationString}}
+     *
+     */
+    public static function getScoreboardMergeDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ) {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        // Get user
+        $r->ensureIdentity();
+
+        $contests = self::getContestList(
+            $r->identity,
+            /*$query=*/ null,
+            /*$page=*/ 1,
+            /*$pageSize=*/ 100,
+            \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+            \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+        );
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'contests' => $contests,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleScoreboardmerge'
+                ),
+            ],
+            'entrypoint' => 'contest_scoreboardmerge',
         ];
     }
 
