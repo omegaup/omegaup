@@ -1,7 +1,7 @@
 <template>
   <omegaup-arena
     :active-tab="activeTab"
-    :contest-title="currentAssignment.name"
+    :title="currentAssignment.name"
     :should-show-runs="isAdmin"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
@@ -19,7 +19,7 @@
       ></omegaup-countdown>
     </template>
     <template #arena-problems>
-      <div data-contest-practice>
+      <div data-course>
         <div class="tab navleft">
           <div class="navbar">
             <omegaup-arena-navbar-problems
@@ -118,7 +118,9 @@
         :problems="scoreboard.problems"
         :ranking="scoreboard.ranking"
         :last-updated="scoreboard.time"
-      ></omegaup-arena-scoreboard>
+      >
+        <template #scoreboard-header><div></div></template>
+      </omegaup-arena-scoreboard>
     </template>
     <template #arena-runs>
       <omegaup-arena-runs
