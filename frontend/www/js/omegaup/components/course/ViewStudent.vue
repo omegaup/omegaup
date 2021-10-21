@@ -335,7 +335,12 @@ export default class CourseViewStudent extends Vue {
     } else {
       url = `/course/${this.course.alias}/student/${this.selectedStudent.username}/assignment/${newVal}/`;
     }
-    this.$emit('push-state', { student: this.selectedStudent }, document.title, url);
+    this.$emit(
+      'push-state',
+      { student: this.selectedStudent },
+      document.title,
+      url,
+    );
   }
 
   @Watch('problems')
