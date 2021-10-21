@@ -2994,7 +2994,7 @@ export namespace types {
     validateRecaptcha: boolean;
   }
 
-  export interface MergedScoreboard {
+  export interface MergedScoreboardEntry {
     contests: { [key: string]: { penalty: number; points: number } };
     name?: string;
     place?: number;
@@ -4245,7 +4245,7 @@ export namespace messages {
   };
   export type ContestScoreboardMergeRequest = { [key: string]: any };
   export type ContestScoreboardMergeResponse = {
-    ranking: types.MergedScoreboard[];
+    ranking: types.MergedScoreboardEntry[];
   };
   export type ContestSearchUsersRequest = { [key: string]: any };
   export type ContestSearchUsersResponse = { results: types.ListItem[] };

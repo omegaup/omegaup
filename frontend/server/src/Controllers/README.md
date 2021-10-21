@@ -1210,9 +1210,9 @@ Gets the accomulative scoreboard for an array of contests
 
 ### Returns
 
-| Name      | Type                       |
-| --------- | -------------------------- |
-| `ranking` | `types.MergedScoreboard[]` |
+| Name      | Type                            |
+| --------- | ------------------------------- |
+| `ranking` | `types.MergedScoreboardEntry[]` |
 
 ## `/api/contest/searchUsers/`
 

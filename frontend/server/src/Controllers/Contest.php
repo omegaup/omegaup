@@ -52,7 +52,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Contestant=array{name: null|string, username: string, email: null|string, gender: null|string, state: null|string, country: null|string, school: null|string}
  * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type ScoreboardMergePayload=array{contests: list<ContestListItem>}
- * @psalm-type MergedScoreboard=array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}, place?: int}
+ * @psalm-type MergedScoreboardEntry=array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}, place?: int}
  */
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
@@ -4013,7 +4013,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the accomulative scoreboard for an array of contests
      *
-     * @return array{ranking: list<MergedScoreboard>}
+     * @return array{ranking: list<MergedScoreboardEntry>}
      *
      * @omegaup-request-param string $contest_aliases
      * @omegaup-request-param mixed $contest_params
@@ -4061,7 +4061,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @param list<string> $usernamesFilter
      * @param array<string, array{only_ac: bool, weight: float}> $contestParams
      *
-     * @return list<MergedScoreboard>
+     * @return list<MergedScoreboardEntry>
      */
     public static function getMergedScoreboard(
         array $contestAliases,
@@ -4105,7 +4105,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $scoreboards[strval($contest->alias)] = $s->generate();
         }
 
-        /** @var array<string, MergedScoreboard> */
+        /** @var array<string, MergedScoreboardEntry> */
         $mergedScoreboard = [];
 
         // Merge
@@ -4167,8 +4167,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         usort(
             $mergedScoreboard,
             /**
-             * @param MergedScoreboard $a
-             * @param MergedScoreboard $b
+             * @param MergedScoreboardEntry $a
+             * @param MergedScoreboardEntry $b
              */
             function ($a, $b): int {
                 if ($a['total']['points'] == $b['total']['points']) {
@@ -4183,7 +4183,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
         );
 
-        /** @var list<MergedScoreboard> */
+        /** @var list<MergedScoreboardEntry> */
         return $mergedScoreboard;
     }
 
@@ -5019,7 +5019,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * @return array{entrypoint: string, smartyProperties: array{payload: ScoreboardMergePayload, title: \OmegaUp\TranslationString}}
-     *
      */
     public static function getScoreboardMergeDetailsForTypeScript(
         \OmegaUp\Request $r

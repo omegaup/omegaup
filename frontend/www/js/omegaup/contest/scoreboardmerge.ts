@@ -15,7 +15,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       contests: payload.contests,
       scoreboard: [] as types.MergedScoreboard[],
-      showPenalty: 0,
+      showPenalty: false,
       aliases: [] as string[],
     }),
     render: function (createElement) {
@@ -35,10 +35,10 @@ OmegaUp.on('ready', () => {
                 const ranking = response.ranking;
                 const aliases: string[] = [];
                 const scoreboard: types.MergedScoreboard[] = [];
-                let showPenalty = 0;
+                let showPenalty = false;
                 if (ranking.length > 0) {
                   for (const entry of ranking) {
-                    showPenalty |= entry.total.penalty;
+                    showPenalty ||= !!entry.total.penalty;
                   }
                   // Get aliases for indexing in the same order all rows
                   for (const entry in ranking[0].contests) {
