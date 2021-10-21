@@ -130,6 +130,7 @@ export default class ArenaScoreboard extends Vue {
   @Prop() lastUpdated!: Date;
   @Prop({ default: true }) showInvitedUsersFilter!: boolean;
   @Prop({ default: true }) showPenalty!: boolean;
+  @Prop({ default: false }) showAllContestants!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   @Prop() title!: string;
   @Prop({ default: null }) finishTime!: null | Date;
@@ -138,7 +139,8 @@ export default class ArenaScoreboard extends Vue {
   T = T;
   ui = ui;
   INF = '∞';
-  onlyShowExplicitlyInvited = true;
+  onlyShowExplicitlyInvited =
+    !this.showAllContestants && this.showInvitedUsersFilter;
 
   get lastUpdatedString(): null | string {
     if (!this.lastUpdated) return null;
