@@ -72,7 +72,7 @@
               aria-haspopup="true"
               aria-expanded="false"
             >
-              {{ T.courseEdit }}
+              {{ T.courseDetailsSettings }}
             </a>
             <div class="dropdown-menu">
               <a
@@ -86,6 +86,12 @@
                 class="dropdown-item"
                 :href="`/course/${course.alias}/edit/#content`"
                 >{{ T.wordsContentEdit }}</a
+              >
+              <a
+                data-button-manage-content
+                class="dropdown-item"
+                :href="`/course/${course.alias}/edit/#clone`"
+                >{{ T.wordsCloneThisCourse }}</a
               >
             </div>
           </div>
@@ -170,45 +176,6 @@
               </tr>
             </tbody>
           </table>
-        </div>
-      </div>
-      <div
-        v-if="course.admission_mode === 'public'"
-        class="accordion"
-        data-accordion-clone
-      >
-        <div class="card">
-          <div class="card-header" data-heading-clone>
-            <h2 class="mb-0">
-              <button
-                class="btn btn-link btn-block text-right"
-                type="button"
-                data-toggle="collapse"
-                data-target="[data-accordion-collapse]"
-                aria-expanded="false"
-                aria-controls="data-accordion-collapse"
-              >
-                {{ T.wordsCloneThisCourse }}
-              </button>
-            </h2>
-          </div>
-          <div
-            data-accordion-collapse
-            class="collapse hide"
-            aria-labelledby="[data-heading-clone]"
-            data-parent="[data-accordion-clone]"
-          >
-            <div class="card-body">
-              <omegaup-course-clone
-                :initial-alias="aliasWithUsername"
-                :initial-name="course.name"
-                @clone="
-                  (alias, name, startTime) =>
-                    $emit('clone', alias, name, startTime)
-                "
-              ></omegaup-course-clone>
-            </div>
-          </div>
         </div>
       </div>
     </div>
