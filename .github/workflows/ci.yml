@@ -298,6 +298,20 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+      - name: Build Docker image
+        run: |
+          USE_BUILDKIT=1 TAG=${{ github.sha }} docker-compose \
+            --file docker-compose.k8s.yml \
+            build \
+            --build-arg="BRANCH=${{ steps.extract_branch.outputs.branch }}" \
+            --build-arg="COMMIT=${{ github.sha }}" \
+            frontend php nginx
+
       - name: Install Python dependencies
         run: |
           python3 -m pip install --user setuptools

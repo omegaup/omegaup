@@ -11,6 +11,11 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
       - uses: actions/checkout@v2
         with:
           submodules: recursive
@@ -50,3 +55,20 @@ jobs:
             --url https://api.github.com/repos/${{ github.repository }}/deployments \
             --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             --data "{\"ref\":\"${{ github.ref }}\",\"required_contexts\":[],\"environment\":\"${ENVIRONMENT}\",\"auto_merge\":false}"
+
+      - name: Build Docker image
+        run: |
+          USE_BUILDKIT=1 TAG=${{ github.sha }} docker-compose \
+            --file docker-compose.k8s.yml \
+            build \
+            --build-arg="BRANCH=${{ steps.extract_branch.outputs.branch }}" \
+            --build-arg="COMMIT=${{ github.sha }}" \
+            frontend php nginx
+
+      - name: Push container images to Docker registry
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | \
+              docker login "--username=${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          docker push "omegaup/frontend:${{ github.sha }}"
+          docker push "omegaup/php:${{ github.sha }}"
+          docker push "omegaup/nginx:${{ github.sha }}"

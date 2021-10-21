@@ -28,7 +28,18 @@ USER ubuntu
 WORKDIR /opt/omegaup
 ARG BRANCH=release
 ENV BRANCH=$BRANCH
-RUN git clone --branch=${BRANCH} --depth=1 --recurse-submodules --shallow-submodules https://github.com/omegaup/omegaup .
+ARG COMMIT=
+ENV COMMIT=$COMMIT
+RUN if [ -z "${COMMIT}" ]; then \
+      git clone --branch="${BRANCH}" --depth=1 --recurse-submodules --shallow-submodules https://github.com/omegaup/omegaup . ; \
+    else \
+      git clone https://github.com/omegaup/omegaup /tmp/omegaup && \
+      git -C /tmp/omegaup fetch origin "${BRANCH}" && \
+      git -C /tmp/omegaup switch -c "${BRANCH}" FETCH_HEAD && \
+      git -C /tmp/omegaup reset --hard "${COMMIT}" && \
+      git clone --branch="${BRANCH}" --depth=1 --recurse-submodules --shallow-submodules file:///tmp/omegaup . && \
+      rm -rf /tmp/omegaup ; \
+    fi
 RUN yarn install && yarn build
 RUN composer install --no-dev
 
