@@ -1,5 +1,23 @@
 <template>
   <div class="omegaup-scoreboard">
+    <slot name="scoreboard-header">
+      <div class="text-center mt-4 pt-2">
+        <h2 class="mb-4">
+          <span>{{ title }}</span>
+          <slot name="socket-status">
+            <sup :class="socketClass" :title="socketStatusTitle">{{
+              socketStatus
+            }}</sup>
+          </slot>
+        </h2>
+        <div v-if="!finishTime" class="clock">{{ INF }}</div>
+        <omegaup-countdown
+          v-else
+          class="clock"
+          :target-time="finishTime"
+        ></omegaup-countdown>
+      </div>
+    </slot>
     <!-- id-lint off -->
     <div id="ranking-chart"></div>
     <!-- id-lint on -->
@@ -95,25 +113,32 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
+import omegaup_Countdown from '../Countdown.vue';
+import { SocketStatus } from '../../arena/events_socket';
 
 @Component({
   components: {
     highcharts: Chart,
+    'omegaup-countdown': omegaup_Countdown,
   },
 })
 export default class ArenaScoreboard extends Vue {
   @Prop({ default: 10 }) numberOfPositions!: number;
   @Prop() problems!: omegaup.Problem[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
-  @Prop() rankingChartOptions!: Highcharts.Options | null;
+  @Prop({ default: null }) rankingChartOptions!: Highcharts.Options | null;
   @Prop() lastUpdated!: Date;
   @Prop({ default: true }) showInvitedUsersFilter!: boolean;
   @Prop({ default: true }) showPenalty!: boolean;
   @Prop({ default: false }) showAllContestants!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
+  @Prop() title!: string;
+  @Prop({ default: null }) finishTime!: null | Date;
+  @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
 
   T = T;
   ui = ui;
+  INF = '∞';
   onlyShowExplicitlyInvited =
     !this.showAllContestants && this.showInvitedUsersFilter;
 
@@ -122,6 +147,26 @@ export default class ArenaScoreboard extends Vue {
     return ui.formatString(T.scoreboardLastUpdated, {
       datetime: time.formatDateTime(this.lastUpdated),
     });
+  }
+
+  get socketClass(): string {
+    if (this.socketStatus === SocketStatus.Connected) {
+      return 'socket-status socket-status-ok';
+    }
+    if (this.socketStatus === SocketStatus.Failed) {
+      return 'socket-status socket-status-error';
+    }
+    return 'socket-status';
+  }
+
+  get socketStatusTitle(): string {
+    if (this.socketStatus === SocketStatus.Connected) {
+      return T.socketStatusConnected;
+    }
+    if (this.socketStatus === SocketStatus.Failed) {
+      return T.socketStatusFailed;
+    }
+    return T.socketStatusWaiting;
   }
 
   legendClass(idx: number): string {
@@ -272,6 +317,23 @@ export default class ArenaScoreboard extends Vue {
   .legend {
     width: 0.5em;
     opacity: 0.8;
+  }
+
+  .socket-status-error {
+    color: var(--arena-socket-status-error-color);
+  }
+
+  .socket-status-ok {
+    color: var(--arena-socket-status-ok-color);
+  }
+
+  .socket-status {
+    cursor: help;
+  }
+
+  .clock {
+    font-size: 3em;
+    line-height: 0.4em;
   }
 }
 </style>
