@@ -130,14 +130,6 @@ describe('cases.ts', () => {
   });
 });
 
-interface generateCaseOptions {
-  name: string;
-  points?: number;
-  pointsDefined?: boolean;
-  groupID?: string;
-  caseID?: string;
-}
-
 function generateCase(caseParams: Partial<Case> & { name: string }): Case {
   return {
     caseID: uuid(),
