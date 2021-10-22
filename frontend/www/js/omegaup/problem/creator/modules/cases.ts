@@ -213,7 +213,7 @@ export function assignMissingPoints(state: CasesState): CasesState {
     }
   }
 
-  const individualPoints = maxPoints / notDefinedCount;
+  const individualPoints = Math.max(maxPoints / notDefinedCount ?? 0, 0);
 
   state.groups = state.groups.map((element) => {
     if (element.groupID === UUID_NIL) {

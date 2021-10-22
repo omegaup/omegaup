@@ -28,6 +28,43 @@ describe('cases.ts', () => {
     expect(store.state.casesStore.groups[0].cases[0].points).toBe(50);
     expect(store.state.casesStore.groups[0].cases[1].points).toBe(50);
   });
+  it('Should not divide by 0. All cases are defined', () => {
+    const newCase1 = generateCase({
+      name: 'case1',
+      points: 50,
+      pointsDefined: true,
+    });
+    store.commit('casesStore/addCase', newCase1);
+    const newCase2 = generateCase({
+      name: 'case2',
+      points: 50,
+      pointsDefined: true,
+    });
+    store.commit('casesStore/addCase', newCase2);
+    expect(store.state.casesStore.groups[0].cases[0].points).toBe(50);
+    expect(store.state.casesStore.groups[0].cases[1].points).toBe(50);
+  });
+  it('Should not assign negative points', () => {
+    const newCase1 = generateCase({
+      name: 'case1',
+      points: 50,
+      pointsDefined: true,
+    });
+    store.commit('casesStore/addCase', newCase1);
+    const newCase2 = generateCase({
+      name: 'case2',
+      points: 70,
+      pointsDefined: true,
+    });
+    store.commit('casesStore/addCase', newCase2);
+    const newCase3 = generateCase({
+      name: 'case3',
+    });
+    store.commit('casesStore/addCase', newCase3);
+    expect(store.state.casesStore.groups[0].cases[0].points).toBe(50);
+    expect(store.state.casesStore.groups[0].cases[1].points).toBe(70);
+    expect(store.state.casesStore.groups[0].cases[2].points).toBe(0);
+  });
 
   it('Should edit a case', () => {
     const newCase = generateCase({
