@@ -50,6 +50,13 @@
               :course="course"
             ></omegaup-course-card-enrolled>
           </template>
+          <template v-if="tabKey === Tab.Finished">
+            <omegaup-course-card-finished
+              v-for="course in courses[tabKey]"
+              :key="course.alias"
+              :course="course"
+            ></omegaup-course-card-finished>
+          </template>
         </div>
       </div>
     </div>
@@ -64,6 +71,7 @@ import T from '../../lang';
 import omegaup_Markdown from '../Markdown.vue';
 import course_CardPublic from './CardPublic.vue';
 import course_CardEnrolled from './CardEnrolled.vue';
+import course_CardFinished from './CardFinished.vue';
 
 export enum Tab {
   Enrolled = 'enrolled',
@@ -75,6 +83,7 @@ export enum Tab {
   components: {
     'omegaup-course-card-public': course_CardPublic,
     'omegaup-course-card-enrolled': course_CardEnrolled,
+    'omegaup-course-card-finished': course_CardFinished,
     'omegaup-markdown': omegaup_Markdown,
   },
 })
@@ -122,6 +131,11 @@ export default class CourseTabs extends Vue {
 
   .progress-bar {
     background-color: $omegaup-yellow;
+  }
+
+  .course-star {
+    font-size: 3.2rem;
+    line-height: normal;
   }
 }
 </style>

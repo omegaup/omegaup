@@ -55,7 +55,7 @@ OmegaUp.on('ready', async () => {
       problems: payload.currentAssignment.problems,
       location: window.location.hash,
     }));
-  } catch (e) {
+  } catch (e: any) {
     ui.apiError(e);
   }
 
