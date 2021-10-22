@@ -10,9 +10,7 @@ import {
 } from '../types';
 import { Module } from 'vuex';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
-import T from '../../../lang';
 import Vue from 'vue';
-import { RuleTester } from 'eslint';
 export interface CasesState {
   groups: Group[];
   selected: CaseGroupID;

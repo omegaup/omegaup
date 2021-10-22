@@ -1,12 +1,6 @@
 import store from '@/js/omegaup/problem/creator/store';
-import { BIconFileEarmarkSpreadsheet } from 'bootstrap-vue';
-import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
-import {
-  generateCase,
-  generateCaseRequest,
-  generateGroup,
-} from '../modules/cases';
-import { Case, CaseRequest } from '../types';
+import { generateCase, generateGroup } from '../modules/cases';
+import { CaseRequest } from '../types';
 
 describe('cases.ts', () => {
   beforeEach(() => {
