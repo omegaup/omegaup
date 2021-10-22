@@ -325,6 +325,7 @@ const emptyAssignment: types.CourseAssignment = {
   scoreboard_url: '',
   scoreboard_url_admin: '',
   assignment_type: 'homework',
+  problemCount: 0,
 };
 
 @Component({

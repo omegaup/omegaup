@@ -37,7 +37,7 @@ spec:
         image: omegaup/nginx:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 80
+        - containerPort: 8000
         volumeMounts:
         - name: nginx-config
           mountPath: /etc/nginx
@@ -103,8 +103,8 @@ spec:
   ports:
   - name: http
     protocol: TCP
-    port: 80
-    targetPort: 80
+    port: 8000
+    targetPort: 8000
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -123,4 +123,4 @@ spec:
           service:
             name: frontend-service
             port:
-              number: 80
+              number: 8000

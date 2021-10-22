@@ -5,8 +5,6 @@ metadata:
 data:
   00-create-metadata.sql: |
     CREATE DATABASE IF NOT EXISTS `_omegaup_metadata`;
-    CREATE DATABASE IF NOT EXISTS `omegaup-test`;
-    GRANT ALL PRIVILEGES ON `omegaup-test`.* TO 'omegaup'@'%';
     CREATE USER IF NOT EXISTS 'omegaup'@'localhost' IDENTIFIED BY 'omegaup';
     FLUSH PRIVILEGES;
 ---
@@ -84,29 +82,23 @@ spec:
     spec:
       containers:
       - name: db-migrate
-        image: omegaup/frontend-sidecar:latest
+        image: omegaup/frontend-sidecar:latest-main
         imagePullPolicy: IfNotPresent
         command: [
-          'bash',
-          '-c',
-          './stuff/db-migrate.py
-            --verbose
-            --username=root
-            --password=omegaup
-            --hostname=mysql-service
-            migrate
-            --databases=omegaup
-            --development-environment &&
-          ./stuff/bootstrap-environment.py
-            --verbose
-            --root-url=http://frontend-service',
+          '/opt/omegaup/stuff/db-migrate.py',
+          '--verbose',
+          '--username=root',
+          '--password=omegaup',
+          '--hostname=mysql-service',
+          'migrate',
+          '--databases=omegaup',
         ]
         volumeMounts:
         - name: omegaup
           mountPath: /opt/omegaup
       initContainers:
       - name: init-volume
-        image: omegaup/frontend:latest
+        image: omegaup/frontend:latest-main
         imagePullPolicy: IfNotPresent
         command: ['rsync', '-az', '/opt/omegaup/', '/mnt/omegaup/']
         volumeMounts:

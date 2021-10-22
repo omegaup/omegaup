@@ -26,6 +26,7 @@ describe('ScheduledProblemLists.vue', () => {
           scoreboard_url: '',
           scoreboard_url_admin: '',
           assignment_type: 'homework',
+          problemCount: 0,
         } as types.CourseAssignment,
         taggedProblems: [] as omegaup.Problem[],
       },

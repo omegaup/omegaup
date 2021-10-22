@@ -180,7 +180,7 @@
       </div>
     </div>
     <template v-else>
-      <div class="my-4">
+      <div class="mt-4 mb-1">
         <div class="progress w-50 mx-auto">
           <div
             class="progress-bar"
@@ -196,47 +196,29 @@
         </p>
       </div>
       <div class="d-flex justify-content-end">
-        <a
-          :href="`/course/${course.alias}/clarification/`"
-          role="button"
-          class="btn btn-primary"
-          >{{ T.wordsMyClarifications }}</a
-        >
-      </div>
-      <div
-        v-if="course.admission_mode === 'public'"
-        class="accordion my-3"
-        data-accordion-clone
-      >
-        <div class="card">
-          <h2 class="mb-0" data-heading-clone>
-            <button
-              class="btn btn-link btn-block text-left"
-              type="button"
-              data-toggle="collapse"
-              data-target="[data-accordion-collapse]"
-              aria-expanded="false"
-              aria-controls="data-accordion-collapse"
-            >
-              {{ T.wordsCloneThisCourse }}
-            </button>
-          </h2>
-          <div
-            data-accordion-collapse
-            class="collapse hide"
-            aria-labelledby="[data-heading-clone]"
-            data-parent="[data-accordion-clone]"
+        <div class="dropdown">
+          <a
+            class="btn btn-primary dropdown-toggle"
+            href="#"
+            role="button"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
           >
-            <div class="card-body">
-              <omegaup-course-clone
-                :initial-alias="aliasWithUsername"
-                :initial-name="course.name"
-                @clone="
-                  (alias, name, startTime) =>
-                    $emit('clone', alias, name, startTime)
-                "
-              ></omegaup-course-clone>
-            </div>
+            {{ T.wordsActions }}
+          </a>
+          <div class="dropdown-menu">
+            <a
+              :href="`/course/${course.alias}/clarification/`"
+              class="dropdown-item"
+              >{{ T.wordsMyClarifications }}</a
+            >
+            <a
+              v-if="course.admission_mode === 'public'"
+              :href="`/course/${course.alias}/clone/`"
+              class="dropdown-item"
+              >{{ T.wordsCloneThisCourse }}</a
+            >
           </div>
         </div>
       </div>
@@ -403,7 +385,6 @@ import * as ui from '../../ui';
 import * as time from '../../time';
 import { types } from '../../api_types';
 
-import course_Clone from './Clone.vue';
 import omegaup_Markdown from '../Markdown.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -434,7 +415,6 @@ export enum Tab {
   components: {
     FontAwesomeIcon,
     'omegaup-markdown': omegaup_Markdown,
-    'omegaup-course-clone': course_Clone,
   },
 })
 export default class CourseDetails extends Vue {

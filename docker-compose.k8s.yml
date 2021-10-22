@@ -23,9 +23,9 @@ services:
       target: nginx
     image: omegaup/nginx:${TAG:-latest}
 
-  frontend-dev-sidecar:
+  frontend-sidecar:
     build:
       dockerfile: ./Dockerfile.frontend
       context: ./stuff/docker/
-      target: frontend-dev-sidecar
-    image: omegaup/frontend-dev-sidecar:${TAG:-latest}
+      target: frontend-sidecar
+    image: omegaup/frontend-sidecar:${TAG:-latest}
