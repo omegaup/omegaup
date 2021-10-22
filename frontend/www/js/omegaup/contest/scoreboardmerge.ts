@@ -15,10 +15,7 @@ OmegaUp.on('ready', () => {
     data: () => ({
       contests: payload.contests,
       scoreboard: [] as types.MergedScoreboardEntry[],
-      // Change following line with:
-      // showPenalty: false,
-      // when we migrate to TypeScript 4.4.4
-      showPenalty: 0,
+      showPenalty: false,
       aliases: [] as string[],
     }),
     render: function (createElement) {
@@ -38,16 +35,10 @@ OmegaUp.on('ready', () => {
                 const ranking = response.ranking;
                 const aliases: string[] = [];
                 const scoreboard: types.MergedScoreboardEntry[] = [];
-                // Change following line with:
-                // let showPenalty = false;
-                // when we migrate to TypeScript 4.4.4
-                let showPenalty = 0;
+                let showPenalty = false;
                 if (ranking.length > 0) {
                   for (const entry of ranking) {
-                    // Change following line with:
-                    // showPenalty ||= !!entry.total.penalty;
-                    // when we migrate to TypeScript 4.4.4
-                    showPenalty |= entry.total.penalty;
+                    showPenalty ||= !!entry.total.penalty;
                   }
                   // Get aliases for indexing in the same order all rows
                   for (const entry in ranking[0].contests) {
