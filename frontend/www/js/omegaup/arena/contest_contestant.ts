@@ -57,7 +57,7 @@ OmegaUp.on('ready', async () => {
       problems: payload.problems,
       location: window.location.hash,
     }));
-  } catch (e) {
+  } catch (e: any) {
     ui.apiError(e);
   }
   trackClarifications(payload.clarifications);
