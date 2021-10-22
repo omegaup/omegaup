@@ -11,7 +11,7 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  *
- * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
  * @psalm-type CourseCardFinished=array{alias: string, name: string}
@@ -59,8 +59,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             SELECT
                 a.*,
                 COUNT(s.submission_id) AS has_runs,
-                p.scoreboard_url,
-                p.scoreboard_url_admin
+                COUNT(p.problem_id) AS problem_count,
+                ps.scoreboard_url,
+                ps.scoreboard_url_admin
             FROM
                 Courses c
             INNER JOIN
@@ -68,13 +69,21 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ON
                 a.course_id = c.course_id
             INNER JOIN
-                Problemsets p
+                Problemsets ps
             ON
-                p.problemset_id = a.problemset_id
+                ps.problemset_id = a.problemset_id
+            LEFT JOIN
+                Problemset_Problems psp
+            ON
+                psp.problemset_id = ps.problemset_id
+            LEFT JOIN
+                Problems p
+            ON
+                p.problem_id = psp.problem_id
             LEFT JOIN
                 Submissions s
             ON
-                p.problemset_id = s.problemset_id
+                ps.problemset_id = s.problemset_id
             WHERE
                 c.alias = ? $timeCondition
             GROUP BY
@@ -82,7 +91,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ORDER BY
                 `order`, start_time;";
 
-        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problem_count: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);
 
         $ar = [];
@@ -91,6 +100,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             unset($row['assignment_id']);
             unset($row['course_id']);
             $row['has_runs'] = $row['has_runs'] > 0;
+            $row['problemCount'] = $row['problem_count'];
+            unset($row['problem_count']);
             $ar[] = $row;
         }
         return $ar;
