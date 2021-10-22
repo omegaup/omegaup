@@ -55,5 +55,4 @@ jobs:
             container_name="omegaup/${container}:latest-${{ steps.extract_branch.outputs.branch }}"
             docker tag "omegaup/${container}:${{ github.sha }}" "${container_name}"
             docker push "${container_name}"
-            done
           done
