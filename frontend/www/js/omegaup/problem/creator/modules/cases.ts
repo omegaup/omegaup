@@ -6,11 +6,13 @@ import {
   RootState,
   GroupID,
   LineID,
+  CaseRequest,
 } from '../types';
 import { Module } from 'vuex';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
 import T from '../../../lang';
 import Vue from 'vue';
+import { RuleTester } from 'eslint';
 export interface CasesState {
   groups: Group[];
   selected: CaseGroupID;
@@ -21,15 +23,7 @@ export interface CasesState {
 export const casesStore: Module<CasesState, RootState> = {
   namespaced: true,
   state: {
-    groups: [
-      {
-        groupID: UUID_NIL,
-        name: T.problemCreatorNoGroup,
-        pointsDefined: false,
-        points: 100,
-        cases: [],
-      },
-    ],
+    groups: [],
     selected: {
       caseID: UUID_NIL,
       groupID: UUID_NIL,
@@ -39,15 +33,7 @@ export const casesStore: Module<CasesState, RootState> = {
   },
   mutations: {
     resetStore(state) {
-      state.groups = [
-        {
-          groupID: UUID_NIL,
-          name: T.problemCreatorNoGroup,
-          pointsDefined: false,
-          points: 100,
-          cases: [],
-        },
-      ];
+      state.groups = [];
       state.selected = {
         caseID: UUID_NIL,
         groupID: UUID_NIL,
@@ -57,15 +43,6 @@ export const casesStore: Module<CasesState, RootState> = {
     },
     addGroup(state, newGroup: Group) {
       state.groups.push(newGroup);
-      state = assignMissingPoints(state);
-    },
-    addCase(state, newCase: Case) {
-      const group = state.groups.find(
-        (group) => group.groupID === newCase.groupID,
-      );
-      if (group) {
-        group.cases.push(newCase);
-      }
       state = assignMissingPoints(state);
     },
     editGroup(state, groupData: Group) {
@@ -79,9 +56,45 @@ export const casesStore: Module<CasesState, RootState> = {
       }
       state = assignMissingPoints(state);
     },
+    addCase(state, caseRequest: CaseRequest) {
+      if (caseRequest.groupID === UUID_NIL) {
+        // Should create a new group with the same name
+        const newCase = generateCase({
+          name: caseRequest.name,
+          caseID: caseRequest.caseID,
+        });
+        const groupID = uuid();
+        const newGroup = generateGroup({
+          name: caseRequest.name,
+          groupID: groupID,
+          points: caseRequest.points,
+          pointsDefined: caseRequest.pointsDefined,
+          ungroupedCase: true,
+          cases: [{ ...newCase, groupID }],
+        });
+        state.groups.push(newGroup);
+      } else {
+        const group = state.groups.find(
+          (group) => group.groupID === caseRequest.groupID,
+        );
+        if (group) {
+          group.cases.push(
+            generateCase({
+              name: caseRequest.name,
+              groupID: caseRequest.groupID,
+              caseID: caseRequest.caseID,
+            }),
+          );
+        }
+      }
+      state = assignMissingPoints(state);
+    },
     editCase(
       state,
-      { oldGroupID, editedCase }: { oldGroupID: GroupID; editedCase: Case },
+      {
+        oldGroupID,
+        editedCase,
+      }: { oldGroupID: GroupID; editedCase: Required<CaseRequest> },
     ) {
       // Old group
 
@@ -107,15 +120,34 @@ export const casesStore: Module<CasesState, RootState> = {
           groupTarget.cases = groupTarget.cases.filter(
             (_case) => _case.caseID !== editedCase.caseID,
           );
+          // If the group has the same name as the case. I.e. the case doesn't have any group
+          if (groupTarget.ungroupedCase) {
+            state.groups = state.groups.filter(
+              (group) => group.groupID !== groupTarget.groupID,
+            );
+          }
           // Find the new group
           const newGroup = state.groups.find(
             (group) => group.groupID === editedCase.groupID,
           );
-          newGroup?.cases.push(editedCase);
+          newGroup?.cases.push(
+            generateCase({
+              name: editedCase.name,
+              groupID: newGroup.groupID,
+              caseID: editedCase.caseID,
+              lines: editedCase.lines,
+            }),
+          );
           state.selected.groupID = editedCase.groupID;
         }
       } else {
         if (caseTarget && groupTarget) {
+          if (groupTarget.ungroupedCase) {
+            // Update both case and group
+            groupTarget.name = editedCase.name;
+            groupTarget.points = editedCase.points;
+            groupTarget.pointsDefined = editedCase.pointsDefined;
+          }
           Vue.set(groupTarget.cases, caseIndex, {
             ...caseTarget,
             ...editedCase,
@@ -135,9 +167,16 @@ export const casesStore: Module<CasesState, RootState> = {
         (group) => group.groupID == caseGroupIDToBeDeleted.groupID,
       );
       if (groupTarget) {
-        groupTarget.cases = groupTarget.cases.filter(
-          (_case) => _case.caseID !== caseGroupIDToBeDeleted.caseID,
-        );
+        if (groupTarget.ungroupedCase) {
+          // Delete the entire group
+          state.groups = state.groups.filter(
+            (group) => group.groupID !== groupTarget.groupID,
+          );
+        } else {
+          groupTarget.cases = groupTarget.cases.filter(
+            (_case) => _case.caseID !== caseGroupIDToBeDeleted.caseID,
+          );
+        }
       }
       state.selected.caseID = UUID_NIL;
       state.selected.groupID = UUID_NIL;
@@ -195,35 +234,16 @@ export function assignMissingPoints(state: CasesState): CasesState {
   let notDefinedCount = 0;
 
   for (const group of state.groups) {
-    if (group.groupID === UUID_NIL) {
-      // Calculate points of cases without group
-      for (const caseElement of group.cases) {
-        if (caseElement.pointsDefined) {
-          maxPoints -= caseElement?.points ?? 0;
-        } else {
-          notDefinedCount++;
-        }
-      }
+    if (group.pointsDefined) {
+      maxPoints -= group?.points ?? 0;
     } else {
-      if (group.pointsDefined) {
-        maxPoints -= group?.points ?? 0;
-      } else {
-        notDefinedCount++;
-      }
+      notDefinedCount++;
     }
   }
 
   const individualPoints = Math.max(maxPoints / notDefinedCount ?? 0, 0);
 
   state.groups = state.groups.map((element) => {
-    if (element.groupID === UUID_NIL) {
-      element.cases = element.cases.map((caseElement) => {
-        if (!caseElement.pointsDefined) {
-          caseElement.points = individualPoints;
-        }
-        return caseElement;
-      });
-    }
     if (!element.pointsDefined) {
       element.points = individualPoints;
     }
@@ -231,4 +251,40 @@ export function assignMissingPoints(state: CasesState): CasesState {
   });
 
   return state;
+}
+
+export function generateCase(
+  caseParams: Partial<Case> & { name: string },
+): Case {
+  return {
+    caseID: uuid(),
+    groupID: UUID_NIL,
+    lines: [],
+    ...caseParams,
+  };
+}
+
+export function generateCaseRequest(
+  caseParams: Partial<CaseRequest> & { name: string },
+): CaseRequest {
+  return {
+    caseID: uuid(),
+    groupID: UUID_NIL,
+    points: 0,
+    pointsDefined: false,
+    lines: [],
+    ...caseParams,
+  };
+}
+export function generateGroup(
+  groupParams: Partial<Group> & { name: string },
+): Group {
+  return {
+    groupID: uuid(),
+    cases: [],
+    points: 0,
+    pointsDefined: false,
+    ungroupedCase: false,
+    ...groupParams,
+  };
 }

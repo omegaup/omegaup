@@ -93,8 +93,6 @@ export interface Case {
   caseID: string;
   groupID: string;
   name: string;
-  points: number;
-  pointsDefined: boolean;
   lines: CaseLine[];
 }
 
@@ -107,6 +105,7 @@ export interface Case {
  * @property {string} name Name of the group
  * @property {number} points Points of the group
  * @property {boolean} pointsDefined Whether the points are defined by the user or not
+ * @property {boolean} ungroupedCase Whether this case belongs to an ungrouped case
  * @property {Array<Case>} cases Cases of the group
  */
 export interface Group {
@@ -114,6 +113,7 @@ export interface Group {
   name: string;
   points: number;
   pointsDefined: boolean;
+  ungroupedCase: boolean;
   cases: Case[];
 }
 
@@ -145,6 +145,15 @@ export interface MultipleCaseAddRequest {
   suffix: string;
   number: number;
   groupID: GroupID;
+}
+
+export interface CaseRequest {
+  groupID: GroupID;
+  caseID: CaseID;
+  name: string;
+  pointsDefined: boolean;
+  points: number;
+  lines?: CaseLine[];
 }
 
 /**
