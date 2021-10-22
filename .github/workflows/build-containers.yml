@@ -39,7 +39,7 @@ jobs:
           for container in frontend frontend-sidecar nginx php; do
             for tag in "latest-${{ steps.extract_branch.outputs.branch }}" "${{ github.sha }}"; do
               container_name="docker.pkg.github.com/${{ github.repository }}/${container}:${tag}"
-              docker tag "omegaup/${container}:${tag}" "${container_name}"
+              docker tag "omegaup/${container}:${{ github.sha }}" "${container_name}"
               docker push "${container_name}"
             done
           done
@@ -50,10 +50,10 @@ jobs:
             docker login "--username=${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
           for container in frontend frontend-sidecar nginx php; do
-            docker push "omegaup/${container}:${tag}"
+            docker push "omegaup/${container}:${{ github.sha }}"
 
             container_name="omegaup/${container}:latest-${{ steps.extract_branch.outputs.branch }}"
-            docker tag "omegaup/${container}:${tag}" "${container_name}"
+            docker tag "omegaup/${container}:${{ github.sha }}" "${container_name}"
             docker push "${container_name}"
             done
           done
