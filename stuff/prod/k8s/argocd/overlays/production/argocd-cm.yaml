@@ -6,4 +6,4 @@ metadata:
     app.kubernetes.io/name: argocd-cm
     app.kubernetes.io/part-of: argocd
 data:
-  kustomize.buildOptions: "--enable_alpha_plugins"
+  kustomize.buildOptions: "--enable-alpha-plugins"
