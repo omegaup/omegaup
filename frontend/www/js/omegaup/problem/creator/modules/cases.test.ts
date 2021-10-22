@@ -1,93 +1,197 @@
 import store from '@/js/omegaup/problem/creator/store';
+import { BIconFileEarmarkSpreadsheet } from 'bootstrap-vue';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
-import { Case, Group } from '../types';
+import {
+  generateCase,
+  generateCaseRequest,
+  generateGroup,
+} from '../modules/cases';
+import { Case, CaseRequest } from '../types';
 
 describe('cases.ts', () => {
   beforeEach(() => {
     store.commit('casesStore/resetStore');
   });
 
-  it('Should save a case to the store', () => {
+  it('Should save an ungrouped case to the store. Should create a ungrouped group with one case inside it', () => {
     const newCase = generateCase({ name: 'case1' }); // casesStore
-    store.commit('casesStore/addCase', newCase);
-    expect(store.state.casesStore.groups[0].cases[0]).toBe(newCase);
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/addCase', newCaseRequest);
+    const groupID = store.state.casesStore.groups[0].groupID;
+    const ungroupedGroup = generateGroup({
+      name: newCase.name,
+      groupID: store.state.casesStore.groups[0].groupID,
+      points: 100,
+      pointsDefined: false,
+      ungroupedCase: true,
+      cases: [{ ...newCase, groupID }],
+    });
+    expect(store.state.casesStore.groups[0]).toEqual(ungroupedGroup);
+    expect(store.state.casesStore.groups[0].cases[0].name).toBe(newCase.name);
+    expect(store.state.casesStore.groups[0].cases[0].caseID).toBe(
+      newCase.caseID,
+    );
   });
 
   it('Should save a group to the store', () => {
     const newGroup = generateGroup({ name: 'group1' });
     store.commit('casesStore/addGroup', newGroup);
-    expect(store.state.casesStore.groups[1]).toBe(newGroup);
+    expect(store.state.casesStore.groups[0]).toBe(newGroup);
   });
 
-  it('Should calculate case points based on how many cases are in the store', () => {
-    const newCase1 = generateCase({ name: 'case1' });
-    store.commit('casesStore/addCase', newCase1);
-    expect(store.state.casesStore.groups[0].cases[0].points).toBe(100);
-    const newCase2 = generateCase({ name: 'case2' });
-    store.commit('casesStore/addCase', newCase2);
-    expect(store.state.casesStore.groups[0].cases[0].points).toBe(50);
-    expect(store.state.casesStore.groups[0].cases[1].points).toBe(50);
-  });
-  it('Should not divide by 0. All cases are defined', () => {
-    const newCase1 = generateCase({
-      name: 'case1',
-      points: 50,
-      pointsDefined: true,
-    });
-    store.commit('casesStore/addCase', newCase1);
-    const newCase2 = generateCase({
-      name: 'case2',
-      points: 50,
-      pointsDefined: true,
-    });
-    store.commit('casesStore/addCase', newCase2);
-    expect(store.state.casesStore.groups[0].cases[0].points).toBe(50);
-    expect(store.state.casesStore.groups[0].cases[1].points).toBe(50);
-  });
-  it('Should not assign negative points', () => {
-    const newCase1 = generateCase({
-      name: 'case1',
-      points: 50,
-      pointsDefined: true,
-    });
-    store.commit('casesStore/addCase', newCase1);
-    const newCase2 = generateCase({
-      name: 'case2',
-      points: 70,
-      pointsDefined: true,
-    });
-    store.commit('casesStore/addCase', newCase2);
-    const newCase3 = generateCase({
-      name: 'case3',
-    });
-    store.commit('casesStore/addCase', newCase3);
-    expect(store.state.casesStore.groups[0].cases[0].points).toBe(50);
-    expect(store.state.casesStore.groups[0].cases[1].points).toBe(70);
-    expect(store.state.casesStore.groups[0].cases[2].points).toBe(0);
+  it('Should add a case to a group', () => {
+    const newGroup = generateGroup({ name: 'group1' });
+    store.commit('casesStore/addGroup', newGroup);
+    const newCase = generateCase({ name: 'case1', groupID: newGroup.groupID }); // casesStore
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/addCase', newCaseRequest);
+    expect(store.state.casesStore.groups[0]).toBe(newGroup);
+    expect(store.state.casesStore.groups[0].cases[0]).toEqual(newCase);
   });
 
-  it('Should edit a case', () => {
-    const newCase = generateCase({
-      name: 'case1',
-      points: 100,
-      pointsDefined: true,
-      groupID: UUID_NIL,
-    });
-    const editedCase = generateCase({
+  it('Should edit an ungrouped case. Should edit both the case and ungrouped group', () => {
+    const newCase = generateCase({ name: 'case1' }); // casesStore
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/addCase', newCaseRequest);
+    expect(store.state.casesStore.groups[0].points).toBe(100);
+    expect(store.state.casesStore.groups[0].pointsDefined).toBe(false);
+    expect(store.state.casesStore.groups[0].cases[0].name).toBe('case1');
+    const groupID = store.state.casesStore.groups[0].groupID;
+    const editedCaseRequest: CaseRequest = {
+      ...newCase,
+      groupID,
       name: 'case2',
-      points: 30,
+      points: 50,
       pointsDefined: true,
-      groupID: UUID_NIL,
-      caseID: newCase.caseID,
-    });
-    store.commit('casesStore/addCase', newCase);
+    };
     store.commit('casesStore/editCase', {
-      oldGroupID: UUID_NIL,
+      oldGroupID: groupID,
+      editedCase: editedCaseRequest,
+    });
+    expect(store.state.casesStore.groups[0].name).toBe('case2');
+    expect(store.state.casesStore.groups[0].points).toBe(50);
+    expect(store.state.casesStore.groups[0].pointsDefined).toBe(true);
+    expect(store.state.casesStore.groups[0].cases[0].name).toBe('case2');
+  });
+  it('Should edit a case', () => {
+    const newGroup = generateGroup({ name: 'group1' });
+    store.commit('casesStore/addGroup', newGroup);
+    const newCase = generateCase({ name: 'case1', groupID: newGroup.groupID });
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/addCase', newCaseRequest);
+    expect(store.state.casesStore.groups[0]).toEqual({
+      ...newGroup,
+      cases: [newCase],
+    });
+    expect(store.state.casesStore.groups[0].cases[0].name).toBe('case1');
+    const groupID = store.state.casesStore.groups[0].groupID;
+    const editedCaseRequest: CaseRequest = {
+      ...newCase,
+      groupID,
+      name: 'case2',
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/editCase', {
+      oldGroupID: groupID,
+      editedCase: editedCaseRequest,
+    });
+    expect(store.state.casesStore.groups[0].name).toBe('group1');
+    expect(store.state.casesStore.groups[0].cases[0].name).toBe('case2');
+  });
+  it('Should change an ungrouped case to another group. Should delete the ungrouped group', () => {
+    const newCase = generateCase({ name: 'case1' });
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/addCase', newCaseRequest);
+    const groupID = store.state.casesStore.groups[0].groupID;
+    const newGroup = generateGroup({ name: 'group1' });
+    store.commit('casesStore/addGroup', newGroup);
+    const editedCase: CaseRequest = {
+      ...newCaseRequest,
+      groupID: newGroup.groupID,
+    };
+    store.commit('casesStore/editCase', {
+      oldGroupID: groupID,
       editedCase: editedCase,
     });
-    expect(store.state.casesStore.groups[0].cases[0]).toStrictEqual(editedCase);
+    expect(store.state.casesStore.groups[0]).toEqual({
+      ...newGroup,
+      cases: [{ ...newCase, groupID: newGroup.groupID }],
+    });
   });
-
+  it('Should change the group of one case to another', () => {
+    const newGroup1 = generateGroup({ name: 'group1' });
+    store.commit('casesStore/addGroup', newGroup1);
+    const newGroup2 = generateGroup({ name: 'group2' });
+    store.commit('casesStore/addGroup', newGroup2);
+    const newCase = generateCase({ name: 'case1', groupID: newGroup1.groupID });
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      pointsDefined: false,
+    };
+    const oldGroupID = store.state.casesStore.groups[0].groupID;
+    const newGroupID = store.state.casesStore.groups[1].groupID;
+    store.commit('casesStore/addCase', newCaseRequest);
+    store.commit('casesStore/editCase', {
+      oldGroupID: oldGroupID,
+      editedCase: { ...newCaseRequest, groupID: newGroupID },
+    });
+    expect(store.state.casesStore.groups[0].cases.length).toBe(0);
+    expect(store.state.casesStore.groups[1].cases.length).toBe(1);
+    expect(store.state.casesStore.groups[1].cases[0]).toEqual({
+      ...newCase,
+      groupID: newGroupID,
+    });
+  });
+  it('Should remove an ungrouped case', () => {
+    const newCase = generateCase({ name: 'case1' });
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/addCase', newCaseRequest);
+    const groupID = store.state.casesStore.groups[0].groupID;
+    store.commit('casesStore/deleteCase', { caseID: newCase.caseID, groupID });
+    expect(store.state.casesStore.groups.length).toBe(0);
+  });
+  it('Should remove a case', () => {
+    const newGroup1 = generateGroup({ name: 'group1' });
+    store.commit('casesStore/addGroup', newGroup1);
+    const newCase = generateCase({ name: 'case1', groupID: newGroup1.groupID });
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/addCase', newCaseRequest);
+    store.commit('casesStore/deleteCase', {
+      groupID: newGroup1.groupID,
+      caseID: newCase.caseID,
+    });
+    expect(store.state.casesStore.groups[0].cases.length).toBe(0);
+  });
   it('Should edit a group', () => {
     const newGroup = generateGroup({ name: 'group1' });
     const editedGroup = generateGroup({
@@ -98,63 +202,86 @@ describe('cases.ts', () => {
     });
     store.commit('casesStore/addGroup', newGroup);
     store.commit('casesStore/editGroup', editedGroup);
-    expect(store.state.casesStore.groups[1]).toStrictEqual(editedGroup);
+    expect(store.state.casesStore.groups[0]).toEqual(editedGroup);
   });
-  it('Should change a case from one group to another group', () => {
-    const newGroup = generateGroup({ name: 'group1' });
-    const newCase = generateCase({ name: 'case1' });
-    const editedCase = { ...newCase, groupID: newGroup.groupID };
-    store.commit('casesStore/addGroup', newGroup);
-    store.commit('casesStore/addCase', newCase);
-    store.commit('casesStore/editCase', {
-      oldGroupID: UUID_NIL,
-      editedCase: editedCase,
-    });
-    expect(store.state.casesStore.groups[1].cases[0]).toStrictEqual(editedCase);
-  });
+
   it('Should remove a group', () => {
     const newGroup = generateGroup({ name: 'group1' });
     store.commit('casesStore/addGroup', newGroup);
     store.commit('casesStore/deleteGroup', newGroup.groupID);
     expect(store.state.casesStore.groups[1]).toBeUndefined();
   });
-  it('Should remove a case', () => {
-    store.commit('casesStore/resetStore');
-    const newCase = generateCase({ name: 'case1' });
-    store.commit('casesStore/addCase', newCase);
-    store.commit('casesStore/deleteCase', {
-      caseID: newCase.caseID,
-      groupID: newCase.groupID,
+  it('Should calculate case points based on how many groups are in the store', () => {
+    const newCase1 = generateCase({ name: 'case1' });
+    const newCaseRequest1: CaseRequest = {
+      ...newCase1,
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/addCase', newCaseRequest1);
+    expect(store.state.casesStore.groups[0].points).toBe(100);
+    const newCase2 = generateCase({ name: 'case2' });
+    const newCaseRequest2: CaseRequest = {
+      ...newCase2,
+      points: 20,
+      pointsDefined: true,
+    };
+    store.commit('casesStore/addCase', newCaseRequest2);
+    expect(store.state.casesStore.groups[0].points).toBe(80);
+    expect(store.state.casesStore.groups[1].points).toBe(20);
+  });
+  it('Should not divide by 0. All groups are defined', () => {
+    const newCase1 = generateCase({
+      name: 'case1',
     });
-    expect(store.state.casesStore.groups[0].cases[0]).toBeUndefined();
+    const newCaseRequest1: CaseRequest = {
+      ...newCase1,
+      points: 50,
+      pointsDefined: true,
+    };
+    store.commit('casesStore/addCase', newCaseRequest1);
+    const newCase2 = generateCase({
+      name: 'case2',
+    });
+    const newCaseRequest2: CaseRequest = {
+      ...newCase2,
+      points: 50,
+      pointsDefined: true,
+    };
+    store.commit('casesStore/addCase', newCaseRequest2);
+    expect(store.state.casesStore.groups[0].points).toBe(50);
+    expect(store.state.casesStore.groups[1].points).toBe(50);
+  });
+  it('Should not assign negative points', () => {
+    const newCase1 = generateCase({
+      name: 'case1',
+    });
+    const newCaseRequest1: CaseRequest = {
+      ...newCase1,
+      points: 50,
+      pointsDefined: true,
+    };
+    store.commit('casesStore/addCase', newCaseRequest1);
+    const newCase2 = generateCase({
+      name: 'case2',
+    });
+    const newCaseRequest2: CaseRequest = {
+      ...newCase2,
+      points: 70,
+      pointsDefined: true,
+    };
+    store.commit('casesStore/addCase', newCaseRequest2);
+    const newCase3 = generateCase({
+      name: 'case3',
+    });
+    const newCaseRequest3: CaseRequest = {
+      ...newCase3,
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/addCase', newCaseRequest3);
+    expect(store.state.casesStore.groups[0].points).toBe(50);
+    expect(store.state.casesStore.groups[1].points).toBe(70);
+    expect(store.state.casesStore.groups[2].points).toBe(0);
   });
 });
-
-interface generateCaseOptions {
-  name: string;
-  points?: number;
-  pointsDefined?: boolean;
-  groupID?: string;
-  caseID?: string;
-}
-
-function generateCase(caseParams: Partial<Case> & { name: string }): Case {
-  return {
-    caseID: uuid(),
-    groupID: UUID_NIL,
-    pointsDefined: false,
-    points: 0,
-    lines: [],
-    ...caseParams,
-  };
-}
-
-function generateGroup(groupParams: Partial<Group> & { name: string }): Group {
-  return {
-    groupID: uuid(),
-    cases: [],
-    points: 0,
-    pointsDefined: false,
-    ...groupParams,
-  };
-}
