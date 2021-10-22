@@ -9,7 +9,11 @@
       <form>
         <div class="form-group col-md-3">
           <label>{{ T.courseStudentSelectStudent }}</label>
-          <select v-model="selectedStudent" class="ml-1 form-control">
+          <select
+            v-model="selectedStudent"
+            class="ml-1 form-control"
+            data-student
+          >
             <option
               v-for="student in students"
               :key="student.username"

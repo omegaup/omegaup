@@ -54,9 +54,17 @@ describe('ViewStudent.vue', () => {
     scoreboard_url_admin: '',
   } as omegaup.Assignment;
 
-  const student = {
-    name: 'student',
-    username: 'student',
+  const student_a = {
+    name: 'student_a',
+    username: 'student_a',
+    progress: {
+      problem: 1,
+    },
+  } as types.CourseStudent;
+
+  const student_b = {
+    name: 'student_b',
+    username: 'student_b',
     progress: {
       problem: 1,
     },
@@ -152,10 +160,18 @@ describe('ViewStudent.vue', () => {
             visits: 1,
           } as types.CourseProblem,
         ],
-        students: [student],
-        student: student,
+        students: [student_a, student_b],
+        student: student_a,
       },
     });
+
+    const students = wrapper.find('select[data-student]')
+      .element as HTMLInputElement;
+    students.value = 'student_b';
+    await students.dispatchEvent(new Event('change'));
+    expect(wrapper.emitted('update')).toEqual([
+      { student: student_b, assignmentAlias: null },
+    ]);
 
     const assignments = wrapper.find('select[data-assignment]')
       .element as HTMLInputElement;
@@ -200,7 +216,7 @@ describe('ViewStudent.vue', () => {
           feedback: submissionFeedback.feedback,
           isUpdate: false,
           assignmentAlias: assignment_a.alias,
-          studentUsername: student.username,
+          studentUsername: student_a.username,
         },
       ],
     ]);
