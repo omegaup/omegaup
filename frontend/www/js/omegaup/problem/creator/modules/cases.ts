@@ -93,7 +93,11 @@ export const casesStore: Module<CasesState, RootState> = {
       const caseIndex =
         groupTarget?.cases.findIndex(
           (_case) => _case.caseID === editedCase.caseID,
-        ) ?? 0;
+        ) ?? -1;
+
+      if (caseIndex === -1) {
+        return;
+      }
 
       const caseTarget = groupTarget?.cases[caseIndex];
 
@@ -116,10 +120,6 @@ export const casesStore: Module<CasesState, RootState> = {
             ...caseTarget,
             ...editedCase,
           });
-          // caseTarget.groupID = editedCase.groupID;
-          // caseTarget.points = editedCase.points;
-          // caseTarget.pointsDefined = editedCase.pointsDefined;
-          // caseTarget.name = editedCase.name;
         }
       }
       state = assignMissingPoints(state);
@@ -130,13 +130,13 @@ export const casesStore: Module<CasesState, RootState> = {
       );
       state = assignMissingPoints(state);
     },
-    deleteCase(state, CaseGroupIDToBeDeleted: CaseGroupID) {
+    deleteCase(state, caseGroupIDToBeDeleted: CaseGroupID) {
       const groupTarget = state.groups.find(
-        (group) => group.groupID == CaseGroupIDToBeDeleted.groupID,
+        (group) => group.groupID == caseGroupIDToBeDeleted.groupID,
       );
       if (groupTarget) {
         groupTarget.cases = groupTarget.cases.filter(
-          (_case) => _case.caseID !== CaseGroupIDToBeDeleted.caseID,
+          (_case) => _case.caseID !== caseGroupIDToBeDeleted.caseID,
         );
       }
       state.selected.caseID = UUID_NIL;
@@ -212,7 +212,6 @@ export function assignMissingPoints(state: CasesState): CasesState {
       }
     }
   }
-  // state.groups.forEach((element) => {});
 
   const individualPoints = maxPoints / notDefinedCount;
 

@@ -14,7 +14,7 @@ describe('cases.ts', () => {
   });
 
   it('Should save a group to the store', () => {
-    const newGroup = generateGroupPayload({ name: 'group1' });
+    const newGroup = generateGroup({ name: 'group1' });
     store.commit('casesStore/addGroup', newGroup);
     expect(store.state.casesStore.groups[1]).toBe(newGroup);
   });
@@ -52,8 +52,8 @@ describe('cases.ts', () => {
   });
 
   it('Should edit a group', () => {
-    const newGroup = generateGroupPayload({ name: 'group1' });
-    const editedGroup = generateGroupPayload({
+    const newGroup = generateGroup({ name: 'group1' });
+    const editedGroup = generateGroup({
       name: 'group2',
       points: 20,
       pointsDefined: true,
@@ -64,7 +64,7 @@ describe('cases.ts', () => {
     expect(store.state.casesStore.groups[1]).toStrictEqual(editedGroup);
   });
   it('Should change a case from one group to another group', () => {
-    const newGroup = generateGroupPayload({ name: 'group1' });
+    const newGroup = generateGroup({ name: 'group1' });
     const newCase = generateCase({ name: 'case1' });
     const editedCase = { ...newCase, groupID: newGroup.groupID };
     store.commit('casesStore/addGroup', newGroup);
@@ -76,7 +76,7 @@ describe('cases.ts', () => {
     expect(store.state.casesStore.groups[1].cases[0]).toStrictEqual(editedCase);
   });
   it('Should remove a group', () => {
-    const newGroup = generateGroupPayload({ name: 'group1' });
+    const newGroup = generateGroup({ name: 'group1' });
     store.commit('casesStore/addGroup', newGroup);
     store.commit('casesStore/deleteGroup', newGroup.groupID);
     expect(store.state.casesStore.groups[1]).toBeUndefined();
@@ -101,41 +101,23 @@ interface generateCaseOptions {
   caseID?: string;
 }
 
-function generateCase({
-  name,
-  points = 0,
-  pointsDefined = false,
-  groupID = UUID_NIL,
-  caseID = uuid(),
-}: generateCaseOptions): Case {
+function generateCase(caseParams: Partial<Case> & { name: string }): Case {
   return {
-    caseID: caseID,
-    groupID: groupID,
-    pointsDefined: pointsDefined,
-    name: name,
-    points: points,
+    caseID: uuid(),
+    groupID: UUID_NIL,
+    pointsDefined: false,
+    points: 0,
     lines: [],
+    ...caseParams,
   };
 }
 
-interface generateGroupOptions {
-  name: string;
-  points?: number;
-  pointsDefined?: boolean;
-  groupID?: string;
-}
-
-function generateGroupPayload({
-  name,
-  points = 0,
-  pointsDefined = false,
-  groupID = uuid(),
-}: generateGroupOptions): Group {
+function generateGroup(groupParams: Partial<Group> & { name: string }): Group {
   return {
-    groupID: groupID,
-    name: name,
-    points: points,
-    pointsDefined: pointsDefined,
+    groupID: uuid(),
     cases: [],
+    points: 0,
+    pointsDefined: false,
+    ...groupParams,
   };
 }
