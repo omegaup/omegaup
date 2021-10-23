@@ -700,7 +700,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleSchoolOfTheMonth: "Schools of the Month",
   omegaupTitleSchoolProfile: "School Profile",
   omegaupTitleSchoolsRank: "School ranking",
-  omegaupTitleScoreboardmerge: "Scoreboardmerge",
+  omegaupTitleScoreboardmerge: "Scoreboard merge",
   omegaupTitleStudentsProgress: "Students' progress",
   omegaupTitleSupportDashboard: "Support dashboard",
   omegaupTitleTeamsGroupEdit: "Edit teams group",
