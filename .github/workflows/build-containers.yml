@@ -56,3 +56,23 @@ jobs:
             docker tag "omegaup/${container}:${{ github.sha }}" "${container_name}"
             docker push "${container_name}"
           done
+
+      - name: Update k8s manifests
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+
+          git clone --depth=1 https://omegaup-bot:${{ secrets.OMEGAUPBOT_RELEASE_TOKEN }}@github.com/omegaup/prod /tmp/prod
+          TAG=${{ github.sha }}
+          (cd /tmp/prod/k8s/omegaup/overlays/sandbox &&
+           git config --local user.name "omegaup-bot" && \
+           git config --local user.email "omegaup-bot@users.noreply.github.com" && \
+           kustomize edit set image \
+             omegaup/php:${TAG} \
+             omegaup/nginx:${TAG} \
+             omegaup/frontend:${TAG} \
+             omegaup/frontend-sidecar:${TAG} &&
+           sed -i "s/db-migrate-.*/db-migrate-${TAG}/" db-migrate-name.yaml &&
+           git commit -am "omegaUp sandbox release ${TAG}" &&
+           git push)
+          rm -rf /tmp/prod
