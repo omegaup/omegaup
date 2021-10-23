@@ -1,8 +1,7 @@
 <template>
   <omegaup-arena
     :active-tab="activeTab"
-    :contest-title="ui.contestTitle(contest)"
-    :is-admin="contestAdmin"
+    :title="ui.contestTitle(contest)"
     :clarifications="currentClarifications"
     :should-show-runs="contestAdmin"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
@@ -97,7 +96,9 @@
         :show-all-contestants="
           contest.default_show_all_contestants_in_scoreboard
         "
-      ></omegaup-arena-scoreboard>
+      >
+        <template #scoreboard-header><div></div></template>
+      </omegaup-arena-scoreboard>
     </template>
     <template #arena-runs>
       <omegaup-arena-runs
@@ -246,7 +247,6 @@ export default class ArenaContest extends Vue {
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   @Prop({ default: true }) showPenalty!: boolean;
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
-  @Prop({ default: true }) socketConnected!: boolean;
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop() searchResultUsers!: types.ListItem[];

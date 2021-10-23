@@ -2541,6 +2541,7 @@ export namespace types {
     max_points: number;
     name: string;
     order: number;
+    problemCount: number;
     problemset_id: number;
     publish_time_delay?: number;
     scoreboard_url: string;
@@ -2579,7 +2580,7 @@ export namespace types {
   export interface CourseCloneDetailsPayload {
     creator: { classname: string; username: string };
     details: types.CourseDetails;
-    token: string;
+    token?: string;
   }
 
   export interface CourseDetails {

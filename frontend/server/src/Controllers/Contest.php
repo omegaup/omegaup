@@ -4446,7 +4446,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
     }
-
     /**
      * Update a Contest
      *
@@ -4455,6 +4454,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $admission_mode
      * @omegaup-request-param null|string $alias
      * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param bool|null $contest_for_teams
+     * @omegaup-request-param bool|null $default_show_all_contestants_in_scoreboard
      * @omegaup-request-param null|string $description
      * @omegaup-request-param mixed $feedback
      * @omegaup-request-param int $finish_time
@@ -4466,16 +4467,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
      * @omegaup-request-param null|string $problems
-     * @omegaup-request-param mixed $requests_user_information
+     * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param float|null $scoreboard
-     * @omegaup-request-param bool|null $default_show_all_contestants_in_scoreboard
      * @omegaup-request-param bool|null $show_scoreboard_after
      * @omegaup-request-param OmegaUp\Timestamp|null $start_time
      * @omegaup-request-param int $submissions_gap
+     * @omegaup-request-param null|string $teams_group_alias
      * @omegaup-request-param null|string $title
      * @omegaup-request-param int $window_length
-     * @omegaup-request-param bool|null $contest_for_teams
-     * @omegaup-request-param null|string $teams_group_alias
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -4488,6 +4487,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $contest = self::validateUpdate($r, $r->identity, $contestAlias);
+        if (is_null($contest->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'contestNotFound'
+            );
+        }
+
+        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+            $contest->problemset_id
+        );
+        $originalNeedsBasicInformation = $problemset->needs_basic_information ?? false;
+        $needsBasicInformation = $r->ensureOptionalBool(
+            'needs_basic_information'
+        ) ?? $originalNeedsBasicInformation;
+
+        $originalRequestsUserInformation = $problemset->requests_user_information ?? 'no';
+        $requestsUserInformation = $r->ensureOptionalEnum(
+            'requests_user_information',
+            ['no', 'optional', 'required']
+        ) ?? $originalRequestsUserInformation;
+
         $contestForTeams = $r->ensureOptionalBool('contest_for_teams');
         if (
             !is_null(
@@ -4503,15 +4522,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'contestCanNotChangeToContestForTeams'
             );
         }
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['requests_user_information'],
-            'requests_user_information',
-            [
-                'no',
-                'optional',
-                'required',
-            ]
-        );
 
         self::forbiddenInVirtual($contest);
 
@@ -4541,7 +4551,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ) ?? false;
 
             // Problemset does not update when admission mode change
-            $updateProblemset = false;
+            $updateProblemset = (
+                $originalNeedsBasicInformation !== $needsBasicInformation ||
+                $originalRequestsUserInformation !== $requestsUserInformation
+            );
         }
 
         $valueProperties = [
@@ -4615,10 +4628,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
                         'problemsetNotFound'
                     );
                 }
-                $problemset->needs_basic_information = $r->ensureOptionalBool(
-                    'needs_basic_information'
-                ) ?? false;
-                $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
+                $problemset->needs_basic_information = $needsBasicInformation;
+                $problemset->requests_user_information = $requestsUserInformation;
                 \OmegaUp\DAO\Problemsets::update($problemset);
                 $teamsGroupAlias = $r->ensureOptionalString(
                     'teams_group_alias'

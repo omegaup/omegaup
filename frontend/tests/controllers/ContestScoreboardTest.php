@@ -1158,4 +1158,34 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
     }
+
+    public function testScoreboardMergeDetailsForTypeScript() {
+        $contests = [];
+        // Get two contests
+        $contests[] = \OmegaUp\Test\Factories\Contest::createContest();
+        $contests[] = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Get user to be added as contest admin
+        [
+            'identity' => $contestIdentityAdmin,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Set admin profile to user
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contests[0],
+            $contestIdentityAdmin
+        );
+        \OmegaUp\Test\Factories\Contest::addAdminUser(
+            $contests[1],
+            $contestIdentityAdmin
+        );
+
+        $login = self::login($contestIdentityAdmin);
+
+        $contests = \OmegaUp\Controllers\Contest::getScoreboardMergeDetailsForTypeScript(
+            new \OmegaUp\Request([ 'auth_token' => $login->auth_token ])
+        )['smartyProperties']['payload']['contests'];
+
+        $this->assertCount(2, $contests);
+    }
 }
