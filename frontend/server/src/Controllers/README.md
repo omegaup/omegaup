@@ -1284,32 +1284,32 @@ Update a Contest
 
 ### Parameters
 
-| Name                                         | Type                      | Description |
-| -------------------------------------------- | ------------------------- | ----------- |
-| `contest_alias`                              | `string`                  |             |
-| `finish_time`                                | `int`                     |             |
-| `submissions_gap`                            | `int`                     |             |
-| `window_length`                              | `int`                     |             |
-| `admission_mode`                             | `null\|string`            |             |
-| `alias`                                      | `null\|string`            |             |
-| `contest_for_teams`                          | `bool\|null`              |             |
-| `default_show_all_contestants_in_scoreboard` | `bool\|null`              |             |
-| `description`                                | `null\|string`            |             |
-| `feedback`                                   | `mixed`                   |             |
-| `languages`                                  | `mixed`                   |             |
-| `needs_basic_information`                    | `bool\|null`              |             |
-| `partial_score`                              | `bool\|null`              |             |
-| `penalty`                                    | `int\|null`               |             |
-| `penalty_calc_policy`                        | `mixed`                   |             |
-| `penalty_type`                               | `mixed`                   |             |
-| `points_decay_factor`                        | `float\|null`             |             |
-| `problems`                                   | `null\|string`            |             |
-| `requests_user_information`                  | `mixed`                   |             |
-| `scoreboard`                                 | `float\|null`             |             |
-| `show_scoreboard_after`                      | `bool\|null`              |             |
-| `start_time`                                 | `OmegaUp\Timestamp\|null` |             |
-| `teams_group_alias`                          | `null\|string`            |             |
-| `title`                                      | `null\|string`            |             |
+| Name                                         | Type                                 | Description |
+| -------------------------------------------- | ------------------------------------ | ----------- |
+| `contest_alias`                              | `string`                             |             |
+| `finish_time`                                | `int`                                |             |
+| `submissions_gap`                            | `int`                                |             |
+| `window_length`                              | `int`                                |             |
+| `admission_mode`                             | `null\|string`                       |             |
+| `alias`                                      | `null\|string`                       |             |
+| `contest_for_teams`                          | `bool\|null`                         |             |
+| `default_show_all_contestants_in_scoreboard` | `bool\|null`                         |             |
+| `description`                                | `null\|string`                       |             |
+| `feedback`                                   | `mixed`                              |             |
+| `languages`                                  | `mixed`                              |             |
+| `needs_basic_information`                    | `bool\|null`                         |             |
+| `partial_score`                              | `bool\|null`                         |             |
+| `penalty`                                    | `int\|null`                          |             |
+| `penalty_calc_policy`                        | `mixed`                              |             |
+| `penalty_type`                               | `mixed`                              |             |
+| `points_decay_factor`                        | `float\|null`                        |             |
+| `problems`                                   | `null\|string`                       |             |
+| `requests_user_information`                  | `'no'\|'optional'\|'required'\|null` |             |
+| `scoreboard`                                 | `float\|null`                        |             |
+| `show_scoreboard_after`                      | `bool\|null`                         |             |
+| `start_time`                                 | `OmegaUp\Timestamp\|null`            |             |
+| `teams_group_alias`                          | `null\|string`                       |             |
+| `title`                                      | `null\|string`                       |             |
 
 ### Returns
 

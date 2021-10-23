@@ -104,6 +104,7 @@ describe('Details.vue', () => {
               has_runs: false,
               max_points: 0,
               problemset_id: 0,
+              problemCount: 0,
             },
           ],
           clarifications: [],

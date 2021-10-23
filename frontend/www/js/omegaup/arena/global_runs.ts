@@ -23,7 +23,7 @@ OmegaUp.on('ready', async () => {
     ({ runDetails } = await getProblemAndRunDetails({
       location: window.location.hash,
     }));
-  } catch (e) {
+  } catch (e: any) {
     ui.apiError(e);
   }
   new Vue({

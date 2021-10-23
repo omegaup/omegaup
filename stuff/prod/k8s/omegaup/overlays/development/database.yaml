@@ -84,7 +84,7 @@ spec:
     spec:
       containers:
       - name: db-migrate
-        image: omegaup/frontend-dev-sidecar:latest
+        image: omegaup/frontend-sidecar:latest
         imagePullPolicy: IfNotPresent
         command: [
           'bash',
