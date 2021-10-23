@@ -19,7 +19,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(rank, index) in ranking" :key="`user_${index}`">
+          <tr v-for="(rank, index) in ranking" :key="rank.username">
             <td class="position">{{ index + 1 }}</td>
             <td class="legend"></td>
             <td class="user">

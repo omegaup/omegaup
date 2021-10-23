@@ -4,6 +4,7 @@ import group_ScoreboardDetails from './ScoreboardDetails.vue';
 
 describe('ScoreboardDetails.vue', () => {
   it('Should handle group scoreboard details view with two contests', () => {
+    const now = Date.now();
     const ranking: types.ScoreboardRanking[] = [
       {
         contests: {
@@ -26,7 +27,7 @@ describe('ScoreboardDetails.vue', () => {
     ];
     const scoreboard: types.ScoreboardDetails = {
       alias: 'scoreboard',
-      create_time: Date.now(),
+      create_time: now,
       description: 'Some description',
       group_id: 1,
       group_scoreboard_id: 1,
@@ -39,10 +40,10 @@ describe('ScoreboardDetails.vue', () => {
       contest_id: 1,
       description: 'Contest 1',
       feedback: 'none',
-      finish_time: new Date(Date.now()),
+      finish_time: new Date(now),
       languages:
         'c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,kp,kj,cat,hs,lua',
-      last_updated: Date.now(),
+      last_updated: now,
       only_ac: false,
       partial_score: true,
       penalty: '0',
@@ -53,7 +54,7 @@ describe('ScoreboardDetails.vue', () => {
       rerun_id: 0,
       scoreboard: 100,
       show_scoreboard_after: true,
-      start_time: new Date(Date.now()),
+      start_time: new Date(now),
       submissions_gap: 60,
       title: 'Contest 1',
       urgent: false,
