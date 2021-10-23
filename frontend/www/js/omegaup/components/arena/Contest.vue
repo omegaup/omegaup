@@ -2,7 +2,6 @@
   <omegaup-arena
     :active-tab="activeTab"
     :title="ui.contestTitle(contest)"
-    :is-admin="contestAdmin"
     :clarifications="currentClarifications"
     :should-show-runs="contestAdmin"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
