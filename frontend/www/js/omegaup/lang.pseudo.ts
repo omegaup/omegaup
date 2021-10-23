@@ -700,7 +700,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleSchoolOfTheMonth: "(Sch0015 0f 7h3 M0n7h)",
   omegaupTitleSchoolProfile: "(Sch001 Pr0fi13)",
   omegaupTitleSchoolsRank: "(Sch001 ranking)",
-  omegaupTitleScoreboardmerge: "(Sc0r3b0ardm3rg3)",
+  omegaupTitleScoreboardmerge: "(Sc0r3b0ard m3rg3)",
   omegaupTitleStudentsProgress: "(S7ud3n75' pr0gr355)",
   omegaupTitleSupportDashboard: "(Supp0r7 da5hb0ard)",
   omegaupTitleTeamsGroupEdit: "(Edi7 73am5 gr0up)",
