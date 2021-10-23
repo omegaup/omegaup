@@ -37,5 +37,5 @@ jobs:
         run: |
           curl --request POST \
             --url https://api.github.com/repos/${{ github.repository }}/merges \
-            --header "Authorization: Bearer ${{ secrets.RELEASE_TOKEN }}" \
+            --header "Authorization: Bearer ${{ secrets.OMEGAUPBOT_RELEASE_TOKEN }}" \
             --data "{\"base\":\"release\",\"head\":\"main\",\"commit_message\":\"Merge branch 'main' of github.com:omegaup/omegaup into release\"}"

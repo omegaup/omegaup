@@ -656,7 +656,23 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         $offset = ($page - 1) * $rowsPerPage;
 
-        // Gets all the students in a course
+        // Gets the total count of students in the course.
+        $sqlCount = '
+            SELECT
+                COUNT(*)
+            FROM
+                Groups_Identities AS gi
+            INNER JOIN
+                Identities i ON i.identity_id = gi.identity_id
+            WHERE
+                gi.group_id = ?';
+        /** @var int */
+        $totalStudents = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlCount,
+            [ $groupId, ]
+        ) ?? 0;
+
+        // Gets the students in a course between a certain range
         $sqlUsers = '
             SELECT
                 i.username,
@@ -687,12 +703,17 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             INNER JOIN
                 Identities i ON i.identity_id = gi.identity_id
             WHERE
-                gi.group_id = ?';
+                gi.group_id = ?
+            LIMIT ?, ?';
 
         /** @var list<array{classname: string, country_id: null|string, name: null|string, username: string}> */
         $courseUsers = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sqlUsers,
-            [ $groupId ]
+            [
+                $groupId,
+                $offset,
+                $rowsPerPage,
+            ]
         );
 
         // Gets on each row:
@@ -889,7 +910,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return [
             'assignmentsProblems' => $assignmentsProblems,
             'studentsProgress' => $studentsProgress,
-            'totalRows' => count($courseUsers),
+            'totalRows' => $totalStudents,
         ];
     }
 
