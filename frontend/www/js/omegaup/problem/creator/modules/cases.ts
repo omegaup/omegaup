@@ -64,7 +64,7 @@ export const casesStore: Module<CasesState, RootState> = {
         const groupID = uuid();
         const newGroup = generateGroup({
           name: caseRequest.name,
-          groupID: groupID,
+          groupID,
           points: caseRequest.points,
           pointsDefined: caseRequest.pointsDefined,
           ungroupedCase: true,
@@ -75,15 +75,17 @@ export const casesStore: Module<CasesState, RootState> = {
         const group = state.groups.find(
           (group) => group.groupID === caseRequest.groupID,
         );
-        if (group) {
-          group.cases.push(
-            generateCase({
-              name: caseRequest.name,
-              groupID: caseRequest.groupID,
-              caseID: caseRequest.caseID,
-            }),
-          );
+        if (!group) {
+          return;
         }
+
+        group.cases.push(
+          generateCase({
+            name: caseRequest.name,
+            groupID: caseRequest.groupID,
+            caseID: caseRequest.caseID,
+          }),
+        );
       }
       state = assignMissingPoints(state);
     },
@@ -239,7 +241,8 @@ export function assignMissingPoints(state: CasesState): CasesState {
     }
   }
 
-  const individualPoints = Math.max(maxPoints / notDefinedCount ?? 0, 0);
+  const individualPoints =
+    notDefinedCount && Math.max(maxPoints, 0) / notDefinedCount;
 
   state.groups = state.groups.map((element) => {
     if (!element.pointsDefined) {
