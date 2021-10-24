@@ -292,6 +292,7 @@ const translations: { [key: string]: string; } = {
   contestScoreboardAdminLink: "Admin scoreboard link",
   contestScoreboardDownloadCsvFile: "Download scoreboard (.csv)",
   contestScoreboardLink: "Scoreboard link",
+  contestScoreboardMergeChoseContests: "Choose the contests",
   contestUpdateAlreadyHasRuns: "Length of a contest can't be changed once a solution has been judged.",
   contestWillBeginIn: "This contest will begin in ",
   contestsCreateNew: "Create a new contest",
