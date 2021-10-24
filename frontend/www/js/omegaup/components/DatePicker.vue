@@ -3,7 +3,7 @@
     v-model="stringValue"
     class="form-control"
     :class="{ 'is-invalid': isInvalid }"
-    required="required"
+    :required="required"
     size="16"
     type="date"
     :disabled="!enabled"
@@ -25,9 +25,11 @@ export default class DatePicker extends Vue {
   @Prop({ default: true }) enabled!: boolean;
   @Prop({ default: T.datePickerFormat }) format!: string;
   @Prop({ default: false }) isInvalid!: boolean;
+  @Prop({ default: true }) isRequired!: boolean;
 
   private usedFallback: boolean = false;
   private stringValue: string = time.formatDateLocal(this.value);
+  private required: string | null = this.isRequired ? 'required' : null;
 
   mounted() {
     if ((this.$el as HTMLInputElement).type === 'text') {
