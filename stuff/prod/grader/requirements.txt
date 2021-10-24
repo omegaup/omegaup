@@ -1,3 +1,0 @@
-requests>=2.25
-prometheus-client>=0.10
-opencensus-ext-azure>=1.0
