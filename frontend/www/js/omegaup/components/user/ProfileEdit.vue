@@ -16,7 +16,7 @@
         <label>{{ T.userEditBirthDate }}</label>
         <omegaup-datepicker
           v-model="selectedProfileInfo.birth_date"
-          :isRequired="false"
+          :is-required="false"
         ></omegaup-datepicker>
       </div>
       <div class="form-group">
@@ -30,7 +30,11 @@
       </div>
       <div class="form-group">
         <label>{{ T.wordsCountry }}</label>
-        <select v-model="selectedProfileInfo.country_id" data-countries class="form-control">
+        <select
+          v-model="selectedProfileInfo.country_id"
+          data-countries
+          class="form-control"
+        >
           <option value=""></option>
           <option
             v-for="country in countries"
@@ -44,8 +48,8 @@
       <div class="form-group">
         <label>{{ T.profileState }}</label>
         <select
-          data-states
           v-model="selectedProfileInfo.state_id"
+          data-states
           :disabled="!isCountrySelected"
           class="form-control"
         >
@@ -77,7 +81,7 @@
         <label>{{ T.userEditGraduationDate }}</label>
         <omegaup-datepicker
           v-model="selectedProfileInfo.graduation_date"
-          :isRequired="false"
+          :is-required="false"
           :enabled="isSchoolSet"
         ></omegaup-datepicker>
       </div>
@@ -169,7 +173,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
@@ -213,7 +217,7 @@ export default class UserProfileEdit extends Vue {
         (r, [code, name]: any) => ({ ...r, [code]: name }),
         {},
       ) as iso3166.Subdivisions;
-    
+
     this.selectedProfileInfo.state_id = Object.keys(subdivisions)[0].split(
       '-',
     )[1];
@@ -228,15 +232,11 @@ export default class UserProfileEdit extends Vue {
     const birthDate = this.selectedProfileInfo.birth_date;
     birthDate.setHours(23);
     const graduationDate = this.selectedProfileInfo.graduation_date;
-    graduationDate.setHours(23);  
+    graduationDate.setHours(23);
     const user = {
       ...this.selectedProfileInfo,
-      birth_date: isNaN(birthDate.getTime())
-        ? null
-        : birthDate,
-      graduation_date: isNaN(graduationDate.getTime())
-        ? null
-        : graduationDate,
+      birth_date: isNaN(birthDate.getTime()) ? null : birthDate,
+      graduation_date: isNaN(graduationDate.getTime()) ? null : graduationDate,
       school_id:
         this.selectedProfileInfo.school_id === this.profile.school_id &&
         this.selectedProfileInfo.school !== this.profile.school

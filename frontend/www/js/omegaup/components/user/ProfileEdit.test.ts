@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import user_Profile_Edit from './ProfileEdit.vue';
-import date_Picker from '../DatePicker.vue'
+import date_Picker from '../DatePicker.vue';
 
 const profile = {
   name: 'omegaUp admin',
@@ -31,11 +31,11 @@ const profileEditProps = {
     countries: [
       {
         country_id: 'MX',
-        name: 'México'
+        name: 'México',
       },
       {
         country_id: 'CA',
-        name: 'Canada'
+        name: 'Canada',
       },
     ],
     programmingLanguages: { py2: 'Python 2', py3: 'Python 3' },
@@ -55,7 +55,11 @@ describe('ProfileEdit.vue', () => {
     const wrapper = mount(user_Profile_Edit, {
       propsData: profileEditProps,
     });
-    wrapper.find('select[data-countries]').findAll('option').at(1).setSelected();
+    wrapper
+      .find('select[data-countries]')
+      .findAll('option')
+      .at(1)
+      .setSelected();
     expect(wrapper.find('select[data-countries]').element).toBeEnabled();
   });
 
@@ -80,7 +84,7 @@ describe('ProfileEdit.vue', () => {
     });
     wrapper.find('button[type="submit"]').trigger('submit');
     expect(wrapper.emitted('update-user')).toBeDefined();
-    
+
     //argument 'locale_changed' should be false
     expect(wrapper.emitted('update-user')[0][1]).toEqual(false);
   });
