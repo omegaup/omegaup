@@ -653,6 +653,14 @@ export namespace types {
       );
     }
 
+    export function ContestReportDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestReportDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function ContestScoreboardPayload(
       elementId: string = 'payload',
     ): types.ContestScoreboardPayload {
@@ -2487,6 +2495,32 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ContestReport {
+    country?: string;
+    is_invited: boolean;
+    name?: string;
+    place?: number;
+    problems: {
+      alias: string;
+      penalty: number;
+      percent: number;
+      place?: number;
+      points: number;
+      run_details?: {
+        cases?: types.CaseResult[];
+        details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
+      };
+      runs: number;
+    }[];
+    total: { penalty: number; points: number };
+    username: string;
+  }
+
+  export interface ContestReportDetailsPayload {
+    contestAlias: string;
+    contestReport: types.ContestReport[];
+  }
+
   export interface ContestRequest {
     accepted?: boolean;
     admin?: { username?: string };
@@ -4181,26 +4215,7 @@ export namespace messages {
   export type ContestReportResponse = {
     finish_time?: Date;
     problems: { alias: string; order: number }[];
-    ranking: {
-      country?: string;
-      is_invited: boolean;
-      name?: string;
-      place?: number;
-      problems: {
-        alias: string;
-        penalty: number;
-        percent: number;
-        place?: number;
-        points: number;
-        run_details?: {
-          cases?: types.CaseResult[];
-          details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
-        };
-        runs: number;
-      }[];
-      total: { penalty: number; points: number };
-      username: string;
-    }[];
+    ranking: types.ContestReport[];
     start_time: Date;
     time: Date;
     title: string;

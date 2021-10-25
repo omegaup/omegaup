@@ -1068,14 +1068,14 @@ Returns a detailed report of the contest
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                          |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `finish_time` | `Date`                                                                                                                                                                                                                                                                                                                                                                        |
-| `problems`    | `{ alias: string; order: number; }[]`                                                                                                                                                                                                                                                                                                                                         |
-| `ranking`     | `{ country: string; is_invited: boolean; name: string; place?: number; problems: { alias: string; penalty: number; percent: number; place?: number; points: number; run_details?: { cases?: types.CaseResult[]; details: { groups: { cases: { meta: types.RunMetadata; }[]; }[]; }; }; runs: number; }[]; total: { penalty: number; points: number; }; username: string; }[]` |
-| `start_time`  | `Date`                                                                                                                                                                                                                                                                                                                                                                        |
-| `time`        | `Date`                                                                                                                                                                                                                                                                                                                                                                        |
-| `title`       | `string`                                                                                                                                                                                                                                                                                                                                                                      |
+| Name          | Type                                  |
+| ------------- | ------------------------------------- |
+| `finish_time` | `Date`                                |
+| `problems`    | `{ alias: string; order: number; }[]` |
+| `ranking`     | `types.ContestReport[]`               |
+| `start_time`  | `Date`                                |
+| `time`        | `Date`                                |
+| `title`       | `string`                              |
 
 ## `/api/contest/requests/`
 

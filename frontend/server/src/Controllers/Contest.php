@@ -53,6 +53,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type ScoreboardMergePayload=array{contests: list<ContestListItem>}
  * @psalm-type MergedScoreboardEntry=array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}, place?: int}
+ * @psalm-type ContestReport=array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}
+ * @psalm-type ContestReportDetailsPayload=array{contestAlias: string, contestReport: list<ContestReport>}
  */
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
@@ -5148,67 +5150,92 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a detailed report of the contest
      *
-     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
+     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ContestReport>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
      *
      * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param null|string $filterBy
      */
     public static function apiReport(\OmegaUp\Request $r): array {
-        return self::getContestReportDetails($r);
-    }
-
-    /**
-     * Returns a detailed report of the contest. Only Admins can get the report
-     *
-     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
-     *
-     * @omegaup-request-param null|string $auth_token
-     * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param null|string $filterBy
-     */
-    private static function getContestReportDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
         $contestAlias = $r->ensureString(
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['auth_token'],
-            'auth_token'
-        );
 
-        $contest = self::validateContestAdmin($contestAlias, $r->identity);
+        $authToken = $r->ensureOptionalString('auth_token');
+
+        // Check the filter if we have one
+        $filterBy = $r->ensureOptionalString('filterBy');
+
+        return self::getContestReportDetails(
+            $r->identity,
+            $contestAlias,
+            $authToken,
+            $filterBy
+        )['scoreboard'];
+    }
+
+    /**
+     * Returns a detailed report of the contest. Only Admins can get the report
+     *
+     * @return array{contest: \OmegaUp\DAO\VO\Contests,scoreboard: array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}}
+     */
+    private static function getContestReportDetails(
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $contestAlias,
+        ?string $authToken,
+        ?string $filterBy
+    ): array {
+        $contest = self::validateContestAdmin($contestAlias, $identity);
 
         $params = \OmegaUp\ScoreboardParams::fromContest($contest);
         $params->admin = true;
-        $params->auth_token = $r['auth_token'];
+        $params->auth_token = $authToken;
         $scoreboard = new \OmegaUp\Scoreboard($params);
 
-        // Check the filter if we have one
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['filterBy'],
-            'filterBy'
-        );
-
-        return $scoreboard->generate(
-            true, // with run details for reporting
-            true, // sort contestants by name,
-            $r['filterBy']
-        );
+        return [
+            'scoreboard' => $scoreboard->generate(
+                /*$withRunDetails=*/                true,
+                /*$sortByName=*/ true,
+                $filterBy
+            ),
+            'contest' => $contest,
+        ];
     }
 
     /**
      * Gets all details to show the report
      *
-     * @return array{contestReport: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>}
+     * @return array{entrypoint: string, smartyProperties: array{payload: ContestReportDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param null|string $filterBy
      */
-    public static function getContestReportDetailsForTypeScript(\OmegaUp\Request $r) {
-        $contestReport = self::getContestReportDetails($r)['ranking'];
+    public static function getContestReportDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ) {
+        $r->ensureIdentity();
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $authToken = $r->ensureOptionalString('auth_token');
+
+        // Check the filter if we have one
+        $filterBy = $r->ensureOptionalString('filterBy');
+
+        $response = self::getContestReportDetails(
+            $r->identity,
+            $contestAlias,
+            $authToken,
+            $filterBy
+        );
+        $contest = $response['contest'];
+        $contestReport = $response['scoreboard']['ranking'];
+
         foreach ($contestReport as &$user) {
             if (!isset($user['problems'])) {
                 continue;
@@ -5231,7 +5258,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'contestReport' => $contestReport,
+            'smartyProperties' => [
+                'payload' => [
+                    'contestReport' => $contestReport,
+                    'contestAlias' => $contest->alias,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleContestReport',
+                    [
+                        'contestName' => $contest->title,
+                    ],
+                ),
+            ],
+            'entrypoint' => 'contest_report',
         ];
     }
 
@@ -5273,24 +5312,31 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Generates a CSV for contest report
      *
-     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $contest_alias
      * @omegaup-request-param null|string $filterBy
      */
     public static function apiCsvReport(\OmegaUp\Request $r): void {
         $r->ensureIdentity();
-
         $contestAlias = $r->ensureString(
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $contest = self::validateContestAdmin($contestAlias, $r->identity);
+
+        $authToken = $r->ensureOptionalString('auth_token');
+
+        // Check the filter if we have one
+        $filterBy = $r->ensureOptionalString('filterBy');
 
         // Get full Report API of the contest
-        $contestReport = self::getContestReportDetails(new \OmegaUp\Request([
-            'contest_alias' => $contestAlias,
-            'auth_token' => $r['auth_token'],
-        ]));
+        $response = self::getContestReportDetails(
+            $r->identity,
+            $contestAlias,
+            $authToken,
+            $filterBy
+        );
+        $contestReport = $response['scoreboard'];
+        $contest = $response['contest'];
 
         // Get problem stats for each contest problem so we can
         // have the full list of cases
