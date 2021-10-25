@@ -72,7 +72,6 @@ jobs:
              omegaup/nginx:${TAG} \
              omegaup/frontend:${TAG} \
              omegaup/frontend-sidecar:${TAG} &&
-           sed -i "s/db-migrate-.*/db-migrate-${TAG}/" db-migrate-name.yaml &&
            git commit -am "omegaUp sandbox release ${TAG}" &&
            git push)
           rm -rf /tmp/prod
