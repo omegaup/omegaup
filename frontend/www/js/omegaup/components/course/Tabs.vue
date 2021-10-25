@@ -24,7 +24,16 @@
       </li>
     </ul>
     <div class="tab-content">
-      <!-- TODO: Add search input. -->
+      <div class="row m-0 mt-4">
+        <div class="col-md-6 col-lg-3 p-0">
+          <input
+            v-model="searchText"
+            class="form-control"
+            type="text"
+            :placeholder="T.courseCardsListSearch"
+          />
+        </div>
+      </div>
       <div
         v-for="(tabName, tabKey) in tabNames"
         :key="tabKey"
@@ -38,21 +47,21 @@
         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3">
           <template v-if="tabKey === Tab.Public">
             <omegaup-course-card-public
-              v-for="course in courses[tabKey]"
+              v-for="course in filteredCards"
               :key="course.alias"
               :course="course"
             ></omegaup-course-card-public>
           </template>
           <template v-if="tabKey === Tab.Enrolled">
             <omegaup-course-card-enrolled
-              v-for="course in courses[tabKey]"
+              v-for="course in filteredCards"
               :key="course.alias"
               :course="course"
             ></omegaup-course-card-enrolled>
           </template>
           <template v-if="tabKey === Tab.Finished">
             <omegaup-course-card-finished
-              v-for="course in courses[tabKey]"
+              v-for="course in filteredCards"
               :key="course.alias"
               :course="course"
             ></omegaup-course-card-finished>
@@ -102,6 +111,30 @@ export default class CourseTabs extends Vue {
     [Tab.Finished]: T.courseTabFinished,
   };
   selectedTab = Tab.Public;
+  searchText = '';
+
+  get filteredCards():
+    | types.CourseCardEnrolled[]
+    | types.CourseCardPublic[]
+    | types.CourseCardFinished[] {
+    switch (this.selectedTab) {
+      case Tab.Enrolled:
+        return this.courses.enrolled.filter(
+          (course) =>
+            this.searchText === '' || course.name.includes(this.searchText),
+        );
+      case Tab.Finished:
+        return this.courses.finished.filter(
+          (course) =>
+            this.searchText === '' || course.name.includes(this.searchText),
+        );
+      default:
+        return this.courses.public.filter(
+          (course) =>
+            this.searchText === '' || course.name.includes(this.searchText),
+        );
+    }
+  }
 }
 </script>
 
