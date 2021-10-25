@@ -91,17 +91,16 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.error);
           },
-          update: (student: types.StudentProgress, assignmentAlias: string) => {
-            viewStudent.refreshStudentProgress(
-              student.username,
-              assignmentAlias,
-            );
+          update: ({
+            student,
+            assignmentAlias,
+          }: {
+            student: string;
+            assignmentAlias: string;
+          }) => {
+            viewStudent.refreshStudentProgress(student, assignmentAlias);
           },
-          'push-state': (
-            student: types.StudentProgress,
-            title: string,
-            url: string,
-          ) => {
+          'push-state': (student: string, title: string, url: string) => {
             window.history.pushState(student, title, url);
           },
         },

@@ -23,14 +23,14 @@ describe('ViewStudent.vue', () => {
     expect(wrapper.text()).toContain(T.courseStudentSelectAssignment);
   });
 
-  const submissionFeedback = {
+  const submissionFeedback: types.SubmissionFeedback = {
     author: 'omegaUp',
     author_classname: 'user-rank-unranked',
     date: new Date(),
     feedback: 'Test feedback',
-  } as types.SubmissionFeedback;
+  };
 
-  const assignment_a = {
+  const assignment_a: omegaup.Assignment = {
     alias: 'assignment_a',
     assignment_type: 'homework',
     description: 'Assignment description A',
@@ -40,9 +40,9 @@ describe('ViewStudent.vue', () => {
     order: 1,
     scoreboard_url: '',
     scoreboard_url_admin: '',
-  } as omegaup.Assignment;
+  };
 
-  const assignment_b = {
+  const assignment_b: omegaup.Assignment = {
     alias: 'assignment_b',
     assignment_type: 'homework',
     description: 'Assignment description B',
@@ -52,26 +52,55 @@ describe('ViewStudent.vue', () => {
     order: 1,
     scoreboard_url: '',
     scoreboard_url_admin: '',
-  } as omegaup.Assignment;
+  };
 
-  const student_a = {
+  const student_a: types.CourseStudent = {
     name: 'student_a',
     username: 'student_a',
-    progress: {
-      problem: 1,
-    },
-  } as types.CourseStudent;
+  };
 
-  const student_b = {
+  const student_b: types.CourseStudent = {
     name: 'student_b',
     username: 'student_b',
-    progress: {
-      problem: 1,
-    },
-  } as types.CourseStudent;
+  };
+
+  const expectedDate = new Date('1/1/2020, 12:00:00 AM');
+
+  const run: types.CourseRun = {
+    guid: 'guid-1',
+    language: 'cpp',
+    memory: 200,
+    penalty: 0,
+    score: 1,
+    status: 'ready',
+    runtime: 1,
+    submit_delay: 1,
+    source: 'print(3)',
+    time: expectedDate,
+    verdict: 'AC',
+  };
+
+  const problem: types.CourseProblem = {
+    accepted: 1,
+    alias: 'problem_a',
+    commit: '',
+    letter: 'A',
+    order: 1,
+    points: 1,
+    runs: [
+      run,
+      { ...run, ...{ guid: 'guid-2', feedback: submissionFeedback } },
+    ],
+    submissions: 1,
+    title: 'problem_1',
+    visits: 1,
+    difficulty: 1,
+    languages: 'cpp',
+    visibility: 1,
+    version: 'abcdef',
+  };
 
   it('Should handle runs', async () => {
-    const expectedDate = new Date('1/1/2020, 12:00:00 AM');
     const wrapper = mount(course_ViewStudent, {
       propsData: {
         course: {
@@ -79,86 +108,8 @@ describe('ViewStudent.vue', () => {
         },
         assignments: [assignment_a, assignment_b],
         problems: [
-          {
-            accepted: 1,
-            alias: 'problem_a',
-            commit: '',
-            letter: 'A',
-            order: 1,
-            points: 1,
-            runs: [
-              {
-                guid: 'guid-1',
-                language: 'cpp',
-                memory: 200,
-                penalty: 0,
-                score: 1,
-                status: 'ready',
-                runtime: 1,
-                submit_delay: 1,
-                source: 'print(3)',
-                time: expectedDate,
-                verdict: 'AC',
-              } as types.CourseRun,
-              {
-                guid: 'guid-2',
-                language: 'cpp',
-                memory: 200,
-                penalty: 0,
-                score: 1,
-                status: 'ready',
-                runtime: 1,
-                submit_delay: 1,
-                source: 'print(3)',
-                time: expectedDate,
-                verdict: 'AC',
-                feedback: submissionFeedback,
-              } as types.CourseRun,
-            ],
-            submissions: 1,
-            title: 'problem_1',
-            visits: 1,
-          } as types.CourseProblem,
-          {
-            accepted: 1,
-            alias: 'problem_b',
-            commit: '',
-            letter: 'A',
-            order: 1,
-            points: 1,
-            runs: [
-              {
-                guid: 'guid-1',
-                language: 'cpp',
-                memory: 200,
-                penalty: 0,
-                score: 1,
-                status: 'ready',
-                runtime: 1,
-                submit_delay: 1,
-                source: 'print(3)',
-                time: expectedDate,
-                verdict: 'AC',
-              } as types.CourseRun,
-              {
-                guid: 'guid-2',
-                language: 'cpp',
-                memory: 200,
-                penalty: 0,
-                score: 1,
-                status: 'ready',
-                runtime: 1,
-                submit_delay: 1,
-                source: 'print(3)',
-                time: expectedDate,
-                verdict: 'AC',
-                feedback: submissionFeedback,
-              } as types.CourseRun,
-            ],
-            submissions: 1,
-            title: 'problem_2',
-            visits: 1,
-          } as types.CourseProblem,
+          problem,
+          { ...problem, ...{ alias: 'problem_b', title: 'problem_2' } },
         ],
         students: [student_a, student_b],
         student: student_a,
@@ -170,8 +121,11 @@ describe('ViewStudent.vue', () => {
     students.value = 'student_b';
     await students.dispatchEvent(new Event('change'));
     expect(wrapper.emitted('update')).toEqual([
-      { student: student_b, assignmentAlias: null },
+      [{ student: student_b.username, assignmentAlias: null }],
     ]);
+    expect(
+      (wrapper.find('select[data-student]').element as HTMLInputElement).value,
+    ).toBe('student_b');
 
     const assignments = wrapper.find('select[data-assignment]')
       .element as HTMLInputElement;
@@ -216,7 +170,7 @@ describe('ViewStudent.vue', () => {
           feedback: submissionFeedback.feedback,
           isUpdate: false,
           assignmentAlias: assignment_a.alias,
-          studentUsername: student_a.username,
+          studentUsername: student_b.username,
         },
       ],
     ]);
