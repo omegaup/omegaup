@@ -5261,7 +5261,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => [
                     'contestReport' => $contestReport,
-                    'contestAlias' => $contest->alias,
+                    'contestAlias' => $contestAlias,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleContestReport',
