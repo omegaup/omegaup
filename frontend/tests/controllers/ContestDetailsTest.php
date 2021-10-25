@@ -558,20 +558,14 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
         ]);
 
-        // Call api. This should fail.
-        try {
-            \OmegaUp\Controllers\Contest::apiDetails($r);
-            $this->assertTrue(
-                false,
-                'User that has not opened contest was able to see its details'
-            );
-        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            // Pass
-        }
-
-        // Call admin api. This should succeed.
-        $detailsResponse = \OmegaUp\Controllers\Contest::apiAdminDetails($r);
+        // Call apiDetails and apiAdminDetails. Now both calls should succeed.
+        $detailsResponse = \OmegaUp\Controllers\Contest::apiDetails($r);
         $this->assertContestDetails($contestData, [], $detailsResponse);
+
+        $adminDetailsResponse = \OmegaUp\Controllers\Contest::apiAdminDetails(
+            $r
+        );
+        $this->assertContestDetails($contestData, [], $adminDetailsResponse);
     }
 
     /**

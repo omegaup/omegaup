@@ -504,6 +504,7 @@ export default class NewForm extends Vue {
       penalty: this.penalty,
       scoreboard: this.scoreboard,
       penalty_type: this.penaltyType,
+      default_show_all_contestants_in_scoreboard: false,
       show_scoreboard_after: this.showScoreboardAfter,
       partial_score: this.partialScore,
       needs_basic_information: this.needsBasicInformation,

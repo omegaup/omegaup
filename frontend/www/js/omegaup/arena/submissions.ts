@@ -26,7 +26,6 @@ export interface SubmissionRequest {
   guid: string;
   hash: string;
   isAdmin: boolean;
-  problemAlias: string;
 }
 
 export function submitRun({

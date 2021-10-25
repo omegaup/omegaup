@@ -1,7 +1,7 @@
 <template>
   <omegaup-arena
     :active-tab="activeTab"
-    :contest-title="currentAssignment.name"
+    :title="currentAssignment.name"
     :should-show-runs="isAdmin"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
@@ -19,7 +19,7 @@
       ></omegaup-countdown>
     </template>
     <template #arena-problems>
-      <div data-contest-practice>
+      <div data-course>
         <div class="tab navleft">
           <div class="navbar">
             <omegaup-arena-navbar-problems
@@ -118,7 +118,9 @@
         :problems="scoreboard.problems"
         :ranking="scoreboard.ranking"
         :last-updated="scoreboard.time"
-      ></omegaup-arena-scoreboard>
+      >
+        <template #scoreboard-header><div></div></template>
+      </omegaup-arena-scoreboard>
     </template>
     <template #arena-runs>
       <omegaup-arena-runs
@@ -133,11 +135,13 @@
         :show-rejudge="true"
         :show-user="true"
         :problemset-problems="Object.values(problems)"
-        :global-runs="false"
-        @details="(run) => onRunAdminDetails(run.guid)"
+        @details="onRunAdminDetails"
         @rejudge="(run) => $emit('rejudge', run)"
         @disqualify="(run) => $emit('disqualify', run)"
-      ></omegaup-arena-runs>
+      >
+        <template #title><div></div></template>
+        <template #runs><div></div></template>
+      </omegaup-arena-runs>
       <omegaup-overlay
         v-if="isAdmin"
         :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
@@ -336,11 +340,11 @@ export default class ArenaCourse extends Vue {
     this.$emit('submit-run', { ...run, problem: this.activeProblem });
   }
 
-  onRunAdminDetails(guid: string): void {
+  onRunAdminDetails(request: SubmissionRequest): void {
     this.$emit('show-run', {
-      guid,
+      ...request,
       isAdmin: this.isAdmin,
-      hash: `#runs/all/show-run:${guid}`,
+      hash: `#runs/all/show-run:${request.guid}`,
     });
     this.currentPopupDisplayed = PopupDisplayed.RunDetails;
   }
@@ -348,9 +352,7 @@ export default class ArenaCourse extends Vue {
   onRunDetails(request: SubmissionRequest): void {
     this.$emit('show-run', {
       ...request,
-      hash: `#problems/${
-        this.activeProblemAlias ?? request.problemAlias
-      }/show-run:${request.guid}`,
+      hash: `#problems/${this.activeProblemAlias}/show-run:${request.guid}`,
     });
   }
 

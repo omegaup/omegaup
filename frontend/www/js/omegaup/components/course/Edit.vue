@@ -296,6 +296,7 @@ import course_GenerateLinkClone from './GenerateLinkClone.vue';
 import T from '../../lang';
 import type { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
+import { AdmissionMode } from '../common/Publish.vue';
 
 const now = new Date();
 const finishTime = new Date();
@@ -324,6 +325,7 @@ const emptyAssignment: types.CourseAssignment = {
   scoreboard_url: '',
   scoreboard_url_admin: '',
   assignment_type: 'homework',
+  problemCount: 0,
 };
 
 @Component({
@@ -349,7 +351,7 @@ export default class CourseEdit extends Vue {
 
   T = T;
   showTab = this.initialTab;
-  admissionMode = omegaup.AdmissionMode;
+  admissionMode = AdmissionMode.Private;
   alreadyArchived = this.data.course.archived;
 
   assignmentProblems = this.data.assignmentProblems;
