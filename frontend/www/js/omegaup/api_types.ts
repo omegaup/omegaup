@@ -2563,6 +2563,7 @@ export namespace types {
 
   export interface CourseCardPublic {
     alias: string;
+    alreadyStarted: boolean;
     lessonCount: number;
     level?: string;
     name: string;

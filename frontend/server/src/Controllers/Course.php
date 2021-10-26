@@ -63,7 +63,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string, page: int, length: int, pagerItems: list<PageItem>}
  * @psalm-type CourseClarificationsPayload=array{page: int, length: int, pagerItems: list<PageItem>, clarifications: list<Clarification>}
- * @psalm-type CourseCardPublic=array{alias: string, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}
+ * @psalm-type CourseCardPublic=array{alias: string, alreadyStarted: bool, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}
  * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
  * @psalm-type CourseCardFinished=array{alias: string, name: string}
  * @psalm-type CourseTabsPayload=array{courses: array{enrolled: list<CourseCardEnrolled>, finished: list<CourseCardFinished>, public: list<CourseCardPublic>}}
@@ -3748,6 +3748,24 @@ class Course extends \OmegaUp\Controllers\Controller {
         ] = \OmegaUp\DAO\Courses::getEnrolledAndFinishedCoursesForTabs(
             $r->identity
         );
+        foreach ($courses['public'] as &$course) {
+            $found = false;
+            foreach ($courses['enrolled'] as $enrolledCourse) {
+                if ($enrolledCourse['alias'] === $course['alias']) {
+                    $course['alreadyStarted'] = true;
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                foreach ($courses['finished'] as $finishedCourse) {
+                    if ($finishedCourse['alias'] === $course['alias']) {
+                        $course['alreadyStarted'] = true;
+                        break;
+                    }
+                }
+            }
+        }
         return [
             'smartyProperties' => [
                 'payload' => [
