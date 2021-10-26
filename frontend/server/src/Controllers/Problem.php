@@ -46,7 +46,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CollectionDetailsByLevelPayload=array{frequentTags: list<TagWithProblemCount>, publicTags: list<TagWithProblemCount>, level: string, selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tagsList: list<string>, difficulty: string}
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
- * @psalm-type ProblemPrintDetailsPayload=array{details: ProblemDetails}
+ * @psalm-type ProblemPrintDetailsPayload=array{details: ProblemDetails, source: null|string, problemsetter: null|ProblemsetterInfo, title: string, points: float, timeLimit: float, overallWallTimeLimit: float, memoryLimit: string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -6237,7 +6237,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        /*$timeLimit = \OmegaUp\Controllers\Problem::parseDuration(
+        $timeLimit = \OmegaUp\Controllers\Problem::parseDuration(
             $details['settings']['limits']['TimeLimit']
         );
         $overallWallTimeLimit = \OmegaUp\Controllers\Problem::parseDuration(
@@ -6245,18 +6245,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         $memoryLimit = (\OmegaUp\Controllers\Problem::parseSize(
             $details['settings']['limits']['MemoryLimit']
-        ) / 1024 / 1024);*/
+        ) / 1024 / 1024);
         return [
             'smartyProperties' => [
                 'payload' => [
                     'details' => $details,
-                    /*'source' => $details['source'],
-                    'problemsetter' => $details['problemsetter'],
+                    'source' => $details['source'] ?? null,
+                    'problemsetter' => $details['problemsetter'] ?? null,
                     'title' => $details['title'],
                     'points' => $details['points'],
                     'timeLimit' => $timeLimit,
-                    'overallWalTimeLimit' => $overallWallTimeLimit,
-                    'memoryLimit' => "{$memoryLimit} MiB",*/
+                    'overallWallTimeLimit' => $overallWallTimeLimit,
+                    'memoryLimit' => "{$memoryLimit} MiB",
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblemPrint',
