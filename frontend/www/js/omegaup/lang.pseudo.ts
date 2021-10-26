@@ -692,6 +692,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleProblemCreator: "(Pr0b13m Cr3a70r)",
   omegaupTitleProblemEdit: "(Edi7 pr0b13m)",
   omegaupTitleProblemNew: "(N3w pr0b13m)",
+  omegaupTitleProblemPrint: "(Pr0b13m (Prin7 m0d3) - %(problemTitle))",
   omegaupTitleProblemStats: "(Pr0b13m 57a75)",
   omegaupTitleProblems: "(Pr0b13m5)",
   omegaupTitleProfile: "(Pr0fi13)",
