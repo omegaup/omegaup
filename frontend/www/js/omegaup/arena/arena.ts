@@ -17,16 +17,11 @@ import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue'
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
 import arena_RunSubmit from '../components/arena/RunSubmit.vue';
-import arena_Runs from '../components/arena/Runs.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import common_Navbar from '../components/common/Navbar.vue';
 import omegaup_Markdown from '../components/Markdown.vue';
 import problem_SettingsSummary from '../components/problem/SettingsSummary.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
-
-import ArenaAdmin from './admin_arena';
-
-export { ArenaAdmin };
 
 export interface ArenaOptions {
   assignmentAlias: string | null;
@@ -230,12 +225,6 @@ export class Arena {
       })
     | null = null;
 
-  myRunsList: Vue & {
-    isContestFinished: boolean;
-    isProblemsetOpened: boolean;
-    problemAlias: string;
-  };
-
   problemSettingsSummary:
     | (Vue & { problem: types.ArenaProblemDetails })
     | null = null;
@@ -293,60 +282,6 @@ export class Arena {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     this.options = options;
-
-    // All runs in this contest/problem.
-    this.myRunsList = new Vue({
-      components: { 'omegaup-arena-runs': arena_Runs },
-      data: () => ({
-        isContestFinished: false,
-        isProblemsetOpened: true,
-        problemAlias: null,
-        searchResultUsers: [] as types.ListItem[],
-      }),
-      render: function (createElement) {
-        return createElement('omegaup-arena-runs', {
-          props: {
-            contestAlias: options.contestAlias,
-            isContestFinished: this.isContestFinished,
-            isProblemsetOpened: this.isProblemsetOpened,
-            problemAlias: this.problemAlias,
-            runs: myRunsStore.state.runs,
-            showDetails: true,
-            showPoints: true,
-            searchResultUsers: this.searchResultUsers,
-          },
-          on: {
-            details: (run: types.Run) => {
-              window.location.hash += `/show-run:${run.guid}`;
-            },
-            'update-search-result-users-contest': ({
-              query,
-              contestAlias,
-            }: {
-              query: string;
-              contestAlias: string;
-            }) => {
-              api.Contest.searchUsers({ query, contest_alias: contestAlias })
-                .then(({ results }) => {
-                  this.searchResultUsers = results.map(
-                    ({ key, value }: types.ListItem) => ({
-                      key,
-                      value: `${ui.escape(key)} (<strong>${ui.escape(
-                        value,
-                      )}</strong>)`,
-                    }),
-                  );
-                })
-                .catch(ui.apiError);
-            },
-          },
-        });
-      },
-    });
-    const myRunsListElement = document.querySelector('#problem table.runs');
-    if (myRunsListElement) {
-      this.myRunsList.$mount(myRunsListElement);
-    }
 
     // Currently opened clarification notifications.
     if (document.getElementById('common-navbar')) {
@@ -848,9 +783,6 @@ export class Arena {
   initProblems(problemset: types.ArenaProblemset): void {
     this.currentProblemset = problemset;
     this.problemsetAdmin = problemset.admin ?? false;
-    this.myRunsList.isProblemsetOpened =
-      !Object.prototype.hasOwnProperty.call(problemset, 'opened') ||
-      (problemset.opened ?? false);
     const problemsetProblems = problemset.problems ?? [];
     for (const problemsetProblem of problemsetProblems) {
       const alias = problemsetProblem.alias;
@@ -891,7 +823,6 @@ export class Arena {
           ui.warning(
             `<a href="/arena/${this.options.contestAlias}/practice/">${T.arenaContestEndedUsePractice}</a>`,
           );
-          this.myRunsList.isContestFinished = true;
         }
       }
     } else {
@@ -1493,7 +1424,6 @@ export class Arena {
               this.trackRun(run);
             }
           }
-          this.myRunsList.problemAlias = problem.alias;
         };
 
         updateRuns(problem.runs);
@@ -1516,8 +1446,7 @@ export class Arena {
           api.Problem.details(
             $.extend(problemset, {
               problem_alias: problem.alias,
-              prevent_problemset_open:
-                this.problemsetAdmin && !this.myRunsList.isProblemsetOpened,
+              prevent_problemset_open: this.problemsetAdmin,
             }),
           )
             .then(time.remoteTimeAdapter)

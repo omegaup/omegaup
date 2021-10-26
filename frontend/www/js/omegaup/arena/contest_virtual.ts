@@ -5,7 +5,6 @@ import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
 import arena_Contest from '../components/arena/Contest.vue';
-import { PopupDisplayed } from '../components/problem/Details.vue';
 import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import problemsStore from './problemStore';
 import {
@@ -36,6 +35,13 @@ OmegaUp.on('ready', async () => {
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
+  const {
+    guid,
+    popupDisplayed,
+    problem,
+    problemAlias,
+    showNewClarificationPopup,
+  } = getOptionsFromLocation(window.location.hash);
   let runDetails: null | types.RunDetails = null;
   let problemDetails: null | types.ProblemDetails = null;
   try {
@@ -44,7 +50,7 @@ OmegaUp.on('ready', async () => {
       problems: payload.problems,
       location: window.location.hash,
     }));
-  } catch (e) {
+  } catch (e: any) {
     ui.apiError(e);
   }
   trackClarifications(payload.clarifications);
@@ -117,13 +123,13 @@ OmegaUp.on('ready', async () => {
     el: '#main-container',
     components: { 'omegaup-arena-contest': arena_Contest },
     data: () => ({
-      problemInfo: null as types.ProblemInfo | null,
-      problem: null as types.NavbarProblemsetProblem | null,
+      problemInfo: problemDetails,
+      problem,
       problems: payload.problems,
-      popupDisplayed: PopupDisplayed.None,
-      showNewClarificationPopup: false,
-      guid: null as null | string,
-      problemAlias: null as null | string,
+      popupDisplayed,
+      showNewClarificationPopup,
+      guid,
+      problemAlias,
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
       nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
@@ -170,16 +176,17 @@ OmegaUp.on('ready', async () => {
             });
           },
           'show-run': (request: SubmissionRequest) => {
-            const hash = `#problems/${
-              this.problemAlias ?? request.request.problemAlias
-            }/show-run:${request.request.guid}/`;
-            api.Run.details({ run_alias: request.request.guid })
+            api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
-                showSubmission({ request, runDetails, hash });
+                this.runDetailsData = showSubmission({ request, runDetails });
+                window.location.hash = request.hash;
               })
-              .catch((error) => {
-                ui.apiError(error);
-                this.popupDisplayed = PopupDisplayed.None;
+              .catch((run) => {
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
               });
           },
           'submit-run': ({
@@ -191,7 +198,7 @@ OmegaUp.on('ready', async () => {
             problem: types.NavbarProblemsetProblem;
             code: string;
             language: string;
-            target: Vue & { nextSubmissionTimestamp: Date };
+            target: Vue & { currentNextSubmissionTimestamp: Date };
           }) => {
             api.Run.create({
               contest_alias: payload.contest.alias,
@@ -209,7 +216,7 @@ OmegaUp.on('ready', async () => {
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
                 });
-                target.nextSubmissionTimestamp =
+                target.currentNextSubmissionTimestamp =
                   response.nextSubmissionTimestamp;
 
                 if (
@@ -268,23 +275,25 @@ OmegaUp.on('ready', async () => {
               .catch(ui.apiError);
           },
           'update:activeTab': (tabName: string) => {
-            window.location.replace(`#${tabName}`);
+            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
           },
-          'reset-hash': (request: { selectedTab: string; alias: string }) => {
-            window.location.replace(`#${request.selectedTab}/${request.alias}`);
+          'reset-hash': ({
+            selectedTab,
+            alias,
+          }: {
+            selectedTab: string;
+            alias: string;
+          }) => {
+            history.replaceState(
+              { selectedTab, alias },
+              'resetHash',
+              `#${selectedTab}/${alias}`,
+            );
           },
         },
       });
     },
   });
-
-  // This needs to be set here and not at the top because it depends
-  // on the `navigate-to-problem` callback being invoked, and that is
-  // not the case if this is set a priori.
-  Object.assign(
-    contestContestant,
-    getOptionsFromLocation(window.location.hash),
-  );
 
   const socket = new EventsSocket({
     disableSockets: false,

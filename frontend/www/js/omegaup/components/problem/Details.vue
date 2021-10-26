@@ -185,7 +185,7 @@
             :show-details="true"
             :problemset-problems="[]"
             :is-contest-finished="isContestFinished"
-            @details="(run) => onRunDetails(run.guid)"
+            @details="(request) => onRunDetails(request, 'problems')"
             @update-search-result-users-contest="
               (request) => $emit('update-search-result-users-contest', request)
             "
@@ -193,7 +193,10 @@
               (request) => $emit('update-search-result-users', request)
             "
             @new-submission="onNewSubmission"
-          ></omegaup-arena-runs>
+          >
+            <template #title><div></div></template>
+            <template #runs><div></div></template>
+          </omegaup-arena-runs>
         </template>
         <omegaup-problem-feedback
           :quality-histogram="parsedQualityHistogram"
@@ -236,7 +239,7 @@
           :show-disqualify="true"
           :problemset-problems="[]"
           :search-result-users="searchResultUsers"
-          @details="(run) => onRunDetails(run.guid)"
+          @details="(request) => onRunDetails(request, 'runs')"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
           @filter-changed="
@@ -248,7 +251,10 @@
           @update-search-result-users="
             (request) => $emit('update-search-result-users', request)
           "
-        ></omegaup-arena-runs>
+        >
+          <template #title><div></div></template>
+          <template #runs><div></div></template>
+        </omegaup-arena-runs>
         <omegaup-overlay
           v-if="user.loggedIn"
           :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
@@ -314,6 +320,7 @@ import {
   faBan,
   faExternalLinkAlt,
 } from '@fortawesome/free-solid-svg-icons';
+import { SubmissionRequest } from '../../arena/submissions';
 library.add(
   faExclamationTriangle,
   faEdit,
@@ -386,11 +393,10 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
-  @Prop() isAdmin!: boolean;
+  @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop() nextSubmissionTimestamp!: null | Date;
   @Prop({ default: false }) shouldShowTabs!: boolean;
-  @Prop({ default: false }) shouldShowRunDetails!: boolean;
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
@@ -494,16 +500,13 @@ export default class ProblemDetails extends Vue {
     this.currentPopupDisplayed = PopupDisplayed.RunSubmit;
   }
 
-  onRunDetails(guid: string): void {
-    this.$emit('show-run', {
-      request: {
-        guid,
-        isAdmin: this.isAdmin,
-        problemAlias: this.problem.alias,
-      },
-      target: this,
-    });
+  onRunDetails(request: SubmissionRequest, tab: string): void {
     this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+    this.$emit('show-run', {
+      ...request,
+      hash: `#${tab}/${this.problemAlias}/show-run:${request.guid}`,
+      isAdmin: this.isAdmin,
+    });
   }
 
   onNewPromotion(): void {
@@ -659,9 +662,6 @@ export default class ProblemDetails extends Vue {
       ui.reportEvent('quality-nomination', 'shown');
       return;
     }
-    if (newValue === PopupDisplayed.RunDetails && this.guid) {
-      this.onRunDetails(this.guid);
-    }
   }
 
   @Watch('currentClarifications')
@@ -670,18 +670,9 @@ export default class ProblemDetails extends Vue {
     this.hasUnreadClarifications = true;
   }
 
-  @Watch('shouldShowRunDetails')
-  onShouldShowRunDetailsChanged(newValue: boolean): void {
-    if (newValue && this.guid) {
-      this.$emit('show-run', {
-        request: {
-          guid: this.guid,
-          isAdmin: this.isAdmin,
-          problemAlias: this.currentRunDetailsData?.alias,
-        },
-        target: this,
-      });
-    }
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 }
 </script>

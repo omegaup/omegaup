@@ -34,6 +34,7 @@ OmegaUp.on('ready', () => {
       teamsMembers: payload.teamsMembers,
       userErrorRow: null,
       searchResultUsers: [] as types.ListItem[],
+      isLoading: false,
     }),
     methods: {
       refreshTeamsList: (): void => {
@@ -68,6 +69,7 @@ OmegaUp.on('ready', () => {
           teamsMembers: this.teamsMembers,
           userErrorRow: this.userErrorRow,
           searchResultUsers: this.searchResultUsers,
+          isLoading: this.isLoading,
         },
         on: {
           'update-teams-group': ({
@@ -134,6 +136,23 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'change-password-identity': ({
+            username,
+            newPassword,
+          }: {
+            username: string;
+            newPassword: string;
+          }) => {
+            api.Identity.changePassword({
+              group_alias: payload.teamGroup.alias,
+              password: newPassword,
+              username: username,
+            })
+              .then(() => {
+                ui.success(T.teamsGroupEditTeamsPasswordUpdated);
+              })
+              .catch(ui.apiError);
+          },
           remove: (username: string) => {
             api.Group.removeUser({
               group_alias: payload.teamGroup.alias,
@@ -175,6 +194,7 @@ OmegaUp.on('ready', () => {
               [team: string]: { username: string; password?: string };
             };
           }) => {
+            this.isLoading = true;
             api.Identity.bulkCreateForTeams({
               team_identities: JSON.stringify(
                 identities.map((identity) => ({
@@ -194,6 +214,9 @@ OmegaUp.on('ready', () => {
               .catch((data) => {
                 ui.error(data.error);
                 this.userErrorRow = data.parameter;
+              })
+              .finally(() => {
+                this.isLoading = false;
               });
           },
           'invalid-file': () => {

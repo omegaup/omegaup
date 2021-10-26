@@ -89,11 +89,21 @@
           <button
             class="btn btn-primary d-inline-block mb-2"
             name="create-identities"
+            :disabled="isLoading"
             @click.prevent="
               $emit('bulk-identities', { identities, identitiesTeams })
             "
           >
-            {{ T.teamsGroupCreateIdentitiesAsTeams }}
+            {{
+              !isLoading
+                ? T.teamsGroupCreateIdentitiesAsTeams
+                : T.teamsGroupCreatingIdentitiesAsTeams
+            }}
+            <font-awesome-icon
+              v-if="isLoading"
+              :icon="['fas', 'spinner']"
+              class="ml-2 fa-spin"
+            ></font-awesome-icon>
           </button>
           <div>
             <button
@@ -118,7 +128,11 @@ import T from '../../lang';
 import omegaup_Markdown from '../Markdown.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faDownload, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import {
+  faDownload,
+  faUserPlus,
+  faSpinner,
+} from '@fortawesome/free-solid-svg-icons';
 import common_MultiTypeahead from '../common/MultiTypeahead.vue';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
@@ -144,7 +158,7 @@ type TeamIdentity = types.Identity & {
   usernames: { username: string; password?: string }[];
 };
 
-library.add(faDownload, faUserPlus);
+library.add(faDownload, faUserPlus, faSpinner);
 @Component({
   components: {
     FontAwesomeIcon,
@@ -159,6 +173,7 @@ export default class Upload extends Vue {
   @Prop({ default: null }) userErrorRow!: string | null;
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop() numberOfContestants!: number;
+  @Prop() isLoading!: boolean;
 
   T = T;
   identities: types.Identity[] = [];

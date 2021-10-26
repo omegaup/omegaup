@@ -289,3 +289,25 @@ jobs:
         with:
           name: test-logs
           path: frontend/tests/runfiles/*/*.log
+
+  python:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --user setuptools
+          python3 -m pip install --user wheel
+          python3 -m pip install --user --upgrade urllib3
+          python3 -m pip install --user \
+            mysqlclient==2.0.1 \
+            pandas \
+            pytest
+
+      - name: Run Python tests
+        run: |
+          python3 -m pytest ./stuff/

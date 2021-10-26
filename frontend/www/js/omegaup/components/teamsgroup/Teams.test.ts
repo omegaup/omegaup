@@ -5,9 +5,8 @@ import T from '../../lang';
 
 import teamsgroup_Teams, { AvailableForms } from './Teams.vue';
 import identity_Edit from '../identity/Edit.vue';
-import identity_ChangePassword from '../identity/ChangePassword.vue';
 
-describe('Members.vue', () => {
+describe('Teams.vue', () => {
   beforeEach(() => {
     const div = document.createElement('div');
     div.id = 'root';
@@ -109,42 +108,6 @@ describe('Members.vue', () => {
             username: 'omegaUp:user',
           },
           originalUsername: 'omegaUp:user',
-        },
-      ],
-    ]);
-  });
-
-  it('Should handle change password form', async () => {
-    const wrapper = mount(teamsgroup_Teams, {
-      attachTo: '#root',
-      propsData,
-    });
-
-    await wrapper
-      .find('button[data-change-password-identity="omegaUp:user"]')
-      .trigger('click');
-
-    expect(wrapper.vm.formToShow).toBe(AvailableForms.ChangePassword);
-    expect(wrapper.vm.username).toBe('omegaUp:user');
-
-    const identityChangePasswordWrapper = wrapper.findComponent(
-      identity_ChangePassword,
-    );
-
-    await identityChangePasswordWrapper.setData({
-      newPassword: '123456789',
-      newPasswordRepeat: '123456789',
-    });
-
-    await identityChangePasswordWrapper
-      .find('button[data-change-password-identity]')
-      .trigger('click');
-    expect(wrapper.emitted('change-password-identity-team')).toEqual([
-      [
-        {
-          username: 'omegaUp:user',
-          newPassword: '123456789',
-          newPasswordRepeat: '123456789',
         },
       ],
     ]);

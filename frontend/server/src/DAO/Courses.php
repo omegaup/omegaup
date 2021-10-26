@@ -11,11 +11,11 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  *
- * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
  * @psalm-type CourseCardFinished=array{alias: string, name: string}
- * @psalm-type CourseCardPublic=array{alias: string, lessonsCount: int, level: null|string, name: string, studentsCount: int}
+ * @psalm-type CourseCardPublic=array{alias: string, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}
  * @psalm-type AssignmentsProblemsPoints=array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
  * @psalm-type StudentProgressInCourse=array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}
  */
@@ -59,8 +59,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             SELECT
                 a.*,
                 COUNT(s.submission_id) AS has_runs,
-                p.scoreboard_url,
-                p.scoreboard_url_admin
+                COUNT(p.problem_id) AS problem_count,
+                ps.scoreboard_url,
+                ps.scoreboard_url_admin
             FROM
                 Courses c
             INNER JOIN
@@ -68,13 +69,21 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ON
                 a.course_id = c.course_id
             INNER JOIN
-                Problemsets p
+                Problemsets ps
             ON
-                p.problemset_id = a.problemset_id
+                ps.problemset_id = a.problemset_id
+            LEFT JOIN
+                Problemset_Problems psp
+            ON
+                psp.problemset_id = ps.problemset_id
+            LEFT JOIN
+                Problems p
+            ON
+                p.problem_id = psp.problem_id
             LEFT JOIN
                 Submissions s
             ON
-                p.problemset_id = s.problemset_id
+                ps.problemset_id = s.problemset_id
             WHERE
                 c.alias = ? $timeCondition
             GROUP BY
@@ -82,7 +91,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ORDER BY
                 `order`, start_time;";
 
-        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problem_count: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);
 
         $ar = [];
@@ -91,6 +100,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             unset($row['assignment_id']);
             unset($row['course_id']);
             $row['has_runs'] = $row['has_runs'] > 0;
+            $row['problemCount'] = $row['problem_count'];
+            unset($row['problem_count']);
             $ar[] = $row;
         }
         return $ar;
@@ -261,7 +272,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             gi.group_id = c.group_id
                     ),
                     0
-                ) AS studentsCount,
+                ) AS studentCount,
                 IFNULL(
                     (
                         SELECT
@@ -273,7 +284,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             a.assignment_type = ?
                     ),
                     0
-                ) AS lessonsCount
+                ) AS lessonCount
             FROM
                 Courses c
             LEFT JOIN
@@ -285,7 +296,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 c.name IS NOT NULL AND
                 c.archived = 0;';
 
-        /** @var list<array{alias: null|string, lessonsCount: int, level: null|string, name: null|string, school_name: null|string, studentsCount: int}> */
+        /** @var list<array{alias: null|string, lessonCount: int, level: null|string, name: null|string, school_name: null|string, studentCount: int}> */
         $rs =  \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
@@ -645,7 +656,23 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
         $offset = ($page - 1) * $rowsPerPage;
 
-        // Gets all the students in a course
+        // Gets the total count of students in the course.
+        $sqlCount = '
+            SELECT
+                COUNT(*)
+            FROM
+                Groups_Identities AS gi
+            INNER JOIN
+                Identities i ON i.identity_id = gi.identity_id
+            WHERE
+                gi.group_id = ?';
+        /** @var int */
+        $totalStudents = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlCount,
+            [ $groupId, ]
+        ) ?? 0;
+
+        // Gets the students in a course between a certain range
         $sqlUsers = '
             SELECT
                 i.username,
@@ -676,12 +703,17 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             INNER JOIN
                 Identities i ON i.identity_id = gi.identity_id
             WHERE
-                gi.group_id = ?';
+                gi.group_id = ?
+            LIMIT ?, ?';
 
         /** @var list<array{classname: string, country_id: null|string, name: null|string, username: string}> */
         $courseUsers = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sqlUsers,
-            [ $groupId ]
+            [
+                $groupId,
+                $offset,
+                $rowsPerPage,
+            ]
         );
 
         // Gets on each row:
@@ -878,7 +910,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return [
             'assignmentsProblems' => $assignmentsProblems,
             'studentsProgress' => $studentsProgress,
-            'totalRows' => count($courseUsers),
+            'totalRows' => $totalStudents,
         ];
     }
 

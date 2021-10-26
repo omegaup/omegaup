@@ -354,10 +354,17 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'update-admission-mode': (admissionMode: string) => {
+          'update-admission-mode': ({
+            admissionMode,
+            defaultShowAllContestantsInScoreboard,
+          }: {
+            admissionMode: string;
+            defaultShowAllContestantsInScoreboard: boolean;
+          }) => {
             api.Contest.update({
               contest_alias: payload.details.alias,
               admission_mode: admissionMode,
+              default_show_all_contestants_in_scoreboard: defaultShowAllContestantsInScoreboard,
             })
               .then(() => {
                 ui.success(`

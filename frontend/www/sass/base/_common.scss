@@ -44,7 +44,7 @@ body {
 #status {
   position: -webkit-sticky; /* Safari */
   position: sticky;
-  z-index: 1;
+  z-index: 99999999;
   max-width: 900px;
   margin-right: auto;
   margin-left: auto;
@@ -55,6 +55,8 @@ body {
 /* FIXME: TODO LO ANTERIOR DEBE IRSE CON BS3 */
 
 /* stylelint-disable-next-line no-descending-specificity */
+// FIXME: This should be re-specified, "a" selector is too general.
+// Changing this could make the two next styles disappear.
 a {
   color: $omegaup-links;
   text-decoration: none;
@@ -65,6 +67,14 @@ a {
     color: $omegaup-links--hover;
     text-decoration: none;
   }
+}
+
+a[role='button'] {
+  color: $omegaup-white;
+}
+
+a.dropdown-item {
+  color: #212529; // This is the bootstrap's default
 }
 
 a.card-header-help {

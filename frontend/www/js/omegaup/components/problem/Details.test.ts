@@ -209,6 +209,8 @@ Here we can add code.
       propsData: {
         initialTab: 'problems',
         problem,
+        problemAlias: problem.alias,
+        isAdmin: true,
         runDetailsData,
         user,
         nominationStatus,
@@ -227,11 +229,61 @@ Here we can add code.
     await wrapper.find('a[href="#runs"]').trigger('click');
     await wrapper.find('td div.dropdown>button.btn-secondary').trigger('click');
     await wrapper.find('button[data-actions-rejudge]').trigger('click');
-    expect(wrapper.emitted('rejudge')).toBeDefined();
+    expect(wrapper.emitted('rejudge')).toEqual([
+      [
+        {
+          alias: 'Hello',
+          classname: 'user-rank-unranked',
+          country: 'xx',
+          guid: 'abcdefg',
+          language: 'py3',
+          memory: 0,
+          penalty: 0,
+          runtime: 0,
+          score: 1,
+          status: 'ready',
+          submit_delay: 0,
+          time: expect.any(Date),
+          username: 'omegaUp',
+          verdict: 'AC',
+        },
+      ],
+    ]);
 
     await wrapper.find('td div.dropdown>button.btn-secondary').trigger('click');
     await wrapper.find('button[data-actions-disqualify]').trigger('click');
-    expect(wrapper.emitted('disqualify')).toBeDefined();
+    expect(wrapper.emitted('disqualify')).toEqual([
+      [
+        {
+          alias: 'Hello',
+          classname: 'user-rank-unranked',
+          country: 'xx',
+          guid: 'abcdefg',
+          language: 'py3',
+          memory: 0,
+          penalty: 0,
+          runtime: 0,
+          score: 1,
+          status: 'ready',
+          submit_delay: 0,
+          time: expect.any(Date),
+          username: 'omegaUp',
+          verdict: 'AC',
+        },
+      ],
+    ]);
+
+    await wrapper.find('td div.dropdown>button.btn-secondary').trigger('click');
+    await wrapper.find('button[data-run-details]').trigger('click');
+    expect(wrapper.emitted('show-run')).toEqual([
+      [
+        {
+          guid: 'abcdefg',
+          hash: '#runs/triangulos/show-run:abcdefg',
+          isAdmin: true,
+        },
+      ],
+    ]);
   });
 
   it('Should handle problem clarifications', async () => {

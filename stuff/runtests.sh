@@ -19,18 +19,18 @@ else
 	IN_DOCKER=0
 fi
 
-/usr/bin/python3 "${OMEGAUP_ROOT}/stuff/db-migrate.py" validate
-/usr/bin/python3 "${OMEGAUP_ROOT}/stuff/policy-tool.py" validate
+python3 "${OMEGAUP_ROOT}/stuff/db-migrate.py" validate
+python3 "${OMEGAUP_ROOT}/stuff/policy-tool.py" validate
 
 # This runs the controllers + badges PHPUnit tests, as well as the MySQL return
 # type check.
 "${OMEGAUP_ROOT}/stuff/mysql_types.sh"
-"${OMEGAUP_ROOT}/vendor/bin/psalm" --update-baseline --show-info=false
+"${OMEGAUP_ROOT}/vendor/bin/psalm" --show-info=false
 
 if [[ "${IN_DOCKER}" == 1 ]]; then
 	echo "Please run \`./stuff/lint.sh ${REF}\` outside the container after this."
-	echo "Please run \`/usr/bin/python3 -m pytest ./frontend/tests/ui/ -s\` outside the container after this."
+	echo "Please run \`python3 -m pytest ./frontend/tests/ui/ -s\` outside the container after this."
 else
 	"${OMEGAUP_ROOT}/stuff/git-hooks/pre-push" $REF
-	/usr/bin/python3 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" -s
+	python3 -m pytest "${OMEGAUP_ROOT}/frontend/tests/ui/" -s
 fi
