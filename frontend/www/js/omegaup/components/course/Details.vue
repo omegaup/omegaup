@@ -255,7 +255,7 @@
             :full-width="true"
           ></omegaup-markdown>
           <div class="row m-0 mt-4">
-            <div v-if="course.objective" class="col-md-8 mb-4 p-0">
+            <div v-if="course.objective" class="col-md-8 mb-4 p-0 pr-md-5">
               <h5 class="intro-subtitle pb-1">
                 {{ T.courseNewFormObjective }}
               </h5>
