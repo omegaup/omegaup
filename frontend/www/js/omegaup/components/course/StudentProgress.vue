@@ -1,7 +1,7 @@
 <template>
   <tr>
     <th scope="row" class="text-center align-middle">
-      <a :href="`/course/${courseAlias}/student/${studentProgress.username}/`">
+      <a :href="studentProgressUrl">
         <omegaup-user-username
           :classname="studentProgress.classname"
           :username="studentProgress.username"
@@ -16,7 +16,7 @@
       >
       <span class="d-block">{{
         ui.formatString(T.studentProgressPoints, {
-          points: studentProgress.courseScore,
+          points: studentProgress.courseScore.toFixed(0),
         })
       }}</span>
     </td>
@@ -33,14 +33,20 @@
       <span class="d-block">{{ getPointsByAssignment(assignment.alias) }}</span>
       <div class="d-flex justify-content-center mt-1">
         <div class="d-flex" :class="{ invisible: assignment.points === 0 }">
-          <div
+          <a
             v-for="problem in assignment.problems"
             :key="problem.alias"
             v-tooltip="getProgressTooltipDescription(assignment.alias, problem)"
             :class="getProblemColor(assignment.alias, problem)"
             data-toggle="tooltip"
             data-placement="bottom"
-          ></div>
+            :href="
+              getStudentProgressUrlWithAssignmentAndProblem(
+                assignment.alias,
+                problem.alias,
+              )
+            "
+          ></a>
         </div>
       </div>
     </td>
@@ -165,6 +171,17 @@ export default class StudentProgress extends Vue {
       ),
       points: problem.points,
     });
+  }
+
+  get studentProgressUrl(): string {
+    return `/course/${this.courseAlias}/student/${this.studentProgress.username}/`;
+  }
+
+  getStudentProgressUrlWithAssignmentAndProblem(
+    selectedAssignment: string,
+    selectedProblem: string,
+  ): string {
+    return `/course/${this.courseAlias}/student/${this.studentProgress.username}/assignment/${selectedAssignment}/#${selectedProblem}`;
   }
 }
 </script>

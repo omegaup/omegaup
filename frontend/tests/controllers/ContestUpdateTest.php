@@ -80,6 +80,52 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Update from private to public.
+     * And choosing default_show_all_contestants_in_scoreboard option
+     */
+    public function testUpdateDefaultShowAllContestantsOption() {
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'private']
+            )
+        );
+
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Update to public
+        $login = self::login($contestData['director']);
+
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+        $this->assertFalse(
+            $contest->default_show_all_contestants_in_scoreboard
+        );
+
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'admission_mode' => 'public',
+            'default_show_all_contestants_in_scoreboard' => true,
+        ]));
+
+        $contest = \OmegaUp\DAO\Contests::getByAlias(
+            $contestData['request']['alias']
+        );
+        $this->assertTrue(
+            $contest->default_show_all_contestants_in_scoreboard
+        );
+    }
+
+    /**
      * Update from private to public with problems added
      */
     public function testUpdatePrivateContestToPublicWithProblems() {
@@ -1257,6 +1303,121 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $e->getMessage()
             );
         }
+    }
+
+    /**
+     * A PHPUnit data provider for the test with changes in problemset attributes.
+     *
+     * @return list<array{0: array<string: bool|string>, 1: array{0: boolean, 1: string}, 2: array{0: boolean, 1: string}}>
+     */
+    public function problemsetAttributeValueProvider(): array {
+        return [
+            [['needs_basic_information' => true], [false, 'no'], [true, 'no']],
+            [[
+                'requests_user_information' => 'optional',
+            ], [false, 'no'], [false, 'optional']],
+            [[
+                'needs_basic_information' => true,
+                'requests_user_information' => 'optional',
+            ], [false, 'no'], [true, 'optional']],
+        ];
+    }
+
+    /**
+     * @dataProvider problemsetAttributeValueProvider
+     *
+     * @param array<string: bool|string> $attributesToUpdate
+     * @param array{0: boolean, 1: string} $originalAttributesValues
+     * @param array{0: boolean, 1: string} $updatedAttributesValues
+     */
+    public function testUpdateProblemsetAttibutesInContest(
+        $attributesToUpdate,
+        $originalAttributesValues,
+        $updatedAttributesValues
+    ) {
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        $login = self::login($contestData['director']);
+
+        $response = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        // Default values
+        $this->assertEquals(
+            $response['needs_basic_information'],
+            $originalAttributesValues[0]
+        );
+        $this->assertEquals(
+            $response['requests_user_information'],
+            $originalAttributesValues[1]
+        );
+
+        // Updating problemset attributes values with admission_mode should
+        // update them
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request(
+            array_merge(
+                [
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                    'admission_mode' => 'private'
+                ],
+                $attributesToUpdate
+            )
+        ));
+
+        $response = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        // Value after updating
+        $this->assertEquals(
+            $response['needs_basic_information'],
+            $updatedAttributesValues[0]
+        );
+        $this->assertEquals(
+            $response['requests_user_information'],
+            $updatedAttributesValues[1]
+        );
+
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'admission_mode' => 'public',
+        ]));
+
+        // Updating admission mode, problemset attributes should not change
+        $response = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertEquals(
+            $response['needs_basic_information'],
+            $updatedAttributesValues[0]
+        );
+        $this->assertEquals(
+            $response['requests_user_information'],
+            $updatedAttributesValues[1]
+        );
     }
 
     private function assertAPIsShowCorrectContestScore(

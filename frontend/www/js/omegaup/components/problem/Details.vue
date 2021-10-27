@@ -185,7 +185,7 @@
             :show-details="true"
             :problemset-problems="[]"
             :is-contest-finished="isContestFinished"
-            @details="(run) => onRunDetails(run.guid)"
+            @details="(request) => onRunDetails(request, 'problems')"
             @update-search-result-users-contest="
               (request) => $emit('update-search-result-users-contest', request)
             "
@@ -193,7 +193,10 @@
               (request) => $emit('update-search-result-users', request)
             "
             @new-submission="onNewSubmission"
-          ></omegaup-arena-runs>
+          >
+            <template #title><div></div></template>
+            <template #runs><div></div></template>
+          </omegaup-arena-runs>
         </template>
         <omegaup-problem-feedback
           :quality-histogram="parsedQualityHistogram"
@@ -236,7 +239,7 @@
           :show-disqualify="true"
           :problemset-problems="[]"
           :search-result-users="searchResultUsers"
-          @details="(run) => onRunAdminDetails(run.guid)"
+          @details="(request) => onRunDetails(request, 'runs')"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
           @filter-changed="
@@ -248,7 +251,10 @@
           @update-search-result-users="
             (request) => $emit('update-search-result-users', request)
           "
-        ></omegaup-arena-runs>
+        >
+          <template #title><div></div></template>
+          <template #runs><div></div></template>
+        </omegaup-arena-runs>
         <omegaup-overlay
           v-if="user.loggedIn"
           :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
@@ -314,6 +320,7 @@ import {
   faBan,
   faExternalLinkAlt,
 } from '@fortawesome/free-solid-svg-icons';
+import { SubmissionRequest } from '../../arena/submissions';
 library.add(
   faExclamationTriangle,
   faEdit,
@@ -493,23 +500,12 @@ export default class ProblemDetails extends Vue {
     this.currentPopupDisplayed = PopupDisplayed.RunSubmit;
   }
 
-  onRunDetails(guid: string): void {
+  onRunDetails(request: SubmissionRequest, tab: string): void {
     this.currentPopupDisplayed = PopupDisplayed.RunDetails;
     this.$emit('show-run', {
-      guid,
-      hash: `#problems/${this.problemAlias}/show-run:${guid}`,
+      ...request,
+      hash: `#${tab}/${this.problemAlias}/show-run:${request.guid}`,
       isAdmin: this.isAdmin,
-      problemAlias: this.problem.alias,
-    });
-  }
-
-  onRunAdminDetails(guid: string): void {
-    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
-    this.$emit('show-run', {
-      guid,
-      hash: `#runs/${this.problemAlias}/show-run:${guid}`,
-      isAdmin: this.isAdmin,
-      problemAlias: this.problem.alias,
     });
   }
 

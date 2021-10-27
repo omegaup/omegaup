@@ -50,7 +50,7 @@ OmegaUp.on('ready', async () => {
       problems: payload.problems,
       location: window.location.hash,
     }));
-  } catch (e) {
+  } catch (e: any) {
     ui.apiError(e);
   }
   trackClarifications(payload.clarifications);
@@ -275,10 +275,20 @@ OmegaUp.on('ready', async () => {
               .catch(ui.apiError);
           },
           'update:activeTab': (tabName: string) => {
-            window.location.replace(`#${tabName}`);
+            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
           },
-          'reset-hash': (request: { selectedTab: string; alias: string }) => {
-            window.location.replace(`#${request.selectedTab}/${request.alias}`);
+          'reset-hash': ({
+            selectedTab,
+            alias,
+          }: {
+            selectedTab: string;
+            alias: string;
+          }) => {
+            history.replaceState(
+              { selectedTab, alias },
+              'resetHash',
+              `#${selectedTab}/${alias}`,
+            );
           },
         },
       });
