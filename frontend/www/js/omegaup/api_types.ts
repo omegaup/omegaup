@@ -1240,6 +1240,33 @@ export namespace types {
       );
     }
 
+    export function GroupScoreboardDetailsPayload(
+      elementId: string = 'payload',
+    ): types.GroupScoreboardDetailsPayload {
+      return ((x) => {
+        x.details = ((x) => {
+          x.contests = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.contests);
+          return x;
+        })(x.details);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function IndexPayload(
       elementId: string = 'payload',
     ): types.IndexPayload {
@@ -2863,6 +2890,18 @@ export namespace types {
     scoreboardAlias: string;
   }
 
+  export interface GroupScoreboardDetails {
+    contests: types.ScoreboardContest[];
+    ranking: types.ScoreboardRanking[];
+    scoreboard: types.ScoreboardDetails;
+  }
+
+  export interface GroupScoreboardDetailsPayload {
+    details: types.GroupScoreboardDetails;
+    groupAlias: string;
+    scoreboardAlias: string;
+  }
+
   export interface Histogram {
     difficulty: number;
     difficultyHistogram?: string;
@@ -3664,6 +3703,15 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ScoreboardDetails {
+    alias: string;
+    create_time: number;
+    description: string;
+    group_id: number;
+    group_scoreboard_id: number;
+    name: string;
+  }
+
   export interface ScoreboardEvent {
     classname: string;
     country: string;
@@ -3677,6 +3725,13 @@ export namespace types {
 
   export interface ScoreboardMergePayload {
     contests: types.ContestListItem[];
+  }
+
+  export interface ScoreboardRanking {
+    contests: { [key: string]: { penalty: number; points: number } };
+    name?: string;
+    total: { penalty: number; points: number };
+    username: string;
   }
 
   export interface ScoreboardRankingEntry {
@@ -4456,49 +4511,7 @@ export namespace messages {
   export type GroupScoreboardAddContestResponse = {};
   export type GroupScoreboardDetailsRequest = { [key: string]: any };
   export type _GroupScoreboardDetailsServerResponse = any;
-  export type GroupScoreboardDetailsResponse = {
-    contests: {
-      acl_id: number;
-      admission_mode: string;
-      alias: string;
-      contest_id: number;
-      description: string;
-      feedback: string;
-      finish_time: Date;
-      languages: string;
-      last_updated: number;
-      only_ac?: boolean;
-      partial_score: boolean;
-      penalty: string;
-      penalty_calc_policy: string;
-      points_decay_factor: number;
-      problemset_id: number;
-      recommended: boolean;
-      rerun_id: number;
-      scoreboard: number;
-      show_scoreboard_after: boolean;
-      start_time: Date;
-      submissions_gap: number;
-      title: string;
-      urgent: boolean;
-      weight?: number;
-      window_length?: number;
-    }[];
-    ranking: {
-      contests: { [key: string]: { penalty: number; points: number } };
-      name?: string;
-      total: { penalty: number; points: number };
-      username: string;
-    }[];
-    scoreboard: {
-      alias: string;
-      create_time: number;
-      description: string;
-      group_id: number;
-      group_scoreboard_id: number;
-      name: string;
-    };
-  };
+  export type GroupScoreboardDetailsResponse = types.GroupScoreboardDetails;
   export type GroupScoreboardListRequest = { [key: string]: any };
   export type GroupScoreboardListResponse = {
     scoreboards: {
