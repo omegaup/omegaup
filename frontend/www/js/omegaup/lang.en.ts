@@ -759,6 +759,7 @@ const translations: { [key: string]: string; } = {
   problemCollectionRandomKarelProblem: "Random Karel Problem",
   problemCollectionRandomLanguageProblem: "Random Problem",
   problemCollectionSearchProblem: "Problem Finder",
+  problemCreatorNewProblem: "New Problem",
   problemDeployerChangeMissingSettingsJson: "The problem is missing a 'settings.json' file.",
   problemDeployerConfigBadLayout: "The commit to 'refs/meta/config' has the wrong layout.",
   problemDeployerConfigInvalidPublishingMode: "The chosen publishing mode is not supported.",

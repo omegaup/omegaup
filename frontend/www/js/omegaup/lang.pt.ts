@@ -759,6 +759,7 @@ const translations: { [key: string]: string; } = {
   problemCollectionRandomKarelProblem: "Problema aleat\u00f3rio de Karel",
   problemCollectionRandomLanguageProblem: "problema aleat\u00f3rio",
   problemCollectionSearchProblem: "Localizador de Problemas",
+  problemCreatorNewProblem: "Novo Problema",
   problemDeployerChangeMissingSettingsJson: "O problema precisa ter um arquivo 'settings.json'.",
   problemDeployerConfigBadLayout: "O commit para 'refs/meta/config' tem uma estrutura incorreta.",
   problemDeployerConfigInvalidPublishingMode: "O modo de publica\u00e7\u00e3o escolhido n\u00e3o \u00e9 suportado.",
