@@ -7,9 +7,7 @@
       {$smarty.const.NEW_RELIC_SCRIPT}
     {/if}
 
-    {if isset($inArena) && $inArena}
-      {assign var='navbarSection' value='arena'}
-    {elseif isset($GOOGLECLIENTID) && !empty($GOOGLECLIENTID)}
+    {if isset($GOOGLECLIENTID) && !empty($GOOGLECLIENTID)}
       <meta name="google-signin-client_id" content="{$GOOGLECLIENTID}" />
     {/if}
 
@@ -39,10 +37,6 @@
     <link rel="stylesheet" type="text/css" href="{version_hash src="/css/dist/omegaup_styles.css"}">
     <link rel="shortcut icon" href="/favicon.ico" />
 
-    {if isset($inArena) && $inArena}
-      <link rel="stylesheet" type="text/css" href="{version_hash src="/css/arena.css"}" />
-    {/if}
-
     {if !empty($ENABLED_EXPERIMENTS)}
         <script type="text/plain" id="omegaup-enabled-experiments">{','|implode:$ENABLED_EXPERIMENTS}</script>
     {/if}
@@ -57,7 +51,7 @@
     <div id="common-navbar"></div>
     {js_include entrypoint="common_navbar_v2"}
 	  <main role="main" {if (!isset($fullWidth) || !$fullWidth)}class="container-lg p-5"{/if}>
-      {if (!isset($inArena) || !$inArena) && isset($ERROR_MESSAGE)}
+      {if isset($ERROR_MESSAGE)}
         <div class="alert alert-danger">
           {$ERROR_MESSAGE}
         </div>

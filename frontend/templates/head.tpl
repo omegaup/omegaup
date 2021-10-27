@@ -5,11 +5,7 @@
 {if !is_null($smarty.const.NEW_RELIC_SCRIPT)}
 		{$smarty.const.NEW_RELIC_SCRIPT}
 {/if}
-{if isset($inArena) && $inArena}
-		{assign var='navbarSection' value='arena'}
-{else}
 		<meta name="google-signin-client_id" content="{$GOOGLECLIENTID}">
-{/if}
 		<script type="text/javascript" src="{version_hash src="/js/error_handler.js"}"></script>
 		<title>{if isset($htmlTitle)}{$htmlTitle} &ndash; {/if}omegaUp</title>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.5.1.min.js"}"></script>
@@ -34,9 +30,7 @@
 		<script src="{version_hash src="/third_party/bootstrap-3.4.1/js/bootstrap.min.js"}" defer></script>
 {/if}
 
-{if isset($inArena) && $inArena}
-    <link rel="stylesheet" type="text/css" href="{version_hash src="/css/arena.css"}" />
-{elseif !isset($headerPayload) || !$headerPayload.bootstrap4}
+{if !isset($headerPayload) || !$headerPayload.bootstrap4}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/css/style.css"}">
 		<!-- Bootstrap table plugin from https://github.com/wenzhixin/bootstrap-table/releases -->
 		<script src="{version_hash src="/third_party/js/bootstrap-table.min.js"}" defer></script>
@@ -60,18 +54,12 @@
 		{if isset($bodyid) and $bodyid} id="{$bodyid|escape}"{/if}
 		class="{if isset($headerPayload) && $headerPayload.bootstrap4} d-flex flex-column h-100 pt-5{/if}{if $smarty.const.OMEGAUP_LOCKDOWN} lockdown{/if}"
 	>
-{if isset($inArena) && $inArena}
-		<!-- Generated from http://ajaxload.info/ -->
-		{if !isset($bodyid) or $bodyid != 'only-problem'}
-		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/media/loading.gif" alt="loading" /></div>
-		{/if}
-{/if}
 {if isset($headerPayload) && $headerPayload.bootstrap4}
 	<script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
 	<div id="common-navbar"></div>
 	{js_include entrypoint="common_navbar"}
 	<main role="main">
-		{if (!isset($inArena) || !$inArena) && isset($ERROR_MESSAGE)}
+		{if isset($ERROR_MESSAGE)}
 			<div class="alert alert-danger">
 				{$ERROR_MESSAGE}
 			</div>
@@ -86,14 +74,12 @@
 	{else}
 		<script type="text/json" id="header-payload">{[]}</script>
 	{/if}
-	{if (!isset($inArena) || !$inArena)}
-	  	{js_include entrypoint="common_navbar"}
-		<div id="content">
-		{if isset($ERROR_MESSAGE)}
-		<div class="alert alert-danger">
-			{$ERROR_MESSAGE}
-		</div>
-		{/if}
+	{js_include entrypoint="common_navbar"}
+	<div id="content">
+	{if isset($ERROR_MESSAGE)}
+	<div class="alert alert-danger">
+		{$ERROR_MESSAGE}
+	</div>
 	{/if}
 	{include file='status.tpl' inline}
 {/if}
