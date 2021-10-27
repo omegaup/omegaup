@@ -10,7 +10,7 @@
             type="button"
             class="close"
             data-dismiss="modal"
-            aria-label="Close"
+            :aria-label="T.modalClose"
           >
             <span aria-hidden="true">&times;</span>
           </button>
@@ -94,7 +94,9 @@
             >
           </div>
           <button
-            v-if="currentModalPage === 1"
+            v-if="
+              currentModalPage === 1 && objective !== ObjectivesAnswers.None
+            "
             type="button"
             class="btn btn-next-previous float-right pr-0"
             @click="onNextModalPage"
@@ -104,6 +106,7 @@
           </button>
           <div v-else>
             <button
+              v-if="objective !== ObjectivesAnswers.None"
               type="button"
               class="btn btn-next-previous float-left pl-0"
               @click="onPreviousModalPage"
@@ -168,8 +171,14 @@ export default class UserObjectivesQuestions extends Vue {
   hasScholarObjective = false;
   hasTeachingObjective = false;
   currentModalPage = 1;
-  lastModalPage = 2;
   ObjectivesAnswers = ObjectivesAnswers;
+
+  get lastModalPage(): number {
+    if (this.objective !== ObjectivesAnswers.None) {
+      return 2;
+    }
+    return this.currentModalPage;
+  }
 
   get description(): string {
     if (this.currentModalPage === 1) {
@@ -181,13 +190,10 @@ export default class UserObjectivesQuestions extends Vue {
     if (this.hasLearningObjective) {
       return this.T.userObjectivesModalDescriptionLearning;
     }
-    if (this.hasTeachingObjective) {
-      return this.T.userObjectivesModalDescriptionTeaching;
-    }
-    return this.T.userObjectivesModalDescriptionUsageWhenNone;
+    return this.T.userObjectivesModalDescriptionTeaching;
   }
 
-  onNextModalPage(): void {
+  setFirstModalPageObjectives(): void {
     switch (this.objective) {
       case ObjectivesAnswers.Learning:
         this.hasLearningObjective = true;
@@ -206,6 +212,10 @@ export default class UserObjectivesQuestions extends Vue {
         this.hasTeachingObjective = false;
         break;
     }
+  }
+
+  onNextModalPage(): void {
+    this.setFirstModalPageObjectives();
     this.previousObjective = this.objective;
     this.objective = ObjectivesAnswers.Scholar;
     this.currentModalPage++;
@@ -217,23 +227,27 @@ export default class UserObjectivesQuestions extends Vue {
   }
 
   onSubmit(): void {
-    switch (this.objective) {
-      case ObjectivesAnswers.Scholar:
-        this.hasScholarObjective = true;
-        this.hasCompetitiveObjective = false;
-        break;
-      case ObjectivesAnswers.Competitive:
-        this.hasScholarObjective = false;
-        this.hasCompetitiveObjective = true;
-        break;
-      case ObjectivesAnswers.ScholarAndCompetitive:
-        this.hasScholarObjective = true;
-        this.hasCompetitiveObjective = true;
-        break;
-      case ObjectivesAnswers.Other:
-        this.hasScholarObjective = false;
-        this.hasCompetitiveObjective = false;
-        break;
+    if (this.currentModalPage !== 1) {
+      switch (this.objective) {
+        case ObjectivesAnswers.Scholar:
+          this.hasScholarObjective = true;
+          this.hasCompetitiveObjective = false;
+          break;
+        case ObjectivesAnswers.Competitive:
+          this.hasScholarObjective = false;
+          this.hasCompetitiveObjective = true;
+          break;
+        case ObjectivesAnswers.ScholarAndCompetitive:
+          this.hasScholarObjective = true;
+          this.hasCompetitiveObjective = true;
+          break;
+        case ObjectivesAnswers.Other:
+          this.hasScholarObjective = false;
+          this.hasCompetitiveObjective = false;
+          break;
+      }
+    } else {
+      this.setFirstModalPageObjectives();
     }
 
     this.$emit('submit', {
