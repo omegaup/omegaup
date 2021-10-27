@@ -9,11 +9,15 @@
       <form>
         <div class="form-group col-md-3">
           <label>{{ T.courseStudentSelectStudent }}</label>
-          <select v-model="selectedStudent" class="ml-1 form-control">
+          <select
+            v-model="selectedStudent"
+            class="ml-1 form-control"
+            data-student
+          >
             <option
               v-for="student in students"
               :key="student.username"
-              :value="student"
+              :value="student.username"
             >
               {{ student.name || student.username }}
             </option>
@@ -216,16 +220,18 @@ import * as time from '../../time';
 export default class CourseViewStudent extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: types.CourseDetails;
-  @Prop() initialStudent!: types.StudentProgress;
+  @Prop() student!: types.StudentProgress;
+  @Prop() assignment!: types.CourseAssignment;
+  @Prop({ default: null }) problem!: null | types.CourseProblem;
   @Prop() problems!: types.CourseProblem[];
   @Prop() students!: types.StudentProgress[];
 
   T = T;
   time = time;
   ui = ui;
-  selectedAssignment: string | null = null;
-  selectedProblem: Partial<types.CourseProblem> | null = null;
-  selectedStudent: Partial<types.StudentProgress> = this.initialStudent || {};
+  selectedAssignment: string | null = this.assignment?.alias ?? null;
+  selectedProblem: Partial<types.CourseProblem> | null = this.problem;
+  selectedStudent: string | null = this.student?.username ?? null;
   selectedRun: Partial<types.CourseRun> | null = null;
   showFeedbackForm = false;
   feedback = '';
@@ -254,8 +260,10 @@ export default class CourseViewStudent extends Vue {
 
   mounted(): void {
     window.addEventListener('popstate', (ev: PopStateEvent) => {
-      this.selectedStudent =
-        (ev.state && ev.state.student) || this.initialStudent;
+      if (this.selectedStudent !== null) {
+        return;
+      }
+      this.selectedStudent = ev.state?.student ?? this.student.username;
     });
   }
 
@@ -295,31 +303,51 @@ export default class CourseViewStudent extends Vue {
       feedback: this.feedback,
       isUpdate: this.selectedRun?.feedback != null,
       assignmentAlias: this.selectedAssignment,
-      studentUsername: this.selectedStudent.username,
+      studentUsername: this.selectedStudent,
     });
     this.feedback = '';
     this.showFeedbackForm = false;
   }
 
   @Watch('selectedStudent')
-  onSelectedStudentChange(
-    newVal?: types.StudentProgress,
-    oldVal?: types.StudentProgress,
-  ) {
-    this.$emit('update', this.selectedStudent, this.selectedAssignment);
-    if (!newVal || newVal?.username === oldVal?.username) {
+  onSelectedStudentChange(newVal?: string, oldVal?: string) {
+    this.$emit('update', {
+      student: this.selectedStudent,
+      assignmentAlias: this.selectedAssignment,
+    });
+    if (!newVal || newVal === oldVal) {
       return;
     }
-    window.history.pushState(
-      { student: newVal },
-      document.title,
-      `/course/${this.course.alias}/student/${newVal.username}/`,
-    );
+    let url: string = '';
+    if (this.selectedAssignment !== null) {
+      url = `/course/${this.course.alias}/student/${newVal}/assignment/${this.selectedAssignment}/#${this.selectedProblem?.alias}`;
+    } else {
+      url = `/course/${this.course.alias}/student/${newVal}/`;
+    }
+    this.$emit('push-state', { student: newVal }, document.title, url);
   }
 
   @Watch('selectedAssignment')
-  onSelectedAssignmentChange() {
-    this.$emit('update', this.selectedStudent, this.selectedAssignment);
+  onSelectedAssignmentChange(newVal?: string, oldVal?: string) {
+    this.$emit('update', {
+      student: this.selectedStudent,
+      assignmentAlias: this.selectedAssignment,
+    });
+    if (!newVal || newVal === oldVal) {
+      return;
+    }
+    let url: string = '';
+    if (this.selectedProblem !== null) {
+      url = `/course/${this.course.alias}/student/${this.selectedStudent}/assignment/${newVal}/#${this.selectedProblem?.alias}`;
+    } else {
+      url = `/course/${this.course.alias}/student/${this.selectedStudent}/assignment/${newVal}/`;
+    }
+    this.$emit(
+      'push-state',
+      { student: this.selectedStudent },
+      document.title,
+      url,
+    );
   }
 
   @Watch('problems')
@@ -339,6 +367,7 @@ export default class CourseViewStudent extends Vue {
   @Watch('selectedProblem')
   onSelectedProblemChange(newVal: types.CourseProblem) {
     this.selectedRun = newVal.runs?.[0] ?? null;
+    window.location.hash = `#${this.selectedProblem?.alias}`;
   }
 }
 </script>

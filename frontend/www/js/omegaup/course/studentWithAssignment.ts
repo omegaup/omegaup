@@ -7,11 +7,24 @@ import T from '../lang';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.StudentProgressPayload();
+  const payload = types.payloadParsers.StudentProgressByAssignmentPayload();
+
+  const match = /#(?<alias>[^/]+)?/g.exec(window.location.hash);
+  const selectedProblem = match?.groups?.alias;
 
   const student = payload.students.find(
     (student) => payload.student === student.username,
   );
+
+  const assignment = payload.course.assignments.find(
+    (assignment) => payload.assignment === assignment.alias,
+  );
+
+  const problem = payload.problems.find(
+    (problem) => selectedProblem === problem.alias,
+  );
+
+  const problems: types.CourseProblem[] = payload.problems;
 
   const viewStudent = new Vue({
     el: '#main-container',
@@ -19,8 +32,8 @@ OmegaUp.on('ready', () => {
       'omegaup-course-viewstudent': course_ViewStudent,
     },
     data: () => ({
-      problems: [] as types.CourseProblem[],
-      problem: null as null | types.CourseProblem,
+      problems,
+      problem,
     }),
     methods: {
       refreshStudentProgress: (
@@ -45,8 +58,9 @@ OmegaUp.on('ready', () => {
           assignments: payload.course.assignments,
           course: payload.course,
           student,
+          assignment,
+          problem,
           problems: this.problems,
-          problem: this.problem,
           students: payload.students,
         },
         on: {
