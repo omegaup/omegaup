@@ -4,6 +4,12 @@
 
 /**
  *  GroupScoreboardController
+ *
+ * @psalm-type ScoreboardContest=array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}
+ * @psalm-type ScoreboardRanking=array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}
+ * @psalm-type ScoreboardDetails=array{group_scoreboard_id: int, group_id: int, create_time: int, alias: string, name: string, description: string}
+ * @psalm-type GroupScoreboardDetails=array{ranking: list<ScoreboardRanking>, scoreboard: ScoreboardDetails, contests: list<ScoreboardContest>}
+ * @psalm-type GroupScoreboardDetailsPayload=array{groupAlias: string, details: GroupScoreboardDetails, scoreboardAlias: string}
  */
 
 class GroupScoreboard extends \OmegaUp\Controllers\Controller {
@@ -178,7 +184,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{ranking: list<array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}>, scoreboard: array{group_scoreboard_id: int, group_id: int, create_time: int, alias: string, name: string, description: string}, contests: list<array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}>}
+     * @return GroupScoreboardDetails
      *
      * @omegaup-request-param string $group_alias
      * @omegaup-request-param string $scoreboard_alias
@@ -202,7 +208,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{ranking: list<array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}>, scoreboard: array{group_scoreboard_id: int, group_id: int, create_time: int, alias: string, name: string, description: string}, contests: list<array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}>}
+     * @return GroupScoreboardDetails
      */
     public static function getScoreboardDetails(
         string $groupAlias,
@@ -216,7 +222,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
         );
 
         // Fill contests
-        /** @var list<array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}> */
+        /** @var list<ScoreboardContest> */
         $contests = [];
         $gscs = \OmegaUp\DAO\GroupsScoreboardsProblemsets::getByGroupScoreboard(
             intval($scoreboard->group_scoreboard_id)
@@ -233,7 +239,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
                     'contestNotFound'
                 );
             }
-            /** @var array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool} */
+            /** @var ScoreboardContest */
             $currentContest = $contest->asArray();
             $currentContest['only_ac'] = $gsc->only_ac;
             $currentContest['weight'] = floatval($gsc->weight);
@@ -260,7 +266,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
             // Get merged scoreboard
             /** @var list<string> */
             $contestAliases = [];
-            /** @var array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float} $contest */
+            /** @var ScoreboardContest $contest */
             foreach ($contests as $contest) {
                 $contestAliases[] = $contest['alias'];
             }
@@ -314,6 +320,44 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
 
         return [
             'scoreboards' => $scoreboards,
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: GroupScoreboardDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $group
+     * @omegaup-request-param string $scoreboard
+     */
+    public static function getGroupScoreboardDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+        $groupAlias = $r->ensureString(
+            'group',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $scoreboardAlias = $r->ensureString(
+            'scoreboard',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'groupAlias' => $groupAlias,
+                    'scoreboardAlias' => $scoreboardAlias,
+                    'details' => self::getScoreboardDetails(
+                        $groupAlias,
+                        $r->identity,
+                        $scoreboardAlias
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleGroupScoreboardDetails'
+                )
+            ],
+            'entrypoint' => 'group_scoreboard_details',
         ];
     }
 }
