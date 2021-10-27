@@ -36,7 +36,6 @@ rewrite ^/contest/new/?$ /contests/new.php last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/?$ /arena/$1/ permanent;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/activity/?$ /contests/activity.php?contest=$1 last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/edit/?$ /contests/edit.php?contest_alias=$1 last;
-rewrite ^/contest/([a-zA-Z0-9_+-]+)/report/print/?$ /contests/report.php?contest_alias=$1&print=1 last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/report/?$ /contests/report.php?contest_alias=$1 last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/stats/?$ /contests/stats.php?contest_alias=$1 last;
 rewrite ^/contest/([a-zA-Z0-9_+-]+)/virtual/?$ /contests/virtual.php?contest_alias=$1  last;
