@@ -668,6 +668,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleContestList: "Contests list",
   omegaupTitleContestNew: "ContestNew",
   omegaupTitleContestPractice: "Contest (Practice mode)",
+  omegaupTitleContestReport: "Report for contest: %(contestName)",
   omegaupTitleContestScoreboard: "Contest scoreboard",
   omegaupTitleContestStats: "Contest stats",
   omegaupTitleCourseClarifications: "Course clarifications",
