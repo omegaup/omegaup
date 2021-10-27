@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import T from '../../lang';
 
-import problem_SettingsSummary from './SettingsSummaryV2.vue';
+import problem_SettingsSummary from './SettingsSummary.vue';
 
 const baseSettingsSummaryProps = {
   showVisibilityIndicators: false,
@@ -44,7 +44,7 @@ const baseSettingsSummaryProps = {
   } as types.ArenaProblemDetails,
 };
 
-describe('SettingsSummaryV2.vue', () => {
+describe('SettingsSummary.vue', () => {
   it('Should handle problem settings summary in contest', () => {
     const wrapper = mount(problem_SettingsSummary, {
       propsData: baseSettingsSummaryProps,
