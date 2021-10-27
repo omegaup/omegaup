@@ -4,6 +4,11 @@
       {{ ui.formatString(T.contestReport, { contest_alias: contestAlias }) }}
     </div>
     <div class="card-body">
+      <div class="text-right">
+        <a :href="`/contest/${contestAlias}/report/`">
+          <font-awesome-icon :icon="['fas', 'globe']"></font-awesome-icon>
+        </a>
+      </div>
       <div
         v-for="contestantData in contestReport"
         :key="contestantData.username"
@@ -110,8 +115,17 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faGlobe } from '@fortawesome/free-solid-svg-icons';
 
-@Component
+library.add(faGlobe);
+
+@Component({
+  components: {
+    FontAwesomeIcon,
+  },
+})
 export default class Report extends Vue {
   @Prop() contestReport!: types.ContestReport[];
   @Prop() contestAlias!: string;

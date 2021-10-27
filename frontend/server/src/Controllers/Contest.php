@@ -5211,6 +5211,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param bool|null $print
      * @omegaup-request-param null|string $filterBy
      */
     public static function getContestReportDetailsForTypeScript(
@@ -5256,6 +5257,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 }
             }
         }
+        $forPrint = $r->ensureOptionalBool('print') ?? false;
 
         return [
             'smartyProperties' => [
@@ -5270,7 +5272,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     ],
                 ),
             ],
-            'entrypoint' => 'contest_report',
+            'entrypoint' => $forPrint ? 'contest_report_print' : 'contest_report',
         ];
     }
 

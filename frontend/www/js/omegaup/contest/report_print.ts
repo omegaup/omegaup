@@ -1,4 +1,4 @@
-import contest_Report from '../components/contest/Reportv2.vue';
+import contest_Report from '../components/contest/Report.vue';
 import { OmegaUp } from '../omegaup';
 import Vue from 'vue';
 import { types } from '../api_types';
