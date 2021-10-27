@@ -208,6 +208,15 @@ class Validators {
     }
 
     /**
+     * Returns whether the token is valid.
+     *
+     * @return boolean
+     */
+    public static function token(string $token): bool {
+        return preg_match('/^[a-zA-Z0-9]{30}$/', $token) === 1;
+    }
+
+    /**
      * Returns whether the username or email is valid.
      *
      * @param string $usernameOrEmail

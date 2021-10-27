@@ -16,7 +16,7 @@
       >
       <span class="d-block">{{
         ui.formatString(T.studentProgressPoints, {
-          points: studentProgress.courseScore,
+          points: studentProgress.courseScore.toFixed(0),
         })
       }}</span>
     </td>
