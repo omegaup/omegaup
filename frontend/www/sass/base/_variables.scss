@@ -225,4 +225,255 @@
   --toggle-switch-slider-background-color--before: #ffffff;
   --toggle-switch-input-checked-slider-background-color: #678dd7;
   --toggle-switch-input-focus-slider-background-color: #678dd7;
+
+  // COMMON
+  --common-card-header-help-font-color: #ffffff;
+  --common-pre-code-background-color: #f5f5f5;
+  --common-pre-code-border-color: #cccccc;
+  --common-empty-table-message-font-color: #aaaaaa;
+  --common-custom-badge-font-color: #000000;
+  --common-custom-badge-font-color--hover: #000000;
+  --common-custom-badge-owner-background-color: #cccccc;
+  --common-custom-badge-quality-background-color: #ffeb3b;
+  --common-custom-badge-voted-background-color: #99c2ff;
+  --common-tt-dataset-background-color: #ffffff;
+  --common-tt-dataset-border-color: #808080;
+  --common-code-mirror-font-color: #333333;
+  --common-code-mirror-background-color: #cccccc;
+}
+
+html[data-color-mode='darkly'] {
+  // STATUS
+  --status-success-color: #468847;
+  --status-error-color: #b94a48;
+  --status-warning-color: #c09853;
+
+  // HEADER
+  --header-primary-color: #678dd7;
+  --header-caret-border-color: #000000;
+  --header-navbar-right-caret-border-color: #ffffff;
+  --header-navbar-right-a-font-color: #ffffff;
+  --header-navbar-brand-background-color: #f2f2f2;
+  --header-navbar-dropdown-item-font-color: #ffffff;
+  --header-active-color: #5f87d4;
+  --header-accent-color: #577dc7;
+
+  --header-font-primary-color: #000000;
+  --header-font-secondary-color: #cccccc;
+  --header-dropdown-active-item: #0a0a0a;
+
+  // BUTTONS
+  --btn-cancel-background-color: #222222;
+  --btn-cancel-font-color: #ffffff;
+  --btn-ok-background-color: #ff8400;
+  --btn-ok-font-color: #000000;
+  --btn-ok-font-color--hover: #000000;
+
+  // MARKDOWN
+  --markdown-pre-background-color: #111111;
+  --markdown-details-border-color: #111111;
+  --markdown-details-summary-font-color: #aa7722;
+  --markdown-td-border-color: #ffffff;
+  --markdown-sample-io-tbody-background-color: #111111;
+  --markdown-sample-io-tbody-border-color: #ffffff;
+  --markdown-sample-io-tr-even-element-background-color: #0a0a0a;
+  --markdown-sample-io-td-border-color: #ffffff;
+  --markdown-libinteractive-download-background-color: #111111;
+  --markdown-libinteractive-download-font-color: #333333;
+  --markdown-libinteractive-download-border-color: #333333;
+  --wmd-button-bar-background-color: #000000;
+  --markdown-button-clipboard-border-color: #251f1a;
+
+  // OVERLAY POPUP
+  --overlay-popup-background-color: #111111;
+  --overlay-popup-border-color: #333333;
+  --overlay-popup-close-background-color--hover: #111111;
+  --overlay-background-color: #ffffff;
+
+  // ARENA
+  --arena-practice-background-color: #999977;
+  --arena-background-color: #14100d;
+  --arena-socket-status-error-color: #880000;
+  --arena-socket-status-ok-color: #008800;
+  --arena-navbar-left-border-color: #333333;
+  --arena-problem-background-color: #000000;
+  --arena-run-details-form-background-color: #111111;
+  --arena-run-details-form-border-color: #333333;
+  --arena-run-details-dropdown-cases-background-color: #0a0a0a;
+  --arena-form-close-background-color: #000000;
+  --arena-form-close-border-color: #333333;
+  --arena-form-close-background-color--hover: #111111;
+  --arena-cases-tr-border-top-color: #333333;
+  --arena-cases-table-stderr-font-color: #bbffff;
+  --arena-run-submit-form-background-color: #111111;
+  --arena-run-submit-form-border-color: #333333;
+  --arena-problem-details-karel-link-border-color: #111111;
+  --arena-problem-details-karel-link-border-left-color: #e47f61;
+  --arena-contest-navleft-main-border-color: #333333;
+  --arena-contest-navtabs-link-background-color: #222222;
+  --arena-contest-navtabs-link-border-top-color: #222222;
+  --arena-contest-navbar-problem-list-background-color: #222222;
+  --arena-contest-navbar-problem-list-border-color: #333333;
+  --arena-contest-navbar-problem-list-a-font-color: #aa7722;
+  --arena-contest-navbar-problem-type-font-color: #656565;
+  --arena-runs-table-border-color: #333333;
+  --arena-runs-table-td-border-color: #333333;
+  --arena-runs-table-tfoot-font-color: #ffffff;
+  --arena-runs-table-tfoot-background-color: #333333;
+  --arena-runs-table-tfoot-background-color--hoover: #000000;
+  --arena-runs-table-status-disqualified-background-color: #ff0000;
+  --arena-runs-table-status-disqualified-font-color: #ffffff;
+  --arena-runs-table-status-je-ve-background-color: #ff0000;
+  --arena-runs-table-status-je-ve-font-color: #ffffff;
+  --arena-runs-table-status-ac-background-color: #cf6;
+  --arena-runs-table-status-ac-font-color: #333;
+  --arena-runs-table-status-ce-background-color: #f90;
+  --arena-runs-table-status-ce-font-color: #000000;
+  --arena-solvers-table-border-color: #333333;
+  --arena-solvers-td-border-color: #333333;
+  --arena-contest-list-empty-category-font-color: #555555;
+  --arena-scoreboard-a-font-color: #aa7722;
+  --arena-scoreboard-footer-font-color: #7f7f7f;
+  --arena-scoreboard-td-border-color: #ffffff;
+  --arena-scoreboard-accepted-background-color: #ddffdd;
+  --arena-scoreboard-pending-background-color: #ddddff;
+  --arena-scoreboard-wrong-background-color: #ffdddd;
+  --arena-scoreboard-position-recent-event-background-color: #ddffdd;
+  --arena-scoreboard-accepted-recent-event-background-color: #88ff88;
+  --arena-scoreboard-legend-1-background-color: #fb3f51;
+  --arena-scoreboard-legend-2-background-color: #ff5d40;
+  --arena-scoreboard-legend-3-background-color: #ffa240;
+  --arena-scoreboard-legend-4-background-color: #ffc740;
+  --arena-scoreboard-legend-5-background-color: #59ea3a;
+  --arena-scoreboard-legend-6-background-color: #37dd6f;
+  --arena-scoreboard-legend-7-background-color: #34d0ba;
+  --arena-scoreboard-legend-8-background-color: #3aaacf;
+  --arena-scoreboard-legend-9-background-color: #8144d6;
+  --arena-scoreboard-legend-10-background-color: #cd35d3;
+  --arena-submissions-list-verdict-ac-background-color: #ccff66;
+  --arena-submissions-list-verdict-ce-background-color: #ff9900;
+  --arena-submissions-list-verdict-je-ve-background-color: #ff0000;
+  --arena-histogram-bar-1-background-gradient: #4fa2eb;
+  --arena-histogram-bar-2-background-gradient: #c2ddeb;
+  --arena-histogram-bar-3-background-gradient: #dddcdb;
+  --arena-histogram-bar-4-background-gradient: #faccb4;
+  --arena-histogram-bar-5-background-gradient: #df3e4b;
+  --arena-settings-summary-panel-th-border-color: #ffffff;
+  --arena-summary-background-color: #000000;
+  --arena-navbar-miniranking-td-border-color: #ffffff;
+
+  // FINDER WIZARD
+  --finder-wizard-modal-mask-background-color: #ffffff;
+  --finder-wizard-modal-container-background-color: #111111;
+  --finder-wizard-modal-container-border-color: #333333;
+  --finder-wizard-slider-process-background-color: #987228;
+  --finder-wizard-tab-select-el-border-color: #987228;
+  --finder-wizard-tab-select-el-font-color: #987228;
+  --finder-wizard-tab-select-el-font-color--active: #000000;
+  --finder-wizard-tab-select-el-background-color--active: #987228;
+
+  // CLARIFICATIONS
+  --clarifications-list-pre-font-color: #cccccc;
+  --clarifications-list-pre-background-color: #0a0a0a;
+  --clarification-resolved-font-color: #468847;
+  --clarification-resolved-background-color: #200f27;
+  --clarification-resolved-gradient-from-background-color: #200f27;
+  --clarification-resolved-gradient-to-background-color: #371a43;
+  --clarification-direct-message-font-color: #828aed;
+  --clarification-direct-message-background-color: #200f27;
+  --clarification-direct-message-gradient-from-background-color: #020a65;
+  --clarification-direct-message-gradient-to-background-color: #00064a;
+
+  // PROBLEM
+  --problem-versions-controls-background-color: #0a0a0a;
+  --problem-versions-controls-border-bottom-color: #222222;
+
+  // NOTIFICATIONS
+  --notifications-clarifications-scrollbar-track-background-color: #0a0a0a;
+  --notifications-clarifications-scrollbar-background-color: #0a0a0a;
+  --notifications-clarifications-scrollbar-thumb-background-color: #7f7f7f;
+  --notifications-clarifications-drawer-li-border-top-color: #0d0d0d;
+  --notifications-clarifications-drawer-li-a-font-color: #cccccc;
+  --notifications-clarifications-drawer-li-background-color--active: #987228;
+  --notifications-clarifications-drawer-li-font-color--active: #000000;
+  --notifications-notification-date-font-color: #999999;
+  --notifications-notification-link-background-color--hover: #ffffff;
+
+  // QUALITY NOMINATIONS
+  --quality-nomination-popup-border-color: #333333;
+  --quality-nomination-popup-background-color: #ffffff;
+  --quality-nomination-tag-select-border-color: #333333;
+  --quality-nomination-tag-select-background-color: #000000;
+  --quality-nomination-details-confirmation-background-color: #ffffff;
+
+  // CODER OF THE MONTH
+  --coder-of-the-month-card-header-font-color: #000000;
+  --coder-of-the-month-card-header-background-color: #aa7722;
+  --coder-of-the-month-card-header-female-background-color: #77aa22;
+
+  // BADGES
+  --badges-link-font-color: #337ab7;
+  --badges-grader-error-font-color: #b94a48;
+  --badges-grader-error-background-color: #f2dede;
+  --badges-grader-error-gradient-from-background-color: #f2dede;
+  --badges-grader-error-gradient-to-background-color: #e7c3c3;
+  --badges-grader-ok-font-color: #468847;
+  --badges-grader-ok-background-color: #dff0d8;
+  --badges-grader-ok-gradient-from-background-color: #dff0d8;
+  --badges-grader-ok-gradient-to-background-color: #c8e5bc;
+  --badges-grader-warning-from-font-color: #03071c;
+  --badges-grader-warning-to-font-color: #07103f;
+  --badges-grader-warning-border-color: #0a1861;
+  --badges-grader-warning-font-color: #3f67ac;
+
+  // MULTISELECT
+  --multiselect-tag-background-color: #987228;
+
+  // SCHOOLS
+  --schools-intro-header-title-text-shadow-color: #987228;
+  --schools-intro-header-text-color: #000000;
+  --schools-intro-body-background-color: #ffffff;
+
+  // TEXTEDITOR
+  --text-editor-textarea-background-color: #dddddd;
+  --text-editor-textarea-font-color: #2b2b2b;
+
+  // USER RANK
+  --user-rank-beginner-font-color: #919191;
+  --user-rank-specialist-font-color: #598c4c;
+  --user-rank-expert-font-color: #1c52c7;
+  --user-rank-master-font-color: #f0c245;
+  --user-rank-international-master-font-color: #cb000a;
+  --user-basic-info-form-group-border-color: #e9e9e9;
+  --user-basic-info-field-data-font-color: #808080;
+
+  // HOMEPAGE
+  --homepage-carousel-font-color: #000000;
+  --homepage-carousel-background-color: #b99550;
+
+  // GRADER
+  --grader-status-submissions-link-background-color: #000000;
+  --grader-status-submissions-link-font-color: #ffffff;
+  --grader-status-submissions-link-background-color--hover: #000000;
+
+  // TOGGLE SWITCH
+  --toggle-switch-slider-background-color: #222222;
+  --toggle-switch-slider-background-color--before: #000000;
+  --toggle-switch-input-checked-slider-background-color: #987228;
+  --toggle-switch-input-focus-slider-background-color: #987228;
+
+  // COMMON
+  --common-card-header-help-font-color: #000000;
+  --common-pre-code-background-color: #0a0a0a;
+  --common-pre-code-border-color: #333333;
+  --common-empty-table-message-font-color: #555555;
+  --common-custom-badge-font-color: #ffffff;
+  --common-custom-badge-font-color--hover: #ffffff;
+  --common-custom-badge-owner-background-color: #333333;
+  --common-custom-badge-quality-background-color: #ffeb3b;
+  --common-custom-badge-voted-background-color: #99c2ff;
+  --common-tt-dataset-background-color: #000000;
+  --common-tt-dataset-border-color: #7f7f7f;
+  --common-code-mirror-font-color: #cccccc;
+  --common-code-mirror-background-color: #333333;
 }
