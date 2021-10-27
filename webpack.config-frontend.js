@@ -75,6 +75,7 @@ module.exports = {
     group_new: './frontend/www/js/omegaup/group/new.ts',
     group_scoreboard_contests:
       './frontend/www/js/omegaup/group/scoreboard_contests.ts',
+    group_scoreboard_details: './frontend/www/js/omegaup/group/scoreboard_details.ts',
     login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
     login_signin: './frontend/www/js/omegaup/login/signin.ts',
