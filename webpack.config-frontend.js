@@ -48,7 +48,6 @@ module.exports = {
     contest_new: './frontend/www/js/omegaup/contest/new.ts',
     contest_print: './frontend/www/js/omegaup/contest/print.ts',
     contest_report: './frontend/www/js/omegaup/contest/report.ts',
-    contest_report_print: './frontend/www/js/omegaup/contest/report_print.ts',
     contest_scoreboard: './frontend/www/js/omegaup/arena/scoreboard.ts',
     contest_scoreboardmerge:
       './frontend/www/js/omegaup/contest/scoreboardmerge.ts',
