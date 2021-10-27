@@ -57,7 +57,8 @@ jobs:
             docker push "${container_name}"
           done
 
-      - name: Update k8s manifests
+      - name: Update k8s sandbox manifests
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
           sudo mv kustomize /usr/local/bin/
@@ -72,6 +73,7 @@ jobs:
              omegaup/nginx:${TAG} \
              omegaup/frontend:${TAG} \
              omegaup/frontend-sidecar:${TAG} &&
+           sed -i "s/app.kubernetes.io\/version: .*/app.kubernetes.io\/version: ${TAG}/" frontend-deployment.yaml &&
            git commit -am "omegaUp sandbox release ${TAG}" &&
            git push)
           rm -rf /tmp/prod
