@@ -21,10 +21,6 @@
     <script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js" defer}"></script>
     {js_include entrypoint="omegaup" runtime}
 
-    {if isset($inArena) && $inArena}
-      {js_include entrypoint="arena"}
-    {/if}
-
     {if isset($jsfile)}
       <script type="text/javascript" src="{$jsfile}" defer></script>
     {/if}
