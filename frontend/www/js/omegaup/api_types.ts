@@ -1507,14 +1507,6 @@ export namespace types {
             })(x.solvers);
           return x;
         })(x.details);
-        if (x.problemsetter)
-          x.problemsetter = ((x) => {
-            if (x.creation_date)
-              x.creation_date = ((x: number) => new Date(x * 1000))(
-                x.creation_date,
-              );
-            return x;
-          })(x.problemsetter);
         return x;
       })(
         JSON.parse(
@@ -3360,13 +3352,6 @@ export namespace types {
 
   export interface ProblemPrintDetailsPayload {
     details: types.ProblemDetails;
-    memoryLimit: string;
-    overallWallTimeLimit: number;
-    points: number;
-    problemsetter?: types.ProblemsetterInfo;
-    source?: string;
-    timeLimit: number;
-    title: string;
   }
 
   export interface ProblemQualityPayload {
