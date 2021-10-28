@@ -200,7 +200,7 @@ describe('ObjectivesQuestions.vue', () => {
         .setChecked();
       await wrapper.find('button.btn-primary').trigger('click');
       expect(wrapper.emitted('submit')).toBeDefined();
-      expect(wrapper.emitted('submit')[0]).toEqual([
+      expect(wrapper.emitted('submit')?.[0]).toEqual([
         {
           hasCompetitiveObjective: valueCompetitive,
           hasLearningObjective: valueLearning,
@@ -216,7 +216,7 @@ describe('ObjectivesQuestions.vue', () => {
     await wrapper.find(`input[type="radio"][value="none"]`).setChecked();
     await wrapper.find('button.btn-primary').trigger('click');
     expect(wrapper.emitted('submit')).toBeDefined();
-    expect(wrapper.emitted('submit')[0]).toEqual([
+    expect(wrapper.emitted('submit')?.[0]).toEqual([
       {
         hasCompetitiveObjective: false,
         hasLearningObjective: false,
