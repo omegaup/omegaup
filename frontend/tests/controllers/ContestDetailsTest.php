@@ -732,12 +732,12 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
             // Create API
             $login = self::login($contestDirector);
-            $r = new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'contest_alias' => $contestData['request']['alias'],
-            ]);
-            $response = \OmegaUp\Controllers\Contest::apiReport($r);
-            unset($login);
+            $response = \OmegaUp\Controllers\Contest::apiReport(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                ])
+            );
 
             $this->assertEquals(
                 $problemData['request']['problem_alias'],
@@ -747,6 +747,26 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             foreach ($identities as $contestant) {
                 $found = false;
                 foreach ($response['ranking'] as $rank) {
+                    if ($rank['username'] == $contestant->username) {
+                        $found = true;
+                        break;
+                    }
+                }
+                $this->assertTrue($found);
+            }
+
+            // We can get ranking in getContestReportDetailsForTypeScript function
+            $ranking = \OmegaUp\Controllers\Contest::getContestReportDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'contest_alias' => $contestData['request']['alias'],
+                ])
+            )['smartyProperties']['payload']['contestReport'];
+            unset($login);
+
+            foreach ($identities as $contestant) {
+                $found = false;
+                foreach ($ranking as $rank) {
                     if ($rank['username'] == $contestant->username) {
                         $found = true;
                         break;

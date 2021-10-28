@@ -130,6 +130,20 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $expected_text,
             $response['statement']['markdown']
         );
+
+        // We can get problem details with following function
+        $details = \OmegaUp\Controllers\Problem::getProblemPrintDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        )['smartyProperties']['payload']['details'];
+
+        // Assert data
+        $this->assertStringContainsString(
+            $expected_text,
+            $details['statement']['markdown']
+        );
     }
 
     /**

@@ -33,6 +33,7 @@
     "@types/prismjs": "^1.16.1",
     "@types/sortablejs": "^1.10.4",
     "@types/testing-library__jest-dom": "^5.9.5",
+    "@types/uuid": "8.3.1",
     "@typescript-eslint/eslint-plugin": "^4.3.0",
     "@typescript-eslint/parser": "^4.3.0",
     "@voerro/vue-tagsinput": "^2.0.2",
@@ -90,6 +91,7 @@
     "typescript": "^4.4.4",
     "typescript-optional": "^2.0.1",
     "unfetch": "^4.1.0",
+    "uuid": "8.3.1",
     "v-clipboard": "^2.2.3",
     "v-tooltip": "^3.0.0-alpha.21",
     "vue": "^2.5.22",
@@ -109,6 +111,7 @@
     "vue-template-compiler": "^2.5.16",
     "vue-typeahead-bootstrap": "^2.1.2",
     "vuex": "^3.0.1",
+    "vuex-class": "^0.3.2",
     "webpack": "^5.8",
     "webpack-cli": "^4.2",
     "wrapper-webpack-plugin": "^2.1"
@@ -125,5 +128,6 @@
     "build-development": "cross-env webpack --mode=development",
     "build-development-frontend": "cross-env webpack --config-name=frontend --mode=development",
     "refactor": "cross-env ./stuff/refactor.js"
-  }
+  },
+  "dependencies": {}
 }
