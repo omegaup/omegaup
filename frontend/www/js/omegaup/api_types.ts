@@ -1500,6 +1500,56 @@ export namespace types {
       );
     }
 
+    export function ProblemPrintDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ProblemPrintDetailsPayload {
+      return ((x) => {
+        x.details = ((x) => {
+          x.creation_date = ((x: number) => new Date(x * 1000))(
+            x.creation_date,
+          );
+          if (x.nextSubmissionTimestamp)
+            x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
+              x.nextSubmissionTimestamp,
+            );
+          if (x.problemsetter)
+            x.problemsetter = ((x) => {
+              if (x.creation_date)
+                x.creation_date = ((x: number) => new Date(x * 1000))(
+                  x.creation_date,
+                );
+              return x;
+            })(x.problemsetter);
+          if (x.runs)
+            x.runs = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.runs);
+          if (x.solvers)
+            x.solvers = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.solvers);
+          return x;
+        })(x.details);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function ProblemQualityPayload(
       elementId: string = 'payload',
     ): types.ProblemQualityPayload {
@@ -3371,6 +3421,10 @@ export namespace types {
     selectedTags: string[];
     tagData: { name?: string }[];
     tags: string[];
+  }
+
+  export interface ProblemPrintDetailsPayload {
+    details: types.ProblemDetails;
   }
 
   export interface ProblemQualityPayload {
