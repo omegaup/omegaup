@@ -315,11 +315,7 @@ import {
   faLink,
   faTachometerAlt,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(
-  faEdit,
-  faLink,
-  faTachometerAlt,
-);
+library.add(faEdit, faLink, faTachometerAlt);
 
 export enum Tab {
   Information = 'information',

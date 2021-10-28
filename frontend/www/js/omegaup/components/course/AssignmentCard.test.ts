@@ -3,84 +3,37 @@ import { mount } from '@vue/test-utils';
 import T from '../../lang';
 import type { types } from '../../api_types';
 
-import course_Course from './Course.vue';
+import course_AssignmentCard from './AssignmentCard.vue';
 
-describe('Course.vue', () => {
-  it('Should handle a card with public course', () => {
-    const wrapper = mount(course_Course, {
+describe('AssignmentCard.vue', () => {
+  const assignment: types.CourseAssignment = {
+    alias: 'test-assignment',
+    assignment_type: 'homework',
+    description: '',
+    finish_time: undefined,
+    name: 'Test',
+    order: 1,
+    scoreboard_url: '',
+    scoreboard_url_admin: '',
+    start_time: new Date(),
+    has_runs: false,
+    max_points: 0,
+    problemset_id: 0,
+    problemCount: 0,
+  };
+
+  it('Should handle assignment details', () => {
+    const studentProgress = 50;
+    const wrapper = mount(course_AssignmentCard, {
       propsData: {
-        courseName: 'Introductorio a la OMI',
-        courseAlias: 'OMI',
-        schoolName: 'omegaUp',
-        finishTime: null,
-        progress: 0,
-        content: [
-          {
-            alias: 't1',
-            assignment_type: 'homework',
-            description: 'assigment description',
-            finish_time: new Date(),
-            has_runs: false,
-            max_points: 100,
-            name: 'Introducción a omegaUp',
-            order: 1,
-            problemset_id: 1,
-            scoreboard_url: 'url',
-            scoreboard_url_admin: 'admin_url',
-            start_time: new Date(),
-            problemCount: 0,
-          },
-          {
-            alias: 't2',
-            assignment_type: 'homework',
-            description: 'assigment description',
-            finish_time: new Date(),
-            has_runs: false,
-            max_points: 100,
-            name: 'Estructura de datos',
-            order: 2,
-            problemset_id: 2,
-            scoreboard_url: 'url',
-            scoreboard_url_admin: 'admin_url',
-            start_time: new Date(),
-            problemCount: 0,
-          },
-        ] as types.CourseAssignment[],
-        loggedIn: true,
-        isOpen: false,
-        showTopics: true,
+        courseAlias: 'test-course',
+        assignment,
+        studentProgress,
       },
     });
-
-    expect(wrapper.text()).toContain(T.startCourse);
-    expect(wrapper.text()).toContain(T.courseCardShowTopics);
-    expect(wrapper.text()).toContain(T.wordsUnlimitedDuration);
-    expect(wrapper.text()).toContain('Introductorio a la OMI');
-    expect(wrapper.text()).toContain('Introducción a omegaUp');
-    expect(wrapper.text()).toContain('Estructura de datos');
-  });
-
-  it('Should handle a card with private course', () => {
-    const now = new Date();
-    const finishTime = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-
-    const wrapper = mount(course_Course, {
-      propsData: {
-        courseName: 'Clase 2020 semestre 1',
-        courseAlias: 'S1-2020',
-        schoolName: 'omegaUp',
-        finishTime: finishTime,
-        progress: 70,
-        content: [],
-        isOpen: true,
-        loggedIn: true,
-        showTopics: false,
-      },
-    });
-
+    expect(wrapper.text()).toContain(assignment.name);
+    expect(wrapper.text()).toContain(T.wordsHomework);
     expect(wrapper.text()).toContain(T.courseCardCourseResume);
-    expect(wrapper.text()).not.toContain(T.courseCardShowTopics);
-    expect(wrapper.text()).toContain(T.wordsProgress);
-    expect(wrapper.text()).toContain('Clase 2020 semestre 1');
+    expect(wrapper.text()).toContain(`${studentProgress}%`);
   });
 });
