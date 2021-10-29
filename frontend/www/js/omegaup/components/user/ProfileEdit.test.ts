@@ -3,7 +3,7 @@ import { types } from '../../api_types';
 import user_Profile_Edit from './ProfileEdit.vue';
 import date_Picker from '../DatePicker.vue';
 
-const profile = {
+const profile: types.UserProfileInfo = {
   name: 'omegaUp admin',
   classname: 'user-rank-unranked',
   email: 'admin@omegaup.com',
@@ -23,9 +23,12 @@ const profile = {
   is_own_profile: true,
   birth_date: new Date('1999-09-09'),
   locale: 'es',
-} as types.UserProfileInfo;
+};
 
-const profileEditProps = {
+const profileEditProps: {
+  profile: types.UserProfileInfo;
+  data: types.UserProfileEditDetailsPayload;
+} = {
   profile,
   data: {
     countries: [
@@ -40,7 +43,7 @@ const profileEditProps = {
     ],
     programmingLanguages: { py2: 'Python 2', py3: 'Python 3' },
     profile: profile,
-  } as types.UserProfileEditDetailsPayload,
+  },
 };
 
 describe('ProfileEdit.vue', () => {
@@ -84,8 +87,6 @@ describe('ProfileEdit.vue', () => {
     });
     wrapper.find('button[type="submit"]').trigger('submit');
     expect(wrapper.emitted('update-user')).toBeDefined();
-
-    //argument 'locale_changed' should be false
-    expect(wrapper.emitted('update-user')[0][1]).toEqual(false);
+    expect(wrapper.emitted('update-user')?.[0][0].localeChanged).toEqual(false);
   });
 });

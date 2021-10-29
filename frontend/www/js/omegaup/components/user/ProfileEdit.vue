@@ -16,7 +16,7 @@
         <label>{{ T.userEditBirthDate }}</label>
         <omegaup-datepicker
           v-model="selectedProfileInfo.birth_date"
-          :is-required="false"
+          :required="false"
         ></omegaup-datepicker>
       </div>
       <div class="form-group">
@@ -81,7 +81,7 @@
         <label>{{ T.userEditGraduationDate }}</label>
         <omegaup-datepicker
           v-model="selectedProfileInfo.graduation_date"
-          :is-required="false"
+          :required="false"
           :enabled="isSchoolSet"
         ></omegaup-datepicker>
       </div>
@@ -173,7 +173,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
@@ -202,7 +202,7 @@ export default class UserProfileEdit extends Vue {
   };
 
   get isCountrySelected(): boolean {
-    return this.selectedProfileInfo.country_id ? true : false;
+    return Boolean(this.selectedProfileInfo.country_id);
   }
 
   get countryStates(): iso3166.Subdivisions {
@@ -211,21 +211,16 @@ export default class UserProfileEdit extends Vue {
       return {};
     }
     const countrySelected = iso3166.country(countryId);
-    let subdivisions = Object.entries(countrySelected.sub)
+    const subdivisions: iso3166.Subdivisions = Object.entries(
+      countrySelected.sub,
+    )
       .sort((a, b) => Intl.Collator().compare(a[0], b[0]))
-      .reduce(
-        (r, [code, name]: any) => ({ ...r, [code]: name }),
-        {},
-      ) as iso3166.Subdivisions;
-
-    this.selectedProfileInfo.state_id = Object.keys(subdivisions)[0].split(
-      '-',
-    )[1];
+      .reduce((r, [code, name]: any) => ({ ...r, [code]: name }), {});
     return subdivisions;
   }
 
   get isSchoolSet(): boolean {
-    return this.selectedProfileInfo.school ? true : false;
+    return Boolean(this.selectedProfileInfo.school);
   }
 
   onUpdateUser(): void {
@@ -235,18 +230,39 @@ export default class UserProfileEdit extends Vue {
     graduationDate.setHours(23);
     const user = {
       ...this.selectedProfileInfo,
-      birth_date: isNaN(birthDate.getTime()) ? null : birthDate,
-      graduation_date: isNaN(graduationDate.getTime()) ? null : graduationDate,
+      birth_date: isNaN(birthDate.getTime()) ? undefined : birthDate,
+      graduation_date: isNaN(graduationDate.getTime())
+        ? undefined
+        : graduationDate,
       school_id:
         this.selectedProfileInfo.school_id === this.profile.school_id &&
         this.selectedProfileInfo.school !== this.profile.school
-          ? null
+          ? undefined
           : this.selectedProfileInfo.school_id,
       school_name: this.selectedProfileInfo.school,
     } as types.UserProfileInfo;
-    const locale_changed =
+    const localeChanged =
       this.selectedProfileInfo.locale != this.profile.locale;
-    this.$emit('update-user', user, locale_changed);
+    this.$emit('update-user', { user, localeChanged });
+  }
+
+  @Watch('selectedProfileInfo.country_id')
+  onCountryIdChanged(newCountryId: string): void {
+    if (!newCountryId) {
+      this.selectedProfileInfo.country_id = undefined;
+      this.selectedProfileInfo.state_id = undefined;
+      return;
+    }
+    this.selectedProfileInfo.state_id = Object.keys(
+      this.countryStates,
+    )[0].split('-')[1];
+  }
+
+  @Watch('selectedProfileInfo.preferred_language')
+  onPreferredLanguageChanged(newPreferredLanguage: string): void {
+    if (!newPreferredLanguage) {
+      this.selectedProfileInfo.preferred_language = undefined;
+    }
   }
 }
 </script>
