@@ -65,6 +65,7 @@ module.exports = {
     course_single_list: './frontend/www/js/omegaup/course/single_list.ts',
     course_statistics: './frontend/www/js/omegaup/course/statistics.ts',
     course_student: './frontend/www/js/omegaup/course/student.ts',
+    course_student_with_assignment: './frontend/www/js/omegaup/course/studentWithAssignment.ts',
     course_students: './frontend/www/js/omegaup/course/students.ts',
     course_submissions_list:
       './frontend/www/js/omegaup/course/submissions_list.ts',
@@ -74,6 +75,7 @@ module.exports = {
     group_new: './frontend/www/js/omegaup/group/new.ts',
     group_scoreboard_contests:
       './frontend/www/js/omegaup/group/scoreboard_contests.ts',
+    group_scoreboard_details: './frontend/www/js/omegaup/group/scoreboard_details.ts',
     login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
     login_signin: './frontend/www/js/omegaup/login/signin.ts',
