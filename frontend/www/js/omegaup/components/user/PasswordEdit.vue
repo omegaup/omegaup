@@ -22,8 +22,8 @@
           <label>{{ T.userEditChangePasswordNewPassword }}</label>
           <div>
             <input
-              v-model="newPassword1"
-              data-new-password1
+              v-model="newPassword"
+              data-new-password
               type="password"
               size="30"
               required
@@ -41,7 +41,11 @@
               size="30"
               required
               class="form-control"
+              :class="invalidPasswordClass"
             />
+            <div v-if="passwordMismatch" class="invalid-message">
+              {{ T.passwordMismatch }}
+            </div>
           </div>
         </div>
         <div>
@@ -56,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component({
@@ -65,16 +69,47 @@ import T from '../../lang';
 export default class UserPasswordEdit extends Vue {
   T = T;
   oldPassword = '';
-  newPassword1 = '';
+  newPassword = '';
   newPassword2 = '';
+  passwordMismatch = false;
+
+  get invalidPasswordClass(): string {
+    return this.passwordMismatch ? 'invalid-input' : '';
+  }
 
   onUpdatePassword(): void {
-    this.$emit(
-      'update-password',
-      this.oldPassword,
-      this.newPassword1,
-      this.newPassword2,
-    );
+    if (this.newPassword !== this.newPassword2) {
+      this.passwordMismatch = true;
+      return;
+    }
+    this.$emit('update-password', {
+      oldPassword: this.oldPassword,
+      newPassword: this.newPassword,
+    });
+  }
+
+  @Watch('newPassword2')
+  onNewPassword2Changed(): void {
+    if (this.passwordMismatch) {
+      this.passwordMismatch = false;
+    }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+.invalid-input {
+  border-color: var(--form-input-error-color);
+}
+
+.invalid-input:focus {
+  box-shadow: 0 0 0 0.2rem var(--form-input-box-shadow-error-color);
+}
+
+.invalid-message {
+  margin-top: 0.25rem;
+  font-size: 80%;
+  color: var(--form-input-error-color);
+}
+</style>
