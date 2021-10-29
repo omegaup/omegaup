@@ -3749,20 +3749,15 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
         foreach ($courses['public'] as &$course) {
-            $found = false;
-            foreach ($courses['enrolled'] as $enrolledCourse) {
-                if ($enrolledCourse['alias'] === $course['alias']) {
+            foreach (
+                array_merge(
+                    $courses['enrolled'],
+                    $courses['finished']
+                ) as $studentCourse
+            ) {
+                if ($studentCourse['alias'] === $course['alias']) {
                     $course['alreadyStarted'] = true;
-                    $found = true;
                     break;
-                }
-            }
-            if (!$found) {
-                foreach ($courses['finished'] as $finishedCourse) {
-                    if ($finishedCourse['alias'] === $course['alias']) {
-                        $course['alreadyStarted'] = true;
-                        break;
-                    }
                 }
             }
         }
