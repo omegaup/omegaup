@@ -1,6 +1,7 @@
 <template>
   <div>
-    <h3 data-problem-title class="text-center mb-4">
+    <h3 :data-problem-title="problem.alias" class="text-center mb-4">
+      <slot name="problemset-title"></slot>
       {{ title }}
       <template v-if="showVisibilityIndicators">
         <img
