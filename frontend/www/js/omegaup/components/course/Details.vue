@@ -359,10 +359,10 @@ export default class CourseDetails extends Vue {
     return percent.toFixed(2);
   }
 
-  getAssignmentProgress(progress: types.Progress): string {
-    const percent = (progress.score / progress.max_score) * 100;
-    const percentText = progress.max_score === 0 ? '--:--' : percent.toFixed(2);
-    return progress.max_score === 0 ? percentText : `${percentText}%`;
+  getAssignmentProgress(progress: types.Progress): number {
+    return progress.max_score === 0
+      ? 100
+      : (progress.score / progress.max_score) * 100;
   }
 
   getFormattedTime(date: Date | null | undefined): string {
