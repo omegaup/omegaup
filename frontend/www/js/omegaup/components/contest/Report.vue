@@ -9,7 +9,13 @@
         :key="contestantData.username"
         class="pb-2"
       >
-        <h1>{{ T.username }}: {{ contestantData.username }}</h1>
+        <h1>
+          {{
+            ui.formatString(T.contestReportUsername, {
+              username: contestantData.username,
+            })
+          }}
+        </h1>
         <h3>
           {{
             ui.formatString(T.contestReportTotalPoints, {
@@ -22,77 +28,83 @@
           :key="`${contestantData.username}_${item.alias}`"
           class="pb-2"
         >
-          <h3>{{ T.wordsProblem }}: {{ item.alias }}</h3>
-          <h3>{{ T.wordsPoints }}: {{ item.points }}</h3>
-          <div v-if="item.run_details">
-            <template v-for="group in item.run_details.details.groups">
-              <template v-if="item.run_details.details.groups">
-                <table
-                  :key="`${contestantData.username}_${item.alias}_${group.group}_case`"
-                  class="table table-stripped table-responsive"
+          <h3>
+            {{
+              ui.formatString(T.contestReportProblemWithAlias, {
+                alias: item.alias,
+              })
+            }}
+          </h3>
+          <h3>
+            {{
+              ui.formatString(T.contestReportProblemWithPoints, {
+                points: item.points,
+              })
+            }}
+          </h3>
+          <template v-for="group in getGroups(item)">
+            <table
+              :key="`${contestantData.username}_${item.alias}_${group.group}_case`"
+              class="table table-stripped table-responsive"
+            >
+              <thead>
+                <tr class="text-center">
+                  <th scope="col">{{ T.wordsCase }}</th>
+                  <th scope="col">{{ T.wordsTimeInSeconds }}</th>
+                  <th scope="col">{{ T.wordsWallTimeInSeconds }}</th>
+                  <th scope="col">{{ T.wordsMemoryInMebibytes }}</th>
+                  <th scope="col">{{ T.wordsStatus }}</th>
+                  <th scope="col">{{ T.rankScore }}</th>
+                  <th scope="col">{{ T.wordsDifference }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="groupCase in group.cases"
+                  :key="`${contestantData.username}_${item.alias}_${group.group}_${groupCase.name}_case`"
                 >
-                  <thead>
-                    <tr class="text-center">
-                      <th scope="col">{{ T.wordsCase }}</th>
-                      <th scope="col">{{ T.wordsTimeInSeconds }}</th>
-                      <th scope="col">{{ T.wordsWallTimeInSeconds }}</th>
-                      <th scope="col">{{ T.wordsMemoryInMebibytes }}</th>
-                      <th scope="col">{{ T.wordsStatus }}</th>
-                      <th scope="col">{{ T.rankScore }}</th>
-                      <th scope="col">{{ T.wordsDifference }}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="groupCase in group.cases"
-                      :key="`${contestantData.username}_${item.alias}_${group.group}_${groupCase.name}_case`"
-                    >
-                      <th scope="row">
-                        {{ group.group }}.{{ groupCase.name }}
-                      </th>
-                      <td class="text-right">
-                        {{ groupCase.meta.time.toFixed(3) }}
-                      </td>
-                      <td class="text-right">
-                        {{ groupCase.meta.wall_time.toFixed(3) }}
-                      </td>
-                      <td class="text-right">
-                        {{ groupCase.meta.memory.toFixed(2) }}
-                      </td>
-                      <td class="text-center">{{ groupCase.verdict }}</td>
-                      <td class="text-center">{{ groupCase.score }}</td>
-                      <td>
-                        <template v-if="groupCase.out_diff">
-                          {{ groupCase.out_diff }}
-                        </template>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                  <th scope="row">{{ group.group }}.{{ groupCase.name }}</th>
+                  <td class="text-right">
+                    {{ groupCase.meta.time.toFixed(3) }}
+                  </td>
+                  <td class="text-right">
+                    {{ groupCase.meta.wall_time.toFixed(3) }}
+                  </td>
+                  <td class="text-right">
+                    {{ groupCase.meta.memory.toFixed(2) }}
+                  </td>
+                  <td class="text-center">{{ groupCase.verdict }}</td>
+                  <td class="text-center">{{ groupCase.score }}</td>
+                  <td>
+                    <template v-if="groupCase.out_diff">
+                      {{ groupCase.out_diff }}
+                    </template>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
-                <table
-                  :key="`${contestantData.username}_${item.alias}_${group.group}_detail`"
-                  class="table table-stripped table-responsive pb-2"
+            <table
+              :key="`${contestantData.username}_${item.alias}_${group.group}_detail`"
+              class="table table-stripped table-responsive pb-2"
+            >
+              <thead>
+                <tr class="text-center">
+                  <th scope="col">{{ T.wordsGroup }}</th>
+                  <th scope="col">{{ T.rankScore }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="groupDetails in item.run_details.details.groups"
+                  :key="`${contestantData.username}_${item.alias}_${groupDetails.group}_detail`"
                 >
-                  <thead>
-                    <tr class="text-center">
-                      <th scope="col">{{ T.wordsGroup }}</th>
-                      <th scope="col">{{ T.rankScore }}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="groupDetails in item.run_details.details.groups"
-                      :key="`${contestantData.username}_${item.alias}_${groupDetails.group}_detail`"
-                    >
-                      <th scope="row">{{ groupDetails.group }}</th>
-                      <td class="text-center">{{ groupDetails.score }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </template>
-            </template>
-          </div>
+                  <th scope="row">{{ groupDetails.group }}</th>
+                  <td class="text-center">{{ groupDetails.score }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </template>
         </div>
         <hr />
       </div>
@@ -117,6 +129,12 @@ export default class Report extends Vue {
 
   getTotalPoints(points: null | number): number {
     return points ?? 0;
+  }
+
+  getGroups(
+    problem: types.ScoreboardRankingProblem,
+  ): types.ScoreboardRankingProblemDetailsGroup[] {
+    return problem.run_details?.details?.groups ?? [];
   }
 }
 </script>

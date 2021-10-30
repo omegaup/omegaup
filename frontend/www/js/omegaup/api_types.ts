@@ -2527,18 +2527,7 @@ export namespace types {
     is_invited: boolean;
     name?: string;
     place?: number;
-    problems: {
-      alias: string;
-      penalty: number;
-      percent: number;
-      place?: number;
-      points: number;
-      run_details?: {
-        cases?: types.CaseResult[];
-        details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
-      };
-      runs: number;
-    }[];
+    problems: types.ScoreboardRankingProblem[];
     total: { penalty: number; points: number };
     username: string;
   }
@@ -3790,9 +3779,13 @@ export namespace types {
     points: number;
     run_details?: {
       cases?: types.CaseResult[];
-      details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
+      details: { groups: types.ScoreboardRankingProblemDetailsGroup[] };
     };
     runs: number;
+  }
+
+  export interface ScoreboardRankingProblemDetailsGroup {
+    cases: { meta: types.RunMetadata }[];
   }
 
   export interface SelectedTag {
