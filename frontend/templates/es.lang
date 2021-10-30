@@ -287,6 +287,7 @@ contestPublicForTeamsNotSupported = "Los concursos públicos para equipos no son
 contestPublicRequiresProblem = "Los concursos públicos necesitan tener un problema. Agrégale un problema y márcalo como público en Editar Concurso."
 contestRegistrationPreAcceptedDescription = "El usuario ha sido invitado explícitamente al concurso"
 contestReport = "Reporte de Concurso: %(contest_alias)"
+contestReportTotalPoints = "Total: %(total_points)"
 contestScoreboardAdminLink = "Admin scoreboard link"
 contestScoreboardDownloadCsvFile = "Descargar scoreboard (.csv)"
 contestScoreboardLink = "Scoreboard link"

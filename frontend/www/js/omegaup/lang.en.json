@@ -288,6 +288,7 @@
 	"contestPublicRequiresProblem": "Public contests require at least one problem. Please add a problem to this contest before marking it as public.",
 	"contestRegistrationPreAcceptedDescription": "User has been explicitly invited to the contest",
 	"contestReport": "Contest Report: %(contest_alias)",
+	"contestReportTotalPoints": "Total: %(total_points)",
 	"contestScoreboardAdminLink": "Admin scoreboard link",
 	"contestScoreboardDownloadCsvFile": "Download scoreboard (.csv)",
 	"contestScoreboardLink": "Scoreboard link",
