@@ -3,7 +3,7 @@
     <h3 class="card-header">{{ T.wordsPrivacyPolicy }}</h3>
     <div class="card-body">
       <omegaup-markdown :markdown="policyMarkdown"></omegaup-markdown>
-      <form @submit.prevent="$emit('submit', this)">
+      <form @submit.prevent="$emit('submit')">
         <div class="top-margin text-center">
           <label class="mr-5"
             ><input
