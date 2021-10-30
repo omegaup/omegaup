@@ -13,14 +13,33 @@
       :key="contestantData.username"
       class="pb-2"
     >
-      <h1 class="text-center">{{ username(contestantData.username) }}</h1>
+      <h1 class="text-center">
+        {{
+          ui.formatString(T.contestReportUsername, {
+            username: contestantData.username,
+          })
+        }}
+      </h1>
       <h3 class="text-center">{{ totalPoints(contestantData) }}</h3>
       <div
         v-for="item in contestantData.problems"
         :key="`${contestantData.username}_${item.alias}`"
         class="pb-2"
       >
-        <h3>{{ T.wordsProblem }}: {{ item.alias }}</h3>
+        <h3>
+          {{
+            ui.formatString(T.contestReportProblemWithAlias, {
+              alias: item.alias,
+            })
+          }}
+        </h3>
+        <h3>
+          {{
+            ui.formatString(T.contestReportProblemWithPoints, {
+              points: item.points,
+            })
+          }}
+        </h3>
         <h3>{{ T.wordsPoints }}: {{ item.points }}</h3>
         <div v-if="item.run_details">
           <b-table
@@ -84,7 +103,7 @@ Vue.use(CardPlugin);
 interface GroupDetails {
   name: string;
   time: string;
-  wall_time: string;
+  wallTime: string;
   memory: string;
   verdict: string;
   score: number;
@@ -120,40 +139,27 @@ export default class Report extends Vue {
     { key: 'diff', label: T.wordsDifference },
   ];
 
-  username(username: string): string {
-    return `${T.username}: ${username}`;
-  }
-
   totalPoints(contestantData: types.ContestReport): string {
-    if (!this.hasTotalAndPointsProperties(contestantData)) {
-      return `${T.wordsTotal}: 0`;
-    }
-    return `${T.wordsTotal}: ${contestantData.total.points}`;
+    const points = contestantData.total.points ?? 0;
+    return ui.formatString(T.contestReportProblemWithPoints, { points });
   }
 
   getGroupsByProblemAndUser(
     groups: types.RunDetailsGroup[],
-  ): { group: string; rank_score: number; details: GroupDetails[] }[] {
+  ): { group: string; rankScore: number; details: GroupDetails[] }[] {
     return groups.map((item) => ({
       group: item.group,
-      rank_score: item.score,
+      rankScore: item.score,
       details: item.cases.map((row) => ({
         name: row.name,
         time: row.meta.time.toFixed(3),
-        wall_time: row.meta.wall_time.toFixed(3),
+        wallTime: row.meta.wall_time.toFixed(3),
         memory: row.meta.memory.toFixed(2),
         verdict: row.verdict,
         score: row.score,
         diff: row.out_diff,
       })),
     }));
-  }
-
-  hasTotalAndPointsProperties(contestantData: types.ContestReport): boolean {
-    return (
-      Object.prototype.hasOwnProperty.call(contestantData, 'total') &&
-      Object.prototype.hasOwnProperty.call(contestantData.total, 'points')
-    );
   }
 }
 </script>
