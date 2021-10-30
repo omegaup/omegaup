@@ -1,7 +1,6 @@
 <template>
   <div>
     <h3 :data-problem-title="problem.alias" class="text-center mb-4">
-      <slot name="problemset-title"></slot>
       {{ title }}
       <template v-if="showVisibilityIndicators">
         <img
@@ -67,6 +66,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
+import * as ui from '../../ui';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -92,6 +92,7 @@ library.add(
 })
 export default class ProblemSettingsSummary extends Vue {
   @Prop() problem!: types.ArenaProblemDetails;
+  @Prop({ default: null }) problemsetTitle!: null | string;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop({ default: false }) showEditLink!: boolean;
 
@@ -99,12 +100,28 @@ export default class ProblemSettingsSummary extends Vue {
 
   get title(): string {
     if (this.showVisibilityIndicators) {
-      return `${this.problem.problem_id}. ${this.problem.title}`;
+      return ui.formatString(T.problemSettingsSummaryTitleWithProblemId, {
+        problem_id: this.problem.problem_id,
+        problem_title: this.problem.title,
+      });
     }
-    if (!this.problem.letter) {
-      return this.problem.title;
+    if (this.problem.letter && this.problemsetTitle) {
+      return ui.formatString(
+        T.problemSettingsSummaryTitleWithProblemsetTitleAndLetter,
+        {
+          problemset_title: this.problemsetTitle,
+          letter: this.problem.letter,
+          problem_title: this.problem.title,
+        },
+      );
     }
-    return `${this.problem.letter}. ${this.problem.title}`;
+    if (this.problem.letter && !this.problemsetTitle) {
+      return ui.formatString(T.problemSettingsSummaryTitleWithLetter, {
+        letter: this.problem.letter,
+        problem_title: this.problem.title,
+      });
+    }
+    return this.problem.title;
   }
 
   get memoryLimit(): string {

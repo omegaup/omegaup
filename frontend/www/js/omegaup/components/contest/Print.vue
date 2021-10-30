@@ -1,11 +1,10 @@
 <template>
   <div>
     <div v-for="problem in problems" :key="problem.alias" class="mt-3">
-      <omegaup-problem-settings-summary :problem="problem">
-        <template #problemset-title
-          ><span>{{ contestTitle }} - </span></template
-        >
-      </omegaup-problem-settings-summary>
+      <omegaup-problem-settings-summary
+        :problem="problem"
+        :problemset-title="contestTitle"
+      ></omegaup-problem-settings-summary>
       <omegaup-markdown
         :markdown="problem.statement.markdown"
         :source-mapping="problem.statement.sources"

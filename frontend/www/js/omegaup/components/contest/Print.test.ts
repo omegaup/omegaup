@@ -4,7 +4,7 @@ import type { types } from '../../api_types';
 import contest_Print from './Print.vue';
 
 describe('Print.vue', () => {
-  const now = new Date(Date.now());
+  const now = new Date();
   const problem: types.ProblemDetails = {
     accepted: 1,
     alias: 'triangulos',
@@ -32,6 +32,7 @@ describe('Print.vue', () => {
     karel_problem: false,
     commit: 'abc',
     languages: ['py3'],
+    letter: 'a',
     limits: {
       input_limit: '10 KiB',
       memory_limit: '32 MiB',
@@ -90,7 +91,7 @@ Here we can add code.
   };
   const problems: types.ProblemDetails[] = [
     problem,
-    { ...problem, ...{ alias: 'sumas', title: 'sumas' } },
+    { ...problem, ...{ alias: 'sumas', title: 'sumas', letter: 'b' } },
   ];
 
   it('Should handle details for a contest in print mode', () => {
