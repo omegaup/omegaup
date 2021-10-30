@@ -2639,18 +2639,7 @@ export namespace types {
     is_invited: boolean;
     name?: string;
     place?: number;
-    problems: {
-      alias: string;
-      penalty: number;
-      percent: number;
-      place?: number;
-      points: number;
-      run_details?: {
-        cases?: types.CaseResult[];
-        details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
-      };
-      runs: number;
-    }[];
+    problems: types.ScoreboardRankingProblem[];
     total: { penalty: number; points: number };
     username: string;
   }
@@ -3695,14 +3684,7 @@ export namespace types {
     details?: {
       compile_meta?: { [key: string]: types.RunMetadata };
       contest_score: number;
-      groups?: {
-        cases: types.CaseResult[];
-        contest_score: number;
-        group: string;
-        max_score: number;
-        score: number;
-        verdict?: string;
-      }[];
+      groups?: types.RunDetailsGroup[];
       judged_by: string;
       max_score?: number;
       memory?: number;
@@ -3721,6 +3703,15 @@ export namespace types {
     source_link?: boolean;
     source_name?: string;
     source_url?: string;
+  }
+
+  export interface RunDetailsGroup {
+    cases: types.CaseResult[];
+    contest_score: number;
+    group: string;
+    max_score: number;
+    score: number;
+    verdict?: string;
   }
 
   export interface RunMetadata {
@@ -3904,9 +3895,13 @@ export namespace types {
     points: number;
     run_details?: {
       cases?: types.CaseResult[];
-      details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
+      details: { groups: types.ScoreboardRankingProblemDetailsGroup[] };
     };
     runs: number;
+  }
+
+  export interface ScoreboardRankingProblemDetailsGroup {
+    cases: { meta: types.RunMetadata }[];
   }
 
   export interface SelectedTag {
