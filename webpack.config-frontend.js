@@ -110,7 +110,7 @@ module.exports = {
     user_manage_identities:
       './frontend/www/js/omegaup/user/manage_identities.js',
     user_profile: './frontend/www/js/omegaup/user/profile.ts',
-    user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.js',
+    user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.ts',
     users_rank: './frontend/www/js/omegaup/user/rank.ts',
   },
 

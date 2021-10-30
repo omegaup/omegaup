@@ -37,6 +37,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Experiment=array{config: bool, hash: string, name: string}
  * @psalm-type UserRole=array{name: string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
+ * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -3282,13 +3283,14 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
+     * @return array{entrypoint: string, smartyProperties: array{payload: PrivacyPolicyDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $username
      */
-    public static function getPrivacyPolicy(\OmegaUp\Request $r): array {
-        $r->ensureIdentity();
-
+    public static function getPrivacyPolicyDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
         /** @var \OmegaUp\DAO\VO\Identities */
         $identity = self::resolveTargetIdentity($r);
 
@@ -3301,6 +3303,7 @@ class User extends \OmegaUp\Controllers\Controller {
         } elseif ($identity->language_id == \OmegaUp\Controllers\User::LANGUAGE_PT) {
             $lang = 'pt';
         }
+        self::$log->error(print_r($lang, true));
         $latestStatement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement();
         if (is_null($latestStatement)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -3308,18 +3311,26 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
         return [
-            'policy_markdown' => file_get_contents(
-                sprintf(
-                    "%s/privacy/privacy_policy/{$lang}.md",
-                    strval(OMEGAUP_ROOT)
+            'smartyProperties' => [
+                'payload' => [
+                    'policy_markdown' => file_get_contents(
+                        sprintf(
+                            "%s/privacy/privacy_policy/{$lang}.md",
+                            strval(OMEGAUP_ROOT)
+                        )
+                    ) ?: '',
+                    'has_accepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
+                        intval($identity->identity_id),
+                        $latestStatement['privacystatement_id']
+                    ),
+                    'git_object_id' => $latestStatement['git_object_id'],
+                    'statement_type' => 'privacy_policy',
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitlePrivacyPolicy'
                 )
-            ) ?: '',
-            'has_accepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
-                intval($identity->identity_id),
-                $latestStatement['privacystatement_id']
-            ),
-            'git_object_id' => $latestStatement['git_object_id'],
-            'statement_type' => 'privacy_policy',
+            ],
+            'entrypoint' => 'user_privacy_policy',
         ];
     }
 

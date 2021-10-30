@@ -1362,6 +1362,14 @@ export namespace types {
       );
     }
 
+    export function PrivacyPolicyDetailsPayload(
+      elementId: string = 'payload',
+    ): types.PrivacyPolicyDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function ProblemDetailsPayload(
       elementId: string = 'payload',
     ): types.ProblemDetailsPayload {
@@ -3208,6 +3216,13 @@ export namespace types {
     school_name?: string;
     state_id?: string;
     username: string;
+  }
+
+  export interface PrivacyPolicyDetailsPayload {
+    git_object_id: string;
+    has_accepted: boolean;
+    policy_markdown: string;
+    statement_type: string;
   }
 
   export interface PrivacyStatement {
