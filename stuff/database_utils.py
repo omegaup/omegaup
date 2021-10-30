@@ -8,11 +8,17 @@ import os
 import shlex
 import subprocess
 import tempfile
-from typing import Optional, Sequence
+from typing import Dict, List, NamedTuple, Optional
 
 
 _MYSQL_BINARY = 'mysql'
 _MYSQLDUMP_BINARY = 'mysqldump'
+
+
+class Authentication(NamedTuple):
+    '''Arguments to the mysql binary to authenticate.'''
+    args: List[str]
+    env: Optional[Dict[str, str]] = None
 
 
 def quote(s: str) -> str:
@@ -46,40 +52,41 @@ def authentication(*,
                    config_file: Optional[str] = default_config_file(),
                    username: Optional[str] = None,
                    password: Optional[str] = None,
-                   hostname: Optional[str] = None) -> Sequence[str]:
+                   hostname: Optional[str] = None) -> Authentication:
     '''Computes the authentication arguments for mysql binaries.'''
     if config_file and os.path.isfile(config_file):
-        return ['--defaults-file=%s' % quote(config_file)]
+        return Authentication(args=['--defaults-file=%s' % quote(config_file)])
     assert username
     args = ['--user=%s' % quote(username)]
+    env: Optional[Dict[str, str]] = None
     if password is not None:
         if password:
-            args.append('--password=%s' % quote(password))
+            env = {**os.environ, 'MYSQL_PWD': password}
         else:
             args.append('--skip-password')
     if hostname is not None:
         args.extend(['--protocol=TCP', '--host=%s' % quote(hostname)])
-    return args
+    return Authentication(args=args, env=env)
 
 
 def mysql(query: str,
           *,
-          dbname: Optional[str] = None,
-          auth: Sequence[str] = ()) -> str:
+          auth: Authentication,
+          dbname: Optional[str] = None) -> str:
     '''Runs the MySQL commandline client with |query| as query.'''
-    args = [_MYSQL_BINARY] + list(auth)
+    args = [_MYSQL_BINARY] + auth.args
     if dbname:
         args.append(dbname)
     args.append('-NBe')
     args.append(query)
-    return subprocess.check_output(args, universal_newlines=True)
+    return subprocess.check_output(args, env=auth.env, universal_newlines=True)
 
 
 def mysqldump(*,
-              dbname: Optional[str] = None,
-              auth: Sequence[str] = ()) -> bytes:
+              auth: Authentication,
+              dbname: Optional[str] = None) -> bytes:
     '''Runs the mysqldump commandline tool.'''
-    args = [_MYSQLDUMP_BINARY] + list(auth)
+    args = [_MYSQLDUMP_BINARY] + auth.args
     if dbname:
         args.append(dbname)
     with tempfile.NamedTemporaryFile(mode='rb') as outfile:
@@ -94,5 +101,5 @@ def mysqldump(*,
             '--result-file',
             outfile.name,
         ])
-        subprocess.check_call(args)
+        subprocess.check_call(args, env=auth.env)
         return outfile.read()

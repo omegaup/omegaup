@@ -113,8 +113,8 @@ class Driver:  # pylint: disable=too-many-instance-attributes
 
         return urllib.parse.urljoin(self._url, path)
 
-    def mysql_auth(self):
-        '''Gets the authentication string for MySQL.'''
+    def mysql_auth(self) -> util.database_utils.Authentication:
+        '''Gets the authentication for MySQL.'''
 
         return util.database_utils.authentication(
             config_file=self.options.mysql_config_file,

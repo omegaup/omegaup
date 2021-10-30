@@ -29,7 +29,7 @@ import os.path
 import sys
 import time
 import urllib.error
-from typing import Iterator, List, Optional, Sequence, Tuple
+from typing import Iterator, List, Optional, Tuple
 
 import database_utils
 from lib import aws
@@ -37,7 +37,8 @@ from lib import aws
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
 
-def _revision(args: argparse.Namespace, auth: Sequence[str]) -> int:
+def _revision(args: argparse.Namespace,
+              auth: database_utils.Authentication) -> int:
     '''Returns the latest revision that has been applied to the database.
 
     Returns 0 if no revision has been applied.
@@ -72,7 +73,7 @@ def _scripts() -> List[Tuple[int, str, str]]:
 
 
 def _set_aws_rds_timeout(args: argparse.Namespace,
-                         auth: Sequence[str],
+                         auth: database_utils.Authentication,
                          timeout: Optional[int] = None,
                          retries: int = 10) -> None:
     '''Set the MySQL through AWS RDS timeouts.'''
@@ -125,7 +126,7 @@ def _set_aws_rds_timeout(args: argparse.Namespace,
 
 
 def _set_mysql_timeout(args: argparse.Namespace,
-                       auth: Sequence[str],
+                       auth: database_utils.Authentication,
                        timeout: Optional[int] = None) -> None:
     '''Set the MySQL timeouts.'''
     del args  # unused
@@ -144,7 +145,7 @@ def _set_mysql_timeout(args: argparse.Namespace,
 @contextlib.contextmanager
 def _connection_timeout_wrapper(
         args: argparse.Namespace,
-        auth: Sequence[str],
+        auth: database_utils.Authentication,
         lower_timeout: str = 'no',
         kill_other_connections: bool = False) -> Iterator[None]:
     '''A context manager that temporarily lowers the wait timeout.
@@ -191,7 +192,8 @@ def _connection_timeout_wrapper(
             _set_aws_rds_timeout(args, auth, None)
 
 
-def exists(args: argparse.Namespace, auth: Sequence[str]) -> None:
+def exists(args: argparse.Namespace,
+           auth: database_utils.Authentication) -> None:
     '''Determines whether the metadata database is present.
 
     Exits with 1 (error) if the metadata database has not been installed.
@@ -207,7 +209,8 @@ def exists(args: argparse.Namespace, auth: Sequence[str]) -> None:
         sys.exit(1)
 
 
-def latest(args: argparse.Namespace, auth: Sequence[str]) -> None:
+def latest(args: argparse.Namespace,
+           auth: database_utils.Authentication) -> None:
     '''Determines whether the latest revision is deployed.
 
     Exits with 1 (error) if the latest script in the checkout has not been
@@ -218,7 +221,7 @@ def latest(args: argparse.Namespace, auth: Sequence[str]) -> None:
 
 
 def migrate(args: argparse.Namespace,
-            auth: Sequence[str],
+            auth: database_utils.Authentication,
             update_metadata: bool = True) -> None:
     '''Performs the database schema migration.
 
@@ -268,7 +271,8 @@ def migrate(args: argparse.Namespace,
             logging.info('Done running script for revision %d', revision)
 
 
-def validate(args: argparse.Namespace, auth: Sequence[str]) -> None:
+def validate(args: argparse.Namespace,
+             auth: database_utils.Authentication) -> None:
     '''Validates that the versioning is has no repeated or missing entries.'''
     del args, auth  # unused
 
@@ -284,7 +288,8 @@ def validate(args: argparse.Namespace, auth: Sequence[str]) -> None:
         sys.exit(1)
 
 
-def ensure(args: argparse.Namespace, auth: Sequence[str]) -> None:
+def ensure(args: argparse.Namespace,
+           auth: database_utils.Authentication) -> None:
     '''Creates both the metadata database and table, if they don't exist yet.
     '''
     del args  # unused
@@ -306,7 +311,8 @@ def ensure(args: argparse.Namespace, auth: Sequence[str]) -> None:
         auth=auth)
 
 
-def reset(args: argparse.Namespace, auth: Sequence[str]) -> None:
+def reset(args: argparse.Namespace,
+          auth: database_utils.Authentication) -> None:
     '''Forces the metadata table to be in a particular revision.
 
     Note that this does not apply or unapply any changes to the actual
@@ -325,12 +331,14 @@ def reset(args: argparse.Namespace, auth: Sequence[str]) -> None:
             auth=auth)
 
 
-def print_revision(args: argparse.Namespace, auth: Sequence[str]) -> None:
+def print_revision(args: argparse.Namespace,
+                   auth: database_utils.Authentication) -> None:
     '''Prints the current revision.'''
     print(_revision(args, auth))
 
 
-def purge(args: argparse.Namespace, auth: Sequence[str]) -> None:
+def purge(args: argparse.Namespace,
+          auth: database_utils.Authentication) -> None:
     '''Use purge to start from scratch.
 
     Drops & re-creates databases including the metadata. Note that purge will
@@ -353,7 +361,8 @@ def purge(args: argparse.Namespace, auth: Sequence[str]) -> None:
             logging.info('Done creating database %s', dbname)
 
 
-def schema(args: argparse.Namespace, auth: Sequence[str]) -> None:
+def schema(args: argparse.Namespace,
+           auth: database_utils.Authentication) -> None:
     '''Prints the schema without modifying the usual database tables.
 
     This does touch the database, but is restricted to a dummy database

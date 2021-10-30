@@ -23,7 +23,7 @@ import os.path
 import subprocess
 import sys
 
-from typing import Generator, Sequence, Tuple
+from typing import Generator, Tuple
 
 import database_utils
 
@@ -48,7 +48,7 @@ def _latest() -> Generator[Tuple[str, str], None, None]:
 
 def _missing(
         args: argparse.Namespace,
-        auth: Sequence[str],
+        auth: database_utils.Authentication,
 ) -> Generator[Tuple[str, str], None, None]:
     '''Gets all the missing privacy statements.'''
 
@@ -64,7 +64,8 @@ def _missing(
         yield (statement_type, git_object_id)
 
 
-def validate(args: argparse.Namespace, auth: Sequence[str]) -> None:
+def validate(args: argparse.Namespace,
+             auth: database_utils.Authentication) -> None:
     '''Validates that the latest statements are present in the database.'''
 
     valid = True
@@ -78,7 +79,8 @@ def validate(args: argparse.Namespace, auth: Sequence[str]) -> None:
         sys.exit(1)
 
 
-def upgrade(args: argparse.Namespace, auth: Sequence[str]) -> None:
+def upgrade(args: argparse.Namespace,
+            auth: database_utils.Authentication) -> None:
     '''Creates the database upgrade script for the latest policies.'''
 
     missing = list(_missing(args, auth))
