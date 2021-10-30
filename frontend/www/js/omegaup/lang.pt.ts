@@ -64,6 +64,8 @@ const translations: { [key: string]: string; } = {
   arenaRunSubmitPaste: "Cole o c\u00f3digo do seu programa aqui",
   arenaRunSubmitUpload: "Ou fa\u00e7a upload de um arquivo",
   arenaRunSubmitWaitBetweenUploads: "Voc\u00ea deve esperar %(submissionGap) segundos entre  cada solu\u00e7\u00e3o apresentada",
+  assignmentCardLessons: "%(lessonCount) li\u00e7\u00f5es",
+  assignmentCardProblems: "%(problemCount) problemas",
   assignmentNotFound: "Conte\u00fado n\u00e3o encontrado",
   assignmentRemoveAlreadyHasRuns: "Conte\u00fado n\u00e3o pode ser removida depois que uma solu\u00e7\u00e3o \u00e9 julgada.",
   authorRankRangeHeader: "Autores com maior score obtido (%(lowCount) a %(highCount))",
