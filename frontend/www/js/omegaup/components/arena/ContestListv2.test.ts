@@ -85,14 +85,8 @@ describe('ContestListv2.vue', () => {
       ref: 'currentContestTab',
     });
 
-    const contestEnrollStatus = wrapper.findComponent({
-      ref: 'contestEnrollStatus',
-    });
-
     expect(currentContestTab.exists()).toBe(true);
     expect(currentContestTab.text()).toContain('Current Contest 1');
-
-    expect(contestEnrollStatus.exists()).toBe(true);
   });
 
   it('Should show the future contest list', async () => {
@@ -100,14 +94,8 @@ describe('ContestListv2.vue', () => {
       ref: 'futureContestTab',
     });
 
-    const contestEnrollStatus = wrapper.findComponent({
-      ref: 'contestEnrollStatus',
-    });
-
     expect(futureContestTab.exists()).toBe(true);
     expect(futureContestTab.text()).toContain('Future Contest 1');
-
-    expect(contestEnrollStatus.exists()).toBe(true);
   });
 
   it('Should show the past contest list', async () => {
