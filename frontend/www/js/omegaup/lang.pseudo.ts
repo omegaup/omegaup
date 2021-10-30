@@ -671,6 +671,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleContestList: "(C0n73575 1i57)",
   omegaupTitleContestNew: "(C0n7357N3w)",
   omegaupTitleContestPractice: "(C0n7357 (Prac7ic3 m0d3))",
+  omegaupTitleContestPrint: "(C0n7357 (Prin7 m0d3) - %(contestTitle))",
   omegaupTitleContestReport: "(R3p0r7 f0r c0n7357: %(contestName))",
   omegaupTitleContestScoreboard: "(C0n7357 5c0r3b0ard)",
   omegaupTitleContestStats: "(C0n7357 57a75)",
