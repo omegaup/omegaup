@@ -429,7 +429,7 @@ export default class CourseDetails extends Vue {
     [Tab.Information]: T.courseDetailsTabInformation,
     [Tab.Content]: T.courseDetailsTabContent,
   };
-  selectedTab = Tab.Information;
+  selectedTab = Tab.Content;
 
   get overallCompletedPercentage(): string {
     let score = 0;
