@@ -87,6 +87,10 @@ describe('ContestListv2.vue', () => {
 
     expect(currentContestTab.exists()).toBe(true);
     expect(currentContestTab.text()).toContain('Current Contest 1');
+    expect(wrapper.find('p.card-text.contest-enroll-status').exists()).toBe(
+      true,
+    );
+    expect(wrapper.find('a.btn.btn-primary').exists()).toBe(true);
   });
 
   it('Should show the future contest list', async () => {
@@ -102,6 +106,10 @@ describe('ContestListv2.vue', () => {
 
     expect(futureContestTab.exists()).toBe(true);
     expect(futureContestTab.text()).toContain('Future Contest 1');
+    expect(wrapper.find('p.card-text.contest-enroll-status').exists()).toBe(
+      true,
+    );
+    expect(wrapper.find('a.btn.btn-primary').exists()).toBe(false);
   });
 
   it('Should show the past contest list', async () => {
