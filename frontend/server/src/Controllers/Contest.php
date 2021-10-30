@@ -55,6 +55,16 @@ namespace OmegaUp\Controllers;
  * @psalm-type MergedScoreboardEntry=array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}, place?: int}
  * @psalm-type ContestReport=array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type ContestReportDetailsPayload=array{contestAlias: string, contestReport: list<ContestReport>}
+ * @psalm-type SettingLimits=array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}
+ * @psalm-type NominationStatus=array{alreadyReviewed: bool, canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language: string, nominated: bool, nominatedBeforeAc: bool, solved: bool, tried: bool}
+ * @psalm-type ProblemsetterInfo=array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}
+ * @psalm-type InteractiveSettingsDistrib=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
+ * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
+ * @psalm-type ProblemSettingsDistrib=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettingsDistrib, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, group_score_policy?: string, name: string, tolerance?: float}}
+ * @psalm-type BestSolvers=array{classname: string, language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}
+ * @psalm-type ProblemStatement=array{images: array<string, string>, sources: array<string, string>, language: string, markdown: string}
+ * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ContestPrintDetailsPayload=array{contestTitle: string, problems: array<int, null|ProblemDetails>}
  */
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
@@ -612,6 +622,82 @@ class Contest extends \OmegaUp\Controllers\Controller {
             )['clarifications'],
             'problems' => $problems,
             'submissionDeadline' => $contestDetails['submission_deadline'] ?? $contest->finish_time,
+        ];
+    }
+
+    /**
+     * Get all the properties for smarty.
+     *
+     * @return array{entrypoint: string, smartyProperties: array{hideFooterAndHeader: bool, payload: ContestPrintDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $alias
+     * @omegaup-request-param null|string $lang
+     */
+    public static function getContestPrintDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+
+        $contestAlias = $r->ensureString(
+            'alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        [
+            'contest' => $contest,
+            'contest_admin' => $contestAdmin,
+            'problemset' => $problemset,
+        ] = self::validateDetails($contestAlias, $r->identity);
+
+        if (!$contestAdmin) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $details = self::getContestDetails(
+            $contest,
+            $contestAdmin,
+            $r->identity
+        );
+
+        $problems = [];
+        foreach ($details['problems'] as $index => $problem) {
+            $problemDetails = \OmegaUp\DAO\Problems::getByAlias(
+                $problem['alias']
+            );
+            if (is_null($problemDetails)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemNotFound'
+                );
+            }
+            $problems[$index] = \OmegaUp\Controllers\Problem::getProblemDetails(
+                $r->identity,
+                $problemDetails,
+                $problemset,
+                \OmegaUp\Controllers\Identity::getPreferredLanguage(
+                    $r->identity
+                ),
+                /*showSolvers=*/false,
+                /*preventProblemsetOpen=*/false,
+                $contestAlias
+            );
+            $problems[$index]['letter'] = $problem['letter'] ?? '';
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'contestTitle' => $details['title'],
+                    'problems' => $problems,
+                ],
+                'hideFooterAndHeader' => true,
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleContestPrint',
+                    [
+                        'contestTitle' => $details['title'],
+                    ]
+                ),
+            ],
+            'entrypoint' => 'contest_print',
         ];
     }
 
