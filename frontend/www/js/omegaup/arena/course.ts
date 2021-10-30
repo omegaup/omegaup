@@ -55,7 +55,7 @@ OmegaUp.on('ready', async () => {
       problems: payload.currentAssignment.problems,
       location: window.location.hash,
     }));
-  } catch (e) {
+  } catch (e: any) {
     ui.apiError(e);
   }
 
@@ -209,7 +209,7 @@ OmegaUp.on('ready', async () => {
               .catch(ui.apiError);
           },
           'update:activeTab': (tabName: string) => {
-            window.location.replace(`#${tabName}`);
+            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
           },
           rejudge: (run: types.Run) => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
@@ -230,15 +230,26 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.ignoreError);
           },
-          'reset-hash': (request: {
+          'reset-hash': ({
+            selectedTab,
+            alias,
+          }: {
             selectedTab: string;
             alias: null | string;
           }) => {
-            if (!request.alias) {
-              window.location.replace(`#${request.selectedTab}`);
+            if (!alias) {
+              history.replaceState(
+                { selectedTab },
+                'updateTab',
+                `#${selectedTab}`,
+              );
               return;
             }
-            window.location.replace(`#${request.selectedTab}/${request.alias}`);
+            history.replaceState(
+              { selectedTab, alias },
+              'resetHash',
+              `#${selectedTab}/${alias}`,
+            );
           },
           'submit-promotion': ({
             solved,

@@ -3,7 +3,7 @@
     <div class="card-body">
       <form class="publish-form" @submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{ T.contestNewFormAdmissionModeSelect }}</label>
+          <label>{{ T.courseEditAdmissionModeSelect }}</label>
           <a
             data-toggle="tooltip"
             rel="tooltip"

@@ -37,6 +37,7 @@ describe('Course.vue', () => {
         order: 1,
         scoreboard_url: 'scoreboard_url',
         scoreboard_url_admin: 'scoreboard_url_admin',
+        problemCount: 0,
       },
     ],
     clarifications: [],
@@ -220,7 +221,6 @@ describe('Course.vue', () => {
         problemInfo: null,
         problems: [],
         showNewClarificationPopup: false,
-        socketConnected: true,
         users: [],
         scoreboard,
       },
@@ -242,7 +242,6 @@ describe('Course.vue', () => {
         problemInfo,
         problems: [problem],
         showNewClarificationPopup: false,
-        socketConnected: true,
         users: [] as types.ContestUser[],
         scoreboard,
       },
@@ -267,7 +266,6 @@ describe('Course.vue', () => {
         problems: [problem],
         runs: [run],
         showNewClarificationPopup: false,
-        socketConnected: true,
         users: [] as types.ContestUser[],
         scoreboard,
       },
@@ -282,7 +280,6 @@ describe('Course.vue', () => {
           guid: '78099022574726af861839e1b4210188',
           hash: '#problems/test/show-run:78099022574726af861839e1b4210188',
           isAdmin: false,
-          problemAlias: 'test',
         },
       ],
     ]);
@@ -291,7 +288,7 @@ describe('Course.vue', () => {
   it('Should handle run details button as admin', async () => {
     const wrapper = mount(arena_Course, {
       propsData: {
-        activeTab: 'problems',
+        activeTab: 'runs',
         clarifications: [],
         course: { ...course, ...{ is_admin: true } },
         currentAssignment,
@@ -301,7 +298,6 @@ describe('Course.vue', () => {
         problems: [problem],
         allRuns: [run],
         showNewClarificationPopup: false,
-        socketConnected: true,
         users: [] as types.ContestUser[],
         scoreboard,
         showAllRuns: true,

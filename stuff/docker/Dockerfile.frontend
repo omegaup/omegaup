@@ -86,7 +86,7 @@ EXPOSE 9001
 
 CMD ["php-fpm7.4", "--nodaemonize", "--force-stderr"]
 
-FROM ubuntu:focal as frontend-dev-sidecar
+FROM ubuntu:focal as frontend-sidecar
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \

@@ -281,7 +281,6 @@ Here we can add code.
           guid: 'abcdefg',
           hash: '#runs/triangulos/show-run:abcdefg',
           isAdmin: true,
-          problemAlias: 'triangulos',
         },
       ],
     ]);

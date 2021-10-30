@@ -1,7 +1,7 @@
 <template>
   <omegaup-arena
     :active-tab="activeTab"
-    :contest-title="contest.title"
+    :title="contest.title"
     :should-show-runs="contestAdmin"
     :background-class="'practice'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
@@ -183,9 +183,7 @@ export default class ArenaContestPractice extends Vue {
   onRunDetails(request: SubmissionRequest): void {
     this.$emit('show-run', {
       ...request,
-      hash: `#problems/${
-        this.activeProblemAlias ?? request.problemAlias
-      }/show-run:${request.guid}`,
+      hash: `#problems/${this.activeProblemAlias}/show-run:${request.guid}`,
     });
   }
 

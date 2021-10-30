@@ -45,7 +45,7 @@ OmegaUp.on('ready', async () => {
     ({ runDetails } = await getProblemAndRunDetails({
       location: window.location.hash,
     }));
-  } catch (e) {
+  } catch (e: any) {
     ui.apiError(e);
   }
 
@@ -327,7 +327,7 @@ OmegaUp.on('ready', async () => {
               .catch(ui.apiError);
           },
           'update:activeTab': (tabName: string) => {
-            window.location.replace(`#${tabName}`);
+            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
           },
           'redirect-login-page': () => {
             window.location.href = `/login/?redirect=${encodeURIComponent(
