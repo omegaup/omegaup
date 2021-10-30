@@ -17,18 +17,18 @@
         </b-col>
         <b-col cols="3">
           <b-button
-            v-if="contestTab === 2"
             :href="getContestScoreboardURL(contest.alias)"
             variant="success"
+            v-if="contestTab === 2"
           >
             <font-awesome-icon icon="table" />
             {{ T.contestButtonScoreBoard }}
           </b-button>
           <b-card-text
+            class="contest-enroll-status"
             v-else-if="
               (contestTab === 0 || contestTab === 1) && contest.participating
             "
-            class="contest-enroll-status"
           >
             <font-awesome-icon icon="clipboard-check" />
             {{ T.contestEnrollStatus }}
@@ -80,24 +80,24 @@
         </b-col>
         <b-col>
           <b-button
-            v-if="contestTab === 0 && contest.participating"
             :href="getContestURL(contest.alias)"
             variant="primary"
+            v-if="contestTab === 0 && contest.participating"
           >
             <font-awesome-icon icon="sign-in-alt" />
             {{ T.contestButtonEnter }}
           </b-button>
           <b-button
+            :href="getContestURL(contest.alias)"
+            variant="primary"
             v-else-if="
               (contestTab === 0 || contestTab === 1) && !contest.participating
             "
-            :href="getContestURL(contest.alias)"
-            variant="primary"
           >
             <font-awesome-icon icon="sign-in-alt" />
             {{ T.contestButtonSingUp }}
           </b-button>
-          <b-dropdown v-else-if="contestTab === 2" variant="primary">
+          <b-dropdown variant="primary" v-else-if="contestTab === 2">
             <template #button-content>
               <font-awesome-icon icon="sign-in-alt" />
               {{ T.contestButtonEnter }}
@@ -148,31 +148,31 @@ export default class ContestCard extends Vue {
   T = T;
   ui = ui;
 
-  get finishContestDate(): string {
+  get finishContestDate(): String {
     return this.contest.finish_time.toLocaleDateString();
   }
 
-  get startContestDate(): string {
+  get startContestDate(): String {
     return this.contest.start_time.toLocaleDateString();
   }
 
-  getContestURL(alias: string): string {
+  getContestURL(alias: String): String {
     return `arena/${alias}`;
   }
 
-  getContestScoreboardURL(alias: string): string {
+  getContestScoreboardURL(alias: String): String {
     return `arena/${alias}/#ranking`;
   }
 
-  getVirtualContestURL(alias: string): string {
+  getVirtualContestURL(alias: String): String {
     return `arena/${alias}/virtual`;
   }
 
-  getPracticeContestURL(alias: string): string {
+  getPracticeContestURL(alias: String): String {
     return `arena/${alias}/practice`;
   }
 
-  contestDuration(seconds: number): string {
+  contestDuration(seconds: number): String {
     return new Date(seconds * 1000).toISOString().substr(11, 8);
   }
 }
