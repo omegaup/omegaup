@@ -64,6 +64,8 @@ const translations: { [key: string]: string; } = {
   arenaRunSubmitPaste: "Pega el c\u00f3digo de tu programa aqu\u00ed",
   arenaRunSubmitUpload: "O sube un archivo",
   arenaRunSubmitWaitBetweenUploads: "Debes esperar %(submissionGap) segundos entre cada env\u00edo del mismo problema",
+  assignmentCardLessons: "%(lessonCount) lecciones",
+  assignmentCardProblems: "%(problemCount) problemas",
   assignmentNotFound: "No se encontr\u00f3 el contenido",
   assignmentRemoveAlreadyHasRuns: "No se puede eliminar contenido si ya tiene soluciones revisadas.",
   authorRankRangeHeader: "Contribuidores con mayor puntaje (%(lowCount) a %(highCount))",
