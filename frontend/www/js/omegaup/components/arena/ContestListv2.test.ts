@@ -74,51 +74,43 @@ describe('ContestListv2.vue', () => {
     ],
   };
 
-  it('Should show the current contest list', async () => {
-    const wrapper = mount(arena_ContestList, {
-      propsData: {
-        contests,
-      },
-    });
+  const wrapper = mount(arena_ContestList, {
+    propsData: {
+      contests,
+    },
+  });
 
+  it('Should show the current contest list', async () => {
     const currentContestTab = wrapper.findComponent({
       ref: 'currentContestTab',
     });
 
+    const contestEnrollStatus = wrapper.findComponent({
+      ref: 'contestEnrollStatus',
+    });
+
     expect(currentContestTab.exists()).toBe(true);
     expect(currentContestTab.text()).toContain('Current Contest 1');
-    expect(wrapper.find('p.card-text.contest-enroll-status').exists()).toBe(
-      true,
-    );
-    expect(wrapper.find('a.btn.btn-primary').exists()).toBe(true);
+
+    expect(contestEnrollStatus.exists()).toBe(true);
   });
 
   it('Should show the future contest list', async () => {
-    const wrapper = mount(arena_ContestList, {
-      propsData: {
-        contests,
-      },
-    });
-
     const futureContestTab = wrapper.findComponent({
       ref: 'futureContestTab',
     });
 
+    const contestEnrollStatus = wrapper.findComponent({
+      ref: 'contestEnrollStatus',
+    });
+
     expect(futureContestTab.exists()).toBe(true);
     expect(futureContestTab.text()).toContain('Future Contest 1');
-    expect(wrapper.find('p.card-text.contest-enroll-status').exists()).toBe(
-      true,
-    );
-    expect(wrapper.find('a.btn.btn-primary').exists()).toBe(false);
+
+    expect(contestEnrollStatus.exists()).toBe(true);
   });
 
   it('Should show the past contest list', async () => {
-    const wrapper = mount(arena_ContestList, {
-      propsData: {
-        contests,
-      },
-    });
-
     const pastContestTab = wrapper.findComponent({
       ref: 'pastContestTab',
     });

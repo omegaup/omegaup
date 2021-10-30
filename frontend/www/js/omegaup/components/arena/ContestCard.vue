@@ -28,6 +28,7 @@
             v-else-if="
               (contestTab === 0 || contestTab === 1) && contest.participating
             "
+            ref="contestEnrollStatus"
             class="contest-enroll-status"
           >
             <font-awesome-icon icon="clipboard-check" />

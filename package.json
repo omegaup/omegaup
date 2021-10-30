@@ -125,5 +125,6 @@
     "build-development": "cross-env webpack --mode=development",
     "build-development-frontend": "cross-env webpack --config-name=frontend --mode=development",
     "refactor": "cross-env ./stuff/refactor.js"
-  }
+  },
+  "dependencies": {}
 }
