@@ -1,30 +1,23 @@
+import { OmegaUp } from '../omegaup';
+import { types } from '../api_types';
 import Vue from 'vue';
+import omegaup_ContestPrint from '../components/contest/Print.vue';
 
-import type { types } from '../api_types';
+OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.ContestPrintDetailsPayload();
 
-import omegaup_Markdown from '../components/Markdown.vue';
-
-(() => {
-  document.querySelectorAll('div.problem').forEach((problem) => {
-    const problemDetails = JSON.parse(
-      (problem.querySelector('script.payload') as HTMLElement).innerText,
-    ) as types.ProblemDetails;
-
-    new Vue({
-      el: problem.querySelector('div.statement') as HTMLElement,
-      components: {
-        'omegaup-markdown': omegaup_Markdown,
-      },
-      render: function (createElement) {
-        return createElement('omegaup-markdown', {
-          props: {
-            markdown: problemDetails.statement.markdown,
-            imageMapping: problemDetails.statement.images,
-            sourceMapping: problemDetails.statement.sources,
-            problemSettings: problemDetails.settings,
-          },
-        });
-      },
-    });
+  new Vue({
+    el: '#main-container',
+    components: {
+      'omegaup-contest-print': omegaup_ContestPrint,
+    },
+    render: function (createElement) {
+      return createElement('omegaup-contest-print', {
+        props: {
+          problems: payload.problems,
+          contestTitle: payload.contestTitle,
+        },
+      });
+    },
   });
-})();
+});
