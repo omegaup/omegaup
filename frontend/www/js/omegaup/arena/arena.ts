@@ -2028,6 +2028,7 @@ export function GetDefaultOptions(): ArenaOptions {
       isAdmin: false,
       lockDownImage: '',
       navbarSection: '',
+      userTypes: [],
     },
     preferredLanguage: null,
   };
