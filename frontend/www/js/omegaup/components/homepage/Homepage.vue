@@ -131,6 +131,10 @@
         ]"
       ></omegaup-sponsors>
     </div>
+    <omegaup-user-objectives-questions
+      v-if="fromLogin && userTypes.length === 0"
+      @submit="(objectives) => $emit('update-user-objectives', objectives)"
+    ></omegaup-user-objectives-questions>
   </div>
 </template>
 
@@ -147,6 +151,7 @@ import homepage_Section from './Section.vue';
 import school_Rank from '../schools/Rank.vue';
 import user_Rank from '../user/Rank.vue';
 import homepage_Sponsors from './Sponsors.vue';
+import user_objectives_questions from '../user/ObjectivesQuestions.vue';
 
 @Component({
   components: {
@@ -158,6 +163,7 @@ import homepage_Sponsors from './Sponsors.vue';
     'omegaup-testimonials': homepage_Testimonials,
     'omegaup-section': homepage_Section,
     'omegaup-sponsors': homepage_Sponsors,
+    'omegaup-user-objectives-questions': user_objectives_questions,
   },
 })
 export default class Homepage extends Vue {
@@ -167,6 +173,8 @@ export default class Homepage extends Vue {
   @Prop() currentUserInfo!: omegaup.User;
   @Prop() rankTable!: omegaup.UserRankTable;
   @Prop() schoolsRank!: omegaup.SchoolRankTable;
+  @Prop() fromLogin!: boolean;
+  @Prop() userTypes!: string[];
 
   T = T;
 }

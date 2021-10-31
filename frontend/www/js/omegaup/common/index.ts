@@ -1,10 +1,14 @@
 import Homepage from '../components/homepage/Homepage.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
+import * as api from '../api';
+import * as ui from '../ui';
+import T from '../lang';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.IndexPayload();
+  const commonPayload = types.payloadParsers.CommonPayload();
 
   const ranking = payload.userRank.map((user, index) => ({
     rank: index + 1,
@@ -14,6 +18,10 @@ OmegaUp.on('ready', () => {
     score: user.score,
     problems_solved: user.problems_solved,
   }));
+
+  const fromLogin =
+    new URL(document.location.toString()).searchParams.get('fromLogin') !==
+    null;
 
   new Vue({
     el: '#main-container',
@@ -48,8 +56,38 @@ OmegaUp.on('ready', () => {
             totalRows: payload.schoolRank.length,
           },
           schoolOfTheMonth: payload.schoolOfTheMonthData,
+          fromLogin: fromLogin,
+          userTypes: commonPayload.userTypes,
+        },
+        on: {
+          'update-user-objectives': ({
+            hasCompetitiveObjective,
+            hasLearningObjective,
+            hasScholarObjective,
+            hasTeachingObjective,
+          }: {
+            hasCompetitiveObjective: string;
+            hasLearningObjective: string;
+            hasScholarObjective: string;
+            hasTeachingObjective: string;
+          }) => {
+            api.User.update({
+              has_competitive_objective: hasCompetitiveObjective,
+              has_learning_objective: hasLearningObjective,
+              has_scholar_objective: hasScholarObjective,
+              has_teaching_objective: hasTeachingObjective,
+            })
+              .then(() => {
+                ui.success(T.userObjectivesUpdateSuccess);
+              })
+              .catch(ui.apiError);
+          },
         },
       });
     },
   });
+
+  if (fromLogin && commonPayload.userTypes.length === 0) {
+    $('.objectivesQuestionsModal').modal();
+  }
 });

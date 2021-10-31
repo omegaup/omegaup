@@ -1351,6 +1351,7 @@ const translations: { [key: string]: string; } = {
   userObjectivesModalDescriptionUsage: "Quiero usar omegaUp para...",
   userObjectivesModalPageCounter: "%(current) de %(last)",
   userObjectivesModalTitle: "Ay\u00fadanos a conocerte",
+  userObjectivesUpdateSuccess: "Gracias por ayudarnos. Tus respuestas han sido guardadas",
   userOrMailNotFound: "Usuario o mail no encontrado",
   userPasswordMustBeSame: "Los passwords nuevos deben ser iguales.",
   userProfileIsPrivate: "El perfil de este usuario est\u00e1 marcado como privado; alguna informaci\u00f3n no se mostrar\u00e1",

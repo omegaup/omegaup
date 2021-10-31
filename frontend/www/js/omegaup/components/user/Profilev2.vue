@@ -146,6 +146,10 @@
         </div>
       </div>
     </div>
+    <omegaup-user-objectives-questions
+      v-if="fromLogin && userTypes.length === 0"
+      @submit="(objectives) => $emit('update-user-objectives', objectives)"
+    ></omegaup-user-objectives-questions>
   </div>
 </template>
 
@@ -163,6 +167,7 @@ import { types } from '../../api_types';
 import * as Highcharts from 'highcharts/highstock';
 import * as ui from '../../ui';
 import { Problem, ContestResult } from '../../linkable_resource';
+import user_objectives_questions from '../user/ObjectivesQuestions.vue';
 
 @Component({
   components: {
@@ -173,6 +178,7 @@ import { Problem, ContestResult } from '../../linkable_resource';
     'omegaup-badge-list': badge_List,
     'omegaup-grid-paginator': common_GridPaginator,
     'omegaup-countryflag': country_Flag,
+    'omegaup-user-objectives-questions': user_objectives_questions,
   },
 })
 export default class UserProfile extends Vue {
@@ -180,6 +186,9 @@ export default class UserProfile extends Vue {
   @Prop() profile!: types.UserProfileInfo;
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
+  @Prop() fromLogin!: boolean;
+  @Prop() userTypes!: string[];
+
   contests = Object.values(
     this.data?.contests ?? ({} as types.UserProfileContests),
   )

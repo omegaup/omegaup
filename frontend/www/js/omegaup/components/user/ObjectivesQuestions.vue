@@ -1,5 +1,5 @@
 <template>
-  <div class="modal" tabindex="-1">
+  <div class="modal fade objectivesQuestionsModal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
