@@ -44,7 +44,7 @@ const baseSettingsSummaryProps = {
   } as types.ArenaProblemDetails,
 };
 
-describe('SettingsSummary.vue', () => {
+describe('SettingsSummaryV2.vue', () => {
   it('Should handle problem settings summary in contest', () => {
     const wrapper = mount(problem_SettingsSummary, {
       propsData: baseSettingsSummaryProps,
