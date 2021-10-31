@@ -87,4 +87,14 @@ describe('SettingsSummary.vue', () => {
 
     expect(wrapper.find('table').exists()).toBeFalsy();
   });
+
+  it('Should handle empty problem settings summary in problem', () => {
+    const wrapper = mount(problem_SettingsSummary, {
+      propsData: Object.assign({}, baseSettingsSummaryProps, {
+        problem: { languages: [], accepts_submissions: true },
+      }),
+    });
+
+    expect(wrapper.text()).not.toContain('undefined');
+  });
 });
