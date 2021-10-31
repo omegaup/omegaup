@@ -1,14 +1,9 @@
 <?php
+namespace OmegaUp;
+require_once(dirname(__DIR__, 1) . '/server/bootstrap.php');
 
-require_once('../server/bootstrap_smarty.php');
-
-$smarty->assign(
-    'payload',
-    \OmegaUp\Controllers\User::getPrivacyPolicy(
-        new \OmegaUp\Request(
-            []
-        )
+\OmegaUp\UITools::render(
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\User::getPrivacyPolicyDetailsForTypeScript(
+        $r
     )
 );
-
-$smarty->display('../templates/user.privacy.policy.tpl');
