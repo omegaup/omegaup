@@ -94,7 +94,9 @@
       {block name="entrypoint"}{/block}
       <div id="main-container"></div>
     </main>
-    {include file='common.analytics.tpl' inline}
+    {if $OMEGAUP_GA_TRACK eq 1}
+      <script type="text/javascript" src="{version_hash src="/js/analytics.js"}"></script>
+    {/if}
     {if $headerPayload.inContest eq false && (!isset($hideFooterAndHeader) || !$hideFooterAndHeader)}
     <div id="common-footer"></div>
     {js_include entrypoint="common_footer_v2"}
