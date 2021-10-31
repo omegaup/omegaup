@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import arena_Runs, { PopupDisplayed } from '../components/arena/Runs.vue';
+import arena_Runs, { PopupDisplayed } from '../components/arena/Runsv2.vue';
 import * as api from '../api';
 import T from '../lang';
 import { OmegaUp } from '../omegaup';

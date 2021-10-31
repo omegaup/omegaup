@@ -4,7 +4,7 @@ import { shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
 
-import arena_Runs from './Runs.vue';
+import arena_Runs from './Runsv2.vue';
 
 describe('Runs.vue', () => {
   it('Should handle empty runs', () => {

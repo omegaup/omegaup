@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import T from '../../lang';
 
-import problem_SettingsSummary from './SettingsSummary.vue';
+import problem_SettingsSummary from './SettingsSummaryV2.vue';
 
 const baseSettingsSummaryProps = {
   showVisibilityIndicators: false,

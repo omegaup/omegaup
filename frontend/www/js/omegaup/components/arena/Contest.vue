@@ -192,7 +192,7 @@ import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_NavbarMiniranking from './NavbarMiniranking.vue';
-import arena_Runs from './Runs.vue';
+import arena_Runs from './Runsv2.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import arena_Summary from './Summary.vue';
 import arena_Scoreboard from './Scoreboard.vue';
