@@ -1,26 +1,20 @@
 <template>
-  <div class="panel panel-default">
-    <div class="panel-body">
-      <div class="panel panel-default no-bottom-margin">
-        <div class="panel-heading">
-          <h3 class="panel-title">{{ T.wordsPrivacyPolicy }}</h3>
-        </div>
-        <div class="panel">
-          <omegaup-markdown :markdown="policyMarkdown"></omegaup-markdown>
-        </div>
-      </div>
-      <form @submit.prevent="$emit('submit', this)">
+  <div class="card">
+    <h3 class="card-header">{{ T.wordsPrivacyPolicy }}</h3>
+    <div class="card-body">
+      <omegaup-markdown :markdown="policyMarkdown"></omegaup-markdown>
+      <form @submit.prevent="$emit('submit')">
         <div class="top-margin text-center">
-          <label
+          <label class="mr-5"
             ><input
-              v-model="agreed"
+              v-model="currentAgreed"
               name="agreed"
               type="checkbox"
               :disabled="saved"
             />
             {{ T.wordsAgree }}</label
           >
-          <button class="btn btn-primary" :disabled="!agreed || saved">
+          <button class="btn btn-primary" :disabled="!currentAgreed || saved">
             {{ T.wordsSaveChanges }}
           </button>
         </div>
@@ -42,10 +36,10 @@ import omegaup_Markdown from '../Markdown.vue';
 })
 export default class UserPrivacyPolicy extends Vue {
   @Prop() policyMarkdown!: string;
-  @Prop({ default: false }) initialAgreed!: boolean;
+  @Prop({ default: false }) agreed!: boolean;
   @Prop() saved!: boolean;
 
   T = T;
-  agreed = this.initialAgreed;
+  currentAgreed = this.agreed;
 }
 </script>

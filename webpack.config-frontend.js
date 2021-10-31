@@ -46,7 +46,7 @@ module.exports = {
     contest_mine: './frontend/www/js/omegaup/contest/mine.ts',
     contest_new: './frontend/www/js/omegaup/contest/new.ts',
     contest_print: './frontend/www/js/omegaup/contest/print.ts',
-    contest_report: './frontend/www/js/omegaup/contest/report.js',
+    contest_report: './frontend/www/js/omegaup/contest/report.ts',
     contest_scoreboard: './frontend/www/js/omegaup/arena/scoreboard.ts',
     contest_scoreboardmerge:
       './frontend/www/js/omegaup/contest/scoreboardmerge.ts',
@@ -64,6 +64,7 @@ module.exports = {
     course_single_list: './frontend/www/js/omegaup/course/single_list.ts',
     course_statistics: './frontend/www/js/omegaup/course/statistics.ts',
     course_student: './frontend/www/js/omegaup/course/student.ts',
+    course_student_with_assignment: './frontend/www/js/omegaup/course/studentWithAssignment.ts',
     course_students: './frontend/www/js/omegaup/course/students.ts',
     course_submissions_list:
       './frontend/www/js/omegaup/course/submissions_list.ts',
@@ -73,6 +74,7 @@ module.exports = {
     group_new: './frontend/www/js/omegaup/group/new.ts',
     group_scoreboard_contests:
       './frontend/www/js/omegaup/group/scoreboard_contests.ts',
+    group_scoreboard_details: './frontend/www/js/omegaup/group/scoreboard_details.ts',
     login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
     login_signin: './frontend/www/js/omegaup/login/signin.ts',
@@ -107,7 +109,7 @@ module.exports = {
     user_manage_identities:
       './frontend/www/js/omegaup/user/manage_identities.js',
     user_profile: './frontend/www/js/omegaup/user/profile.ts',
-    user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.js',
+    user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.ts',
     users_rank: './frontend/www/js/omegaup/user/rank.ts',
   },
 

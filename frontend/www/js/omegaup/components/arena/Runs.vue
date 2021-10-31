@@ -367,7 +367,7 @@ export enum PopupDisplayed {
     'omegaup-user-username': user_Username,
   },
 })
-export default class Runsv2 extends Vue {
+export default class Runs extends Vue {
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: true }) isProblemsetOpened!: boolean;
   @Prop({ default: false }) showContest!: boolean;
