@@ -15,7 +15,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import problem_SettingsSummary from './SettingsSummaryV2.vue';
+import problem_SettingsSummary from './SettingsSummary.vue';
 import omegaup_Markdown from '../Markdown.vue';
 
 @Component({

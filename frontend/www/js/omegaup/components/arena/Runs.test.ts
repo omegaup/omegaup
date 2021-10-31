@@ -4,11 +4,11 @@ import { shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
 
-import arena_Runsv2 from './Runsv2.vue';
+import arena_Runs from './Runs.vue';
 
-describe('Runsv2.vue', () => {
+describe('Runs.vue', () => {
   it('Should handle empty runs', () => {
-    const wrapper = shallowMount(arena_Runsv2, {
+    const wrapper = shallowMount(arena_Runs, {
       propsData: {
         contestAlias: 'admin',
         runs: [],
@@ -21,7 +21,7 @@ describe('Runsv2.vue', () => {
 
   it('Should handle runs', async () => {
     const expectedDate = '1/1/2020, 12:00:00 AM';
-    const wrapper = shallowMount(arena_Runsv2, {
+    const wrapper = shallowMount(arena_Runs, {
       propsData: {
         contestAlias: 'admin',
         runs: [
@@ -80,7 +80,7 @@ describe('Runsv2.vue', () => {
       username: 'username',
       verdict: 'WA',
     };
-    const wrapper = shallowMount(arena_Runsv2, {
+    const wrapper = shallowMount(arena_Runs, {
       propsData: {
         contestAlias: 'admin',
         runs: [

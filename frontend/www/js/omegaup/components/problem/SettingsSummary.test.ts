@@ -55,9 +55,10 @@ describe('SettingsSummary.vue', () => {
 
   it('Should handle problem settings summary out of contest', () => {
     const wrapper = mount(problem_SettingsSummary, {
-      propsData: Object.assign({}, baseSettingsSummaryProps, {
+      propsData: {
+        ...baseSettingsSummaryProps,
         showVisibilityIndicators: true,
-      }),
+      },
     });
 
     expect(wrapper.text()).not.toContain(T.wordsInOut);
@@ -66,13 +67,14 @@ describe('SettingsSummary.vue', () => {
 
   it('Should handle problem settings summary with memory limit as string', () => {
     const wrapper = mount(problem_SettingsSummary, {
-      propsData: Object.assign({}, baseSettingsSummaryProps, {
+      propsData: {
+        ...baseSettingsSummaryProps,
         problem: {
           settings: { limits: { MemoryLimit: '32 MiB' } },
           languages: ['java', 'py'],
           accepts_submissions: true,
         },
-      }),
+      },
     });
 
     expect(wrapper.find('td[data-memory-limit]').text()).toContain('32 MiB');
@@ -80,11 +82,23 @@ describe('SettingsSummary.vue', () => {
 
   it('Should handle empty problem settings summary in lectures', () => {
     const wrapper = mount(problem_SettingsSummary, {
-      propsData: Object.assign({}, baseSettingsSummaryProps, {
+      propsData: {
+        ...baseSettingsSummaryProps,
         problem: { languages: [], accepts_submissions: false },
-      }),
+      },
     });
 
     expect(wrapper.find('table').exists()).toBeFalsy();
+  });
+
+  it('Should handle empty problem settings summary in problem', () => {
+    const wrapper = mount(problem_SettingsSummary, {
+      propsData: {
+        ...baseSettingsSummaryProps,
+        problem: { languages: [], accepts_submissions: true },
+      },
+    });
+
+    expect(wrapper.text()).not.toContain('undefined');
   });
 });
