@@ -2561,7 +2561,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return ProblemDetails
      */
-    private static function getProblemDetails(
+    public static function getProblemDetails(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Problemsets $problemset,
