@@ -47,7 +47,7 @@ module.exports = {
     contest_mine: './frontend/www/js/omegaup/contest/mine.ts',
     contest_new: './frontend/www/js/omegaup/contest/new.ts',
     contest_print: './frontend/www/js/omegaup/contest/print.ts',
-    contest_report: './frontend/www/js/omegaup/contest/report.js',
+    contest_report: './frontend/www/js/omegaup/contest/report.ts',
     contest_scoreboard: './frontend/www/js/omegaup/arena/scoreboard.ts',
     contest_scoreboardmerge:
       './frontend/www/js/omegaup/contest/scoreboardmerge.ts',
@@ -110,7 +110,7 @@ module.exports = {
     user_manage_identities:
       './frontend/www/js/omegaup/user/manage_identities.js',
     user_profile: './frontend/www/js/omegaup/user/profile.ts',
-    user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.js',
+    user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.ts',
     users_rank: './frontend/www/js/omegaup/user/rank.ts',
   },
 

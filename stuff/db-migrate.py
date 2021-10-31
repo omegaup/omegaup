@@ -61,9 +61,11 @@ def _scripts() -> List[Tuple[int, str, str]]:
         if not filename.endswith('.sql'):
             continue
         parts = filename.split('_', 1)
-        if len(parts) != 2 or not all(x.isdigit() for x in parts[0]):
+        if (len(parts) != 2 or
+                len(parts[0]) != 5 or
+                not all(x.isdigit() for x in parts[0])):
             continue
-        scripts.append((int(parts[0]), parts[1],
+        scripts.append((int(parts[0], 10), parts[1],
                         os.path.join(scripts_dir, filename)))
     scripts.sort()
     return scripts
