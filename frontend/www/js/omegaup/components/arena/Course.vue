@@ -202,7 +202,7 @@ import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarAssignments from './NavbarAssignments.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
-import arena_Runs from './Runsv2.vue';
+import arena_Runs from './Runs.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import arena_Scoreboard from './Scoreboard.vue';
