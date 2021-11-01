@@ -1,7 +1,7 @@
 <template>
   <b-card>
     <b-container>
-      <b-row align-v="center">
+      <b-row class="p-1" align-v="center">
         <b-col>
           <b-card-text>
             <h5>
@@ -18,7 +18,6 @@
         <b-col cols="3">
           <b-button
             v-if="contestTab === 2"
-            ref="contestButtonScoreboard"
             :href="getContestScoreboardURL(contest.alias)"
             variant="success"
           >
@@ -37,7 +36,7 @@
           </b-card-text>
         </b-col>
       </b-row>
-      <b-row align-v="center">
+      <b-row class="p-1" align-v="center">
         <b-col>
           <b-card-text v-if="contestTab === 0">
             <font-awesome-icon icon="calendar-alt" />
@@ -83,7 +82,6 @@
         <b-col>
           <b-button
             v-if="contestTab === 0 && contest.participating"
-            ref="contestButttonEnter"
             :href="getContestURL(contest.alias)"
             variant="primary"
           >
@@ -94,7 +92,6 @@
             v-else-if="
               (contestTab === 0 || contestTab === 1) && !contest.participating
             "
-            ref="contestButtonSingUp"
             :href="getContestURL(contest.alias)"
             variant="primary"
           >
@@ -184,11 +181,6 @@ export default class ContestCard extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-
-.row {
-  padding: 5px;
-}
-
 .contest-enroll-status {
   color: $omegaup-green;
 }
