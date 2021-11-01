@@ -18,6 +18,12 @@
           :title-link-class="titleLinkClass(ContestTab.Current)"
           active
         >
+          <omegaup-contest-card
+            v-for="contestItem in contests.current"
+            :key="contestItem.contest_id"
+            :contest="contestItem"
+            :contest-tab="activeTab"
+          />
           {{ contests.current }}
         </b-tab>
         <b-tab
@@ -25,6 +31,12 @@
           :title="T.contestListFuture"
           :title-link-class="titleLinkClass(ContestTab.Future)"
         >
+          <omegaup-contest-card
+            v-for="contestItem in contests.future"
+            :key="contestItem.contest_id"
+            :contest="contestItem"
+            :contest-tab="activeTab"
+          />
           {{ contests.future }}
         </b-tab>
         <b-tab
@@ -32,6 +44,12 @@
           :title="T.contestListPast"
           :title-link-class="titleLinkClass(ContestTab.Past)"
         >
+          <omegaup-contest-card
+            v-for="contestItem in contests.past"
+            :key="contestItem.contest_id"
+            :contest="contestItem"
+            :contest-tab="activeTab"
+          />
           {{ contests.past }}
         </b-tab>
       </b-tabs>
@@ -50,6 +68,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 // Import Only Required Plugins
 import { TabsPlugin, CardPlugin } from 'bootstrap-vue';
+import ContestCard from './ContestCard.vue';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 
@@ -60,7 +79,9 @@ export enum ContestTab {
 }
 
 @Component({
-  components: {},
+  components: {
+    'omegaup-contest-card': ContestCard,
+  },
 })
 export default class ArenaContestList extends Vue {
   @Prop() contests!: types.ContestList;
