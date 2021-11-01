@@ -17,18 +17,20 @@
         </b-col>
         <b-col cols="3">
           <b-button
+            v-if="contestTab === 2"
+            ref="contestButtonScoreboard"
             :href="getContestScoreboardURL(contest.alias)"
             variant="success"
-            v-if="contestTab === 2"
           >
             <font-awesome-icon icon="table" />
             {{ T.contestButtonScoreBoard }}
           </b-button>
           <b-card-text
-            class="contest-enroll-status"
             v-else-if="
               (contestTab === 0 || contestTab === 1) && contest.participating
             "
+            ref="contestEnrollStatus"
+            class="contest-enroll-status"
           >
             <font-awesome-icon icon="clipboard-check" />
             {{ T.contestEnrollStatus }}
@@ -80,24 +82,26 @@
         </b-col>
         <b-col>
           <b-button
+            v-if="contestTab === 0 && contest.participating"
+            ref="contestButttonEnter"
             :href="getContestURL(contest.alias)"
             variant="primary"
-            v-if="contestTab === 0 && contest.participating"
           >
             <font-awesome-icon icon="sign-in-alt" />
             {{ T.contestButtonEnter }}
           </b-button>
           <b-button
-            :href="getContestURL(contest.alias)"
-            variant="primary"
             v-else-if="
               (contestTab === 0 || contestTab === 1) && !contest.participating
             "
+            ref="contestButtonSingUp"
+            :href="getContestURL(contest.alias)"
+            variant="primary"
           >
             <font-awesome-icon icon="sign-in-alt" />
             {{ T.contestButtonSingUp }}
           </b-button>
-          <b-dropdown variant="primary" v-else-if="contestTab === 2">
+          <b-dropdown v-else-if="contestTab === 2" variant="primary">
             <template #button-content>
               <font-awesome-icon icon="sign-in-alt" />
               {{ T.contestButtonEnter }}
@@ -148,31 +152,31 @@ export default class ContestCard extends Vue {
   T = T;
   ui = ui;
 
-  get finishContestDate(): String {
+  get finishContestDate(): string {
     return this.contest.finish_time.toLocaleDateString();
   }
 
-  get startContestDate(): String {
+  get startContestDate(): string {
     return this.contest.start_time.toLocaleDateString();
   }
 
-  getContestURL(alias: String): String {
+  getContestURL(alias: string): string {
     return `/arena/${alias}/`;
   }
 
-  getContestScoreboardURL(alias: String): String {
+  getContestScoreboardURL(alias: string): string {
     return `/arena/${alias}/#ranking/`;
   }
 
-  getVirtualContestURL(alias: String): String {
+  getVirtualContestURL(alias: string): string {
     return `/arena/${alias}/virtual/`;
   }
 
-  getPracticeContestURL(alias: String): String {
+  getPracticeContestURL(alias: string): string {
     return `/arena/${alias}/practice/`;
   }
 
-  contestDuration(seconds: number): String {
+  contestDuration(seconds: number): string {
     return new Date(seconds * 1000).toISOString().substr(11, 8);
   }
 }

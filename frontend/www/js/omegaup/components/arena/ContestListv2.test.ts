@@ -80,7 +80,7 @@ describe('ContestListv2.vue', () => {
         contests,
       },
     });
-  
+
     const currentContestTab = wrapper.findComponent({
       ref: 'currentContestTab',
     });
@@ -95,7 +95,7 @@ describe('ContestListv2.vue', () => {
         contests,
       },
     });
-  
+
     const futureContestTab = wrapper.findComponent({
       ref: 'futureContestTab',
     });
@@ -110,7 +110,7 @@ describe('ContestListv2.vue', () => {
         contests,
       },
     });
-  
+
     const pastContestTab = wrapper.findComponent({
       ref: 'pastContestTab',
     });
