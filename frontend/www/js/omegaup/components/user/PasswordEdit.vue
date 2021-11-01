@@ -49,7 +49,11 @@
           </div>
         </div>
         <div>
-          <button type="submit" class="btn btn-primary mr-2">
+          <button
+            type="submit"
+            class="btn btn-primary mr-2"
+            :disabled="submitDisabled"
+          >
             {{ T.wordsSaveChanges }}
           </button>
           <a href="/profile/" class="btn btn-cancel">{{ T.wordsCancel }}</a>
@@ -77,9 +81,17 @@ export default class UserPasswordEdit extends Vue {
     return this.passwordMismatch ? 'invalid-input' : '';
   }
 
+  get submitDisabled(): boolean {
+    return (
+      this.passwordMismatch ||
+      this.oldPassword.length === 0 ||
+      this.newPassword.length === 0 ||
+      this.newPassword2.length === 0
+    );
+  }
+
   onUpdatePassword(): void {
-    if (this.newPassword !== this.newPassword2) {
-      this.passwordMismatch = true;
+    if (this.passwordMismatch) {
       return;
     }
     this.$emit('update-password', {
@@ -88,11 +100,22 @@ export default class UserPasswordEdit extends Vue {
     });
   }
 
-  @Watch('newPassword2')
-  onNewPassword2Changed(): void {
-    if (this.passwordMismatch) {
-      this.passwordMismatch = false;
+  @Watch('newPassword')
+  onNewPasswordChanged(newPassword: string): void {
+    if (newPassword !== this.newPassword2) {
+      this.passwordMismatch = true;
+      return;
     }
+    this.passwordMismatch = false;
+  }
+
+  @Watch('newPassword2')
+  onNewPassword2Changed(newPassword2: string): void {
+    if (this.newPassword !== newPassword2) {
+      this.passwordMismatch = true;
+      return;
+    }
+    this.passwordMismatch = false;
   }
 }
 </script>
