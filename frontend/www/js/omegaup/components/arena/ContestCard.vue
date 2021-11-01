@@ -157,19 +157,19 @@ export default class ContestCard extends Vue {
   }
 
   getContestURL(alias: String): String {
-    return `arena/${alias}`;
+    return `/arena/${alias}/`;
   }
 
   getContestScoreboardURL(alias: String): String {
-    return `arena/${alias}/#ranking`;
+    return `/arena/${alias}/#ranking/`;
   }
 
   getVirtualContestURL(alias: String): String {
-    return `arena/${alias}/virtual`;
+    return `/arena/${alias}/virtual/`;
   }
 
   getPracticeContestURL(alias: String): String {
-    return `arena/${alias}/practice`;
+    return `/arena/${alias}/practice/`;
   }
 
   contestDuration(seconds: number): String {
@@ -186,7 +186,7 @@ export default class ContestCard extends Vue {
 }
 
 .contest-enroll-status {
-  color: #468847;
+  color: $omegaup-green;
 }
 
 .btn {
