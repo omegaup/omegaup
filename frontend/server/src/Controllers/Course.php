@@ -3749,18 +3749,19 @@ class Course extends \OmegaUp\Controllers\Controller {
         ] = \OmegaUp\DAO\Courses::getEnrolledAndFinishedCoursesForTabs(
             $r->identity
         );
+        /** @var array<string, bool> */
+        $startedCourses = [];
+        foreach ($courses['enrolled'] as $studentCourse) {
+            $startedCourses[$studentCourse['alias']] = true;
+        }
+        foreach ($courses['finished'] as $studentCourse) {
+            $startedCourses[$studentCourse['alias']] = true;
+        }
         foreach ($courses['public'] as &$course) {
-            foreach (
-                array_merge(
-                    $courses['enrolled'],
-                    $courses['finished']
-                ) as $studentCourse
-            ) {
-                if ($studentCourse['alias'] === $course['alias']) {
-                    $course['alreadyStarted'] = true;
-                    break;
-                }
-            }
+            $course['alreadyStarted'] = in_array(
+                $course['alias'],
+                $startedCourses
+            );
         }
         return [
             'smartyProperties' => [
