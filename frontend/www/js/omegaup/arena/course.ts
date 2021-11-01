@@ -109,7 +109,7 @@ OmegaUp.on('ready', async () => {
             assignmentAliasToShow: string;
             courseAlias: string;
           }) => {
-            window.location.pathname = `/course/${courseAlias}/assignment/${assignmentAliasToShow}/`;
+            window.location.href = `/course/${courseAlias}/assignment/${assignmentAliasToShow}/`;
           },
           'navigate-to-problem': ({
             problem,
