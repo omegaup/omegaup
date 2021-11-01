@@ -15,7 +15,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \
 
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
-        php7.4-fpm php7.4-curl php7.4-mysql php7.4-sqlite3 php7.4-zip \
+        php7.4-fpm php7.4-curl php7.4-mysql php7.4-zip \
         php7.4-mbstring php7.4-json php7.4-opcache php7.4-xml php-apcu \
         nginx git yarn nodejs supervisor python3-jinja2 python3-requests \
         python3-mysqldb python3-pyparsing mysql-client-core-8.0 \
