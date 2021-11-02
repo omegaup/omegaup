@@ -130,7 +130,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'name' => \OmegaUp\Test\Utils::createRandomString(),
             'country_id' => 'MX',
             'state_id' => $states[0]->state_id,
-            'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+            'school' => \OmegaUp\Test\Utils::createRandomString(),
             'gender' => 'female',
             'scholar_degree' => 'master',
             'birth_date' => strtotime('1998-01-01'),
