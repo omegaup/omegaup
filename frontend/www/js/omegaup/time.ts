@@ -1,6 +1,5 @@
 import * as moment from 'moment';
 import dayjs from 'dayjs';
-import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 import T from './lang';
 
 let momentInitialized: boolean = false;
