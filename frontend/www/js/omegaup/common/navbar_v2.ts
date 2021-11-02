@@ -4,10 +4,14 @@ import * as api from '../api';
 import { types } from '../api_types';
 import * as ui from '../ui';
 import Vue from 'vue';
+import T from '../lang';
 import clarificationsStore from '../arena/clarificationsStore';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload('header-payload');
+  const fromLogin =
+    new URL(document.location.toString()).searchParams.get('fromLogin') !==
+    null;
   const commonNavbar = new Vue({
     el: '#common-navbar',
     components: {
@@ -42,6 +46,8 @@ OmegaUp.on('ready', () => {
           graderQueueLength: this.graderQueueLength,
           errorMessage: this.errorMessage,
           clarifications: clarificationsStore.state.clarifications,
+          fromLogin: fromLogin,
+          userTypes: payload.userTypes,
         },
         on: {
           'read-notifications': (
@@ -68,6 +74,28 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 window.location.reload();
+              })
+              .catch(ui.apiError);
+          },
+          'update-user-objectives': ({
+            hasCompetitiveObjective,
+            hasLearningObjective,
+            hasScholarObjective,
+            hasTeachingObjective,
+          }: {
+            hasCompetitiveObjective: string;
+            hasLearningObjective: string;
+            hasScholarObjective: string;
+            hasTeachingObjective: string;
+          }) => {
+            api.User.update({
+              has_competitive_objective: hasCompetitiveObjective,
+              has_learning_objective: hasLearningObjective,
+              has_scholar_objective: hasScholarObjective,
+              has_teaching_objective: hasTeachingObjective,
+            })
+              .then(() => {
+                ui.success(T.userObjectivesUpdateSuccess);
               })
               .catch(ui.apiError);
           },
@@ -103,5 +131,9 @@ OmegaUp.on('ready', () => {
 
     updateGraderStatus();
     setInterval(updateGraderStatus, 30000);
+  }
+
+  if (fromLogin && payload.userTypes.length === 0) {
+    $('.objectivesQuestionsModal').modal();
   }
 });
