@@ -64,7 +64,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component({
@@ -75,7 +75,10 @@ export default class UserPasswordEdit extends Vue {
   oldPassword = '';
   newPassword = '';
   newPassword2 = '';
-  passwordMismatch = false;
+
+  get passwordMismatch(): boolean {
+    return this.newPassword != this.newPassword2;
+  }
 
   get invalidPasswordClass(): string {
     return this.passwordMismatch ? 'invalid-input' : '';
@@ -98,24 +101,6 @@ export default class UserPasswordEdit extends Vue {
       oldPassword: this.oldPassword,
       newPassword: this.newPassword,
     });
-  }
-
-  @Watch('newPassword')
-  onNewPasswordChanged(newPassword: string): void {
-    if (newPassword !== this.newPassword2) {
-      this.passwordMismatch = true;
-      return;
-    }
-    this.passwordMismatch = false;
-  }
-
-  @Watch('newPassword2')
-  onNewPassword2Changed(newPassword2: string): void {
-    if (this.newPassword !== newPassword2) {
-      this.passwordMismatch = true;
-      return;
-    }
-    this.passwordMismatch = false;
   }
 }
 </script>
