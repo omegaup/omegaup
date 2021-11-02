@@ -56,7 +56,7 @@
     {/if}
   </head>
 
-  <body class="d-flex flex-column h-100">
+  <body class="d-flex flex-column h-100{if $smarty.const.OMEGAUP_LOCKDOWN} lockdown{/if}">
     <script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
     {if !isset($hideFooterAndHeader) || !$hideFooterAndHeader}
       <div id="common-navbar"></div>

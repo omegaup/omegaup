@@ -92,6 +92,9 @@
                     isDismissed,
                   })
               "
+              @new-submission-popup-displayed="
+                $emit('new-submission-popup-displayed')
+              "
             >
               <template #quality-nomination-buttons>
                 <div></div>
@@ -248,6 +251,8 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
+  @Prop({ default: false })
+  shouldShowFirstAssociatedIdentityRunWarning!: boolean;
 
   T = T;
   PopupDisplayed = PopupDisplayed;
