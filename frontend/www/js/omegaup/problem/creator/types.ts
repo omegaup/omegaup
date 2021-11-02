@@ -1,5 +1,9 @@
 import { CasesState } from './modules/cases';
 
+export type CaseID = string;
+export type GroupID = string;
+export type LineID = string;
+
 /**
  * StoreState
  * Store containing modules
@@ -25,32 +29,52 @@ export interface RootState {
 }
 
 /**
- * Linetype
- * Type of line in the editor
- * @alias Linetype
- * @typedef {string}
+ * CaseLineData
+ * Contains the type and the corresponding parameters for each type
  */
-export type LineType = 'line' | 'multiline' | 'array' | 'matrix';
+export type CaseLineData =
+  | {
+      kind: 'line';
+      value: string;
+    }
+  | {
+      kind: 'multiline';
+      value: string;
+    }
+  | {
+      kind: 'array';
+      size: number;
+      min: number;
+      max: number;
+      distinct: boolean;
+      value: number[];
+    }
+  | {
+      kind: 'matrix';
+      rows: number;
+      cols: number;
+      min: number;
+      max: number;
+      distinct: 'none' | 'rows' | 'cols' | 'both';
+      value: number[][];
+    };
 
 /**
  * InLine
  * Line in the editor
- * @alias InLine
+ * @alias CaseLine
  * @typedef {object}
- * @property {string} lineId UUID of the line
+ * @property {LineID} lineID UUID of the line
  * @property {string} label Label of the line
  * @property {string} value Value of the line
  * @property {LineType} lineType Type of line
  * @property {ArrayData} arrayData Object containig all the logic for the Array Generator
  * @property {object} matrixData Object containig all the logic for the Matrix Generator
  */
-export interface InLine {
-  lineId: string;
+export interface CaseLine {
+  lineID: LineID;
   label: string;
-  value: string;
-  type: LineType;
-  arrayData: ArrayData;
-  matrixData: any;
+  data: CaseLineData;
 }
 
 /**
@@ -58,20 +82,18 @@ export interface InLine {
  * Contains all the information of a case
  * @alias Case
  * @typedef {object}
- * @property {string} caseId UUID of the case
- * @property {string} groupId UUID referencing to the parent group
+ * @property {CaseID} caseID UUID of the case
+ * @property {GroupID} groupID UUID referencing to the parent group
  * @property {stirng} name Name of the case
  * @property {number} points Points of the case
- * @property {boolean} defined Whether the points are defined by the user or not
+ * @property {boolean} pointsDefined Whether the points are defined by the user or not
  * @property {Array<InLine>} lines Lines containing .IN information of the cases
  */
 export interface Case {
-  caseId: string;
-  groupId: string;
+  caseID: string;
+  groupID: string;
   name: string;
-  points: number;
-  defined: boolean;
-  lines: InLine[];
+  lines: CaseLine[];
 }
 
 /**
@@ -79,17 +101,19 @@ export interface Case {
  * Contains all the information of a group
  * @alis Group
  * @typedef {object}
- * @property {string} groupId UUID of the group
+ * @property {GrouID} groupID UUID of the group
  * @property {string} name Name of the group
  * @property {number} points Points of the group
- * @property {boolean} defined Whether the points are defined by the user or not
+ * @property {boolean} pointsDefined Whether the points are defined by the user or not
+ * @property {boolean} ungroupedCase Whether this case belongs to an ungrouped case
  * @property {Array<Case>} cases Cases of the group
  */
 export interface Group {
-  groupId: string;
+  groupID: GroupID;
   name: string;
   points: number;
-  defined: boolean;
+  pointsDefined: boolean;
+  ungroupedCase: boolean;
   cases: Case[];
 }
 
@@ -107,51 +131,40 @@ export interface Option {
 }
 
 /**
- * MultipleCaseAdd
+ * MultipleCaseAddRequest
  * Object containing all the information to add multiple cases in the store
- * @alias MultipleCaseAdd
+ * @alias MultipleCaseAddRequest
  * @typedef {object}
  * @property {string} prefix Prefix of the name of all the cases
  * @property {string} suffix Suffix of the name of all the cases
- * @property {number} number Number of cases to add
- * @property {string} groupId UUID of the group
+ * @property {number} numberOfCases Number of cases to add
+ * @property {GroupID} groupID UUID of the group
  */
-export interface MultipleCaseAdd {
+export interface MultipleCaseAddRequest {
   prefix: string;
   suffix: string;
-  number: number;
-  groupId: string;
+  numberOfCases: number;
+  groupID: GroupID;
+}
+
+export interface CaseRequest {
+  groupID: GroupID;
+  caseID: CaseID;
+  name: string;
+  pointsDefined: boolean;
+  points: number;
+  lines?: CaseLine[];
 }
 
 /**
- * CaseGrouID
- * Identifier of a case containing both groupId and caseId
+ * CaseGroupID
+ * Identifier of a case containing both groupID and caseID
  * @alias CaseGroupID
  * @typedef {object}
- * @property {string} groupId UUID of the group
- * @property {string} caseId UUID of the case
+ * @property {GroupID} groupID UUID of the group
+ * @property {GroupID} caseID UUID of the case
  */
 export interface CaseGroupID {
-  groupId: string;
-  caseId: string;
-}
-
-/**
- * Array Data
- * Array Data used in the Array Generator
- * @alias ArrayData
- * @typedef {object}
- * @property {size} size Size of the array
- * @property {number} min Minimum permitted value of the array
- * @property {number} max Maximum permitted value of the array
- * @property {boolean} distinct Whether the array values are distinct or not
- * @property {string} arrayVal Value of the array represented in a string
- *
- */
-export interface ArrayData {
-  size: number;
-  min: number;
-  max: number;
-  distinct: boolean;
-  arrayVal: string;
+  groupID: GroupID;
+  caseID: GroupID;
 }

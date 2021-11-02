@@ -7,7 +7,7 @@ import T from '../../lang';
 Vue.use(Vuex);
 
 const state: StoreState = {
-  problemName: T.problemCreatorNamePlaceholder,
+  problemName: T.problemCreatorNewProblem,
 } as StoreState;
 
 const store: Module<StoreState, RootState> = {

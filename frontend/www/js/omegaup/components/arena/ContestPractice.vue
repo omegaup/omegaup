@@ -1,7 +1,7 @@
 <template>
   <omegaup-arena
     :active-tab="activeTab"
-    :contest-title="contest.title"
+    :title="contest.title"
     :should-show-runs="contestAdmin"
     :background-class="'practice'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
@@ -51,6 +51,9 @@
               "
               @submit-run="onRunSubmitted"
               @show-run="onRunDetails"
+              @new-submission-popup-displayed="
+                $emit('new-submission-popup-displayed')
+              "
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -154,6 +157,8 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
+  @Prop({ default: false })
+  shouldShowFirstAssociatedIdentityRunWarning!: boolean;
 
   T = T;
   ui = ui;
@@ -183,9 +188,7 @@ export default class ArenaContestPractice extends Vue {
   onRunDetails(request: SubmissionRequest): void {
     this.$emit('show-run', {
       ...request,
-      hash: `#problems/${
-        this.activeProblemAlias ?? request.problemAlias
-      }/show-run:${request.guid}`,
+      hash: `#problems/${this.activeProblemAlias}/show-run:${request.guid}`,
     });
   }
 

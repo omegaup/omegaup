@@ -4,6 +4,7 @@ import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
+import T from '../lang';
 import arena_ContestPractice from '../components/arena/ContestPractice.vue';
 import {
   showSubmission,
@@ -45,7 +46,7 @@ OmegaUp.on('ready', async () => {
       problems: payload.problems,
       location: window.location.hash,
     }));
-  } catch (e) {
+  } catch (e: any) {
     ui.apiError(e);
   }
   trackClarifications(payload.clarifications);
@@ -61,15 +62,16 @@ OmegaUp.on('ready', async () => {
       showNewClarificationPopup,
       guid,
       problemAlias,
-      isAdmin: false,
       nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
       runDetailsData: runDetails,
+      shouldShowFirstAssociatedIdentityRunWarning:
+        payload.shouldShowFirstAssociatedIdentityRunWarning,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
         props: {
           contest: payload.contest,
-          contestAdmin: Boolean(payload.adminPayload),
+          contestAdmin: payload.contestAdmin,
           problems: this.problems,
           users: payload.adminPayload?.users,
           problemInfo: this.problemInfo,
@@ -80,10 +82,11 @@ OmegaUp.on('ready', async () => {
           activeTab,
           guid: this.guid,
           problemAlias: this.problemAlias,
-          isAdmin: this.isAdmin,
           runs: myRunsStore.state.runs,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           runDetailsData: this.runDetailsData,
+          shouldShowFirstAssociatedIdentityRunWarning: this
+            .shouldShowFirstAssociatedIdentityRunWarning,
         },
         on: {
           'navigate-to-problem': ({
@@ -186,10 +189,26 @@ OmegaUp.on('ready', async () => {
               .catch(ui.apiError);
           },
           'update:activeTab': (tabName: string) => {
-            window.location.replace(`#${tabName}`);
+            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
           },
-          'reset-hash': (request: { selectedTab: string; alias: string }) => {
-            window.location.replace(`#${request.selectedTab}/${request.alias}`);
+          'reset-hash': ({
+            selectedTab,
+            alias,
+          }: {
+            selectedTab: string;
+            alias: string;
+          }) => {
+            history.replaceState(
+              { selectedTab, alias },
+              'resetHash',
+              `#${selectedTab}/${alias}`,
+            );
+          },
+          'new-submission-popup-displayed': () => {
+            if (this.shouldShowFirstAssociatedIdentityRunWarning) {
+              this.shouldShowFirstAssociatedIdentityRunWarning = false;
+              ui.warning(T.firstSumbissionWithIdentity);
+            }
           },
         },
       });

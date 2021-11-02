@@ -55,7 +55,7 @@ OmegaUp.on('ready', async () => {
       problems: payload.currentAssignment.problems,
       location: window.location.hash,
     }));
-  } catch (e) {
+  } catch (e: any) {
     ui.apiError(e);
   }
 
@@ -77,6 +77,8 @@ OmegaUp.on('ready', async () => {
       searchResultUsers: [] as types.ListItem[],
       runDetailsData: runDetails,
       nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      shouldShowFirstAssociatedIdentityRunWarning:
+        payload.shouldShowFirstAssociatedIdentityRunWarning,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-course', {
@@ -100,6 +102,8 @@ OmegaUp.on('ready', async () => {
           runDetailsData: this.runDetailsData,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           socketStatus: socketStore.state.socketStatus,
+          shouldShowFirstAssociatedIdentityRunWarning: this
+            .shouldShowFirstAssociatedIdentityRunWarning,
         },
         on: {
           'navigate-to-assignment': ({
@@ -109,7 +113,7 @@ OmegaUp.on('ready', async () => {
             assignmentAliasToShow: string;
             courseAlias: string;
           }) => {
-            window.location.pathname = `/course/${courseAlias}/assignment/${assignmentAliasToShow}/`;
+            window.location.href = `/course/${courseAlias}/assignment/${assignmentAliasToShow}/`;
           },
           'navigate-to-problem': ({
             problem,
@@ -209,7 +213,7 @@ OmegaUp.on('ready', async () => {
               .catch(ui.apiError);
           },
           'update:activeTab': (tabName: string) => {
-            window.location.replace(`#${tabName}`);
+            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
           },
           rejudge: (run: types.Run) => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
@@ -230,15 +234,26 @@ OmegaUp.on('ready', async () => {
               })
               .catch(ui.ignoreError);
           },
-          'reset-hash': (request: {
+          'reset-hash': ({
+            selectedTab,
+            alias,
+          }: {
             selectedTab: string;
             alias: null | string;
           }) => {
-            if (!request.alias) {
-              window.location.replace(`#${request.selectedTab}`);
+            if (!alias) {
+              history.replaceState(
+                { selectedTab },
+                'updateTab',
+                `#${selectedTab}`,
+              );
               return;
             }
-            window.location.replace(`#${request.selectedTab}/${request.alias}`);
+            history.replaceState(
+              { selectedTab, alias },
+              'resetHash',
+              `#${selectedTab}/${alias}`,
+            );
           },
           'submit-promotion': ({
             solved,
@@ -330,6 +345,12 @@ OmegaUp.on('ready', async () => {
                 );
               })
               .catch(ui.error);
+          },
+          'new-submission-popup-displayed': () => {
+            if (this.shouldShowFirstAssociatedIdentityRunWarning) {
+              this.shouldShowFirstAssociatedIdentityRunWarning = false;
+              ui.warning(T.firstSumbissionWithIdentity);
+            }
           },
         },
       });

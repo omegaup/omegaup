@@ -28,6 +28,7 @@
   --btn-ok-background-color: #007bff;
   --btn-ok-font-color: #fff;
   --btn-ok-font-color--hover: #fff;
+  --btn-next-previous-font-color: #666;
 
   // MARKDOWN
   --markdown-pre-background-color: #eeeeee;
@@ -95,6 +96,7 @@
   --arena-contest-list-sidebar-tab-list-background-color: #efefef;
   --arena-contest-list-sidebar-tab-list-link-font-color: #5588dd;
   --arena-contest-list-sidebar-tab-list-link-background-color--active: #5588dd;
+  --arena-scoreboard-penalty-color: #ff0000;
   --arena-scoreboard-a-font-color: #5588dd;
   --arena-scoreboard-footer-font-color: #808080;
   --arena-scoreboard-td-border-color: #000000;
@@ -224,4 +226,8 @@
   --toggle-switch-slider-background-color--before: #ffffff;
   --toggle-switch-input-checked-slider-background-color: #678dd7;
   --toggle-switch-input-focus-slider-background-color: #678dd7;
+
+  // FORM INPUT
+  --form-input-error-color: #dc3545;
+  --form-input-box-shadow-error-color: rgba(220, 53, 69, 0.25);
 }

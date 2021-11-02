@@ -28,14 +28,17 @@ namespace OmegaUp\Controllers;
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>}
+ * @psalm-type UserProfileEditDetailsPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, programmingLanguages: array<string, string>, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
  * @psalm-type UserProfileDetailsPayload=array{privateProfile: bool, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
- * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
+ * @psalm-type ScoreboardRankingProblemDetailsGroup=array{cases: list<array{meta: RunMetadata}>}
+ * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type LoginDetailsPayload=array{facebookUrl: string, statusError?: string, validateRecaptcha: bool}
  * @psalm-type Experiment=array{config: bool, hash: string, name: string}
  * @psalm-type UserRole=array{name: string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
+ * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -3281,13 +3284,14 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
+     * @return array{entrypoint: string, smartyProperties: array{payload: PrivacyPolicyDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $username
      */
-    public static function getPrivacyPolicy(\OmegaUp\Request $r): array {
-        $r->ensureIdentity();
-
+    public static function getPrivacyPolicyDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
         /** @var \OmegaUp\DAO\VO\Identities */
         $identity = self::resolveTargetIdentity($r);
 
@@ -3300,6 +3304,7 @@ class User extends \OmegaUp\Controllers\Controller {
         } elseif ($identity->language_id == \OmegaUp\Controllers\User::LANGUAGE_PT) {
             $lang = 'pt';
         }
+        self::$log->error(print_r($lang, true));
         $latestStatement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement();
         if (is_null($latestStatement)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -3307,18 +3312,26 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
         return [
-            'policy_markdown' => file_get_contents(
-                sprintf(
-                    "%s/privacy/privacy_policy/{$lang}.md",
-                    strval(OMEGAUP_ROOT)
+            'smartyProperties' => [
+                'payload' => [
+                    'policy_markdown' => file_get_contents(
+                        sprintf(
+                            "%s/privacy/privacy_policy/{$lang}.md",
+                            strval(OMEGAUP_ROOT)
+                        )
+                    ) ?: '',
+                    'has_accepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
+                        intval($identity->identity_id),
+                        $latestStatement['privacystatement_id']
+                    ),
+                    'git_object_id' => $latestStatement['git_object_id'],
+                    'statement_type' => 'privacy_policy',
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitlePrivacyPolicy'
                 )
-            ) ?: '',
-            'has_accepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
-                intval($identity->identity_id),
-                $latestStatement['privacystatement_id']
-            ),
-            'git_object_id' => $latestStatement['git_object_id'],
-            'statement_type' => 'privacy_policy',
+            ],
+            'entrypoint' => 'user_privacy_policy',
         ];
     }
 
@@ -4032,6 +4045,68 @@ class User extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => $smartyProperties,
             'template' => $template,
         ];
+    }
+
+    /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: UserProfileEditDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param null|string $username
+     *
+     */
+    public static function getProfileEditDetailsForTypeScriptV2(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
+        $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'Identity'
+            );
+        }
+        $response = [
+            'smartyProperties' => [
+                'title' => new \OmegaUp\TranslationString(
+                    'userEditEditProfile'
+                ),
+            ],
+            'entrypoint' => 'user_edit',
+        ];
+        $ownedBadges = [];
+        $user = $r->user;
+        if (!is_null($user)) {
+            $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
+                $user
+            );
+        }
+        $response['smartyProperties']['payload'] = [
+            'countries' => \OmegaUp\DAO\Countries::getAll(
+                null,
+                100,
+                'name'
+            ),
+            'programmingLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+            'profile' => self::getProfileDetails($r->identity, $identity),
+            'extraProfileDetails' => [
+                'contests' => self::getContestStats($identity),
+                'solvedProblems' => self::getSolvedProblems(
+                    $identity->identity_id
+                ),
+                'unsolvedProblems' => self::getUnsolvedProblems(
+                    $identity->identity_id
+                ),
+                'createdProblems' => self::getCreatedProblems(
+                    $identity->identity_id
+                ),
+                'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
+                    $identity->identity_id
+                ),
+                'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
+                'ownedBadges' => $ownedBadges,
+            ],
+        ];
+        if (is_null($r->identity->password)) {
+            $response['entrypoint'] = 'user_basic_edit';
+        }
+        return $response;
     }
 
     /**

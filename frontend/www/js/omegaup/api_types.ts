@@ -11,6 +11,7 @@ export namespace dao {
     certificates_status?: string;
     contest_for_teams?: boolean;
     contest_id?: number;
+    default_show_all_contestants_in_scoreboard?: boolean;
     description?: string;
     feedback?: string;
     finish_time?: Date;
@@ -652,6 +653,99 @@ export namespace types {
       );
     }
 
+    export function ContestPrintDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestPrintDetailsPayload {
+      return ((x) => {
+        x.problems = ((x) => {
+          if (x instanceof Object) {
+            Object.keys(x).forEach(
+              (y) =>
+                (x[y] = ((x) => {
+                  x.creation_date = ((x: number) => new Date(x * 1000))(
+                    x.creation_date,
+                  );
+                  if (x.nextSubmissionTimestamp)
+                    x.nextSubmissionTimestamp = ((x: number) =>
+                      new Date(x * 1000))(x.nextSubmissionTimestamp);
+                  if (x.problemsetter)
+                    x.problemsetter = ((x) => {
+                      if (x.creation_date)
+                        x.creation_date = ((x: number) => new Date(x * 1000))(
+                          x.creation_date,
+                        );
+                      return x;
+                    })(x.problemsetter);
+                  if (x.runs)
+                    x.runs = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        x.time = ((x: number) => new Date(x * 1000))(x.time);
+                        return x;
+                      });
+                    })(x.runs);
+                  if (x.solvers)
+                    x.solvers = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        x.time = ((x: number) => new Date(x * 1000))(x.time);
+                        return x;
+                      });
+                    })(x.solvers);
+                  return x;
+                })(x[y])),
+            );
+          }
+          return x;
+        })(x.problems);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
+    export function ContestReportDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ContestReportDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function ContestScoreboardPayload(
+      elementId: string = 'payload',
+    ): types.ContestScoreboardPayload {
+      return ((x) => {
+        x.contest = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          if (x.submission_deadline)
+            x.submission_deadline = ((x: number) => new Date(x * 1000))(
+              x.submission_deadline,
+            );
+          return x;
+        })(x.contest);
+        x.scoreboard = ((x) => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.scoreboard);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function ContestVirtualDetailsPayload(
       elementId: string = 'payload',
     ): types.ContestVirtualDetailsPayload {
@@ -1050,6 +1144,44 @@ export namespace types {
       );
     }
 
+    export function CourseScoreboardPayload(
+      elementId: string = 'payload',
+    ): types.CourseScoreboardPayload {
+      return ((x) => {
+        x.assignment = ((x) => {
+          x.courseAssignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.courseAssignments);
+          if (x.finishTime)
+            x.finishTime = ((x: number) => new Date(x * 1000))(x.finishTime);
+          x.startTime = ((x: number) => new Date(x * 1000))(x.startTime);
+          return x;
+        })(x.assignment);
+        x.scoreboard = ((x) => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          return x;
+        })(x.scoreboard);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function CourseStatisticsPayload(
       elementId: string = 'payload',
     ): types.CourseStatisticsPayload {
@@ -1173,6 +1305,33 @@ export namespace types {
       );
     }
 
+    export function GroupScoreboardDetailsPayload(
+      elementId: string = 'payload',
+    ): types.GroupScoreboardDetailsPayload {
+      return ((x) => {
+        x.details = ((x) => {
+          x.contests = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.contests);
+          return x;
+        })(x.details);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function IndexPayload(
       elementId: string = 'payload',
     ): types.IndexPayload {
@@ -1255,6 +1414,14 @@ export namespace types {
     export function LoginDetailsPayload(
       elementId: string = 'payload',
     ): types.LoginDetailsPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function PrivacyPolicyDetailsPayload(
+      elementId: string = 'payload',
+    ): types.PrivacyPolicyDetailsPayload {
       return JSON.parse(
         (document.getElementById(elementId) as HTMLElement).innerText,
       );
@@ -1398,6 +1565,56 @@ export namespace types {
       );
     }
 
+    export function ProblemPrintDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ProblemPrintDetailsPayload {
+      return ((x) => {
+        x.details = ((x) => {
+          x.creation_date = ((x: number) => new Date(x * 1000))(
+            x.creation_date,
+          );
+          if (x.nextSubmissionTimestamp)
+            x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
+              x.nextSubmissionTimestamp,
+            );
+          if (x.problemsetter)
+            x.problemsetter = ((x) => {
+              if (x.creation_date)
+                x.creation_date = ((x: number) => new Date(x * 1000))(
+                  x.creation_date,
+                );
+              return x;
+            })(x.problemsetter);
+          if (x.runs)
+            x.runs = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.runs);
+          if (x.solvers)
+            x.solvers = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.solvers);
+          return x;
+        })(x.details);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function ProblemQualityPayload(
       elementId: string = 'payload',
     ): types.ProblemQualityPayload {
@@ -1435,6 +1652,34 @@ export namespace types {
     ): types.SchoolRankPayload {
       return JSON.parse(
         (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function ScoreboardMergePayload(
+      elementId: string = 'payload',
+    ): types.ScoreboardMergePayload {
+      return ((x) => {
+        x.contests = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
+            x.original_finish_time = ((x: number) => new Date(x * 1000))(
+              x.original_finish_time,
+            );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          });
+        })(x.contests);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -1726,6 +1971,70 @@ export namespace types {
       );
     }
 
+    export function UserProfileEditDetailsPayload(
+      elementId: string = 'payload',
+    ): types.UserProfileEditDetailsPayload {
+      return ((x) => {
+        if (x.extraProfileDetails)
+          x.extraProfileDetails = ((x) => {
+            x.contests = ((x) => {
+              if (x instanceof Object) {
+                Object.keys(x).forEach(
+                  (y) =>
+                    (x[y] = ((x) => {
+                      x.data = ((x) => {
+                        x.finish_time = ((x: number) => new Date(x * 1000))(
+                          x.finish_time,
+                        );
+                        x.last_updated = ((x: number) => new Date(x * 1000))(
+                          x.last_updated,
+                        );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      })(x.data);
+                      return x;
+                    })(x[y])),
+                );
+              }
+              return x;
+            })(x.contests);
+            x.ownedBadges = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.assignation_time)
+                  x.assignation_time = ((x: number) => new Date(x * 1000))(
+                    x.assignation_time,
+                  );
+                if (x.first_assignation)
+                  x.first_assignation = ((x: number) => new Date(x * 1000))(
+                    x.first_assignation,
+                  );
+                return x;
+              });
+            })(x.ownedBadges);
+            return x;
+          })(x.extraProfileDetails);
+        x.profile = ((x) => {
+          if (x.birth_date)
+            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+          if (x.graduation_date)
+            x.graduation_date = ((x: number) => new Date(x * 1000))(
+              x.graduation_date,
+            );
+          return x;
+        })(x.profile);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function UserRankTablePayload(
       elementId: string = 'payload',
     ): types.UserRankTablePayload {
@@ -1835,10 +2144,25 @@ export namespace types {
     title?: string;
   }
 
+  export interface AssignmentDetails {
+    admin: boolean;
+    alias: string;
+    assignmentType: string;
+    courseAssignments: types.CourseAssignment[];
+    description: string;
+    director: string;
+    finishTime?: Date;
+    name: string;
+    problems: types.ProblemsetProblem[];
+    problemsetId: number;
+    startTime: Date;
+  }
+
   export interface AssignmentDetailsPayload {
     courseDetails: types.CourseDetails;
     currentAssignment: types.ArenaAssignment;
     scoreboard: types.Scoreboard;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
   }
 
@@ -2102,6 +2426,7 @@ export namespace types {
     archived: boolean;
     available_languages: { [key: string]: string };
     contest_for_teams: boolean;
+    default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -2139,6 +2464,7 @@ export namespace types {
     alias: string;
     archived: boolean;
     contest_for_teams: boolean;
+    default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -2213,7 +2539,6 @@ export namespace types {
     needsBasicInformation: boolean;
     privacyStatement: types.PrivacyStatement;
     requestsUserInformation: string;
-    shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
   export interface ContestList {
@@ -2273,6 +2598,7 @@ export namespace types {
     adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
+    contestAdmin: boolean;
     original?: {
       contest: dao.Contests;
       scoreboard?: types.Scoreboard;
@@ -2283,9 +2609,15 @@ export namespace types {
     submissionDeadline?: Date;
   }
 
+  export interface ContestPrintDetailsPayload {
+    contestTitle: string;
+    problems: { [key: number]: null | types.ProblemDetails };
+  }
+
   export interface ContestPublicDetails {
     admission_mode: string;
     alias: string;
+    default_show_all_contestants_in_scoreboard: boolean;
     description: string;
     director: string;
     feedback: string;
@@ -2310,6 +2642,21 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ContestReport {
+    country?: string;
+    is_invited: boolean;
+    name?: string;
+    place?: number;
+    problems: types.ScoreboardRankingProblem[];
+    total: { penalty: number; points: number };
+    username: string;
+  }
+
+  export interface ContestReportDetailsPayload {
+    contestAlias: string;
+    contestReport: types.ContestReport[];
+  }
+
   export interface ContestRequest {
     accepted?: boolean;
     admin?: { username?: string };
@@ -2317,6 +2664,15 @@ export namespace types {
     last_update?: Date;
     request_time: Date;
     username: string;
+  }
+
+  export interface ContestScoreboardPayload {
+    contest: types.ContestDetails;
+    contestAdmin: boolean;
+    problems: types.NavbarProblemsetProblem[];
+    scoreboard: types.Scoreboard;
+    scoreboardEvents: types.ScoreboardEvent[];
+    scoreboardToken?: string;
   }
 
   export interface ContestUser {
@@ -2355,6 +2711,7 @@ export namespace types {
     max_points: number;
     name: string;
     order: number;
+    problemCount: number;
     problemset_id: number;
     publish_time_delay?: number;
     scoreboard_url: string;
@@ -2376,6 +2733,7 @@ export namespace types {
 
   export interface CourseCardPublic {
     alias: string;
+    alreadyStarted: boolean;
     lessonCount: number;
     level?: string;
     name: string;
@@ -2393,7 +2751,7 @@ export namespace types {
   export interface CourseCloneDetailsPayload {
     creator: { classname: string; username: string };
     details: types.CourseDetails;
-    token: string;
+    token?: string;
   }
 
   export interface CourseDetails {
@@ -2423,7 +2781,6 @@ export namespace types {
   export interface CourseDetailsPayload {
     details: types.CourseDetails;
     progress?: types.AssignmentProgress;
-    shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
   export interface CourseEditPayload {
@@ -2518,6 +2875,13 @@ export namespace types {
     submit_delay: number;
     time: Date;
     verdict: string;
+  }
+
+  export interface CourseScoreboardPayload {
+    assignment: types.AssignmentDetails;
+    problems: types.NavbarProblemsetProblem[];
+    scoreboard: types.Scoreboard;
+    scoreboardToken?: string;
   }
 
   export interface CourseStatisticsPayload {
@@ -2669,6 +3033,18 @@ export namespace types {
     scoreboardAlias: string;
   }
 
+  export interface GroupScoreboardDetails {
+    contests: types.ScoreboardContest[];
+    ranking: types.ScoreboardRanking[];
+    scoreboard: types.ScoreboardDetails;
+  }
+
+  export interface GroupScoreboardDetailsPayload {
+    details: types.GroupScoreboardDetails;
+    groupAlias: string;
+    scoreboardAlias: string;
+  }
+
   export interface Histogram {
     difficulty: number;
     difficultyHistogram?: string;
@@ -2763,7 +3139,6 @@ export namespace types {
   export interface IntroCourseDetails {
     details: types.CourseDetails;
     progress: { [key: string]: { [key: string]: number } };
-    shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
   export interface IntroDetailsPayload {
@@ -2771,7 +3146,6 @@ export namespace types {
     isFirstTimeAccess: boolean;
     needsBasicInformation: boolean;
     shouldShowAcceptTeacher: boolean;
-    shouldShowFirstAssociatedIdentityRunWarning: boolean;
     shouldShowResults: boolean;
     statements: {
       acceptTeacher?: types.PrivacyStatement;
@@ -2799,6 +3173,14 @@ export namespace types {
     facebookUrl: string;
     statusError?: string;
     validateRecaptcha: boolean;
+  }
+
+  export interface MergedScoreboardEntry {
+    contests: { [key: string]: { penalty: number; points: number } };
+    name?: string;
+    place?: number;
+    total: { penalty: number; points: number };
+    username: string;
   }
 
   export interface NavbarProblemsetProblem {
@@ -2883,6 +3265,13 @@ export namespace types {
     school_name?: string;
     state_id?: string;
     username: string;
+  }
+
+  export interface PrivacyPolicyDetailsPayload {
+    git_object_id: string;
+    has_accepted: boolean;
+    policy_markdown: string;
+    statement_type: string;
   }
 
   export interface PrivacyStatement {
@@ -3098,6 +3487,10 @@ export namespace types {
     tags: string[];
   }
 
+  export interface ProblemPrintDetailsPayload {
+    details: types.ProblemDetails;
+  }
+
   export interface ProblemQualityPayload {
     canNominateProblem: boolean;
     dismissed: boolean;
@@ -3304,14 +3697,7 @@ export namespace types {
     details?: {
       compile_meta?: { [key: string]: types.RunMetadata };
       contest_score: number;
-      groups?: {
-        cases: types.CaseResult[];
-        contest_score: number;
-        group: string;
-        max_score: number;
-        score: number;
-        verdict?: string;
-      }[];
+      groups?: types.RunDetailsGroup[];
       judged_by: string;
       max_score?: number;
       memory?: number;
@@ -3330,6 +3716,15 @@ export namespace types {
     source_link?: boolean;
     source_name?: string;
     source_url?: string;
+  }
+
+  export interface RunDetailsGroup {
+    cases: types.CaseResult[];
+    contest_score: number;
+    group: string;
+    max_score: number;
+    score: number;
+    verdict?: string;
   }
 
   export interface RunMetadata {
@@ -3462,6 +3857,15 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ScoreboardDetails {
+    alias: string;
+    create_time: number;
+    description: string;
+    group_id: number;
+    group_scoreboard_id: number;
+    name: string;
+  }
+
   export interface ScoreboardEvent {
     classname: string;
     country: string;
@@ -3469,6 +3873,17 @@ export namespace types {
     is_invited: boolean;
     name?: string;
     problem: { alias: string; penalty: number; points: number };
+    total: { penalty: number; points: number };
+    username: string;
+  }
+
+  export interface ScoreboardMergePayload {
+    contests: types.ContestListItem[];
+  }
+
+  export interface ScoreboardRanking {
+    contests: { [key: string]: { penalty: number; points: number } };
+    name?: string;
     total: { penalty: number; points: number };
     username: string;
   }
@@ -3493,9 +3908,13 @@ export namespace types {
     points: number;
     run_details?: {
       cases?: types.CaseResult[];
-      details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
+      details: { groups: types.ScoreboardRankingProblemDetailsGroup[] };
     };
     runs: number;
+  }
+
+  export interface ScoreboardRankingProblemDetailsGroup {
+    cases: { meta: types.RunMetadata }[];
   }
 
   export interface SelectedTag {
@@ -3721,6 +4140,13 @@ export namespace types {
     extraProfileDetails?: types.ExtraProfileDetails;
     privateProfile: boolean;
     profile: types.UserProfileInfo;
+  }
+
+  export interface UserProfileEditDetailsPayload {
+    countries: dao.Countries[];
+    extraProfileDetails?: types.ExtraProfileDetails;
+    profile: types.UserProfileInfo;
+    programmingLanguages: { [key: string]: string };
   }
 
   export interface UserProfileInfo {
@@ -3968,26 +4394,7 @@ export namespace messages {
   export type ContestReportResponse = {
     finish_time?: Date;
     problems: { alias: string; order: number }[];
-    ranking: {
-      country?: string;
-      is_invited: boolean;
-      name?: string;
-      place?: number;
-      problems: {
-        alias: string;
-        penalty: number;
-        percent: number;
-        place?: number;
-        points: number;
-        run_details?: {
-          cases?: types.CaseResult[];
-          details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
-        };
-        runs: number;
-      }[];
-      total: { penalty: number; points: number };
-      username: string;
-    }[];
+    ranking: types.ContestReport[];
     start_time: Date;
     time: Date;
     title: string;
@@ -4033,12 +4440,7 @@ export namespace messages {
   };
   export type ContestScoreboardMergeRequest = { [key: string]: any };
   export type ContestScoreboardMergeResponse = {
-    ranking: {
-      contests: { [key: string]: { penalty: number; points: number } };
-      name?: string;
-      total: { penalty: number; points: number };
-      username: string;
-    }[];
+    ranking: types.MergedScoreboardEntry[];
   };
   export type ContestSearchUsersRequest = { [key: string]: any };
   export type ContestSearchUsersResponse = { results: types.ListItem[] };
@@ -4248,49 +4650,7 @@ export namespace messages {
   export type GroupScoreboardAddContestResponse = {};
   export type GroupScoreboardDetailsRequest = { [key: string]: any };
   export type _GroupScoreboardDetailsServerResponse = any;
-  export type GroupScoreboardDetailsResponse = {
-    contests: {
-      acl_id: number;
-      admission_mode: string;
-      alias: string;
-      contest_id: number;
-      description: string;
-      feedback: string;
-      finish_time: Date;
-      languages: string;
-      last_updated: number;
-      only_ac?: boolean;
-      partial_score: boolean;
-      penalty: string;
-      penalty_calc_policy: string;
-      points_decay_factor: number;
-      problemset_id: number;
-      recommended: boolean;
-      rerun_id: number;
-      scoreboard: number;
-      show_scoreboard_after: boolean;
-      start_time: Date;
-      submissions_gap: number;
-      title: string;
-      urgent: boolean;
-      weight?: number;
-      window_length?: number;
-    }[];
-    ranking: {
-      contests: { [key: string]: { penalty: number; points: number } };
-      name?: string;
-      total: { penalty: number; points: number };
-      username: string;
-    }[];
-    scoreboard: {
-      alias: string;
-      create_time: number;
-      description: string;
-      group_id: number;
-      group_scoreboard_id: number;
-      name: string;
-    };
-  };
+  export type GroupScoreboardDetailsResponse = types.GroupScoreboardDetails;
   export type GroupScoreboardListRequest = { [key: string]: any };
   export type GroupScoreboardListResponse = {
     scoreboards: {

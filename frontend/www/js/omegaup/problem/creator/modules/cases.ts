@@ -2,248 +2,319 @@ import {
   Case,
   CaseGroupID,
   Group,
-  InLine,
-  MultipleCaseAdd,
+  CaseLine,
   RootState,
+  GroupID,
+  LineID,
+  CaseRequest,
+  MultipleCaseAddRequest,
 } from '../types';
 import { Module } from 'vuex';
-import { NIL, v4 } from 'uuid';
-import T from '../../../lang';
+import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
+import Vue from 'vue';
 export interface CasesState {
   groups: Group[];
   selected: CaseGroupID;
-  layout: InLine[];
+  layout: CaseLine[];
   hide: boolean;
 }
 
 export const casesStore: Module<CasesState, RootState> = {
   namespaced: true,
   state: {
-    groups: [
-      {
-        groupId: NIL,
-        name: T.problemCreatorNoGroup,
-        defined: false,
-        points: 100,
-        cases: [],
-      },
-    ],
+    groups: [],
     selected: {
-      caseId: NIL,
-      groupId: NIL,
+      caseID: UUID_NIL,
+      groupID: UUID_NIL,
     },
     layout: [],
     hide: false,
   },
   mutations: {
     resetStore(state) {
-      state.groups = [
-        {
-          groupId: NIL,
-          name: T.problemCreatorNoGroup,
-          defined: false,
-          points: 100,
-          cases: [],
-        },
-      ];
+      state.groups = [];
       state.selected = {
-        caseId: NIL,
-        groupId: NIL,
+        caseID: UUID_NIL,
+        groupID: UUID_NIL,
       };
       state.layout = [];
       state.hide = false;
     },
-    addGroup(state, payload: Group) {
-      state.groups.push(payload);
-      state = calculatePoints(state);
+    addGroup(state, newGroup: Group) {
+      state.groups.push(newGroup);
+      state = assignMissingPoints(state);
     },
-    addCase(state, payload: Case) {
-      const group = state.groups.find(
-        (group) => group.groupId === payload.groupId,
-      );
-      if (group) {
-        group.cases.push(payload);
-      }
-      state = calculatePoints(state);
-    },
-    editGroup(state, payload: Group) {
+    editGroup(state, groupData: Group) {
       const groupTarget = state.groups.find(
-        (group) => group.groupId === payload.groupId,
+        (group) => group.groupID === groupData.groupID,
       );
-      if (groupTarget !== undefined) {
-        groupTarget.points = payload.points;
-        groupTarget.name = payload.name;
-        groupTarget.defined = payload.defined;
+      if (groupTarget) {
+        groupTarget.points = groupData.points;
+        groupTarget.name = groupData.name;
+        groupTarget.pointsDefined = groupData.pointsDefined;
       }
-      state = calculatePoints(state);
+      state = assignMissingPoints(state);
     },
-    editCase(state, payload: { oldGroup: string; editedCase: Case }) {
+    addCase(state, caseRequest: CaseRequest) {
+      if (caseRequest.groupID === UUID_NIL) {
+        // Should create a new group with the same name
+        const newCase = generateCase({
+          name: caseRequest.name,
+          caseID: caseRequest.caseID,
+        });
+        const groupID = uuid();
+        const newGroup = generateGroup({
+          name: caseRequest.name,
+          groupID,
+          points: caseRequest.points,
+          pointsDefined: caseRequest.pointsDefined,
+          ungroupedCase: true,
+          cases: [{ ...newCase, groupID }],
+        });
+        state.groups.push(newGroup);
+      } else {
+        const group = state.groups.find(
+          (group) => group.groupID === caseRequest.groupID,
+        );
+        if (!group) {
+          return;
+        }
+
+        group.cases.push(
+          generateCase({
+            name: caseRequest.name,
+            groupID: caseRequest.groupID,
+            caseID: caseRequest.caseID,
+          }),
+        );
+      }
+      state = assignMissingPoints(state);
+    },
+    editCase(
+      state,
+      {
+        oldGroupID,
+        editedCase,
+      }: { oldGroupID: GroupID; editedCase: Required<CaseRequest> },
+    ) {
       // Old group
 
       // Find original case
       const groupTarget = state.groups.find(
-        (group) => group.groupId === payload.oldGroup,
+        (group) => group.groupID === oldGroupID,
       );
 
-      const caseTarget = groupTarget?.cases.find(
-        (_case) => _case.caseId === payload.editedCase.caseId,
-      );
+      const caseIndex =
+        groupTarget?.cases.findIndex(
+          (_case) => _case.caseID === editedCase.caseID,
+        ) ?? -1;
 
-      if (caseTarget?.groupId !== payload.editedCase.groupId) {
+      if (caseIndex === -1) {
+        return;
+      }
+
+      const caseTarget = groupTarget?.cases[caseIndex];
+
+      if (caseTarget?.groupID !== editedCase.groupID) {
         // If we changed the group
-        if (groupTarget !== undefined) {
+        if (groupTarget) {
           groupTarget.cases = groupTarget.cases.filter(
-            (_case) => _case.caseId !== payload.editedCase.caseId,
+            (_case) => _case.caseID !== editedCase.caseID,
           );
+          // If the group has the same name as the case. I.e. the case doesn't have any group
+          if (groupTarget.ungroupedCase) {
+            state.groups = state.groups.filter(
+              (group) => group.groupID !== groupTarget.groupID,
+            );
+          }
           // Find the new group
           const newGroup = state.groups.find(
-            (group) => group.groupId === payload.editedCase.groupId,
+            (group) => group.groupID === editedCase.groupID,
           );
-          newGroup?.cases.push(payload.editedCase);
-          state.selected.groupId = payload.editedCase.groupId;
+          newGroup?.cases.push(
+            generateCase({
+              name: editedCase.name,
+              groupID: newGroup.groupID,
+              caseID: editedCase.caseID,
+              lines: editedCase.lines,
+            }),
+          );
+          state.selected.groupID = editedCase.groupID;
         }
       } else {
-        if (caseTarget !== undefined) {
-          caseTarget.groupId = payload.editedCase.groupId;
-          caseTarget.points = payload.editedCase.points;
-          caseTarget.defined = payload.editedCase.defined;
-          caseTarget.name = payload.editedCase.name;
+        if (caseTarget && groupTarget) {
+          if (groupTarget.ungroupedCase) {
+            // Update both case and group
+            groupTarget.name = editedCase.name;
+            groupTarget.points = editedCase.points;
+            groupTarget.pointsDefined = editedCase.pointsDefined;
+          }
+          Vue.set(groupTarget.cases, caseIndex, {
+            ...caseTarget,
+            ...editedCase,
+          });
         }
       }
-      state = calculatePoints(state);
+      state = assignMissingPoints(state);
     },
-    deleteGroup(state, payload: string) {
-      state.groups = state.groups.filter((group) => group.groupId !== payload);
-      state = calculatePoints(state);
-    },
-    deleteCase(state, payload: CaseGroupID) {
-      const groupTarget = state.groups.find(
-        (group) => group.groupId == payload.groupId,
+    deleteGroup(state, groupIDToBeDeleted: GroupID) {
+      state.groups = state.groups.filter(
+        (group) => group.groupID !== groupIDToBeDeleted,
       );
-      if (groupTarget !== undefined) {
-        groupTarget.cases = groupTarget.cases.filter(
-          (_case) => _case.caseId !== payload.caseId,
-        );
+      state = assignMissingPoints(state);
+    },
+    deleteCase(state, caseGroupIDToBeDeleted: CaseGroupID) {
+      const groupTarget = state.groups.find(
+        (group) => group.groupID == caseGroupIDToBeDeleted.groupID,
+      );
+      if (groupTarget) {
+        if (groupTarget.ungroupedCase) {
+          // Delete the entire group
+          state.groups = state.groups.filter(
+            (group) => group.groupID !== groupTarget.groupID,
+          );
+        } else {
+          groupTarget.cases = groupTarget.cases.filter(
+            (_case) => _case.caseID !== caseGroupIDToBeDeleted.caseID,
+          );
+        }
       }
-      state.selected.caseId = NIL;
-      state.selected.groupId = NIL;
-      state = calculatePoints(state);
+      state.selected.caseID = UUID_NIL;
+      state.selected.groupID = UUID_NIL;
+      state = assignMissingPoints(state);
     },
-    deleteGroupCases(state, payload: string) {
+    deleteGroupCases(state, groupIDToBeDeleted: GroupID) {
       const groupTarget = state.groups.find(
-        (group) => group.groupId === payload,
+        (group) => group.groupID === groupIDToBeDeleted,
       );
-      if (groupTarget !== undefined) {
+      if (groupTarget) {
         groupTarget.cases = [];
       }
-      state = calculatePoints(state);
+      state = assignMissingPoints(state);
     },
     addLayoutLine(state) {
-      const payload: InLine = {
-        lineId: v4(),
+      const payload: CaseLine = {
+        lineID: uuid(),
         label: 'NEW',
-        value: '',
-        type: 'line',
-        arrayData: { size: 0, min: 0, max: 0, distinct: false, arrayVal: '' },
-        matrixData: {},
+        data: {
+          kind: 'line',
+          value: '',
+        },
       };
       state.layout.push(payload);
     },
-    editLayoutLine(state, payload: InLine) {
+    editLayoutLine(state, layoutLineData: CaseLine) {
       const lineToEdit = state.layout.find(
-        (line) => line.lineId === payload.lineId,
+        (line) => line.lineID === layoutLineData.lineID,
       );
-      if (lineToEdit !== undefined) {
-        lineToEdit.type = payload.type;
-        lineToEdit.label = payload.label;
+      if (lineToEdit) {
+        lineToEdit.data.kind = layoutLineData.data.kind;
+        lineToEdit.label = layoutLineData.label;
       }
     },
-    removeLayoutLine(state, payload: string) {
-      state.layout = state.layout.filter((line) => line.lineId !== payload);
+    removeLayoutLine(state, lineIDToBeDeleted: LineID) {
+      state.layout = state.layout.filter(
+        (line) => line.lineID !== lineIDToBeDeleted,
+      );
     },
-    setLayout(state, payload: InLine[]) {
-      state.layout = payload;
+    setLayout(state, layoutLines: CaseLine[]) {
+      state.layout = layoutLines;
     },
-    setSelected(state, payload: CaseGroupID) {
-      state.selected = payload;
+    setSelected(state, CaseGroupsIDToBeSelected: CaseGroupID) {
+      state.selected = CaseGroupsIDToBeSelected;
     },
     toggleHide(state) {
       state.hide = !state.hide;
     },
   },
   actions: {
-    addMultipleCases({ commit, getters, state }, payload: MultipleCaseAdd) {
-      const cases: Case[] = getters.getCasesFromGroup(payload.groupId);
-      if (cases !== undefined) {
-        let caseNumber = 0;
-        for (let i = 0; i < payload.number; i++) {
-          let shouldBreak = false;
-          do {
-            caseNumber++;
-            const name = payload.prefix + caseNumber + payload.suffix;
-            const caseExist = cases.find((_case) => _case.name === name);
-            if (caseExist === undefined) {
-              const layoutWithNewIds = state.layout.map((layoutLine) => {
-                return { ...layoutLine, lineId: v4() };
-              });
-              const casePayload: Case = {
-                name: name,
-                defined: false,
-                points: 0,
-                caseId: v4(),
-                groupId: payload.groupId,
-                lines: layoutWithNewIds,
-              };
-              commit('addCase', casePayload);
-              shouldBreak = true;
+    addMultipleCases(
+      { commit, getters, state },
+      multipleCaseRequest: MultipleCaseAddRequest,
+    ) {
+      let cases: Case[] = [];
+      if (multipleCaseRequest.groupID !== UUID_NIL) {
+        // Only if we don't want ungrouped cases
+        cases = getters.getCasesFromGroup(multipleCaseRequest.groupID);
+      }
+      let caseNumber = 0;
+      for (let i = 0; i < multipleCaseRequest.numberOfCases; i++) {
+        let shouldBreak = false;
+        do {
+          caseNumber++;
+          const name =
+            multipleCaseRequest.prefix +
+            caseNumber +
+            multipleCaseRequest.suffix;
+          if (multipleCaseRequest.groupID === UUID_NIL) {
+            // Should search in all groups
+            const groupExist = state.groups.find(
+              (group) => group.name === name,
+            );
+            if (groupExist) {
+              continue;
             }
-          } while (!shouldBreak);
-        }
+          } else {
+            // Should search in the given group
+            const caseExist = cases.find((_case) => _case.name === name);
+            if (caseExist) {
+              continue;
+            }
+          }
+          const newCase = generateCase({
+            name: name,
+            groupID: multipleCaseRequest.groupID,
+          });
+          const caseRequest = generateCaseRequest({
+            ...newCase,
+            points: 0,
+            pointsDefined: false,
+          });
+          commit('addCase', caseRequest);
+          shouldBreak = true;
+        } while (!shouldBreak);
       }
     },
-    setLines({ getters }, payload: InLine[]) {
+    setLines({ getters }, lines: CaseLine[]) {
       const selectedCase: Case = getters.getSelectedCase;
-      selectedCase.lines = payload;
+      selectedCase.lines = lines;
     },
     addNewLine({ getters }) {
       const selectedCase: Case = getters.getSelectedCase;
-      const newLine: InLine = {
-        lineId: v4(),
+      const newLine: CaseLine = {
+        lineID: uuid(),
         label: 'NEW',
-        value: '',
-        type: 'line',
-        arrayData: { size: 0, min: 0, max: 0, distinct: false, arrayVal: '' },
-        matrixData: {},
+        data: {
+          kind: 'line',
+          value: '',
+        },
       };
       selectedCase.lines.push(newLine);
     },
-    updateLine({ getters }, payload: InLine) {
+    updateLine({ getters }, newLine: CaseLine) {
       const selectedCase: Case = getters.getSelectedCase;
       const lineToUpdate = selectedCase.lines.find(
-        (line) => line.lineId === payload.lineId,
+        (line) => line.lineID === newLine.lineID,
       );
-      if (lineToUpdate !== undefined) {
-        lineToUpdate.value = payload.value;
-        lineToUpdate.type = payload.type;
-        lineToUpdate.label = payload.label;
-        lineToUpdate.arrayData = payload.arrayData;
-        lineToUpdate.matrixData = payload.matrixData;
+      if (lineToUpdate === undefined) {
+        return;
       }
+      lineToUpdate.data = newLine.data;
     },
-    deleteLine({ getters }, payload: string) {
+    deleteLine({ getters }, lineIDToBeDeleted: LineID) {
       const selectedCase: Case = getters.getSelectedCase;
       selectedCase.lines = selectedCase.lines.filter(
-        (line) => line.lineId !== payload,
+        (line) => line.lineID !== lineIDToBeDeleted,
       );
     },
   },
   getters: {
-    getCasesFromGroup: (state) => (groupId: string) => {
-      return state.groups.find((group) => group.groupId === groupId)?.cases;
+    getCasesFromGroup: (state) => (groupID: GroupID) => {
+      return state.groups.find((group) => group.groupID === groupID)?.cases;
     },
     getGroupIdsAndNames: (state) => {
       return state.groups.map((group) => {
-        return { value: group.groupId, text: group.name };
+        return { value: group.groupID, text: group.name };
       });
     },
     getAllCases: (state) => {
@@ -253,62 +324,92 @@ export const casesStore: Module<CasesState, RootState> = {
     },
     getSelectedCase: (state) => {
       const selectedGroup = state.groups.find(
-        (group) => group.groupId === state.selected.groupId,
+        (group) => group.groupID === state.selected.groupID,
       );
       if (selectedGroup !== undefined) {
         return selectedGroup.cases.find(
-          (_case) => _case.caseId === state.selected.caseId,
+          (_case) => _case.caseID === state.selected.caseID,
         );
       }
       return undefined;
     },
     getSelectedGroup: (state) => {
       return state.groups.find(
-        (group) => group.groupId === state.selected.groupId,
+        (group) => group.groupID === state.selected.groupID,
       );
     },
   },
 };
 
-export function calculatePoints(state: CasesState) {
+export function assignMissingPoints(state: CasesState): CasesState {
   let maxPoints = 100;
   let notDefinedCount = 0;
 
-  state.groups.forEach((element) => {
-    if (element.groupId === NIL) {
-      // Calculate points of cases without group
-      element.cases.forEach((caseElement) => {
-        if (caseElement.defined) {
-          maxPoints -= caseElement.points ? caseElement.points : 0;
-        } else {
-          notDefinedCount++;
-        }
-      });
+  for (const group of state.groups) {
+    if (group.pointsDefined) {
+      maxPoints -= group?.points ?? 0;
     } else {
-      if (element.defined) {
-        maxPoints -= element.points ? element.points : 0;
-      } else {
-        notDefinedCount++;
-      }
+      notDefinedCount++;
     }
-  });
+  }
 
-  const individualPoints = maxPoints / notDefinedCount;
+  const individualPoints =
+    notDefinedCount && Math.max(maxPoints, 0) / notDefinedCount;
 
   state.groups = state.groups.map((element) => {
-    if (element.groupId === NIL) {
-      element.cases = element.cases.map((caseElement) => {
-        if (!caseElement.defined) {
-          caseElement.points = individualPoints;
-        }
-        return caseElement;
-      });
-    }
-    if (!element.defined) {
+    if (!element.pointsDefined) {
       element.points = individualPoints;
     }
     return element;
   });
 
   return state;
+}
+
+export function generateCase(
+  caseParams: Partial<Case> & { name: string },
+): Case {
+  return {
+    caseID: uuid(),
+    groupID: UUID_NIL,
+    lines: [],
+    ...caseParams,
+  };
+}
+
+export function generateCaseRequest(
+  caseParams: Partial<CaseRequest> & { name: string },
+): CaseRequest {
+  return {
+    caseID: uuid(),
+    groupID: UUID_NIL,
+    points: 0,
+    pointsDefined: false,
+    lines: [],
+    ...caseParams,
+  };
+}
+export function generateGroup(
+  groupParams: Partial<Group> & { name: string },
+): Group {
+  return {
+    groupID: uuid(),
+    cases: [],
+    points: 0,
+    pointsDefined: false,
+    ungroupedCase: false,
+    ...groupParams,
+  };
+}
+
+export function generateLine(lineParams: Partial<CaseLine>): CaseLine {
+  return {
+    lineID: uuid(),
+    label: 'NEW',
+    data: {
+      kind: 'line',
+      value: '',
+    },
+    ...lineParams,
+  };
 }

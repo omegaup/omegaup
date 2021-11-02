@@ -104,6 +104,7 @@ describe('Details.vue', () => {
               has_runs: false,
               max_points: 0,
               problemset_id: 0,
+              problemCount: 0,
             },
           ],
           clarifications: [],
@@ -132,9 +133,6 @@ describe('Details.vue', () => {
       },
     });
 
-    expect(
-      wrapper.find('[data-content-alias="test-assignment"]').text(),
-    ).toContain('—');
     expect(wrapper.text()).toContain(T.wordsCloneThisCourse);
   });
 });

@@ -1,3 +1,5 @@
+jest.mock('../../../../third_party/js/diff_match_patch.js');
+
 import { shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
@@ -13,6 +15,7 @@ describe('Runs.vue', () => {
       },
     });
 
+    expect(wrapper.find('.card-header').text()).toBe(T.wordsGlobalSubmissions);
     expect(wrapper.find('table tbody').text()).toBe('');
   });
 
@@ -118,7 +121,6 @@ describe('Runs.vue', () => {
         username: null,
       },
     });
-
     expect(
       wrapper.findAll('acronym[data-run-guid]').wrappers.map((e) => e.text()),
     ).toEqual(['122000', '121500', '121000', '120500', '120000']);

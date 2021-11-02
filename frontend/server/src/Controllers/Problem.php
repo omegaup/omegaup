@@ -46,6 +46,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CollectionDetailsByLevelPayload=array{frequentTags: list<TagWithProblemCount>, publicTags: list<TagWithProblemCount>, level: string, selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tagsList: list<string>, difficulty: string}
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
+ * @psalm-type ProblemPrintDetailsPayload=array{details: ProblemDetails}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -2560,7 +2561,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return ProblemDetails
      */
-    private static function getProblemDetails(
+    public static function getProblemDetails(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Problemsets $problemset,
@@ -6176,6 +6177,75 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'fullWidth' => true,
             ],
             'entrypoint' => 'problem_collection_list_by_author',
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: ProblemPrintDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param null|string $lang
+     */
+    public static function getProblemPrintDetailsForTypeScript(\OmegaUp\Request $r) {
+        // Get user
+        $r->ensureIdentity();
+
+        // Validate request
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
+            $r->identity,
+            $r
+        );
+        [
+            'problem' => $problem,
+            'problemset' => $problemset,
+        ] = self::getValidProblemAndProblemset(
+            $r->identity,
+            /*$contestAlias=*/ null,
+            $problemAlias,
+            /*statementType=*/ 'markdown',
+            /*$problemsetId=*/ null
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+        $details = self::getProblemDetails(
+            $r->identity,
+            $problem,
+            $problemset,
+            $lang,
+            /*$showSolvers*/ true,
+            /*$preventProblemsetOpen*/ false
+        );
+
+        if (is_null($details) || empty($details['settings'])) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'details' => $details,
+                ],
+                'hideFooterAndHeader' => true,
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleProblemPrint',
+                    [
+                        'problemTitle' => $details['title'],
+                    ]
+                ),
+            ],
+            'entrypoint' => 'problem_print',
         ];
     }
 }

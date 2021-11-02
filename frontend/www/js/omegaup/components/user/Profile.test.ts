@@ -3,7 +3,7 @@ import { types } from '../../api_types';
 import user_Profile from './Profilev2.vue';
 
 describe('Profilev2.vue', () => {
-  it('Should display profile edit button', () => {
+  it('Should display navtab', () => {
     const badge_alias = 'contestManager';
     const badges = ['100SolvedProblems'];
     const wrapper = shallowMount(user_Profile, {
@@ -62,6 +62,6 @@ describe('Profilev2.vue', () => {
         visitorBadges: new Set(badge_alias) as Set<string>,
       },
     });
-    expect(wrapper.find('a[href="/profile/edit/"]').exists()).toBe(true);
+    expect(wrapper.find('[data-profile-navtabs]').exists()).toBe(true);
   });
 });

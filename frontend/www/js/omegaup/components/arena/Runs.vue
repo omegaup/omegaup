@@ -1,9 +1,17 @@
 <template>
-  <div class="mt-2">
+  <div class="mt-2" data-runs>
+    <slot name="title">
+      <div class="card-header">
+        <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
+      </div>
+    </slot>
     <div class="table-responsive">
       <table
         class="runs table table-striped"
-        :class="{ global: showAllRuns, local: !showAllRuns }"
+        :class="{
+          'single-problem-runs': !showAllRuns,
+          'all-runs': showAllRuns,
+        }"
       >
         <caption>
           {{
@@ -14,7 +22,10 @@
               &lt;
             </button>
             {{ filterOffset + 1 }}
-            <button :disabled="runs.length < rowCount" @click="filterOffset++">
+            <button
+              :disabled="runs && runs.length < rowCount"
+              @click="filterOffset++"
+            >
               &gt;
             </button>
 
@@ -232,8 +243,8 @@
             <td v-if="showDetails && !showDisqualify && !showRejudge">
               <button
                 class="details btn-outline-dark btn-sm"
-                data-run-details
-                @click="$emit('details', run)"
+                :data-run-details="run.guid"
+                @click="onRunDetails(run)"
               >
                 <font-awesome-icon :icon="['fas', 'search-plus']" />
               </button>
@@ -248,35 +259,34 @@
                   aria-expanded="false"
                 >
                   {{ T.wordsActions }}
-                  <span class="caret"></span>
                 </button>
-                <ul class="dropdown-menu">
-                  <li v-if="showDetails" data-actions-details>
-                    <button
-                      class="btn-link dropdown-item"
-                      @click="$emit('details', run)"
-                    >
-                      {{ T.wordsDetails }}
-                    </button>
-                  </li>
-                  <li v-if="showRejudge" data-actions-rejudge>
-                    <button
-                      class="btn-link dropdown-item"
-                      @click="$emit('rejudge', run)"
-                    >
-                      {{ T.wordsRejudge }}
-                    </button>
-                  </li>
-                  <li role="separator" class="divider"></li>
-                  <li v-if="showDisqualify" data-actions-disqualify>
-                    <button
-                      class="btn-link dropdown-item"
-                      @click="$emit('disqualify', run)"
-                    >
-                      {{ T.wordsDisqualify }}
-                    </button>
-                  </li>
-                </ul>
+                <div class="dropdown-menu">
+                  <button
+                    v-if="showDetails"
+                    :data-run-details="run.guid"
+                    class="btn-link dropdown-item"
+                    @click="onRunDetails(run)"
+                  >
+                    {{ T.wordsDetails }}
+                  </button>
+                  <button
+                    v-if="showRejudge"
+                    data-actions-rejudge
+                    class="btn-link dropdown-item"
+                    @click="$emit('rejudge', run)"
+                  >
+                    {{ T.wordsRejudge }}
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button
+                    v-if="showDisqualify"
+                    data-actions-disqualify
+                    class="btn-link dropdown-item"
+                    @click="$emit('disqualify', run)"
+                  >
+                    {{ T.wordsDisqualify }}
+                  </button>
+                </div>
               </div>
             </td>
             <td v-else></td>
@@ -284,6 +294,20 @@
         </tbody>
       </table>
     </div>
+    <slot name="runs">
+      <omegaup-overlay
+        :show-overlay="currentPopupDisplayed !== PopupDisplayed.None"
+        @hide-overlay="onPopupDismissed"
+      >
+        <template #popup>
+          <omegaup-arena-rundetails-popup
+            v-show="currentPopupDisplayed === PopupDisplayed.RunDetails"
+            :data="currentRunDetailsData"
+            @dismiss="onPopupDismissed"
+          ></omegaup-arena-rundetails-popup>
+        </template>
+      </omegaup-overlay>
+    </slot>
   </div>
 </template>
 
@@ -295,6 +319,8 @@ import * as time from '../../time';
 import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
+import arena_RunDetailsPopup from './RunDetailsPopup.vue';
+import omegaup_Overlay from '../Overlay.vue';
 
 import Autocomplete from '../Autocomplete.vue';
 
@@ -322,16 +348,26 @@ declare global {
   }
 }
 
+export enum PopupDisplayed {
+  None,
+  RunSubmit,
+  RunDetails,
+  Promotion,
+  Demotion,
+  Reviewer,
+}
+
 @Component({
   components: {
     FontAwesomeIcon,
+    'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-autocomplete': Autocomplete,
-    'omegaup-user-username': user_Username,
+    'omegaup-overlay': omegaup_Overlay,
     'omegaup-common-typeahead': common_Typeahead,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class Runs extends Vue {
-  @Prop({ default: false }) showAllRuns!: boolean;
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: true }) isProblemsetOpened!: boolean;
   @Prop({ default: false }) showContest!: boolean;
@@ -344,12 +380,17 @@ export default class Runs extends Vue {
   @Prop({ default: false }) showUser!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
   @Prop({ default: null }) problemAlias!: string | null;
-  @Prop({ default: null }) problemsetProblems!: types.ProblemsetProblem[];
+  @Prop({ default: () => [] }) problemsetProblems!: types.ProblemsetProblem[];
   @Prop({ default: null }) username!: string | null;
   @Prop({ default: 100 }) rowCount!: number;
-  @Prop() runs!: types.Run[];
+  @Prop() runs!: null | types.Run[];
   @Prop() searchResultUsers!: types.ListItem[];
+  @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
+  @Prop({ default: PopupDisplayed.None }) popupDisplayed!: PopupDisplayed;
+  @Prop({ default: null }) guid!: null | string;
+  @Prop({ default: false }) showAllRuns!: boolean;
 
+  PopupDisplayed = PopupDisplayed;
   T = T;
   time = time;
   typeahead = typeahead;
@@ -362,6 +403,8 @@ export default class Runs extends Vue {
   filterVerdict: string = '';
   filterContest: string = '';
   filters: { name: string; value: string }[] = [];
+  currentRunDetailsData = this.runDetailsData;
+  currentPopupDisplayed = this.popupDisplayed;
 
   get filteredRuns(): types.Run[] {
     if (
@@ -404,6 +447,9 @@ export default class Runs extends Vue {
   }
 
   get sortedRuns(): types.Run[] {
+    if (!this.runs) {
+      return [];
+    }
     return this.runs
       .slice()
       .sort((a, b) => b.time.getTime() - a.time.getTime());
@@ -550,6 +596,25 @@ export default class Runs extends Vue {
     const verdictHelp = T[`verdictHelp${run.verdict}`];
 
     return `${verdict}: ${verdictHelp}`;
+  }
+
+  onRunDetails(run: types.Run): void {
+    this.$emit('details', {
+      guid: run.guid,
+      isAdmin: true,
+      hash: `#runs/all/show-run:${run.guid}`,
+    });
+    this.currentPopupDisplayed = PopupDisplayed.RunDetails;
+  }
+
+  onPopupDismissed(): void {
+    this.currentPopupDisplayed = PopupDisplayed.None;
+    this.$emit('reset-hash');
+  }
+
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 
   @Watch('username')
