@@ -1,5 +1,6 @@
 import * as moment from 'moment';
-
+import dayjs from 'dayjs';
+import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 import T from './lang';
 
 let momentInitialized: boolean = false;
@@ -250,4 +251,29 @@ export function remoteTimeAdapter<T>(value: T): T {
     }
   }
   return value;
+}
+
+export function formatContestDuration(
+  startDate: Date,
+  finishDate: Date,
+): string {
+  const startDateJs = dayjs(startDate);
+  const finishDateJs = dayjs(finishDate);
+
+  const durationInMiliSeconds: number = finishDateJs.diff(startDateJs);
+
+  const seconds: number = (durationInMiliSeconds / 1000) % 60;
+  const minutes: number = (durationInMiliSeconds / (1000 * 60)) % 60;
+  const hours: number = (durationInMiliSeconds / (1000 * 60 * 60)) % 24;
+
+  return (
+    (hours < 10 ? '0' : '') +
+    hours +
+    ':' +
+    (minutes < 10 ? '0' : '') +
+    minutes +
+    ':' +
+    (seconds < 10 ? '0' : '') +
+    seconds
+  );
 }

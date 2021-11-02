@@ -68,7 +68,7 @@
             <font-awesome-icon icon="stopwatch" />
             {{
               ui.formatString(T.contestDuration, {
-                duration: contestDuration(contest.duration),
+                duration: contestDuration,
               })
             }}
           </b-card-text>
@@ -119,6 +119,7 @@
 <script lang="ts">
 import { Vue, Prop, Component } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import * as time from '../../time';
 import * as ui from '../../ui';
 import T from '../../lang';
 
@@ -157,6 +158,13 @@ export default class ContestCard extends Vue {
     return this.contest.start_time.toLocaleDateString();
   }
 
+  get contestDuration(): string {
+    return time.formatContestDuration(
+      this.contest.start_time,
+      this.contest.finish_time,
+    );
+  }
+
   getContestURL(alias: string): string {
     return `/arena/${alias}/`;
   }
@@ -171,10 +179,6 @@ export default class ContestCard extends Vue {
 
   getPracticeContestURL(alias: string): string {
     return `/arena/${alias}/practice/`;
-  }
-
-  contestDuration(seconds: number): string {
-    return new Date(seconds * 1000).toISOString().substr(11, 8);
   }
 }
 </script>
