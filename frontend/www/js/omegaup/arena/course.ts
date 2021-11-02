@@ -77,6 +77,8 @@ OmegaUp.on('ready', async () => {
       searchResultUsers: [] as types.ListItem[],
       runDetailsData: runDetails,
       nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      shouldShowFirstAssociatedIdentityRunWarning:
+        payload.shouldShowFirstAssociatedIdentityRunWarning,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-course', {
@@ -100,6 +102,8 @@ OmegaUp.on('ready', async () => {
           runDetailsData: this.runDetailsData,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           socketStatus: socketStore.state.socketStatus,
+          shouldShowFirstAssociatedIdentityRunWarning: this
+            .shouldShowFirstAssociatedIdentityRunWarning,
         },
         on: {
           'navigate-to-assignment': ({
@@ -341,6 +345,12 @@ OmegaUp.on('ready', async () => {
                 );
               })
               .catch(ui.error);
+          },
+          'new-submission-popup-displayed': () => {
+            if (this.shouldShowFirstAssociatedIdentityRunWarning) {
+              this.shouldShowFirstAssociatedIdentityRunWarning = false;
+              ui.warning(T.firstSumbissionWithIdentity);
+            }
           },
         },
       });
