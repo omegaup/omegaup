@@ -18,11 +18,12 @@
         <b-col cols="3">
           <b-button
             v-if="contestTab === 2"
+            ref="contestButtonScoreboard"
             :href="getContestScoreboardURL(contest.alias)"
             variant="success"
           >
             <font-awesome-icon icon="table" />
-            {{ T.contestButtonScoreBoard }}
+            {{ T.contestButtonScoreboard }}
           </b-button>
           <b-card-text
             v-else-if="
@@ -82,6 +83,7 @@
         <b-col>
           <b-button
             v-if="contestTab === 0 && contest.participating"
+            ref="contestButtonEnter"
             :href="getContestURL(contest.alias)"
             variant="primary"
           >
@@ -92,6 +94,7 @@
             v-else-if="
               (contestTab === 0 || contestTab === 1) && !contest.participating
             "
+            ref="contestButtonSingUp"
             :href="getContestURL(contest.alias)"
             variant="primary"
           >

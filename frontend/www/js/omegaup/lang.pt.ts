@@ -180,7 +180,7 @@ const translations: { [key: string]: string; } = {
   contestAdmissionModeDescription: "Selecione o modo do concurso. Existem tr\u00eas modalidades diferentes:\n\n- **Privado:** o concurso n\u00e3o aparece em nenhuma lista e os usu\u00e1rios n\u00e3o podem acess\u00e1-lo, a menos que tenham sido convidados explicitamente.\n\n- **Registramento aberto:** Qualquer pessoa pode participar ap\u00f3s o registro, mas somente pessoas admitidas anteriormente podem participar oficialmente do concurso.\n\n- **P\u00fablico:** todos podem participar.",
   contestBasicInformationNeeded: "Para participar do concurso, voc\u00ea deve preencher sua informa\u00e7\u00f5e b\u00e1sica. V\u00e1 para o [Meu perfil](/profile/edit/)",
   contestButtonEnter: "Entrar",
-  contestButtonScoreBoard: "Scoreboard",
+  contestButtonScoreboard: "Scoreboard",
   contestButtonSingUp: "Inscrever-se",
   contestCanNotChangeToContestForTeams: "O concurso normal n\u00e3o pode ser alterado para o concurso para equipes",
   contestDetailsGoToContest: "Ir ao concurso",
