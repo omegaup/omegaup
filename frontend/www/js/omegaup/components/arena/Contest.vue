@@ -74,6 +74,9 @@
               "
               @submit-run="onRunSubmitted"
               @show-run="onRunDetails"
+              @new-submission-popup-displayed="
+                $emit('new-submission-popup-displayed')
+              "
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -252,6 +255,9 @@ export default class ArenaContest extends Vue {
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
+  @Prop({ default: false }) lockdown!: boolean;
+  @Prop({ default: false })
+  shouldShowFirstAssociatedIdentityRunWarning!: boolean;
 
   T = T;
   ui = ui;
@@ -299,6 +305,31 @@ export default class ArenaContest extends Vue {
 
   get urlPractice(): string {
     return `/arena/${this.contest.alias}/practice/`;
+  }
+
+  created() {
+    if (this.lockdown) {
+      window.addEventListener('beforeunload', this.beforeWindowUnload);
+    }
+  }
+
+  beforeDestroy() {
+    if (this.lockdown) {
+      window.removeEventListener('beforeunload', this.beforeWindowUnload);
+    }
+  }
+
+  confirmLeave() {
+    return window.confirm(T.lockdownMessageWarning);
+  }
+
+  beforeWindowUnload(e: BeforeUnloadEvent) {
+    if (!this.confirmLeave()) {
+      // Cancel the event
+      e.preventDefault();
+      // Chrome requires returnValue to be set
+      e.returnValue = true;
+    }
   }
 
   onNavigateToProblem(problem: types.NavbarProblemsetProblem) {

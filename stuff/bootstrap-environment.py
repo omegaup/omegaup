@@ -102,11 +102,13 @@ class Session:
                                     files=f.files,
                                     data=data,
                                     cookies=self.jar,
-                                    headers=headers)
+                                    headers=headers,
+                                    timeout=(3, 9))
         else:
             req = requests.get(f'{self.url}/api{api}',
                                cookies=self.jar,
-                               headers=headers)
+                               headers=headers,
+                               timeout=(3, 9))
         cookies: ItemsView[str, str] = req.cookies.items()  # type: ignore
         for name, value in cookies:
             self.jar[name] = value
