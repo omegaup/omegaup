@@ -197,8 +197,12 @@ export default class UserProfileEdit extends Vue {
   programmingLanguages = this.profile.programming_languages;
   selectedProfileInfo = {
     ...this.profile,
-    birth_date: this.profile.birth_date ?? new Date(''),
-    graduation_date: this.profile.graduation_date ?? new Date(''),
+    birth_date: new Date(
+      this.profile.birth_date?.toUTCString().replace('GMT', '') ?? '',
+    ),
+    graduation_date: new Date(
+      this.profile.graduation_date?.toUTCString().replace('GMT', '') ?? '',
+    ),
   };
 
   get isCountrySelected(): boolean {
@@ -224,23 +228,20 @@ export default class UserProfileEdit extends Vue {
   }
 
   onUpdateUser(): void {
-    const birthDate = this.selectedProfileInfo.birth_date;
-    birthDate.setHours(23);
-    const graduationDate = this.selectedProfileInfo.graduation_date;
-    graduationDate.setHours(23);
-    const user = {
+    const user: types.UserProfileInfo = {
       ...this.selectedProfileInfo,
-      birth_date: isNaN(birthDate.getTime()) ? undefined : birthDate,
-      graduation_date: isNaN(graduationDate.getTime())
+      birth_date: isNaN(this.selectedProfileInfo.birth_date.getTime())
         ? undefined
-        : graduationDate,
+        : this.selectedProfileInfo.birth_date,
+      graduation_date: isNaN(this.selectedProfileInfo.graduation_date.getTime())
+        ? undefined
+        : this.selectedProfileInfo.graduation_date,
       school_id:
         this.selectedProfileInfo.school_id === this.profile.school_id &&
         this.selectedProfileInfo.school !== this.profile.school
           ? undefined
           : this.selectedProfileInfo.school_id,
-      school_name: this.selectedProfileInfo.school,
-    } as types.UserProfileInfo;
+    };
     const localeChanged =
       this.selectedProfileInfo.locale != this.profile.locale;
     this.$emit('update-user', { user, localeChanged });
