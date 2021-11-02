@@ -36,10 +36,10 @@ class DaoLinter(linters.Linter):
 
         new_contents = {}
         original_contents = {}
+        contents = contents_callback(
+            'frontend/database/dao_schema.sql').decode('utf-8')
         for (filename, file_type,
-             contents) in dao_utils.generate_dao(  # type: ignore
-                 contents_callback('frontend/database/schema.sql').decode(
-                     'utf-8')):
+             contents) in dao_utils.generate_dao(contents):  # type: ignore
             if file_type == 'dao':
                 path = os.path.join('frontend/server/src/DAO/Base', filename)
             else:

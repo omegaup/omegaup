@@ -29,6 +29,13 @@ describe('StudentProgress.vue', () => {
                 points: 100,
                 order: 2,
               },
+              {
+                alias: 'test-problem-c',
+                title: 'Test problem C',
+                isExtraProblem: false,
+                points: 100,
+                order: 3,
+              },
             ],
           },
           {
@@ -57,8 +64,12 @@ describe('StudentProgress.vue', () => {
                   progress: 100,
                 },
                 'test-problem-b': {
-                  score: 1,
-                  progress: 1,
+                  score: 100,
+                  progress: 10,
+                },
+                'test-problem-c': {
+                  score: 100,
+                  progress: 60,
                 },
               },
             },
@@ -66,8 +77,9 @@ describe('StudentProgress.vue', () => {
         } as types.StudentProgressInCourse,
       },
     });
-    expect(wrapper.find('div.bg-green').exists()).toBe(true);
-    expect(wrapper.find('div.bg-red').exists()).toBe(true);
+    expect(wrapper.find('a.bg-green').exists()).toBe(true);
+    expect(wrapper.find('a.bg-yellow').exists()).toBe(true);
+    expect(wrapper.find('a.bg-red').exists()).toBe(true);
     expect(wrapper.find('td[data-global-score]').text()).toBe(
       '50% ' +
         ui.formatString(T.studentProgressPoints, {
