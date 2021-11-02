@@ -63,8 +63,8 @@ FROM ubuntu:focal AS php
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
-        php7.4-fpm php7.4-curl php7.4-mysql php7.4-sqlite3 php7.4-zip \
-        php7.4-mbstring php7.4-json php7.4-opcache php7.4-xml php-apcu && \
+        php7.4-fpm php7.4-curl php7.4-mysql php7.4-zip \
+        php7.4-mbstring php7.4-json php7.4-opcache php7.4-xml php-apcu php-apcu-bc && \
     apt-get autoremove -y && \
     apt-get clean
 
