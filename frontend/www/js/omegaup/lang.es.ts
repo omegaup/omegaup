@@ -349,6 +349,7 @@ const translations: { [key: string]: string; } = {
   courseCardDescriptionCourses: "Los cursos en omegaUp son para:\n\n*   Docentes que desean crear cursos en l\u00ednea\n*   Estudiantes que participan en los cursos de sus clases\n*   Cualquier persona que desea aprender m\u00e1s sobre programaci\u00f3n participando en los cursos p\u00fablicos",
   courseCardDueDate: "Finaliza %(due_date)",
   courseCardImpartedBy: "Impartido por: **%(school_name)**",
+  courseCardMustLogIn: "Debes iniciar sesi\u00f3n para ver estos cursos.",
   courseCardProgress: "Progreso:",
   courseCardPublicLevelAdvanced: "\u2605\u2605\u2605 Avanzado",
   courseCardPublicLevelIntermediate: "\u2605\u2605 Intermedio",

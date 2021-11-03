@@ -44,28 +44,54 @@
         }"
         role="tabpanel"
       >
-        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3">
-          <template v-if="tabKey === Tab.Public">
-            <omegaup-course-card-public
-              v-for="course in filteredCards"
-              :key="course.alias"
-              :course="course"
-            ></omegaup-course-card-public>
-          </template>
-          <template v-if="tabKey === Tab.Enrolled">
+        <div
+          v-if="tabKey === Tab.Public"
+          class="row row-cols-1 row-cols-md-2 row-cols-xl-3"
+        >
+          <omegaup-course-card-public
+            v-for="course in filteredCards"
+            :key="course.alias"
+            :course="course"
+            :logged-in="loggedIn"
+          ></omegaup-course-card-public>
+        </div>
+        <div
+          v-if="tabKey === Tab.Enrolled"
+          class="row"
+          :class="{
+            'row-cols-1 row-cols-md-2 row-cols-xl-3': loggedIn,
+            'justify-content-center': !loggedIn,
+          }"
+        >
+          <template v-if="loggedIn">
             <omegaup-course-card-enrolled
               v-for="course in filteredCards"
               :key="course.alias"
               :course="course"
             ></omegaup-course-card-enrolled>
           </template>
-          <template v-if="tabKey === Tab.Finished">
+          <div v-else class="empty-content my-2">
+            {{ T.courseCardMustLogIn }}
+          </div>
+        </div>
+        <div
+          v-if="tabKey === Tab.Finished"
+          class="row"
+          :class="{
+            'row-cols-1 row-cols-md-2 row-cols-xl-3': loggedIn,
+            'justify-content-center': !loggedIn,
+          }"
+        >
+          <template v-if="loggedIn">
             <omegaup-course-card-finished
               v-for="course in filteredCards"
               :key="course.alias"
               :course="course"
             ></omegaup-course-card-finished>
           </template>
+          <div v-else class="empty-content my-2">
+            {{ T.courseCardMustLogIn }}
+          </div>
         </div>
       </div>
     </div>
@@ -102,16 +128,24 @@ export default class CourseTabs extends Vue {
     public: types.CourseCardPublic[];
     finished: types.CourseCardFinished[];
   };
+  @Prop({ default: false }) loggedIn!: boolean;
 
   T = T;
   Tab = Tab;
-  tabNames: Record<Tab, string> = {
-    [Tab.Public]: T.courseTabPublic,
-    [Tab.Enrolled]: T.courseTabEnrolled,
-    [Tab.Finished]: T.courseTabFinished,
-  };
   selectedTab = Tab.Public;
   searchText = '';
+
+  get tabNames(): Record<Tab, string> {
+    return {
+      [Tab.Public]: T.courseTabPublic,
+      [Tab.Enrolled]: this.loggedIn
+        ? `${T.courseTabEnrolled} (${this.courses.enrolled.length})`
+        : T.courseTabEnrolled,
+      [Tab.Finished]: this.loggedIn
+        ? `${T.courseTabFinished} (${this.courses.finished.length})`
+        : T.courseTabFinished,
+    };
+  }
 
   get filteredCards():
     | types.CourseCardEnrolled[]
@@ -170,5 +204,11 @@ export default class CourseTabs extends Vue {
     font-size: 3.2rem;
     line-height: normal;
   }
+}
+
+.empty-content {
+  text-align: center;
+  font-size: 2.25rem;
+  color: var(--arena-contest-list-empty-category-font-color);
 }
 </style>

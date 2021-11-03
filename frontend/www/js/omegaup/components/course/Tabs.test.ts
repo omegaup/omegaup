@@ -41,22 +41,43 @@ describe('Tabs.vue', () => {
       },
     ],
   };
+
   it('Should show tabs', () => {
     const wrapper = shallowMount(course_Tabs, {
       propsData: {
         courses,
       },
     });
-
     expect(wrapper.text()).toContain(T.courseTabEnrolled);
     expect(wrapper.text()).toContain(T.courseTabFinished);
     expect(wrapper.text()).toContain(T.courseTabPublic);
+    expect(wrapper.text()).not.toContain(T.wordsStart);
+    expect(wrapper.text()).toContain(T.courseCardMustLogIn);
+  });
+
+  it('Should show tabs with counts for logged user', () => {
+    const wrapper = mount(course_Tabs, {
+      propsData: {
+        courses,
+        loggedIn: true,
+      },
+    });
+    expect(wrapper.text()).toContain(
+      `${T.courseTabEnrolled} (${courses.enrolled.length})`,
+    );
+    expect(wrapper.text()).toContain(
+      `${T.courseTabFinished} (${courses.finished.length})`,
+    );
+    expect(wrapper.text()).toContain(T.courseTabPublic);
+    expect(wrapper.text()).toContain(T.wordsStart);
+    expect(wrapper.text()).not.toContain(T.courseCardMustLogIn);
   });
 
   it('Should show the correct course cards', async () => {
     const wrapper = mount(course_Tabs, {
       propsData: {
         courses,
+        loggedIn: true,
       },
     });
 

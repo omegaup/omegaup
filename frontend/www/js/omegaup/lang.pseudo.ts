@@ -349,6 +349,7 @@ const translations: { [key: string]: string; } = {
   courseCardDescriptionCourses: "(Th3 c0ur535 a7 0m3gaUp ar3 f0r:\n\n*   T3ach3r5 wh0 wan7 70 cr3a73 0n1in3 c0ur535\n*   S7ud3n75 par7icipa7ing in 7h3 c0ur535 0f 7h3ir c1a5535\n*   Any u53r wh0 wan75 70 13arn m0r3 ab0u7 pr0gramming by par7icipa7ing in pub1ic c0ur535)",
   courseCardDueDate: "(Du3 %(due_date))",
   courseCardImpartedBy: "(Impar73d by: **%(school_name)**)",
+  courseCardMustLogIn: "(Y0u mu57 10gin 70 533 7hi5 c0ur535.)",
   courseCardProgress: "(Pr0gr355:)",
   courseCardPublicLevelAdvanced: "(\u2605\u2605\u2605 Advanc3d)",
   courseCardPublicLevelIntermediate: "(\u2605\u2605 In73rm3dia73)",
