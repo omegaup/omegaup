@@ -1,5 +1,4 @@
 import * as moment from 'moment';
-import dayjs from 'dayjs';
 import T from './lang';
 
 let momentInitialized: boolean = false;
@@ -252,27 +251,15 @@ export function remoteTimeAdapter<T>(value: T): T {
   return value;
 }
 
+/**
+ * Calculate the duration of a contest based on its start date and its end date.
+ * @param startDate - The start date of a contest
+ * @param finishDate - The finish date of a contest
+ * @returns The duration of a contest in human redeable format (HH:mm:ss)
+ */
 export function formatContestDuration(
   startDate: Date,
   finishDate: Date,
 ): string {
-  const startDateJs = dayjs(startDate);
-  const finishDateJs = dayjs(finishDate);
-
-  const durationInMiliSeconds: number = finishDateJs.diff(startDateJs);
-
-  const seconds: number = (durationInMiliSeconds / 1000) % 60;
-  const minutes: number = (durationInMiliSeconds / (1000 * 60)) % 60;
-  const hours: number = (durationInMiliSeconds / (1000 * 60 * 60)) % 24;
-
-  return (
-    (hours < 10 ? '0' : '') +
-    hours +
-    ':' +
-    (minutes < 10 ? '0' : '') +
-    minutes +
-    ':' +
-    (seconds < 10 ? '0' : '') +
-    seconds
-  );
+  return formatDelta(finishDate.getTime() - startDate.getTime());
 }

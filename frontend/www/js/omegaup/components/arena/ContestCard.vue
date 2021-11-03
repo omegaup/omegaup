@@ -173,7 +173,7 @@ export default class ContestCard extends Vue {
   }
 
   getContestScoreboardURL(alias: string): string {
-    return `/arena/${alias}/#ranking/`;
+    return `/arena/${alias}/#ranking`;
   }
 
   getVirtualContestURL(alias: string): string {
