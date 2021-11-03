@@ -3,7 +3,7 @@
 namespace OmegaUp;
 
 /**
- * A class that abstracts away support for APC user cache for PHP7 / Travis.
+ * A class that abstracts away support for Redis / APC user cache for PHP7 / Travis.
  */
 abstract class CacheAdapter {
     /** @var CacheAdapter|null */
@@ -11,7 +11,11 @@ abstract class CacheAdapter {
 
     public static function getInstance(): CacheAdapter {
         if (is_null(CacheAdapter::$_instance)) {
-            if (function_exists('apcu_enabled') && \apcu_enabled()) {
+            /** @psalm-suppress TypeDoesNotContainType OMEGAUP_CACHE_IMPLEMENTATION is really a variable */
+            if (OMEGAUP_CACHE_IMPLEMENTATION === 'redis') {
+                CacheAdapter::$_instance = new RedisCacheAdapter();
+            /** @psalm-suppress TypeDoesNotContainType OMEGAUP_CACHE_IMPLEMENTATION is really a variable */
+            } elseif (OMEGAUP_CACHE_IMPLEMENTATION === 'apcu') {
                 CacheAdapter::$_instance = new APCCacheAdapter();
             } else {
                 CacheAdapter::$_instance = new InProcessCacheAdapter();
@@ -52,6 +56,317 @@ abstract class CacheAdapter {
      * @param int $ttl
      */
     abstract public function store(string $key, $var, int $ttl = 0): bool;
+
+    public function inc(string $key): int {
+        // Must do this in a loop to avoid race condition when two threads try
+        // to invalidate the cache simultaneously.
+        do {
+            // Ensure the version key exists.
+            $version = $this->entry($key, 0);
+            $newVersion = $version + 1;
+        } while (
+            !$this->cas(
+                $key,
+                $version,
+                $newVersion
+            )
+        );
+        return $newVersion;
+    }
+
+    /**
+     * If the specified $id exists in cache, gets its associated value from the
+     * cache.  Otherwise, executes $setFunc() to generate the associated
+     * value, stores it, and returns it.
+     *
+     * @template T
+     *
+     * @param string $key
+     * @param string $lockGroup
+     * @param callable():T $setFunc
+     * @param int $timeout (seconds)
+     * @param ?bool &$cacheUsed Whether the $id had a pre-computed value in the cache.
+     *
+     * @return T the value returned from the cache or $setFunc().
+     */
+    public function getOrSet(
+        string $key,
+        string $lockGroup,
+        callable $setFunc,
+        int $timeout = 0,
+        ?bool &$cacheUsed = null
+    ) {
+        /** @var false|T */
+        $returnValue = $this->fetch($key);
+
+        // If there was a value in the cache for the key.
+        if ($returnValue !== false) {
+            if (!is_null($cacheUsed)) {
+                $cacheUsed = true;
+            }
+            return $returnValue;
+        }
+        $log = \Logger::getLogger('cache');
+
+        // Get a lock to prevent multiple requests from trying to create the
+        // same cache entry. The name of the lockfile is derived from the
+        // provided lock group, not the full key, since it is still preferred
+        // to rate-limit all possible cache interactions with the same lock
+        // group, since they typically deal with pagination. That way multiple
+        // independent caches can still make progress.
+        //
+        // This is preferred over apcu_entry() because that function grabs a
+        // *global* lock that blocks evey single APCu function call!
+        $lockFile = '/tmp/omegaup-cache-' . sha1($lockGroup) . '.lock';
+
+        $f = fopen($lockFile, 'w');
+        try {
+            flock($f, LOCK_EX);
+
+            // Maybe by the time we acquired the lock it had already been
+            // populated by another request.
+            /** @var false|T */
+            $returnValue = $this->fetch($key);
+            if ($returnValue !== false) {
+                if (!is_null($cacheUsed)) {
+                    $cacheUsed = true;
+                }
+                return $returnValue;
+            }
+
+            // Get the value from the function provided
+            $log->info('Calling $setFunc');
+            /** @var T */
+            $returnValue = call_user_func($setFunc);
+            $this->store($key, $returnValue, $timeout);
+            $log->info('Committed value');
+
+            if (!is_null($cacheUsed)) {
+                $cacheUsed = false;
+            }
+            return $returnValue;
+        } finally {
+            flock($f, LOCK_UN);
+            fclose($f);
+            // By the time the code reaches this point, it might be the case
+            // that another request managed to reach the critical section and
+            // also opened the file. In that case, it could be the case that
+            // multiple requests will attempt to unlink the lock file, so it's
+            // totally okay for them to fail.
+            //
+            // Additionally, since this is performed after the call to set(),
+            // even if we somehow managed to unlink the file between the time
+            // another request checked if the cache was set and it tried to
+            // open the lockfile (thus opening a completely unrelated file that
+            // is not synchronized with the current one at all), that other
+            // request will finish acquiring the lockfile and then see that the
+            // cache value had already been set, causing no additional
+            // evaluations of $setFunc.
+            @unlink($lockFile);
+        }
+    }
+}
+
+/**
+ * Implementation of CacheAdapter that uses Redis.
+ */
+class RedisCacheAdapter extends CacheAdapter {
+    /**
+     * @var \Redis $redis
+     * @readonly
+     */
+    private $redis;
+
+    public function __construct() {
+        $this->redis = new \Redis();
+        $this->redis->pconnect(REDIS_HOST, REDIS_PORT);
+        /** @psalm-suppress RedundantCondition REDIS_PASS is really a variable */
+        if (REDIS_PASS !== '' && !$this->redis->auth(REDIS_PASS)) {
+            throw new \Exception('Redis authentication failed');
+        }
+    }
+
+    /**
+     * @psalm-template T
+     * @param string $key
+     * @param T $defaultVar
+     * @param int $ttl
+     * @return T
+     */
+    public function entry(string $key, $defaultVar, int $ttl = 0) {
+        $flags = ['nx'];
+        if ($ttl > 0) {
+            $flags['ex'] = $ttl;
+        }
+        while (true) {
+            $this->redis->watch($key);
+            $current = $this->redis->get($key);
+            if ($current !== false) {
+                $this->redis->unwatch();
+                /** @var T */
+                return unserialize($current);
+            }
+
+            /** @psalm-suppress InvalidMethodCall calls in a pipeline return a Redis */
+            if (
+                $this->redis->multi()->set(
+                    $key,
+                    serialize($defaultVar)
+                )->exec()
+            ) {
+                return $defaultVar;
+            }
+        }
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $var
+     * @param int $ttl
+     * @return bool
+     */
+    public function add(string $key, $var, int $ttl = 0): bool {
+        $flags = ['nx'];
+        if ($ttl > 0) {
+            $flags['ex'] = $ttl;
+        }
+        return $this->redis->set($key, serialize($var), $flags);
+    }
+
+    public function cas(string $key, int $old, int $new): bool {
+        while (true) {
+            $this->redis->watch($key);
+            $current = $this->redis->get($key);
+            if ($current === false || unserialize($current) !== $old) {
+                $this->redis->unwatch();
+                return false;
+            }
+            /** @psalm-suppress InvalidMethodCall calls in a pipeline return a Redis */
+            if ($this->redis->multi()->set($key, serialize($new))->exec()) {
+                break;
+            }
+        }
+        return true;
+    }
+
+    public function clear(): void {
+        $this->redis->flushall();
+    }
+
+    public function delete(string $key): bool {
+        return $this->redis->del($key) == 1;
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public function fetch(string $key) {
+        $ret = $this->redis->get($key);
+        if ($ret === false) {
+            return false;
+        }
+        return unserialize($ret);
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $var
+     * @param int $ttl
+     */
+    public function store(string $key, $var, int $ttl = 0): bool {
+        $flags = [];
+        if ($ttl > 0) {
+            $flags['ex'] = $ttl;
+        }
+        return $this->redis->set($key, serialize($var), $flags);
+    }
+
+    public function inc(string $key): int {
+        $current = 0;
+        while (true) {
+            $this->redis->watch($key);
+            $current = $this->redis->get($key);
+            if ($current !== false) {
+                /** @var int */
+                $current = unserialize($current);
+            } else {
+                $current = 0;
+            }
+            $current++;
+            /** @psalm-suppress InvalidMethodCall calls in a pipeline return a Redis */
+            if ($this->redis->multi()->set($key, serialize($current))->exec()) {
+                break;
+            }
+        }
+        return $current;
+    }
+
+    /**
+     * If the specified $id exists in cache, gets its associated value from the
+     * cache.  Otherwise, executes $setFunc() to generate the associated
+     * value, stores it, and returns it.
+     *
+     * @template T
+     *
+     * @param string $key
+     * @param string $lockGroup
+     * @param callable():T $setFunc
+     * @param int $timeout (seconds)
+     * @param ?bool &$cacheUsed Whether the $id had a pre-computed value in the cache.
+     *
+     * @return T the value returned from the cache or $setFunc().
+     */
+    public function getOrSet(
+        string $key,
+        string $lockGroup,
+        callable $setFunc,
+        int $timeout = 0,
+        ?bool &$cacheUsed = null
+    ) {
+        /** @var false|T */
+        $current = $this->fetch($key);
+        if ($current !== false) {
+            if (!is_null($cacheUsed)) {
+                $cacheUsed = true;
+            }
+            return $current;
+        }
+
+        // TODO: This does not acquire a global lock to avoid this from being
+        // called multiple times. Maybe we should try a Redlock here.
+        $defaultVar = call_user_func($setFunc);
+        $flags = ['nx'];
+        if ($timeout > 0) {
+            $flags['ex'] = $timeout;
+        }
+        while (true) {
+            $this->redis->watch($key);
+            /** @var false|string */
+            $current = $this->redis->get($key);
+            if ($current !== false) {
+                if (!is_null($cacheUsed)) {
+                    $cacheUsed = true;
+                }
+                $this->redis->unwatch();
+                /** @var T */
+                return unserialize($current);
+            }
+
+            /** @psalm-suppress InvalidMethodCall calls in a pipeline return a Redis */
+            if (
+                $this->redis->multi()->set(
+                    $key,
+                    serialize($defaultVar)
+                )->exec()
+            ) {
+                if (!is_null($cacheUsed)) {
+                    $cacheUsed = false;
+                }
+                return $defaultVar;
+            }
+        }
+    }
 }
 
 /**
@@ -347,72 +662,13 @@ class Cache {
     ) {
         $cache = new \OmegaUp\Cache($prefix, $id);
         /** @var null|T */
-        $returnValue = $cache->get();
-
-        // If there was a value in the cache for the key ($prefix, $id)
-        if (!is_null($returnValue)) {
-            if (!is_null($cacheUsed)) {
-                $cacheUsed = true;
-            }
-            return $returnValue;
-        }
-
-        // Get a lock to prevent multiple requests from trying to create the
-        // same cache entry. The name of the lockfile is derived from the
-        // prefix, not the full key, since it is still preferred to rate-limit
-        // all possible cache interactions with the same prefix, since they
-        // typically deal with pagination. That way multiple independent caches
-        // can still make progress.
-        //
-        // This is preferred over apcu_entry() because that function grabs a
-        // *global* lock that blocks evey single APCu function call!
-        $lockFile = '/tmp/omegaup-cache-' . sha1($prefix) . '.lock';
-
-        $f = fopen($lockFile, 'w');
-        try {
-            flock($f, LOCK_EX);
-
-            // Maybe by the time we acquired the lock it had already been
-            // populated by another request.
-            /** @var null|T */
-            $returnValue = $cache->get();
-            if (!is_null($returnValue)) {
-                if (!is_null($cacheUsed)) {
-                    $cacheUsed = true;
-                }
-                return $returnValue;
-            }
-
-            // Get the value from the function provided
-            $cache->log->info('Calling $setFunc');
-            /** @var T */
-            $returnValue = call_user_func($setFunc);
-            $cache->set($returnValue, $timeout);
-            $cache->log->info('Committed value');
-
-            if (!is_null($cacheUsed)) {
-                $cacheUsed = false;
-            }
-            return $returnValue;
-        } finally {
-            flock($f, LOCK_UN);
-            fclose($f);
-            // By the time the code reaches this point, it might be the case
-            // that another request managed to reach the critical section and
-            // also opened the file. In that case, it could be the case that
-            // multiple requests will attempt to unlink the lock file, so it's
-            // totally okay for them to fail.
-            //
-            // Additionally, since this is performed after the call to set(),
-            // even if we somehow managed to unlink the file between the time
-            // another request checked if the cache was set and it tried to
-            // open the lockfile (thus opening a completely unrelated file that
-            // is not synchronized with the current one at all), that other
-            // request will finish acquiring the lockfile and then see that the
-            // cache value had already been set, causing no additional
-            // evaluations of $setFunc.
-            @unlink($lockFile);
-        }
+        return CacheAdapter::getInstance()->getOrSet(
+            $cache->key,
+            $prefix,
+            $setFunc,
+            $timeout,
+            $cacheUsed
+        );
     }
 
     /**
@@ -447,24 +703,13 @@ class Cache {
         if (!self::isEnabled()) {
             return;
         }
-        $key = "v{$prefix}";
-        // Must do this in a loop to avoid race condition when two threads try
-        // to invalidate the cache simultaneously.
-        do {
-            // Ensure the version key exists.
-            $version = self::getVersion($prefix);
-        } while (
-            !CacheAdapter::getInstance()->cas(
-                $key,
-                $version,
-                $version + 1
-            )
-        );
+        CacheAdapter::getInstance()->inc("v{$prefix}");
     }
 
     private static function isEnabled(): bool {
-        return defined('APC_USER_CACHE_ENABLED') &&
-            APC_USER_CACHE_ENABLED === true;
+        /** @psalm-suppress RedundantCondition OMEGAUP_CACHE_IMPLEMENTATION is really a variable */
+        return defined('OMEGAUP_CACHE_IMPLEMENTATION') &&
+            OMEGAUP_CACHE_IMPLEMENTATION !== '';
     }
 
     /**
