@@ -1,7 +1,7 @@
 import store from '@/js/omegaup/problem/creator/store';
-import { NIL as UUID_NIL } from 'uuid';
+import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
 import { generateCase, generateGroup } from '../modules/cases';
-import { CaseRequest, MultipleCaseAddRequest } from '../types';
+import { CaseLine, CaseRequest, MultipleCaseAddRequest } from '../types';
 
 describe('cases.ts', () => {
   beforeEach(() => {
@@ -309,5 +309,110 @@ describe('cases.ts', () => {
         `case ${i + 1}`,
       );
     }
+  });
+  it('Should set all the cases lines to a defined line array', () => {
+    const newCase = generateCase({ name: 'case1' });
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/addCase', newCaseRequest);
+    const groupID = store.state.casesStore.groups[0].groupID;
+    store.commit('casesStore/setSelected', {
+      groupID: groupID,
+      caseID: newCase.caseID,
+    });
+    const lines: CaseLine[] = [
+      { lineID: uuid(), label: 'line1', data: { kind: 'line', value: '1' } },
+      {
+        lineID: uuid(),
+        label: 'line2',
+        data: {
+          kind: 'array',
+          distinct: false,
+          max: 10,
+          min: 1,
+          size: 2,
+          value: [1, 2],
+        },
+      },
+    ];
+    store.dispatch('casesStore/setLines', lines);
+    expect(store.state.casesStore.groups[0].cases[0].lines).toEqual(lines);
+  });
+  it('Should add a new line to a selected case', () => {
+    const newCase = generateCase({ name: 'case1' });
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/addCase', newCaseRequest);
+    const groupID = store.state.casesStore.groups[0].groupID;
+    store.commit('casesStore/setSelected', {
+      groupID: groupID,
+      caseID: newCase.caseID,
+    });
+    store.dispatch('casesStore/addNewLine');
+    const lineID = store.state.casesStore.groups[0].cases[0].lines[0].lineID;
+    const lineToBeExpected: CaseLine = {
+      lineID: lineID,
+      label: 'NEW',
+      data: { kind: 'line', value: '' },
+    };
+    expect(store.state.casesStore.groups[0].cases[0].lines.length).toBe(1);
+    expect(store.state.casesStore.groups[0].cases[0].lines[0]).toEqual(
+      lineToBeExpected,
+    );
+  });
+  it('Should update a defined line', () => {
+    const newCase = generateCase({ name: 'case1' });
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/addCase', newCaseRequest);
+    const groupID = store.state.casesStore.groups[0].groupID;
+    store.commit('casesStore/setSelected', {
+      groupID: groupID,
+      caseID: newCase.caseID,
+    });
+    store.dispatch('casesStore/addNewLine');
+    const updatedLine: CaseLine = {
+      ...store.state.casesStore.groups[0].cases[0].lines[0],
+      label: 'UPDATED',
+      data: {
+        kind: 'array',
+        distinct: false,
+        max: 10,
+        min: 1,
+        size: 2,
+        value: [1, 2],
+      },
+    };
+    store.dispatch('casesStore/updateLine', updatedLine);
+    expect(store.state.casesStore.groups[0].cases[0].lines[0]).toEqual(
+      updatedLine,
+    );
+  });
+  it('Should delete a line', () => {
+    const newCase = generateCase({ name: 'case1' });
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/addCase', newCaseRequest);
+    const groupID = store.state.casesStore.groups[0].groupID;
+    store.commit('casesStore/setSelected', {
+      groupID: groupID,
+      caseID: newCase.caseID,
+    });
+    store.dispatch('casesStore/addNewLine');
+    const lineID = store.state.casesStore.groups[0].cases[0].lines[0].lineID;
+    store.dispatch('casesStore/deleteLine', lineID);
+    expect(store.state.casesStore.groups[0].cases[0].lines.length).toBe(0);
   });
 });
