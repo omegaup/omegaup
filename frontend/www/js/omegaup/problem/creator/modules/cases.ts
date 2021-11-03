@@ -299,6 +299,7 @@ export const casesStore: Module<CasesState, RootState> = {
       if (lineToUpdate === undefined) {
         return;
       }
+      lineToUpdate.label = newLine.label;
       lineToUpdate.data = newLine.data;
     },
     deleteLine({ getters }, lineIDToBeDeleted: LineID) {
