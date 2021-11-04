@@ -3033,11 +3033,11 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{entrypoint: string, smartyProperties: array{payload: UserRolesPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getUserRolesForTypeScript(\OmegaUp\Request $r) {
-        $r->ensureMainUserIdentity();
-
         if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
+
+        $r->ensureMainUserIdentity();
 
         $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles(
             $r->user->user_id
