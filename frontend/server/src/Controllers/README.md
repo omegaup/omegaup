@@ -4706,8 +4706,8 @@ Update user profile
 | `is_private`                | `bool\|null`                                 |             |
 | `name`                      | `null\|string`                               |             |
 | `scholar_degree`            | `null\|string`                               |             |
-| `school`                    | `mixed`                                      |             |
 | `school_id`                 | `int\|null`                                  |             |
+| `school_name`               | `null\|string`                               |             |
 | `username`                  | `mixed`                                      |             |
 
 ### Returns

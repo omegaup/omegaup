@@ -2223,7 +2223,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $name
      * @omegaup-request-param null|string $scholar_degree
      * @omegaup-request-param int|null $school_id
-     * @omegaup-request-param mixed $school
+     * @omegaup-request-param null|string $school_name
      * @omegaup-request-param string $state_id
      * @omegaup-request-param mixed $username
      */
@@ -2323,10 +2323,10 @@ class User extends \OmegaUp\Controllers\Controller {
             $newSchoolId = null;
         }
 
-        if (is_null($newSchoolId) && !empty($r['school'])) {
+        if (is_null($newSchoolId) && !empty($r['school_name'])) {
             $response = \OmegaUp\Controllers\School::apiCreate(
                 new \OmegaUp\Request([
-                    'name' => $r['school'],
+                    'name' => $r['school_name'],
                     'country_id' => !is_null(
                         $state
                     ) ? $state->country_id : null,
