@@ -314,6 +314,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $row['lessonCount'] = $row['lesson_count'];
             $row['studentCount'] = $row['student_count'];
             $row['alreadyStarted'] = boolval($row['already_started']);
+            unset($row['lesson_count']);
+            unset($row['student_count']);
+            unset($row['already_started']);
             $results[] = $row;
         }
         return $results;
