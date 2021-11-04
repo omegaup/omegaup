@@ -102,6 +102,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 
 import omegaup_Markdown from '../Markdown.vue';
 import course_CardPublic from './CardPublic.vue';
@@ -131,6 +132,7 @@ export default class CourseTabs extends Vue {
   @Prop({ default: false }) loggedIn!: boolean;
 
   T = T;
+  ui = ui;
   Tab = Tab;
   selectedTab = Tab.Public;
   searchText = '';
@@ -139,11 +141,9 @@ export default class CourseTabs extends Vue {
     return {
       [Tab.Public]: T.courseTabPublic,
       [Tab.Enrolled]: this.loggedIn
-        ? `${T.courseTabEnrolled} (${this.courses.enrolled.length})`
-        : T.courseTabEnrolled,
+        ? ui.formatString(T.courseTabEnrolled, { course_count: this.courses.enrolled.length }) : T.courseTabEnrolledUnlogged,
       [Tab.Finished]: this.loggedIn
-        ? `${T.courseTabFinished} (${this.courses.finished.length})`
-        : T.courseTabFinished,
+        ? ui.formatString(T.courseTabFinished, { course_count: this.courses.finished.length }) : T.courseTabFinishedUnlogged,
     };
   }
 
