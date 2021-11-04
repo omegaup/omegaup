@@ -233,7 +233,7 @@ export const casesStore: Module<CasesState, RootState> = {
       multipleCaseRequest: MultipleCaseAddRequest,
     ) {
       // This set will store all occupied names in the given group
-      let occupiedNames: Set<string> = new Set();
+      const occupiedNames: Set<string> = new Set();
 
       if (multipleCaseRequest.groupID === UUID_NIL) {
         // We should add group names
