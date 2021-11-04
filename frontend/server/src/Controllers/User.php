@@ -4120,6 +4120,16 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $targetIdentity = self::resolveTargetIdentity($r);
 
+        // Only sysadmin can change email for another user
+        if (
+            $targetIdentity->identity_id !== $r->identity->identity_id
+            && !\OmegaUp\Authorization::isSystemAdmin($r->identity)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
         if (
             is_null(
                 $targetIdentity
@@ -4132,16 +4142,6 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
                 'Identity'
-            );
-        }
-
-        // Only sysadmin can change email for another user
-        if (
-            $targetIdentity->identity_id !== $r->identity->identity_id
-            && !\OmegaUp\Authorization::isSystemAdmin($r->identity)
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
             );
         }
 
