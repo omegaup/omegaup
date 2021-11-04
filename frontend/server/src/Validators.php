@@ -212,8 +212,8 @@ class Validators {
      *
      * @return boolean
      */
-    public static function token(string $token, int $length = 30): bool {
-        return preg_match("/^[a-zA-Z0-9]{{$length}}$/", $token) === 1;
+    public static function token(string $token): bool {
+        return preg_match('/^[a-zA-Z0-9]{30}$/', $token) === 1;
     }
 
     /**
