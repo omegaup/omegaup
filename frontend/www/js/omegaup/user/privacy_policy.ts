@@ -1,28 +1,37 @@
 import Vue from 'vue';
-import user_Privacy_Policy from '../components/user/PrivacyPolicy.vue';
-import { OmegaUp } from '../omegaup-legacy';
+import user_PrivacyPolicy from '../components/user/PrivacyPolicy.vue';
+import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import * as api from '../api';
 import * as ui from '../ui';
+import { types } from '../api_types';
 
-OmegaUp.on('ready', function () {
-  const payload = JSON.parse(document.getElementById('payload').innerText);
+OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.PrivacyPolicyDetailsPayload();
 
-  let privacyPolicy = new Vue({
-    el: '#privacy-policy',
+  const privacyPolicy = new Vue({
+    el: '#main-container',
+    components: {
+      'omegaup-privacy-policy': user_PrivacyPolicy,
+    },
+    data: () => {
+      return {
+        saved: payload.has_accepted,
+      };
+    },
     render: function (createElement) {
       return createElement('omegaup-privacy-policy', {
         props: {
-          policyMarkdown: this.policyMarkdown,
+          policyMarkdown: payload.policy_markdown,
           saved: this.saved,
         },
         on: {
-          submit: function (ev) {
+          submit: () => {
             api.User.acceptPrivacyPolicy({
               privacy_git_object_id: payload.git_object_id,
               statement_type: payload.statement_type,
             })
-              .then(function (data) {
+              .then(() => {
                 ui.info(T.wordsPrivacyPolicyAccepted);
                 privacyPolicy.saved = true;
               })
@@ -30,13 +39,6 @@ OmegaUp.on('ready', function () {
           },
         },
       });
-    },
-    data: {
-      policyMarkdown: payload.policy_markdown,
-      saved: payload.has_accepted,
-    },
-    components: {
-      'omegaup-privacy-policy': user_Privacy_Policy,
     },
   });
 });

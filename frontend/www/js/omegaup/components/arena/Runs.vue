@@ -319,7 +319,7 @@ import * as time from '../../time';
 import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
-import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
+import arena_RunDetailsPopup from './RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
 
 import Autocomplete from '../Autocomplete.vue';
@@ -367,7 +367,7 @@ export enum PopupDisplayed {
     'omegaup-user-username': user_Username,
   },
 })
-export default class Runsv2 extends Vue {
+export default class Runs extends Vue {
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: true }) isProblemsetOpened!: boolean;
   @Prop({ default: false }) showContest!: boolean;
