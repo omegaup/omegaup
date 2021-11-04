@@ -233,12 +233,12 @@ export const casesStore: Module<CasesState, RootState> = {
       multipleCaseRequest: MultipleCaseAddRequest,
     ) {
       // This set will store all occupied names in the given group
-      const occupiedNames: Set<string> = new Set();
+      const usedCaseNames: Set<string> = new Set();
 
       if (multipleCaseRequest.groupID === UUID_NIL) {
         // We should add group names
         for (const group of state.groups) {
-          occupiedNames.add(group.name);
+          usedCaseNames.add(group.name);
         }
       } else {
         // We should add case names
@@ -247,25 +247,24 @@ export const casesStore: Module<CasesState, RootState> = {
         );
         if (cases) {
           for (const case_ of cases) {
-            occupiedNames.add(case_.name);
+            usedCaseNames.add(case_.name);
           }
         }
       }
 
-      // caseNum will continue to be incremented even if the case is not added
-      for (
-        let i = 0, caseNum = 1;
-        i < multipleCaseRequest.numberOfCases;
-        i++, caseNum++
-      ) {
-        const name =
-          multipleCaseRequest.prefix + caseNum + multipleCaseRequest.suffix;
-        if (occupiedNames.has(name)) {
-          i--; // We need to try again until we find a name that is not occupied
-          continue;
+      let caseNumber = 0;
+      for (let i = 0; i < multipleCaseRequest.numberOfCases; i++) {
+        let caseName = '';
+        while (true) {
+          caseNumber++;
+          caseName = `${multipleCaseRequest.prefix}${caseNumber}${multipleCaseRequest.suffix}`;
+          if (!usedCaseNames.has(caseName)) {
+            break;
+          }
         }
+        usedCaseNames.add(caseName);
         const newCase = generateCase({
-          name: name,
+          name: caseName,
           groupID: multipleCaseRequest.groupID,
         });
         const caseRequest = generateCaseRequest({
