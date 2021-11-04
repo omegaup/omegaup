@@ -3035,13 +3035,8 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function getUserRolesForTypeScript(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
 
-        if (
-            !\OmegaUp\Authorization::isSystemAdmin($r->identity) &&
-            !OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                'userNotAllowed'
-            );
+        if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles(
