@@ -63,6 +63,9 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             $coursesAliases['public'][0],
             $response['smartyProperties']['payload']['courses']['public'][0]['alias']
         );
+        $this->assertFalse(
+            $response['smartyProperties']['payload']['courses']['public'][0]['alreadyStarted']
+        );
     }
 
     public function testAuthenticatedUserTabs() {
@@ -153,6 +156,9 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             $coursesAliases['public'][0],
             $response['smartyProperties']['payload']['courses']['public'][0]['alias']
+        );
+        $this->assertTrue(
+            $response['smartyProperties']['payload']['courses']['public'][0]['alreadyStarted']
         );
         $this->assertEquals(
             $coursesAliases['enrolled'][0],

@@ -67,6 +67,7 @@
       <template v-else>
         <form
           v-if="!userRegistrationRequested"
+          class="text-center"
           @submit.prevent="$emit('request-access-course')"
         >
           <omegaup-markdown

@@ -269,7 +269,7 @@ class UITools {
     }
 
     /**
-     * @param callable(\OmegaUp\Request):array{smartyProperties: array{fullWidth?: bool, payload: array<string, mixed>, scripts?: list<string>, title: \OmegaUp\TranslationString}, entrypoint: string, template?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string}|callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, entrypoint?: string, template?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string} $callback
+     * @param callable(\OmegaUp\Request):array{smartyProperties: array{fullWidth?: bool, hideFooterAndHeader?: bool, payload: array<string, mixed>, scripts?: list<string>, title: \OmegaUp\TranslationString}, entrypoint: string, template?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string}|callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, entrypoint?: string, template?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string} $callback
      */
     public static function render(callable $callback): void {
         $smarty = self::getSmartyInstance();
@@ -351,16 +351,5 @@ class UITools {
                 )
             );
         }
-    }
-
-    /**
-     * Return the path of a Smarty template.
-     */
-    public static function templatePath(string $templateName): string {
-        return sprintf(
-            '%s/templates/%s.tpl',
-            strval(OMEGAUP_ROOT),
-            $templateName
-        );
     }
 }

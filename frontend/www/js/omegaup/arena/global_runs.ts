@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import arena_Runsv2, { PopupDisplayed } from '../components/arena/Runsv2.vue';
+import arena_Runs, { PopupDisplayed } from '../components/arena/Runs.vue';
 import * as api from '../api';
 import T from '../lang';
 import { OmegaUp } from '../omegaup';
@@ -29,7 +29,7 @@ OmegaUp.on('ready', async () => {
   new Vue({
     el: '#main-container',
     components: {
-      'omegaup-arena-runs': arena_Runsv2,
+      'omegaup-arena-runs': arena_Runs,
     },
     data: () => ({
       searchResultUsers: [] as types.ListItem[],

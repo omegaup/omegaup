@@ -7,7 +7,9 @@
 	{js_include entrypoint="common_footer"}
 </div>
 
-{include file='common.analytics.tpl' inline}
+{if $OMEGAUP_GA_TRACK eq 1}
+	<script type="text/javascript" src="{version_hash src="/js/analytics.js"}"></script>
+{/if}
 <!-- #root -->
 </body>
 </html>

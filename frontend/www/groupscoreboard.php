@@ -1,4 +1,9 @@
 <?php
+namespace OmegaUp;
+require_once(dirname(__DIR__) . '/server/bootstrap.php');
 
-require_once('../server/bootstrap_smarty.php');
-$smarty->display('../templates/group.scoreboard.details.tpl');
+\OmegaUp\UITools::render(
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\GroupScoreboard::getGroupScoreboardDetailsForTypeScript(
+        $r
+    )
+);
