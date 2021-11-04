@@ -1419,6 +1419,7 @@
 	"verdictWA": "Wrong Answer",
 	"verificationEmailBody": "Welcome to omegaUp! Please click on the following link to login and verify your email: <a href=\"https://omegaup.com/user/verifyemail/%(verification_id)/\">https://omegaup.com/user/verifyemail/%(verification_id)/</a>",
 	"verificationEmailSubject": "Welcome to omegaUp!",
+	"verificationEmailSuccesfully": "Your email address has been verified.",
 	"verificationIdInvalid": "The provided verification information is not valid.",
 	"virtualContest": "Virtual contest",
 	"virtualContestSuffix": "%(title) [virtual]",
