@@ -310,6 +310,39 @@ describe('cases.ts', () => {
       );
     }
   });
+  it('Should create multiple cases inside a group and skip a used name', () => {
+    const newGroup = generateGroup({ name: 'group1' });
+    store.commit('casesStore/addGroup', newGroup);
+    const newCase = generateCase({
+      name: 'case 3',
+      groupID: newGroup.groupID,
+    });
+    const newCaseRequest: CaseRequest = {
+      ...newCase,
+      points: 0,
+      pointsDefined: false,
+    };
+    store.commit('casesStore/addCase', newCaseRequest);
+    const multipleCaseRequest: MultipleCaseAddRequest = {
+      groupID: newGroup.groupID,
+      numberOfCases: 5,
+      prefix: 'case ',
+      suffix: '',
+    };
+    store.dispatch('casesStore/addMultipleCases', multipleCaseRequest);
+    expect(store.state.casesStore.groups.length).toBe(1);
+    expect(store.state.casesStore.groups[0].name).toBe(newGroup.name);
+    expect(store.state.casesStore.groups[0].cases[0].name).toBe(`case 3`);
+    for (let i = 1; i < 6; i++) {
+      if (i >= 3) {
+        expect(store.state.casesStore.groups[0].cases[i].name).toBe(
+          `case ${i + 1}`,
+        );
+        continue;
+      }
+      expect(store.state.casesStore.groups[0].cases[i].name).toBe(`case ${i}`);
+    }
+  });
   it('Should set all the cases lines to a defined line array', () => {
     const newCase = generateCase({ name: 'case1' });
     const newCaseRequest: CaseRequest = {

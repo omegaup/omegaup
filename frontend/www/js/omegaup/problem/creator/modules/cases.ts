@@ -232,47 +232,48 @@ export const casesStore: Module<CasesState, RootState> = {
       { commit, getters, state },
       multipleCaseRequest: MultipleCaseAddRequest,
     ) {
-      let cases: Case[] = [];
-      if (multipleCaseRequest.groupID !== UUID_NIL) {
-        // Only if we don't want ungrouped cases
-        cases = getters.getCasesFromGroup(multipleCaseRequest.groupID);
-      }
-      let caseNumber = 0;
-      for (let i = 0; i < multipleCaseRequest.numberOfCases; i++) {
-        let shouldBreak = false;
-        do {
-          caseNumber++;
-          const name =
-            multipleCaseRequest.prefix +
-            caseNumber +
-            multipleCaseRequest.suffix;
-          if (multipleCaseRequest.groupID === UUID_NIL) {
-            // Should search in all groups
-            const groupExist = state.groups.find(
-              (group) => group.name === name,
-            );
-            if (groupExist) {
-              continue;
-            }
-          } else {
-            // Should search in the given group
-            const caseExist = cases.find((_case) => _case.name === name);
-            if (caseExist) {
-              continue;
-            }
+      // This set will store all occupied names in the given group
+      let occupiedNames: Set<string> = new Set();
+
+      if (multipleCaseRequest.groupID === UUID_NIL) {
+        // We should add group names
+        for (const group of state.groups) {
+          occupiedNames.add(group.name);
+        }
+      } else {
+        // We should add case names
+        const cases: Case[] = getters.getCasesFromGroup(
+          multipleCaseRequest.groupID,
+        );
+        if (cases) {
+          for (const case_ of cases) {
+            occupiedNames.add(case_.name);
           }
-          const newCase = generateCase({
-            name: name,
-            groupID: multipleCaseRequest.groupID,
-          });
-          const caseRequest = generateCaseRequest({
-            ...newCase,
-            points: 0,
-            pointsDefined: false,
-          });
-          commit('addCase', caseRequest);
-          shouldBreak = true;
-        } while (!shouldBreak);
+        }
+      }
+
+      // caseNum will continue to be incremented even if the case is not added
+      for (
+        let i = 0, caseNum = 1;
+        i < multipleCaseRequest.numberOfCases;
+        i++, caseNum++
+      ) {
+        const name =
+          multipleCaseRequest.prefix + caseNum + multipleCaseRequest.suffix;
+        if (occupiedNames.has(name)) {
+          i--; // We need to try again until we find a name that is not occupied
+          continue;
+        }
+        const newCase = generateCase({
+          name: name,
+          groupID: multipleCaseRequest.groupID,
+        });
+        const caseRequest = generateCaseRequest({
+          ...newCase,
+          points: 0,
+          pointsDefined: false,
+        });
+        commit('addCase', caseRequest);
       }
     },
     setLines({ getters }, lines: CaseLine[]) {
@@ -311,7 +312,9 @@ export const casesStore: Module<CasesState, RootState> = {
   },
   getters: {
     getCasesFromGroup: (state) => (groupID: GroupID) => {
-      return state.groups.find((group) => group.groupID === groupID)?.cases;
+      return (
+        state.groups.find((group) => group.groupID === groupID)?.cases ?? null
+      );
     },
     getGroupIdsAndNames: (state) => {
       return state.groups.map((group) => {
@@ -327,16 +330,20 @@ export const casesStore: Module<CasesState, RootState> = {
       const selectedGroup = state.groups.find(
         (group) => group.groupID === state.selected.groupID,
       );
-      if (selectedGroup !== undefined) {
-        return selectedGroup.cases.find(
-          (_case) => _case.caseID === state.selected.caseID,
-        );
+      if (selectedGroup === undefined) {
+        return null;
       }
-      return undefined;
+      return (
+        selectedGroup.cases.find(
+          (_case) => _case.caseID === state.selected.caseID,
+        ) ?? null
+      );
     },
     getSelectedGroup: (state) => {
-      return state.groups.find(
-        (group) => group.groupID === state.selected.groupID,
+      return (
+        state.groups.find(
+          (group) => group.groupID === state.selected.groupID,
+        ) ?? null
       );
     },
   },
@@ -400,17 +407,5 @@ export function generateGroup(
     pointsDefined: false,
     ungroupedCase: false,
     ...groupParams,
-  };
-}
-
-export function generateLine(lineParams: Partial<CaseLine>): CaseLine {
-  return {
-    lineID: uuid(),
-    label: 'NEW',
-    data: {
-      kind: 'line',
-      value: '',
-    },
-    ...lineParams,
   };
 }
