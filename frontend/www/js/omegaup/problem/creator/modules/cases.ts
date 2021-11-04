@@ -255,11 +255,12 @@ export const casesStore: Module<CasesState, RootState> = {
       let caseNumber = 0;
       for (let i = 0; i < multipleCaseRequest.numberOfCases; i++) {
         let caseName = '';
-        while (true) {
+        let shouldBreak = false;
+        while (!shouldBreak) {
           caseNumber++;
           caseName = `${multipleCaseRequest.prefix}${caseNumber}${multipleCaseRequest.suffix}`;
           if (!usedCaseNames.has(caseName)) {
-            break;
+            shouldBreak = true;
           }
         }
         usedCaseNames.add(caseName);
