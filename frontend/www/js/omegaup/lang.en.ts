@@ -630,7 +630,6 @@ const translations: { [key: string]: string; } = {
   navBlog: "Blog",
   navCoderOfTheMonth: "Coder of the month overall",
   navCoderOfTheMonthFemale: "Coder of the month for her",
-  navCommonIndex: "omegaUp",
   navContests: "Contests",
   navCourses: "Courses",
   navHelp: "Help",
