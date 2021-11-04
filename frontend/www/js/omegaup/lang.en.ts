@@ -719,6 +719,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleTeamsGroupNew: "New teams group",
   omegaupTitleTeamsGroups: "Teams groups",
   omegaupTitleUpdatePrivileges: "Update privileges",
+  omegaupTitleUsersEditEmail: "Edit email",
   omegaupTitleUsersRank: "User ranking",
   onlyDemotionsSupported: "Resolution only supported for demotions for now.",
   openInKarelJs: "You can use karel.js to solve this problem.",
