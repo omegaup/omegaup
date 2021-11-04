@@ -365,6 +365,7 @@ const translations: { [key: string]: string; } = {
   courseCloneGenerateLinkTitle: "Generar liga para clonar",
   courseContentEmpty: "No hay contenido",
   courseContentNewFormTypeDesc: "El tipo de contenido es usado para distinguir una tarea de una lecci\u00f3n o examen visualmente en los cursos.",
+  courseDetailsOverallCompletedPoints: "%(completed_points) de %(total_points) puntos",
   courseDetailsProgress: "Progreso del curso",
   courseDetailsSettings: "Ajustes",
   courseDetailsTabContent: "Contenido",
