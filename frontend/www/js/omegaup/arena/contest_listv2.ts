@@ -11,12 +11,14 @@ OmegaUp.on('ready', () => {
     el: '#main-container',
     components: { 'omegaup-arena-contestlist': arena_ContestList },
     data: () => ({
+      initialQuery: payload.query,
       contests: payload.contests,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contestlist', {
         props: {
           contests: this.contests,
+          initialQuery: this.initialQuery,
         },
       });
     },

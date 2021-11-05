@@ -12,11 +12,35 @@
         vertical
         nav-wrapper-class="contest-list-nav col-sm-4 col-md-2"
       >
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <form :action="queryUrl" method="GET">
+                <div class="input-group">
+                  <input
+                    v-model="query"
+                    class="form-control"
+                    type="text"
+                    name="query"
+                    autocomplete="off"
+                    :placeholder="T.wordsKeyword"
+                  />
+                  <div class="input-group-append">
+                    <input
+                      class="btn btn-primary btn-md active"
+                      type="submit"
+                      :value="T.wordsSearch"
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
         <b-tab
           ref="currentContestTab"
           :title="T.contestListCurrent"
           :title-link-class="titleLinkClass(ContestTab.Current)"
-          active
         >
           {{ contests.current }}
         </b-tab>
@@ -64,9 +88,13 @@ export enum ContestTab {
 })
 export default class ArenaContestList extends Vue {
   @Prop() contests!: types.ContestList;
+  @Prop() initialQuery!: string;
   T = T;
   ContestTab = ContestTab;
-  activeTab: ContestTab = ContestTab.Current;
+  activeTab: ContestTab = window.location.hash
+    ? parseInt(window.location.hash.substr(1))
+    : ContestTab.Current;
+  query = this.initialQuery;
 
   titleLinkClass(tab: ContestTab) {
     if (this.activeTab === tab) {
@@ -74,6 +102,10 @@ export default class ArenaContestList extends Vue {
     } else {
       return ['text-center', 'title-link'];
     }
+  }
+
+  get queryUrl(): string {
+    return `/arenav2/#${this.activeTab}`;
   }
 }
 </script>
