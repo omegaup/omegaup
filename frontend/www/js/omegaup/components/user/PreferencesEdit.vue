@@ -56,15 +56,13 @@
         </label>
       </div>
       <div class="form-group">
-        <span>&nbsp;</span>
         <label>
           <input
             v-model="hideProblemTags"
             type="checkbox"
-            name="hide_problem_tags"
+            :checked="hideProblemTags"
             data-hide-problem-tags
             class="mr-2"
-            :checked="hideProblemTags"
           />{{ T.userEditHideProblemTags }}
         </label>
       </div>

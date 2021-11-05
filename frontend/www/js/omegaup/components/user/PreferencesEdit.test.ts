@@ -29,14 +29,14 @@ const profile: types.UserProfileInfo = {
 describe('PreferencesEdit.vue', () => {
   it('Should display user email', () => {
     const wrapper = shallowMount(user_Preferences_Edit, {
-      propsData: { profile: profile },
+      propsData: { profile },
     });
     expect(wrapper.find('[data-email]').text()).toContain('admin@omegaup.com');
   });
 
   it('Should emit user update preferences', async () => {
     const wrapper = shallowMount(user_Preferences_Edit, {
-      propsData: { profile: profile },
+      propsData: { profile },
     });
 
     await wrapper
