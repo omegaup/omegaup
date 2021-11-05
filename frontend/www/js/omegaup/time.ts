@@ -251,3 +251,13 @@ export function remoteTimeAdapter<T>(value: T): T {
   }
   return value;
 }
+
+/**
+ * Converts a date to a GMT (UTC) date.
+ *
+ * @param date - The local date to be converted.
+ * @returns The same date, but in GMT.
+ */
+export function convertLocalDateToGMTDate(date: Date): Date {
+  return new Date(date.toUTCString().replace('GMT', ''));
+}

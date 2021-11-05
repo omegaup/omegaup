@@ -4707,7 +4707,7 @@ Update user profile
 | `name`                      | `null\|string`                               |             |
 | `scholar_degree`            | `null\|string`                               |             |
 | `school_id`                 | `int\|null`                                  |             |
-| `school_name`               | `null\|string`                               |             |
+| `school_name`               | `mixed`                                      |             |
 | `username`                  | `mixed`                                      |             |
 
 ### Returns

@@ -69,7 +69,7 @@
             <strong>{{ T.profileGraduationDate }}</strong>
           </div>
           <div class="col-sm-9 field-data">
-            <strong>{{ graduationDate }}</strong>
+            <strong>{{ profile.graduation_date }}</strong>
           </div>
         </div>
 
@@ -126,13 +126,6 @@ export default class UserBasicInfo extends Vue {
 
   get urlUsername(): string {
     return `https://omegaup.com/profile/${this.profile.username}/`;
-  }
-
-  get graduationDate(): string {
-    if (this.profile.graduation_date) {
-      return this.profile.graduation_date.toLocaleDateString(T.locale);
-    }
-    return '';
   }
 }
 </script>
