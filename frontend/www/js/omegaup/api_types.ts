@@ -3178,9 +3178,10 @@ export namespace types {
   }
 
   export interface LoginDetailsPayload {
-    facebookUrl: string;
+    facebookUrl?: string;
     statusError?: string;
     validateRecaptcha: boolean;
+    verifyEmailSuccessfully?: string;
   }
 
   export interface MergedScoreboardEntry {

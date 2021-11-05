@@ -34,7 +34,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
- * @psalm-type LoginDetailsPayload=array{facebookUrl: string, statusError?: string, validateRecaptcha: bool}
+ * @psalm-type LoginDetailsPayload=array{facebookUrl?: string, statusError?: string, validateRecaptcha: bool, verifyEmailSuccessfully?: string}
  * @psalm-type Experiment=array{config: bool, hash: string, name: string}
  * @psalm-type UserRole=array{name: string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
@@ -537,6 +537,46 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $id
+     */
+    public static function getLoginDetailsViaVerifyEmailForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $response = [
+            'smartyProperties' => [
+                'payload' => [
+                    'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
+                    'verifyEmailSuccessfully' => \OmegaUp\Translations::getInstance()->get(
+                        'verificationEmailSuccesfully'
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
+                'scripts' => [
+                    'https://apis.google.com/js/platform.js?onload=init',
+                ],
+            ],
+            'entrypoint' => 'login_signin',
+        ];
+        try {
+            $id = $r->ensureString('id');
+
+            $user = \OmegaUp\DAO\Users::getByVerification($id);
+
+            self::verifyEmail($user);
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            \OmegaUp\ApiCaller::logException($e);
+            $response['smartyProperties']['payload'] = [
+                'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
+                'statusError' => $e->getErrorMessage(),
+            ];
+        } finally {
+            return $response;
+        }
+    }
+
+    /**
      * Verifies the user given its verification id
      *
      * @param \OmegaUp\Request $r
@@ -550,12 +590,15 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $usernameOrEmail
      */
     public static function apiVerifyEmail(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['usernameOrEmail'],
-            'usernameOrEmail'
+        $usernameOrEmail = $r->ensureOptionalString(
+            'usernameOrEmail',
+            /*$required=*/false,
+            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
         );
 
-        if (isset($r['usernameOrEmail'])) {
+        if (!is_null($usernameOrEmail)) {
             // Admin can override verification by sending username
             $r->ensureIdentity();
 
@@ -563,14 +606,25 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            self::$log->info("Admin verifying user... {$r['usernameOrEmail']}");
-            $user = self::resolveUser($r['usernameOrEmail']);
+            self::$log->info("Admin verifying user... {$usernameOrEmail}");
+            $user = self::resolveUser($usernameOrEmail);
         } else {
             // Normal user verification path
-            \OmegaUp\Validators::validateStringNonEmpty($r['id'], 'id');
-            $user = \OmegaUp\DAO\Users::getByVerification($r['id']);
+            $id = $r->ensureString('id');
+            $user = \OmegaUp\DAO\Users::getByVerification($id);
         }
 
+        self::verifyEmail($user);
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * @throws \OmegaUp\Exceptions\NotFoundException
+     */
+    private static function verifyEmail(
+        ?\OmegaUp\DAO\VO\Users $user
+    ): void {
         if (is_null($user) || is_null($user->main_identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'verificationIdInvalid'
@@ -597,8 +651,6 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::USER_PROFILE,
             strval($identity->username)
         );
-
-        return ['status' => 'ok'];
     }
 
     /**
