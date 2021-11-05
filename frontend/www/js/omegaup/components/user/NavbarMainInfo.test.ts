@@ -57,6 +57,17 @@ const data: types.ExtraProfileDetails = {
   unsolvedProblems: [],
 };
 
+const rankingMapping: { classname: string; rank: string }[] = [
+  { classname: 'user-rank-beginner', rank: T.profileRankBeginner },
+  { classname: 'user-rank-specialist', rank: T.profileRankSpecialist },
+  { classname: 'user-rank-expert', rank: T.profileRankExpert },
+  { classname: 'user-rank-master', rank: T.profileRankMaster },
+  {
+    classname: 'user-rank-international-master',
+    rank: T.profileRankInternationalMaster,
+  },
+];
+
 describe('NavbarMainInfo.vue', () => {
   it('Should display visible buttons', () => {
     const wrapper = shallowMount(user_NavbarMainInfo, {
@@ -83,11 +94,16 @@ describe('NavbarMainInfo.vue', () => {
     });
     expect(wrapper.text()).toContain('3');
   });
+});
 
-  it('Should display correct rank', () => {
+describe.each(rankingMapping)(`A user:`, (rank) => {
+  it(`whose classname is ${rank.classname} should have rank ${rank.rank}`, () => {
     const wrapper = shallowMount(user_NavbarMainInfo, {
-      propsData: { profile, data },
+      propsData: {
+        profile: { ...profile, ...{ classname: rank.classname } },
+        data,
+      },
     });
-    expect(wrapper.text()).toContain(T.profileRankMaster);
+    expect(wrapper.text()).toContain(rank.rank);
   });
 });
