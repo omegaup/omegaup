@@ -31,7 +31,11 @@
                   class="btn btn-primary text-white"
                   role="button"
                   :href="`/course/${course.alias}/`"
-                  >{{ T.wordsStart }}</a
+                  >{{
+                    course.alreadyStarted
+                      ? T.courseCardCourseResume
+                      : T.wordsStart
+                  }}</a
                 >
               </div>
             </div>
