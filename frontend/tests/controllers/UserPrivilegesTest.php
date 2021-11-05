@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Test autogenerating privileges user
  */
@@ -18,35 +16,76 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($identity);
         // Call to API Add Role
-        $response = \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'role' => 'Admin'
         ]));
-        $response = \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'role' => 'Reviewer'
         ]));
-        $response = \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiAddRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'role' => 'Mentor'
         ]));
 
+        $selectedRolesMapping = ['Admin', 'Reviewer', 'Mentor'];
+
         $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
-        $this->assertContains('Admin', $systemRoles);
-        $this->assertContains('Reviewer', $systemRoles);
-        $this->assertContains('Mentor', $systemRoles);
+        foreach ($selectedRolesMapping as $role) {
+            $this->assertContains($role, $systemRoles);
+        }
+
+        $payload = \OmegaUp\Controllers\User::getUserRolesForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        foreach ($payload['userSystemRoles'] as $userRole) {
+            $this->assertEquals(
+                $userRole['value'],
+                in_array(
+                    $userRole['name'],
+                    $selectedRolesMapping
+                )
+            );
+        }
 
         // Call to API Remove Role
-        $response = \OmegaUp\Controllers\User::apiRemoveRole(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiRemoveRole(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'role' => 'Mentor'
         ]));
         $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
         $this->assertNotContains('Mentor', $systemRoles);
+
+        array_pop($selectedRolesMapping);
+
+        $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles($user->user_id);
+        foreach ($selectedRolesMapping as $role) {
+            $this->assertContains($role, $systemRoles);
+        }
+
+        $payload = \OmegaUp\Controllers\User::getUserRolesForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        foreach ($payload['userSystemRoles'] as $userRole) {
+            $this->assertEquals(
+                $userRole['value'],
+                in_array(
+                    $userRole['name'],
+                    $selectedRolesMapping
+                )
+            );
+        }
     }
 
     public function testPreviouslyAddedRoles() {
@@ -125,7 +164,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testAddRemoveGroups() {
         $username = 'testusergroup';
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['username' => $username]
             )
@@ -133,31 +172,53 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($identity);
         // Call to API Add Group
-        $response = \OmegaUp\Controllers\User::apiAddGroup(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiAddGroup(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'group' => 'omegaup:quality-reviewer'
         ]));
-        $response = \OmegaUp\Controllers\User::apiAddGroup(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiAddGroup(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'group' => 'omegaup:course-curator'
         ]));
-        $response = \OmegaUp\Controllers\User::apiAddGroup(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiAddGroup(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'group' => 'omegaup:mentor'
         ]));
 
+        $selectedGroupsMapping = [
+            'omegaup:quality-reviewer',
+            'omegaup:course-curator',
+            'omegaup:mentor',
+        ];
+
         $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups(
             $identity->identity_id
         );
-        $this->assertContains('omegaup:quality-reviewer', $systemGroups);
-        $this->assertContains('omegaup:course-curator', $systemGroups);
-        $this->assertContains('omegaup:mentor', $systemGroups);
+        foreach ($selectedGroupsMapping as $group) {
+            $this->assertContains($group, $systemGroups);
+        }
+
+        $payload = \OmegaUp\Controllers\User::getUserRolesForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        foreach ($payload['userSystemGroups'] as $userGroup) {
+            $this->assertEquals(
+                $userGroup['value'],
+                in_array(
+                    $userGroup['name'],
+                    $selectedGroupsMapping
+                )
+            );
+        }
 
         // Call to API Remove Group
-        $response = \OmegaUp\Controllers\User::apiRemoveGroup(new \OmegaUp\Request([
+        \OmegaUp\Controllers\User::apiRemoveGroup(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'username' => $username,
             'group' => 'omegaup:mentor'
@@ -166,6 +227,24 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
             $identity->user_id
         );
         $this->assertNotContains('omegaup:mentor', $systemGroups);
+
+        array_pop($selectedGroupsMapping);
+
+        $payload = \OmegaUp\Controllers\User::getUserRolesForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        foreach ($payload['userSystemGroups'] as $userGroup) {
+            $this->assertEquals(
+                $userGroup['value'],
+                in_array(
+                    $userGroup['name'],
+                    $selectedGroupsMapping
+                )
+            );
+        }
     }
 
     /*

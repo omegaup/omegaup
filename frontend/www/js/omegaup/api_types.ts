@@ -2042,6 +2042,14 @@ export namespace types {
         (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
+
+    export function UserRolesPayload(
+      elementId: string = 'payload',
+    ): types.UserRolesPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
   }
 
   export interface ActivityEvent {
@@ -3170,9 +3178,10 @@ export namespace types {
   }
 
   export interface LoginDetailsPayload {
-    facebookUrl: string;
+    facebookUrl?: string;
     statusError?: string;
     validateRecaptcha: boolean;
+    verifyEmailSuccessfully?: string;
   }
 
   export interface MergedScoreboardEntry {
@@ -4224,6 +4233,12 @@ export namespace types {
 
   export interface UserRole {
     name: string;
+  }
+
+  export interface UserRolesPayload {
+    userSystemGroups: { [key: number]: { name: string; value: boolean } };
+    userSystemRoles: { [key: number]: { name: string; value: boolean } };
+    username: string;
   }
 }
 
