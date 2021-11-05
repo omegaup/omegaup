@@ -375,6 +375,7 @@ const translations: { [key: string]: string; } = {
   courseCloneGenerateLinkTitle: "Generate clone link",
   courseContentEmpty: "No content",
   courseContentNewFormTypeDesc: "The content type is used to distinguish tests from homeworks or lessons visually.",
+  courseDetailsOverallCompletedPoints: "%(completed_points) of %(total_points) points",
   courseDetailsProgress: "Course progress",
   courseDetailsSettings: "Settings",
   courseDetailsTabContent: "Content",
