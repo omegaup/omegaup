@@ -3,6 +3,7 @@ jest.mock('../../../../third_party/js/diff_match_patch.js');
 import { types } from '../../api_types';
 import { shallowMount, mount } from '@vue/test-utils';
 import T from '../../lang';
+import * as ui from '../../ui';
 import course_Tabs from './Tabs.vue';
 
 describe('Tabs.vue', () => {
@@ -48,8 +49,8 @@ describe('Tabs.vue', () => {
         courses,
       },
     });
-    expect(wrapper.text()).toContain(T.courseTabEnrolled);
-    expect(wrapper.text()).toContain(T.courseTabFinished);
+    expect(wrapper.text()).toContain(T.courseTabEnrolledUnlogged);
+    expect(wrapper.text()).toContain(T.courseTabFinishedUnlogged);
     expect(wrapper.text()).toContain(T.courseTabPublic);
     expect(wrapper.text()).not.toContain(T.wordsStart);
     expect(wrapper.text()).toContain(T.courseCardMustLogIn);
@@ -63,10 +64,14 @@ describe('Tabs.vue', () => {
       },
     });
     expect(wrapper.text()).toContain(
-      `${T.courseTabEnrolled} (${courses.enrolled.length})`,
+      ui.formatString(T.courseTabEnrolled, {
+        course_count: courses.enrolled.length,
+      }),
     );
     expect(wrapper.text()).toContain(
-      `${T.courseTabFinished} (${courses.finished.length})`,
+      ui.formatString(T.courseTabFinished, {
+        course_count: courses.finished.length,
+      }),
     );
     expect(wrapper.text()).toContain(T.courseTabPublic);
     expect(wrapper.text()).toContain(T.wordsStart);

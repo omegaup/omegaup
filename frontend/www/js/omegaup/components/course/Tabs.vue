@@ -141,9 +141,15 @@ export default class CourseTabs extends Vue {
     return {
       [Tab.Public]: T.courseTabPublic,
       [Tab.Enrolled]: this.loggedIn
-        ? ui.formatString(T.courseTabEnrolled, { course_count: this.courses.enrolled.length }) : T.courseTabEnrolledUnlogged,
+        ? ui.formatString(T.courseTabEnrolled, {
+            course_count: this.courses.enrolled.length,
+          })
+        : T.courseTabEnrolledUnlogged,
       [Tab.Finished]: this.loggedIn
-        ? ui.formatString(T.courseTabFinished, { course_count: this.courses.finished.length }) : T.courseTabFinishedUnlogged,
+        ? ui.formatString(T.courseTabFinished, {
+            course_count: this.courses.finished.length,
+          })
+        : T.courseTabFinishedUnlogged,
     };
   }
 
