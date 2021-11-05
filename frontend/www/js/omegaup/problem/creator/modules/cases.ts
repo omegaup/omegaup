@@ -255,14 +255,11 @@ export const casesStore: Module<CasesState, RootState> = {
       let caseNumber = 0;
       for (let i = 0; i < multipleCaseRequest.numberOfCases; i++) {
         let caseName = '';
-        let shouldBreak = false;
-        while (!shouldBreak) {
+        do {
           caseNumber++;
           caseName = `${multipleCaseRequest.prefix}${caseNumber}${multipleCaseRequest.suffix}`;
-          if (!usedCaseNames.has(caseName)) {
-            shouldBreak = true;
-          }
-        }
+        } while (usedCaseNames.has(caseName));
+
         usedCaseNames.add(caseName);
         const newCase = generateCase({
           name: caseName,
