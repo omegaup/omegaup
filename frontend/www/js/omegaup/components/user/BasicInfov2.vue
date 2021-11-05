@@ -129,10 +129,10 @@ export default class UserBasicInfo extends Vue {
   }
 
   get graduationDate(): string {
-    if (this.profile.graduation_date) {
-      return this.profile.graduation_date.toLocaleDateString(T.locale);
+    if (!this.profile.graduation_date) {
+      return '';
     }
-    return '';
+    return this.profile.graduation_date.toLocaleDateString(T.locale);
   }
 }
 </script>
