@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">{{ T.userEditEditProfile }}</h3>
+      <h3 class="card-title">{{ T.userEditBasicInformation }}</h3>
     </div>
     <form role="form" class="card-body" @submit.prevent="onUpdateUser">
       <div class="form-group">

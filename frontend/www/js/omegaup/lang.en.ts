@@ -1314,6 +1314,7 @@ const translations: { [key: string]: string; } = {
   userDoesNotHaveAnyPasswordChangeRequest: "User does not have any password change request in the last 24 hours.",
   userEditAddPassword: "Add password",
   userEditBachelors: "Bachelor's",
+  userEditBasicInformation: "Basic Information",
   userEditBirthDate: "Birth date",
   userEditChangePassword: "Change password",
   userEditChangePasswordNewPassword: "New password",

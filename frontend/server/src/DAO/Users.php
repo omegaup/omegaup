@@ -136,6 +136,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
         $user['birth_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
             $user['birth_date']
         );
+
         return $user;
     }
 
