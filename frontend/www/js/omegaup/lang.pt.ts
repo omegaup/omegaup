@@ -1334,6 +1334,7 @@ const translations: { [key: string]: string; } = {
   userEditNone: "Nenhum",
   userEditPostSecondary: "P\u00f3s-secund\u00e1rio",
   userEditPrePrimary: "Pr\u00e9-prim\u00e1rio",
+  userEditPreferences: "Prefer\u00eancias",
   userEditPreferredProgrammingLanguage: "Linguagem de programa\u00e7\u00e3o preferida",
   userEditPrimary: "Prim\u00e1ria",
   userEditPrivateProfile: "Gostaria de esconder os detalhes do perfil de outros?",

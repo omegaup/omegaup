@@ -1334,6 +1334,7 @@ const translations: { [key: string]: string; } = {
   userEditNone: "None",
   userEditPostSecondary: "Career / technical institution",
   userEditPrePrimary: "Pre-primary",
+  userEditPreferences: "Preferences",
   userEditPreferredProgrammingLanguage: "Preferred programming language",
   userEditPrimary: "Elementary",
   userEditPrivateProfile: "Would you like to hide profile details from others?",
