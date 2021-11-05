@@ -64,7 +64,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
     }
     /**
      * @param int $user_id
-     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, scholar_degree: null|string, state: null|string, state_id: null|string, hide_problem_tags: bool, verified: bool|null}|null
+     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, locale: null|string, school: null|string, school_id: int|null, scholar_degree: null|string, state: null|string, state_id: null|string, hide_problem_tags: bool, verified: bool|null}|null
     */
     final public static function getExtendedProfileDataByPk(int $userId): ?array {
         $sql = 'SELECT
@@ -136,7 +136,9 @@ class Users extends \OmegaUp\DAO\Base\Users {
         $user['birth_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
             $user['birth_date']
         );
-
+        $user['graduation_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $user['graduation_date']
+        );
         return $user;
     }
 
