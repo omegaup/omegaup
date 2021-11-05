@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Test administrative tasks for support team
  */
@@ -9,8 +7,8 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
      * Basic test for users with support role
      */
     public function testUserHasSupportRole() {
-        ['user' => $supportUser, 'identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
-        ['user' => $mentorUser, 'identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
+        ['identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
+        ['identity' => $mentorIdentity] = \OmegaUp\Test\Factories\User::createMentorIdentity();
 
         // Asserting that user belongs to the support group
         $this->assertTrue(
@@ -38,7 +36,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Creates a user
         $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams([
                 'email' => $email,
                 'verify' => false,
@@ -72,6 +70,60 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals(1, $response['verified']);
+    }
+
+    public function testVerifyUserViaUrl() {
+        // Creates a user
+        $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
+        \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'email' => $email,
+                'verify' => false,
+            ])
+        );
+
+        $user = \OmegaUp\DAO\Users::findByEmail($email);
+        $this->assertFalse($user->verified);
+
+        $payload = \OmegaUp\Controllers\User::getLoginDetailsViaVerifyEmailForTypeScript(
+            new \OmegaUp\Request([
+                'id' => $user->verification_id,
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertArrayHasKey('verifyEmailSuccessfully', $payload);
+        $this->assertArrayNotHasKey('statusError', $payload);
+
+        $user = \OmegaUp\DAO\Users::findByEmail($email);
+
+        $this->assertTrue($user->verified);
+    }
+
+    public function testVerifyUserViaUrlWithWrongVerficationId() {
+        // Creates a user
+        $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
+        \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'email' => $email,
+                'verify' => false,
+            ])
+        );
+
+        $user = \OmegaUp\DAO\Users::findByEmail($email);
+        $this->assertFalse($user->verified);
+
+        $payload = \OmegaUp\Controllers\User::getLoginDetailsViaVerifyEmailForTypeScript(
+            new \OmegaUp\Request([
+                'id' => 'wrong_verification_id',
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertArrayNotHasKey('verifyEmailSuccessfully', $payload);
+        $this->assertArrayHasKey('statusError', $payload);
+
+        $user = \OmegaUp\DAO\Users::findByEmail($email);
+
+        $this->assertFalse($user->verified);
     }
 
     public function testUpdateMainEmailAsASupportTeamMember() {
@@ -141,7 +193,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
         ] = \OmegaUp\Test\Factories\User::createUser();
 
         // Creates a common user
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['email' => 'original@email.com']
             )
@@ -168,11 +220,11 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUserGeneratesValidToken() {
         // Support team member will verify $user
-        ['user' => $supportUser, 'identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
+        ['identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
 
         // Creates a user
         $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['email' => $email]
             )
@@ -220,11 +272,11 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUserGeneratesExpiredToken() {
         // Support team member will verify $user
-        ['user' => $supportUser, 'identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
+        ['identity' => $supportIdentity] = \OmegaUp\Test\Factories\User::createSupportUser();
 
         // Creates a user
         $email = \OmegaUp\Test\Utils::createRandomString() . '@mail.com';
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        ['user' => $user] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['email' => $email]
             )
