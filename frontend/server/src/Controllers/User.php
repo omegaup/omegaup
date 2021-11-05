@@ -39,6 +39,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserRole=array{name: string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
  * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
+ * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -3022,6 +3023,58 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         return $response;
+    }
+
+    /**
+     * Gets the list of roles assigned to logged user
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{entrypoint: string, smartyProperties: array{payload: UserRolesPayload, title: \OmegaUp\TranslationString}}
+     */
+    public static function getUserRolesForTypeScript(\OmegaUp\Request $r) {
+        if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        $r->ensureMainUserIdentity();
+
+        $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles(
+            $r->user->user_id
+        );
+        $roles = \OmegaUp\DAO\Roles::getAll();
+        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups(
+            $r->identity->identity_id
+        );
+        $groups = \OmegaUp\DAO\Groups::searchByName('omegaup:');
+        $userSystemRoles = [];
+        $userSystemGroups = [];
+        foreach ($roles as $key => $role) {
+            $userSystemRoles[$key] = [
+                'name' => strval($role->name),
+                'value' => in_array($role->name, $systemRoles),
+            ];
+        }
+        foreach ($groups as $key => $group) {
+            $userSystemGroups[$key] = [
+                'name' => strval($group->name),
+                'value' => in_array($group->name, $systemGroups),
+            ];
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'userSystemRoles' => $userSystemRoles,
+                    'userSystemGroups' => $userSystemGroups,
+                    'username' => $r->identity->username,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleUpdatePrivileges'
+                )
+            ],
+            'entrypoint' => 'admin_roles',
+        ];
     }
 
     private static function validateAddRemoveRole(
