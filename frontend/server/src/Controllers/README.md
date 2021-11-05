@@ -1068,14 +1068,14 @@ Returns a detailed report of the contest
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                          |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `finish_time` | `Date`                                                                                                                                                                                                                                                                                                                                                                        |
-| `problems`    | `{ alias: string; order: number; }[]`                                                                                                                                                                                                                                                                                                                                         |
-| `ranking`     | `{ country: string; is_invited: boolean; name: string; place?: number; problems: { alias: string; penalty: number; percent: number; place?: number; points: number; run_details?: { cases?: types.CaseResult[]; details: { groups: { cases: { meta: types.RunMetadata; }[]; }[]; }; }; runs: number; }[]; total: { penalty: number; points: number; }; username: string; }[]` |
-| `start_time`  | `Date`                                                                                                                                                                                                                                                                                                                                                                        |
-| `time`        | `Date`                                                                                                                                                                                                                                                                                                                                                                        |
-| `title`       | `string`                                                                                                                                                                                                                                                                                                                                                                      |
+| Name          | Type                                  |
+| ------------- | ------------------------------------- |
+| `finish_time` | `Date`                                |
+| `problems`    | `{ alias: string; order: number; }[]` |
+| `ranking`     | `types.ContestReport[]`               |
+| `start_time`  | `Date`                                |
+| `time`        | `Date`                                |
+| `title`       | `string`                              |
 
 ## `/api/contest/requests/`
 
@@ -1210,9 +1210,9 @@ Gets the accomulative scoreboard for an array of contests
 
 ### Returns
 
-| Name      | Type                                                                                                                                                     |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ranking` | `{ contests: { [key: string]: { penalty: number; points: number; }; }; name: string; total: { penalty: number; points: number; }; username: string; }[]` |
+| Name      | Type                            |
+| --------- | ------------------------------- |
+| `ranking` | `types.MergedScoreboardEntry[]` |
 
 ## `/api/contest/searchUsers/`
 
@@ -1284,32 +1284,32 @@ Update a Contest
 
 ### Parameters
 
-| Name                                         | Type                      | Description |
-| -------------------------------------------- | ------------------------- | ----------- |
-| `contest_alias`                              | `string`                  |             |
-| `finish_time`                                | `int`                     |             |
-| `submissions_gap`                            | `int`                     |             |
-| `window_length`                              | `int`                     |             |
-| `admission_mode`                             | `null\|string`            |             |
-| `alias`                                      | `null\|string`            |             |
-| `contest_for_teams`                          | `bool\|null`              |             |
-| `default_show_all_contestants_in_scoreboard` | `bool\|null`              |             |
-| `description`                                | `null\|string`            |             |
-| `feedback`                                   | `mixed`                   |             |
-| `languages`                                  | `mixed`                   |             |
-| `needs_basic_information`                    | `bool\|null`              |             |
-| `partial_score`                              | `bool\|null`              |             |
-| `penalty`                                    | `int\|null`               |             |
-| `penalty_calc_policy`                        | `mixed`                   |             |
-| `penalty_type`                               | `mixed`                   |             |
-| `points_decay_factor`                        | `float\|null`             |             |
-| `problems`                                   | `null\|string`            |             |
-| `requests_user_information`                  | `mixed`                   |             |
-| `scoreboard`                                 | `float\|null`             |             |
-| `show_scoreboard_after`                      | `bool\|null`              |             |
-| `start_time`                                 | `OmegaUp\Timestamp\|null` |             |
-| `teams_group_alias`                          | `null\|string`            |             |
-| `title`                                      | `null\|string`            |             |
+| Name                                         | Type                                 | Description |
+| -------------------------------------------- | ------------------------------------ | ----------- |
+| `contest_alias`                              | `string`                             |             |
+| `finish_time`                                | `int`                                |             |
+| `submissions_gap`                            | `int`                                |             |
+| `window_length`                              | `int`                                |             |
+| `admission_mode`                             | `null\|string`                       |             |
+| `alias`                                      | `null\|string`                       |             |
+| `contest_for_teams`                          | `bool\|null`                         |             |
+| `default_show_all_contestants_in_scoreboard` | `bool\|null`                         |             |
+| `description`                                | `null\|string`                       |             |
+| `feedback`                                   | `mixed`                              |             |
+| `languages`                                  | `mixed`                              |             |
+| `needs_basic_information`                    | `bool\|null`                         |             |
+| `partial_score`                              | `bool\|null`                         |             |
+| `penalty`                                    | `int\|null`                          |             |
+| `penalty_calc_policy`                        | `mixed`                              |             |
+| `penalty_type`                               | `mixed`                              |             |
+| `points_decay_factor`                        | `float\|null`                        |             |
+| `problems`                                   | `null\|string`                       |             |
+| `requests_user_information`                  | `'no'\|'optional'\|'required'\|null` |             |
+| `scoreboard`                                 | `float\|null`                        |             |
+| `show_scoreboard_after`                      | `bool\|null`                         |             |
+| `start_time`                                 | `OmegaUp\Timestamp\|null`            |             |
+| `teams_group_alias`                          | `null\|string`                       |             |
+| `title`                                      | `null\|string`                       |             |
 
 ### Returns
 
@@ -2362,11 +2362,9 @@ the given scoreboard_alias
 
 ### Returns
 
-| Name         | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `contests`   | `{ acl_id: number; admission_mode: string; alias: string; contest_id: number; description: string; feedback: string; finish_time: Date; languages: string; last_updated: number; only_ac?: boolean; partial_score: boolean; penalty: string; penalty_calc_policy: string; points_decay_factor: number; problemset_id: number; recommended: boolean; rerun_id: number; scoreboard: number; show_scoreboard_after: boolean; start_time: Date; submissions_gap: number; title: string; urgent: boolean; weight?: number; window_length: number; }[]` |
-| `ranking`    | `{ contests: { [key: string]: { penalty: number; points: number; }; }; name: string; total: { penalty: number; points: number; }; username: string; }[]`                                                                                                                                                                                                                                                                                                                                                                                          |
-| `scoreboard` | `{ alias: string; create_time: number; description: string; group_id: number; group_scoreboard_id: number; name: string; }`                                                                                                                                                                                                                                                                                                                                                                                                                       |
+```typescript
+types.GroupScoreboardDetails;
+```
 
 ## `/api/groupScoreboard/list/`
 

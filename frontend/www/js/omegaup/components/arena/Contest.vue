@@ -1,8 +1,7 @@
 <template>
   <omegaup-arena
     :active-tab="activeTab"
-    :contest-title="ui.contestTitle(contest)"
-    :is-admin="contestAdmin"
+    :title="ui.contestTitle(contest)"
     :clarifications="currentClarifications"
     :should-show-runs="contestAdmin"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
@@ -75,6 +74,9 @@
               "
               @submit-run="onRunSubmitted"
               @show-run="onRunDetails"
+              @new-submission-popup-displayed="
+                $emit('new-submission-popup-displayed')
+              "
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -91,8 +93,15 @@
         :last-updated="lastUpdated"
         :digits-after-decimal-point="digitsAfterDecimalPoint"
         :show-penalty="showPenalty"
-        :show-invited-users-filter="true"
-      ></omegaup-arena-scoreboard>
+        :show-invited-users-filter="
+          contest.admission_mode !== AdmissionMode.Private
+        "
+        :show-all-contestants="
+          contest.default_show_all_contestants_in_scoreboard
+        "
+      >
+        <template #scoreboard-header><div></div></template>
+      </omegaup-arena-scoreboard>
     </template>
     <template #arena-runs>
       <omegaup-arena-runs
@@ -186,7 +195,7 @@ import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
 import arena_NavbarMiniranking from './NavbarMiniranking.vue';
-import arena_Runs from './Runsv2.vue';
+import arena_Runs from './Runs.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import arena_Summary from './Summary.vue';
 import arena_Scoreboard from './Scoreboard.vue';
@@ -197,6 +206,7 @@ import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { omegaup } from '../../omegaup';
 import { ContestClarificationType } from '../../arena/clarifications';
 import { SocketStatus } from '../../arena/events_socket';
+import { AdmissionMode } from '../common/Publish.vue';
 import { SubmissionRequest } from '../../arena/submissions';
 
 @Component({
@@ -240,15 +250,18 @@ export default class ArenaContest extends Vue {
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
   @Prop({ default: true }) showPenalty!: boolean;
   @Prop({ default: SocketStatus.Waiting }) socketStatus!: SocketStatus;
-  @Prop({ default: true }) socketConnected!: boolean;
   @Prop({ default: () => [] }) runs!: types.Run[];
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop() searchResultUsers!: types.ListItem[];
   @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
+  @Prop({ default: false }) lockdown!: boolean;
+  @Prop({ default: false })
+  shouldShowFirstAssociatedIdentityRunWarning!: boolean;
 
   T = T;
   ui = ui;
+  AdmissionMode = AdmissionMode;
   PopupDisplayed = PopupDisplayed;
   ContestClarificationType = ContestClarificationType;
   currentClarifications = this.clarifications;
@@ -292,6 +305,31 @@ export default class ArenaContest extends Vue {
 
   get urlPractice(): string {
     return `/arena/${this.contest.alias}/practice/`;
+  }
+
+  created() {
+    if (this.lockdown) {
+      window.addEventListener('beforeunload', this.beforeWindowUnload);
+    }
+  }
+
+  beforeDestroy() {
+    if (this.lockdown) {
+      window.removeEventListener('beforeunload', this.beforeWindowUnload);
+    }
+  }
+
+  confirmLeave() {
+    return window.confirm(T.lockdownMessageWarning);
+  }
+
+  beforeWindowUnload(e: BeforeUnloadEvent) {
+    if (!this.confirmLeave()) {
+      // Cancel the event
+      e.preventDefault();
+      // Chrome requires returnValue to be set
+      e.returnValue = true;
+    }
   }
 
   onNavigateToProblem(problem: types.NavbarProblemsetProblem) {

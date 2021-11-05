@@ -15,61 +15,6 @@
 	</div>
 
 	{block name="content"}
-	<div class="col-md-10 no-right-padding">
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h2 class="panel-title">{if $profile.rankinfo.rank > 0}#{$profile.rankinfo.rank} - {/if}{$profile.username} {if isset($profile.country_id)} <img src="/media/flags/{$profile.country_id|lower}.png" width="16" height="11" title="{$profile.country_id}"/> {/if}</h2>
-			</div>
-{include file='profile.basicinfo.tpl' inline}
-		</div>
-
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h2 class="panel-title">{#profileContests#} <span class="badge" id="contests-total">0</span></h2>
-			</div>
-			<table class="table table-striped" id="contest-results">
-				<thead>
-					<tr>
-						<th>{#profileContestsTableContest#}</th>
-						<th>{#profileContestsTablePlace#}</th>
-					</tr>
-				</thead>
-				<tbody>
-
-				</tbody>
-			</table>
-			<div id="contest-results-wait"><img src="/media/wait.gif" /></div>
-		</div>
-
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h2 class="panel-title">{#profileSolvedProblems#} <span class="badge" id="problems-solved-total">0</span></h2>
-			</div>
-			<table class="table table-striped" id="problems-solved">
-				<tbody>
-				</tbody>
-			</table>
-			<div id="problems-solved-wait"><img src="/media/wait.gif" /></div>
-		</div>
-
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h2 class="panel-title">{#profileUnsolvedProblems#} <span class="badge" id="problems-unsolved-total">0</span></h2>
-			</div>
-			<table class="table table-striped" id="problems-unsolved">
-				<tbody>
-				</tbody>
-			</table>
-			<div id="problems-unsolved-wait"><img src="/media/wait.gif" /></div>
-		</div>
-
-		<div class="panel panel-default no-bottom-margin">
-			<div class="panel-heading">
-				<h2 class="panel-title">{#profileStatistics#}</h2>
-			</div>
-		</div>
-
-	</div>
 	{/block}
 
 </div>

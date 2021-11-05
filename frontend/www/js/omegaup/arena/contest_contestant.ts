@@ -57,7 +57,7 @@ OmegaUp.on('ready', async () => {
       problems: payload.problems,
       location: window.location.hash,
     }));
-  } catch (e) {
+  } catch (e: any) {
     ui.apiError(e);
   }
   trackClarifications(payload.clarifications);
@@ -118,10 +118,13 @@ OmegaUp.on('ready', async () => {
       searchResultUsers: [] as types.ListItem[],
       nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
       runDetailsData: runDetails,
+      shouldShowFirstAssociatedIdentityRunWarning:
+        payload.shouldShowFirstAssociatedIdentityRunWarning,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
         props: {
+          lockdown: commonPayload.omegaUpLockDown,
           contest: payload.contest,
           contestAdmin,
           problems: this.problems,
@@ -146,6 +149,8 @@ OmegaUp.on('ready', async () => {
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          shouldShowFirstAssociatedIdentityRunWarning: this
+            .shouldShowFirstAssociatedIdentityRunWarning,
         },
         on: {
           'navigate-to-problem': ({
@@ -325,6 +330,12 @@ OmegaUp.on('ready', async () => {
               'resetHash',
               `#${selectedTab}/${alias}`,
             );
+          },
+          'new-submission-popup-displayed': () => {
+            if (this.shouldShowFirstAssociatedIdentityRunWarning) {
+              this.shouldShowFirstAssociatedIdentityRunWarning = false;
+              ui.warning(T.firstSumbissionWithIdentity);
+            }
           },
         },
       });

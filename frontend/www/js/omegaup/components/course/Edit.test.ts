@@ -31,6 +31,7 @@ describe('Edit.vue', () => {
                 scoreboard_url: 'sb_url',
                 scoreboard_url_admin: 'sc_url_admin',
                 assignment_type: 'test',
+                problemCount: 0,
               },
             ],
             clarifications: [],

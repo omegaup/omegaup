@@ -31,6 +31,7 @@ fi
 ! read -r -d '' config_contents <<EOF
 <?php
 define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
+define('OMEGAUP_CACHE_IMPLEMENTATION', 'redis');
 define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
 define('OMEGAUP_DB_HOST', 'mysql');
 define('OMEGAUP_DB_NAME', 'omegaup');

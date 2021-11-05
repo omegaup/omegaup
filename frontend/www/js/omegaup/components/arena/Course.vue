@@ -1,7 +1,7 @@
 <template>
   <omegaup-arena
     :active-tab="activeTab"
-    :contest-title="currentAssignment.name"
+    :title="currentAssignment.name"
     :should-show-runs="isAdmin"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
   >
@@ -19,7 +19,7 @@
       ></omegaup-countdown>
     </template>
     <template #arena-problems>
-      <div data-contest-practice>
+      <div data-course>
         <div class="tab navleft">
           <div class="navbar">
             <omegaup-arena-navbar-problems
@@ -92,6 +92,9 @@
                     isDismissed,
                   })
               "
+              @new-submission-popup-displayed="
+                $emit('new-submission-popup-displayed')
+              "
             >
               <template #quality-nomination-buttons>
                 <div></div>
@@ -118,7 +121,9 @@
         :problems="scoreboard.problems"
         :ranking="scoreboard.ranking"
         :last-updated="scoreboard.time"
-      ></omegaup-arena-scoreboard>
+      >
+        <template #scoreboard-header><div></div></template>
+      </omegaup-arena-scoreboard>
     </template>
     <template #arena-runs>
       <omegaup-arena-runs
@@ -200,7 +205,7 @@ import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarAssignments from './NavbarAssignments.vue';
 import arena_NavbarProblems from './NavbarProblems.vue';
-import arena_Runs from './Runsv2.vue';
+import arena_Runs from './Runs.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import arena_Scoreboard from './Scoreboard.vue';
@@ -246,6 +251,8 @@ export default class ArenaCourse extends Vue {
   @Prop({ default: null }) allRuns!: null | types.Run[];
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
+  @Prop({ default: false })
+  shouldShowFirstAssociatedIdentityRunWarning!: boolean;
 
   T = T;
   PopupDisplayed = PopupDisplayed;

@@ -4,6 +4,7 @@ import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
+import T from '../lang';
 import arena_ContestPractice from '../components/arena/ContestPractice.vue';
 import {
   showSubmission,
@@ -45,7 +46,7 @@ OmegaUp.on('ready', async () => {
       problems: payload.problems,
       location: window.location.hash,
     }));
-  } catch (e) {
+  } catch (e: any) {
     ui.apiError(e);
   }
   trackClarifications(payload.clarifications);
@@ -63,6 +64,8 @@ OmegaUp.on('ready', async () => {
       problemAlias,
       nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
       runDetailsData: runDetails,
+      shouldShowFirstAssociatedIdentityRunWarning:
+        payload.shouldShowFirstAssociatedIdentityRunWarning,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
@@ -82,6 +85,8 @@ OmegaUp.on('ready', async () => {
           runs: myRunsStore.state.runs,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           runDetailsData: this.runDetailsData,
+          shouldShowFirstAssociatedIdentityRunWarning: this
+            .shouldShowFirstAssociatedIdentityRunWarning,
         },
         on: {
           'navigate-to-problem': ({
@@ -198,6 +203,12 @@ OmegaUp.on('ready', async () => {
               'resetHash',
               `#${selectedTab}/${alias}`,
             );
+          },
+          'new-submission-popup-displayed': () => {
+            if (this.shouldShowFirstAssociatedIdentityRunWarning) {
+              this.shouldShowFirstAssociatedIdentityRunWarning = false;
+              ui.warning(T.firstSumbissionWithIdentity);
+            }
           },
         },
       });

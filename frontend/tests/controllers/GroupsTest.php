@@ -652,4 +652,104 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertEquals(700, $response['ranking'][0]['total']['points']);
     }
+
+    /**
+     * apiDetails with only AC and Weights
+     */
+    public function testScoreboardDetailsForTypescript() {
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
+        $scoreboardData = \OmegaUp\Test\Factories\Groups::createGroupScoreboard(
+            $groupData
+        );
+        $contestsData = [];
+
+        // Create contestants to submit runs
+        ['identity' => $identityInGroup] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $groupData,
+            $identityInGroup
+        );
+        ['identity' => $identityInGroupNoAc] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Groups::addUserToGroup(
+            $groupData,
+            $identityInGroupNoAc
+        );
+
+        $numberOfContests = 5;
+        // Create five contests
+        foreach (range(0, $numberOfContests - 1) as $id) {
+            $contestsData[] = \OmegaUp\Test\Factories\Contest::createContest();
+            \OmegaUp\Test\Factories\Contest::addAdminUser(
+                $contestsData[$id],
+                $groupData['owner']
+            );
+            \OmegaUp\Test\Factories\Groups::addContestToScoreboard(
+                $contestsData[$id],
+                $scoreboardData,
+                $groupData,
+                1 /*onlyAC*/,
+                ($id === 0 ? 3 : 1)
+            );
+
+            // Create a problem to solve
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+            \OmegaUp\Test\Factories\Contest::addProblemToContest(
+                $problemData,
+                $contestsData[$id]
+            );
+
+            // Submit runs
+            $run1 = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestsData[$id],
+                $identityInGroup
+            );
+            $run2 = \OmegaUp\Test\Factories\Run::createRun(
+                $problemData,
+                $contestsData[$id],
+                $identityInGroupNoAc
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run1);
+            \OmegaUp\Test\Factories\Run::gradeRun($run2, 0.5, 'PA');
+        }
+
+        $login = self::login($groupData['owner']);
+        $response = \OmegaUp\Controllers\GroupScoreboard::getGroupScoreboardDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'group' => $groupData['request']['alias'],
+                'scoreboard' => $scoreboardData['request']['alias'],
+            ])
+        )['smartyProperties']['payload']['details'];
+
+        $this->assertCount($numberOfContests, $response['contests']);
+        $this->assertEquals(
+            $scoreboardData['request']['alias'],
+            $response['scoreboard']['alias']
+        );
+
+        // 2 users in the merged scoreboard is expected
+        $this->assertCount(2, $response['ranking']);
+        $this->assertCount(
+            $numberOfContests,
+            $response['ranking'][0]['contests']
+        );
+
+        // Only AC is expected
+        $this->assertEquals(
+            100,
+            $response['ranking'][0]['contests'][$contestsData[1]['request']['alias']]['points']
+        );
+        $this->assertEquals(
+            0,
+            $response['ranking'][1]['contests'][$contestsData[1]['request']['alias']]['points']
+        );
+
+        // Weight x3 in the first contest for 1st user
+        $this->assertEquals(
+            300,
+            $response['ranking'][0]['contests'][$contestsData[0]['request']['alias']]['points']
+        );
+        $this->assertEquals(700, $response['ranking'][0]['total']['points']);
+    }
 }

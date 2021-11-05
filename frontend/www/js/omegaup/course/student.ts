@@ -9,16 +9,9 @@ import Vue from 'vue';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.StudentProgressPayload();
 
-  let initialStudent: types.StudentProgress | null = null;
-  if (payload.students && payload.students.length > 0) {
-    initialStudent = payload.students[0];
-    for (const student of payload.students) {
-      if (student.username == payload.student) {
-        initialStudent = student;
-        break;
-      }
-    }
-  }
+  const student = payload.students.find(
+    (student) => payload.student === student.username,
+  );
 
   const viewStudent = new Vue({
     el: '#main-container',
@@ -27,6 +20,7 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       problems: [] as types.CourseProblem[],
+      problem: null as null | types.CourseProblem,
     }),
     methods: {
       refreshStudentProgress: (
@@ -50,8 +44,9 @@ OmegaUp.on('ready', () => {
         props: {
           assignments: payload.course.assignments,
           course: payload.course,
-          initialStudent: initialStudent,
+          student,
           problems: this.problems,
+          problem: this.problem,
           students: payload.students,
         },
         on: {
@@ -96,11 +91,17 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.error);
           },
-          update: (student: types.StudentProgress, assignmentAlias: string) => {
-            viewStudent.refreshStudentProgress(
-              student.username,
-              assignmentAlias,
-            );
+          update: ({
+            student,
+            assignmentAlias,
+          }: {
+            student: string;
+            assignmentAlias: string;
+          }) => {
+            viewStudent.refreshStudentProgress(student, assignmentAlias);
+          },
+          'push-state': (student: string, title: string, url: string) => {
+            window.history.pushState(student, title, url);
           },
         },
       });
