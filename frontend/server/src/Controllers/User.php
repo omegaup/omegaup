@@ -4253,7 +4253,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     'email' => \OmegaUp\DAO\Emails::getMainMailByUserId(
                         $targetIdentity->user_id
                     ),
-                    'profile' => self::getProfileDetails(
+                    'profile' => self::getUserProfile(
                         $r->identity,
                         $targetIdentity
                     ),
