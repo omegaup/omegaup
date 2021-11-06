@@ -18,7 +18,7 @@
               <form :action="queryURL" method="GET">
                 <div class="input-group">
                   <input
-                    v-model="query"
+                    v-model="activeQuery"
                     class="form-control"
                     type="text"
                     name="query"
@@ -89,9 +89,11 @@ export enum ContestTab {
 export default class ArenaContestList extends Vue {
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
+  //@Prop() section!: ContestTab;
   T = T;
   ContestTab = ContestTab;
   activeTab: ContestTab = this.section;
+  activeQuery: string = this.query;
 
   titleLinkClass(tab: ContestTab) {
     if (this.activeTab === tab) {
