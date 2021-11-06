@@ -65,7 +65,7 @@ jobs:
 
           git clone --depth=1 https://omegaup-bot:${{ secrets.OMEGAUPBOT_RELEASE_TOKEN }}@github.com/omegaup/prod /tmp/prod
           TAG=${{ github.sha }}
-          (cd /tmp/prod/k8s/omegaup/overlays/sandbox &&
+          (cd /tmp/prod/k8s/omegaup/overlays/sandbox/frontend &&
            git config --local user.name "omegaup-bot" && \
            git config --local user.email "omegaup-bot@users.noreply.github.com" && \
            kustomize edit set image \
