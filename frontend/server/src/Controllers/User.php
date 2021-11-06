@@ -28,8 +28,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>}
- * @psalm-type UserProfileEditDetailsPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, programmingLanguages: array<string, string>, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
- * @psalm-type UserProfileDetailsPayload=array{privateProfile: bool, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
+ * @psalm-type UserProfileDetailsPayload=array{countries?: list<\OmegaUp\DAO\VO\Countries>, programmingLanguages?: array<string, string>, privateProfile: bool, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
  * @psalm-type ScoreboardRankingProblemDetailsGroup=array{cases: list<array{meta: RunMetadata}>}
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
@@ -3958,7 +3957,21 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $username
      */
     public static function getProfileDetailsForTypeScript(\OmegaUp\Request $r) {
+        $username = $r->ensureOptionalString(
+            'username',
+            /*$required=*/false,
+            fn (string $username) => \OmegaUp\Validators::normalUsername(
+                $username
+            )
+        );
         self::authenticateOrAllowUnauthenticatedRequest($r);
+        // When $username is not provided we need to validate that user is logged in
+        // because we assume they want to edit their own profile
+        if (is_null($username)) {
+            $r->ensureIdentity();
+        } else {
+            $r->identity = null;
+        }
         $identity = self::resolveTargetIdentity($r);
         if (
             is_null($identity) ||
@@ -3970,11 +3983,8 @@ class User extends \OmegaUp\Controllers\Controller {
                 'username'
             );
         }
-        $user = null;
+        $user = $r->user;
         $ownedBadges = [];
-        if (!is_null($identity->user_id)) {
-            $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
-        }
         if (!is_null($user)) {
             $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges($user);
         }
@@ -3998,10 +4008,13 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         $response['smartyProperties']['payload'] = [
             'privateProfile' => false,
-            'profile' => self::getUserProfile(
-                $r->identity,
-                $identity
+            'profile' => self::getUserProfile($r->identity, $identity),
+            'countries' => \OmegaUp\DAO\Countries::getAll(
+                null,
+                100,
+                'name'
             ),
+            'programmingLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
             'extraProfileDetails' => [
                 'contests' => self::getContestStats($identity),
                 'solvedProblems' => self::getSolvedProblems(
@@ -4146,68 +4159,6 @@ class User extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => $smartyProperties,
             'template' => $template,
         ];
-    }
-
-    /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: UserProfileEditDetailsPayload, title: \OmegaUp\TranslationString}}
-     *
-     * @omegaup-request-param null|string $username
-     *
-     */
-    public static function getProfileEditDetailsForTypeScriptV2(\OmegaUp\Request $r) {
-        $r->ensureIdentity();
-        $identity = self::resolveTargetIdentity($r);
-        if (is_null($identity) || is_null($identity->identity_id)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterNotFound',
-                'Identity'
-            );
-        }
-        $response = [
-            'smartyProperties' => [
-                'title' => new \OmegaUp\TranslationString(
-                    'userEditEditProfile'
-                ),
-            ],
-            'entrypoint' => 'user_edit',
-        ];
-        $ownedBadges = [];
-        $user = $r->user;
-        if (!is_null($user)) {
-            $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
-                $user
-            );
-        }
-        $response['smartyProperties']['payload'] = [
-            'countries' => \OmegaUp\DAO\Countries::getAll(
-                null,
-                100,
-                'name'
-            ),
-            'programmingLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
-            'profile' => self::getUserProfile($r->identity, $identity),
-            'extraProfileDetails' => [
-                'contests' => self::getContestStats($identity),
-                'solvedProblems' => self::getSolvedProblems(
-                    $identity->identity_id
-                ),
-                'unsolvedProblems' => self::getUnsolvedProblems(
-                    $identity->identity_id
-                ),
-                'createdProblems' => self::getCreatedProblems(
-                    $identity->identity_id
-                ),
-                'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
-                    $identity->identity_id
-                ),
-                'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
-                'ownedBadges' => $ownedBadges,
-            ],
-        ];
-        if (is_null($r->identity->password)) {
-            $response['entrypoint'] = 'user_basic_edit';
-        }
-        return $response;
     }
 
     /**

@@ -1971,70 +1971,6 @@ export namespace types {
       );
     }
 
-    export function UserProfileEditDetailsPayload(
-      elementId: string = 'payload',
-    ): types.UserProfileEditDetailsPayload {
-      return ((x) => {
-        if (x.extraProfileDetails)
-          x.extraProfileDetails = ((x) => {
-            x.contests = ((x) => {
-              if (x instanceof Object) {
-                Object.keys(x).forEach(
-                  (y) =>
-                    (x[y] = ((x) => {
-                      x.data = ((x) => {
-                        x.finish_time = ((x: number) => new Date(x * 1000))(
-                          x.finish_time,
-                        );
-                        x.last_updated = ((x: number) => new Date(x * 1000))(
-                          x.last_updated,
-                        );
-                        x.start_time = ((x: number) => new Date(x * 1000))(
-                          x.start_time,
-                        );
-                        return x;
-                      })(x.data);
-                      return x;
-                    })(x[y])),
-                );
-              }
-              return x;
-            })(x.contests);
-            x.ownedBadges = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                if (x.assignation_time)
-                  x.assignation_time = ((x: number) => new Date(x * 1000))(
-                    x.assignation_time,
-                  );
-                if (x.first_assignation)
-                  x.first_assignation = ((x: number) => new Date(x * 1000))(
-                    x.first_assignation,
-                  );
-                return x;
-              });
-            })(x.ownedBadges);
-            return x;
-          })(x.extraProfileDetails);
-        x.profile = ((x) => {
-          if (x.birth_date)
-            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-          if (x.graduation_date)
-            x.graduation_date = ((x: number) => new Date(x * 1000))(
-              x.graduation_date,
-            );
-          return x;
-        })(x.profile);
-        return x;
-      })(
-        JSON.parse(
-          (document.getElementById(elementId) as HTMLElement).innerText,
-        ),
-      );
-    }
-
     export function UserRankTablePayload(
       elementId: string = 'payload',
     ): types.UserRankTablePayload {
@@ -4146,16 +4082,11 @@ export namespace types {
   }
 
   export interface UserProfileDetailsPayload {
+    countries?: dao.Countries[];
     extraProfileDetails?: types.ExtraProfileDetails;
     privateProfile: boolean;
     profile: types.UserProfileInfo;
-  }
-
-  export interface UserProfileEditDetailsPayload {
-    countries: dao.Countries[];
-    extraProfileDetails?: types.ExtraProfileDetails;
-    profile: types.UserProfileInfo;
-    programmingLanguages: { [key: string]: string };
+    programmingLanguages?: { [key: string]: string };
   }
 
   export interface UserProfileInfo {
