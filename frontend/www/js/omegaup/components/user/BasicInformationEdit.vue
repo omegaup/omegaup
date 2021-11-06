@@ -74,7 +74,7 @@
           :required="false"
         ></omegaup-datepicker>
       </div>
-      <div class="float-right mt-3">
+      <div class="mt-3">
         <button type="submit" class="btn btn-primary mr-2">
           {{ T.wordsSaveChanges }}
         </button>
