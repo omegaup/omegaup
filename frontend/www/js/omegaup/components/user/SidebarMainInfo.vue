@@ -99,7 +99,7 @@ export const urlMapping: { key: string; title: string; visible: boolean }[] = [
     'omegaup-user-username': user_Username,
   },
 })
-export default class UserNavbarMainInfo extends Vue {
+export default class UserSidebarMainInfo extends Vue {
   @Prop({ default: null }) data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop({ default: null }) tabSelected!: null | string;

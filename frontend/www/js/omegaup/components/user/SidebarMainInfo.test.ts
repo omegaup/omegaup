@@ -2,7 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import T from '../../lang';
 
-import user_NavbarMainInfo, { urlMapping } from './NavbarMainInfo.vue';
+import user_SidebarMainInfo, { urlMapping } from './SidebarMainInfo.vue';
 
 const profile: types.UserProfileInfo = {
   country: 'Mexico',
@@ -68,9 +68,9 @@ const rankingMapping: { classname: string; rank: string }[] = [
   },
 ];
 
-describe('NavbarMainInfo.vue', () => {
+describe('SidebarMainInfo.vue', () => {
   it('Should display visible buttons', () => {
-    const wrapper = shallowMount(user_NavbarMainInfo, {
+    const wrapper = shallowMount(user_SidebarMainInfo, {
       propsData: { profile, data },
     });
     for (const url of urlMapping.filter(
@@ -89,7 +89,7 @@ describe('NavbarMainInfo.vue', () => {
   });
 
   it('Should display number of solved problems', () => {
-    const wrapper = shallowMount(user_NavbarMainInfo, {
+    const wrapper = shallowMount(user_SidebarMainInfo, {
       propsData: { profile, data },
     });
     expect(wrapper.text()).toContain('3');
@@ -98,7 +98,7 @@ describe('NavbarMainInfo.vue', () => {
 
 describe.each(rankingMapping)(`A user:`, (rank) => {
   it(`whose classname is ${rank.classname} should have rank ${rank.rank}`, () => {
-    const wrapper = shallowMount(user_NavbarMainInfo, {
+    const wrapper = shallowMount(user_SidebarMainInfo, {
       propsData: {
         profile: { ...profile, ...{ classname: rank.classname } },
         data,
