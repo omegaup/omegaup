@@ -1,0 +1,118 @@
+<template>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{{ T.profileManageSchools }}</h3>
+    </div>
+    <form role="form" class="card-body" @submit.prevent="onUpdateUserSchools">
+      <div class="form-group">
+        <label>{{ T.profileSchool }}</label>
+        <omegaup-autocomplete
+          v-model="school"
+          class="form-control"
+          :init="
+            (el) =>
+              typeahead.schoolTypeahead(el, (event, val) => {
+                school = val.value;
+                schoolId = val.id;
+              })
+          "
+        ></omegaup-autocomplete>
+        <input v-model="schoolId" type="hidden" />
+      </div>
+      <div class="form-group">
+        <label>{{ T.userEditSchoolGrade }}</label>
+        <select v-model="scholarDegree" class="form-control">
+          <option value="none">{{ T.userEditNone }}</option>
+          <option value="early_childhood">
+            {{ T.userEditEarlyChildhood }}
+          </option>
+          <option value="pre_primary">{{ T.userEditPrePrimary }}</option>
+          <option value="primary">{{ T.userEditPrimary }}</option>
+          <option value="lower_secondary">
+            {{ T.userEditLowerSecondary }}
+          </option>
+          <option value="upper_secondary">
+            {{ T.userEditUpperSecondary }}
+          </option>
+          <option value="post_secondary">{{ T.userEditPostSecondary }}</option>
+          <option value="tertiary">{{ T.userEditTertiary }}</option>
+          <option value="bachelors">{{ T.userEditBachelors }}</option>
+          <option value="master">{{ T.userEditMaster }}</option>
+          <option value="doctorate">{{ T.userEditDoctorate }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>{{ T.profileManageSchoolsStillInCourse }}</label>
+        <omegaup-radio-switch
+          :value.sync="schoolInCourse"
+          :selected-value="schoolInCourse"
+        ></omegaup-radio-switch>
+      </div>
+      <div class="form-group">
+        <label>{{ T.userEditGraduationDate }}</label>
+        <omegaup-datepicker
+          v-model="graduationDate"
+          :required="false"
+          :enabled="!schoolInCourse"
+        ></omegaup-datepicker>
+      </div>
+      <div class="mt-3">
+        <button type="submit" class="btn btn-primary mr-2">
+          {{ T.wordsSaveChanges }}
+        </button>
+        <a href="/profile" class="btn btn-cancel">{{ T.wordsCancel }}</a>
+      </div>
+    </form>
+  </div>
+</template>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { types } from '../../api_types';
+import T from '../../lang';
+import * as typeahead from '../../typeahead';
+import * as time from '../../time';
+import Autocomplete from '../Autocomplete.vue';
+import DatePicker from '../DatePicker.vue';
+import OmegaupRadioSwitch from '../RadioSwitch.vue';
+
+@Component({
+  components: {
+    'omegaup-datepicker': DatePicker,
+    'omegaup-autocomplete': Autocomplete,
+    'omegaup-radio-switch': OmegaupRadioSwitch,
+  },
+})
+export default class UserManageSchools extends Vue {
+  @Prop() profile!: types.UserProfileInfo;
+
+  T = T;
+  typeahead = typeahead;
+  graduationDate = this.profile.graduation_date
+    ? time.convertLocalDateToGMTDate(this.profile.graduation_date)
+    : new Date('');
+  school = this.profile.school;
+  schoolId = this.profile.school_id;
+  scholarDegree = this.profile.scholar_degree;
+  schoolInCourse = !this.profile.graduation_date;
+
+  get isSchoolSet(): boolean {
+    return true;
+  }
+
+  onUpdateUserSchools(): void {
+    this.$emit('update-user-schools', {
+      graduationDate: isNaN(this.graduationDate.getTime())
+        ? undefined
+        : this.graduationDate,
+      schoolId:
+        this.schoolId === this.profile.school_id &&
+        this.school !== this.profile.school
+          ? undefined
+          : this.schoolId,
+      schoolName: this.school,
+      scholarDegree: this.scholarDegree,
+    });
+  }
+}
+</script>

@@ -1096,6 +1096,8 @@ const translations: { [key: string]: string; } = {
   profileIdentitiesEmpty: "No identities",
   profileIdentityAdded: "Identity added succesfully",
   profileManageIdentities: "Manage identities",
+  profileManageSchools: "Manage schools",
+  profileManageSchoolsStillInCourse: "Still in course",
   profileName: "Name",
   profileOrganizedContests: "Organized contests",
   profilePersonalData: "Personal data",
