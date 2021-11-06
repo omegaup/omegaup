@@ -4192,7 +4192,7 @@ export namespace types {
     country_id?: string;
     email?: string;
     gender?: string;
-    graduation_date?: Date | string;
+    graduation_date?: Date;
     gravatar_92?: string;
     has_competitive_objective?: boolean;
     has_learning_objective?: boolean;
