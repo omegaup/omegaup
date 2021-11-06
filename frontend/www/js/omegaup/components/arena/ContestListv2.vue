@@ -15,7 +15,7 @@
         <div class="card-body">
           <div class="row">
             <div class="col-md-6">
-              <form :action="queryUrl" method="GET">
+              <form :action="queryURL" method="GET">
                 <div class="input-group">
                   <input
                     v-model="query"
@@ -88,13 +88,10 @@ export enum ContestTab {
 })
 export default class ArenaContestList extends Vue {
   @Prop() contests!: types.ContestList;
-  @Prop() initialQuery!: string;
+  @Prop() query!: string;
   T = T;
   ContestTab = ContestTab;
-  activeTab: ContestTab = window.location.hash
-    ? parseInt(window.location.hash.substr(1))
-    : ContestTab.Current;
-  query = this.initialQuery;
+  activeTab: ContestTab = this.section;
 
   titleLinkClass(tab: ContestTab) {
     if (this.activeTab === tab) {
@@ -104,8 +101,14 @@ export default class ArenaContestList extends Vue {
     }
   }
 
-  get queryUrl(): string {
+  get queryURL(): string {
     return `/arenav2/#${this.activeTab}`;
+  }
+
+  get section(): number {
+    return window.location.hash
+      ? parseInt(window.location.hash.substr(1))
+      : ContestTab.Current;
   }
 }
 </script>
