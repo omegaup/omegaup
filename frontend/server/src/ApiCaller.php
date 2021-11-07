@@ -81,7 +81,8 @@ class ApiCaller {
         $allowedHosts = [
             parse_url(OMEGAUP_URL, PHP_URL_HOST),
             OMEGAUP_LOCKDOWN_DOMAIN,
-        ] + OMEGAUP_CSRF_HOSTS;
+            ...OMEGAUP_CSRF_HOSTS,
+        ];
         if (!in_array($referrerHost, $allowedHosts, true)) {
             self::$log->error(
                 "CSRF attempt, referrer host '{$referrerHost}' not in " .
