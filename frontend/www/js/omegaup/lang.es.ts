@@ -754,6 +754,7 @@ const translations: { [key: string]: string; } = {
   parameterStringTooLong: "La longitud de la cadena no debe exceder %(max_length) caracteres",
   parameterStringTooShort: "La longitud de la cadena debe ser al menos %(min_length) caracteres",
   parameterUsernameInUse: "El nombre de usuario ya fue tomado",
+  passwordAddRequestSuccess: "Se ha agregado tu contrase\u00f1a.",
   passwordCopyToken: "Copiar token",
   passwordGenerateToken: "Generar token",
   passwordGenerateTokenDesc: "Da clic en el bot\u00f3n \"Generar token\" para crear el link",

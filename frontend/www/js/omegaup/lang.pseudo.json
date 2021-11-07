@@ -753,6 +753,7 @@
 	"parameterStringTooLong": "(Param373r i5 10ng3r 7han %(max_length) charac73r5.)",
 	"parameterStringTooShort": "(Param373r i5 5h0r73r 7han %(min_length) charac73r5.)",
 	"parameterUsernameInUse": "(U53rnam3 a1r3ady in u53.)",
+	"passwordAddRequestSuccess": "(Y0ur pa55w0rd ha5 b33n add3d.)",
 	"passwordCopyToken": "(C0py 70k3n)",
 	"passwordGenerateToken": "(G3n3ra73 70k3n)",
 	"passwordGenerateTokenDesc": "(C1ick 0n \"G3n3ra73 70k3n\" 70 cr3a73 1ink)",

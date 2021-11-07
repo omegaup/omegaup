@@ -4154,6 +4154,7 @@ export namespace types {
   export interface UserProfileEditDetailsPayload {
     countries: dao.Countries[];
     extraProfileDetails?: types.ExtraProfileDetails;
+    hasPassword: boolean;
     profile: types.UserProfileInfo;
     programmingLanguages: { [key: string]: string };
   }

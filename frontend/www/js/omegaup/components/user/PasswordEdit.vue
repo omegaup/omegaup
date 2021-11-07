@@ -1,17 +1,32 @@
 <template>
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">{{ T.userEditChangePassword }}</h3>
+      <h3 class="card-title">
+        <slot>{{ T.userEditChangePassword }}</slot>
+      </h3>
     </div>
     <div class="card-body">
       <form @submit.prevent="onUpdatePassword">
         <div class="form-group">
-          <label>{{ T.userEditChangePasswordOldPassword }}</label>
+          <label>
+            <slot name="firstInputLabel">{{
+              T.userEditChangePasswordOldPassword
+            }}</slot>
+          </label>
           <div>
             <input
+              v-if="newUsername === null"
               v-model="oldPassword"
               data-old-password
               type="password"
+              size="30"
+              required
+              class="form-control"
+            />
+            <input
+              v-else
+              v-model="newUsername"
+              data-username
               size="30"
               required
               class="form-control"
@@ -64,14 +79,15 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
-@Component({
-  components: {},
-})
+@Component({})
 export default class UserPasswordEdit extends Vue {
+  @Prop({ default: null }) username!: string | null;
+
   T = T;
+  newUsername = this.username;
   oldPassword = '';
   newPassword = '';
   newPassword2 = '';
@@ -87,9 +103,10 @@ export default class UserPasswordEdit extends Vue {
   get submitDisabled(): boolean {
     return (
       this.passwordMismatch ||
-      this.oldPassword.length === 0 ||
       this.newPassword.length === 0 ||
-      this.newPassword2.length === 0
+      this.newPassword2.length === 0 ||
+      (this.newUsername === null && this.oldPassword.length === 0) ||
+      this.newUsername?.trim().length === 0
     );
   }
 
@@ -97,9 +114,16 @@ export default class UserPasswordEdit extends Vue {
     if (this.passwordMismatch) {
       return;
     }
-    this.$emit('update-password', {
-      oldPassword: this.oldPassword,
-      newPassword: this.newPassword,
+    if (this.newUsername === null) {
+      this.$emit('update-password', {
+        oldPassword: this.oldPassword,
+        newPassword: this.newPassword,
+      });
+      return;
+    }
+    this.$emit('add-password', {
+      username: this.newUsername,
+      password: this.newPassword,
     });
   }
 }
