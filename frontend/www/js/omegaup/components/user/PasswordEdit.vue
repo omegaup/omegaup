@@ -1,81 +1,72 @@
 <template>
-  <div class="card">
-    <div class="card-header">
-      <h3 class="card-title">
-        <slot>{{ T.userEditChangePassword }}</slot>
-      </h3>
+  <form @submit.prevent="onUpdatePassword">
+    <div class="form-group">
+      <label>
+        <slot name="firstInputLabel">{{
+          T.userEditChangePasswordOldPassword
+        }}</slot>
+      </label>
+      <div>
+        <input
+          v-if="newUsername === null"
+          v-model="oldPassword"
+          data-old-password
+          type="password"
+          size="30"
+          required
+          class="form-control"
+        />
+        <input
+          v-else
+          v-model="newUsername"
+          data-username
+          size="30"
+          required
+          class="form-control"
+        />
+      </div>
     </div>
-    <div class="card-body">
-      <form @submit.prevent="onUpdatePassword">
-        <div class="form-group">
-          <label>
-            <slot name="firstInputLabel">{{
-              T.userEditChangePasswordOldPassword
-            }}</slot>
-          </label>
-          <div>
-            <input
-              v-if="newUsername === null"
-              v-model="oldPassword"
-              data-old-password
-              type="password"
-              size="30"
-              required
-              class="form-control"
-            />
-            <input
-              v-else
-              v-model="newUsername"
-              data-username
-              size="30"
-              required
-              class="form-control"
-            />
-          </div>
-        </div>
-        <div class="form-group">
-          <label>{{ T.userEditChangePasswordNewPassword }}</label>
-          <div>
-            <input
-              v-model="newPassword"
-              data-new-password
-              type="password"
-              size="30"
-              required
-              class="form-control"
-            />
-          </div>
-        </div>
-        <div class="form-group">
-          <label>{{ T.userEditChangePasswordRepeatNewPassword }}</label>
-          <div>
-            <input
-              v-model="newPassword2"
-              data-new-password2
-              type="password"
-              size="30"
-              required
-              class="form-control"
-              :class="invalidPasswordClass"
-            />
-            <div v-if="passwordMismatch" class="invalid-message">
-              {{ T.passwordMismatch }}
-            </div>
-          </div>
-        </div>
-        <div>
-          <button
-            type="submit"
-            class="btn btn-primary mr-2"
-            :disabled="submitDisabled"
-          >
-            {{ T.wordsSaveChanges }}
-          </button>
-          <a href="/profile/" class="btn btn-cancel">{{ T.wordsCancel }}</a>
-        </div>
-      </form>
+    <div class="form-group">
+      <label>{{ T.userEditChangePasswordNewPassword }}</label>
+      <div>
+        <input
+          v-model="newPassword"
+          data-new-password
+          type="password"
+          size="30"
+          required
+          class="form-control"
+        />
+      </div>
     </div>
-  </div>
+    <div class="form-group">
+      <label>{{ T.userEditChangePasswordRepeatNewPassword }}</label>
+      <div>
+        <input
+          v-model="newPassword2"
+          data-new-password2
+          type="password"
+          size="30"
+          required
+          class="form-control"
+          :class="invalidPasswordClass"
+        />
+        <div v-if="passwordMismatch" class="invalid-message">
+          {{ T.passwordMismatch }}
+        </div>
+      </div>
+    </div>
+    <div>
+      <button
+        type="submit"
+        class="btn btn-primary mr-2"
+        :disabled="submitDisabled"
+      >
+        {{ T.wordsSaveChanges }}
+      </button>
+      <a href="/profile/" class="btn btn-cancel">{{ T.wordsCancel }}</a>
+    </div>
+  </form>
 </template>
 
 <script lang="ts">
