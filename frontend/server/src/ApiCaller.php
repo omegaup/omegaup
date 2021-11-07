@@ -78,7 +78,7 @@ class ApiCaller {
         $allowedHosts = [
             parse_url(OMEGAUP_URL, PHP_URL_HOST),
             OMEGAUP_LOCKDOWN_DOMAIN,
-        ];
+        ] + OMEGAUP_CSRF_HOSTS;
         return !in_array($referrerHost, $allowedHosts, true);
     }
 
