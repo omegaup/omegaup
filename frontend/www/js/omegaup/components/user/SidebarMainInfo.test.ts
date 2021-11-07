@@ -2,7 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import T from '../../lang';
 
-import user_SidebarMainInfo, { urlMapping } from './SidebarMainInfo.vue';
+import user_SidebarMainInfo from './SidebarMainInfo.vue';
 
 const profile: types.UserProfileInfo = {
   country: 'Mexico',
@@ -57,6 +57,13 @@ const data: types.ExtraProfileDetails = {
   unsolvedProblems: [],
 };
 
+const urlMapping: { key: string; title: string; visible: boolean }[] = [
+  { key: 'manage-identities', title: T.profileManageIdentities, visible: true },
+  { key: 'change-password', title: T.userEditChangePassword, visible: true },
+  { key: 'add-password', title: T.userEditAddPassword, visible: false },
+  { key: 'change-email', title: T.userEditChangeEmail, visible: false },
+];
+
 const rankingMapping: { classname: string; rank: string }[] = [
   { classname: 'user-rank-beginner', rank: T.profileRankBeginner },
   { classname: 'user-rank-specialist', rank: T.profileRankSpecialist },
@@ -71,7 +78,7 @@ const rankingMapping: { classname: string; rank: string }[] = [
 describe('SidebarMainInfo.vue', () => {
   it('Should display visible buttons', () => {
     const wrapper = shallowMount(user_SidebarMainInfo, {
-      propsData: { profile, data },
+      propsData: { profile, data, urlMapping },
     });
     for (const url of urlMapping.filter(
       (url: { key: string; title: string; visible: boolean }) => url.visible,
@@ -90,7 +97,7 @@ describe('SidebarMainInfo.vue', () => {
 
   it('Should display number of solved problems', () => {
     const wrapper = shallowMount(user_SidebarMainInfo, {
-      propsData: { profile, data },
+      propsData: { profile, data, urlMapping },
     });
     expect(wrapper.text()).toContain('3');
   });
@@ -102,6 +109,7 @@ describe.each(rankingMapping)(`A user:`, (rank) => {
       propsData: {
         profile: { ...profile, ...{ classname: rank.classname } },
         data,
+        urlMapping,
       },
     });
     expect(wrapper.text()).toContain(rank.rank);

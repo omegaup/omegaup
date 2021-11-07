@@ -26,12 +26,12 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import user_NavbarMainInfo from './NavbarMainInfo.vue';
+import user_SidebarMainInfo from './SidebarMainInfo.vue';
 import { types } from '../../api_types';
 
 @Component({
   components: {
-    'omegaup-user-maininfo': user_NavbarMainInfo,
+    'omegaup-user-maininfo': user_SidebarMainInfo,
   },
 })
 export default class UserProfile extends Vue {

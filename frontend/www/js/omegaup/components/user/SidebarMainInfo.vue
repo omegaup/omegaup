@@ -82,17 +82,6 @@ import user_Username from './Username.vue';
 import { types } from '../../api_types';
 import { Problem } from '../../linkable_resource';
 
-export const urlMapping: { key: string; title: string; visible: boolean }[] = [
-  { key: 'see-profile', title: T.userEditSeeProfile, visible: true },
-  { key: 'edit-basic-information', title: T.profileEdit, visible: true },
-  { key: 'edit-preferences', title: T.userEditPreferences, visible: true },
-  { key: 'manage-schools', title: T.userEditManageSchools, visible: true },
-  { key: 'manage-identities', title: T.profileManageIdentities, visible: true },
-  { key: 'change-password', title: T.userEditChangePassword, visible: true },
-  { key: 'add-password', title: T.userEditAddPassword, visible: false },
-  { key: 'change-email', title: T.userEditChangeEmail, visible: false },
-];
-
 @Component({
   components: {
     'omegaup-countryflag': country_Flag,
@@ -103,9 +92,9 @@ export default class UserSidebarMainInfo extends Vue {
   @Prop({ default: null }) data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop({ default: null }) tabSelected!: null | string;
+  @Prop() urlMapping!: { key: string; title: string; visible: boolean }[];
 
   T = T;
-  urlMapping = urlMapping;
 
   get solvedProblems(): Problem[] {
     if (!this.data?.solvedProblems) return [];
