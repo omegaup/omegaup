@@ -39,6 +39,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserRole=array{name: string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
  * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
+ * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
  */
 class User extends \OmegaUp\Controllers\Controller {
@@ -4202,39 +4203,55 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param null|string $username
      *
-     * @return array{smartyProperties: array{STATUS_ERROR?: string, payload?: array{email: null|string}, profile?: UserProfileInfo}, template: string}
+     * @return array{entrypoint: string, smartyProperties: array{payload: EmailEditDetailsPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getEmailEditDetailsForTypeScript(\OmegaUp\Request $r) {
-        $currentSession = \OmegaUp\Controllers\Session::getCurrentSession();
+        $r->ensureMainUserIdentity();
 
-        try {
-            self::authenticateOrAllowUnauthenticatedRequest($r);
+        $targetIdentity = self::resolveTargetIdentity($r);
 
-            $identity = self::resolveTargetIdentity($r);
-            if (is_null($identity)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterNotFound',
-                    'Identity'
-                );
-            }
-            $smartyProperties = [
-                'payload' => [
-                    'email' => $currentSession['email'],
-                ],
-                'profile' => self::getUserProfile(
-                    $currentSession['identity'],
-                    $identity
-                ),
-            ];
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            \OmegaUp\ApiCaller::logException($e);
-            $smartyProperties = [
-                'STATUS_ERROR' => $e->getErrorMessage(),
-            ];
+        // Only sysadmin can change email for another user
+        if (
+            !is_null($targetIdentity)
+            && $targetIdentity->identity_id !== $r->identity->identity_id
+            && !\OmegaUp\Authorization::isSystemAdmin($r->identity)
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
         }
+
+        if (
+            is_null(
+                $targetIdentity
+            ) || is_null(
+                $targetIdentity->identity_id
+            ) || is_null(
+                $targetIdentity->user_id
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'Identity'
+            );
+        }
+
         return [
-            'smartyProperties' => $smartyProperties,
-            'template' => 'user.email.edit.tpl',
+            'smartyProperties' => [
+                'payload' => [
+                    'email' => \OmegaUp\DAO\Emails::getMainMailByUserId(
+                        $targetIdentity->user_id
+                    ),
+                    'profile' => self::getUserProfile(
+                        $r->identity,
+                        $targetIdentity
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleUsersEditEmail'
+                ),
+            ],
+            'entrypoint' => 'user_edit_email_form',
         ];
     }
 
