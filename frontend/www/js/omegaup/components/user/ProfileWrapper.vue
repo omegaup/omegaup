@@ -6,6 +6,7 @@
         <omegaup-user-maininfo
           :profile="profile"
           :data="data"
+          :url-mapping="urlMapping"
           :tab-selected.sync="currentTabSelected"
         >
         </omegaup-user-maininfo>
@@ -38,6 +39,11 @@ export default class UserProfile extends Vue {
   @Prop({ default: null }) data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop({ default: null }) tabSelected!: null | string;
+  @Prop({ default: () => [] }) urlMapping!: {
+    key: string;
+    title: string;
+    visible: boolean;
+  }[];
 
   currentTabSelected = this.tabSelected;
 

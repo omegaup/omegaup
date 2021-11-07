@@ -92,7 +92,11 @@ export default class UserSidebarMainInfo extends Vue {
   @Prop({ default: null }) data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop({ default: null }) tabSelected!: null | string;
-  @Prop() urlMapping!: { key: string; title: string; visible: boolean }[];
+  @Prop({ default: () => [] }) urlMapping!: {
+    key: string;
+    title: string;
+    visible: boolean;
+  }[];
 
   T = T;
 
