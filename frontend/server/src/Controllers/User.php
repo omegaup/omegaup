@@ -4200,7 +4200,6 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param null|string $username
      *
      * @return array{entrypoint: string, smartyProperties: array{payload: EmailEditDetailsPayload, title: \OmegaUp\TranslationString}}
