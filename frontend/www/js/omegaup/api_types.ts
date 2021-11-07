@@ -4117,6 +4117,7 @@ export namespace types {
   export interface UserProfileDetailsPayload {
     countries: dao.Countries[];
     extraProfileDetails?: types.ExtraProfileDetails;
+    identities: types.AssociatedIdentity[];
     profile: types.UserProfileInfo;
     programmingLanguages: { [key: string]: string };
     urlMapping: types.UrlProfile[];

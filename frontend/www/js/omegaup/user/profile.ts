@@ -2,6 +2,9 @@ import Vue from 'vue';
 
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
+import * as api from '../api';
+import * as ui from '../ui';
+import T from '../lang';
 
 // TODO: Import Profile.vue when it is merged
 import user_Profile from '../components/user/Profilev2.vue';
@@ -20,7 +23,7 @@ OmegaUp.on('ready', () => {
     return validTabs.includes(tab) ? tab : 'see-profile';
   }
 
-  new Vue({
+  const userProfile = new Vue({
     el: '#main-container',
     components: {
       'omegaup-user-profile': user_Profile,
@@ -29,6 +32,7 @@ OmegaUp.on('ready', () => {
       return {
         profile: payload.profile,
         data: payload.extraProfileDetails,
+        identities: payload.identities,
       };
     },
     render: function (createElement) {
@@ -43,8 +47,37 @@ OmegaUp.on('ready', () => {
           ),
           visitorBadges: new Set(payload.extraProfileDetails?.badges),
           tabSelected: activeTab,
+          urlMapping: payload.urlMapping,
+          identities: this.identities,
+        },
+        on: {
+          'add-identity': ({
+            username,
+            password,
+          }: {
+            username: string;
+            password: string;
+          }) => {
+            api.User.associateIdentity({
+              username: username,
+              password: password,
+            })
+              .then(() => {
+                refreshIdentityList();
+                ui.success(T.profileIdentityAdded);
+              })
+              .catch(ui.apiError);
+          },
         },
       });
     },
   });
+
+  function refreshIdentityList() {
+    api.User.listAssociatedIdentities({})
+      .then(function (data) {
+        userProfile.identities = data.identities;
+      })
+      .catch(ui.apiError);
+  }
 });
