@@ -4,7 +4,7 @@ import T from '../../lang';
 
 describe('PasswordEdit.vue', () => {
   it('Should emit password update', async () => {
-    let wrapper = shallowMount(user_Password_Edit);
+    const wrapper = shallowMount(user_Password_Edit);
 
     const oldPassword = 'oldPassword';
     const newPassword = 'newPassword';
@@ -23,11 +23,15 @@ describe('PasswordEdit.vue', () => {
         },
       ],
     ]);
+  });
 
+  it('Should emit password add', async () => {
     const username = 'username';
-    wrapper = shallowMount(user_Password_Edit, {
+    const wrapper = shallowMount(user_Password_Edit, {
       propsData: { username },
     });
+    const newPassword = 'newPassword';
+    const newPassword2 = 'newPassword';
 
     await wrapper.find('input[data-new-password]').setValue(newPassword);
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);
@@ -59,8 +63,24 @@ describe('PasswordEdit.vue', () => {
     expect(wrapper.emitted('update-password')).toBeUndefined();
   });
 
-  it('Should enable submit button when there is no new password mismatch nor empty passwords', async () => {
-    let wrapper = shallowMount(user_Password_Edit);
+  it('Should not emit password add when there is new password mismatch', async () => {
+    const wrapper = shallowMount(user_Password_Edit, {
+      propsData: { username: 'username' },
+    });
+
+    const newPassword = 'newPassword';
+    const newPassword2 = 'newPassword2';
+
+    await wrapper.find('input[data-new-password]').setValue(newPassword);
+    await wrapper.find('input[data-new-password2]').setValue(newPassword2);
+    expect(wrapper.find('div.invalid-message').text()).toBe(T.passwordMismatch);
+
+    await wrapper.find('button[type="submit"]').trigger('submit');
+    expect(wrapper.emitted('add-password')).toBeUndefined();
+  });
+
+  it('Should enable submit button when there is no new password mismatch nor empty passwords on password update', async () => {
+    const wrapper = shallowMount(user_Password_Edit);
 
     const oldPassword = 'oldPassword';
     const newPassword = 'newPassword';
@@ -70,18 +90,23 @@ describe('PasswordEdit.vue', () => {
     await wrapper.find('input[data-new-password]').setValue(newPassword);
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);
     expect(wrapper.find('button[type="submit"]').element).toBeEnabled();
+  });
 
-    wrapper = shallowMount(user_Password_Edit, {
+  it('Should enable submit button when there is no new password mismatch nor empty passwords on password add', async () => {
+    const wrapper = shallowMount(user_Password_Edit, {
       propsData: { username: 'username' },
     });
+
+    const newPassword = 'newPassword';
+    const newPassword2 = 'newPassword';
 
     await wrapper.find('input[data-new-password]').setValue(newPassword);
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);
     expect(wrapper.find('button[type="submit"]').element).toBeEnabled();
   });
 
-  it('Should disable submit button when there is new password mismatch or empty passwords', async () => {
-    let wrapper = shallowMount(user_Password_Edit);
+  it('Should disable submit button when there is new password mismatch or empty inputs on password update', async () => {
+    const wrapper = shallowMount(user_Password_Edit);
 
     let oldPassword = 'oldPassword';
     const newPassword = 'newPassword';
@@ -99,12 +124,38 @@ describe('PasswordEdit.vue', () => {
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);
     expect(wrapper.find('button[type="submit"]').element).toBeDisabled();
 
-    wrapper = shallowMount(user_Password_Edit, {
-      propsData: { username: 'username' },
+    oldPassword = 'oldPassword';
+    newPassword2 = '';
+
+    await wrapper.find('input[data-old-password]').setValue(oldPassword);
+    await wrapper.find('input[data-new-password2]').setValue(newPassword2);
+    expect(wrapper.find('button[type="submit"]').element).toBeDisabled();
+  });
+
+  it('Should disable submit button when there is new password mismatch or empty inputs on password add', async () => {
+    let username = 'username';
+    const wrapper = shallowMount(user_Password_Edit, {
+      propsData: { username },
     });
 
-    await wrapper.find('input[data-username]').setValue('');
+    const newPassword = 'newPassword';
+    let newPassword2 = 'newPassword2';
+
     await wrapper.find('input[data-new-password]').setValue(newPassword);
+    await wrapper.find('input[data-new-password2]').setValue(newPassword2);
+    expect(wrapper.find('button[type="submit"]').element).toBeDisabled();
+
+    username = '';
+    newPassword2 = 'newPassword';
+
+    await wrapper.find('input[data-username]').setValue(username);
+    await wrapper.find('input[data-new-password2]').setValue(newPassword2);
+    expect(wrapper.find('button[type="submit"]').element).toBeDisabled();
+
+    username = 'username';
+    newPassword2 = '';
+
+    await wrapper.find('input[data-username]').setValue(username);
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);
     expect(wrapper.find('button[type="submit"]').element).toBeDisabled();
   });

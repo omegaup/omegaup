@@ -82,7 +82,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
-@Component({})
+@Component
 export default class UserPasswordEdit extends Vue {
   @Prop({ default: null }) username!: string | null;
 
