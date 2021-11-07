@@ -1,6 +1,4 @@
 <?php
-// phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
 /**
  * Test getting general user Info methods
  */
@@ -9,7 +7,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      * Test for the function which returns the general user info
      */
     public function testUserData() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'testuser1']
             )
@@ -32,12 +30,12 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      * Test for the function which returns the general user info
      */
     public function testUserDataAnotherUser() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'testuser2']
             )
         );
-        ['user' => $user2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(
                 ['username' => 'testuser3']
             )
@@ -115,8 +113,8 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      * Test admin can see emails for all non-private profiles
      */
     public function testAdminCanSeeEmails() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         $login = self::login($identityAdmin);
         $r = new \OmegaUp\Request([
@@ -132,10 +130,10 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      * Test admin can see all details for private profiles
      */
     public function testAdminCanSeePrivateProfile() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams(['isPrivate' => true])
         );
-        ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        ['identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
 
         $login = self::login($identityAdmin);
         $r = new \OmegaUp\Request([
@@ -166,7 +164,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      * User can see his own email
      */
     public function testUserCanSeeSelfEmail() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
@@ -289,7 +287,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      * API can be accessed by a user who cannot see the contest (contest is private)
      */
     public function testUserContestsPrivateContestOutsider() {
-        ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $contests = [];
         $contests[0] = \OmegaUp\Test\Factories\Contest::createContest(
@@ -315,7 +313,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        ['user' => $externalUser, 'identity' => $externalIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $externalIdentity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($externalIdentity);
         // Get ContestStats
@@ -334,7 +332,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      * Test the problems solved by user
      */
     public function testProblemsSolved() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $contest = \OmegaUp\Test\Factories\Contest::createContest();
 
@@ -390,7 +388,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      * Test the problems solved by user
      */
     public function testProblemsCreated() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
 
@@ -428,7 +426,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Now, as another user, request the problems created by initial user
-        ['user' => $otherUser, 'identity' => $otherIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $otherIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($otherIdentity);
 
         $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
@@ -450,7 +448,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        $response = \OmegaUp\Controllers\User::apiUpdateMainEmail(
+        \OmegaUp\Controllers\User::apiUpdateMainEmail(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'email' => 'new@email.com'
@@ -466,7 +464,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      * Test update main email api
      */
     public function testStats() {
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
         $login = self::login($identity);
@@ -598,7 +596,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEmpty($response['problems']);
 
         // Now, as another user, request the problems created by initial user
-        ['user' => $otherUser, 'identity' => $otherIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $otherIdentity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($otherIdentity);
 
         $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
@@ -606,5 +604,93 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'username' => $identity->username
         ]));
         $this->assertEmpty($response['problems']);
+    }
+
+    public function testGetProfileDetailsForLoggedUser() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                [ 'username' => 'testusername1', 'name' => 'testuser1' ]
+            )
+        );
+
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\User::getProfileDetailsForTypeScript(
+            new \OmegaUp\Request([ 'auth_token' => $login->auth_token ])
+        )['smartyProperties']['payload'];
+        $profile = $response['profile'];
+
+        $this->assertNotEmpty($response['urlMapping']);
+        $this->assertEquals($identity->username, $profile['username']);
+        $this->assertEquals($identity->name, $profile['name']);
+        $this->assertTrue($profile['is_own_profile']);
+        $this->assertNotNull($response['extraProfileDetails']);
+    }
+
+    public function testGetProfileDetailsForUser() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                [ 'username' => 'testusername1', 'name' => 'testuser1' ]
+            )
+        );
+        [
+            'identity' => $otherIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($otherIdentity);
+        $response = \OmegaUp\Controllers\User::getProfileDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => 'testusername1',
+            ])
+        )['smartyProperties']['payload'];
+        $profile = $response['profile'];
+
+        // UrlMapping is empty when user is seeing another user profile
+        $this->assertEmpty($response['urlMapping']);
+        $this->assertEquals($identity->username, $profile['username']);
+        $this->assertEquals($identity->name, $profile['name']);
+        $this->assertFalse($profile['is_own_profile']);
+
+        // Even when user are not logged in, they want to see the profile for a
+        // given username
+        $response = \OmegaUp\Controllers\User::getProfileDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'username' => 'testusername1',
+            ])
+        )['smartyProperties']['payload'];
+        $profile = $response['profile'];
+
+        // UrlMapping is empty when user is seeing another user profile
+        $this->assertEmpty($response['urlMapping']);
+        $this->assertEquals($identity->username, $profile['username']);
+        $this->assertEquals($identity->name, $profile['name']);
+        $this->assertFalse($profile['is_own_profile']);
+    }
+
+    public function testGetProfileDetailsForAPrivateUser() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                [ 'username' => 'testusername1', 'isPrivate' => true ]
+            )
+        );
+
+        [
+            'identity' => $otherIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($otherIdentity);
+        $response = \OmegaUp\Controllers\User::getProfileDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => 'testusername1',
+            ])
+        )['smartyProperties']['payload'];
+        $profile = $response['profile'];
+
+        // UrlMapping is empty when user is seeing a private profile for a user
+        $this->assertEmpty($response['urlMapping']);
+        $this->assertTrue($profile['is_private']);
+        $this->assertEquals($identity->username, $profile['username']);
+        $this->assertFalse($profile['is_own_profile']);
     }
 }

@@ -28,7 +28,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>}
- * @psalm-type UserProfileDetailsPayload=array{countries?: list<\OmegaUp\DAO\VO\Countries>, programmingLanguages?: array<string, string>, privateProfile: bool, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
+ * @psalm-type UrlProfile=array{key: string, title: string, visible: bool}
+ * @psalm-type UserProfileDetailsPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, programmingLanguages: array<string, string>, profile: UserProfileInfo, extraProfileDetails: ExtraProfileDetails|null, urlMapping: list<UrlProfile>}
  * @psalm-type ScoreboardRankingProblemDetailsGroup=array{cases: list<array{meta: RunMetadata}>}
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
@@ -3965,18 +3966,17 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         );
         self::authenticateOrAllowUnauthenticatedRequest($r);
-        // When $username is not provided we need to validate that user is logged in
-        // because we assume they want to edit their own profile
+        // When $username is not provided we need to validate that user is
+        // logged in because we assume they want to see/edit their own profile
         if (is_null($username)) {
             $r->ensureIdentity();
-        } else {
-            $r->identity = null;
         }
-        $identity = self::resolveTargetIdentity($r);
+        $loggedIdentity = $r->identity;
+        $targetIdentity = self::resolveTargetIdentity($r);
         if (
-            is_null($identity) ||
-            is_null($identity->identity_id) ||
-            is_null($identity->username)
+            is_null($targetIdentity) ||
+            is_null($targetIdentity->identity_id) ||
+            is_null($targetIdentity->username)
         ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
@@ -3990,6 +3990,17 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         $response = [
             'smartyProperties' => [
+                'payload' => [
+                    'profile' => self::getPrivateUserProfile($targetIdentity),
+                    'countries' => \OmegaUp\DAO\Countries::getAll(
+                        null,
+                        100,
+                        'name'
+                    ),
+                    'programmingLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+                    'extraProfileDetails' => null,
+                    'urlMapping' => [],
+                ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProfile'
                 ),
@@ -3998,41 +4009,67 @@ class User extends \OmegaUp\Controllers\Controller {
         ];
 
         if (
-            self::shouldUserInformationBeHidden($r->identity, $identity, $user)
+            self::shouldUserInformationBeHidden(
+                $loggedIdentity,
+                $targetIdentity,
+                $user
+            )
         ) {
-            $response['smartyProperties']['payload'] = [
-                'profile' => self::getPrivateUserProfile($identity),
-                'privateProfile' => true,
-            ];
             return $response;
         }
-        $response['smartyProperties']['payload'] = [
-            'privateProfile' => false,
-            'profile' => self::getUserProfile($r->identity, $identity),
-            'countries' => \OmegaUp\DAO\Countries::getAll(
-                null,
-                100,
-                'name'
-            ),
-            'programmingLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
-            'extraProfileDetails' => [
-                'contests' => self::getContestStats($identity),
-                'solvedProblems' => self::getSolvedProblems(
-                    $identity->identity_id
-                ),
-                'unsolvedProblems' => self::getUnsolvedProblems(
-                    $identity->identity_id
-                ),
-                'createdProblems' => self::getCreatedProblems(
-                    $identity->identity_id
-                ),
-                'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
-                    $identity->identity_id
-                ),
-                'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
-                'ownedBadges' => $ownedBadges,
-            ],
-        ];
+
+        $profile = self::getUserProfile($loggedIdentity, $targetIdentity);
+        $urlMapping = !$profile['is_own_profile'] ? [] : [
+            ['key' => 'see-profile', 'title' => \OmegaUp\Translations::getInstance()->get(
+                'userEditSeeProfile'
+            ), 'visible' => true ],
+            ['key' => 'edit-basic-information', 'title' => \OmegaUp\Translations::getInstance()->get(
+                'profileEdit'
+            ), 'visible' => true ],
+            ['key' => 'edit-preferences', 'title' => \OmegaUp\Translations::getInstance()->get(
+                'userEditPreferences'
+            ), 'visible' => true ],
+            ['key' => 'manage-schools', 'title' => \OmegaUp\Translations::getInstance()->get(
+                'userEditManageSchools'
+            ), 'visible' => true ],
+            ['key' => 'manage-identities', 'title' => \OmegaUp\Translations::getInstance()->get(
+                'profileManageIdentities'
+            ), 'visible' => true, ],
+            ['key' => 'change-password', 'title' => \OmegaUp\Translations::getInstance()->get(
+                'userEditChangePassword'
+            ), 'visible' => true, ],
+            ['key' => 'add-password', 'title' => \OmegaUp\Translations::getInstance()->get(
+                'userEditAddPassword'
+            ), 'visible' => false ],
+            ['key' => 'change-email', 'title' => \OmegaUp\Translations::getInstance()->get(
+                'userEditChangeEmail'
+            ), 'visible' => false ],
+          ];
+        $response['smartyProperties']['payload'] = array_merge(
+            $response['smartyProperties']['payload'],
+            [
+                'profile' => $profile,
+                'extraProfileDetails' => [
+                    'contests' => self::getContestStats($targetIdentity),
+                    'solvedProblems' => self::getSolvedProblems(
+                        $targetIdentity->identity_id
+                    ),
+                    'unsolvedProblems' => self::getUnsolvedProblems(
+                        $targetIdentity->identity_id
+                    ),
+                    'createdProblems' => self::getCreatedProblems(
+                        $targetIdentity->identity_id
+                    ),
+                    'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
+                        $targetIdentity->identity_id
+                    ),
+                    'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
+                    'ownedBadges' => $ownedBadges,
+                ],
+                'urlMapping' => $urlMapping,
+            ]
+        );
+
         return $response;
     }
 

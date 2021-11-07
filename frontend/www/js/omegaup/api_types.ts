@@ -4033,6 +4033,12 @@ export namespace types {
     [key: string]: types.ContestListItem[];
   }
 
+  export interface UrlProfile {
+    key: string;
+    title: string;
+    visible: boolean;
+  }
+
   export interface UserDetailsPayload {
     emails: string[];
     experiments: string[];
@@ -4082,11 +4088,11 @@ export namespace types {
   }
 
   export interface UserProfileDetailsPayload {
-    countries?: dao.Countries[];
+    countries: dao.Countries[];
     extraProfileDetails?: types.ExtraProfileDetails;
-    privateProfile: boolean;
     profile: types.UserProfileInfo;
-    programmingLanguages?: { [key: string]: string };
+    programmingLanguages: { [key: string]: string };
+    urlMapping: types.UrlProfile[];
   }
 
   export interface UserProfileInfo {
