@@ -5,21 +5,20 @@
       @submit.prevent="onAddIdentity(dataForm)"
     >
       <div class="form-group">
-        <label>{{ T.wordsIdentity }}</label>
-        <span
-          aria-hidden="true"
-          class="glyphicon glyphicon-info-sign"
-          data-placement="top"
-          data-toggle="tooltip"
-          :title="T.profileAddIdentitiesTooltip"
-        ></span>
-        <input
-          v-model="dataForm.username"
-          autocomplete="off"
-          class="form-control username-input"
-          size="20"
-          type="text"
-        />
+        <label>
+          {{ T.wordsIdentity }}
+          <font-awesome-icon
+            :title="T.profileAddIdentitiesTooltip"
+            icon="info-circle"
+          ></font-awesome-icon>
+          <input
+            v-model="dataForm.username"
+            autocomplete="off"
+            class="form-control username-input"
+            size="20"
+            type="text"
+          />
+        </label>
       </div>
       <div class="form-group">
         <label>{{ T.loginPassword }}</label>
@@ -62,7 +61,22 @@ import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 
-@Component
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
+  },
+})
 export default class UserManageIdentities extends Vue {
   @Prop() identities!: types.Identity[];
   T = T;
