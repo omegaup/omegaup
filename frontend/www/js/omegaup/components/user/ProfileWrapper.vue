@@ -34,7 +34,7 @@ import { types } from '../../api_types';
     'omegaup-user-maininfo': user_SidebarMainInfo,
   },
 })
-export default class UserProfile extends Vue {
+export default class ProfileWrapper extends Vue {
   @Prop({ default: null }) data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop({ default: null }) selectedTab!: null | string;

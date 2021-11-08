@@ -5,7 +5,7 @@
       @submit.prevent="onAddIdentity(dataForm)"
     >
       <div class="form-group">
-        <label>
+        <label class="w-100">
           {{ T.wordsIdentity }}
           <font-awesome-icon
             :title="T.profileAddIdentitiesTooltip"
@@ -21,14 +21,16 @@
         </label>
       </div>
       <div class="form-group">
-        <label>{{ T.loginPassword }}</label>
-        <input
-          v-model="dataForm.password"
-          autocomplete="off"
-          class="form-control password-input"
-          size="20"
-          type="password"
-        />
+        <label class="w-100">
+          {{ T.loginPassword }}
+          <input
+            v-model="dataForm.password"
+            autocomplete="off"
+            class="form-control password-input"
+            size="20"
+            type="password"
+          />
+        </label>
       </div>
       <div class="form-group text-right">
         <button class="btn btn-primary" type="submit">
@@ -77,7 +79,7 @@ library.add(fas);
     'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
-export default class UserManageIdentities extends Vue {
+export default class ManageIdentities extends Vue {
   @Prop() identities!: types.Identity[];
   T = T;
   dataForm: { username: string; password: string } = {
