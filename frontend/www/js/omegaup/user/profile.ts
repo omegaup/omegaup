@@ -7,7 +7,7 @@ import * as ui from '../ui';
 import T from '../lang';
 
 // TODO: Import Profile.vue when it is merged
-import user_Profile from '../components/user/Profile.vue';
+import user_Profile from '../components/user/Profilev2.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
