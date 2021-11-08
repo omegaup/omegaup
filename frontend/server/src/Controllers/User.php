@@ -21,7 +21,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CoderOfTheMonthList=list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>
  * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
  * @psalm-type CoderOfTheMonthPayload=array{codersOfCurrentMonth: CoderOfTheMonthList, codersOfPreviousMonth: CoderOfTheMonthList, candidatesToCoderOfTheMonth: list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, username: string}>, isMentor: bool, category: string, options?: array{canChooseCoder: bool, coderIsSelected: bool}}
- * @psalm-type UserProfileInfo=array{birth_date?: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, has_competitive_objective?: bool|null, has_learning_objective?: bool|null, has_scholar_objective?: bool|null, has_teaching_objective?: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
+ * @psalm-type UserProfileInfo=array{birth_date?: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: null|string, has_competitive_objective?: bool|null, has_learning_objective?: bool|null, has_scholar_objective?: bool|null, has_teaching_objective?: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
  * @psalm-type ContestParticipated=array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}
  * @psalm-type UserProfileContests=array<string, array{data: ContestParticipated, place: int}>
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
@@ -39,6 +39,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserRole=array{name: string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
  * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
+ * @psalm-type EmailEditDetailsPayload=array{email: null|string, profile?: UserProfileInfo}
  * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
  */
 class User extends \OmegaUp\Controllers\Controller {
@@ -1405,11 +1406,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
-        $response['graduation_date'] = is_null(
-            $userDb['graduation_date']
-        ) ? null : \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-            $userDb['graduation_date']
-        );
+        $response['graduation_date'] = $userDb['graduation_date'];
         $response['email'] = $userDb['email'];
         $response['classname'] = $userDb['classname'];
         $response['country'] = $userDb['country'];
@@ -4002,7 +3999,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         $response['smartyProperties']['payload'] = [
             'privateProfile' => false,
-            'profile' => self::getProfileDetails(
+            'profile' => self::getUserProfile(
                 $r->identity,
                 $identity
             ),
@@ -4128,7 +4125,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
             }
             $smartyProperties = [
-                'profile' => self::getProfileDetails($r->identity, $identity),
+                'profile' => self::getUserProfile($r->identity, $identity),
                 'PROGRAMMING_LANGUAGES' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
                 'COUNTRIES' => \OmegaUp\DAO\Countries::getAll(
                     null,
@@ -4189,7 +4186,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'name'
             ),
             'programmingLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
-            'profile' => self::getProfileDetails($r->identity, $identity),
+            'profile' => self::getUserProfile($r->identity, $identity),
             'extraProfileDetails' => [
                 'contests' => self::getContestStats($identity),
                 'solvedProblems' => self::getSolvedProblems(
@@ -4215,64 +4212,58 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param null|string $username
      *
-     * @return array{smartyProperties: array{STATUS_ERROR?: string, payload?: array{email: null|string}, profile?: UserProfileInfo}, template: string}
+     * @return array{entrypoint: string, smartyProperties: array{payload: EmailEditDetailsPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getEmailEditDetailsForTypeScript(\OmegaUp\Request $r) {
-        $currentSession = \OmegaUp\Controllers\Session::getCurrentSession();
+        $r->ensureMainUserIdentity();
 
-        try {
-            self::authenticateOrAllowUnauthenticatedRequest($r);
+        $targetIdentity = self::resolveTargetIdentity($r);
 
-            $identity = self::resolveTargetIdentity($r);
-            if (is_null($identity)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterNotFound',
-                    'Identity'
-                );
-            }
-            $smartyProperties = [
-                'payload' => [
-                    'email' => $currentSession['email'],
-                ],
-                'profile' => self::getProfileDetails(
-                    $currentSession['identity'],
-                    $identity
-                ),
-            ];
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            \OmegaUp\ApiCaller::logException($e);
-            $smartyProperties = [
-                'STATUS_ERROR' => $e->getErrorMessage(),
-            ];
-        }
-        return [
-            'smartyProperties' => $smartyProperties,
-            'template' => 'user.email.edit.tpl',
-        ];
-    }
-
-    /**
-     * @return UserProfileInfo
-     */
-    private static function getProfileDetails(
-        ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
-        \OmegaUp\DAO\VO\Identities $identity
-    ) {
-        $response = self::getUserProfile($loggedIdentity, $identity);
+        // Only sysadmin can change email for another user
         if (
-            !empty($response['graduation_date'])
-            && is_object($response['graduation_date'])
+            !is_null($targetIdentity)
+            && $targetIdentity->identity_id !== $r->identity->identity_id
+            && !\OmegaUp\Authorization::isSystemAdmin($r->identity)
         ) {
-            $response['graduation_date'] = gmdate(
-                'Y-m-d',
-                $response['graduation_date']->time
-            ) ?: null;
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
         }
 
-        return $response;
+        if (
+            is_null(
+                $targetIdentity
+            ) || is_null(
+                $targetIdentity->identity_id
+            ) || is_null(
+                $targetIdentity->user_id
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'Identity'
+            );
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'email' => \OmegaUp\DAO\Emails::getMainMailByUserId(
+                        $targetIdentity->user_id
+                    ),
+                    'profile' => self::getUserProfile(
+                        $r->identity,
+                        $targetIdentity
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleUsersEditEmail'
+                ),
+            ],
+            'entrypoint' => 'user_edit_email_form',
+        ];
     }
 
     /**
