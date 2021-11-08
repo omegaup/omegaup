@@ -606,84 +606,72 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEmpty($response['problems']);
     }
 
-    public function testGetProfileDetailsForLoggedUser() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
-            new \OmegaUp\Test\Factories\UserParams(
-                [ 'username' => 'testusername1', 'name' => 'testuser1' ]
-            )
-        );
-
-        $login = self::login($identity);
-        $response = \OmegaUp\Controllers\User::getProfileDetailsForTypeScript(
-            new \OmegaUp\Request([ 'auth_token' => $login->auth_token ])
-        )['smartyProperties']['payload'];
-        $profile = $response['profile'];
-
-        $this->assertEquals($identity->username, $profile['username']);
-        $this->assertEquals($identity->name, $profile['name']);
-        $this->assertTrue($profile['is_own_profile']);
-        $this->assertNotNull($response['extraProfileDetails']);
+    /**
+     * A PHPUnit data provider for all the tests to get profile details.
+     *
+     * @return list<array{0: bool, 1: bool, 2: bool}>
+     */
+    public function profileDetailsProvider(): array {
+        return [
+            [true, true, false],
+            [true, false, false],
+            [false, false, false],
+            [true, false, true],
+        ];
     }
 
-    public function testGetProfileDetailsForUser() {
+    /**
+     * Test different cases for getting profile details
+     * @dataProvider profileDetailsProvider
+     */
+    public function testGetProfileDetails(
+        bool $isLoggedIn,
+        bool $isOwnProfile,
+        bool $isPrivate
+    ) {
+        $userParams = [ 'username' => 'testusername1', 'name' => 'testuser1' ];
+        if ($isPrivate) {
+            $userParams = array_merge($userParams, ['isPrivate' => true]);
+        }
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
-            new \OmegaUp\Test\Factories\UserParams(
-                [ 'username' => 'testusername1', 'name' => 'testuser1' ]
-            )
+            new \OmegaUp\Test\Factories\UserParams($userParams)
         );
         [
             'identity' => $otherIdentity,
         ] = \OmegaUp\Test\Factories\User::createUser();
 
-        $login = self::login($otherIdentity);
+        $login = null;
+        if ($isLoggedIn && $isOwnProfile) {
+            $login = self::login($identity);
+        } elseif ($isLoggedIn && !$isOwnProfile) {
+            $login = self::login($otherIdentity);
+        }
+
+        $requestParams = [];
+        if ($isLoggedIn) {
+            $requestParams = array_merge(
+                $requestParams,
+                ['auth_token' => $login->auth_token]
+            );
+        }
+
+        if (!$isOwnProfile) {
+            $requestParams = array_merge(
+                $requestParams,
+                ['username' => 'testusername1']
+            );
+        }
+
         $response = \OmegaUp\Controllers\User::getProfileDetailsForTypeScript(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'username' => 'testusername1',
-            ])
+            new \OmegaUp\Request($requestParams)
         )['smartyProperties']['payload'];
         $profile = $response['profile'];
 
+        // User's name is hidden when private profile is set
+        $identityName = $isPrivate ? null : $identity->name;
         $this->assertEquals($identity->username, $profile['username']);
-        $this->assertEquals($identity->name, $profile['name']);
-        $this->assertFalse($profile['is_own_profile']);
-
-        // Even when user are not logged in, they want to see the profile for a
-        // given username
-        $response = \OmegaUp\Controllers\User::getProfileDetailsForTypeScript(
-            new \OmegaUp\Request([
-                'username' => 'testusername1',
-            ])
-        )['smartyProperties']['payload'];
-        $profile = $response['profile'];
-
-        $this->assertEquals($identity->username, $profile['username']);
-        $this->assertEquals($identity->name, $profile['name']);
-        $this->assertFalse($profile['is_own_profile']);
-    }
-
-    public function testGetProfileDetailsForAPrivateUser() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
-            new \OmegaUp\Test\Factories\UserParams(
-                [ 'username' => 'testusername1', 'isPrivate' => true ]
-            )
-        );
-
-        [
-            'identity' => $otherIdentity,
-        ] = \OmegaUp\Test\Factories\User::createUser();
-
-        $login = self::login($otherIdentity);
-        $response = \OmegaUp\Controllers\User::getProfileDetailsForTypeScript(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'username' => 'testusername1',
-            ])
-        )['smartyProperties']['payload'];
-        $profile = $response['profile'];
-
-        $this->assertTrue($profile['is_private']);
-        $this->assertEquals($identity->username, $profile['username']);
-        $this->assertFalse($profile['is_own_profile']);
+        $this->assertEquals($identityName, $profile['name']);
+        $this->assertEquals($profile['is_own_profile'], $isOwnProfile);
+        $this->assertEquals($profile['is_private'], $isPrivate);
     }
 }
