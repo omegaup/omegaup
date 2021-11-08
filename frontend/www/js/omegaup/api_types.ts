@@ -1238,6 +1238,28 @@ export namespace types {
       );
     }
 
+    export function EmailEditDetailsPayload(
+      elementId: string = 'payload',
+    ): types.EmailEditDetailsPayload {
+      return ((x) => {
+        if (x.profile)
+          x.profile = ((x) => {
+            if (x.birth_date)
+              x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+            if (x.graduation_date)
+              x.graduation_date = ((x: number) => new Date(x * 1000))(
+                x.graduation_date,
+              );
+            return x;
+          })(x.profile);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function GroupEditPayload(
       elementId: string = 'payload',
     ): types.GroupEditPayload {
@@ -2951,6 +2973,11 @@ export namespace types {
     valid: boolean;
   }
 
+  export interface EmailEditDetailsPayload {
+    email?: string;
+    profile?: types.UserProfileInfo;
+  }
+
   export interface Event {
     courseAlias?: string;
     courseName?: string;
@@ -4165,7 +4192,7 @@ export namespace types {
     country_id?: string;
     email?: string;
     gender?: string;
-    graduation_date?: Date | string;
+    graduation_date?: Date;
     gravatar_92?: string;
     has_competitive_objective?: boolean;
     has_learning_objective?: boolean;
