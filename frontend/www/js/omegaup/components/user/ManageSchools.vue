@@ -40,8 +40,8 @@
     <div class="form-group">
       <label>{{ T.userEditManageSchoolsUserCurrentlyEnrolled }}</label>
       <omegaup-radio-switch
-        :value.sync="schoolInCourse"
-        :selected-value="schoolInCourse"
+        :value.sync="isCurrentlyEnrolled"
+        :selected-value="isCurrentlyEnrolled"
       ></omegaup-radio-switch>
     </div>
     <div class="form-group">
@@ -49,7 +49,7 @@
       <omegaup-datepicker
         v-model="graduationDate"
         :required="false"
-        :enabled="!schoolInCourse"
+        :enabled="!isCurrentlyEnrolled"
       ></omegaup-datepicker>
     </div>
     <div class="mt-3">
@@ -89,11 +89,7 @@ export default class UserManageSchools extends Vue {
   school = this.profile.school;
   schoolId = this.profile.school_id;
   scholarDegree = this.profile.scholar_degree;
-  schoolInCourse = !this.profile.graduation_date;
-
-  get isSchoolSet(): boolean {
-    return true;
-  }
+  isCurrentlyEnrolled = !this.profile.graduation_date;
 
   onUpdateUserSchools(): void {
     this.$emit('update-user-schools', {
