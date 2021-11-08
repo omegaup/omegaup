@@ -40,6 +40,8 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.LoginDetailsPayload();
   if (payload.statusError) {
     ui.error(payload.statusError);
+  } else if (payload.verifyEmailSuccessfully) {
+    ui.success(payload.verifyEmailSuccessfully);
   }
   new Vue({
     el: '#main-container',

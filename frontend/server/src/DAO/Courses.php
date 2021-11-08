@@ -15,7 +15,7 @@ namespace OmegaUp\DAO;
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
  * @psalm-type CourseCardFinished=array{alias: string, name: string}
- * @psalm-type CourseCardPublic=array{alias: string, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}
+ * @psalm-type CourseCardPublic=array{alias: string, alreadyStarted: bool, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}
  * @psalm-type AssignmentsProblemsPoints=array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
  * @psalm-type StudentProgressInCourse=array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}
  */
@@ -272,7 +272,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             gi.group_id = c.group_id
                     ),
                     0
-                ) AS studentCount,
+                ) AS student_count,
                 IFNULL(
                     (
                         SELECT
@@ -284,7 +284,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             a.assignment_type = ?
                     ),
                     0
-                ) AS lessonCount
+                ) AS lesson_count,
+                0 AS already_started
             FROM
                 Courses c
             LEFT JOIN
@@ -296,7 +297,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 c.name IS NOT NULL AND
                 c.archived = 0;';
 
-        /** @var list<array{alias: null|string, lessonCount: int, level: null|string, name: null|string, school_name: null|string, studentCount: int}> */
+        /** @var list<array{alias: null|string, already_started: int, lesson_count: int, level: null|string, name: null|string, school_name: null|string, student_count: int}> */
         $rs =  \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
@@ -306,10 +307,16 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         );
 
         $results = [];
-        foreach ($rs as $row) {
+        foreach ($rs as &$row) {
             if (is_null($row['alias']) || is_null($row['name'])) {
                 continue;
             }
+            $row['lessonCount'] = $row['lesson_count'];
+            $row['studentCount'] = $row['student_count'];
+            $row['alreadyStarted'] = boolval($row['already_started']);
+            unset($row['lesson_count']);
+            unset($row['student_count']);
+            unset($row['already_started']);
             $results[] = $row;
         }
         return $results;

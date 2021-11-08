@@ -183,17 +183,26 @@
       <div class="mt-4 mb-1">
         <div class="progress w-50 mx-auto">
           <div
-            class="progress-bar"
+            class="progress-bar text-dark"
             role="progressbar"
             :aria-valuenow="overallCompletedPercentage"
             aria-valuemin="0"
             aria-valuemax="100"
             :style="`width: ${overallCompletedPercentage}%`"
-          ></div>
+          >
+            {{ overallCompletedPercentage.toFixed(0) }}%
+          </div>
         </div>
-        <p class="text-center my-0 text-uppercase progress-text">
-          {{ T.courseDetailsProgress }}
-        </p>
+        <div
+          class="w-50 mx-auto d-flex justify-content-between text-center progress-text"
+        >
+          <p class="my-0 text-uppercase">
+            {{ T.courseDetailsProgress }}
+          </p>
+          <p class="my-0">
+            {{ overallCompletedPoints }}
+          </p>
+        </div>
       </div>
       <div class="d-flex justify-content-end">
         <div class="dropdown">
@@ -255,7 +264,7 @@
             :full-width="true"
           ></omegaup-markdown>
           <div class="row m-0 mt-4">
-            <div v-if="course.objective" class="col-md-8 mb-4 p-0">
+            <div v-if="course.objective" class="col-md-8 mb-4 p-0 pr-md-5">
               <h5 class="intro-subtitle pb-1">
                 {{ T.courseNewFormObjective }}
               </h5>
@@ -283,95 +292,15 @@
           }"
           role="tabpanel"
         >
-          <div class="table-responsive">
-            <table class="table table-striped table-hover mb-0">
-              <thead>
-                <tr>
-                  <th class="text-center" scope="col">
-                    {{ T.wordsContentType }}
-                  </th>
-                  <th class="text-center" scope="col">{{ T.wordsName }}</th>
-                  <th v-if="!course.is_admin" class="text-center" scope="col">
-                    {{ T.wordsCompletedPercentage }}
-                  </th>
-                  <th v-if="course.is_admin" class="text-center" scope="col">
-                    {{ T.wordsActions }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-if="!course.assignments.length">
-                  <td class="empty-table-message" colspan="5">
-                    {{ T.courseContentEmpty }}
-                  </td>
-                </tr>
-                <tr
-                  v-for="assignment in course.assignments"
-                  v-else
-                  :key="assignment.alias"
-                  :data-content-alias="assignment.alias"
-                >
-                  <td class="text-center">
-                    <template v-if="assignment.assignment_type === 'homework'">
-                      <font-awesome-icon icon="file-alt" />
-                      <span class="ml-2">{{ T.wordsHomework }}</span>
-                    </template>
-                    <template
-                      v-else-if="assignment.assignment_type === 'lesson'"
-                    >
-                      <font-awesome-icon icon="chalkboard-teacher" />
-                      <span class="ml-2">{{ T.wordsLesson }}</span>
-                    </template>
-                    <template v-else>
-                      <font-awesome-icon icon="list-alt" />
-                      <span class="ml-2">{{ T.wordsExam }}</span>
-                    </template>
-                  </td>
-                  <td>
-                    <a
-                      class="text-center"
-                      :href="`/course/${course.alias}/assignment/${assignment.alias}/`"
-                    >
-                      {{ assignment.name }}
-                    </a>
-                  </td>
-                  <td v-if="!course.is_admin" class="text-center">
-                    <div class="progress mx-auto">
-                      <div
-                        class="progress-bar"
-                        role="progressbar"
-                        :aria-valuenow="
-                          getAssignmentProgress(progress[assignment.alias])
-                        "
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                        :style="`width: ${getAssignmentProgress(
-                          progress[assignment.alias],
-                        )}%`"
-                      ></div>
-                    </div>
-                  </td>
-                  <td v-if="course.is_admin" class="text-center">
-                    <a
-                      class="mr-2"
-                      :href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
-                    >
-                      <font-awesome-icon :icon="['fas', 'link']" />{{
-                        T.courseActionScoreboard
-                      }}</a
-                    >
-                    <a
-                      class="mr-2"
-                      :href="`/course/${course.alias}/assignment/${assignment.alias}/#runs`"
-                    >
-                      <font-awesome-icon :icon="['fas', 'tachometer-alt']" />
-                      {{ T.wordsRuns }}
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <omegaup-assignment-card
+            v-for="assignment in course.assignments"
+            :key="assignment.alias"
+            :assignment="assignment"
+            :course-alias="course.alias"
+            :student-progress="
+              getAssignmentProgress(progress[assignment.alias])
+            "
+          ></omegaup-assignment-card>
         </div>
       </div>
     </template>
@@ -386,25 +315,16 @@ import * as time from '../../time';
 import { types } from '../../api_types';
 
 import omegaup_Markdown from '../Markdown.vue';
+import course_AssignmentCard from './AssignmentCard.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
-  faChalkboardTeacher,
   faEdit,
-  faFileAlt,
   faLink,
-  faListAlt,
   faTachometerAlt,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(
-  faEdit,
-  faLink,
-  faTachometerAlt,
-  faChalkboardTeacher,
-  faFileAlt,
-  faListAlt,
-);
+library.add(faEdit, faLink, faTachometerAlt);
 
 export enum Tab {
   Information = 'information',
@@ -415,6 +335,7 @@ export enum Tab {
   components: {
     FontAwesomeIcon,
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-assignment-card': course_AssignmentCard,
   },
 })
 export default class CourseDetails extends Vue {
@@ -429,9 +350,9 @@ export default class CourseDetails extends Vue {
     [Tab.Information]: T.courseDetailsTabInformation,
     [Tab.Content]: T.courseDetailsTabContent,
   };
-  selectedTab = Tab.Information;
+  selectedTab = Tab.Content;
 
-  get overallCompletedPercentage(): string {
+  get overallCompletedPercentage(): number {
     let score = 0;
     let maxScore = 0;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -440,17 +361,29 @@ export default class CourseDetails extends Vue {
       maxScore += progress.max_score;
     }
     if (maxScore === 0) {
-      return (0).toFixed(2);
+      return 0;
     }
-    const percent = (score / maxScore) * 100;
-
-    return percent.toFixed(2);
+    return (score / maxScore) * 100;
   }
 
-  getAssignmentProgress(progress: types.Progress): string {
-    const percent = (progress.score / progress.max_score) * 100;
-    const percentText = progress.max_score === 0 ? '--:--' : percent.toFixed(2);
-    return progress.max_score === 0 ? percentText : `${percentText}%`;
+  get overallCompletedPoints(): string {
+    let score = 0;
+    let maxScore = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (const [assignment, progress] of Object.entries(this.progress)) {
+      score += progress.score;
+      maxScore += progress.max_score;
+    }
+    return ui.formatString(T.courseDetailsOverallCompletedPoints, {
+      completed_points: score,
+      total_points: maxScore,
+    });
+  }
+
+  getAssignmentProgress(progress: types.Progress): number {
+    return progress.max_score === 0
+      ? 100
+      : (progress.score / progress.max_score) * 100;
   }
 
   getFormattedTime(date: Date | null | undefined): string {
@@ -470,7 +403,7 @@ export default class CourseDetails extends Vue {
 @import '../../../../sass/main.scss';
 
 .progress-text {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
 }
 
 .progress-bar {

@@ -21,7 +21,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CoderOfTheMonthList=list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>
  * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
  * @psalm-type CoderOfTheMonthPayload=array{codersOfCurrentMonth: CoderOfTheMonthList, codersOfPreviousMonth: CoderOfTheMonthList, candidatesToCoderOfTheMonth: list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, username: string}>, isMentor: bool, category: string, options?: array{canChooseCoder: bool, coderIsSelected: bool}}
- * @psalm-type UserProfileInfo=array{birth_date?: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, has_competitive_objective?: bool|null, has_learning_objective?: bool|null, has_scholar_objective?: bool|null, has_teaching_objective?: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
+ * @psalm-type UserProfileInfo=array{birth_date?: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: null|string, has_competitive_objective?: bool|null, has_learning_objective?: bool|null, has_scholar_objective?: bool|null, has_teaching_objective?: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null, programming_languages: array<string,string>}
  * @psalm-type ContestParticipated=array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}
  * @psalm-type UserProfileContests=array<string, array{data: ContestParticipated, place: int}>
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
@@ -30,13 +30,16 @@ namespace OmegaUp\Controllers;
  * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>}
  * @psalm-type UserProfileEditDetailsPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, programmingLanguages: array<string, string>, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
  * @psalm-type UserProfileDetailsPayload=array{privateProfile: bool, profile: UserProfileInfo, extraProfileDetails?: ExtraProfileDetails}
- * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
+ * @psalm-type ScoreboardRankingProblemDetailsGroup=array{cases: list<array{meta: RunMetadata}>}
+ * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
- * @psalm-type LoginDetailsPayload=array{facebookUrl: string, statusError?: string, validateRecaptcha: bool}
+ * @psalm-type LoginDetailsPayload=array{facebookUrl?: string, statusError?: string, validateRecaptcha: bool, verifyEmailSuccessfully?: string}
  * @psalm-type Experiment=array{config: bool, hash: string, name: string}
  * @psalm-type UserRole=array{name: string}
  * @psalm-type UserDetailsPayload=array{emails: list<string>, experiments: list<string>, roleNames: list<UserRole>, systemExperiments: list<Experiment>, systemRoles: list<string>, username: string, verified: bool}
+ * @psalm-type PrivacyPolicyDetailsPayload=array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
+ * @psalm-type UserRolesPayload=array{username: string, userSystemRoles: array<int, array{name: string, value: bool}>, userSystemGroups: array<int, array{name: string, value: bool}>}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -534,6 +537,46 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $id
+     */
+    public static function getLoginDetailsViaVerifyEmailForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $response = [
+            'smartyProperties' => [
+                'payload' => [
+                    'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
+                    'verifyEmailSuccessfully' => \OmegaUp\Translations::getInstance()->get(
+                        'verificationEmailSuccesfully'
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
+                'scripts' => [
+                    'https://apis.google.com/js/platform.js?onload=init',
+                ],
+            ],
+            'entrypoint' => 'login_signin',
+        ];
+        try {
+            $id = $r->ensureString('id');
+
+            $user = \OmegaUp\DAO\Users::getByVerification($id);
+
+            self::verifyEmail($user);
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            \OmegaUp\ApiCaller::logException($e);
+            $response['smartyProperties']['payload'] = [
+                'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
+                'statusError' => $e->getErrorMessage(),
+            ];
+        } finally {
+            return $response;
+        }
+    }
+
+    /**
      * Verifies the user given its verification id
      *
      * @param \OmegaUp\Request $r
@@ -547,12 +590,15 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param null|string $usernameOrEmail
      */
     public static function apiVerifyEmail(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['usernameOrEmail'],
-            'usernameOrEmail'
+        $usernameOrEmail = $r->ensureOptionalString(
+            'usernameOrEmail',
+            /*$required=*/false,
+            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
         );
 
-        if (isset($r['usernameOrEmail'])) {
+        if (!is_null($usernameOrEmail)) {
             // Admin can override verification by sending username
             $r->ensureIdentity();
 
@@ -560,14 +606,25 @@ class User extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\ForbiddenAccessException();
             }
 
-            self::$log->info("Admin verifying user... {$r['usernameOrEmail']}");
-            $user = self::resolveUser($r['usernameOrEmail']);
+            self::$log->info("Admin verifying user... {$usernameOrEmail}");
+            $user = self::resolveUser($usernameOrEmail);
         } else {
             // Normal user verification path
-            \OmegaUp\Validators::validateStringNonEmpty($r['id'], 'id');
-            $user = \OmegaUp\DAO\Users::getByVerification($r['id']);
+            $id = $r->ensureString('id');
+            $user = \OmegaUp\DAO\Users::getByVerification($id);
         }
 
+        self::verifyEmail($user);
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * @throws \OmegaUp\Exceptions\NotFoundException
+     */
+    private static function verifyEmail(
+        ?\OmegaUp\DAO\VO\Users $user
+    ): void {
         if (is_null($user) || is_null($user->main_identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'verificationIdInvalid'
@@ -594,8 +651,6 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::USER_PROFILE,
             strval($identity->username)
         );
-
-        return ['status' => 'ok'];
     }
 
     /**
@@ -1350,11 +1405,7 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
-        $response['graduation_date'] = is_null(
-            $userDb['graduation_date']
-        ) ? null : \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-            $userDb['graduation_date']
-        );
+        $response['graduation_date'] = $userDb['graduation_date'];
         $response['email'] = $userDb['email'];
         $response['classname'] = $userDb['classname'];
         $response['country'] = $userDb['country'];
@@ -3022,6 +3073,58 @@ class User extends \OmegaUp\Controllers\Controller {
         return $response;
     }
 
+    /**
+     * Gets the list of roles assigned to logged user
+     *
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return array{entrypoint: string, smartyProperties: array{payload: UserRolesPayload, title: \OmegaUp\TranslationString}}
+     */
+    public static function getUserRolesForTypeScript(\OmegaUp\Request $r) {
+        if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        $r->ensureMainUserIdentity();
+
+        $systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles(
+            $r->user->user_id
+        );
+        $roles = \OmegaUp\DAO\Roles::getAll();
+        $systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups(
+            $r->identity->identity_id
+        );
+        $groups = \OmegaUp\DAO\Groups::searchByName('omegaup:');
+        $userSystemRoles = [];
+        $userSystemGroups = [];
+        foreach ($roles as $key => $role) {
+            $userSystemRoles[$key] = [
+                'name' => strval($role->name),
+                'value' => in_array($role->name, $systemRoles),
+            ];
+        }
+        foreach ($groups as $key => $group) {
+            $userSystemGroups[$key] = [
+                'name' => strval($group->name),
+                'value' => in_array($group->name, $systemGroups),
+            ];
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'userSystemRoles' => $userSystemRoles,
+                    'userSystemGroups' => $userSystemGroups,
+                    'username' => $r->identity->username,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleUpdatePrivileges'
+                )
+            ],
+            'entrypoint' => 'admin_roles',
+        ];
+    }
+
     private static function validateAddRemoveRole(
         \OmegaUp\DAO\VO\Identities $identity,
         string $roleName
@@ -3282,13 +3385,14 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{policy_markdown: string, has_accepted: bool, git_object_id: string, statement_type: string}
+     * @return array{entrypoint: string, smartyProperties: array{payload: PrivacyPolicyDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $username
      */
-    public static function getPrivacyPolicy(\OmegaUp\Request $r): array {
-        $r->ensureIdentity();
-
+    public static function getPrivacyPolicyDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
         /** @var \OmegaUp\DAO\VO\Identities */
         $identity = self::resolveTargetIdentity($r);
 
@@ -3301,6 +3405,7 @@ class User extends \OmegaUp\Controllers\Controller {
         } elseif ($identity->language_id == \OmegaUp\Controllers\User::LANGUAGE_PT) {
             $lang = 'pt';
         }
+        self::$log->error(print_r($lang, true));
         $latestStatement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement();
         if (is_null($latestStatement)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -3308,18 +3413,26 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
         return [
-            'policy_markdown' => file_get_contents(
-                sprintf(
-                    "%s/privacy/privacy_policy/{$lang}.md",
-                    strval(OMEGAUP_ROOT)
+            'smartyProperties' => [
+                'payload' => [
+                    'policy_markdown' => file_get_contents(
+                        sprintf(
+                            "%s/privacy/privacy_policy/{$lang}.md",
+                            strval(OMEGAUP_ROOT)
+                        )
+                    ) ?: '',
+                    'has_accepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
+                        intval($identity->identity_id),
+                        $latestStatement['privacystatement_id']
+                    ),
+                    'git_object_id' => $latestStatement['git_object_id'],
+                    'statement_type' => 'privacy_policy',
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitlePrivacyPolicy'
                 )
-            ) ?: '',
-            'has_accepted' => \OmegaUp\DAO\PrivacyStatementConsentLog::hasAcceptedPrivacyStatement(
-                intval($identity->identity_id),
-                $latestStatement['privacystatement_id']
-            ),
-            'git_object_id' => $latestStatement['git_object_id'],
-            'statement_type' => 'privacy_policy',
+            ],
+            'entrypoint' => 'user_privacy_policy',
         ];
     }
 
@@ -3885,7 +3998,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         $response['smartyProperties']['payload'] = [
             'privateProfile' => false,
-            'profile' => self::getProfileDetails(
+            'profile' => self::getUserProfile(
                 $r->identity,
                 $identity
             ),
@@ -4011,7 +4124,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 );
             }
             $smartyProperties = [
-                'profile' => self::getProfileDetails($r->identity, $identity),
+                'profile' => self::getUserProfile($r->identity, $identity),
                 'PROGRAMMING_LANGUAGES' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
                 'COUNTRIES' => \OmegaUp\DAO\Countries::getAll(
                     null,
@@ -4072,7 +4185,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'name'
             ),
             'programmingLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
-            'profile' => self::getProfileDetails($r->identity, $identity),
+            'profile' => self::getUserProfile($r->identity, $identity),
             'extraProfileDetails' => [
                 'contests' => self::getContestStats($identity),
                 'solvedProblems' => self::getSolvedProblems(
@@ -4120,7 +4233,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'email' => $currentSession['email'],
                 ],
-                'profile' => self::getProfileDetails(
+                'profile' => self::getUserProfile(
                     $currentSession['identity'],
                     $identity
                 ),
@@ -4135,27 +4248,6 @@ class User extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => $smartyProperties,
             'template' => 'user.email.edit.tpl',
         ];
-    }
-
-    /**
-     * @return UserProfileInfo
-     */
-    private static function getProfileDetails(
-        ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
-        \OmegaUp\DAO\VO\Identities $identity
-    ) {
-        $response = self::getUserProfile($loggedIdentity, $identity);
-        if (
-            !empty($response['graduation_date'])
-            && is_object($response['graduation_date'])
-        ) {
-            $response['graduation_date'] = gmdate(
-                'Y-m-d',
-                $response['graduation_date']->time
-            ) ?: null;
-        }
-
-        return $response;
     }
 
     /**

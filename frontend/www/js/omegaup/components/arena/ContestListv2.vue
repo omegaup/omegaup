@@ -12,54 +12,51 @@
         vertical
         nav-wrapper-class="contest-list-nav col-sm-4 col-md-2"
       >
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <form :action="queryURL" method="GET">
+                <div class="input-group">
+                  <input
+                    v-model="activeQuery"
+                    class="form-control"
+                    type="text"
+                    name="query"
+                    autocomplete="off"
+                    :placeholder="T.wordsKeyword"
+                  />
+                  <div class="input-group-append">
+                    <input
+                      class="btn btn-primary btn-md active"
+                      type="submit"
+                      :value="T.wordsSearch"
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
         <b-tab
           ref="currentContestTab"
           :title="T.contestListCurrent"
           :title-link-class="titleLinkClass(ContestTab.Current)"
-          active
         >
-          <div v-if="contests.current.length === 0">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
-          </div>
-          <omegaup-contest-card
-            v-for="contestItem in contests.current"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
-            :contest-tab="activeTab"
-          />
+          {{ contests.current }}
         </b-tab>
         <b-tab
           ref="futureContestTab"
           :title="T.contestListFuture"
           :title-link-class="titleLinkClass(ContestTab.Future)"
         >
-          <div v-if="contests.future.length === 0">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
-          </div>
-          <omegaup-contest-card
-            v-for="contestItem in contests.future"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
-            :contest-tab="activeTab"
-          />
+          {{ contests.future }}
         </b-tab>
         <b-tab
           ref="pastContestTab"
           :title="T.contestListPast"
           :title-link-class="titleLinkClass(ContestTab.Past)"
         >
-          <div v-if="contests.past.length === 0">
-            <div class="empty-category">{{ T.contestListEmpty }}</div>
-          </div>
-          <omegaup-contest-card
-            v-for="contestItem in contests.past"
-            v-else
-            :key="contestItem.contest_id"
-            :contest="contestItem"
-            :contest-tab="activeTab"
-          />
+          {{ contests.past }}
         </b-tab>
       </b-tabs>
     </b-card>
@@ -70,7 +67,6 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import ContestCard from './ContestCard.vue';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
 import 'bootstrap/dist/css/bootstrap.css';
@@ -88,15 +84,15 @@ export enum ContestTab {
 }
 
 @Component({
-  components: {
-    'omegaup-contest-card': ContestCard,
-  },
+  components: {},
 })
 export default class ArenaContestList extends Vue {
   @Prop() contests!: types.ContestList;
+  @Prop() query!: string;
   T = T;
   ContestTab = ContestTab;
-  activeTab: ContestTab = ContestTab.Current;
+  activeTab: ContestTab = this.section;
+  activeQuery: string = this.query;
 
   titleLinkClass(tab: ContestTab) {
     if (this.activeTab === tab) {
@@ -104,6 +100,16 @@ export default class ArenaContestList extends Vue {
     } else {
       return ['text-center', 'title-link'];
     }
+  }
+
+  get queryURL(): string {
+    return `/arenav2/#${this.activeTab}`;
+  }
+
+  get section(): number {
+    return window.location.hash
+      ? parseInt(window.location.hash.substr(1))
+      : ContestTab.Current;
   }
 }
 </script>
@@ -129,12 +135,5 @@ export default class ArenaContestList extends Vue {
       ) !important;
     }
   }
-}
-
-.empty-category {
-  text-align: center;
-  font-size: 200%;
-  margin: 1em;
-  color: var(--arena-contest-list-empty-category-font-color);
 }
 </style>
