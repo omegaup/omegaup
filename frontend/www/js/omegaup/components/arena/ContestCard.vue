@@ -17,7 +17,7 @@
         </b-col>
         <b-col cols="3">
           <b-button
-            v-if="contestTab === ContestTab.Past"
+            v-if="contestTab === 2"
             ref="contestButtonScoreboard"
             :href="getContestScoreboardURL(contest.alias)"
             variant="success"
@@ -27,7 +27,7 @@
           </b-button>
           <b-card-text
             v-else-if="
-              (contestTab === ContestTab.Current || contestTab === ContestTab.Future) && contest.participating
+              (contestTab === 0 || contestTab === 1) && contest.participating
             "
             ref="contestEnrollStatus"
             class="contest-enroll-status"
@@ -39,7 +39,7 @@
       </b-row>
       <b-row class="p-1" align-v="center">
         <b-col>
-          <b-card-text v-if="contestTab === ContestTab.Current">
+          <b-card-text v-if="contestTab === 0">
             <font-awesome-icon icon="calendar-alt" />
             {{
               ui.formatString(T.contestEndTime, {
@@ -47,7 +47,7 @@
               })
             }}
           </b-card-text>
-          <b-card-text v-else-if="contestTab === ContestTab.Future">
+          <b-card-text v-else-if="contestTab === 1">
             <font-awesome-icon icon="calendar-alt" />
             {{
               ui.formatString(T.contestStartTime, {
@@ -55,7 +55,7 @@
               })
             }}
           </b-card-text>
-          <b-card-text v-else-if="contestTab === ContestTab.Past">
+          <b-card-text v-else-if="contestTab === 2">
             <font-awesome-icon icon="calendar-alt" />
             {{
               ui.formatString(T.contestStartedTime, {
@@ -82,7 +82,7 @@
         </b-col>
         <b-col>
           <b-button
-            v-if="contestTab === ContestTab.Current && contest.participating"
+            v-if="contestTab === 0 && contest.participating"
             ref="contestButtonEnter"
             :href="getContestURL(contest.alias)"
             variant="primary"
@@ -92,7 +92,7 @@
           </b-button>
           <b-button
             v-else-if="
-              (contestTab === ContestTab.Current || contestTab === ContestTab.Future) && !contest.participating
+              (contestTab === 0 || contestTab === 1) && !contest.participating
             "
             ref="contestButtonSingUp"
             :href="getContestURL(contest.alias)"
@@ -101,7 +101,7 @@
             <font-awesome-icon icon="sign-in-alt" />
             {{ T.contestButtonSingUp }}
           </b-button>
-          <b-dropdown v-else-if="contestTab === ContestTab.Past" variant="primary">
+          <b-dropdown v-else-if="contestTab === 2" variant="primary">
             <template #button-content>
               <font-awesome-icon icon="sign-in-alt" />
               {{ T.contestButtonEnter }}
@@ -149,7 +149,6 @@ library.add(fas);
 export default class ContestCard extends Vue {
   @Prop() contest!: types.ContestListItem;
   @Prop() contestTab!: ContestTab;
-  ContestTab = ContestTab;
 
   T = T;
   ui = ui;
@@ -170,19 +169,19 @@ export default class ContestCard extends Vue {
   }
 
   getContestURL(alias: string): string {
-    return `/arena/${encodeURIComponent(alias)}/`;
+    return `/arena/${alias}/`;
   }
 
   getContestScoreboardURL(alias: string): string {
-    return `/arena/${encodeURIComponent(alias)}/#ranking`;
+    return `/arena/${alias}/#ranking`;
   }
 
   getVirtualContestURL(alias: string): string {
-    return `/arena/${encodeURIComponent(alias)}/virtual/`;
+    return `/arena/${alias}/virtual/`;
   }
 
   getPracticeContestURL(alias: string): string {
-    return `/arena/${encodeURIComponent(alias)}/practice/`;
+    return `/arena/${alias}/practice/`;
   }
 }
 </script>
