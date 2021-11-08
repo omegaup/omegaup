@@ -70,6 +70,9 @@ class ApiCaller {
         $referrerHost = parse_url($httpReferer, PHP_URL_HOST);
         if (is_null($referrerHost)) {
             // Malformed referrer. Fail closed and prefer to not allow this.
+            self::$log->error(
+                "CSRF attempt, no referrer found in '{$httpReferer}'"
+            );
             return true;
         }
         // Instead of attempting to exactly match the whole URL, just ensure
@@ -78,8 +81,17 @@ class ApiCaller {
         $allowedHosts = [
             parse_url(OMEGAUP_URL, PHP_URL_HOST),
             OMEGAUP_LOCKDOWN_DOMAIN,
+            ...OMEGAUP_CSRF_HOSTS,
         ];
-        return !in_array($referrerHost, $allowedHosts, true);
+        if (!in_array($referrerHost, $allowedHosts, true)) {
+            self::$log->error(
+                "CSRF attempt, referrer host '{$referrerHost}' not in " .
+                json_encode($allowedHosts)
+            );
+            return true;
+        }
+
+        return false;
     }
 
     /**
