@@ -61,8 +61,7 @@ describe('BasicInformationEdit.vue', () => {
     });
     await wrapper
       .find('select[data-countries]')
-      .findAll('option')
-      .at(1)
+      .find('option[value="CA"]')
       .setSelected();
     expect(wrapper.find('select[data-countries]').element).toBeEnabled();
   });
@@ -71,38 +70,36 @@ describe('BasicInformationEdit.vue', () => {
     const wrapper = mount(user_Basic_Information_Edit, {
       propsData: basicInformationEditProps,
     });
-    const expected: types.UserProfileInfo = {
-      ...profile,
-      username: 'omegaup modified',
-      name: 'omegaUp admin modified',
-      birth_date: new Date('2001-01-01'),
-      gender: 'other',
-      country_id: 'CA',
-      state_id: 'AB',
-    };
+
     await wrapper.find('input[data-username]').setValue('omegaup modified');
     await wrapper.find('input[data-name]').setValue('omegaUp admin modified');
     await wrapper.findComponent(date_Picker).setValue('2001-01-01');
     await wrapper
       .find('select[data-gender]')
-      .findAll('option')
-      .at(2)
+      .find('option[value="other"]')
       .setSelected();
     await wrapper
       .find('select[data-countries]')
-      .findAll('option')
-      .at(2)
+      .find('option[value="CA"]')
       .setSelected();
     await wrapper
       .find('select[data-states]')
-      .findAll('option')
-      .at(0)
+      .find('option[value="AB"]')
       .setSelected();
 
     await wrapper.find('button[type="submit"]').trigger('submit');
     expect(wrapper.emitted('update-user-basic-information')).toBeDefined();
-    expect(
-      wrapper.emitted('update-user-basic-information')?.[0][0].user,
-    ).toEqual(expected);
+    expect(wrapper.emitted('update-user-basic-information')).toEqual([
+      [
+        {
+          username: 'omegaup modified',
+          name: 'omegaUp admin modified',
+          gender: 'other',
+          countryId: 'CA',
+          stateId: 'AB',
+          birthDate: new Date('2001-01-01'),
+        },
+      ],
+    ]);
   });
 });

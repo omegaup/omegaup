@@ -1,87 +1,70 @@
 <template>
-  <div class="card">
-    <div class="card-header">
-      <h3 class="card-title">{{ T.userEditBasicInformation }}</h3>
+  <form
+    role="form"
+    class="card-body"
+    @submit.prevent="onUpdateUserBasicInformation"
+  >
+    <div class="form-group">
+      <label>{{ T.username }}</label>
+      <input v-model="username" data-username class="form-control" />
     </div>
-    <form role="form" class="card-body" @submit.prevent="onUpdateUser">
-      <div class="form-group">
-        <label>{{ T.username }}</label>
-        <input
-          v-model="selectedProfileInfo.username"
-          data-username
-          class="form-control"
-        />
-      </div>
-      <div class="form-group">
-        <label>{{ T.wordsName }}</label>
-        <input
-          v-model="selectedProfileInfo.name"
-          data-name
-          class="form-control"
-        />
-      </div>
-      <div class="form-group">
-        <label>{{ T.wordsGender }}</label>
-        <select
-          v-model="selectedProfileInfo.gender"
-          data-gender
-          class="form-control"
+    <div class="form-group">
+      <label>{{ T.wordsName }}</label>
+      <input v-model="name" data-name class="form-control" />
+    </div>
+    <div class="form-group">
+      <label>{{ T.wordsGender }}</label>
+      <select v-model="gender" data-gender class="form-control">
+        <option value="female">{{ T.wordsGenderFemale }}</option>
+        <option value="male">{{ T.wordsGenderMale }}</option>
+        <option value="other">{{ T.wordsGenderOther }}</option>
+        <option value="decline">{{ T.wordsGenderDecline }}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>{{ T.wordsCountry }}</label>
+      <select v-model="countryId" data-countries class="form-control">
+        <option value=""></option>
+        <option
+          v-for="country in countries"
+          :key="country.country_id"
+          :value="country.country_id"
         >
-          <option value="female">{{ T.wordsGenderFemale }}</option>
-          <option value="male">{{ T.wordsGenderMale }}</option>
-          <option value="other">{{ T.wordsGenderOther }}</option>
-          <option value="decline">{{ T.wordsGenderDecline }}</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>{{ T.wordsCountry }}</label>
-        <select
-          v-model="selectedProfileInfo.country_id"
-          data-countries
-          class="form-control"
+          {{ country.name }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>{{ T.profileState }}</label>
+      <select
+        v-model="stateId"
+        data-states
+        :disabled="!isCountrySelected"
+        class="form-control"
+      >
+        <option
+          v-for="[code, state] in Object.entries(countryStates)"
+          :key="code"
+          :value="code.split('-')[1]"
         >
-          <option value=""></option>
-          <option
-            v-for="country in countries"
-            :key="country.country_id"
-            :value="country.country_id"
-          >
-            {{ country.name }}
-          </option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>{{ T.profileState }}</label>
-        <select
-          v-model="selectedProfileInfo.state_id"
-          data-states
-          :disabled="!isCountrySelected"
-          class="form-control"
-        >
-          <option
-            v-for="[code, state] in Object.entries(countryStates)"
-            :key="code"
-            :value="code.split('-')[1]"
-          >
-            {{ state.name }}
-          </option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>{{ T.userEditBirthDate }}</label>
-        <omegaup-datepicker
-          v-model="selectedProfileInfo.birth_date"
-          :required="false"
-        ></omegaup-datepicker>
-      </div>
-      <div class="mt-3">
-        <button type="submit" class="btn btn-primary mr-2">
-          {{ T.wordsSaveChanges }}
-        </button>
-        <a href="/profile" class="btn btn-cancel">{{ T.wordsCancel }}</a>
-      </div>
-    </form>
-  </div>
+          {{ state.name }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>{{ T.userEditBirthDate }}</label>
+      <omegaup-datepicker
+        v-model="birthDate"
+        :required="false"
+      ></omegaup-datepicker>
+    </div>
+    <div class="mt-3">
+      <button type="submit" class="btn btn-primary mr-2">
+        {{ T.wordsSaveChanges }}
+      </button>
+      <a href="/profile" class="btn btn-cancel">{{ T.wordsCancel }}</a>
+    </div>
+  </form>
 </template>
 
 <script lang="ts">
@@ -97,25 +80,27 @@ import DatePicker from '../DatePicker.vue';
     'omegaup-datepicker': DatePicker,
   },
 })
-export default class UserProfileEdit extends Vue {
+export default class UserBasicInformationEdit extends Vue {
   @Prop() data!: types.UserProfileEditDetailsPayload;
   @Prop() profile!: types.UserProfileInfo;
 
   T = T;
   countries = this.data.countries;
-  selectedProfileInfo = {
-    ...this.profile,
-    birth_date: this.profile.birth_date
-      ? time.convertLocalDateToGMTDate(this.profile.birth_date)
-      : new Date(''),
-  };
+  username = this.profile.username;
+  name = this.profile.name;
+  gender = this.profile.gender;
+  countryId = this.profile.country_id ?? null;
+  stateId = this.profile.state_id ?? null;
+  birthDate = this.profile.birth_date
+    ? time.convertLocalDateToGMTDate(this.profile.birth_date)
+    : new Date('');
 
   get isCountrySelected(): boolean {
-    return Boolean(this.selectedProfileInfo.country_id);
+    return Boolean(this.countryId);
   }
 
   get countryStates(): iso3166.Subdivisions {
-    const countryId = this.selectedProfileInfo.country_id;
+    const countryId = this.countryId;
     if (!countryId) {
       return {};
     }
@@ -128,26 +113,26 @@ export default class UserProfileEdit extends Vue {
     return subdivisions;
   }
 
-  onUpdateUser(): void {
-    const user: types.UserProfileInfo = {
-      ...this.selectedProfileInfo,
-      birth_date: isNaN(this.selectedProfileInfo.birth_date.getTime())
-        ? undefined
-        : this.selectedProfileInfo.birth_date,
+  onUpdateUserBasicInformation(): void {
+    const newUserBasicInformation = {
+      username: this.username,
+      name: this.name,
+      gender: this.gender,
+      countryId: this.countryId,
+      stateId: this.stateId,
+      birthDate: isNaN(this.birthDate.getTime()) ? null : this.birthDate,
     };
-    this.$emit('update-user-basic-information', { user: user });
+    this.$emit('update-user-basic-information', newUserBasicInformation);
   }
 
-  @Watch('selectedProfileInfo.country_id')
+  @Watch('countryId')
   onCountryIdChanged(newCountryId: string): void {
     if (!newCountryId) {
-      this.selectedProfileInfo.country_id = undefined;
-      this.selectedProfileInfo.state_id = undefined;
+      this.countryId = null;
+      this.stateId = null;
       return;
     }
-    this.selectedProfileInfo.state_id = Object.keys(
-      this.countryStates,
-    )[0].split('-')[1];
+    this.stateId = Object.keys(this.countryStates)[0].split('-')[1];
   }
 }
 </script>
