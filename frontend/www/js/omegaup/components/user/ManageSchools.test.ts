@@ -33,8 +33,7 @@ describe('ManageSchools.vue', () => {
     expect(wrapper.findComponent(datePicker).element).toBeDisabled();
     await wrapper
       .findComponent(omegaupRadioSwitch)
-      .findAll('input')
-      .at(1)
+      .find('input[value="false"]')
       .setChecked();
     expect(wrapper.findComponent(datePicker).element).toBeEnabled();
   });
@@ -44,23 +43,27 @@ describe('ManageSchools.vue', () => {
       propsData: { profile },
     });
 
-    await wrapper.find('select').findAll('option').at(8).setSelected();
+    await wrapper
+      .find('select')
+      .find('option[value="bachelors"]')
+      .setSelected();
     await wrapper
       .findComponent(omegaupRadioSwitch)
-      .findAll('input')
-      .at(1)
+      .find('input[value="false"]')
       .setChecked();
     await wrapper.findComponent(datePicker).setValue('2010-10-10');
 
     await wrapper.find('button[type="submit"]').trigger('submit');
     expect(wrapper.emitted('update-user-schools')).toBeDefined();
-    expect(wrapper.emitted('update-user-schools')?.[0]).toEqual([
-      {
-        graduationDate: new Date('2010-10-10'),
-        schoolId: 1,
-        schoolName: 'escuela',
-        scholarDegree: 'bachelors',
-      },
+    expect(wrapper.emitted('update-user-schools')).toEqual([
+      [
+        {
+          graduationDate: new Date('2010-10-10'),
+          schoolId: 1,
+          schoolName: 'escuela',
+          scholarDegree: 'bachelors',
+        },
+      ],
     ]);
   });
 });
