@@ -7,35 +7,11 @@ import * as ui from '../ui';
 import T from '../lang';
 
 // TODO: Import Profile.vue when it is merged
-import user_Profile from '../components/user/Profilev2.vue';
-
-const urlMapping: { key: string; title: string; visible: boolean }[] = [
-  { key: 'see-profile', title: T.userEditSeeProfile, visible: true },
-  { key: 'edit-basic-information', title: T.profileEdit, visible: true },
-  { key: 'edit-preferences', title: T.userEditPreferences, visible: true },
-  { key: 'manage-schools', title: T.userEditManageSchools, visible: true },
-  { key: 'manage-identities', title: T.profileManageIdentities, visible: true },
-  { key: 'change-password', title: T.userEditChangePassword, visible: true },
-  { key: 'add-password', title: T.userEditAddPassword, visible: false },
-  { key: 'change-email', title: T.userEditChangeEmail, visible: false },
-];
+import user_Profile from '../components/user/Profile.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
-  const locationHash = window.location.hash.substr(1).split('/');
-  const activeTab = getSelectedValidTab(locationHash[0], urlMapping);
-
-  if (activeTab !== locationHash[0]) {
-    window.location.hash = activeTab;
-  }
-
-  function getSelectedValidTab(
-    tab: string,
-    urls: { key: string; title: string; visible: boolean }[],
-  ): string {
-    const validTabs = urls.filter((url) => url.visible).map((url) => url.key);
-    return validTabs.includes(tab) ? tab : 'see-profile';
-  }
+  const locationHash = window.location.hash.substr(1).split('#');
 
   const userProfile = new Vue({
     el: '#main-container',
@@ -60,8 +36,7 @@ OmegaUp.on('ready', () => {
             ),
           ),
           visitorBadges: new Set(payload.extraProfileDetails?.badges),
-          tabSelected: activeTab,
-          urlMapping: payload.profile.is_own_profile ? urlMapping : [],
+          selectedTab: locationHash[0] != '' ? locationHash[0] : 'see-profile',
           identities: this.identities,
         },
         on: {
