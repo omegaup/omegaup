@@ -28,7 +28,7 @@ const profile: types.UserProfileInfo = {
 
 const basicInformationEditProps: {
   profile: types.UserProfileInfo;
-  data: types.UserProfileEditDetailsPayload;
+  data: types.UserProfileDetailsPayload;
 } = {
   profile,
   data: {
@@ -44,6 +44,7 @@ const basicInformationEditProps: {
     ],
     programmingLanguages: { py2: 'Python 2', py3: 'Python 3' },
     profile: profile,
+    identities: [],
   },
 };
 
