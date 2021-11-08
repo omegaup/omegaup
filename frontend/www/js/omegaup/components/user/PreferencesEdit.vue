@@ -1,79 +1,70 @@
 <template>
-  <div class="card">
-    <div class="card-header">
-      <h3 class="card-title">{{ T.userEditPreferences }}</h3>
+  <form role="form" class="card-body" @submit.prevent="onUpdateUserPreferences">
+    <div class="form-group">
+      <label>{{ T.userEditProfileImage }}</label>
+      <a
+        href="http://www.gravatar.com"
+        target="_blank"
+        data-email
+        class="btn btn-link"
+      >
+        {{ T.userEditGravatar }} {{ email }}
+      </a>
     </div>
-    <form
-      role="form"
-      class="card-body"
-      @submit.prevent="onUpdateUserPreferences"
-    >
-      <div class="form-group">
-        <label>{{ T.userEditProfileImage }}</label>
-        <a
-          href="http://www.gravatar.com"
-          target="_blank"
-          data-email
-          class="btn btn-link"
+    <div class="form-group">
+      <label>{{ T.userEditLanguage }}</label>
+      <select v-model="locale" data-locale class="form-control">
+        <option value="es">{{ T.wordsSpanish }}</option>
+        <option value="en">{{ T.wordsEnglish }}</option>
+        <option value="pt">{{ T.wordsPortuguese }}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>{{ T.userEditPreferredProgrammingLanguage }}</label>
+      <select
+        v-model="preferredLanguage"
+        data-preferred-language
+        class="form-control"
+      >
+        <option value=""></option>
+        <option
+          v-for="[extension, name] in Object.entries(programmingLanguages)"
+          :key="extension"
+          :value="extension"
         >
-          {{ T.userEditGravatar }} {{ email }}
-        </a>
-      </div>
-      <div class="form-group">
-        <label>{{ T.userEditLanguage }}</label>
-        <select v-model="locale" data-locale class="form-control">
-          <option value="es">{{ T.wordsSpanish }}</option>
-          <option value="en">{{ T.wordsEnglish }}</option>
-          <option value="pt">{{ T.wordsPortuguese }}</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>{{ T.userEditPreferredProgrammingLanguage }}</label>
-        <select
-          v-model="preferredLanguage"
-          data-preferred-language
-          class="form-control"
-        >
-          <option value=""></option>
-          <option
-            v-for="[extension, name] in Object.entries(programmingLanguages)"
-            :key="extension"
-            :value="extension"
-          >
-            {{ name }}
-          </option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>
-          <input
-            v-model="isPrivate"
-            type="checkbox"
-            :checked="isPrivate"
-            data-is-private
-            class="mr-2"
-          />{{ T.userEditPrivateProfile }}
-        </label>
-      </div>
-      <div class="form-group">
-        <label>
-          <input
-            v-model="hideProblemTags"
-            type="checkbox"
-            :checked="hideProblemTags"
-            data-hide-problem-tags
-            class="mr-2"
-          />{{ T.userEditHideProblemTags }}
-        </label>
-      </div>
-      <div class="mt-3">
-        <button type="submit" class="btn btn-primary mr-2">
-          {{ T.wordsSaveChanges }}
-        </button>
-        <a href="/profile" class="btn btn-cancel">{{ T.wordsCancel }}</a>
-      </div>
-    </form>
-  </div>
+          {{ name }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>
+        <input
+          v-model="isPrivate"
+          type="checkbox"
+          :checked="isPrivate"
+          data-is-private
+          class="mr-2"
+        />{{ T.userEditPrivateProfile }}
+      </label>
+    </div>
+    <div class="form-group">
+      <label>
+        <input
+          v-model="hideProblemTags"
+          type="checkbox"
+          :checked="hideProblemTags"
+          data-hide-problem-tags
+          class="mr-2"
+        />{{ T.userEditHideProblemTags }}
+      </label>
+    </div>
+    <div class="mt-3">
+      <button type="submit" class="btn btn-primary mr-2">
+        {{ T.wordsSaveChanges }}
+      </button>
+      <a href="/profile" class="btn btn-cancel">{{ T.wordsCancel }}</a>
+    </div>
+  </form>
 </template>
 
 <script lang="ts">
@@ -81,9 +72,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 
-@Component({
-  components: {},
-})
+@Component
 export default class UserPreferencesEdit extends Vue {
   @Prop() profile!: types.UserProfileInfo;
 
@@ -99,9 +88,7 @@ export default class UserPreferencesEdit extends Vue {
     this.$emit('update-user-preferences', {
       locale: this.locale,
       localeChanged: this.locale != this.profile.locale,
-      preferredLanguage: this.preferredLanguage
-        ? this.preferredLanguage
-        : undefined,
+      preferredLanguage: this.preferredLanguage ? this.preferredLanguage : null,
       isPrivate: this.isPrivate,
       hideProblemTags: this.hideProblemTags,
     });

@@ -41,27 +41,27 @@ describe('PreferencesEdit.vue', () => {
 
     await wrapper
       .find('select[data-locale]')
-      .findAll('option')
-      .at(1)
+      .find('option[value="en"]')
       .setSelected();
     await wrapper
       .find('select[data-preferred-language]')
-      .findAll('option')
-      .at(2)
+      .find('option[value="rb"]')
       .setSelected();
     await wrapper.find('input[data-is-private]').setChecked();
     await wrapper.find('input[data-hide-problem-tags]').setChecked();
 
     await wrapper.find('button[type="submit"]').trigger('submit');
     expect(wrapper.emitted('update-user-preferences')).toBeDefined();
-    expect(wrapper.emitted('update-user-preferences')?.[0]).toEqual([
-      {
-        locale: 'en',
-        localeChanged: true,
-        preferredLanguage: 'rb',
-        isPrivate: true,
-        hideProblemTags: true,
-      },
+    expect(wrapper.emitted('update-user-preferences')).toEqual([
+      [
+        {
+          locale: 'en',
+          localeChanged: true,
+          preferredLanguage: 'rb',
+          isPrivate: true,
+          hideProblemTags: true,
+        },
+      ],
     ]);
   });
 });
