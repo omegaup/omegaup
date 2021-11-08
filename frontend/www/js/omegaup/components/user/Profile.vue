@@ -3,22 +3,20 @@
     <omegaup-user-profile-wrapper
       :profile="profile"
       :data="data"
-      :tab-selected="currentTabSelected"
-      :url-mapping="urlMapping"
-      @update-tab="(tab) => (currentTabSelected = tab)"
+      :selected-tab.sync="currentSelectedTab"
     >
       <template #title>
         <h3>{{ currentTitle }}</h3>
       </template>
       <template #content>
-        <template v-if="currentTabSelected === 'manage-identities'">
+        <template v-if="currentSelectedTab === 'manage-identities'">
           <omegaup-user-manage-identities
             :identities="identities"
             @add-identity="(request) => $emit('add-identity', request)"
           ></omegaup-user-manage-identities>
         </template>
         <div v-else>
-          {{ currentTabSelected }}
+          {{ currentSelectedTab }}
         </div>
       </template>
     </omegaup-user-profile-wrapper>
@@ -30,6 +28,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import user_ProfileWrapper from './ProfileWrapper.vue';
+import { urlMapping } from './SidebarMainInfo.vue';
 import user_ManageIdentities from './ManageIdentitiesv2.vue';
 
 @Component({
@@ -38,24 +37,19 @@ import user_ManageIdentities from './ManageIdentitiesv2.vue';
     'omegaup-user-manage-identities': user_ManageIdentities,
   },
 })
-export default class UserProfile extends Vue {
+export default class Profile extends Vue {
   @Prop({ default: null }) data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
-  @Prop({ default: 'see-profile' }) tabSelected!: string;
-  @Prop({ default: () => [] }) urlMapping!: {
-    key: string;
-    title: string;
-    visible: boolean;
-  }[];
+  @Prop({ default: 'see-profile' }) selectedTab!: string;
   @Prop() identities!: types.Identity[];
 
   T = T;
-  currentTabSelected = this.tabSelected;
+  currentSelectedTab = this.selectedTab;
 
   get currentTitle(): string {
     return (
-      this.urlMapping.find((url) => url.key === this.currentTabSelected)
-        ?.title ?? 'see-profile'
+      urlMapping.find((url) => url.key === this.currentSelectedTab)?.title ??
+      'see-profile'
     );
   }
 }

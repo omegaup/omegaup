@@ -6,8 +6,7 @@
         <omegaup-user-maininfo
           :profile="profile"
           :data="data"
-          :url-mapping="urlMapping"
-          :tab-selected.sync="currentTabSelected"
+          :selected-tab.sync="currentSelectedTab"
         >
         </omegaup-user-maininfo>
       </div>
@@ -38,18 +37,13 @@ import { types } from '../../api_types';
 export default class UserProfile extends Vue {
   @Prop({ default: null }) data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
-  @Prop({ default: null }) tabSelected!: null | string;
-  @Prop({ default: () => [] }) urlMapping!: {
-    key: string;
-    title: string;
-    visible: boolean;
-  }[];
+  @Prop({ default: null }) selectedTab!: null | string;
 
-  currentTabSelected = this.tabSelected;
+  currentSelectedTab = this.selectedTab;
 
-  @Watch('currentTabSelected')
-  onCurrentTabSelectedChanged(newValue: string) {
-    this.$emit('update-tab', newValue);
+  @Watch('currentSelectedTab')
+  onCurrentSelectedTabChanged(newValue: string) {
+    this.$emit('update:selectedTab', newValue);
   }
 }
 </script>

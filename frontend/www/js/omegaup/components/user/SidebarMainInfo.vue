@@ -61,12 +61,12 @@
     </div>
     <div v-if="profile.is_own_profile" class="card-body text-center">
       <a
-        v-for="url in urlMapping.filter((url) => url.visible)"
+        v-for="url in currentUrlMapping.filter((url) => url.visible)"
         :key="url.key"
         class="btn btn-primary btn-sm my-1 w-100"
         :href="`/profile/#${url.key}`"
-        :class="{ disabled: url.key === tabSelected }"
-        @click="$emit('update:tabSelected', url.key)"
+        :class="{ disabled: url.key === selectedTab }"
+        @click="$emit('update:selectedTab', url.key)"
       >
         {{ url.title }}
       </a>
@@ -82,6 +82,17 @@ import user_Username from './Username.vue';
 import { types } from '../../api_types';
 import { Problem } from '../../linkable_resource';
 
+export const urlMapping: { key: string; title: string; visible: boolean }[] = [
+  { key: 'see-profile', title: T.userEditSeeProfile, visible: true },
+  { key: 'edit-basic-information', title: T.profileEdit, visible: true },
+  { key: 'edit-preferences', title: T.userEditPreferences, visible: true },
+  { key: 'manage-schools', title: T.userEditManageSchools, visible: true },
+  { key: 'manage-identities', title: T.profileManageIdentities, visible: true },
+  { key: 'change-password', title: T.userEditChangePassword, visible: true },
+  { key: 'add-password', title: T.userEditAddPassword, visible: false },
+  { key: 'change-email', title: T.userEditChangeEmail, visible: false },
+];
+
 @Component({
   components: {
     'omegaup-countryflag': country_Flag,
@@ -91,12 +102,7 @@ import { Problem } from '../../linkable_resource';
 export default class UserSidebarMainInfo extends Vue {
   @Prop({ default: null }) data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
-  @Prop({ default: null }) tabSelected!: null | string;
-  @Prop({ default: () => [] }) urlMapping!: {
-    key: string;
-    title: string;
-    visible: boolean;
-  }[];
+  @Prop({ default: null }) selectedTab!: null | string;
 
   T = T;
 
@@ -119,6 +125,14 @@ export default class UserSidebarMainInfo extends Vue {
       default:
         return T.profileRankUnrated;
     }
+  }
+
+  get currentUrlMapping(): {
+    key: string;
+    title: string;
+    visible: boolean;
+  }[] {
+    return this.profile.is_own_profile ? urlMapping : [];
   }
 }
 </script>
