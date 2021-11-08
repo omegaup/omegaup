@@ -57,7 +57,7 @@ const data: types.ExtraProfileDetails = {
   unsolvedProblems: [],
 };
 
-const urlMapping: types.UrlProfile[] = [
+const urlMapping: { key: string; title: string; visible: boolean }[] = [
   { key: 'manage-identities', title: T.profileManageIdentities, visible: true },
   { key: 'change-password', title: T.userEditChangePassword, visible: true },
   { key: 'add-password', title: T.userEditAddPassword, visible: false },
@@ -97,7 +97,7 @@ describe('SidebarMainInfo.vue', () => {
 
   it('Should display number of solved problems', () => {
     const wrapper = shallowMount(user_SidebarMainInfo, {
-      propsData: { profile, data, urlMapping },
+      propsData: { profile, data },
     });
     expect(wrapper.text()).toContain('3');
   });
@@ -109,7 +109,6 @@ describe.each(rankingMapping)(`A user:`, (rank) => {
       propsData: {
         profile: { ...profile, ...{ classname: rank.classname } },
         data,
-        urlMapping,
       },
     });
     expect(wrapper.text()).toContain(rank.rank);

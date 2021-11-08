@@ -4060,12 +4060,6 @@ export namespace types {
     [key: string]: types.ContestListItem[];
   }
 
-  export interface UrlProfile {
-    key: string;
-    title: string;
-    visible: boolean;
-  }
-
   export interface UserDetailsPayload {
     emails: string[];
     experiments: string[];
@@ -4120,7 +4114,6 @@ export namespace types {
     identities: types.AssociatedIdentity[];
     profile: types.UserProfileInfo;
     programmingLanguages: { [key: string]: string };
-    urlMapping: types.UrlProfile[];
   }
 
   export interface UserProfileInfo {

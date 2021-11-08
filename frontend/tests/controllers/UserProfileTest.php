@@ -619,7 +619,6 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties']['payload'];
         $profile = $response['profile'];
 
-        $this->assertNotEmpty($response['urlMapping']);
         $this->assertEquals($identity->username, $profile['username']);
         $this->assertEquals($identity->name, $profile['name']);
         $this->assertTrue($profile['is_own_profile']);
@@ -645,8 +644,6 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties']['payload'];
         $profile = $response['profile'];
 
-        // UrlMapping is empty when user is seeing another user profile
-        $this->assertEmpty($response['urlMapping']);
         $this->assertEquals($identity->username, $profile['username']);
         $this->assertEquals($identity->name, $profile['name']);
         $this->assertFalse($profile['is_own_profile']);
@@ -660,8 +657,6 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties']['payload'];
         $profile = $response['profile'];
 
-        // UrlMapping is empty when user is seeing another user profile
-        $this->assertEmpty($response['urlMapping']);
         $this->assertEquals($identity->username, $profile['username']);
         $this->assertEquals($identity->name, $profile['name']);
         $this->assertFalse($profile['is_own_profile']);
@@ -687,8 +682,6 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties']['payload'];
         $profile = $response['profile'];
 
-        // UrlMapping is empty when user is seeing a private profile for a user
-        $this->assertEmpty($response['urlMapping']);
         $this->assertTrue($profile['is_private']);
         $this->assertEquals($identity->username, $profile['username']);
         $this->assertFalse($profile['is_own_profile']);
