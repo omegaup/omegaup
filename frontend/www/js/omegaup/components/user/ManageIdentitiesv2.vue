@@ -2,7 +2,7 @@
   <div>
     <form
       class="form add-identity-form"
-      @submit.prevent="onAddIdentity(dataForm)"
+      @submit.prevent="onAddIdentity(username, password)"
     >
       <div class="form-group">
         <label class="w-100">
@@ -12,7 +12,7 @@
             icon="info-circle"
           ></font-awesome-icon>
           <input
-            v-model="dataForm.username"
+            v-model="username"
             autocomplete="off"
             class="form-control username-input"
             size="20"
@@ -24,7 +24,7 @@
         <label class="w-100">
           {{ T.loginPassword }}
           <input
-            v-model="dataForm.password"
+            v-model="password"
             autocomplete="off"
             class="form-control password-input"
             size="20"
@@ -81,15 +81,22 @@ library.add(fas);
 })
 export default class ManageIdentities extends Vue {
   @Prop() identities!: types.Identity[];
+
   T = T;
-  dataForm: { username: string; password: string } = {
-    username: '',
-    password: '',
-  };
+  username = '';
+  password = '';
 
   @Emit('add-identity')
-  onAddIdentity(dataForm: { username: string; password: string }) {
-    this.dataForm = dataForm;
+  onAddIdentity({
+    username,
+    password,
+  }: {
+    username: string;
+    password: string;
+  }) {
+    this.username = username;
+    this.password = password;
+    return { username, password };
   }
 }
 </script>
