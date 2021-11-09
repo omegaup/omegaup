@@ -106,7 +106,6 @@ export default class UserSidebarMainInfo extends Vue {
   @Prop() selectedTab!: string;
 
   T = T;
-
   currentSelectedTab = this.getSelectedValidTab(
     this.selectedTab,
     this.currentUrlMapping,
