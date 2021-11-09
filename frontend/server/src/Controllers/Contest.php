@@ -1177,7 +1177,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return [
             'smartyProperties' => [
                 'payload' => [
-                    'query' => $r['query'],
+                    'query' => $r->ensureOptionalString('query'),
                     'contests' => $contests,
                 ],
                 'title' => new \OmegaUp\TranslationString(

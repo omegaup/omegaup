@@ -5,7 +5,7 @@
     </div>
     <b-card no-body>
       <b-tabs
-        v-model="activeTab"
+        v-model="currentTab"
         class="sidebar"
         pills
         card
@@ -18,7 +18,7 @@
               <form :action="queryURL" method="GET">
                 <div class="input-group">
                   <input
-                    v-model="activeQuery"
+                    v-model="currentQuery"
                     class="form-control"
                     type="text"
                     name="query"
@@ -89,13 +89,14 @@ export enum ContestTab {
 export default class ArenaContestList extends Vue {
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
+  @Prop() section!: ContestTab;
   T = T;
   ContestTab = ContestTab;
-  activeTab: ContestTab = this.section;
-  activeQuery: string = this.query;
+  currentTab: ContestTab = this.section;
+  currentQuery: string = this.query;
 
   titleLinkClass(tab: ContestTab) {
-    if (this.activeTab === tab) {
+    if (this.currentTab === tab) {
       return ['text-center', 'active-title-link'];
     } else {
       return ['text-center', 'title-link'];
@@ -103,13 +104,7 @@ export default class ArenaContestList extends Vue {
   }
 
   get queryURL(): string {
-    return `/arenav2/#${this.activeTab}`;
-  }
-
-  get section(): number {
-    return window.location.hash
-      ? parseInt(window.location.hash.substr(1))
-      : ContestTab.Current;
+    return `/arenav2/#${this.currentTab}`;
   }
 }
 </script>
