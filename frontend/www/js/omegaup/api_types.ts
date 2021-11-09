@@ -1433,6 +1433,14 @@ export namespace types {
       );
     }
 
+    export function LibinteractiveGenPayload(
+      elementId: string = 'payload',
+    ): types.LibinteractiveGenPayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function LoginDetailsPayload(
       elementId: string = 'payload',
     ): types.LoginDetailsPayload {
@@ -3189,6 +3197,14 @@ export namespace types {
     userRegistrationAccepted?: boolean;
     userRegistrationAnswered?: boolean;
     userRegistrationRequested?: boolean;
+  }
+
+  export interface LibinteractiveGenPayload {
+    error?: { description?: string; field?: string };
+    idl?: string;
+    language?: string;
+    name?: string;
+    os?: string;
   }
 
   export interface LimitsSettings {

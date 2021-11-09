@@ -706,6 +706,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleGroupsNew: "Novo grupo",
   omegaupTitleGroupsScoreboardEdit: "Editar painel de avalia\u00e7\u00e3o",
   omegaupTitleLatestSubmissions: "\u00daltimas submiss\u00f5es",
+  omegaupTitleLibInteractive: "Libinteractive",
   omegaupTitleLogin: "Entrar",
   omegaupTitleLogout: "Sair",
   omegaupTitleMyContests: "Meus concursos",
