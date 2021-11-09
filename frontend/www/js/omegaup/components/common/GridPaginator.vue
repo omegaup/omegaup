@@ -31,6 +31,11 @@
           <td v-for="(item, itemIndex) in group" :key="itemIndex">
             <slot name="item-data" :item="item">
               <a :href="item.getUrl()">
+                <img
+                  v-if="item.getLogo()"
+                  :src="item.getLogo().url"
+                  :title="item.getLogo().title"
+                />
                 {{ item.toString() }}
               </a>
             </slot>
