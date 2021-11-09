@@ -26,7 +26,7 @@
                 }}
               </p>
               <p class="mb-0">{{ courseLevelText(course.level) }}</p>
-              <div class="text-center mt-1">
+              <div v-if="loggedIn" class="text-center mt-1">
                 <a
                   class="btn btn-primary text-white"
                   role="button"
@@ -61,6 +61,7 @@ import omegaup_Markdown from '../Markdown.vue';
 })
 export default class CourseCardPublic extends Vue {
   @Prop() course!: types.CourseCardPublic;
+  @Prop({ default: false }) loggedIn!: boolean;
 
   T = T;
   ui = ui;
