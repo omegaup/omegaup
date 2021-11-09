@@ -38,6 +38,7 @@ OmegaUp.on('ready', () => {
           visitorBadges: new Set(payload.extraProfileDetails?.badges),
           selectedTab: locationHash[0] != '' ? locationHash[0] : 'see-profile',
           identities: this.identities,
+          hasPassword: payload.hasPassword,
         },
         on: {
           'add-identity': ({
@@ -57,8 +58,6 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-        },
-        on: {
           'update-password': ({
             oldPassword,
             newPassword,

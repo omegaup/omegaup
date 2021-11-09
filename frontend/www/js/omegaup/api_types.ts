@@ -4111,6 +4111,7 @@ export namespace types {
   export interface UserProfileDetailsPayload {
     countries: dao.Countries[];
     extraProfileDetails?: types.ExtraProfileDetails;
+    hasPassword?: boolean;
     identities: types.AssociatedIdentity[];
     profile: types.UserProfileInfo;
     programmingLanguages: { [key: string]: string };
