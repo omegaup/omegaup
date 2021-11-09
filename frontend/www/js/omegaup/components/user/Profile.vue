@@ -12,10 +12,7 @@
         <template v-if="currentSelectedTab === 'manage-identities'">
           <omegaup-user-manage-identities
             :identities="identities"
-            @add-identity="
-              (request, username, password) =>
-                $emit('add-identity', { username, password })
-            "
+            @add-identity="(request) => $emit('add-identity', request)"
           ></omegaup-user-manage-identities>
         </template>
         <div v-else>

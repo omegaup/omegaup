@@ -2,7 +2,7 @@
   <div>
     <form
       class="form add-identity-form"
-      @submit.prevent="onAddIdentity(username, password)"
+      @submit.prevent="$emit('add-identity', { username, password })"
     >
       <div class="form-group">
         <label class="w-100">
@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 
@@ -85,18 +85,5 @@ export default class ManageIdentities extends Vue {
   T = T;
   username = '';
   password = '';
-
-  @Emit('add-identity')
-  onAddIdentity({
-    username,
-    password,
-  }: {
-    username: string;
-    password: string;
-  }) {
-    this.username = username;
-    this.password = password;
-    return { username, password };
-  }
 }
 </script>
