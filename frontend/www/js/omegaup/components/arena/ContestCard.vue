@@ -27,7 +27,9 @@
           </b-button>
           <b-card-text
             v-else-if="
-              (contestTab === ContestTab.Current || contestTab === ContestTab.Future) && contest.participating
+              (contestTab === ContestTab.Current ||
+                contestTab === ContestTab.Future) &&
+              contest.participating
             "
             ref="contestEnrollStatus"
             class="contest-enroll-status"
@@ -92,7 +94,9 @@
           </b-button>
           <b-button
             v-else-if="
-              (contestTab === ContestTab.Current || contestTab === ContestTab.Future) && !contest.participating
+              (contestTab === ContestTab.Current ||
+                contestTab === ContestTab.Future) &&
+              !contest.participating
             "
             ref="contestButtonSingUp"
             :href="getContestURL(contest.alias)"
@@ -101,7 +105,10 @@
             <font-awesome-icon icon="sign-in-alt" />
             {{ T.contestButtonSingUp }}
           </b-button>
-          <b-dropdown v-else-if="contestTab === ContestTab.Past" variant="primary">
+          <b-dropdown
+            v-else-if="contestTab === ContestTab.Past"
+            variant="primary"
+          >
             <template #button-content>
               <font-awesome-icon icon="sign-in-alt" />
               {{ T.contestButtonEnter }}
