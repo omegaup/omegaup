@@ -51,37 +51,39 @@
                       ></omegaup-common-sort-controls>
                     </span>
                   </th>
-                  <th
-                    v-for="assignment in assignmentsProblems"
-                    :key="assignment.alias"
-                    class="score text-center align-middle"
-                  >
-                    <span>
-                      {{ assignment.name }}
-                      <span class="d-block"
-                        >{{
-                          assignment.extraPoints > 0
-                            ? ui.formatString(
-                                T.studentProgressDescriptionTotalPoints,
-                                {
+                  <template v-for="assignment in assignmentsProblems">
+                    <th
+                      v-if="assignment.type !== 'lesson'"
+                      :key="assignment.alias"
+                      class="score text-center align-middle"
+                    >
+                      <span>
+                        {{ assignment.name }}
+                        <span class="d-block"
+                          >{{
+                            assignment.extraPoints > 0
+                              ? ui.formatString(
+                                  T.studentProgressDescriptionTotalPoints,
+                                  {
+                                    points: assignment.points,
+                                    extraPoints: assignment.extraPoints,
+                                  },
+                                )
+                              : ui.formatString(T.studentProgressPoints, {
                                   points: assignment.points,
-                                  extraPoints: assignment.extraPoints,
-                                },
-                              )
-                            : ui.formatString(T.studentProgressPoints, {
-                                points: assignment.points,
-                              })
-                        }}
-                        <a
-                          v-if="assignment.points === 0"
-                          data-toggle="tooltip"
-                          rel="tooltip"
-                          :title="T.studentProgressOnlyLecturesDescription"
-                          ><img src="/media/question.png"
-                        /></a>
+                                })
+                          }}
+                          <a
+                            v-if="assignment.points === 0"
+                            data-toggle="tooltip"
+                            rel="tooltip"
+                            :title="T.studentProgressOnlyLecturesDescription"
+                            ><img src="/media/question.png"
+                          /></a>
+                        </span>
                       </span>
-                    </span>
-                  </th>
+                    </th>
+                  </template>
                 </tr>
               </thead>
               <tbody>
@@ -236,6 +238,7 @@ export default class CourseViewProgress extends Vue {
     ];
     header.push();
     for (const assignment of this.assignmentsProblems) {
+      if (assignment.type === 'lesson') continue;
       header.push(
         `${assignment.name} ${
           assignment.extraPoints > 0
@@ -258,6 +261,7 @@ export default class CourseViewProgress extends Vue {
         new Percentage(student.courseProgress / 100),
       ];
       for (const assignment of this.assignmentsProblems) {
+        if (assignment.type === 'lesson') continue;
         row.push(
           assignment.alias in student.assignments
             ? new Percentage(
