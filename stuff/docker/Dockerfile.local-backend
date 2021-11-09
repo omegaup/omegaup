@@ -67,7 +67,7 @@ FROM ubuntu:focal
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
-      curl ca-certificates openjdk-14-jre-headless wait-for-it && \
+      curl ca-certificates openjdk-16-jre-headless wait-for-it && \
     /usr/sbin/update-ca-certificates && \
     apt-get autoremove -y && \
     apt-get clean

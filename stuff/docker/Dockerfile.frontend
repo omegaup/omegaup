@@ -69,7 +69,7 @@ RUN apt-get update -y && \
     apt-get update -y && \
     apt-get install --no-install-recommends -y \
         newrelic-php5 \
-        openjdk-14-jre-headless \
+        openjdk-16-jre-headless \
         php-apcu \
         php-apcu-bc \
         php-redis \
