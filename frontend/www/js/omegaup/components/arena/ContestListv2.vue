@@ -18,21 +18,48 @@
           :title-link-class="titleLinkClass(ContestTab.Current)"
           active
         >
-          {{ contests.current }}
+          <div v-if="contests.current.length === 0">
+            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          </div>
+          <omegaup-contest-card
+            v-for="contestItem in contests.current"
+            v-else
+            :key="contestItem.contest_id"
+            :contest="contestItem"
+            :contest-tab="activeTab"
+          />
         </b-tab>
         <b-tab
           ref="futureContestTab"
           :title="T.contestListFuture"
           :title-link-class="titleLinkClass(ContestTab.Future)"
         >
-          {{ contests.future }}
+          <div v-if="contests.future.length === 0">
+            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          </div>
+          <omegaup-contest-card
+            v-for="contestItem in contests.future"
+            v-else
+            :key="contestItem.contest_id"
+            :contest="contestItem"
+            :contest-tab="activeTab"
+          />
         </b-tab>
         <b-tab
           ref="pastContestTab"
           :title="T.contestListPast"
           :title-link-class="titleLinkClass(ContestTab.Past)"
         >
-          {{ contests.past }}
+          <div v-if="contests.past.length === 0">
+            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          </div>
+          <omegaup-contest-card
+            v-for="contestItem in contests.past"
+            v-else
+            :key="contestItem.contest_id"
+            :contest="contestItem"
+            :contest-tab="activeTab"
+          />
         </b-tab>
       </b-tabs>
     </b-card>
@@ -41,6 +68,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import ContestCard from './ContestCard.vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 
@@ -60,7 +88,9 @@ export enum ContestTab {
 }
 
 @Component({
-  components: {},
+  components: {
+    'omegaup-contest-card': ContestCard,
+  },
 })
 export default class ArenaContestList extends Vue {
   @Prop() contests!: types.ContestList;
@@ -80,7 +110,6 @@ export default class ArenaContestList extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-
 .sidebar {
   /deep/ .contest-list-nav {
     background-color: var(
@@ -99,5 +128,12 @@ export default class ArenaContestList extends Vue {
       ) !important;
     }
   }
+}
+
+.empty-category {
+  text-align: center;
+  font-size: 200%;
+  margin: 1em;
+  color: var(--arena-contest-list-empty-category-font-color);
 }
 </style>
