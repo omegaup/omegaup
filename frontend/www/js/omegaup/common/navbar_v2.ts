@@ -132,8 +132,4 @@ OmegaUp.on('ready', () => {
     updateGraderStatus();
     setInterval(updateGraderStatus, 30000);
   }
-
-  if (fromLogin && payload.userTypes.length === 0) {
-    $('.objectivesQuestionsModal').modal();
-  }
 });
