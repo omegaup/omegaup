@@ -6,7 +6,7 @@ services:
     build:
       dockerfile: ./Dockerfile.dev-php
       context: ./stuff/docker/
-    image: omegaup/dev-php:20211102
+    image: omegaup/dev-php:20211109
     user: "${UID_GID}"
     restart: always
     volumes:
@@ -149,8 +149,13 @@ services:
     expose:
       - '6379'
     volumes:
-      - 'redis:/data'
-      - './stuff/docker/etc/redis/redis.conf:/etc/redis/redis.conf'
+      - type: volume
+        source: redis
+        target: /data
+      - type: bind
+        source: ./stuff/docker/etc/redis/
+        target: /etc/redis
+        read_only: true
     ports:
       - target: 6379
         published: 6379

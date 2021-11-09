@@ -92,7 +92,21 @@ describe('SidebarMainInfo.vue', () => {
     const wrapper = shallowMount(user_SidebarMainInfo, {
       propsData: { profile, data },
     });
-    expect(wrapper.text()).toContain('3');
+    expect(wrapper.find('div[data-solved-problems]>h4').text()).toBe('3');
+  });
+
+  it('Should not display buttons for a different user profile', () => {
+    const wrapper = shallowMount(user_SidebarMainInfo, {
+      propsData: {
+        profile: { ...profile, ...{ is_own_profile: false } },
+        data,
+      },
+    });
+
+    for (const url of urlMapping) {
+      const urlSelector = `a[href="/profile/#${url.key}"]`;
+      expect(wrapper.find(urlSelector).exists()).toBeFalsy();
+    }
   });
 });
 

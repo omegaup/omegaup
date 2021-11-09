@@ -6,14 +6,24 @@ import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
 
+// TODO: Import Profile.vue when it is merged
 import user_Profile from '../components/user/Profilev2.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
-  new Vue({
+  const locationHash = window.location.hash.substr(1).split('#');
+
+  const userProfile = new Vue({
     el: '#main-container',
     components: {
       'omegaup-user-profile': user_Profile,
+    },
+    data: () => {
+      return {
+        profile: payload.profile,
+        data: payload.extraProfileDetails,
+        identities: payload.identities,
+      };
     },
     render: function (createElement) {
       return createElement('omegaup-user-profile', {
@@ -26,6 +36,27 @@ OmegaUp.on('ready', () => {
             ),
           ),
           visitorBadges: new Set(payload.extraProfileDetails?.badges),
+          selectedTab: locationHash[0] != '' ? locationHash[0] : 'see-profile',
+          identities: this.identities,
+        },
+        on: {
+          'add-identity': ({
+            username,
+            password,
+          }: {
+            username: string;
+            password: string;
+          }) => {
+            api.User.associateIdentity({
+              username: username,
+              password: password,
+            })
+              .then(() => {
+                refreshIdentityList();
+                ui.success(T.profileIdentityAdded);
+              })
+              .catch(ui.apiError);
+          },
         },
         on: {
           'update-password': ({
@@ -64,4 +95,12 @@ OmegaUp.on('ready', () => {
       });
     },
   });
+
+  function refreshIdentityList() {
+    api.User.listAssociatedIdentities({})
+      .then(function (data) {
+        userProfile.identities = data.identities;
+      })
+      .catch(ui.apiError);
+  }
 });

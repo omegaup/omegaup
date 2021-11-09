@@ -32,6 +32,7 @@
       <div
         v-if="profile.is_own_profile || !profile.is_private"
         class="mb-3 text-center"
+        data-solved-problems
       >
         <h4 class="m-0">
           {{ Object.keys(solvedProblems).length }}
@@ -61,12 +62,12 @@
     </div>
     <div v-if="profile.is_own_profile" class="card-body text-center">
       <a
-        v-for="url in urlMapping.filter((url) => url.visible)"
+        v-for="url in currentUrlMapping.filter((url) => url.visible)"
         :key="url.key"
         class="btn btn-primary btn-sm my-1 w-100"
         :href="`/profile/#${url.key}`"
-        :class="{ disabled: url.key === tabSelected }"
-        @click="$emit('update:tabSelected', url.key)"
+        :class="{ disabled: url.key === selectedTab }"
+        @click="$emit('update:selectedTab', url.key)"
       >
         {{ url.title }}
       </a>
@@ -75,7 +76,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import country_Flag from '../CountryFlag.vue';
 import user_Username from './Username.vue';
@@ -102,10 +103,13 @@ export const urlMapping: { key: string; title: string; visible: boolean }[] = [
 export default class UserSidebarMainInfo extends Vue {
   @Prop({ default: null }) data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
-  @Prop({ default: null }) tabSelected!: null | string;
+  @Prop() selectedTab!: string;
 
   T = T;
-  urlMapping = urlMapping;
+  currentSelectedTab = this.getSelectedValidTab(
+    this.selectedTab,
+    this.currentUrlMapping,
+  );
 
   get solvedProblems(): Problem[] {
     if (!this.data?.solvedProblems) return [];
@@ -125,6 +129,36 @@ export default class UserSidebarMainInfo extends Vue {
         return T.profileRankInternationalMaster;
       default:
         return T.profileRankUnrated;
+    }
+  }
+
+  get currentUrlMapping(): {
+    key: string;
+    title: string;
+    visible: boolean;
+  }[] {
+    return this.profile.is_own_profile ? urlMapping : [];
+  }
+
+  getSelectedValidTab(
+    tab: string,
+    urls: { key: string; title: string; visible: boolean }[],
+  ): string {
+    const validTabs = urls.filter((url) => url.visible).map((url) => url.key);
+    const isValidTab = validTabs.includes(tab);
+    if (!isValidTab) {
+      this.$emit('update:selectedTab', 'see-profile');
+      return 'see-profile';
+    }
+    return tab;
+  }
+
+  @Watch('selectedTab')
+  onSelectedTabChange(newValue: string) {
+    const validTab = this.getSelectedValidTab(newValue, this.currentUrlMapping);
+    this.currentSelectedTab = validTab;
+    if (validTab !== newValue) {
+      this.$emit('update:selectedTab', validTab);
     }
   }
 }
