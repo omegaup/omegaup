@@ -641,10 +641,12 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         ] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = null;
-        if ($isLoggedIn && $isOwnProfile) {
-            $login = self::login($identity);
-        } elseif ($isLoggedIn && !$isOwnProfile) {
-            $login = self::login($otherIdentity);
+        if ($isLoggedIn) {
+            if ($isOwnProfile) {
+                $login = self::login($identity);
+            } else {
+                $login = self::login($otherIdentity);
+            }
         }
 
         $requestParams = [];
