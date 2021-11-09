@@ -618,7 +618,6 @@ const translations: { [key: string]: string; } = {
   makeRegistration: "Tornar aberto com registro",
   messageMakeYourContestsPublic: "Voc\u00ea tem concursos privados que j\u00e1 terminaram. Por favor, considere torn\u00e1-los p\u00fablicos para contribuir para a comunidade.",
   messageMakeYourProblemsPublic: "Voc\u00ea tem problemas privados que j\u00e1 foram utilizados. Por favor, considere torn\u00e1-los p\u00fablicos para contribuir para a comunidade.",
-  modalClose: "Fechar",
   mustLoginToFilterUsers: "Voc\u00ea deve entrar para filtrar usu\u00e1rios no ranking.",
   mustLoginToJoinContest: "Voc\u00ea deve entrar na sua conta para se inscrever num concurso",
   mustRegisterToJoinContest: "voc\u00ea deve se registrar para entrar concurso",
