@@ -261,7 +261,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null
+     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null
      */
     final public static function getExtendedProfileDataByPk(?int $identityId): ?array {
         if (is_null($identityId)) {
@@ -349,9 +349,6 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         );
         $identity['birth_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
             $identity['birth_date']
-        );
-        $identity['graduation_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
-            $identity['graduation_date']
         );
 
         return $identity;

@@ -2042,14 +2042,6 @@ export namespace types {
         (document.getElementById(elementId) as HTMLElement).innerText,
       );
     }
-
-    export function UserRolesPayload(
-      elementId: string = 'payload',
-    ): types.UserRolesPayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
-      );
-    }
   }
 
   export interface ActivityEvent {
@@ -2588,7 +2580,6 @@ export namespace types {
 
   export interface ContestListv2Payload {
     contests: types.ContestList;
-    query: string;
   }
 
   export interface ContestNewPayload {
@@ -3179,10 +3170,9 @@ export namespace types {
   }
 
   export interface LoginDetailsPayload {
-    facebookUrl?: string;
+    facebookUrl: string;
     statusError?: string;
     validateRecaptcha: boolean;
-    verifyEmailSuccessfully?: string;
   }
 
   export interface MergedScoreboardEntry {
@@ -4166,7 +4156,7 @@ export namespace types {
     country_id?: string;
     email?: string;
     gender?: string;
-    graduation_date?: Date;
+    graduation_date?: Date | string;
     gravatar_92?: string;
     has_competitive_objective?: boolean;
     has_learning_objective?: boolean;
@@ -4234,12 +4224,6 @@ export namespace types {
 
   export interface UserRole {
     name: string;
-  }
-
-  export interface UserRolesPayload {
-    userSystemGroups: { [key: number]: { name: string; value: boolean } };
-    userSystemRoles: { [key: number]: { name: string; value: boolean } };
-    username: string;
   }
 }
 

@@ -1,33 +1,29 @@
 import user_Roles from '../components/admin/Roles.vue';
-import { omegaup, OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
-import { types } from '../api_types';
 
-OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.UserRolesPayload();
+OmegaUp.on('ready', function () {
+  var payload = JSON.parse(document.getElementById('payload').innerText);
 
-  new Vue({
-    el: '#main-container',
-    components: {
-      'omegaup-user-roles': user_Roles,
-    },
+  var userRoles = new Vue({
+    el: '#user-roles',
     render: function (createElement) {
       return createElement('omegaup-user-roles', {
         props: {
-          roles: payload.userSystemRoles,
-          groups: payload.userSystemGroups,
+          initialRoles: this.roles,
+          initialGroups: this.groups,
         },
         on: {
-          'change-role': (selectedRole: omegaup.Selectable<omegaup.Role>) => {
+          'on-change-role': function (selectedRole) {
             if (selectedRole.selected) {
               api.User.addRole({
                 username: payload.username,
                 role: selectedRole.value.name,
               })
-                .then(() => {
+                .then(function () {
                   ui.success(T.userEditSuccess);
                 })
                 .catch(ui.apiError);
@@ -36,19 +32,19 @@ OmegaUp.on('ready', () => {
                 username: payload.username,
                 role: selectedRole.value.name,
               })
-                .then(() => {
+                .then(function () {
                   ui.success(T.userEditSuccess);
                 })
                 .catch(ui.apiError);
             }
           },
-          'change-group': (selectedGroup: omegaup.Selectable<types.Group>) => {
+          'on-change-group': function (selectedGroup) {
             if (selectedGroup.selected) {
               api.User.addGroup({
                 username: payload.username,
                 group: selectedGroup.value.name,
               })
-                .then(() => {
+                .then(function () {
                   ui.success(T.userEditSuccess);
                 })
                 .catch(ui.apiError);
@@ -57,7 +53,7 @@ OmegaUp.on('ready', () => {
                 username: payload.username,
                 group: selectedGroup.value.name,
               })
-                .then(() => {
+                .then(function () {
                   ui.success(T.userEditSuccess);
                 })
                 .catch(ui.apiError);
@@ -65,6 +61,13 @@ OmegaUp.on('ready', () => {
           },
         },
       });
+    },
+    data: {
+      roles: payload.userSystemRoles,
+      groups: payload.userSystemGroups,
+    },
+    components: {
+      'omegaup-user-roles': user_Roles,
     },
   });
 });

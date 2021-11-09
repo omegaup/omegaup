@@ -286,7 +286,7 @@ class Group extends \OmegaUp\Controllers\Controller {
             /*$maxLength=*/null
         );
 
-        $groups = \OmegaUp\DAO\Groups::searchByName($r['query']);
+        $groups = \OmegaUp\DAO\Groups::SearchByName($r['query']);
 
         $response = [];
         foreach ($groups as $group) {

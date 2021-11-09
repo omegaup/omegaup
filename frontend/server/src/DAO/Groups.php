@@ -24,18 +24,18 @@ class Groups extends \OmegaUp\DAO\Base\Groups {
     }
 
     /**
-     * @return list<\OmegaUp\DAO\VO\Groups>
+     * @return \OmegaUp\DAO\VO\Groups[]
      */
-    public static function searchByName(string $name) {
-        $sql = "SELECT `g`.* FROM `Groups_` AS `g` WHERE `g`.`name` LIKE CONCAT('%', ?, '%') LIMIT 100;";
+    public static function SearchByName(string $name) {
+        $sql = "SELECT `g`.* FROM `Groups_` AS `g` WHERE `g`.`name` LIKE CONCAT('%', ?, '%') LIMIT 10;";
+        $args = [$name];
 
-        /** @var list<array{acl_id: int, alias: string, create_time: \OmegaUp\Timestamp, description: null|string, group_id: int, name: string}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$name]);
-        $groups = [];
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
+        $ar = [];
         foreach ($rs as $row) {
-            $groups[] = new \OmegaUp\DAO\VO\Groups($row);
+            array_push($ar, new \OmegaUp\DAO\VO\Groups($row));
         }
-        return $groups;
+        return $ar;
     }
 
     public static function getByName(string $name): ?\OmegaUp\DAO\VO\Groups {
