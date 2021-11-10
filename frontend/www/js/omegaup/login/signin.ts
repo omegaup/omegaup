@@ -34,10 +34,10 @@ OmegaUp.on('ready', () => {
     }
     const fromLoginParam = '?fromLogin';
     if (isAccountCreation) {
-      window.location.href = '/profile/' + fromLoginParam;
+      window.location.href = `/profile/${fromLoginParam}`;
       return;
     }
-    window.location.href = '/' + fromLoginParam;
+    window.location.href = `/${fromLoginParam}`;
   }
 
   const payload = types.payloadParsers.LoginDetailsPayload();
