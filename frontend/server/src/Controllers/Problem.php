@@ -47,7 +47,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
  * @psalm-type ProblemPrintDetailsPayload=array{details: ProblemDetails}
- * @psalm-type LibinteractiveGenPayload=array{error: array{description: null|string, field: null|string}|null, idl: null|string, language: null|string, name: null|string, os: null|string}
+ * @psalm-type LibinteractiveError=array{description: null|string, field: null|string}
+ * @psalm-type LibinteractiveGenPayload=array{error: LibinteractiveError|null, idl: null|string, language: null|string, name: null|string, os: null|string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -5695,7 +5696,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function getLibinteractiveGenForTypeScript(
         \OmegaUp\Request $r
     ): array {
-        error_log(print_r($r, true));
         $response = [
             'smartyProperties' => [
                 'payload' => [
@@ -5718,11 +5718,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $language = $r->ensureOptionalEnum('language', ['c', 'cpp', 'java']);
         $os = $r->ensureOptionalEnum('os', ['unix', 'windows']);
-        $name = $r->ensureOptionalString(
-            'name',
-            /*$required=*/false,
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
+        $name = $r->ensureOptionalString('name');
         $idl = $r->ensureOptionalString('idl');
         $response['smartyProperties']['payload'] =  [
             'language' => $language,
@@ -5752,6 +5748,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $response['smartyProperties']['payload']['error'] = [
                 'description' => \OmegaUp\Translations::getInstance()->get(
                     'parameterInvalid'
+                ),
+                'field' => 'name',
+            ];
+            return $response;
+        }
+        if (!\OmegaUp\Validators::alias($name)) {
+            $response['smartyProperties']['payload']['error'] = [
+                'description' => \OmegaUp\Translations::getInstance()->get(
+                    'parameterInvalidAlias'
                 ),
                 'field' => 'name',
             ];

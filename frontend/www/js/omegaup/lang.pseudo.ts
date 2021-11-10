@@ -706,7 +706,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleGroupsNew: "(N3w gr0up)",
   omegaupTitleGroupsScoreboardEdit: "(Edi7 5c0r3b0ard)",
   omegaupTitleLatestSubmissions: "(La7357 5ubmi55i0n5)",
-  omegaupTitleLibInteractive: "(Libin73rac7iv3)",
+  omegaupTitleLibInteractive: "(1ibin73rac7iv3)",
   omegaupTitleLogin: "(L0gin)",
   omegaupTitleLogout: "(L0g0u7)",
   omegaupTitleMyContests: "(My c0n73575)",

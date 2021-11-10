@@ -1,14 +1,19 @@
 <template>
   <b-card>
     <b-card-body>
-      <form action="/libinteractive/gen/" method="post">
+      <form
+        action="/libinteractive/gen/"
+        method="post"
+        @submit="currentError = null"
+      >
         <div class="form-group">
           <label for="language">{{ T.libinteractiveLanguage }}</label>
           <select
             v-model="currentLanguage"
-            class="form-control"
+            class="custom-select"
             name="language"
             :class="{ 'is-invalid': errorField === 'language' }"
+            required
           >
             <option value="cpp">C++</option>
             <option value="c">C</option>
@@ -19,9 +24,10 @@
           <label for="os">{{ T.libinteractiveOs }}</label>
           <select
             v-model="currentOs"
-            class="form-control"
+            class="custom-select"
             name="os"
             :class="{ 'is-invalid': errorField === 'os' }"
+            required
           >
             <option value="windows">Windows</option>
             <option value="unix">Linux/Mac OS</option>
@@ -35,6 +41,7 @@
             class="form-control"
             name="name"
             :class="{ 'is-invalid': errorField === 'name' }"
+            required
           />
           <p>{{ T.libinteractiveIdlFilenameHelp }}</p>
         </div>
@@ -46,6 +53,7 @@
             rows="10"
             name="idl"
             :class="{ 'is-invalid': errorField === 'idl' }"
+            required
           ></textarea>
         </div>
         <div class="form-group text-right">
@@ -72,6 +80,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 // Import Only Required Plugins
 import { ButtonPlugin, CardPlugin, BIconCloudDownload } from 'bootstrap-vue';
+import { types } from '../../api_types';
 Vue.use(ButtonPlugin);
 Vue.use(CardPlugin);
 
@@ -81,8 +90,7 @@ Vue.use(CardPlugin);
   },
 })
 export default class LibinteractiveGen extends Vue {
-  @Prop({ default: null }) errorDescription!: null | string;
-  @Prop({ default: null }) errorField!: null | string;
+  @Prop({ default: null }) error!: null | types.LibinteractiveError;
   @Prop() language!: string;
   @Prop() os!: string;
   @Prop() name!: string;
@@ -93,6 +101,15 @@ export default class LibinteractiveGen extends Vue {
   currentOs = this.os;
   currentName = this.name;
   currentIdl = this.idl;
+  currentError = this.error;
+
+  get errorDescription(): null | string {
+    return this.currentError?.description ?? null;
+  }
+
+  get errorField(): null | string {
+    return this.currentError?.field ?? null;
+  }
 }
 </script>
 

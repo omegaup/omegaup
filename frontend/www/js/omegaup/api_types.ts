@@ -3199,8 +3199,13 @@ export namespace types {
     userRegistrationRequested?: boolean;
   }
 
+  export interface LibinteractiveError {
+    description?: string;
+    field?: string;
+  }
+
   export interface LibinteractiveGenPayload {
-    error?: { description?: string; field?: string };
+    error?: types.LibinteractiveError;
     idl?: string;
     language?: string;
     name?: string;
