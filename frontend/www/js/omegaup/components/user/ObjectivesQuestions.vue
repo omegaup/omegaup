@@ -1,10 +1,5 @@
 <template>
-  <b-modal
-    v-model="showModal"
-    header-class="modal-header"
-    content-class="modal-content"
-    hide-footer
-  >
+  <b-modal v-model="showModal" hide-footer>
     <template #modal-title>
       <h5 class="modal-title font-weight-bold">
         {{ T.userObjectivesModalTitle }}
@@ -258,7 +253,7 @@ export default class UserObjectivesQuestions extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
-/deep/ .modal-content {
+/deep/ .modal-dialog {
   max-width: 330px;
 }
 
