@@ -3325,12 +3325,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             },
             60 * 60 * 12 // 12 hours
         );
-        $studentsProgress = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
-            $course->course_id,
-            $course->group_id,
-            $page,
-            $length
-        );
 
         return [
             'smartyProperties' => [
