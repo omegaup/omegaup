@@ -5,7 +5,8 @@
         <b-col>
           <b-card-text>
             <h5>
-              <a :href="getContestURL(contest.alias)">{{ contest.title }}</a>
+              <a class="mr-1" :href="getContestURL(contest.alias)">{{ contest.title }}</a>
+              <font-awesome-icon v-if="contest.recommended" icon="award" />
             </h5>
           </b-card-text>
         </b-col>
@@ -16,53 +17,31 @@
           </b-card-text>
         </b-col>
         <b-col cols="3">
-          <b-button
-            v-if="contestTab === ContestTab.Past"
-            ref="contestButtonScoreboard"
-            :href="getContestScoreboardURL(contest.alias)"
-            variant="success"
-          >
-            <font-awesome-icon icon="table" />
-            {{ T.contestButtonScoreboard }}
-          </b-button>
-          <b-card-text
-            v-else-if="
-              (contestTab === ContestTab.Current || contestTab === ContestTab.Future) && contest.participating
-            "
-            ref="contestEnrollStatus"
-            class="contest-enroll-status"
-          >
-            <font-awesome-icon icon="clipboard-check" />
-            {{ T.contestEnrollStatus }}
-          </b-card-text>
+          <slot name="contest-button-scoreboard">
+            <b-button
+              ref="contestButtonScoreboard"
+              :href="getContestScoreboardURL(contest.alias)"
+              variant="success"
+            >
+              <font-awesome-icon icon="table" />
+              {{ T.contestButtonScoreboard }}
+            </b-button>
+          </slot>
+          <slot name="contest-enroll-status">
+            <b-card-text
+              v-if="contest.participating"
+              ref="contestEnrollStatus"
+              class="contest-enroll-status"
+            >
+              <font-awesome-icon icon="clipboard-check" />
+              {{ T.contestEnrollStatus }}
+            </b-card-text>
+          </slot>
         </b-col>
       </b-row>
       <b-row class="p-1" align-v="center">
         <b-col>
-          <b-card-text v-if="contestTab === ContestTab.Current">
-            <font-awesome-icon icon="calendar-alt" />
-            {{
-              ui.formatString(T.contestEndTime, {
-                endDate: finishContestDate,
-              })
-            }}
-          </b-card-text>
-          <b-card-text v-else-if="contestTab === ContestTab.Future">
-            <font-awesome-icon icon="calendar-alt" />
-            {{
-              ui.formatString(T.contestStartTime, {
-                startDate: startContestDate,
-              })
-            }}
-          </b-card-text>
-          <b-card-text v-else-if="contestTab === ContestTab.Past">
-            <font-awesome-icon icon="calendar-alt" />
-            {{
-              ui.formatString(T.contestStartedTime, {
-                startedDate: startContestDate,
-              })
-            }}
-          </b-card-text>
+          <slot name="text-contest-date"></slot>
         </b-col>
         <b-col>
           <b-card-text>
@@ -81,38 +60,42 @@
           </b-card-text>
         </b-col>
         <b-col>
-          <b-button
-            v-if="contestTab === ContestTab.Current && contest.participating"
-            ref="contestButtonEnter"
-            :href="getContestURL(contest.alias)"
-            variant="primary"
-          >
-            <font-awesome-icon icon="sign-in-alt" />
-            {{ T.contestButtonEnter }}
-          </b-button>
-          <b-button
-            v-else-if="
-              (contestTab === ContestTab.Current || contestTab === ContestTab.Future) && !contest.participating
-            "
-            ref="contestButtonSingUp"
-            :href="getContestURL(contest.alias)"
-            variant="primary"
-          >
-            <font-awesome-icon icon="sign-in-alt" />
-            {{ T.contestButtonSingUp }}
-          </b-button>
-          <b-dropdown v-else-if="contestTab === ContestTab.Past" variant="primary">
-            <template #button-content>
+          <slot name="contest-button-enter">
+            <b-button
+              v-if="contest.participating"
+              ref="contestButtonEnter"
+              :href="getContestURL(contest.alias)"
+              variant="primary"
+            >
               <font-awesome-icon icon="sign-in-alt" />
               {{ T.contestButtonEnter }}
-            </template>
-            <b-dropdown-item :href="getVirtualContestURL(contest.alias)">{{
-              T.contestVirtualMode
-            }}</b-dropdown-item>
-            <b-dropdown-item :href="getPracticeContestURL(contest.alias)">{{
-              T.contestPracticeMode
-            }}</b-dropdown-item>
-          </b-dropdown>
+            </b-button>
+          </slot>
+          <slot name="contest-button-singup">
+            <b-button
+              v-if="!contest.participating"
+              ref="contestButtonSingUp"
+              :href="getContestURL(contest.alias)"
+              variant="primary"
+            >
+              <font-awesome-icon icon="sign-in-alt" />
+              {{ T.contestButtonSingUp }}
+            </b-button>
+          </slot>
+          <slot name="contest-dropdown">
+            <b-dropdown variant="primary">
+              <template #button-content>
+                <font-awesome-icon icon="sign-in-alt" />
+                {{ T.contestButtonEnter }}
+              </template>
+              <b-dropdown-item :href="getVirtualContestURL(contest.alias)">{{
+                T.contestVirtualMode
+              }}</b-dropdown-item>
+              <b-dropdown-item :href="getPracticeContestURL(contest.alias)">{{
+                T.contestPracticeMode
+              }}</b-dropdown-item>
+            </b-dropdown>
+          </slot>
         </b-col>
       </b-row>
     </b-container>
@@ -153,14 +136,6 @@ export default class ContestCard extends Vue {
   T = T;
   ui = ui;
   ContestTab = ContestTab;
-
-  get finishContestDate(): string {
-    return this.contest.finish_time.toLocaleDateString();
-  }
-
-  get startContestDate(): string {
-    return this.contest.start_time.toLocaleDateString();
-  }
 
   get contestDuration(): string {
     return time.formatContestDuration(

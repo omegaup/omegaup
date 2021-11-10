@@ -27,7 +27,24 @@
             :key="contestItem.contest_id"
             :contest="contestItem"
             :contest-tab="activeTab"
-          />
+          >
+            <template #contest-button-scoreboard>
+              <div></div>
+            </template>
+            <template #text-contest-date>
+              <b-card-text>
+                <font-awesome-icon icon="calendar-alt" />
+                {{
+                  ui.formatString(T.contestEndTime, {
+                    endDate: finishContestDate(contestItem),
+                  })
+                }}
+              </b-card-text>
+            </template>
+            <template #contest-dropdown>
+              <div></div>
+            </template>
+          </omegaup-contest-card>
         </b-tab>
         <b-tab
           ref="futureContestTab"
@@ -43,7 +60,27 @@
             :key="contestItem.contest_id"
             :contest="contestItem"
             :contest-tab="activeTab"
-          />
+          >
+            <template #contest-button-scoreboard>
+              <div></div>
+            </template>
+            <template #text-contest-date>
+              <b-card-text>
+                <font-awesome-icon icon="calendar-alt" />
+                {{
+                  ui.formatString(T.contestStartTime, {
+                    startDate: startContestDate(contestItem),
+                  })
+                }}
+              </b-card-text>
+            </template>
+            <template #contest-button-enter>
+              <div></div>
+            </template>
+            <template #contest-dropdown>
+              <div></div>
+            </template>
+          </omegaup-contest-card>
         </b-tab>
         <b-tab
           ref="pastContestTab"
@@ -59,7 +96,27 @@
             :key="contestItem.contest_id"
             :contest="contestItem"
             :contest-tab="activeTab"
-          />
+          >
+            <template #contest-enroll-status>
+              <div></div>
+            </template>
+            <template #text-contest-date>
+              <b-card-text>
+                <font-awesome-icon icon="calendar-alt" />
+                {{
+                  ui.formatString(T.contestStartedTime, {
+                    startedDate: startContestDate(contestItem),
+                  })
+                }}
+              </b-card-text>
+            </template>
+            <template #contest-button-enter>
+              <div></div>
+            </template>
+            <template #contest-button-singup>
+              <div></div>
+            </template>
+          </omegaup-contest-card>
         </b-tab>
       </b-tabs>
     </b-card>
@@ -69,6 +126,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import * as ui from '../../ui';
 import T from '../../lang';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
@@ -76,10 +134,14 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 // Import Only Required Plugins
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
 import { TabsPlugin, CardPlugin } from 'bootstrap-vue';
 import ContestCard from './ContestCard.vue';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
+library.add(fas);
 
 export enum ContestTab {
   Current = 0,
@@ -90,11 +152,13 @@ export enum ContestTab {
 @Component({
   components: {
     'omegaup-contest-card': ContestCard,
+    FontAwesomeIcon,
   },
 })
 export default class ArenaContestList extends Vue {
   @Prop() contests!: types.ContestList;
   T = T;
+  ui = ui;
   ContestTab = ContestTab;
   activeTab: ContestTab = ContestTab.Current;
 
@@ -104,6 +168,14 @@ export default class ArenaContestList extends Vue {
     } else {
       return ['text-center', 'title-link'];
     }
+  }
+
+  finishContestDate(contest: types.ContestListItem): string {
+    return contest.finish_time.toLocaleDateString();
+  }
+
+  startContestDate(contest: types.ContestListItem): string {
+    return contest.start_time.toLocaleDateString();
   }
 }
 </script>
