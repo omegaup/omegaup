@@ -5,7 +5,9 @@
         <b-col>
           <b-card-text>
             <h5>
-              <a class="mr-1" :href="getContestURL(contest.alias)">{{ contest.title }}</a>
+              <a class="mr-1" :href="getContestURL(contest.alias)">{{
+                contest.title
+              }}</a>
               <font-awesome-icon v-if="contest.recommended" icon="award" />
             </h5>
           </b-card-text>
