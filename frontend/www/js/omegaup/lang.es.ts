@@ -570,6 +570,7 @@ const translations: { [key: string]: string; } = {
   homepageTrainSectionDescription: "Resuelve problemas y mejora tus habilidades",
   homepageTrainSectionTitle: "Entrena",
   identityAlreadyAssociated: "Ya cuentas con una identidad asociada con el mismo grupo.",
+  identityAlreadyInUse: "La identidad ya est\u00e1 siendo utilizada por otro usuario.",
   identityInGroup: "La identidad ya est\u00e1 asociada al grupo.",
   incompatibleArgs: "Los par\u00e1metros problemset_id y contest_alias no se pueden utilizar al mismo tiempo",
   invalidLanguage: "Languaje inv\u00e1lido",
