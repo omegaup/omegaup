@@ -3953,7 +3953,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: UserProfileDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: UserProfileDetailsPayload, title: \OmegaUp\TranslationString, fullWidth: bool}}
      *
      * @omegaup-request-param null|string $username
      */
@@ -4004,6 +4004,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProfile'
                 ),
+                'fullWidth' => true
             ],
             'entrypoint' => 'user_profile',
         ];
