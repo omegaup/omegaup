@@ -70,13 +70,13 @@ export class Problem implements LinkableResource {
   }
 
   getLogo(): Logo | null {
-    if (this.qualitySeal) {
-      return {
-        url: '/media/quality-badge-sm.png',
-        title: T.wordsHighQualityProblem,
-      };
+    if (!this.qualitySeal) {
+      return null;
     }
-    return null;
+    return {
+      url: '/media/quality-badge-sm.png',
+      title: T.wordsHighQualityProblem,
+    };
   }
 
   getUrl(): string {
