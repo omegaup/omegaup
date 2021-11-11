@@ -3587,6 +3587,11 @@ class User extends \OmegaUp\Controllers\Controller {
                 'username'
             );
         }
+        if (!is_null($identity->user_id)) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'identityAlreadyInUse'
+            );
+        }
 
         if (
             \OmegaUp\DAO\Identities::isUserAssociatedWithIdentityOfGroup(

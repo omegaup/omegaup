@@ -570,6 +570,7 @@ const translations: { [key: string]: string; } = {
   homepageTrainSectionDescription: "Solve problems and improve your skills",
   homepageTrainSectionTitle: "Train",
   identityAlreadyAssociated: "You already have one identity associated with the same group.",
+  identityAlreadyInUse: "Identity is already used by another user.",
   identityInGroup: "Identity is already associated to the group.",
   incompatibleArgs: "Arguments can't be set simultaneously",
   invalidLanguage: "Invalid language",
