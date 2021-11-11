@@ -771,9 +771,15 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
         ]));
         $this->assertEquals(3, count($response['problems']));
+
+        $response = \OmegaUp\Controllers\Problem::apiMyList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'query' => $problemData[2]['request']['problem_alias'],
+        ]));
+        $this->assertEquals(1, count($response['problems']));
         $this->assertEquals(
             $problemData[2]['request']['problem_alias'],
-            $response['problems'][0]['alias']
+            $response['problems'][0]['title']
         );
     }
 
