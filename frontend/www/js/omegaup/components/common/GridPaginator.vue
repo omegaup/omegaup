@@ -2,6 +2,7 @@
   <div class="card">
     <h5 v-if="title" class="card-header">
       {{ title }} <span class="badge badge-secondary">{{ items.length }}</span>
+      <slot name="header-link"></slot>
     </h5>
     <div v-if="sortOptions.length > 0" class="card-body text-center">
       <div class="form-check form-check-inline">
@@ -31,6 +32,11 @@
           <td v-for="(item, itemIndex) in group" :key="itemIndex">
             <slot name="item-data" :item="item">
               <a :href="item.getUrl()">
+                <img
+                  v-if="item.getLogo()"
+                  :src="item.getLogo().url"
+                  :title="item.getLogo().title"
+                />
                 {{ item.toString() }}
               </a>
             </slot>

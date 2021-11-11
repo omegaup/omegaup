@@ -259,12 +259,13 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testGetStudentProgressForCourseWithExtraProblems() {
-        // One course, with two assignments
+        // One course, with three assignments
         // A1 has 2 problems that the student will solve => score 100%
         // A2 has 2 problems, the student will solve just one => score 50%
+        // A3 is a lesson, it should not be counted
         // Global score will be 75% (A1: 100% + A2: 50%)
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
-            2
+            3
         );
         $assignmentAliases = $courseData['assignment_aliases'];
 
@@ -272,6 +273,14 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
+
+        // A3 should be a lesson
+        $lessonAssignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+            $assignmentAliases[2],
+            $course->course_id
+        );
+        $lessonAssignment->assignment_type = 'lesson';
+        \OmegaUp\DAO\Assignments::update($lessonAssignment);
 
         [
             'user' => $user,
