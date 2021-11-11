@@ -1337,6 +1337,7 @@ const translations: { [key: string]: string; } = {
   userEditLanguage: "Language",
   userEditLowerSecondary: "Middle school / Junior high",
   userEditManageSchools: "Manage schools",
+  userEditManageSchoolsUserCurrentlyEnrolled: "Currently enrolled",
   userEditMaster: "Masters",
   userEditNameTooLong: "Name can't exceed 50 caracters in length.",
   userEditNone: "None",
