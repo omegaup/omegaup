@@ -197,9 +197,9 @@ export default class ArenaContestList extends Vue {
     }
   }
 
-
   get queryURL(): string {
     return `/arenav2/#${this.currentTab}`;
+  }
 
   finishContestDate(contest: types.ContestListItem): string {
     return contest.finish_time.toLocaleDateString();
