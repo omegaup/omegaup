@@ -20,42 +20,36 @@
         })
       }}</span>
     </td>
-    <template v-for="assignment in assignmentsProblems">
-      <td
-        v-if="assignment.type !== 'lesson'"
-        :key="assignment.alias"
-        class="flex-column text-center align-middle text-nowrap justify-content-center align-items-center"
-      >
-        <span class="d-block">{{
-          assignment.points === 0
-            ? T.courseWithoutProblems
-            : getProgressByAssignment(assignment.alias)
-        }}</span>
-        <span class="d-block">{{
-          getPointsByAssignment(assignment.alias)
-        }}</span>
-        <div class="d-flex justify-content-center mt-1">
-          <div class="d-flex" :class="{ invisible: assignment.points === 0 }">
-            <a
-              v-for="problem in assignment.problems"
-              :key="problem.alias"
-              v-tooltip="
-                getProgressTooltipDescription(assignment.alias, problem)
-              "
-              :class="getProblemColor(assignment.alias, problem)"
-              data-toggle="tooltip"
-              data-placement="bottom"
-              :href="
-                getStudentProgressUrlWithAssignmentAndProblem(
-                  assignment.alias,
-                  problem.alias,
-                )
-              "
-            ></a>
-          </div>
+    <td
+      v-for="assignment in assignmentsProblems"
+      :key="assignment.alias"
+      class="flex-column text-center align-middle text-nowrap justify-content-center align-items-center"
+    >
+      <span class="d-block">{{
+        assignment.points === 0
+          ? T.courseWithoutProblems
+          : getProgressByAssignment(assignment.alias)
+      }}</span>
+      <span class="d-block">{{ getPointsByAssignment(assignment.alias) }}</span>
+      <div class="d-flex justify-content-center mt-1">
+        <div class="d-flex" :class="{ invisible: assignment.points === 0 }">
+          <a
+            v-for="problem in assignment.problems"
+            :key="problem.alias"
+            v-tooltip="getProgressTooltipDescription(assignment.alias, problem)"
+            :class="getProblemColor(assignment.alias, problem)"
+            data-toggle="tooltip"
+            data-placement="bottom"
+            :href="
+              getStudentProgressUrlWithAssignmentAndProblem(
+                assignment.alias,
+                problem.alias,
+              )
+            "
+          ></a>
         </div>
-      </td>
-    </template>
+      </div>
+    </td>
   </tr>
 </template>
 

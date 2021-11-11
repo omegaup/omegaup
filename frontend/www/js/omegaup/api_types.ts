@@ -2149,7 +2149,6 @@ export namespace types {
       points: number;
       title: string;
     }[];
-    type: string;
   }
 
   export interface AssociatedIdentity {

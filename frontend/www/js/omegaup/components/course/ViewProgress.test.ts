@@ -24,8 +24,6 @@ describe('ViewProgress.vue', () => {
         name: 'Test assignment A',
         extraPoints: 0,
         points: 200,
-        order: 1,
-        type: 'homework',
         problems: [
           {
             alias: 'test-problem-a',
@@ -42,15 +40,6 @@ describe('ViewProgress.vue', () => {
             order: 2,
           },
         ],
-      },
-      {
-        alias: 'test-assignment-b',
-        name: 'Test assignment B',
-        extraPoints: 0,
-        points: 0,
-        order: 2,
-        type: 'lesson',
-        problems: [],
       },
     ] as types.AssignmentsProblemsPoints[],
     students: [
@@ -92,7 +81,6 @@ describe('ViewProgress.vue', () => {
   };
   const student = baseViewProgressProps.students[0];
   const assignment = baseViewProgressProps.assignmentsProblems[0];
-  const lesson = baseViewProgressProps.assignmentsProblems[1];
   const courseName = baseViewProgressProps.course.name;
 
   it('Should handle scores', async () => {
@@ -152,13 +140,5 @@ ${new Percentage(
       student.assignments[assignment.alias].progress / 100,
     ).toString()}</text:p></table:table-cell></table:table-row>
 </table:table>`);
-  });
-
-  it('Should not show lesson assignment in table', async () => {
-    const wrapper = shallowMount(course_ViewProgress, {
-      propsData: baseViewProgressProps,
-    });
-    expect(wrapper.text()).toContain(assignment.name);
-    expect(wrapper.text()).not.toContain(lesson.name);
   });
 });
