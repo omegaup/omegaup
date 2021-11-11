@@ -55,6 +55,7 @@ const data: types.ExtraProfileDetails = {
   ],
   stats: [],
   unsolvedProblems: [],
+  hasPassword: true,
 };
 
 const rankingMapping: { classname: string; rank: string }[] = [
