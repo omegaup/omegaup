@@ -6,7 +6,7 @@
       :country="profile.country_id"
     />
     <div class="card-body">
-      <div class="img-thumbnail rounded-circle bottom-margin">
+      <div class="text-center rounded-circle bottom-margin">
         <img class="rounded-circle" :src="profile.gravatar_92" />
       </div>
     </div>
