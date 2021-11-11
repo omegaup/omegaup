@@ -89,10 +89,10 @@ export enum ContestTab {
 export default class ArenaContestList extends Vue {
   @Prop() contests!: types.ContestList;
   @Prop() query!: string;
-  @Prop() section!: ContestTab;
+  @Prop() tab!: ContestTab;
   T = T;
   ContestTab = ContestTab;
-  currentTab: ContestTab = this.section;
+  currentTab: ContestTab = this.tab;
   currentQuery: string = this.query;
 
   titleLinkClass(tab: ContestTab) {

@@ -34,7 +34,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestList=array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
  * @psalm-type ContestListPayload=array{contests: TimeTypeContests, isLogged: bool, query: string}
- * @psalm-type ContestListv2Payload=array{contests: ContestList}
+ * @psalm-type ContestListv2Payload=array{contests: ContestList, query: string | null}
  * @psalm-type ContestNewPayload=array{languages: array<string, string>}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}

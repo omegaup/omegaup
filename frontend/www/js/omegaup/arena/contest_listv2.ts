@@ -9,7 +9,7 @@ import arena_ContestList, {
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestListv2Payload();
-  const locationHash = window.location.hash
+  const tab = window.location.hash
     ? parseInt(window.location.hash.substr(1))
     : ContestTab.Current;
   new Vue({
@@ -18,14 +18,13 @@ OmegaUp.on('ready', () => {
     data: () => ({
       query: payload.query,
       contests: payload.contests,
-      section: locationHash,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contestlist', {
         props: {
           contests: this.contests,
           query: this.query,
-          section: locationHash,
+          tab,
         },
       });
     },
