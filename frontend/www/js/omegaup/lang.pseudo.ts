@@ -1335,6 +1335,7 @@ const translations: { [key: string]: string; } = {
   userEditLanguage: "(Languag3)",
   userEditLowerSecondary: "(Midd13 5ch001 / Juni0r high)",
   userEditManageSchools: "(Manag3 5ch0015)",
+  userEditManageSchoolsUserCurrentlyEnrolled: "(Curr3n71y 3nr0113d)",
   userEditMaster: "(Ma573r5)",
   userEditNameTooLong: "(Nam3 can'7 3xc33d 50 carac73r5 in 13ng7h.)",
   userEditNone: "(N0n3)",
