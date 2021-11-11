@@ -4068,6 +4068,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{pagerItems: list<PageItem>, problems: list<ProblemListItem>}
      *
+     * @omegaup-request-param null|string $query
      * @omegaup-request-param int $page
      * @omegaup-request-param int|null $rowcount
      */
@@ -4080,13 +4081,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
         $page = $r->ensureOptionalInt('page') ?? 1;
 
+        $query = substr(
+            $r->ensureOptionalString('query') ?? '',
+            0,
+            256
+        );
+
         [
             'problems' => $problems,
             'count' => $count,
         ] = \OmegaUp\DAO\Problems::getAllProblemsOwnedByUser(
             $r->user->user_id,
             $page,
-            $pageSize
+            $pageSize,
+            $query
         );
 
         $addedProblems = [];

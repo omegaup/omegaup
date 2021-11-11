@@ -2,7 +2,7 @@ FROM ubuntu:focal
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
-    apt-get install --no-install-recommends -y openjdk-14-jre-headless curl \
+    apt-get install --no-install-recommends -y openjdk-16-jre-headless curl \
         ca-certificates gnupg2 xz-utils && \
     /usr/sbin/update-ca-certificates && \
     apt-get autoremove -y && \
@@ -15,8 +15,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \
 
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
-        php7.4-fpm php7.4-curl php7.4-mysql php7.4-zip \
-        php7.4-mbstring php7.4-json php7.4-opcache php7.4-xml php-apcu \
+        php7.4-fpm php7.4-curl php7.4-mysql php7.4-zip php7.4-mbstring \
+        php7.4-json php7.4-opcache php7.4-xml php-apcu php-redis \
         nginx git yarn nodejs supervisor python3-jinja2 python3-requests \
         python3-mysqldb python3-pyparsing mysql-client-core-8.0 \
         sudo wait-for-it && \

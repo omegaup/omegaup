@@ -169,4 +169,18 @@ describe('time', () => {
       ).toEqual('2021-03-01T08:55');
     });
   });
+
+  describe('convertLocalDateToGMTDate', () => {
+    it('Should convert local dates to GMT (UTC) dates correctly', () => {
+      const dateNow = new Date();
+      const result = time.convertLocalDateToGMTDate(dateNow);
+
+      expect(result.getFullYear()).toEqual(dateNow.getUTCFullYear());
+      expect(result.getMonth()).toEqual(dateNow.getUTCMonth());
+      expect(result.getDate()).toEqual(dateNow.getUTCDate());
+      expect(result.getHours()).toEqual(dateNow.getUTCHours());
+      expect(result.getMinutes()).toEqual(dateNow.getUTCMinutes());
+      expect(result.getSeconds()).toEqual(dateNow.getUTCSeconds());
+    });
+  });
 });

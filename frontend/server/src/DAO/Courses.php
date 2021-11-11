@@ -314,6 +314,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $row['lessonCount'] = $row['lesson_count'];
             $row['studentCount'] = $row['student_count'];
             $row['alreadyStarted'] = boolval($row['already_started']);
+            unset($row['lesson_count']);
+            unset($row['student_count']);
+            unset($row['already_started']);
             $results[] = $row;
         }
         return $results;
@@ -619,7 +622,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             INNER JOIN
                 Problems p ON p.problem_id = psp.problem_id
             WHERE
-                a.course_id = ?
+                a.course_id = ? AND a.assignment_type <> "lesson"
             ORDER BY
                 a.`order`, psp.`order`';
 
@@ -786,7 +789,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             INNER JOIN
                 Assignments a ON a.problemset_id = s.problemset_id
             WHERE
-                a.course_id = ?
+                a.course_id = ? AND a.assignment_type <> "lesson"
             GROUP BY
                 students.identity_id, a.assignment_id, p.problem_id
             HAVING

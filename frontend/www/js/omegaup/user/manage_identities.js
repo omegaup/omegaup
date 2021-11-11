@@ -14,7 +14,7 @@ OmegaUp.on('ready', function () {
           identities: this.identities,
         },
         on: {
-          'add-identity': function (username, password) {
+          'add-identity': function ({ username, password }) {
             api.User.associateIdentity({
               username: username,
               password: password,

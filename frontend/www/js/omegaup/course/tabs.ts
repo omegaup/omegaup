@@ -5,6 +5,7 @@ import course_Tabs from '../components/course/Tabs.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseTabsPayload();
+  const commonPayload = types.payloadParsers.CommonPayload();
   new Vue({
     el: '#main-container',
     components: {
@@ -14,6 +15,7 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-course-tabs', {
         props: {
           courses: payload.courses,
+          loggedIn: commonPayload.isLoggedIn,
         },
       });
     },

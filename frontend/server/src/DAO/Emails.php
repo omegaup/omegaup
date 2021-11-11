@@ -32,4 +32,23 @@ class Emails extends \OmegaUp\DAO\Base\Emails {
         }
         return $emails;
     }
+
+    /**
+     * @return null|string
+     */
+    final public static function getMainMailByUserId(int $userId) {
+        $sql = 'SELECT
+                    email
+                FROM
+                    Emails e
+                INNER JOIN
+                    Users u
+                ON
+                    e.email_id = u.main_email_id
+                WHERE
+                    u.user_id = ?';
+
+        /** @var null|string */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, [$userId]);
+    }
 }
