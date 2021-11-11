@@ -13,7 +13,7 @@
     </div>
     <div class="form-group">
       <label>{{ T.userEditLanguage }}</label>
-      <select v-model="locale" data-locale class="form-control">
+      <select v-model="locale" data-locale class="custom-select">
         <option value="es">{{ T.wordsSpanish }}</option>
         <option value="en">{{ T.wordsEnglish }}</option>
         <option value="pt">{{ T.wordsPortuguese }}</option>
@@ -24,7 +24,7 @@
       <select
         v-model="preferredLanguage"
         data-preferred-language
-        class="form-control"
+        class="custom-select"
       >
         <option value=""></option>
         <option
