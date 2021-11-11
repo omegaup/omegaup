@@ -1093,6 +1093,8 @@ const translations: { [key: string]: string; } = {
   profileContestsTableContest: "Concurso",
   profileContestsTablePlace: "Lugar",
   profileCountry: "Pa\u00eds / Regi\u00f3n",
+  profileCreatedContent: "Contenido creado",
+  profileCreatedContentSeeAll: "Ver todo",
   profileCreatedProblems: "Problemas creados",
   profileEdit: "Editar perfil",
   profileEmail: "Correo",
