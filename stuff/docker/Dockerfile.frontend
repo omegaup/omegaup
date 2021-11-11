@@ -85,6 +85,9 @@ RUN apt-get update -y && \
     apt-get autoremove -y && \
     apt-get clean
 
+RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.27/libinteractive.jar \
+        -o /usr/share/java/libinteractive.jar
+
 RUN useradd --create-home --shell=/bin/bash ubuntu && \
     mkdir -p /etc/omegaup/frontend && \
     mkdir -p /var/log/omegaup && chown -R ubuntu /var/log/omegaup && \

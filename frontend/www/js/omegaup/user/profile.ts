@@ -6,7 +6,7 @@ import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
 
-// TODO: Import Profile.vue when it is merged
+// TODO: Import Profile.vue when PR #5951 is merged
 import user_Profile from '../components/user/Profilev2.vue';
 
 OmegaUp.on('ready', () => {

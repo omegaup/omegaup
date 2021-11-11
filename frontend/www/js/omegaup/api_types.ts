@@ -3257,6 +3257,7 @@ export namespace types {
     accepted: number;
     alias: string;
     difficulty: number;
+    quality_seal: boolean;
     submissions: number;
     title: string;
   }

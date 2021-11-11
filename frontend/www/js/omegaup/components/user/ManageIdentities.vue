@@ -6,7 +6,7 @@
     <div class="panel-body add-identity-panel">
       <form
         class="form add-identity-form"
-        @submit.prevent="onAddIdentity(username, password)"
+        @submit.prevent="$emit('add-identity', { username, password })"
       >
         <div class="form-group">
           <label>{{ T.wordsIdentity }}</label>
@@ -53,7 +53,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="identity in identities">
+          <tr v-for="identity in identities" :key="identity.username">
             <td>{{ identity.username }}</td>
           </tr>
         </tbody>
@@ -63,7 +63,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 
@@ -73,12 +73,6 @@ export default class UserManageIdentities extends Vue {
   T = T;
   username: string = '';
   password: string = '';
-
-  @Emit('add-identity')
-  onAddIdentity(username: string, password: string) {
-    this.username = username;
-    this.password = password;
-  }
 }
 </script>
 
