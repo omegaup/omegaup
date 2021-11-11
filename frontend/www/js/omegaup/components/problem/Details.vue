@@ -498,6 +498,7 @@ export default class ProblemDetails extends Vue {
       return;
     }
     this.currentPopupDisplayed = PopupDisplayed.RunSubmit;
+    this.$emit('new-submission-popup-displayed');
   }
 
   onRunDetails(request: SubmissionRequest, tab: string): void {

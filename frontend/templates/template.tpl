@@ -7,9 +7,7 @@
       {$smarty.const.NEW_RELIC_SCRIPT}
     {/if}
 
-    {if isset($inArena) && $inArena}
-      {assign var='navbarSection' value='arena'}
-    {elseif isset($GOOGLECLIENTID) && !empty($GOOGLECLIENTID)}
+    {if isset($GOOGLECLIENTID) && !empty($GOOGLECLIENTID)}
       <meta name="google-signin-client_id" content="{$GOOGLECLIENTID}" />
     {/if}
 
@@ -20,10 +18,6 @@
     <script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js" defer}" defer></script>
     <script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js" defer}"></script>
     {js_include entrypoint="omegaup" runtime}
-
-    {if isset($inArena) && $inArena}
-      {js_include entrypoint="arena"}
-    {/if}
 
     {if isset($jsfile)}
       <script type="text/javascript" src="{$jsfile}" defer></script>
@@ -43,10 +37,6 @@
     <link rel="stylesheet" type="text/css" href="{version_hash src="/css/dist/omegaup_styles.css"}">
     <link rel="shortcut icon" href="/favicon.ico" />
 
-    {if isset($inArena) && $inArena}
-      <link rel="stylesheet" type="text/css" href="{version_hash src="/css/arena.css"}" />
-    {/if}
-
     {if !empty($ENABLED_EXPERIMENTS)}
         <script type="text/plain" id="omegaup-enabled-experiments">{','|implode:$ENABLED_EXPERIMENTS}</script>
     {/if}
@@ -56,14 +46,14 @@
     {/if}
   </head>
 
-  <body class="d-flex flex-column h-100">
+  <body class="d-flex flex-column h-100{if $smarty.const.OMEGAUP_LOCKDOWN} lockdown{/if}">
     <script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
     {if !isset($hideFooterAndHeader) || !$hideFooterAndHeader}
       <div id="common-navbar"></div>
       {js_include entrypoint="common_navbar_v2"}
     {/if}
 	  <main role="main" {if (!isset($fullWidth) || !$fullWidth)}class="container-lg p-5"{/if}>
-      {if (!isset($inArena) || !$inArena) && isset($ERROR_MESSAGE)}
+      {if isset($ERROR_MESSAGE)}
         <div class="alert alert-danger">
           {$ERROR_MESSAGE}
         </div>

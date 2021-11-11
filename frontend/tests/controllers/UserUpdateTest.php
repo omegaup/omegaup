@@ -580,4 +580,100 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals('has_teaching_objective', $e->parameter);
         }
     }
+
+    public function testGetSelfEmailDetailsForTypeScript() {
+        $userInformation = [
+            'username' => 'original_username',
+            'name' => 'Original Name',
+            'email' => 'original@email.com',
+        ];
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams($userInformation)
+        );
+
+        $login = self::login($identity);
+
+        $payload = \OmegaUp\Controllers\User::getEmailEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertEquals($payload['email'], $userInformation['email']);
+        $this->assertEquals(
+            $payload['profile']['username'],
+            $userInformation['username']
+        );
+        $this->assertEquals(
+            $payload['profile']['name'],
+            $userInformation['name']
+        );
+    }
+
+    public function testUpdateUserMainEmailAsNonSysAdmin() {
+        $userToGetInformation = [
+            'username' => 'username_to_get_info',
+            'name' => 'Name To Get Info',
+            'email' => 'email_to_get_info@email.com',
+        ];
+        [
+            'identity' => $identityToGetInformation,
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams($userToGetInformation)
+        );
+
+        // Create user who attempts get the information of previously registered
+        // user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\User::getEmailEditDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'username' => $identityToGetInformation->username,
+                ])
+            );
+            $this->fail(
+                'Non-admin user should not be able to get user details'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+    }
+
+    public function testUpdateUserMainEmailAsSysAdmin() {
+        //createAdminUser
+        $userToGetInformation = [
+            'username' => 'username_to_get_info',
+            'name' => 'Name To Get Info',
+            'email' => 'email_to_get_info@email.com',
+        ];
+        [
+            'identity' => $identityToGetInformation,
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams($userToGetInformation)
+        );
+
+        // Create user with sysadmin privileges
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = self::login($identity);
+
+        $payload = \OmegaUp\Controllers\User::getEmailEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $identityToGetInformation->username,
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertEquals($payload['email'], $userToGetInformation['email']);
+        $this->assertEquals(
+            $payload['profile']['username'],
+            $identityToGetInformation->username
+        );
+        $this->assertEquals(
+            $payload['profile']['name'],
+            $identityToGetInformation->name
+        );
+    }
 }

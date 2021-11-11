@@ -183,17 +183,26 @@
       <div class="mt-4 mb-1">
         <div class="progress w-50 mx-auto">
           <div
-            class="progress-bar"
+            class="progress-bar text-dark"
             role="progressbar"
             :aria-valuenow="overallCompletedPercentage"
             aria-valuemin="0"
             aria-valuemax="100"
             :style="`width: ${overallCompletedPercentage}%`"
-          ></div>
+          >
+            {{ overallCompletedPercentage.toFixed(0) }}%
+          </div>
         </div>
-        <p class="text-center my-0 text-uppercase progress-text">
-          {{ T.courseDetailsProgress }}
-        </p>
+        <div
+          class="w-50 mx-auto d-flex justify-content-between text-center progress-text"
+        >
+          <p class="my-0 text-uppercase">
+            {{ T.courseDetailsProgress }}
+          </p>
+          <p class="my-0">
+            {{ overallCompletedPoints }}
+          </p>
+        </div>
       </div>
       <div class="d-flex justify-content-end">
         <div class="dropdown">
@@ -343,7 +352,7 @@ export default class CourseDetails extends Vue {
   };
   selectedTab = Tab.Content;
 
-  get overallCompletedPercentage(): string {
+  get overallCompletedPercentage(): number {
     let score = 0;
     let maxScore = 0;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -352,11 +361,23 @@ export default class CourseDetails extends Vue {
       maxScore += progress.max_score;
     }
     if (maxScore === 0) {
-      return (0).toFixed(2);
+      return 0;
     }
-    const percent = (score / maxScore) * 100;
+    return (score / maxScore) * 100;
+  }
 
-    return percent.toFixed(2);
+  get overallCompletedPoints(): string {
+    let score = 0;
+    let maxScore = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (const [assignment, progress] of Object.entries(this.progress)) {
+      score += progress.score;
+      maxScore += progress.max_score;
+    }
+    return ui.formatString(T.courseDetailsOverallCompletedPoints, {
+      completed_points: score,
+      total_points: maxScore,
+    });
   }
 
   getAssignmentProgress(progress: types.Progress): number {
@@ -382,7 +403,7 @@ export default class CourseDetails extends Vue {
 @import '../../../../sass/main.scss';
 
 .progress-text {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
 }
 
 .progress-bar {

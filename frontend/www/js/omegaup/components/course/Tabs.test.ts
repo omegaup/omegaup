@@ -3,6 +3,7 @@ jest.mock('../../../../third_party/js/diff_match_patch.js');
 import { types } from '../../api_types';
 import { shallowMount, mount } from '@vue/test-utils';
 import T from '../../lang';
+import * as ui from '../../ui';
 import course_Tabs from './Tabs.vue';
 
 describe('Tabs.vue', () => {
@@ -27,6 +28,7 @@ describe('Tabs.vue', () => {
         name: 'Test course',
         school_name: 'Test course school',
         studentCount: 2000,
+        alreadyStarted: false,
       },
     ],
     finished: [
@@ -40,22 +42,47 @@ describe('Tabs.vue', () => {
       },
     ],
   };
+
   it('Should show tabs', () => {
     const wrapper = shallowMount(course_Tabs, {
       propsData: {
         courses,
       },
     });
-
-    expect(wrapper.text()).toContain(T.courseTabEnrolled);
-    expect(wrapper.text()).toContain(T.courseTabFinished);
+    expect(wrapper.text()).toContain(T.courseTabEnrolledUnlogged);
+    expect(wrapper.text()).toContain(T.courseTabFinishedUnlogged);
     expect(wrapper.text()).toContain(T.courseTabPublic);
+    expect(wrapper.text()).not.toContain(T.wordsStart);
+    expect(wrapper.text()).toContain(T.courseCardMustLogIn);
+  });
+
+  it('Should show tabs with counts for logged user', () => {
+    const wrapper = mount(course_Tabs, {
+      propsData: {
+        courses,
+        loggedIn: true,
+      },
+    });
+    expect(wrapper.text()).toContain(
+      ui.formatString(T.courseTabEnrolled, {
+        course_count: courses.enrolled.length,
+      }),
+    );
+    expect(wrapper.text()).toContain(
+      ui.formatString(T.courseTabFinished, {
+        course_count: courses.finished.length,
+      }),
+    );
+    expect(wrapper.text()).toContain(T.courseTabPublic);
+    expect(wrapper.text()).toContain(T.wordsStart);
+    expect(wrapper.text()).not.toContain(T.courseCardMustLogIn);
   });
 
   it('Should show the correct course cards', async () => {
     const wrapper = mount(course_Tabs, {
       propsData: {
         courses,
+        loggedIn: true,
       },
     });
 

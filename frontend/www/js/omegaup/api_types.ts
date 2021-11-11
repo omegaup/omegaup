@@ -1238,6 +1238,28 @@ export namespace types {
       );
     }
 
+    export function EmailEditDetailsPayload(
+      elementId: string = 'payload',
+    ): types.EmailEditDetailsPayload {
+      return ((x) => {
+        if (x.profile)
+          x.profile = ((x) => {
+            if (x.birth_date)
+              x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+            if (x.graduation_date)
+              x.graduation_date = ((x: number) => new Date(x * 1000))(
+                x.graduation_date,
+              );
+            return x;
+          })(x.profile);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
+      );
+    }
+
     export function GroupEditPayload(
       elementId: string = 'payload',
     ): types.GroupEditPayload {
@@ -1971,73 +1993,17 @@ export namespace types {
       );
     }
 
-    export function UserProfileEditDetailsPayload(
-      elementId: string = 'payload',
-    ): types.UserProfileEditDetailsPayload {
-      return ((x) => {
-        if (x.extraProfileDetails)
-          x.extraProfileDetails = ((x) => {
-            x.contests = ((x) => {
-              if (x instanceof Object) {
-                Object.keys(x).forEach(
-                  (y) =>
-                    (x[y] = ((x) => {
-                      x.data = ((x) => {
-                        x.finish_time = ((x: number) => new Date(x * 1000))(
-                          x.finish_time,
-                        );
-                        x.last_updated = ((x: number) => new Date(x * 1000))(
-                          x.last_updated,
-                        );
-                        x.start_time = ((x: number) => new Date(x * 1000))(
-                          x.start_time,
-                        );
-                        return x;
-                      })(x.data);
-                      return x;
-                    })(x[y])),
-                );
-              }
-              return x;
-            })(x.contests);
-            x.ownedBadges = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                if (x.assignation_time)
-                  x.assignation_time = ((x: number) => new Date(x * 1000))(
-                    x.assignation_time,
-                  );
-                if (x.first_assignation)
-                  x.first_assignation = ((x: number) => new Date(x * 1000))(
-                    x.first_assignation,
-                  );
-                return x;
-              });
-            })(x.ownedBadges);
-            return x;
-          })(x.extraProfileDetails);
-        x.profile = ((x) => {
-          if (x.birth_date)
-            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-          if (x.graduation_date)
-            x.graduation_date = ((x: number) => new Date(x * 1000))(
-              x.graduation_date,
-            );
-          return x;
-        })(x.profile);
-        return x;
-      })(
-        JSON.parse(
-          (document.getElementById(elementId) as HTMLElement).innerText,
-        ),
-      );
-    }
-
     export function UserRankTablePayload(
       elementId: string = 'payload',
     ): types.UserRankTablePayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
+    export function UserRolesPayload(
+      elementId: string = 'payload',
+    ): types.UserRolesPayload {
       return JSON.parse(
         (document.getElementById(elementId) as HTMLElement).innerText,
       );
@@ -2162,6 +2128,7 @@ export namespace types {
     courseDetails: types.CourseDetails;
     currentAssignment: types.ArenaAssignment;
     scoreboard: types.Scoreboard;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
     showRanking: boolean;
   }
 
@@ -2538,7 +2505,6 @@ export namespace types {
     needsBasicInformation: boolean;
     privacyStatement: types.PrivacyStatement;
     requestsUserInformation: string;
-    shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
   export interface ContestList {
@@ -2733,6 +2699,7 @@ export namespace types {
 
   export interface CourseCardPublic {
     alias: string;
+    alreadyStarted: boolean;
     lessonCount: number;
     level?: string;
     name: string;
@@ -2780,7 +2747,6 @@ export namespace types {
   export interface CourseDetailsPayload {
     details: types.CourseDetails;
     progress?: types.AssignmentProgress;
-    shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
   export interface CourseEditPayload {
@@ -2941,6 +2907,11 @@ export namespace types {
     loginIdentity?: dao.Identities;
     user?: dao.Users;
     valid: boolean;
+  }
+
+  export interface EmailEditDetailsPayload {
+    email?: string;
+    profile?: types.UserProfileInfo;
   }
 
   export interface Event {
@@ -3139,7 +3110,6 @@ export namespace types {
   export interface IntroCourseDetails {
     details: types.CourseDetails;
     progress: { [key: string]: { [key: string]: number } };
-    shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
   export interface IntroDetailsPayload {
@@ -3147,7 +3117,6 @@ export namespace types {
     isFirstTimeAccess: boolean;
     needsBasicInformation: boolean;
     shouldShowAcceptTeacher: boolean;
-    shouldShowFirstAssociatedIdentityRunWarning: boolean;
     shouldShowResults: boolean;
     statements: {
       acceptTeacher?: types.PrivacyStatement;
@@ -3172,9 +3141,10 @@ export namespace types {
   }
 
   export interface LoginDetailsPayload {
-    facebookUrl: string;
+    facebookUrl?: string;
     statusError?: string;
     validateRecaptcha: boolean;
+    verifyEmailSuccessfully?: string;
   }
 
   export interface MergedScoreboardEntry {
@@ -4139,14 +4109,9 @@ export namespace types {
   }
 
   export interface UserProfileDetailsPayload {
-    extraProfileDetails?: types.ExtraProfileDetails;
-    privateProfile: boolean;
-    profile: types.UserProfileInfo;
-  }
-
-  export interface UserProfileEditDetailsPayload {
     countries: dao.Countries[];
     extraProfileDetails?: types.ExtraProfileDetails;
+    identities: types.AssociatedIdentity[];
     profile: types.UserProfileInfo;
     programmingLanguages: { [key: string]: string };
   }
@@ -4158,7 +4123,7 @@ export namespace types {
     country_id?: string;
     email?: string;
     gender?: string;
-    graduation_date?: Date | string;
+    graduation_date?: Date;
     gravatar_92?: string;
     has_competitive_objective?: boolean;
     has_learning_objective?: boolean;
@@ -4226,6 +4191,12 @@ export namespace types {
 
   export interface UserRole {
     name: string;
+  }
+
+  export interface UserRolesPayload {
+    userSystemGroups: { [key: number]: { name: string; value: boolean } };
+    userSystemRoles: { [key: number]: { name: string; value: boolean } };
+    username: string;
   }
 }
 
