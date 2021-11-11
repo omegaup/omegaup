@@ -397,7 +397,6 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 Identities i
             WHERE
                 i.username = ?
-                AND user_id IS NULL
             LIMIT 1;';
         $args = [$username];
 

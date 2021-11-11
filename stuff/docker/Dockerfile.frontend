@@ -68,11 +68,25 @@ RUN apt-get update -y && \
     curl -sL https://download.newrelic.com/548C16BF.gpg | apt-key add - && \
     apt-get update -y && \
     apt-get install --no-install-recommends -y \
-        php7.4-fpm php7.4-curl php7.4-mysql php7.4-zip php7.4-mbstring \
-        php7.4-json php7.4-opcache php7.4-xml php-apcu php-apcu-bc \
-        newrelic-php5 php-redis && \
+        newrelic-php5 \
+        openjdk-16-jre-headless \
+        php-apcu \
+        php-apcu-bc \
+        php-redis \
+        php7.4-curl \
+        php7.4-fpm \
+        php7.4-json \
+        php7.4-mbstring \
+        php7.4-mysql \
+        php7.4-opcache \
+        php7.4-xml \
+        php7.4-zip \
+        && \
     apt-get autoremove -y && \
     apt-get clean
+
+RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.27/libinteractive.jar \
+        -o /usr/share/java/libinteractive.jar
 
 RUN useradd --create-home --shell=/bin/bash ubuntu && \
     mkdir -p /etc/omegaup/frontend && \

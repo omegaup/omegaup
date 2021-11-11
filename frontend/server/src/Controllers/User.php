@@ -13,7 +13,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL128: string, gravatarURL51: string, currentEmail: string, currentName: null|string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
- * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
+ * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float, quality_seal: bool}
  * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, is_own_profile: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type ListItem=array{key: string, value: string}
  * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>}
@@ -1993,7 +1993,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         /** @var list<Problem> */
         $responseProblems = [];
-        $relevantColumns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
+        $relevantColumns = ['title', 'alias', 'submissions', 'accepted', 'difficulty', 'quality_seal'];
         foreach ($problems as $problem) {
             if (!\OmegaUp\DAO\Problems::isVisible($problem)) {
                 continue;
@@ -2032,7 +2032,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $identityId
         );
 
-        $relevantColumns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
+        $relevantColumns = ['title', 'alias', 'submissions', 'accepted', 'difficulty', 'quality_seal'];
         /** @var list<Problem> */
         $filteredProblems = [];
         foreach ($problems as $problem) {
@@ -2070,7 +2070,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return list<Problem>
      */
     private static function getCreatedProblems(int $identityId): array {
-        $relevantColumns = ['title', 'alias', 'submissions', 'accepted', 'difficulty'];
+        $relevantColumns = ['title', 'alias', 'submissions', 'accepted', 'difficulty', 'quality_seal'];
         /** @var list<Problem> */
         $filteredProblems = [];
         foreach (
@@ -3587,6 +3587,11 @@ class User extends \OmegaUp\Controllers\Controller {
                 'username'
             );
         }
+        if (!is_null($identity->user_id)) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'identityAlreadyInUse'
+            );
+        }
 
         if (
             \OmegaUp\DAO\Identities::isUserAssociatedWithIdentityOfGroup(
@@ -3953,7 +3958,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: UserProfileDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: UserProfileDetailsPayload, title: \OmegaUp\TranslationString, fullWidth: bool}}
      *
      * @omegaup-request-param null|string $username
      */
