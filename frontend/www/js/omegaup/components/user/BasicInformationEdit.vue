@@ -114,15 +114,14 @@ export default class UserBasicInformationEdit extends Vue {
   }
 
   onUpdateUserBasicInformation(): void {
-    const newUserBasicInformation = {
+    this.$emit('update-user-basic-information', {
       username: this.username,
       name: this.name,
       gender: this.gender,
-      countryId: this.countryId,
-      stateId: this.stateId,
-      birthDate: isNaN(this.birthDate.getTime()) ? null : this.birthDate,
-    };
-    this.$emit('update-user-basic-information', newUserBasicInformation);
+      country_id: this.countryId,
+      state_id: this.stateId,
+      birth_date: isNaN(this.birthDate.getTime()) ? null : this.birthDate,
+    });
   }
 
   @Watch('countryId')

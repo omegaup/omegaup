@@ -1,13 +1,7 @@
 <template>
-  <div class="container-fluid p-5 mt-0" data-user-profile-root>
-    <h1 v-if="!profile.is_own_profile && profile.is_private">
-      {{ ui.info(T.userProfileIsPrivate) }}
-    </h1>
+  <div class="container-fluid p-0 mt-0">
     <div class="row">
-      <div class="col-md-2">
-        <omegaup-user-maininfo :profile="profile" :data="data" :edit="false" />
-      </div>
-      <div class="col-md-10">
+      <div class="col-md-12">
         <div class="card">
           <div class="card-header">
             <nav class="nav nav-tabs" role="tablist" data-profile-navtabs>
@@ -94,6 +88,13 @@
                   :title="T.profileUnsolvedProblems"
                   class="mb-3"
                 ></omegaup-grid-paginator>
+                <omegaup-grid-paginator
+                  :columns="3"
+                  :items="createdProblems"
+                  :items-per-page="30"
+                  :title="T.profileCreatedProblems"
+                  class="mb-3"
+                ></omegaup-grid-paginator>
               </div>
               <div
                 v-show="selectedTab == 'contests'"
@@ -110,7 +111,7 @@
                     <thead>
                       <tr>
                         <th>{{ T.profileContestsTableContest }}</th>
-                        <th class="numericColumn">
+                        <th class="text-right">
                           {{ T.profileContestsTablePlace }}
                         </th>
                       </tr>
@@ -253,13 +254,5 @@ export default class UserProfile extends Vue {
 <style lang="scss" scoped>
 a:hover {
   cursor: pointer;
-}
-
-th.numericColumn {
-  text-align: right;
-}
-
-[data-user-profile-root] {
-  font-size: 1rem;
 }
 </style>

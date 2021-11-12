@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import { types } from '../../api_types';
+import { dao, types } from '../../api_types';
 import user_Basic_Information_Edit from './BasicInformationEdit.vue';
 import date_Picker from '../DatePicker.vue';
 
@@ -29,6 +29,7 @@ const profile: types.UserProfileInfo = {
 const basicInformationEditProps: {
   profile: types.UserProfileInfo;
   data: types.UserProfileDetailsPayload;
+  countries: dao.Countries[];
 } = {
   profile,
   data: {
@@ -46,6 +47,16 @@ const basicInformationEditProps: {
     profile: profile,
     identities: [],
   },
+  countries: [
+    {
+      country_id: 'MX',
+      name: 'México',
+    },
+    {
+      country_id: 'CA',
+      name: 'Canada',
+    },
+  ],
 };
 
 describe('BasicInformationEdit.vue', () => {
@@ -96,9 +107,9 @@ describe('BasicInformationEdit.vue', () => {
           username: 'omegaup modified',
           name: 'omegaUp admin modified',
           gender: 'other',
-          countryId: 'CA',
-          stateId: 'AB',
-          birthDate: new Date('2001-01-01'),
+          country_id: 'CA',
+          state_id: 'AB',
+          birth_date: new Date('2001-01-01'),
         },
       ],
     ]);

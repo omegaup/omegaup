@@ -55,11 +55,13 @@ describe('PreferencesEdit.vue', () => {
     expect(wrapper.emitted('update-user-preferences')).toEqual([
       [
         {
-          locale: 'en',
+          userPreferences: {
+            locale: 'en',
+            preferred_language: 'rb',
+            is_private: true,
+            hide_problem_tags: true,
+          },
           localeChanged: true,
-          preferredLanguage: 'rb',
-          isPrivate: true,
-          hideProblemTags: true,
         },
       ],
     ]);

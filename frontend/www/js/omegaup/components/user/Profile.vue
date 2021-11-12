@@ -27,12 +27,26 @@
             :data="data"
             :profile="profile"
             :countries="countries"
+            @update-user-basic-information="
+              (request) => $emit('update-user-basic-information', request)
+            "
           ></omegaup-user-edit-basic-information>
         </template>
         <template v-else-if="currentSelectedTab === 'edit-preferences'">
           <omegaup-user-edit-preferences
             :profile="profile"
+            @update-user-preferences="
+              (request) => $emit('update-user-preferences', request)
+            "
           ></omegaup-user-edit-preferences>
+        </template>
+        <template v-else-if="currentSelectedTab === 'manage-schools'">
+          <omegaup-user-manage-schools
+            :profile="profile"
+            @update-user-schools="
+              (request) => $emit('update-user-schools', request)
+            "
+          ></omegaup-user-manage-schools>
         </template>
         <template v-else-if="currentSelectedTab === 'manage-identities'">
           <omegaup-user-manage-identities
@@ -63,6 +77,7 @@ import user_BasicInformationEdit from './BasicInformationEdit.vue';
 import user_PasswordEdit from './PasswordEdit.vue';
 import { urlMapping } from './SidebarMainInfo.vue';
 import user_ManageIdentities from './ManageIdentitiesv2.vue';
+import user_ManageSchools from './ManageSchools.vue';
 
 @Component({
   components: {
@@ -72,6 +87,7 @@ import user_ManageIdentities from './ManageIdentitiesv2.vue';
     'omegaup-user-edit-basic-information': user_BasicInformationEdit,
     'omegaup-user-edit-password': user_PasswordEdit,
     'omegaup-user-manage-identities': user_ManageIdentities,
+    'omegaup-user-manage-schools': user_ManageSchools,
   },
 })
 export default class Profile extends Vue {

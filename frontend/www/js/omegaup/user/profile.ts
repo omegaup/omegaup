@@ -7,7 +7,7 @@ import * as ui from '../ui';
 import T from '../lang';
 
 // TODO: Import Profile.vue when PR #5951 is merged
-import user_Profile from '../components/user/Profilev2.vue';
+import user_Profile from '../components/user/Profile.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
@@ -42,6 +42,45 @@ OmegaUp.on('ready', () => {
           programmingLanguages: payload.programmingLanguages,
         },
         on: {
+          'update-user-basic-information': (
+            userBasicInformation: Partial<types.UserProfileInfo>,
+          ) => {
+            api.User.update(userBasicInformation)
+              .then(() => {
+                ui.success(T.userEditSuccess);
+              })
+              .catch(ui.apiError);
+          },
+          'update-user-preferences': ({
+            userPreferences,
+            localeChanged,
+          }: {
+            userPreferences: Partial<types.UserProfileInfo>;
+            localeChanged: boolean;
+          }) => {
+            const profile = {
+              ...userPreferences,
+              ...{ username: this.profile.username },
+            };
+            console.log(profile);
+            api.User.update(profile)
+              .then(() => {
+                ui.success(T.userEditPreferencesSuccess);
+                if (localeChanged) {
+                  window.location.reload();
+                }
+              })
+              .catch(ui.apiError);
+          },
+          'update-user-schools': (
+            schoolInformation: Partial<types.UserProfileInfo>,
+          ) => {
+            api.User.update(schoolInformation)
+              .then(() => {
+                ui.success(T.userEditSchoolSuccess);
+              })
+              .catch(ui.apiError);
+          },
           'add-identity': ({
             username,
             password,
