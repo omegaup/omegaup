@@ -114,6 +114,12 @@ export default class UserBasicInformationEdit extends Vue {
   }
 
   onUpdateUserBasicInformation(): void {
+    if (this.name && this.name.length > 50) {
+      this.$emit('update-user-basic-information-error', {
+        description: T.userEditNameTooLong,
+      });
+      return;
+    }
     const newUserBasicInformation = {
       username: this.username,
       name: this.name,
