@@ -2554,6 +2554,7 @@ export namespace types {
 
   export interface ContestListv2Payload {
     contests: types.ContestList;
+    query?: string;
   }
 
   export interface ContestNewPayload {

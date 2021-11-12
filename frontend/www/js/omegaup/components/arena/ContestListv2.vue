@@ -5,18 +5,42 @@
     </div>
     <b-card no-body>
       <b-tabs
-        v-model="activeTab"
+        v-model="currentTab"
         class="sidebar"
         pills
         card
         vertical
         nav-wrapper-class="contest-list-nav col-sm-4 col-md-2"
       >
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <form :action="queryURL" method="GET">
+                <div class="input-group">
+                  <input
+                    v-model="currentQuery"
+                    class="form-control"
+                    type="text"
+                    name="query"
+                    autocomplete="off"
+                    :placeholder="T.wordsKeyword"
+                  />
+                  <div class="input-group-append">
+                    <input
+                      class="btn btn-primary btn-md active"
+                      type="submit"
+                      :value="T.wordsSearch"
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
         <b-tab
           ref="currentContestTab"
           :title="T.contestListCurrent"
           :title-link-class="titleLinkClass(ContestTab.Current)"
-          active
         >
           <div v-if="contests.current.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
@@ -157,17 +181,24 @@ export enum ContestTab {
 })
 export default class ArenaContestList extends Vue {
   @Prop() contests!: types.ContestList;
+  @Prop() query!: string;
+  @Prop() tab!: ContestTab;
   T = T;
   ui = ui;
   ContestTab = ContestTab;
-  activeTab: ContestTab = ContestTab.Current;
+  currentTab: ContestTab = this.tab;
+  currentQuery: string = this.query;
 
   titleLinkClass(tab: ContestTab) {
-    if (this.activeTab === tab) {
+    if (this.currentTab === tab) {
       return ['text-center', 'active-title-link'];
     } else {
       return ['text-center', 'title-link'];
     }
+  }
+
+  get queryURL(): string {
+    return `/arenav2/#${this.currentTab}`;
   }
 
   finishContestDate(contest: types.ContestListItem): string {
