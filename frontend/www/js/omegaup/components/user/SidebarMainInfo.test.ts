@@ -37,6 +37,7 @@ const data: types.ExtraProfileDetails = {
       difficulty: 0,
       submissions: 2,
       title: 'title',
+      quality_seal: false,
     },
     {
       accepted: 1,
@@ -44,6 +45,7 @@ const data: types.ExtraProfileDetails = {
       difficulty: 1,
       submissions: 3,
       title: 'title2',
+      quality_seal: false,
     },
     {
       accepted: 1,
@@ -51,10 +53,12 @@ const data: types.ExtraProfileDetails = {
       difficulty: 2,
       submissions: 5,
       title: 'title3',
+      quality_seal: false,
     },
   ],
   stats: [],
   unsolvedProblems: [],
+  hasPassword: true,
 };
 
 const rankingMapping: { classname: string; rank: string }[] = [
@@ -92,7 +96,21 @@ describe('SidebarMainInfo.vue', () => {
     const wrapper = shallowMount(user_SidebarMainInfo, {
       propsData: { profile, data },
     });
-    expect(wrapper.text()).toContain('3');
+    expect(wrapper.find('div[data-solved-problems]>h4').text()).toBe('3');
+  });
+
+  it('Should not display buttons for a different user profile', () => {
+    const wrapper = shallowMount(user_SidebarMainInfo, {
+      propsData: {
+        profile: { ...profile, ...{ is_own_profile: false } },
+        data,
+      },
+    });
+
+    for (const url of urlMapping) {
+      const urlSelector = `a[href="/profile/#${url.key}"]`;
+      expect(wrapper.find(urlSelector).exists()).toBeFalsy();
+    }
   });
 });
 

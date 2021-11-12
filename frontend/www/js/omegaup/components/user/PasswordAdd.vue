@@ -1,12 +1,11 @@
 <template>
-  <form @submit.prevent="onUpdatePassword">
+  <form @submit.prevent="onAddPassword">
     <div class="form-group">
-      <label>{{ T.userEditChangePasswordOldPassword }}</label>
+      <label>{{ T.profileUsername }}</label>
       <div>
         <input
-          v-model="oldPassword"
-          data-old-password
-          type="password"
+          v-model="newUsername"
+          data-username
           size="30"
           required
           class="form-control"
@@ -57,13 +56,15 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component
-export default class UserPasswordEdit extends Vue {
+export default class UserPasswordAdd extends Vue {
+  @Prop() username!: string;
+
   T = T;
-  oldPassword = '';
+  newUsername = this.username;
   newPassword = '';
   newPassword2 = '';
 
@@ -80,17 +81,17 @@ export default class UserPasswordEdit extends Vue {
       this.passwordMismatch ||
       this.newPassword.length === 0 ||
       this.newPassword2.length === 0 ||
-      this.oldPassword.length === 0
+      this.newUsername.trim().length === 0
     );
   }
 
-  onUpdatePassword(): void {
+  onAddPassword(): void {
     if (this.passwordMismatch) {
       return;
     }
-    this.$emit('update-password', {
-      oldPassword: this.oldPassword,
-      newPassword: this.newPassword,
+    this.$emit('add-password', {
+      username: this.newUsername,
+      password: this.newPassword,
     });
   }
 }
