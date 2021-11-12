@@ -36,7 +36,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
  * @psalm-type ProblemDetailsPayload=array{allowUserAddTags?: bool, allRuns?: list<Run>, clarifications?: list<Clarification>, histogram: Histogram, levelTags?: list<string>, nominationStatus?: NominationStatus, problem: ProblemInfo, problemLevel?: null|string, publicTags?: list<string>, runs?: list<Run>, selectedPrivateTags?: list<string>, selectedPublicTags?: list<string>, solutionStatus?: string, solvers: list<BestSolvers>, user: UserInfoForProblem}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, groupScorePolicy: null|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
- * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>, keyword: string|null}
  * @psalm-type ProblemListPayload=array{selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
@@ -4370,6 +4370,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     *
+     * @omegaup-request-param null|string $query
+     *
      * @return array{smartyProperties: array{payload: ProblemsMineInfoPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getProblemsMineInfoForTypeScript(\OmegaUp\Request $r): array {
@@ -4405,6 +4408,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     ),
                     'privateProblemsAlert' => $privateProblemsAlert,
                     'visibilityStatuses' => $visibilityStatuses,
+                    'keyword' => $r->ensureOptionalString('query'),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleMyProblemsList'

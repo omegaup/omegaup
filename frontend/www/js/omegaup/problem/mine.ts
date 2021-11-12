@@ -26,6 +26,7 @@ OmegaUp.on('ready', () => {
           isSysadmin: payload.isSysadmin,
           pagerItems: this.pagerItems,
           visibilityStatuses: payload.visibilityStatuses,
+          initialKeyword: payload.keyword,
         },
         on: {
           'change-show-all-problems': (shouldShowAll: boolean) => {
@@ -78,6 +79,7 @@ OmegaUp.on('ready', () => {
         })
       : api.Problem.myList({
           page: pageNumber,
+          query: payload.keyword ? payload.keyword : null,
         })
     )
       .then((result) => {
