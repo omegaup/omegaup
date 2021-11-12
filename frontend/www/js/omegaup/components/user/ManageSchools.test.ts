@@ -58,10 +58,10 @@ describe('ManageSchools.vue', () => {
     expect(wrapper.emitted('update-user-schools')).toEqual([
       [
         {
-          graduation_date: new Date('2010-10-10'),
-          school_id: 1,
-          school_name: 'escuela',
-          scholar_degree: 'bachelors',
+          graduationDate: new Date('2010-10-10'),
+          schoolId: 1,
+          schoolName: 'escuela',
+          scholarDegree: 'bachelors',
         },
       ],
     ]);

@@ -1,16 +1,22 @@
 <template>
-  <div>
-    <form
-      class="form add-identity-form"
-      @submit.prevent="$emit('add-identity', { username, password })"
-    >
-      <div class="form-group">
-        <label class="w-100">
-          {{ T.wordsIdentity }}
-          <font-awesome-icon
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">{{ T.profileManageIdentities }}</h2>
+    </div>
+    <div class="panel-body add-identity-panel">
+      <form
+        class="form add-identity-form"
+        @submit.prevent="$emit('add-identity', { username, password })"
+      >
+        <div class="form-group">
+          <label>{{ T.wordsIdentity }}</label>
+          <span
+            aria-hidden="true"
+            class="glyphicon glyphicon-info-sign"
+            data-placement="top"
+            data-toggle="tooltip"
             :title="T.profileAddIdentitiesTooltip"
-            icon="info-circle"
-          ></font-awesome-icon>
+          ></span>
           <input
             v-model="username"
             autocomplete="off"
@@ -18,11 +24,9 @@
             size="20"
             type="text"
           />
-        </label>
-      </div>
-      <div class="form-group">
-        <label class="w-100">
-          {{ T.loginPassword }}
+        </div>
+        <div class="form-group">
+          <label>{{ T.loginPassword }}</label>
           <input
             v-model="password"
             autocomplete="off"
@@ -30,31 +34,31 @@
             size="20"
             type="password"
           />
-        </label>
+        </div>
+        <div class="form-group pull-right">
+          <button class="btn btn-primary" type="submit">
+            {{ T.wordsAddIdentity }}
+          </button>
+        </div>
+      </form>
+      <div v-if="identities.length == 0">
+        <div class="empty-category">
+          {{ T.profileIdentitiesEmpty }}
+        </div>
       </div>
-      <div class="form-group text-right">
-        <button class="btn btn-primary" type="submit">
-          {{ T.wordsAddIdentity }}
-        </button>
-      </div>
-    </form>
-    <div v-if="identities.length == 0">
-      <div class="empty-category">
-        {{ T.profileIdentitiesEmpty }}
-      </div>
+      <table v-else class="table table-striped table-over">
+        <thead>
+          <tr>
+            <th>{{ T.wordsIdentity }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="identity in identities" :key="identity.username">
+            <td>{{ identity.username }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <table v-else class="table table-striped table-over">
-      <thead>
-        <tr>
-          <th>{{ T.wordsIdentity }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="identity in identities" :key="identity.username">
-          <td>{{ identity.username }}</td>
-        </tr>
-      </tbody>
-    </table>
   </div>
 </template>
 
@@ -63,27 +67,17 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 
-import {
-  FontAwesomeIcon,
-  FontAwesomeLayers,
-  FontAwesomeLayersText,
-} from '@fortawesome/vue-fontawesome';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { library } from '@fortawesome/fontawesome-svg-core';
-library.add(fas);
-
-@Component({
-  components: {
-    'font-awesome-icon': FontAwesomeIcon,
-    'font-awesome-layers': FontAwesomeLayers,
-    'font-awesome-layers-text': FontAwesomeLayersText,
-  },
-})
-export default class ManageIdentities extends Vue {
+@Component
+export default class UserManageIdentities extends Vue {
   @Prop() identities!: types.Identity[];
-
   T = T;
-  username = '';
-  password = '';
+  username: string = '';
+  password: string = '';
 }
 </script>
+
+<style>
+th.align-right {
+  text-align: right;
+}
+</style>

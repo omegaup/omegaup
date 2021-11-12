@@ -13,7 +13,7 @@
     </div>
     <div class="form-group">
       <label>{{ T.userEditLanguage }}</label>
-      <select v-model="locale" data-locale class="custom-select">
+      <select v-model="locale" data-locale class="form-control">
         <option value="es">{{ T.wordsSpanish }}</option>
         <option value="en">{{ T.wordsEnglish }}</option>
         <option value="pt">{{ T.wordsPortuguese }}</option>
@@ -24,7 +24,7 @@
       <select
         v-model="preferredLanguage"
         data-preferred-language
-        class="custom-select"
+        class="form-control"
       >
         <option value=""></option>
         <option
@@ -62,7 +62,7 @@
       <button type="submit" class="btn btn-primary mr-2">
         {{ T.wordsSaveChanges }}
       </button>
-      <a href="/profile/" class="btn btn-cancel">{{ T.wordsCancel }}</a>
+      <a href="/profile" class="btn btn-cancel">{{ T.wordsCancel }}</a>
     </div>
   </form>
 </template>
@@ -86,13 +86,11 @@ export default class UserPreferencesEdit extends Vue {
 
   onUpdateUserPreferences(): void {
     this.$emit('update-user-preferences', {
-      userPreferences: {
-        locale: this.locale,
-        preferred_language: this.preferredLanguage ?? null,
-        is_private: this.isPrivate,
-        hide_problem_tags: this.hideProblemTags,
-      },
+      locale: this.locale,
       localeChanged: this.locale != this.profile.locale,
+      preferredLanguage: this.preferredLanguage ?? null,
+      isPrivate: this.isPrivate,
+      hideProblemTags: this.hideProblemTags,
     });
   }
 }

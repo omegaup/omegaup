@@ -88,7 +88,7 @@ import user_BasicInformationEdit from './BasicInformationEdit.vue';
 import user_PasswordEdit from './PasswordEdit.vue';
 import user_PasswordAdd from './PasswordAdd.vue';
 import { urlMapping } from './SidebarMainInfo.vue';
-import user_ManageIdentities from './ManageIdentities.vue';
+import user_ManageIdentities from './ManageIdentitiesv2.vue';
 import user_ManageSchools from './ManageSchools.vue';
 
 @Component({
