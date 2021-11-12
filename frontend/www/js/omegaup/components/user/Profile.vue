@@ -30,6 +30,9 @@
             @update-user-basic-information="
               (request) => $emit('update-user-basic-information', request)
             "
+            @update-user-basic-information-error="
+              (request) => $emit('update-user-basic-information-error', request)
+            "
           ></omegaup-user-edit-basic-information>
         </template>
         <template v-else-if="currentSelectedTab === 'edit-preferences'">

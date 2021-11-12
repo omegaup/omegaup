@@ -51,6 +51,13 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'update-user-basic-information-error': ({
+            description,
+          }: {
+            description: string;
+          }) => {
+            ui.error(description);
+          },
           'update-user-preferences': ({
             userPreferences,
             localeChanged,

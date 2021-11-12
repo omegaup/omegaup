@@ -69,7 +69,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import * as ui from '../../ui';
 import { dao, types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
@@ -116,7 +115,9 @@ export default class UserBasicInformationEdit extends Vue {
 
   onUpdateUserBasicInformation(): void {
     if (this.name && this.name.length > 50) {
-      ui.error(T.userEditNameTooLong);
+      this.$emit('update-user-basic-information-error', {
+        description: T.userEditNameTooLong,
+      });
       return;
     }
 
