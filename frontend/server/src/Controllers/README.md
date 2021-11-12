@@ -2844,10 +2844,11 @@ Gets a list of problems where current user is the owner
 
 ### Parameters
 
-| Name       | Type        | Description |
-| ---------- | ----------- | ----------- |
-| `page`     | `int`       |             |
-| `rowcount` | `int\|null` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `page`     | `int`          |             |
+| `query`    | `null\|string` |             |
+| `rowcount` | `int\|null`    |             |
 
 ### Returns
 

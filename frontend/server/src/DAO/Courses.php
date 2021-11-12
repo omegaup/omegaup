@@ -622,7 +622,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             INNER JOIN
                 Problems p ON p.problem_id = psp.problem_id
             WHERE
-                a.course_id = ?
+                a.course_id = ? AND a.assignment_type <> "lesson"
             ORDER BY
                 a.`order`, psp.`order`';
 
@@ -789,7 +789,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             INNER JOIN
                 Assignments a ON a.problemset_id = s.problemset_id
             WHERE
-                a.course_id = ?
+                a.course_id = ? AND a.assignment_type <> "lesson"
             GROUP BY
                 students.identity_id, a.assignment_id, p.problem_id
             HAVING
