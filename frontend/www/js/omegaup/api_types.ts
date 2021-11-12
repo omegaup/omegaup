@@ -2349,6 +2349,7 @@ export namespace types {
     profileProgress: number;
     userClassname: string;
     userCountry: string;
+    userTypes: string[];
   }
 
   export interface ConsentStatement {
@@ -2554,6 +2555,7 @@ export namespace types {
 
   export interface ContestListv2Payload {
     contests: types.ContestList;
+    query?: string;
   }
 
   export interface ContestNewPayload {
