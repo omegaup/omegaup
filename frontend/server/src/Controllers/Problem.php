@@ -47,6 +47,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
  * @psalm-type ProblemPrintDetailsPayload=array{details: ProblemDetails}
+ * @psalm-type LibinteractiveError=array{description: string, field: string}
+ * @psalm-type LibinteractiveGenPayload=array{error: LibinteractiveError|null, idl: null|string, language: null|string, name: null|string, os: null|string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -5692,56 +5694,97 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{error?: string, error_field?: string}, template: string}
+     * @return array{entrypoint: string, smartyProperties: array{payload: LibinteractiveGenPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $idl
      * @omegaup-request-param 'c'|'cpp'|'java' $language
      * @omegaup-request-param null|string $name
-     * @omegaup-request-param mixed $os
+     * @omegaup-request-param 'unix'|'windows' $os
      */
-    public static function getLibinteractiveGenForTypeScript(\OmegaUp\Request $r): array {
+    public static function getLibinteractiveGenForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $response = [
+            'smartyProperties' => [
+                'payload' => [
+                    'error' => null,
+                    'language' => 'c',
+                    'os' => 'unix',
+                    'name' => null,
+                    'idl' => null,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleLibInteractive'
+                ),
+            ],
+            'entrypoint' => 'libinteractive_gen',
+        ];
         if (count($r) === 0) {
             // \OmegaUp\Request does not support empty().
-            return [
-                'smartyProperties' => [],
-                'template' => 'libinteractive.gen.tpl',
-            ];
+            return $response;
         }
-        try {
-            $language = $r->ensureEnum(
-                'language',
-                ['c', 'cpp', 'java']
-            );
-            \OmegaUp\Validators::validateInEnum(
-                $r['os'],
-                'os',
-                ['unix', 'windows']
-            );
-            $name = $r->ensureString(
-                'name',
-                fn (string $alias) => \OmegaUp\Validators::alias($alias)
-            );
-            \OmegaUp\Validators::validateStringNonEmpty(
-                $r['idl'],
-                'idl'
-            );
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            return [
-                'smartyProperties' => [
-                    'error' => \OmegaUp\Translations::getInstance()->get(
-                        'parameterInvalid'
-                    ),
-                    'error_field' => strval($e->parameter),
-                ],
-                'template' => 'libinteractive.gen.tpl',
+
+        $language = $r->ensureOptionalEnum('language', ['c', 'cpp', 'java']);
+        $os = $r->ensureOptionalEnum('os', ['unix', 'windows']);
+        $name = $r->ensureOptionalString('name');
+        $idl = $r->ensureOptionalString('idl');
+        $response['smartyProperties']['payload'] =  [
+            'language' => $language,
+            'os' => $os,
+            'name' => $name,
+            'idl' => $idl,
+        ];
+        if (empty($language)) {
+            $response['smartyProperties']['payload']['error'] = [
+                'description' => \OmegaUp\Translations::getInstance()->get(
+                    'parameterInvalid'
+                ),
+                'field' => 'language',
             ];
+            return $response;
+        }
+        if (empty($os)) {
+            $response['smartyProperties']['payload']['error'] = [
+                'description' => \OmegaUp\Translations::getInstance()->get(
+                    'parameterInvalid'
+                ),
+                'field' => 'os',
+            ];
+            return $response;
+        }
+        if (empty($name)) {
+            $response['smartyProperties']['payload']['error'] = [
+                'description' => \OmegaUp\Translations::getInstance()->get(
+                    'parameterInvalid'
+                ),
+                'field' => 'name',
+            ];
+            return $response;
+        }
+        if (!\OmegaUp\Validators::alias($name)) {
+            $response['smartyProperties']['payload']['error'] = [
+                'description' => \OmegaUp\Translations::getInstance()->get(
+                    'parameterInvalidAlias'
+                ),
+                'field' => 'name',
+            ];
+            return $response;
+        }
+        if (empty($idl)) {
+            $response['smartyProperties']['payload']['error'] = [
+                'description' => \OmegaUp\Translations::getInstance()->get(
+                    'parameterInvalid'
+                ),
+                'field' => 'idl',
+            ];
+            return $response;
         }
         $dirname = \OmegaUp\FileHandler::TempDir(
             sys_get_temp_dir(),
             'libinteractive'
         );
         try {
-            file_put_contents("{$dirname}/{$name}.idl", $r['idl']);
+            file_put_contents("{$dirname}/{$name}.idl", $idl);
             $args = [
                 '/usr/bin/java',
                 '-jar',
@@ -5751,7 +5794,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $language,
                 $language,
                 '--makefile',
-                "--{$r['os']}",
+                "--{$os}",
             ];
             $descriptorspec = [
                 0 => ['pipe', 'r'],
@@ -5768,12 +5811,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
             if (!is_resource($proc)) {
                 $lastError = error_get_last();
-                return [
-                    'smartyProperties' => [
-                        'error' => $lastError['message'] ?? '',
-                    ],
-                    'template' => 'libinteractive.gen.tpl',
+                $response['smartyProperties']['payload']['error'] = [
+                    'description' => $lastError['message'] ?? \OmegaUp\Translations::getInstance()->get(
+                        'parameterInvalid'
+                    ),
+                    'field' => 'idl',
                 ];
+                return $response;
             }
             fclose($pipes[0]);
             $output = stream_get_contents($pipes[1]);
@@ -5783,12 +5827,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $retval = proc_close($proc);
 
             if ($retval != 0) {
-                return [
-                    'smartyProperties' => [
-                        'error' => "{$output}{$err}",
-                    ],
-                    'template' => 'libinteractive.gen.tpl',
+                $response['smartyProperties']['payload']['error'] = [
+                    'description' => "{$output}{$err}",
+                    'field' => 'idl',
                 ];
+                return $response;
             }
             $zip = new \ZipArchive();
             $zip->open(
@@ -5832,12 +5875,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } catch (\OmegaUp\Exceptions\ExitException $e) {
             throw $e;
         } catch (\Exception $e) {
-            return [
-                'smartyProperties' => [
-                    'error' => strval($e),
-                ],
-                'template' => 'libinteractive.gen.tpl',
+            $response['smartyProperties']['payload']['error'] = [
+                'description' => strval($e),
+                'field' => 'idl',
             ];
+            return $response;
         } finally {
             \OmegaUp\FileHandler::deleteDirRecursively($dirname);
         }

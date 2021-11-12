@@ -38,6 +38,7 @@ OmegaUp.on('ready', () => {
           visitorBadges: new Set(payload.extraProfileDetails?.badges),
           selectedTab: locationHash[0] != '' ? locationHash[0] : 'see-profile',
           identities: this.identities,
+          hasPassword: payload.extraProfileDetails?.hasPassword,
         },
         on: {
           'add-identity': ({
@@ -54,6 +55,38 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 refreshIdentityList();
                 ui.success(T.profileIdentityAdded);
+              })
+              .catch(ui.apiError);
+          },
+          'update-password': ({
+            oldPassword,
+            newPassword,
+          }: {
+            oldPassword: string;
+            newPassword: string;
+          }) => {
+            api.User.changePassword({
+              old_password: oldPassword,
+              password: newPassword,
+            })
+              .then(() => {
+                ui.success(T.passwordResetResetSuccess);
+              })
+              .catch(ui.apiError);
+          },
+          'add-password': ({
+            username,
+            password,
+          }: {
+            username: string;
+            password: string;
+          }) => {
+            api.User.updateBasicInfo({
+              username,
+              password,
+            })
+              .then(() => {
+                ui.success(T.passwordAddRequestSuccess);
               })
               .catch(ui.apiError);
           },
