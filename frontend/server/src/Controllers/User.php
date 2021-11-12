@@ -3988,10 +3988,15 @@ class User extends \OmegaUp\Controllers\Controller {
                 'username'
             );
         }
-        $user = $r->user;
+        $targetUser = null;
         $ownedBadges = [];
-        if (!is_null($user)) {
-            $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges($user);
+        if (!is_null($targetIdentity->user_id)) {
+            $targetUser = \OmegaUp\DAO\Users::getByPK($targetIdentity->user_id);
+        }
+        if (!is_null($targetUser)) {
+            $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
+                $targetUser
+            );
         }
         $response = [
             'smartyProperties' => [
@@ -4009,7 +4014,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProfile'
                 ),
-                'fullWidth' => true
+                'fullWidth' => true,
             ],
             'entrypoint' => 'user_profile',
         ];
@@ -4018,7 +4023,7 @@ class User extends \OmegaUp\Controllers\Controller {
             self::shouldUserInformationBeHidden(
                 $loggedIdentity,
                 $targetIdentity,
-                $user
+                $targetUser
             )
         ) {
             return $response;
@@ -4140,47 +4145,6 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'admin_user',
-        ];
-    }
-
-    /**
-     * @omegaup-request-param null|string $username
-     *
-     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{COUNTRIES: list<\OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: UserProfileInfo}, template: string}
-     */
-    public static function getProfileEditDetailsForTypeScript(\OmegaUp\Request $r) {
-        try {
-            self::authenticateOrAllowUnauthenticatedRequest($r);
-
-            $identity = self::resolveTargetIdentity($r);
-            if (is_null($identity)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterNotFound',
-                    'Identity'
-                );
-            }
-            $smartyProperties = [
-                'profile' => self::getUserProfile($r->identity, $identity),
-                'PROGRAMMING_LANGUAGES' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
-                'COUNTRIES' => \OmegaUp\DAO\Countries::getAll(
-                    null,
-                    100,
-                    'name'
-                ),
-            ];
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            \OmegaUp\ApiCaller::logException($e);
-            $smartyProperties = [
-                'STATUS_ERROR' => $e->getErrorMessage(),
-            ];
-        }
-        $template = 'user.edit.tpl';
-        if (is_null($r->identity) || is_null($r->identity->password)) {
-            $template = 'user.basicedit.tpl';
-        }
-        return [
-            'smartyProperties' => $smartyProperties,
-            'template' => $template,
         ];
     }
 
