@@ -2,7 +2,7 @@ FROM ubuntu:focal
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
-    apt-get install --no-install-recommends -y openjdk-14-jre-headless curl \
+    apt-get install --no-install-recommends -y openjdk-16-jre-headless curl \
         ca-certificates gnupg2 xz-utils && \
     /usr/sbin/update-ca-certificates && \
     apt-get autoremove -y && \

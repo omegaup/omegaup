@@ -81,7 +81,7 @@ import DatePicker from '../DatePicker.vue';
   },
 })
 export default class UserBasicInformationEdit extends Vue {
-  @Prop() data!: types.UserProfileEditDetailsPayload;
+  @Prop() data!: types.UserProfileDetailsPayload;
   @Prop() profile!: types.UserProfileInfo;
 
   T = T;
