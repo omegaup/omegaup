@@ -62,13 +62,14 @@
       <button type="submit" class="btn btn-primary mr-2">
         {{ T.wordsSaveChanges }}
       </button>
-      <a href="/profile" class="btn btn-cancel">{{ T.wordsCancel }}</a>
+      <a href="/profile/" class="btn btn-cancel">{{ T.wordsCancel }}</a>
     </div>
   </form>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import * as ui from '../../ui';
 import { dao, types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
@@ -114,6 +115,11 @@ export default class UserBasicInformationEdit extends Vue {
   }
 
   onUpdateUserBasicInformation(): void {
+    if (this.name && this.name.length > 50) {
+      ui.error(T.userEditNameTooLong);
+      return;
+    }
+
     this.$emit('update-user-basic-information', {
       username: this.username,
       name: this.name,

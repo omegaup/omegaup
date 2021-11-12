@@ -79,7 +79,7 @@ import * as ui from '../../ui';
 import T from '../../lang';
 import { dao, types } from '../../api_types';
 import user_ProfileWrapper from './ProfileWrapper.vue';
-import user_SeeProfile from './Profilev2.vue';
+import user_SeeProfile from './SeeProfile.vue';
 import user_PreferencesEdit from './PreferencesEdit.vue';
 import user_BasicInformationEdit from './BasicInformationEdit.vue';
 import user_PasswordEdit from './PasswordEdit.vue';

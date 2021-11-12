@@ -56,7 +56,7 @@
       <button type="submit" class="btn btn-primary mr-2">
         {{ T.wordsSaveChanges }}
       </button>
-      <a href="/profile" class="btn btn-cancel">{{ T.wordsCancel }}</a>
+      <a href="/profile/" class="btn btn-cancel">{{ T.wordsCancel }}</a>
     </div>
   </form>
 </template>

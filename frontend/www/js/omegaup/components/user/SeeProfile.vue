@@ -196,7 +196,7 @@ import { Problem, ContestResult } from '../../linkable_resource';
     'omegaup-countryflag': country_Flag,
   },
 })
-export default class UserProfile extends Vue {
+export default class UserSeeProfile extends Vue {
   @Prop() data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop() profileBadges!: Set<string>;

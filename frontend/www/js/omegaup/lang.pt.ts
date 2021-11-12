@@ -1332,7 +1332,6 @@ const translations: { [key: string]: string; } = {
   userEditCountry: "Pa\u00eds / Regi\u00e3o",
   userEditDoctorate: "Doutorado",
   userEditEarlyChildhood: "Primeira inf\u00e2ncia",
-  userEditEditProfile: "Editar seu perfil",
   userEditGraduationDate: "Data da gradua\u00e7\u00e3o",
   userEditGravatar: "Carreg\u00e1-lo em Gravatar.com usando seu e-mail: ",
   userEditHideProblemTags: "Ocultar tags de problemas",
