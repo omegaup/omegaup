@@ -55,7 +55,15 @@
           ></omegaup-user-manage-identities>
         </template>
         <template v-else-if="currentSelectedTab === 'change-password'">
-          <omegaup-user-edit-password></omegaup-user-edit-password>
+          <omegaup-user-edit-password
+            @update-password="(request) => $emit('update-password', request)"
+          ></omegaup-user-edit-password>
+        </template>
+        <template v-else-if="currentSelectedTab === 'add-password'">
+          <omegaup-user-add-password
+            :username="profile.username"
+            @add-password="(request) => $emit('add-password', request)"
+          ></omegaup-user-add-password>
         </template>
         <div v-else>
           {{ currentSelectedTab }}
@@ -75,6 +83,7 @@ import user_SeeProfile from './Profilev2.vue';
 import user_PreferencesEdit from './PreferencesEdit.vue';
 import user_BasicInformationEdit from './BasicInformationEdit.vue';
 import user_PasswordEdit from './PasswordEdit.vue';
+import user_PasswordAdd from './PasswordAdd.vue';
 import { urlMapping } from './SidebarMainInfo.vue';
 import user_ManageIdentities from './ManageIdentitiesv2.vue';
 import user_ManageSchools from './ManageSchools.vue';
@@ -86,6 +95,7 @@ import user_ManageSchools from './ManageSchools.vue';
     'omegaup-user-edit-preferences': user_PreferencesEdit,
     'omegaup-user-edit-basic-information': user_BasicInformationEdit,
     'omegaup-user-edit-password': user_PasswordEdit,
+    'omegaup-user-add-password': user_PasswordAdd,
     'omegaup-user-manage-identities': user_ManageIdentities,
     'omegaup-user-manage-schools': user_ManageSchools,
   },
@@ -99,6 +109,7 @@ export default class Profile extends Vue {
   @Prop() visitorBadges!: Set<string>;
   @Prop() countries!: dao.Countries[];
   @Prop() programmingLanguages!: { [key: string]: string };
+  @Prop() hasPassword!: boolean;
 
   T = T;
   ui = ui;

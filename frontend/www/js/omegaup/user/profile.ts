@@ -6,7 +6,6 @@ import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
 
-// TODO: Import Profile.vue when PR #5951 is merged
 import user_Profile from '../components/user/Profile.vue';
 
 OmegaUp.on('ready', () => {
@@ -40,6 +39,7 @@ OmegaUp.on('ready', () => {
           identities: this.identities,
           countries: payload.countries,
           programmingLanguages: payload.programmingLanguages,
+          hasPassword: payload.extraProfileDetails?.hasPassword,
         },
         on: {
           'update-user-basic-information': (
@@ -95,6 +95,39 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 refreshIdentityList();
                 ui.success(T.profileIdentityAdded);
+              })
+              .catch(ui.apiError);
+          },
+          'update-password': ({
+            oldPassword,
+            newPassword,
+          }: {
+            oldPassword: string;
+            newPassword: string;
+          }) => {
+            api.User.changePassword({
+              old_password: oldPassword,
+              password: newPassword,
+            })
+              .then(() => {
+                ui.success(T.passwordResetResetSuccess);
+              })
+              .catch(ui.apiError);
+          },
+          'add-password': ({
+            username,
+            password,
+          }: {
+            username: string;
+            password: string;
+          }) => {
+            api.User.updateBasicInfo({
+              username,
+              password,
+            })
+              .then(() => {
+                ui.success(T.passwordAddRequestSuccess);
+                window.location.reload();
               })
               .catch(ui.apiError);
           },

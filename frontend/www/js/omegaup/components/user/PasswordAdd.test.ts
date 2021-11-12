@@ -1,82 +1,83 @@
 import { shallowMount } from '@vue/test-utils';
-import user_Password_Edit from './PasswordEdit.vue';
+import user_Password_Add from './PasswordAdd.vue';
 import T from '../../lang';
 
-describe('PasswordEdit.vue', () => {
-  it('Should emit password update', async () => {
-    const wrapper = shallowMount(user_Password_Edit);
-
-    const oldPassword = 'oldPassword';
+describe('PasswordAdd.vue', () => {
+  it('Should emit password add', async () => {
+    const username = 'username';
+    const wrapper = shallowMount(user_Password_Add, {
+      propsData: { username },
+    });
     const newPassword = 'newPassword';
     const newPassword2 = 'newPassword';
 
-    await wrapper.find('input[data-old-password]').setValue(oldPassword);
     await wrapper.find('input[data-new-password]').setValue(newPassword);
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);
     await wrapper.find('button[type="submit"]').trigger('submit');
-    expect(wrapper.emitted('update-password')).toBeDefined();
-    expect(wrapper.emitted('update-password')).toEqual([
+    expect(wrapper.emitted('add-password')).toBeDefined();
+    expect(wrapper.emitted('add-password')).toEqual([
       [
         {
-          oldPassword: oldPassword,
-          newPassword: newPassword,
+          username,
+          password: newPassword,
         },
       ],
     ]);
   });
 
-  it('Should not emit password update when there is new password mismatch', async () => {
-    const wrapper = shallowMount(user_Password_Edit);
+  it('Should not emit password add when there is new password mismatch', async () => {
+    const wrapper = shallowMount(user_Password_Add, {
+      propsData: { username: 'username' },
+    });
 
-    const oldPassword = 'oldPassword';
     const newPassword = 'newPassword';
     const newPassword2 = 'newPassword2';
 
-    await wrapper.find('input[data-old-password]').setValue(oldPassword);
     await wrapper.find('input[data-new-password]').setValue(newPassword);
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);
     expect(wrapper.find('div.invalid-message').text()).toBe(T.passwordMismatch);
 
     await wrapper.find('button[type="submit"]').trigger('submit');
-    expect(wrapper.emitted('update-password')).toBeUndefined();
+    expect(wrapper.emitted('add-password')).toBeUndefined();
   });
 
   it('Should enable submit button when there is no new password mismatch nor empty passwords', async () => {
-    const wrapper = shallowMount(user_Password_Edit);
+    const wrapper = shallowMount(user_Password_Add, {
+      propsData: { username: 'username' },
+    });
 
-    const oldPassword = 'oldPassword';
     const newPassword = 'newPassword';
     const newPassword2 = 'newPassword';
 
-    await wrapper.find('input[data-old-password]').setValue(oldPassword);
     await wrapper.find('input[data-new-password]').setValue(newPassword);
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);
     expect(wrapper.find('button[type="submit"]').element).toBeEnabled();
   });
 
   it('Should disable submit button when there is new password mismatch or empty inputs', async () => {
-    const wrapper = shallowMount(user_Password_Edit);
+    let username = 'username';
+    const wrapper = shallowMount(user_Password_Add, {
+      propsData: { username },
+    });
 
-    let oldPassword = 'oldPassword';
     const newPassword = 'newPassword';
     let newPassword2 = 'newPassword2';
 
-    await wrapper.find('input[data-old-password]').setValue(oldPassword);
     await wrapper.find('input[data-new-password]').setValue(newPassword);
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);
     expect(wrapper.find('button[type="submit"]').element).toBeDisabled();
 
-    oldPassword = '';
+    username = '';
     newPassword2 = 'newPassword';
 
-    await wrapper.find('input[data-old-password]').setValue(oldPassword);
+    await wrapper.find('input[data-username]').setValue(username);
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);
     expect(wrapper.find('button[type="submit"]').element).toBeDisabled();
 
-    oldPassword = 'oldPassword';
+    username = 'username';
     newPassword2 = '';
 
-    await wrapper.find('input[data-old-password]').setValue(oldPassword);
+    await wrapper.find('input[data-username]').setValue(username);
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);
     expect(wrapper.find('button[type="submit"]').element).toBeDisabled();
   });

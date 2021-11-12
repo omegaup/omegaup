@@ -58,6 +58,7 @@ const propsData = {
     ],
     stats: [],
     unsolvedProblems: [],
+    hasPassword: true,
   } as types.ExtraProfileDetails,
   edit: false,
 };

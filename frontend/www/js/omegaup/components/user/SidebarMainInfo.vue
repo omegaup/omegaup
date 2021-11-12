@@ -89,7 +89,7 @@ export const urlMapping: { key: string; title: string; visible: boolean }[] = [
   { key: 'edit-preferences', title: T.userEditPreferences, visible: true },
   { key: 'manage-schools', title: T.userEditManageSchools, visible: true },
   { key: 'manage-identities', title: T.profileManageIdentities, visible: true },
-  { key: 'change-password', title: T.userEditChangePassword, visible: true },
+  { key: 'change-password', title: T.userEditChangePassword, visible: false },
   { key: 'add-password', title: T.userEditAddPassword, visible: false },
   { key: 'change-email', title: T.userEditChangeEmail, visible: false },
 ];
@@ -137,7 +137,30 @@ export default class UserSidebarMainInfo extends Vue {
     title: string;
     visible: boolean;
   }[] {
-    return this.profile.is_own_profile ? urlMapping : [];
+    if (!this.profile.is_own_profile) {
+      return [];
+    }
+    if (this.data?.hasPassword) {
+      const changePasswordRowIndex = urlMapping.findIndex(
+        (url) => url.key === 'change-password',
+      );
+      if (changePasswordRowIndex) {
+        urlMapping[changePasswordRowIndex].visible = true;
+      }
+      return urlMapping;
+    }
+
+    const addPasswordRowIndex = urlMapping.findIndex(
+      (url) => url.key === 'add-password',
+    );
+    const changePasswordRowIndex = urlMapping.findIndex(
+      (url) => url.key === 'change-password',
+    );
+    if (addPasswordRowIndex && changePasswordRowIndex) {
+      urlMapping[addPasswordRowIndex].visible = true;
+      urlMapping[changePasswordRowIndex].visible = false;
+    }
+    return urlMapping;
   }
 
   getSelectedValidTab(
