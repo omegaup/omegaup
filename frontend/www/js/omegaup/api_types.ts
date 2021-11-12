@@ -2349,6 +2349,7 @@ export namespace types {
     profileProgress: number;
     userClassname: string;
     userCountry: string;
+    userTypes: string[];
   }
 
   export interface ConsentStatement {

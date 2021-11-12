@@ -274,6 +274,9 @@ class Driver:  # pylint: disable=too-many-instance-attributes
         with self.page_transition():
             self.browser.find_element_by_name('login').click()
 
+        self.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, 'button[aria-label="Close"]'))).click()
         try:
             yield
         except:  # noqa: bare-except
