@@ -188,7 +188,10 @@
               </span>
             </td>
             <td v-else class="text-right align-middle">—</td>
-            <td v-if="problem.difficulty !== null" class="text-center align-middle">
+            <td
+              v-if="problem.difficulty !== null"
+              class="text-center align-middle"
+            >
               <span
                 v-tooltip="
                   `${ui.formatString(T.wordsOutOf4, {
@@ -206,7 +209,9 @@
             <td v-if="loggedIn" class="text-right align-middle">
               {{ problem.score.toFixed(2) }}
             </td>
-            <td class="text-right align-middle">{{ problem.points.toFixed(2) }}</td>
+            <td class="text-right align-middle">
+              {{ problem.points.toFixed(2) }}
+            </td>
           </tr>
         </tbody>
       </table>
