@@ -47,7 +47,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
  * @psalm-type ProblemPrintDetailsPayload=array{details: ProblemDetails}
- * @psalm-type LibinteractiveError=array{description: null|string, field: null|string}
+ * @psalm-type LibinteractiveError=array{description: string, field: string}
  * @psalm-type LibinteractiveGenPayload=array{error: LibinteractiveError|null, idl: null|string, language: null|string, name: null|string, os: null|string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
@@ -5812,8 +5812,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (!is_resource($proc)) {
                 $lastError = error_get_last();
                 $response['smartyProperties']['payload']['error'] = [
-                    'description' => $lastError['message'] ?? null,
-                    'field' => null,
+                    'description' => $lastError['message'] ?? \OmegaUp\Translations::getInstance()->get(
+                        'parameterInvalid'
+                    ),
+                    'field' => 'idl',
                 ];
                 return $response;
             }
@@ -5827,7 +5829,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if ($retval != 0) {
                 $response['smartyProperties']['payload']['error'] = [
                     'description' => "{$output}{$err}",
-                    'field' => null,
+                    'field' => 'idl',
                 ];
                 return $response;
             }
@@ -5875,7 +5877,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } catch (\Exception $e) {
             $response['smartyProperties']['payload']['error'] = [
                 'description' => strval($e),
-                'field' => null,
+                'field' => 'idl',
             ];
             return $response;
         } finally {

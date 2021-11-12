@@ -3136,8 +3136,8 @@ export namespace types {
   }
 
   export interface LibinteractiveError {
-    description?: string;
-    field?: string;
+    description: string;
+    field: string;
   }
 
   export interface LibinteractiveGenPayload {
