@@ -9,7 +9,7 @@ import arena_ContestList, {
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestListv2Payload();
-  const tab = window.location.hash
+  const tab: ContestTab = window.location.hash
     ? parseInt(window.location.hash.substr(1))
     : ContestTab.Current;
   new Vue({
