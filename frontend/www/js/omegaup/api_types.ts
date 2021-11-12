@@ -2939,6 +2939,7 @@ export namespace types {
     badges: string[];
     contests: types.UserProfileContests;
     createdProblems: types.Problem[];
+    hasPassword: boolean;
     ownedBadges: types.Badge[];
     solvedProblems: types.Problem[];
     stats: types.UserProfileStats[];

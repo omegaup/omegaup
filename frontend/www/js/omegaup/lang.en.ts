@@ -757,6 +757,7 @@ const translations: { [key: string]: string; } = {
   parameterStringTooLong: "Parameter is longer than %(max_length) characters.",
   parameterStringTooShort: "Parameter is shorter than %(min_length) characters.",
   parameterUsernameInUse: "Username already in use.",
+  passwordAddRequestSuccess: "Your password has been added.",
   passwordCopyToken: "Copy token",
   passwordGenerateToken: "Generate token",
   passwordGenerateTokenDesc: "Click on \"Generate token\" to create link",

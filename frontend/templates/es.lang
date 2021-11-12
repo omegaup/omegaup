@@ -755,6 +755,7 @@ parameterNumberTooSmall = "El valor es menor al límite inferior de %(lower_boun
 parameterStringTooLong = "La longitud de la cadena no debe exceder %(max_length) caracteres"
 parameterStringTooShort = "La longitud de la cadena debe ser al menos %(min_length) caracteres"
 parameterUsernameInUse = "El nombre de usuario ya fue tomado"
+passwordAddRequestSuccess = "Se ha agregado tu contraseña."
 passwordCopyToken = "Copiar token"
 passwordGenerateToken = "Generar token"
 passwordGenerateTokenDesc = "Da clic en el botón \"Generar token\" para crear el link"
