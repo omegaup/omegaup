@@ -1033,6 +1033,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $params[] = $pageSize;
 
         $problems = [];
+         /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 "{$select} {$sql} {$limits}",
