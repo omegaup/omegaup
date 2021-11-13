@@ -2,7 +2,7 @@
   <div class="container-fluid p-0 mt-0">
     <slot name="message"></slot>
     <div class="row">
-      <div class="col-md-3">
+      <div class="col-md-3 col-lg-2">
         <omegaup-user-maininfo
           :profile="profile"
           :data="data"
@@ -10,7 +10,7 @@
         >
         </omegaup-user-maininfo>
       </div>
-      <div class="col-md-9 sticky-top">
+      <div class="col-md-9 col-lg-10 sticky-top">
         <div class="card">
           <div class="card-header">
             <slot name="title"></slot>

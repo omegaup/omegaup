@@ -69,7 +69,6 @@ OmegaUp.on('ready', () => {
               ...userPreferences,
               ...{ username: this.profile.username },
             };
-            console.log(profile);
             api.User.update(profile)
               .then(() => {
                 ui.success(T.userEditPreferencesSuccess);
