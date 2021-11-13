@@ -987,19 +987,62 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      */
     public static function getAllWithCount(
         int $page,
-        int $pageSize
+        int $pageSize,
+        string $query = ''
     ) {
+        $offset = ($page - 1) * $pageSize;
+        $params = [];
+
+        $sqlCount = '
+            SELECT
+                COUNT(*)
+        ';
+
+        $select = '
+            SELECT
+                p.*
+        ';
+
+        $sql = '
+            FROM
+                Problems AS p
+        ';
+        if (!empty($query)) {
+            $sql .= '
+                WHERE
+                    p.`title` LIKE CONCAT("%", ?, "%") OR
+                    p.`alias` LIKE CONCAT("%", ?, "%")
+            ';
+            $params[] = $query;
+            $params[] = $query;
+        }
+
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            'SELECT COUNT(*) FROM `Problems`'
+            "{$sqlCount} {$sql}",
+            $params
         );
 
-        $problems = \OmegaUp\DAO\Problems::getAll(
-            $page,
-            $pageSize,
-            'problem_id',
-            'DESC'
-        );
+        $limits = '
+            ORDER BY
+                p.problem_id DESC
+            LIMIT
+                ?, ?
+        ';
+        $params[] = $offset;
+        $params[] = $pageSize;
+
+        $problems = [];
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                "{$select} {$sql} {$limits}",
+                $params
+            ) as $row
+        ) {
+            $problems[] = new \OmegaUp\DAO\VO\Problems(
+                $row,
+            );
+        }
 
         return [
             'problems' => $problems,
@@ -1015,7 +1058,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     final public static function getAllProblemsAdminedByIdentity(
         int $identityId,
         int $page,
-        int $pageSize
+        int $pageSize,
+        string $query = ''
     ): array {
         $offset = ($page - 1) * $pageSize;
         $select = '
@@ -1058,9 +1102,19 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             \OmegaUp\ProblemParams::VISIBILITY_DELETED,
         ];
 
+        $sqlQuery = '';
+        if (!empty($query)) {
+            $sqlQuery = ' AND (
+                p.title LIKE CONCAT("%", ?, "%") OR
+                p.alias LIKE CONCAT("%", ?, "%")
+            )';
+            $params[] = $query;
+            $params[] = $query;
+        }
+
         /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            "SELECT COUNT(*) {$sql}",
+            "SELECT COUNT(*) {$sql} {$sqlQuery}",
             $params
         );
 
@@ -1069,7 +1123,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            "{$select} {$sql} {$limits};",
+            "{$select} {$sql} {$sqlQuery} {$limits};",
             $params
         );
 

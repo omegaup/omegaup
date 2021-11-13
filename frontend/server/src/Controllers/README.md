@@ -2652,10 +2652,11 @@ the owner).
 
 ### Parameters
 
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `page`      | `int` |             |
-| `page_size` | `int` |             |
+| Name        | Type           | Description |
+| ----------- | -------------- | ----------- |
+| `page`      | `int`          |             |
+| `page_size` | `int`          |             |
+| `query`     | `null\|string` |             |
 
 ### Returns
 
