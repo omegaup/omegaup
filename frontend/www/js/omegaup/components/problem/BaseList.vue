@@ -231,7 +231,7 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 
-import common_Paginator from '../common/Paginatorv2.vue';
+import common_Paginator from '../common/Paginator.vue';
 import common_SortControls from '../common/SortControls.vue';
 
 import 'v-tooltip/dist/v-tooltip.css';
