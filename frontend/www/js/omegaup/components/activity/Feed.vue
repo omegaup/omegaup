@@ -197,7 +197,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import user_Username from '../user/Username.vue';
-import common_Paginator from '../common/Paginatorv2.vue';
+import common_Paginator from '../common/Paginator.vue';
 
 interface Mapping {
   [key: string]: string[];
