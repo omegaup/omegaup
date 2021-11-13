@@ -638,7 +638,9 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         );
         [
             'identity' => $otherIdentity,
-        ] = \OmegaUp\Test\Factories\User::createUser();
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(['isPrivate' => true])
+        );
 
         $login = null;
         if ($isLoggedIn) {

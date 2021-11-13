@@ -3988,10 +3988,15 @@ class User extends \OmegaUp\Controllers\Controller {
                 'username'
             );
         }
-        $user = $r->user;
+        $targetUser = null;
         $ownedBadges = [];
-        if (!is_null($user)) {
-            $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges($user);
+        if (!is_null($targetIdentity->user_id)) {
+            $targetUser = \OmegaUp\DAO\Users::getByPK($targetIdentity->user_id);
+        }
+        if (!is_null($targetUser)) {
+            $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
+                $targetUser
+            );
         }
         $response = [
             'smartyProperties' => [
@@ -4009,7 +4014,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProfile'
                 ),
-                'fullWidth' => true
+                'fullWidth' => true,
             ],
             'entrypoint' => 'user_profile',
         ];
@@ -4018,7 +4023,7 @@ class User extends \OmegaUp\Controllers\Controller {
             self::shouldUserInformationBeHidden(
                 $loggedIdentity,
                 $targetIdentity,
-                $user
+                $targetUser
             )
         ) {
             return $response;
