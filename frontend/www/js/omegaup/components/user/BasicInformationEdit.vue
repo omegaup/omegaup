@@ -14,7 +14,7 @@
     </div>
     <div class="form-group">
       <label>{{ T.wordsGender }}</label>
-      <select v-model="gender" data-gender class="form-control">
+      <select v-model="gender" data-gender class="custom-select">
         <option value="female">{{ T.wordsGenderFemale }}</option>
         <option value="male">{{ T.wordsGenderMale }}</option>
         <option value="other">{{ T.wordsGenderOther }}</option>
@@ -23,7 +23,7 @@
     </div>
     <div class="form-group">
       <label>{{ T.wordsCountry }}</label>
-      <select v-model="countryId" data-countries class="form-control">
+      <select v-model="countryId" data-countries class="custom-select">
         <option value=""></option>
         <option
           v-for="country in countries"
@@ -40,7 +40,7 @@
         v-model="stateId"
         data-states
         :disabled="!isCountrySelected"
-        class="form-control"
+        class="custom-select"
       >
         <option
           v-for="[code, state] in Object.entries(countryStates)"
@@ -62,14 +62,14 @@
       <button type="submit" class="btn btn-primary mr-2">
         {{ T.wordsSaveChanges }}
       </button>
-      <a href="/profile" class="btn btn-cancel">{{ T.wordsCancel }}</a>
+      <a href="/profile/" class="btn btn-cancel">{{ T.wordsCancel }}</a>
     </div>
   </form>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { types } from '../../api_types';
+import { dao, types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
@@ -82,10 +82,10 @@ import DatePicker from '../DatePicker.vue';
 })
 export default class UserBasicInformationEdit extends Vue {
   @Prop() data!: types.UserProfileDetailsPayload;
+  @Prop() countries!: dao.Countries[];
   @Prop() profile!: types.UserProfileInfo;
 
   T = T;
-  countries = this.data.countries;
   username = this.profile.username;
   name = this.profile.name;
   gender = this.profile.gender;
@@ -114,15 +114,20 @@ export default class UserBasicInformationEdit extends Vue {
   }
 
   onUpdateUserBasicInformation(): void {
-    const newUserBasicInformation = {
+    if (this.name && this.name.length > 50) {
+      this.$emit('update-user-basic-information-error', {
+        description: T.userEditNameTooLong,
+      });
+      return;
+    }
+    this.$emit('update-user-basic-information', {
       username: this.username,
       name: this.name,
       gender: this.gender,
-      countryId: this.countryId,
-      stateId: this.stateId,
-      birthDate: isNaN(this.birthDate.getTime()) ? null : this.birthDate,
-    };
-    this.$emit('update-user-basic-information', newUserBasicInformation);
+      country_id: this.countryId,
+      state_id: this.stateId,
+      birth_date: isNaN(this.birthDate.getTime()) ? null : this.birthDate,
+    });
   }
 
   @Watch('countryId')
