@@ -4025,7 +4025,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ] = \OmegaUp\DAO\Problems::getAllProblemsAdminedByIdentity(
                 $r->identity->identity_id,
                 $page,
-                $pageSize
+                $pageSize,
+                $query
             );
         }
 
