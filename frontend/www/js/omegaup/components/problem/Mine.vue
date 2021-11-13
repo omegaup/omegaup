@@ -159,7 +159,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
-import common_Paginator from '../common/Paginatorv2.vue';
+import common_Paginator from '../common/Paginator.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
