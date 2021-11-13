@@ -56,7 +56,7 @@
       <button type="submit" class="btn btn-primary mr-2">
         {{ T.wordsSaveChanges }}
       </button>
-      <a href="/profile" class="btn btn-cancel">{{ T.wordsCancel }}</a>
+      <a href="/profile/" class="btn btn-cancel">{{ T.wordsCancel }}</a>
     </div>
   </form>
 </template>
@@ -93,16 +93,17 @@ export default class UserManageSchools extends Vue {
 
   onUpdateUserSchools(): void {
     this.$emit('update-user-schools', {
-      graduationDate: isNaN(this.graduationDate.getTime())
-        ? null
-        : this.graduationDate,
-      schoolId:
+      graduation_date:
+        this.isCurrentlyEnrolled || isNaN(this.graduationDate.getTime())
+          ? null
+          : this.graduationDate,
+      school_id:
         this.schoolId === this.profile.school_id &&
         this.school !== this.profile.school
           ? null
           : this.schoolId,
-      schoolName: this.school,
-      scholarDegree: this.scholarDegree,
+      school_name: this.school,
+      scholar_degree: this.scholarDegree,
     });
   }
 }
