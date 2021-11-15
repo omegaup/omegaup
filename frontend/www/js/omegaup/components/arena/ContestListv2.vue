@@ -35,6 +35,58 @@
                 </div>
               </form>
             </div>
+            <div class="col-md-6">
+              <b-dropdown no-caret>
+                <template #button-content>
+                  <div>
+                    <font-awesome-icon icon="sort-amount-down" />
+                    {{ T.contestOrderBy }}
+                  </div>
+                </template>
+                <b-dropdown-item href="#" @click="orderByName">
+                  <font-awesome-icon
+                    v-if="currentOrder === 0"
+                    icon="check"
+                    class="mr-1"
+                  />{{ T.contestOrderByName }}</b-dropdown-item
+                >
+                <b-dropdown-item href="#" @click="orderByEnds">
+                  <font-awesome-icon
+                    v-if="currentOrder === 1"
+                    icon="check"
+                    class="mr-1"
+                  />{{ T.contestOrderByEnds }}</b-dropdown-item
+                >
+                <b-dropdown-item href="#" @click="orderByDuration">
+                  <font-awesome-icon
+                    v-if="currentOrder === 2"
+                    icon="check"
+                    class="mr-1"
+                  />{{ T.contestOrderByDuration }}</b-dropdown-item
+                >
+                <b-dropdown-item href="#" @click="orderByOrganizer">
+                  <font-awesome-icon
+                    v-if="currentOrder === 3"
+                    icon="check"
+                    class="mr-1"
+                  />{{ T.contestOrderByOrganizer }}</b-dropdown-item
+                >
+                <b-dropdown-item href="#" @click="orderByContestants">
+                  <font-awesome-icon
+                    v-if="currentOrder === 4"
+                    icon="check"
+                    class="mr-1"
+                  />{{ T.contestOrderByContestants }}</b-dropdown-item
+                >
+                <b-dropdown-item href="#" @click="orderBySignedUp">
+                  <font-awesome-icon
+                    v-if="currentOrder === 5"
+                    icon="check"
+                    class="mr-1"
+                  />{{ T.contestOrderBySignedUp }}</b-dropdown-item
+                >
+              </b-dropdown>
+            </div>
           </div>
         </div>
         <b-tab
@@ -50,7 +102,7 @@
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
-            :contest-tab="activeTab"
+            :contest-tab="currentTab"
           >
             <template #contest-button-scoreboard>
               <div></div>
@@ -83,7 +135,7 @@
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
-            :contest-tab="activeTab"
+            :contest-tab="currentTab"
           >
             <template #contest-button-scoreboard>
               <div></div>
@@ -119,7 +171,7 @@
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
-            :contest-tab="activeTab"
+            :contest-tab="currentTab"
           >
             <template #contest-enroll-status>
               <div></div>
@@ -161,10 +213,11 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { TabsPlugin, CardPlugin } from 'bootstrap-vue';
+import { TabsPlugin, CardPlugin, DropdownPlugin } from 'bootstrap-vue';
 import ContestCard from './ContestCard.vue';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
+Vue.use(DropdownPlugin);
 library.add(fas);
 
 export enum ContestTab {
@@ -188,6 +241,7 @@ export default class ArenaContestList extends Vue {
   ContestTab = ContestTab;
   currentTab: ContestTab = this.tab;
   currentQuery: string = this.query;
+  currentOrder: number = -1;
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
@@ -207,6 +261,133 @@ export default class ArenaContestList extends Vue {
 
   startContestDate(contest: types.ContestListItem): string {
     return contest.start_time.toLocaleDateString();
+  }
+
+  orderByName() {
+    this.currentOrder = 0;
+    switch (this.currentTab) {
+      case ContestTab.Current:
+        this.contests.current.sort((a, b) => (a.title < b.title ? -1 : 1));
+        break;
+      case ContestTab.Future:
+        this.contests.future.sort((a, b) => (a.title < b.title ? -1 : 1));
+        break;
+      case ContestTab.Past:
+        this.contests.past.sort((a, b) => (a.title < b.title ? -1 : 1));
+        break;
+    }
+  }
+
+  orderByEnds() {
+    this.currentOrder = 1;
+    switch (this.currentTab) {
+      case ContestTab.Current:
+        this.contests.current.sort((a, b) =>
+          a.finish_time < b.finish_time ? -1 : 1,
+        );
+        break;
+      case ContestTab.Future:
+        this.contests.future.sort((a, b) =>
+          a.finish_time < b.finish_time ? -1 : 1,
+        );
+        break;
+      case ContestTab.Past:
+        this.contests.past.sort((a, b) =>
+          a.finish_time < b.finish_time ? -1 : 1,
+        );
+        break;
+    }
+  }
+
+  orderByDuration() {
+    this.currentOrder = 2;
+    switch (this.currentTab) {
+      case ContestTab.Current:
+        this.contests.current.sort((a, b) =>
+          a.finish_time.getTime() - a.start_time.getTime() <
+          b.finish_time.getTime() - a.start_time.getTime()
+            ? -1
+            : 1,
+        );
+        break;
+      case ContestTab.Future:
+        this.contests.future.sort((a, b) =>
+          a.finish_time.getTime() - a.start_time.getTime() <
+          b.finish_time.getTime() - a.start_time.getTime()
+            ? -1
+            : 1,
+        );
+        break;
+      case ContestTab.Past:
+        this.contests.past.sort((a, b) =>
+          a.finish_time.getTime() - a.start_time.getTime() <
+          b.finish_time.getTime() - a.start_time.getTime()
+            ? -1
+            : 1,
+        );
+        break;
+    }
+  }
+
+  orderByOrganizer() {
+    this.currentOrder = 3;
+    switch (this.currentTab) {
+      case ContestTab.Current:
+        this.contests.current.sort((a, b) =>
+          a.organizer < b.organizer ? -1 : 1,
+        );
+        break;
+      case ContestTab.Future:
+        this.contests.future.sort((a, b) =>
+          a.organizer < b.organizer ? -1 : 1,
+        );
+        break;
+      case ContestTab.Past:
+        this.contests.past.sort((a, b) => (a.organizer < b.organizer ? -1 : 1));
+        break;
+    }
+  }
+
+  orderByContestants() {
+    this.currentOrder = 4;
+    switch (this.currentTab) {
+      case ContestTab.Current:
+        this.contests.current.sort((a, b) =>
+          a.contestants < b.contestants ? -1 : 1,
+        );
+        break;
+      case ContestTab.Future:
+        this.contests.future.sort((a, b) =>
+          a.contestants < b.contestants ? -1 : 1,
+        );
+        break;
+      case ContestTab.Past:
+        this.contests.past.sort((a, b) =>
+          a.contestants < b.contestants ? -1 : 1,
+        );
+        break;
+    }
+  }
+
+  orderBySignedUp() {
+    this.currentOrder = 5;
+    switch (this.currentTab) {
+      case ContestTab.Current:
+        this.contests.current.sort((a, b) =>
+          a.participating > b.participating ? -1 : 1,
+        );
+        break;
+      case ContestTab.Future:
+        this.contests.future.sort((a, b) =>
+          a.participating > b.participating ? -1 : 1,
+        );
+        break;
+      case ContestTab.Past:
+        this.contests.past.sort((a, b) =>
+          a.participating > b.participating ? -1 : 1,
+        );
+        break;
+    }
   }
 }
 </script>
