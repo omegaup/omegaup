@@ -181,7 +181,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import { types } from '../../api_types';
-import common_Paginator from '../common/Paginatorv2.vue';
+import common_Paginator from '../common/Paginator.vue';
 import Autocomplete from '../Autocomplete.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';

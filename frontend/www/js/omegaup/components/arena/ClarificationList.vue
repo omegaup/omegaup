@@ -133,7 +133,7 @@ import arena_Clarification from './Clarification.vue';
 import arena_NewClarification from './NewClarificationPopup.vue';
 import omegaup_Overlay from '../Overlay.vue';
 import clarificationsStore from '../../arena/clarificationsStore';
-import common_Paginator from '../common/Paginatorv2.vue';
+import common_Paginator from '../common/Paginator.vue';
 
 export enum PopupDisplayed {
   None,
