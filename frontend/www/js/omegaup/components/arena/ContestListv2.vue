@@ -12,83 +12,85 @@
         vertical
         nav-wrapper-class="contest-list-nav col-sm-4 col-md-2"
       >
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <form :action="queryURL" method="GET">
-                <div class="input-group">
-                  <input
-                    v-model="currentQuery"
-                    class="form-control"
-                    type="text"
-                    name="query"
-                    autocomplete="off"
-                    :placeholder="T.wordsKeyword"
-                  />
-                  <div class="input-group-append">
+        <b-card>
+          <b-container>
+            <b-row class="p-1" align-v="center">
+              <b-col cols="6">
+                <form :action="queryURL" method="GET">
+                  <div class="input-group">
                     <input
-                      class="btn btn-primary btn-md active"
-                      type="submit"
-                      :value="T.wordsSearch"
+                      v-model="currentQuery"
+                      class="form-control"
+                      type="text"
+                      name="query"
+                      autocomplete="off"
+                      :placeholder="T.wordsKeyword"
                     />
+                    <div class="input-group-append">
+                      <input
+                        class="btn btn-primary btn-md active"
+                        type="submit"
+                        :value="T.wordsSearch"
+                      />
+                    </div>
                   </div>
-                </div>
-              </form>
-            </div>
-            <div class="col-md-6">
-              <b-dropdown no-caret>
-                <template #button-content>
-                  <div>
-                    <font-awesome-icon icon="sort-amount-down" />
-                    {{ T.contestOrderBy }}
-                  </div>
-                </template>
-                <b-dropdown-item href="#" @click="orderByName">
-                  <font-awesome-icon
-                    v-if="currentOrder === 0"
-                    icon="check"
-                    class="mr-1"
-                  />{{ T.contestOrderByName }}</b-dropdown-item
-                >
-                <b-dropdown-item href="#" @click="orderByEnds">
-                  <font-awesome-icon
-                    v-if="currentOrder === 1"
-                    icon="check"
-                    class="mr-1"
-                  />{{ T.contestOrderByEnds }}</b-dropdown-item
-                >
-                <b-dropdown-item href="#" @click="orderByDuration">
-                  <font-awesome-icon
-                    v-if="currentOrder === 2"
-                    icon="check"
-                    class="mr-1"
-                  />{{ T.contestOrderByDuration }}</b-dropdown-item
-                >
-                <b-dropdown-item href="#" @click="orderByOrganizer">
-                  <font-awesome-icon
-                    v-if="currentOrder === 3"
-                    icon="check"
-                    class="mr-1"
-                  />{{ T.contestOrderByOrganizer }}</b-dropdown-item
-                >
-                <b-dropdown-item href="#" @click="orderByContestants">
-                  <font-awesome-icon
-                    v-if="currentOrder === 4"
-                    icon="check"
-                    class="mr-1"
-                  />{{ T.contestOrderByContestants }}</b-dropdown-item
-                >
-                <b-dropdown-item href="#" @click="orderBySignedUp">
-                  <font-awesome-icon
-                    v-if="currentOrder === 5"
-                    icon="check"
-                    class="mr-1"
-                  />{{ T.contestOrderBySignedUp }}</b-dropdown-item
-                >
-              </b-dropdown>
-            </div>
-          </div>
-        </div>
+                </form>
+              </b-col>
+              <b-col cols="6">
+                <b-dropdown no-caret>
+                  <template #button-content>
+                    <div>
+                      <font-awesome-icon icon="sort-amount-down" />
+                      {{ T.contestOrderBy }}
+                    </div>
+                  </template>
+                  <b-dropdown-item href="#" @click="orderByName">
+                    <font-awesome-icon
+                      v-if="currentOrder === 0"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByName }}</b-dropdown-item
+                  >
+                  <b-dropdown-item href="#" @click="orderByEnds">
+                    <font-awesome-icon
+                      v-if="currentOrder === 1"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByEnds }}</b-dropdown-item
+                  >
+                  <b-dropdown-item href="#" @click="orderByDuration">
+                    <font-awesome-icon
+                      v-if="currentOrder === 2"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByDuration }}</b-dropdown-item
+                  >
+                  <b-dropdown-item href="#" @click="orderByOrganizer">
+                    <font-awesome-icon
+                      v-if="currentOrder === 3"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByOrganizer }}</b-dropdown-item
+                  >
+                  <b-dropdown-item href="#" @click="orderByContestants">
+                    <font-awesome-icon
+                      v-if="currentOrder === 4"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderByContestants }}</b-dropdown-item
+                  >
+                  <b-dropdown-item href="#" @click="orderBySignedUp">
+                    <font-awesome-icon
+                      v-if="currentOrder === 5"
+                      icon="check"
+                      class="mr-1"
+                    />{{ T.contestOrderBySignedUp }}</b-dropdown-item
+                  >
+                </b-dropdown>
+              </b-col>
+            </b-row>
+          </b-container>
+        </b-card>
         <b-tab
           ref="currentContestTab"
           :title="T.contestListCurrent"
@@ -200,7 +202,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -213,11 +215,17 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { TabsPlugin, CardPlugin, DropdownPlugin } from 'bootstrap-vue';
+import {
+  TabsPlugin,
+  CardPlugin,
+  DropdownPlugin,
+  LayoutPlugin,
+} from 'bootstrap-vue';
 import ContestCard from './ContestCard.vue';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
+Vue.use(LayoutPlugin);
 library.add(fas);
 
 export enum ContestTab {
@@ -353,17 +361,17 @@ export default class ArenaContestList extends Vue {
     switch (this.currentTab) {
       case ContestTab.Current:
         this.contests.current.sort((a, b) =>
-          a.contestants < b.contestants ? -1 : 1,
+          a.contestants > b.contestants ? -1 : 1,
         );
         break;
       case ContestTab.Future:
         this.contests.future.sort((a, b) =>
-          a.contestants < b.contestants ? -1 : 1,
+          a.contestants > b.contestants ? -1 : 1,
         );
         break;
       case ContestTab.Past:
         this.contests.past.sort((a, b) =>
-          a.contestants < b.contestants ? -1 : 1,
+          a.contestants > b.contestants ? -1 : 1,
         );
         break;
     }
@@ -388,6 +396,11 @@ export default class ArenaContestList extends Vue {
         );
         break;
     }
+  }
+
+  @Watch('currentTab')
+  onCurrentTabChanged() {
+    this.currentOrder = -1;
   }
 }
 </script>
