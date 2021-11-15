@@ -7,10 +7,10 @@ import logging
 import os
 import sys
 import json
-import MySQLdb
-import MySQLdb.cursors
 from typing import Optional
 import datetime
+import MySQLdb
+import MySQLdb.cursors
 import pika
 
 sys.path.insert(
@@ -22,19 +22,17 @@ import lib.logs  # pylint: disable=wrong-import-position
 
 
 def send_messages_contest_queue(cur: MySQLdb.cursors.BaseCursor,
-                  rabbit_user: str,
-                  rabbit_password: str,
-                  date_low_limit: str,
-                  date_upper_limit: Optional[str] = None) -> None:
+                                rabbit_user: str,
+                                rabbit_password: str,
+                                low_date: str,
+                                upper_date: Optional[str] = None) -> None:
     '''Send messages to contest queue
-    
-    date_low_limit: initial time from which to be taken the finishes courses
-    date_upper_limit: Optional finish time from which to be taken
+    low_date: initial time from which to be taken the finishes courses
+    upper_date: Optional finish time from which to be taken
       the finishes courses. By default, the current date will be taken
     '''
-    if date_upper_limit is None:
-        date_upper_limit = datetime.date.today()
-    
+    if upper_date is None:
+        upper_date = str(datetime.date.today())
     credentials = pika.PlainCredentials(rabbit_user, rabbit_password)
     parameters = pika.ConnectionParameters('rabbitmq', 5672, '/', credentials)
     connection = pika.BlockingConnection(parameters)
@@ -49,7 +47,7 @@ def send_messages_contest_queue(cur: MySQLdb.cursors.BaseCursor,
             Contests
         WHERE
             finish_time BETWEEN %s AND %s;
-        ''', (date_low_limit, date_upper_limit)
+        ''', (low_date, upper_date)
     )
     try:
         for row in cur:
@@ -82,8 +80,10 @@ def main() -> None:
     dbconn = lib.db.connect(args)
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
-            send_messages_contest_queue(cur, args.user_rabbit, args.password_rabbit,
-                                        args.date_low_limit, args.date_upper_limit)
+            send_messages_contest_queue(cur, args.user_rabbit,
+                                        args.password_rabbit,
+                                        args.date_low_limit,
+                                        args.date_upper_limit)
     finally:
         dbconn.close()
         logging.info('Done')
