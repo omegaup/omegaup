@@ -76,6 +76,7 @@ OmegaUp.on('ready', () => {
     (showAllProblems
       ? api.Problem.adminList({
           page: pageNumber,
+          query: payload.keyword ? payload.keyword : null,
         })
       : api.Problem.myList({
           page: pageNumber,
