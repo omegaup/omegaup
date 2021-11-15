@@ -5,34 +5,142 @@
     </div>
     <b-card no-body>
       <b-tabs
-        v-model="activeTab"
+        v-model="currentTab"
         class="sidebar"
         pills
         card
         vertical
         nav-wrapper-class="contest-list-nav col-sm-4 col-md-2"
       >
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <form :action="queryURL" method="GET">
+                <div class="input-group">
+                  <input
+                    v-model="currentQuery"
+                    class="form-control"
+                    type="text"
+                    name="query"
+                    autocomplete="off"
+                    :placeholder="T.wordsKeyword"
+                  />
+                  <div class="input-group-append">
+                    <input
+                      class="btn btn-primary btn-md active"
+                      type="submit"
+                      :value="T.wordsSearch"
+                    />
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
         <b-tab
           ref="currentContestTab"
           :title="T.contestListCurrent"
           :title-link-class="titleLinkClass(ContestTab.Current)"
-          active
         >
-          {{ contests.current }}
+          <div v-if="contests.current.length === 0">
+            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          </div>
+          <omegaup-contest-card
+            v-for="contestItem in contests.current"
+            v-else
+            :key="contestItem.contest_id"
+            :contest="contestItem"
+            :contest-tab="activeTab"
+          >
+            <template #contest-button-scoreboard>
+              <div></div>
+            </template>
+            <template #text-contest-date>
+              <b-card-text>
+                <font-awesome-icon icon="calendar-alt" />
+                {{
+                  ui.formatString(T.contestEndTime, {
+                    endDate: finishContestDate(contestItem),
+                  })
+                }}
+              </b-card-text>
+            </template>
+            <template #contest-dropdown>
+              <div></div>
+            </template>
+          </omegaup-contest-card>
         </b-tab>
         <b-tab
           ref="futureContestTab"
           :title="T.contestListFuture"
           :title-link-class="titleLinkClass(ContestTab.Future)"
         >
-          {{ contests.future }}
+          <div v-if="contests.future.length === 0">
+            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          </div>
+          <omegaup-contest-card
+            v-for="contestItem in contests.future"
+            v-else
+            :key="contestItem.contest_id"
+            :contest="contestItem"
+            :contest-tab="activeTab"
+          >
+            <template #contest-button-scoreboard>
+              <div></div>
+            </template>
+            <template #text-contest-date>
+              <b-card-text>
+                <font-awesome-icon icon="calendar-alt" />
+                {{
+                  ui.formatString(T.contestStartTime, {
+                    startDate: startContestDate(contestItem),
+                  })
+                }}
+              </b-card-text>
+            </template>
+            <template #contest-button-enter>
+              <div></div>
+            </template>
+            <template #contest-dropdown>
+              <div></div>
+            </template>
+          </omegaup-contest-card>
         </b-tab>
         <b-tab
           ref="pastContestTab"
           :title="T.contestListPast"
           :title-link-class="titleLinkClass(ContestTab.Past)"
         >
-          {{ contests.past }}
+          <div v-if="contests.past.length === 0">
+            <div class="empty-category">{{ T.contestListEmpty }}</div>
+          </div>
+          <omegaup-contest-card
+            v-for="contestItem in contests.past"
+            v-else
+            :key="contestItem.contest_id"
+            :contest="contestItem"
+            :contest-tab="activeTab"
+          >
+            <template #contest-enroll-status>
+              <div></div>
+            </template>
+            <template #text-contest-date>
+              <b-card-text>
+                <font-awesome-icon icon="calendar-alt" />
+                {{
+                  ui.formatString(T.contestStartedTime, {
+                    startedDate: startContestDate(contestItem),
+                  })
+                }}
+              </b-card-text>
+            </template>
+            <template #contest-button-enter>
+              <div></div>
+            </template>
+            <template #contest-button-singup>
+              <div></div>
+            </template>
+          </omegaup-contest-card>
         </b-tab>
       </b-tabs>
     </b-card>
@@ -42,6 +150,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import * as ui from '../../ui';
 import T from '../../lang';
 
 // Import Bootstrap an BootstrapVue CSS files (order is important)
@@ -49,9 +158,14 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 // Import Only Required Plugins
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
 import { TabsPlugin, CardPlugin } from 'bootstrap-vue';
+import ContestCard from './ContestCard.vue';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
+library.add(fas);
 
 export enum ContestTab {
   Current = 0,
@@ -60,20 +174,39 @@ export enum ContestTab {
 }
 
 @Component({
-  components: {},
+  components: {
+    'omegaup-contest-card': ContestCard,
+    FontAwesomeIcon,
+  },
 })
 export default class ArenaContestList extends Vue {
   @Prop() contests!: types.ContestList;
+  @Prop() query!: string;
+  @Prop() tab!: ContestTab;
   T = T;
+  ui = ui;
   ContestTab = ContestTab;
-  activeTab: ContestTab = ContestTab.Current;
+  currentTab: ContestTab = this.tab;
+  currentQuery: string = this.query;
 
   titleLinkClass(tab: ContestTab) {
-    if (this.activeTab === tab) {
+    if (this.currentTab === tab) {
       return ['text-center', 'active-title-link'];
     } else {
       return ['text-center', 'title-link'];
     }
+  }
+
+  get queryURL(): string {
+    return `/arenav2/#${this.currentTab}`;
+  }
+
+  finishContestDate(contest: types.ContestListItem): string {
+    return contest.finish_time.toLocaleDateString();
+  }
+
+  startContestDate(contest: types.ContestListItem): string {
+    return contest.start_time.toLocaleDateString();
   }
 }
 </script>
@@ -99,5 +232,12 @@ export default class ArenaContestList extends Vue {
       ) !important;
     }
   }
+}
+
+.empty-category {
+  text-align: center;
+  font-size: 200%;
+  margin: 1em;
+  color: var(--arena-contest-list-empty-category-font-color);
 }
 </style>

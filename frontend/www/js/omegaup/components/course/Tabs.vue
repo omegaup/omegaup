@@ -24,7 +24,16 @@
       </li>
     </ul>
     <div class="tab-content">
-      <!-- TODO: Add search input. -->
+      <div class="row m-0 mt-4">
+        <div class="col-md-6 col-lg-3 p-0">
+          <input
+            v-model="searchText"
+            class="form-control"
+            type="text"
+            :placeholder="T.courseCardsListSearch"
+          />
+        </div>
+      </div>
       <div
         v-for="(tabName, tabKey) in tabNames"
         :key="tabKey"
@@ -35,28 +44,54 @@
         }"
         role="tabpanel"
       >
-        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3">
-          <template v-if="tabKey === Tab.Public">
-            <omegaup-course-card-public
-              v-for="course in courses[tabKey]"
-              :key="course.alias"
-              :course="course"
-            ></omegaup-course-card-public>
-          </template>
-          <template v-if="tabKey === Tab.Enrolled">
+        <div
+          v-if="tabKey === Tab.Public"
+          class="row row-cols-1 row-cols-md-2 row-cols-xl-3"
+        >
+          <omegaup-course-card-public
+            v-for="course in filteredCards"
+            :key="course.alias"
+            :course="course"
+            :logged-in="loggedIn"
+          ></omegaup-course-card-public>
+        </div>
+        <div
+          v-if="tabKey === Tab.Enrolled"
+          class="row"
+          :class="{
+            'row-cols-1 row-cols-md-2 row-cols-xl-3': loggedIn,
+            'justify-content-center': !loggedIn,
+          }"
+        >
+          <template v-if="loggedIn">
             <omegaup-course-card-enrolled
-              v-for="course in courses[tabKey]"
+              v-for="course in filteredCards"
               :key="course.alias"
               :course="course"
             ></omegaup-course-card-enrolled>
           </template>
-          <template v-if="tabKey === Tab.Finished">
+          <div v-else class="empty-content my-2">
+            {{ T.courseCardMustLogIn }}
+          </div>
+        </div>
+        <div
+          v-if="tabKey === Tab.Finished"
+          class="row"
+          :class="{
+            'row-cols-1 row-cols-md-2 row-cols-xl-3': loggedIn,
+            'justify-content-center': !loggedIn,
+          }"
+        >
+          <template v-if="loggedIn">
             <omegaup-course-card-finished
-              v-for="course in courses[tabKey]"
+              v-for="course in filteredCards"
               :key="course.alias"
               :course="course"
             ></omegaup-course-card-finished>
           </template>
+          <div v-else class="empty-content my-2">
+            {{ T.courseCardMustLogIn }}
+          </div>
         </div>
       </div>
     </div>
@@ -67,6 +102,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 
 import omegaup_Markdown from '../Markdown.vue';
 import course_CardPublic from './CardPublic.vue';
@@ -93,15 +129,52 @@ export default class CourseTabs extends Vue {
     public: types.CourseCardPublic[];
     finished: types.CourseCardFinished[];
   };
+  @Prop({ default: false }) loggedIn!: boolean;
 
   T = T;
+  ui = ui;
   Tab = Tab;
-  tabNames: Record<Tab, string> = {
-    [Tab.Public]: T.courseTabPublic,
-    [Tab.Enrolled]: T.courseTabEnrolled,
-    [Tab.Finished]: T.courseTabFinished,
-  };
   selectedTab = Tab.Public;
+  searchText = '';
+
+  get tabNames(): Record<Tab, string> {
+    return {
+      [Tab.Public]: T.courseTabPublic,
+      [Tab.Enrolled]: this.loggedIn
+        ? ui.formatString(T.courseTabEnrolled, {
+            course_count: this.courses.enrolled.length,
+          })
+        : T.courseTabEnrolledUnlogged,
+      [Tab.Finished]: this.loggedIn
+        ? ui.formatString(T.courseTabFinished, {
+            course_count: this.courses.finished.length,
+          })
+        : T.courseTabFinishedUnlogged,
+    };
+  }
+
+  get filteredCards():
+    | types.CourseCardEnrolled[]
+    | types.CourseCardPublic[]
+    | types.CourseCardFinished[] {
+    switch (this.selectedTab) {
+      case Tab.Enrolled:
+        return this.courses.enrolled.filter(
+          (course) =>
+            this.searchText === '' || course.name.includes(this.searchText),
+        );
+      case Tab.Finished:
+        return this.courses.finished.filter(
+          (course) =>
+            this.searchText === '' || course.name.includes(this.searchText),
+        );
+      default:
+        return this.courses.public.filter(
+          (course) =>
+            this.searchText === '' || course.name.includes(this.searchText),
+        );
+    }
+  }
 }
 </script>
 
@@ -137,5 +210,11 @@ export default class CourseTabs extends Vue {
     font-size: 3.2rem;
     line-height: normal;
   }
+}
+
+.empty-content {
+  text-align: center;
+  font-size: 2.25rem;
+  color: var(--arena-contest-list-empty-category-font-color);
 }
 </style>

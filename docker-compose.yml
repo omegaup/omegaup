@@ -6,7 +6,7 @@ services:
     build:
       dockerfile: ./Dockerfile.dev-php
       context: ./stuff/docker/
-    image: omegaup/dev-php:20210830
+    image: omegaup/dev-php:20211109
     user: "${UID_GID}"
     restart: always
     volumes:
@@ -142,7 +142,28 @@ services:
         protocol: tcp
         mode: host
 
+  redis:
+    image: redis
+    restart: always
+    command: ['redis-server', '/etc/redis/redis.conf']
+    expose:
+      - '6379'
+    volumes:
+      - type: volume
+        source: redis
+        target: /data
+      - type: bind
+        source: ./stuff/docker/etc/redis/
+        target: /etc/redis
+        read_only: true
+    ports:
+      - target: 6379
+        published: 6379
+        protocol: tcp
+        mode: host
+
 volumes:
   dbdata:
   omegaupdata:
   rabbitmq:
+  redis:

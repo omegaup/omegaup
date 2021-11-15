@@ -360,6 +360,10 @@
         </div>
       </div>
     </nav>
+    <omegaup-user-objectives-questions
+      v-if="fromLogin && userTypes.length === 0"
+      @submit="(objectives) => $emit('update-user-objectives', objectives)"
+    ></omegaup-user-objectives-questions>
   </header>
 </template>
 
@@ -371,6 +375,7 @@ import notifications_List from '../notification/List.vue';
 import notifications_Clarifications from '../notification/Clarificationsv2.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
 import common_GraderBadge from '../common/GraderBadge.vue';
+import user_objectives_questions from '../user/ObjectivesQuestions.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -384,6 +389,7 @@ library.add(faSignOutAlt, faUser);
     'omegaup-notifications-clarifications': notifications_Clarifications,
     'omegaup-common-grader-status': common_GraderStatus,
     'omegaup-common-grader-badge': common_GraderBadge,
+    'omegaup-user-objectives-questions': user_objectives_questions,
   },
 })
 export default class Navbar extends Vue {
@@ -407,6 +413,8 @@ export default class Navbar extends Vue {
   @Prop() errorMessage!: string | null;
   @Prop({ default: 0 }) profileProgress!: number;
   @Prop() clarifications!: types.Clarification[];
+  @Prop() fromLogin!: boolean;
+  @Prop() userTypes!: string[];
 
   T = T;
 

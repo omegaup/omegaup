@@ -37,6 +37,7 @@ const propsData = {
         difficulty: 0,
         submissions: 2,
         title: 'title',
+        quality_seal: false,
       },
       {
         accepted: 1,
@@ -44,6 +45,7 @@ const propsData = {
         difficulty: 1,
         submissions: 3,
         title: 'title2',
+        quality_seal: false,
       },
       {
         accepted: 1,
@@ -51,10 +53,12 @@ const propsData = {
         difficulty: 2,
         submissions: 5,
         title: 'title3',
+        quality_seal: false,
       },
     ],
     stats: [],
     unsolvedProblems: [],
+    hasPassword: true,
   } as types.ExtraProfileDetails,
   edit: false,
 };

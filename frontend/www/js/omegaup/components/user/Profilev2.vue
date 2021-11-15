@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid p-0 mt-0" data-user-profile-root>
+  <div class="container-fluid p-5 mt-0" data-user-profile-root>
     <h1 v-if="!profile.is_own_profile && profile.is_private">
       {{ ui.info(T.userProfileIsPrivate) }}
     </h1>
@@ -40,6 +40,13 @@
                   {{ Object.keys(contests).length }}
                 </span>
               </a>
+              <a
+                v-if="profile.is_own_profile || !profile.is_private"
+                class="nav-item nav-link"
+                data-toggle="tab"
+                @click="selectedTab = 'created-content'"
+                >{{ T.profileCreatedContent }}</a
+              >
               <a
                 class="nav-item nav-link"
                 data-toggle="tab"
@@ -87,13 +94,6 @@
                   :title="T.profileUnsolvedProblems"
                   class="mb-3"
                 ></omegaup-grid-paginator>
-                <omegaup-grid-paginator
-                  :columns="3"
-                  :items="createdProblems"
-                  :items-per-page="30"
-                  :title="T.profileCreatedProblems"
-                  class="mb-3"
-                ></omegaup-grid-paginator>
               </div>
               <div
                 v-show="selectedTab == 'contests'"
@@ -116,6 +116,26 @@
                       </tr>
                     </thead>
                   </template>
+                </omegaup-grid-paginator>
+              </div>
+              <div
+                v-if="selectedTab == 'created-content'"
+                class="tab-pane fade show active"
+                role="tab"
+                aria-labelledby="nav-created-content-tab"
+              >
+                <omegaup-grid-paginator
+                  :columns="3"
+                  :items="createdProblems"
+                  :items-per-page="30"
+                  :title="T.profileCreatedProblems"
+                  class="mb-3"
+                >
+                  <template v-if="profile.is_own_profile" #header-link
+                    ><a href="/problem/mine/" class="float-right">{{
+                      T.profileCreatedContentSeeAll
+                    }}</a></template
+                  >
                 </omegaup-grid-paginator>
               </div>
               <div

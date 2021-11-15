@@ -1,35 +1,43 @@
 <template>
-  <div class="panel">
-    <h1 class="title">
+  <div>
+    <h3 :data-problem-title="problem.alias" class="text-center mb-4">
       {{ title }}
       <template v-if="showVisibilityIndicators">
         <img
           v-if="problem.quality_seal || problem.visibility === 3"
           src="/media/quality-badge-sm.png"
           :title="T.wordsHighQualityProblem"
+          class="mr-2"
         />
-        <span
+        <font-awesome-icon
           v-if="problem.visibility === 1 || problem.visibility === -1"
-          class="glyphicon glyphicon-warning-sign"
+          :icon="['fas', 'exclamation-triangle']"
           :title="T.wordsWarningProblem"
-        ></span>
-        <span
+          class="mr-2"
+        ></font-awesome-icon>
+        <font-awesome-icon
           v-if="problem.visibility === 0 || problem.visibility === -1"
-          class="glyphicon glyphicon-eye-close"
+          :icon="['fas', 'eye-slash']"
           :title="T.wordsPrivate"
-        ></span>
-        <span
+          class="mr-2"
+        ></font-awesome-icon>
+        <font-awesome-icon
           v-if="problem.visibility <= -2"
-          class="glyphicon glyphicon-ban-circle"
+          :icon="['fas', 'ban']"
           :title="T.wordsBannedProblem"
-        ></span>
+          class="mr-2"
+          color="darkred"
+        ></font-awesome-icon>
       </template>
-      <template v-if="showEditLink">
-        (<a :href="`/problem/${problem.alias}/edit/`">{{ T.wordsEdit }}</a
-        >)
-      </template>
-    </h1>
-    <table v-if="problem.accepts_submissions">
+
+      <a v-if="showEditLink" :href="`/problem/${problem.alias}/edit/`">
+        <font-awesome-icon :icon="['fas', 'edit']" />
+      </a>
+    </h3>
+    <table
+      v-if="problem.accepts_submissions"
+      class="table table-bordered mx-auto w-75 mb-0"
+    >
       <tr>
         <th scope="row">{{ T.wordsPoints }}</th>
         <td>{{ problem.points }}</td>
@@ -58,10 +66,33 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
+import * as ui from '../../ui';
 
-@Component
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faEdit,
+  faExclamationTriangle,
+  faEyeSlash,
+  faBan,
+  faExternalLinkAlt,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(
+  faExclamationTriangle,
+  faEdit,
+  faEyeSlash,
+  faBan,
+  faExternalLinkAlt,
+);
+
+@Component({
+  components: {
+    FontAwesomeIcon,
+  },
+})
 export default class ProblemSettingsSummary extends Vue {
   @Prop() problem!: types.ArenaProblemDetails;
+  @Prop({ default: null }) problemsetTitle!: null | string;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop({ default: false }) showEditLink!: boolean;
 
@@ -69,12 +100,28 @@ export default class ProblemSettingsSummary extends Vue {
 
   get title(): string {
     if (this.showVisibilityIndicators) {
-      return `${this.problem.problem_id}. ${this.problem.title}`;
+      return ui.formatString(T.problemSettingsSummaryTitleWithProblemId, {
+        problem_id: this.problem.problem_id,
+        problem_title: this.problem.title,
+      });
     }
-    if (!this.problem.letter) {
-      return this.problem.title;
+    if (this.problem.letter && this.problemsetTitle) {
+      return ui.formatString(
+        T.problemSettingsSummaryTitleWithProblemsetTitleAndLetter,
+        {
+          problemset_title: this.problemsetTitle,
+          letter: this.problem.letter,
+          problem_title: this.problem.title,
+        },
+      );
     }
-    return `${this.problem.letter}. ${this.problem.title}`;
+    if (this.problem.letter && !this.problemsetTitle) {
+      return ui.formatString(T.problemSettingsSummaryTitleWithLetter, {
+        letter: this.problem.letter,
+        problem_title: this.problem.title,
+      });
+    }
+    return this.problem.title;
   }
 
   get memoryLimit(): string {
@@ -89,10 +136,16 @@ export default class ProblemSettingsSummary extends Vue {
   }
 
   get timeLimit(): string {
+    if (!this.problem.settings?.limits.TimeLimit) {
+      return '';
+    }
     return `${this.problem.settings?.limits.TimeLimit}`;
   }
 
   get overallWallTimeLimit(): string {
+    if (!this.problem.settings?.limits.OverallWallTimeLimit) {
+      return '';
+    }
     return `${this.problem.settings?.limits.OverallWallTimeLimit}`;
   }
 
@@ -107,30 +160,8 @@ export default class ProblemSettingsSummary extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-.panel {
-  .title {
-    text-align: center;
-    font-size: 1.5em;
-    margin: 1em;
-  }
 
-  table {
-    width: 30em;
-    margin: 10px auto;
-
-    td {
-      text-align: center;
-    }
-
-    th[scope='row'] {
-      font-weight: bold;
-    }
-
-    td,
-    th[scope='row'] {
-      border: 1px solid var(--arena-settings-summary-panel-th-border-color);
-      padding: 2px;
-    }
-  }
+table td {
+  padding: 0.5rem;
 }
 </style>
