@@ -10,7 +10,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank, pagerItems: list<PageItem>}
  * @psalm-type Badge=array{assignation_time: \OmegaUp\Timestamp|null, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}
  * @psalm-type AssociatedIdentity=array{username: string, default: bool}
- * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL128: string, gravatarURL51: string, currentEmail: string, currentName: null|string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL128: string, gravatarURL51: string, currentEmail: string, currentName: null|string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string, userTypes: list<string>}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float, quality_seal: bool}
@@ -3988,10 +3988,15 @@ class User extends \OmegaUp\Controllers\Controller {
                 'username'
             );
         }
-        $user = $r->user;
+        $targetUser = null;
         $ownedBadges = [];
-        if (!is_null($user)) {
-            $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges($user);
+        if (!is_null($targetIdentity->user_id)) {
+            $targetUser = \OmegaUp\DAO\Users::getByPK($targetIdentity->user_id);
+        }
+        if (!is_null($targetUser)) {
+            $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
+                $targetUser
+            );
         }
         $response = [
             'smartyProperties' => [
@@ -4009,7 +4014,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProfile'
                 ),
-                'fullWidth' => true
+                'fullWidth' => true,
             ],
             'entrypoint' => 'user_profile',
         ];
@@ -4018,7 +4023,7 @@ class User extends \OmegaUp\Controllers\Controller {
             self::shouldUserInformationBeHidden(
                 $loggedIdentity,
                 $targetIdentity,
-                $user
+                $targetUser
             )
         ) {
             return $response;

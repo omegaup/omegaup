@@ -29,7 +29,7 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import user_ProfileWrapper from './ProfileWrapper.vue';
 import { urlMapping } from './SidebarMainInfo.vue';
-import user_ManageIdentities from './ManageIdentitiesv2.vue';
+import user_ManageIdentities from './ManageIdentities.vue';
 
 @Component({
   components: {

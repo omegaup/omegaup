@@ -138,7 +138,7 @@ import * as ui from '../../ui';
 import * as time from '../../time';
 import UserName from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
-import common_Paginator from '../common/Paginatorv2.vue';
+import common_Paginator from '../common/Paginator.vue';
 
 @Component({
   components: {
