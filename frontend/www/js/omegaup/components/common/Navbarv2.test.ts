@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 
 import T from '../../lang';
 
@@ -6,7 +6,7 @@ import common_Navbarv2 from './Navbarv2.vue';
 
 describe('Navbarv2.vue', () => {
   it('Should handle empty navbar (in contest only)', async () => {
-    const wrapper = shallowMount(common_Navbarv2, {
+    const wrapper = mount(common_Navbarv2, {
       propsData: {
         currentUsername: 'user',
         errorMessage: null,
@@ -24,6 +24,8 @@ describe('Navbarv2.vue', () => {
         navbarSection: '',
         omegaUpLockDown: false,
         allIdentities: [{ username: 'user', default: true }],
+        fromLogin: false,
+        userTypes: [],
       },
     });
 
@@ -34,7 +36,7 @@ describe('Navbarv2.vue', () => {
   });
 
   it('Should handle common navbar to logged user', async () => {
-    const wrapper = shallowMount(common_Navbarv2, {
+    const wrapper = mount(common_Navbarv2, {
       propsData: {
         currentUsername: 'user',
         errorMessage: null,
@@ -52,6 +54,8 @@ describe('Navbarv2.vue', () => {
         navbarSection: '',
         omegaUpLockDown: false,
         associatedIdentities: [{ username: 'user', default: true }],
+        fromLogin: false,
+        userTypes: ['student', 'teacher'],
       },
     });
 
@@ -62,7 +66,7 @@ describe('Navbarv2.vue', () => {
   });
 
   it('Should handle common navbar to not-logged user', async () => {
-    const wrapper = shallowMount(common_Navbarv2, {
+    const wrapper = mount(common_Navbarv2, {
       propsData: {
         currentUsername: 'user',
         errorMessage: null,
@@ -80,6 +84,8 @@ describe('Navbarv2.vue', () => {
         navbarSection: '',
         omegaUpLockDown: false,
         associatedIdentities: [{ username: 'user', default: true }],
+        fromLogin: false,
+        userTypes: [],
       },
     });
 
