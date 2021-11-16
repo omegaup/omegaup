@@ -103,7 +103,7 @@
               class="dropdown-item"
               href="/problem/collection/"
               data-nav-problems-collection
-              >{{ T.problemcollectionViewProblems }}</a
+              >{{ T.navViewProblems }}</a
             >
             <a class="dropdown-item" href="/submissions/">{{
               T.navViewLatestSubmissions
