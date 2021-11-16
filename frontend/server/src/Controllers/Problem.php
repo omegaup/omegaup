@@ -3427,22 +3427,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     );
                 }
             }
-            $response['runs'] = [];
-            foreach (
-                \OmegaUp\DAO\Runs::getAllRuns(
-                    null,
-                    $r->ensureOptionalString('status'),
-                    $r->ensureOptionalString('verdict'),
-                    $problem->problem_id,
-                    $r->ensureOptionalString('language'),
-                    !is_null($identity) ? intval($identity->identity_id) : null,
-                    $r->ensureOptionalInt('offset'),
-                    $r->ensureOptionalInt('rowcount')
-                ) as $run
-            ) {
-                unset($run['run_id']);
-                $response['runs'][] = $run;
-            }
+            $runs = \OmegaUp\DAO\Runs::getAllRuns(
+                null,
+                $r->ensureOptionalString('status'),
+                $r->ensureOptionalString('verdict'),
+                $problem->problem_id,
+                $r->ensureOptionalString('language'),
+                !is_null($identity) ? intval($identity->identity_id) : null,
+                $r->ensureOptionalInt('offset') ?? 0,
+                $r->ensureOptionalInt('rowcount') ?? 100
+            );
+            $response['runs'] = $runs['runs'];
         } else {
             // Get all the available runs
             $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
@@ -4650,23 +4645,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $response['smartyProperties']['payload']['problem']['nextSubmissionTimestamp'] = $nextSubmissionTimestamp;
 
         if ($isAdmin) {
-            $allRuns = [];
-            foreach (
-                \OmegaUp\DAO\Runs::getAllRuns(
-                    /*$problemset_id=*/                    null,
-                    /*$status=*/null,
-                    /*$verdict=*/null,
-                    $problem->problem_id,
-                    /*$language=*/null,
-                    /*$identity_id=*/null,
-                    /*$offset=*/null,
-                    /*$rowcount=*/null
-                ) as $run
-            ) {
-                unset($run['run_id']);
-                $allRuns[] = $run;
-            }
-            $response['smartyProperties']['payload']['allRuns'] = $allRuns;
+            [
+                'runs' => $runs,
+            ] = \OmegaUp\DAO\Runs::getAllRuns(
+                /*$problemsetId=*/                null,
+                /*$status=*/null,
+                /*$verdict=*/null,
+                $problem->problem_id,
+                /*$language=*/null,
+                /*$identityId=*/null,
+                /*$offset=*/ 0,
+                /*$rowCount=*/ 100
+            );
+            $response['smartyProperties']['payload']['allRuns'] = $runs;
             $response['smartyProperties']['payload']['problemLevel'] = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
                 $problem
             );

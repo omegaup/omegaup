@@ -1587,41 +1587,26 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{runs: list<Run>}
      *
-     * @omegaup-request-param mixed $language
+     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null $language
      * @omegaup-request-param int $offset
      * @omegaup-request-param string $problem_alias
      * @omegaup-request-param int $rowcount
-     * @omegaup-request-param mixed $status
+     * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
      * @omegaup-request-param string $username
-     * @omegaup-request-param mixed $verdict
+     * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict
      */
     public static function apiList(\OmegaUp\Request $r): array {
         // Authenticate request
         $r->ensureIdentity();
 
         // Defaults for offset and rowcount
-        $r->ensureOptionalInt('offset');
-        if (!isset($r['offset'])) {
-            $r['offset'] = 0;
-        }
-        $r->ensureOptionalInt('rowcount');
-        if (!isset($r['rowcount'])) {
-            $r['rowcount'] = 100;
-        }
+        $offset = $r->ensureOptionalInt('offset') ?? 0;
+        $rowCount = $r->ensureOptionalInt('rowcount') ?? 100;
 
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['status'],
-            'status',
-            self::STATUS
-        );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['verdict'],
-            'verdict',
-            \OmegaUp\Controllers\Run::VERDICTS
-        );
+        $status = $r->ensureOptionalEnum('status', self::STATUS);
+        $verdict = $r->ensureOptionalEnum('verdict', self::VERDICTS);
 
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['language'],
+        $language = $r->ensureOptionalEnum(
             'language',
             array_keys(self::SUPPORTED_LANGUAGES)
         );
@@ -1631,15 +1616,17 @@ class Run extends \OmegaUp\Controllers\Controller {
             'identity' => $identity,
         ] = self::validateList($r);
 
-        $runs = \OmegaUp\DAO\Runs::getAllRuns(
+        [
+            'runs' => $runs,
+        ] = \OmegaUp\DAO\Runs::getAllRuns(
             null,
-            $r['status'],
-            $r['verdict'],
+            $status,
+            $verdict,
             !is_null($problem) ? $problem->problem_id : null,
-            $r['language'],
+            $language,
             !is_null($identity) ? $identity->identity_id : null,
-            intval($r['offset']),
-            intval($r['rowcount'])
+            intval($offset),
+            intval($rowCount)
         );
 
         $result = [];
