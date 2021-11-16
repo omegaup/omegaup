@@ -402,8 +402,7 @@ export default class Runs extends Vue {
   filterUsername: null | string = null;
   filterVerdict: string = '';
   filterContest: string = '';
-  filters: { name: string; value: string }[] =
-    this.rowCount > 100 ? [{ name: 'pager', value: '0' }] : [];
+  filters: { name: string; value: string }[] = [];
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
 

@@ -125,7 +125,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return array{page: int, runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>, totalRuns: int}
+     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>, totalRuns: int}
      */
     final public static function getAllRuns(
         ?int $problemsetId,
@@ -134,8 +134,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ?int $problemId,
         ?string $language,
         ?int $identityId,
-        ?int $offset,
-        ?int $rowCount
+        ?int $offset = 0,
+        ?int $rowCount = 100
     ): array {
         $sql = '
             SELECT
@@ -249,12 +249,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $val
         );
 
-        if (is_null($offset)) {
-            $offset = 0;
-        }
-        if (is_null($rowCount)) {
-            $rowCount = 100;
-        }
         $sql .= 'LIMIT ?, ?;';
         $val[] = $offset;
         $val[] = $rowCount;
@@ -265,7 +259,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return [
             'runs' => $runs,
             'totalRuns' => $totalRows,
-            'page' => $offset,
         ];
     }
 

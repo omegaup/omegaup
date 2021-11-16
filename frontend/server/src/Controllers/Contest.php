@@ -807,13 +807,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 // Get our runs
                 $response = self::getAllRuns(
                     $contest->problemset_id,
-                    /*$status=*/ null,
-                    /*$verdict=*/ null,
-                    /*$problemId=*/ null,
-                    /*$language=*/ null,
-                    /*$identityId=*/ null,
-                    /*$offset=*/ 0,
-                    /*$rowCount=*/ 100,
                     $contest->partial_score
                 );
 
@@ -4910,21 +4903,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Authenticate request
         $r->ensureIdentity();
 
-        $status = $r->ensureOptionalEnum(
-            'status',
-            \OmegaUp\Controllers\Run::STATUS
-        );
-        $verdict = $r->ensureOptionalEnum(
-            'verdict',
-            \OmegaUp\Controllers\Run::VERDICTS
-        );
-        $language = $r->ensureOptionalEnum(
-            'language',
-            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
-        );
-        $offset = $r->ensureOptionalInt('offset') ?? 0; // default value
-        $rowCount = $r->ensureOptionalInt('rowcount') ?? 100; // default value
-
         // Contest information
         $contestAlias = $r->ensureString(
             'contest_alias',
@@ -4963,17 +4941,22 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
         }
 
+        $languages = array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES);
+
         // Get our runs
         $response = self::getAllRuns(
             $contest->problemset_id,
-            $status,
-            $verdict,
+            $contest->partial_score,
+            $r->ensureOptionalEnum('status', \OmegaUp\Controllers\Run::STATUS),
+            $r->ensureOptionalEnum(
+                'verdict',
+                \OmegaUp\Controllers\Run::VERDICTS
+            ),
             !is_null($problem) ? $problem->problem_id : null,
-            $language,
+            $r->ensureOptionalEnum('language', $languages),
             !is_null($identity) ? $identity->identity_id : null,
-            $offset,
-            $rowCount,
-            $contest->partial_score
+            $r->ensureOptionalInt('offset') ?? 0,
+            $r->ensureOptionalInt('rowcount') ?? 100
         );
 
         return [
@@ -4982,24 +4965,23 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{runs: list<Run>, totalRuns: int, page: int}
+     * @return array{runs: list<Run>, totalRuns: int}
      */
     private static function getAllRuns(
         int $problemsetId,
-        ?string $status,
-        ?string $verdict,
-        ?int $problemId,
-        ?string $language,
-        ?int $identityId,
-        ?int $offset,
-        ?int $rowCount,
-        bool $partialScore = false
+        bool $partialScore,
+        ?string $status = null,
+        ?string $verdict = null,
+        ?int $problemId = null,
+        ?string $language = null,
+        ?int $identityId = null,
+        ?int $offset = 0,
+        ?int $rowCount = 100
     ): array {
         // Get our runs
         [
             'runs' => $runs,
             'totalRuns' => $totalRuns,
-            'page' => $page,
         ] = \OmegaUp\DAO\Runs::getAllRuns(
             $problemsetId,
             $status,
@@ -5032,9 +5014,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return [
             'runs' => $allRuns,
             'totalRuns' => $totalRuns,
-            'page' => $page,
         ];
     }
+
     /**
      * Stats of a contest
      *
