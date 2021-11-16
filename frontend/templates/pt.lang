@@ -310,6 +310,7 @@ contestUpdateAlreadyHasRuns = "A duração do concurso não pode ser alterada se
 contestVirtualMode = "Virtual"
 contestWillBeginIn = "Concurso inciará em "
 contestsCreate = "Criar Concurso"
+contestsCreateNew = "Criar um novo concurso"
 contestsJoinScoreboards = "Juntar Paineis de Avaliação"
 courseActionScoreboard = "Painel de avaliação"
 courseAddContent = "Adicionar conteúdo"

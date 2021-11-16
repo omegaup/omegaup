@@ -312,6 +312,7 @@ const translations: { [key: string]: string; } = {
   contestVirtualMode: "Virtual",
   contestWillBeginIn: "Concurso inciar\u00e1 em ",
   contestsCreate: "Criar Concurso",
+  contestsCreateNew: "Criar um novo concurso",
   contestsJoinScoreboards: "Juntar Paineis de Avalia\u00e7\u00e3o",
   courseActionScoreboard: "Painel de avalia\u00e7\u00e3o",
   courseAddContent: "Adicionar conte\u00fado",

@@ -74,7 +74,7 @@
             </template>
             <template v-if="hasTeachingObjective" #problems-items>
               <a
-                v-if="isMainUserIdentity"
+                v-if="isLoggedIn && isMainUserIdentity"
                 class="dropdown-item"
                 href="/problem/new/"
                 data-nav-problems-create

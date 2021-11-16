@@ -312,6 +312,7 @@ const translations: { [key: string]: string; } = {
   contestVirtualMode: "(Vir7ua1)",
   contestWillBeginIn: "(Thi5 c0n7357 wi11 b3gin in )",
   contestsCreate: "(Cr3a73 C0n7357)",
+  contestsCreateNew: "(Cr3a73 a n3w c0n7357)",
   contestsJoinScoreboards: "(M3rg3 Sc0r3b0ard5)",
   courseActionScoreboard: "(Sc0r3b0ard)",
   courseAddContent: "(Add c0n73n7)",
