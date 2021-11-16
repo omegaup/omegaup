@@ -1,5 +1,6 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
+import T from '../../lang';
 import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
 
@@ -117,5 +118,41 @@ describe('ContestListv2.vue', () => {
 
     expect(pastContestTab.exists()).toBe(true);
     expect(pastContestTab.text()).toContain('Past Contest 1');
+  });
+
+  it('Should reorder contest list', async () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+      },
+    });
+
+    const dropdownOrderBy = wrapper.findComponent({
+      ref: 'dropdownOrderBy'
+    }).element as HTMLInputElement;
+
+    dropdownOrderBy.value = T.contestOrderByName;
+    await dropdownOrderBy.dispatchEvent(new Event('change'));
+    expect(dropdownOrderBy.value).toBe(T.contestOrderByName);
+
+    dropdownOrderBy.value = T.contestOrderByEnds;
+    await dropdownOrderBy.dispatchEvent(new Event('change'));
+    expect(dropdownOrderBy.value).toBe(T.contestOrderByEnds);
+
+    dropdownOrderBy.value = T.contestOrderByDuration;
+    await dropdownOrderBy.dispatchEvent(new Event('change'));
+    expect(dropdownOrderBy.value).toBe(T.contestOrderByDuration);
+
+    dropdownOrderBy.value = T.contestOrderByOrganizer;
+    await dropdownOrderBy.dispatchEvent(new Event('change'));
+    expect(dropdownOrderBy.value).toBe(T.contestOrderByOrganizer);
+
+    dropdownOrderBy.value = T.contestOrderByContestants;
+    await dropdownOrderBy.dispatchEvent(new Event('change'));
+    expect(dropdownOrderBy.value).toBe(T.contestOrderByContestants);
+    
+    dropdownOrderBy.value = T.contestOrderBySignedUp;
+    await dropdownOrderBy.dispatchEvent(new Event('change'));
+    expect(dropdownOrderBy.value).toBe(T.contestOrderBySignedUp);
   });
 });
