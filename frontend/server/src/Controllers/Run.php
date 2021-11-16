@@ -1599,34 +1599,23 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Authenticate request
         $r->ensureIdentity();
 
-        // Defaults for offset and rowcount
-        $offset = $r->ensureOptionalInt('offset') ?? 0;
-        $rowCount = $r->ensureOptionalInt('rowcount') ?? 100;
-
-        $status = $r->ensureOptionalEnum('status', self::STATUS);
-        $verdict = $r->ensureOptionalEnum('verdict', self::VERDICTS);
-
-        $language = $r->ensureOptionalEnum(
-            'language',
-            array_keys(self::SUPPORTED_LANGUAGES)
-        );
-
         [
             'problem' => $problem,
             'identity' => $identity,
         ] = self::validateList($r);
 
+        $languagesKeys = array_keys(self::SUPPORTED_LANGUAGES);
         [
             'runs' => $runs,
         ] = \OmegaUp\DAO\Runs::getAllRuns(
             null,
-            $status,
-            $verdict,
+            $r->ensureOptionalEnum('status', self::STATUS),
+            $r->ensureOptionalEnum('verdict', self::VERDICTS),
             !is_null($problem) ? $problem->problem_id : null,
-            $language,
+            $r->ensureOptionalEnum('language', $languagesKeys),
             !is_null($identity) ? $identity->identity_id : null,
-            intval($offset),
-            intval($rowCount)
+            $r->ensureOptionalInt('offset') ?? 0,
+            $r->ensureOptionalInt('rowcount') ?? 100
         );
 
         $result = [];

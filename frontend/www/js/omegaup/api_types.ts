@@ -2471,7 +2471,11 @@ export namespace types {
   }
 
   export interface ContestDetailsPayload {
-    adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
+    adminPayload?: {
+      allRuns: types.Run[];
+      totalRuns: number;
+      users: types.ContestUser[];
+    };
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
     original?: {
@@ -4413,7 +4417,7 @@ export namespace messages {
   export type ContestRoleResponse = { admin: boolean };
   export type ContestRunsRequest = { [key: string]: any };
   export type _ContestRunsServerResponse = any;
-  export type ContestRunsResponse = { runs: types.Run[] };
+  export type ContestRunsResponse = { runs: types.Run[]; totalRuns: number };
   export type ContestRunsDiffRequest = { [key: string]: any };
   export type ContestRunsDiffResponse = {
     diff: {
