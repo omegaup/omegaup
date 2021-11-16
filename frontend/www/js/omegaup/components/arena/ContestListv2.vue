@@ -37,8 +37,7 @@
                 </form>
               </b-col>
               <b-col cols="6">
-                <b-dropdown no-caret
-                  ref="dropdownOrderBy">
+                <b-dropdown ref="dropdownOrderBy" no-caret>
                   <template #button-content>
                     <div>
                       <font-awesome-icon icon="sort-amount-down" />

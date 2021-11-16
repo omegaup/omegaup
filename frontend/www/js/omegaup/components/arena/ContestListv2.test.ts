@@ -128,7 +128,7 @@ describe('ContestListv2.vue', () => {
     });
 
     const dropdownOrderBy = wrapper.findComponent({
-      ref: 'dropdownOrderBy'
+      ref: 'dropdownOrderBy',
     }).element as HTMLInputElement;
 
     dropdownOrderBy.value = T.contestOrderByName;
@@ -150,7 +150,7 @@ describe('ContestListv2.vue', () => {
     dropdownOrderBy.value = T.contestOrderByContestants;
     await dropdownOrderBy.dispatchEvent(new Event('change'));
     expect(dropdownOrderBy.value).toBe(T.contestOrderByContestants);
-    
+
     dropdownOrderBy.value = T.contestOrderBySignedUp;
     await dropdownOrderBy.dispatchEvent(new Event('change'));
     expect(dropdownOrderBy.value).toBe(T.contestOrderBySignedUp);
