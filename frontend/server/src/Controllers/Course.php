@@ -3357,7 +3357,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{progress: list<StudentProgressInCourse>, nextPage: int}
+     * @return array{progress: list<StudentProgressInCourse>, nextPage: null|int}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page

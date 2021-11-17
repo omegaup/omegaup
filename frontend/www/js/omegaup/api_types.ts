@@ -4596,7 +4596,7 @@ export namespace messages {
   };
   export type CourseStudentsProgressRequest = { [key: string]: any };
   export type CourseStudentsProgressResponse = {
-    nextPage: number;
+    nextPage?: number;
     progress: types.StudentProgressInCourse[];
   };
   export type CourseUpdateRequest = { [key: string]: any };
