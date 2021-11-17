@@ -81,7 +81,7 @@ export const myRunsStore = new Vuex.Store<RunsState>({
     totalRuns: 0,
   },
   mutations: {
-    addRun(state: RunsState, run: types.Run) {
+    addRun(state, run: types.Run) {
       if (Object.prototype.hasOwnProperty.call(state.index, run.guid)) {
         Vue.set(
           state.runs,

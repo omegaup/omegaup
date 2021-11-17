@@ -91,6 +91,7 @@ describe('Runs.vue', () => {
     {
       ...baseRunData,
       guid: '121000',
+      username: 'other_username',
       time: new Date('1/1/2020, 12:10:00 AM'),
     },
     {
@@ -101,6 +102,7 @@ describe('Runs.vue', () => {
     {
       ...baseRunData,
       guid: '120000',
+      username: 'other_username',
       time: new Date('1/1/2020, 12:00:00 AM'),
     },
     {
@@ -185,5 +187,37 @@ describe('Runs.vue', () => {
       wrapper.find('button[data-button-page-next]').attributes('disabled'),
     ).toBeFalsy();
     expect(wrapper.find('.pager-controls').text()).toContain('2');
+  });
+
+  it('Should handle username filter', async () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'contest',
+        runs,
+        showPager: true,
+        showUser: true,
+      },
+    });
+
+    await wrapper.setData({ filterUsername: 'other_username' });
+    expect(wrapper.emitted('filter-changed')).toEqual([
+      [{ filter: 'username', value: 'other_username' }],
+    ]);
+  });
+
+  it('Should handle problem filter', async () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        contestAlias: 'contest',
+        runs,
+        showPager: true,
+        showProblem: true,
+      },
+    });
+
+    await wrapper.setData({ filterProblem: 'other_problem' });
+    expect(wrapper.emitted('filter-changed')).toEqual([
+      [{ filter: 'problem', value: 'other_problem' }],
+    ]);
   });
 });
