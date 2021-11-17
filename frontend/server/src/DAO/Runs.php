@@ -249,6 +249,13 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $val
         );
 
+        if (is_null($offset)) {
+            $offset = 0;
+        }
+        if (is_null($rowCount)) {
+            $rowCount = 100;
+        }
+
         $sql .= 'LIMIT ?, ?;';
         $val[] = $offset * $rowCount;
         $val[] = $rowCount;
