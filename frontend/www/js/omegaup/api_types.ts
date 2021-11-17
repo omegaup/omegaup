@@ -2472,7 +2472,11 @@ export namespace types {
   }
 
   export interface ContestDetailsPayload {
-    adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
+    adminPayload?: {
+      allRuns: types.Run[];
+      totalRuns: number;
+      users: types.ContestUser[];
+    };
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
     original?: {

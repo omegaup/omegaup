@@ -18,20 +18,30 @@
             T.wordsSubmissions
           }}
           <div v-if="showPager">
-            <button :disabled="filterOffset <= 0" @click="filterOffset--">
-              &lt;
-            </button>
-            {{ filterOffset + 1 }}
-            <button
-              :disabled="runs && runs.length < rowCount"
-              @click="filterOffset++"
-            >
-              &gt;
-            </button>
-
+            <div class="pager-controls">
+              <button
+                data-button-page-previous
+                :disabled="filterOffset <= 0"
+                @click="filterOffset--"
+              >
+                &lt;
+              </button>
+              {{ filterOffset + 1 }}
+              <button
+                data-button-page-next
+                :disabled="runs && runs.length < rowCount"
+                @click="filterOffset++"
+              >
+                &gt;
+              </button>
+            </div>
             <label
               >{{ T.wordsVerdict }}:
-              <select v-model="filterVerdict" class="form-control">
+              <select
+                v-model="filterVerdict"
+                data-select-verdict
+                class="form-control"
+              >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="AC">AC</option>
                 <option value="PA">PA</option>
@@ -50,7 +60,11 @@
 
             <label
               >{{ T.wordsStatus }}:
-              <select v-model="filterStatus" class="form-control">
+              <select
+                v-model="filterStatus"
+                data-select-status
+                class="form-control"
+              >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="new">new</option>
                 <option value="waiting">waiting</option>
@@ -62,7 +76,11 @@
 
             <label
               >{{ T.wordsLanguage }}:
-              <select v-model="filterLanguage" class="form-control">
+              <select
+                v-model="filterLanguage"
+                data-select-language
+                class="form-control"
+              >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="cpp17-gcc">C++17 (g++ 9.3)</option>
                 <option value="cpp17-clang">C++17 (clang++ 10.0)</option>
