@@ -1119,22 +1119,23 @@ Returns all runs for a contest
 
 ### Parameters
 
-| Name            | Type           | Description |
-| --------------- | -------------- | ----------- |
-| `contest_alias` | `string`       |             |
-| `problem_alias` | `string`       |             |
-| `language`      | `mixed`        |             |
-| `offset`        | `int\|null`    |             |
-| `rowcount`      | `int\|null`    |             |
-| `status`        | `mixed`        |             |
-| `username`      | `null\|string` |             |
-| `verdict`       | `mixed`        |             |
+| Name            | Type                                                                                                                                                            | Description |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `contest_alias` | `string`                                                                                                                                                        |             |
+| `problem_alias` | `string`                                                                                                                                                        |             |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cs'\|'hs'\|'java'\|'kj'\|'kp'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|null` |             |
+| `offset`        | `int\|null`                                                                                                                                                     |             |
+| `rowcount`      | `int\|null`                                                                                                                                                     |             |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                       |             |
+| `username`      | `null\|string`                                                                                                                                                  |             |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                          |             |
 
 ### Returns
 
-| Name   | Type          |
-| ------ | ------------- |
-| `runs` | `types.Run[]` |
+| Name        | Type          |
+| ----------- | ------------- |
+| `runs`      | `types.Run[]` |
+| `totalRuns` | `number`      |
 
 ## `/api/contest/runsDiff/`
 
@@ -1908,9 +1909,11 @@ Get clarifications of problem in a contest
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
+| Name                     | Type         | Description |
+| ------------------------ | ------------ | ----------- |
+| `course_alias`           | `string`     |             |
+| `accept_teacher`         | `bool\|null` |             |
+| `share_user_information` | `bool\|null` |             |
 
 ### Returns
 
@@ -2034,9 +2037,9 @@ Returns all runs for a course
 | `assignment_alias` | `string`                                                                                                                                                        |             |
 | `course_alias`     | `string`                                                                                                                                                        |             |
 | `language`         | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cs'\|'hs'\|'java'\|'kj'\|'kp'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|null` |             |
-| `offset`           | `mixed`                                                                                                                                                         |             |
+| `offset`           | `int\|null`                                                                                                                                                     |             |
 | `problem_alias`    | `null\|string`                                                                                                                                                  |             |
-| `rowcount`         | `mixed`                                                                                                                                                         |             |
+| `rowcount`         | `int\|null`                                                                                                                                                     |             |
 | `status`           | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                       |             |
 | `username`         | `null\|string`                                                                                                                                                  |             |
 | `verdict`          | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                          |             |
@@ -3650,15 +3653,15 @@ Gets a list of latest runs overall
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `offset`        | `int`    |             |
-| `problem_alias` | `string` |             |
-| `rowcount`      | `int`    |             |
-| `username`      | `string` |             |
-| `language`      | `mixed`  |             |
-| `status`        | `mixed`  |             |
-| `verdict`       | `mixed`  |             |
+| Name            | Type                                                                                                                                                            | Description |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `offset`        | `int`                                                                                                                                                           |             |
+| `problem_alias` | `string`                                                                                                                                                        |             |
+| `rowcount`      | `int`                                                                                                                                                           |             |
+| `username`      | `string`                                                                                                                                                        |             |
+| `language`      | `'c11-clang'\|'c11-gcc'\|'cat'\|'cpp11-clang'\|'cpp11-gcc'\|'cpp17-clang'\|'cpp17-gcc'\|'cs'\|'hs'\|'java'\|'kj'\|'kp'\|'lua'\|'pas'\|'py2'\|'py3'\|'rb'\|null` |             |
+| `status`        | `'compiling'\|'new'\|'ready'\|'running'\|'waiting'\|null`                                                                                                       |             |
+| `verdict`       | `'AC'\|'CE'\|'JE'\|'MLE'\|'NO-AC'\|'OLE'\|'PA'\|'RFE'\|'RTE'\|'TLE'\|'VE'\|'WA'\|null`                                                                          |             |
 
 ### Returns
 
