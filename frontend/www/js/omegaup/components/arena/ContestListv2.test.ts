@@ -4,7 +4,11 @@ import T from '../../lang';
 import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
 
-import arena_ContestList from './ContestListv2.vue';
+import arena_ContestList, {
+  ContestOrder,
+  ContestTab,
+} from './ContestListv2.vue';
+import each from 'jest-each';
 
 describe('ContestListv2.vue', () => {
   const daySeconds = 24 * 60 * 60 * 1000;
@@ -120,7 +124,7 @@ describe('ContestListv2.vue', () => {
     expect(pastContestTab.text()).toContain('Past Contest 1');
   });
 
-  it('Should reorder contest list', async () => {
+  it('Should show dropdown', async () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {
         contests,
@@ -131,9 +135,9 @@ describe('ContestListv2.vue', () => {
       ref: 'dropdownOrderBy',
     }).element as HTMLInputElement;
 
-    dropdownOrderBy.value = T.contestOrderByName;
+    dropdownOrderBy.value = T.contestOrderByTitle;
     await dropdownOrderBy.dispatchEvent(new Event('change'));
-    expect(dropdownOrderBy.value).toBe(T.contestOrderByName);
+    expect(dropdownOrderBy.value).toBe(T.contestOrderByTitle);
 
     dropdownOrderBy.value = T.contestOrderByEnds;
     await dropdownOrderBy.dispatchEvent(new Event('change'));
@@ -155,4 +159,63 @@ describe('ContestListv2.vue', () => {
     await dropdownOrderBy.dispatchEvent(new Event('change'));
     expect(dropdownOrderBy.value).toBe(T.contestOrderBySignedUp);
   });
+
+  const orderMapping = [
+    [{ field: ContestOrder.Title, name: 'title' }],
+    [{ field: ContestOrder.Ends, name: 'ends' }],
+    [{ field: ContestOrder.Duration, name: 'duration' }],
+    [{ field: ContestOrder.Organizer, name: 'organizer' }],
+    [{ field: ContestOrder.Contestants, name: 'contestants' }],
+    [{ field: ContestOrder.SignedUp, name: 'signed-up' }],
+  ];
+
+  each(orderMapping).it(
+    'Should order correct current contest list when "%s" field is selected',
+    async ({ field, name }) => {
+      const wrapper = mount(arena_ContestList, {
+        propsData: {
+          contests,
+          tab: ContestTab.Current,
+        },
+      });
+
+      await wrapper.find('.b-dropdown').trigger('click');
+      await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
+
+      expect(wrapper.vm.currentOrder).toBe(field);
+    },
+  );
+
+  each(orderMapping).it(
+    'Should order correct past contest list when "%s" field is selected',
+    async ({ field, name }) => {
+      const wrapper = mount(arena_ContestList, {
+        propsData: {
+          contests,
+          tab: ContestTab.Past,
+        },
+      });
+
+      await wrapper.find('.b-dropdown').trigger('click');
+      await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
+      expect(wrapper.vm.currentOrder).toBe(field);
+    },
+  );
+
+  each(orderMapping).it(
+    'Should order correct future contest list when "%s" field is selected',
+    async ({ field, name }) => {
+      const wrapper = mount(arena_ContestList, {
+        propsData: {
+          contests,
+          tab: ContestTab.Future,
+        },
+      });
+
+      await wrapper.find('.b-dropdown').trigger('click');
+      await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
+
+      expect(wrapper.vm.currentOrder).toBe(field);
+    },
+  );
 });
