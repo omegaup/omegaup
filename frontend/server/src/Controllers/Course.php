@@ -4347,6 +4347,8 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param string $course_alias
+     * @omegaup-request-param bool|null $accept_teacher
+     * @omegaup-request-param bool|null $share_user_information
      */
     public static function apiRegisterForCourse(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -4355,6 +4357,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         $courseAlias = $r->ensureString(
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $acceptTeacher = $r->ensureOptionalBool('accept_teacher');
+        $shareUserInformation = $r->ensureOptionalBool(
+            'share_user_information'
         );
 
         $course = self::validateCourseExists($courseAlias);
@@ -4370,6 +4376,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'identity_id' => $r->identity->identity_id,
                 'course_id' => $course->course_id,
                 'request_time' => \OmegaUp\Time::get(),
+                'accept_teacher' => $acceptTeacher,
+                'share_user_information' => $shareUserInformation,
             ])
         );
 

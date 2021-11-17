@@ -1909,9 +1909,11 @@ Get clarifications of problem in a contest
 
 ### Parameters
 
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
+| Name                     | Type         | Description |
+| ------------------------ | ------------ | ----------- |
+| `course_alias`           | `string`     |             |
+| `accept_teacher`         | `bool\|null` |             |
+| `share_user_information` | `bool\|null` |             |
 
 ### Returns
 
