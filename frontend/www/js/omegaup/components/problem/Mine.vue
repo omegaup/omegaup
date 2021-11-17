@@ -20,17 +20,17 @@
       <div class="card-body">
         <div class="row align-items-center mb-3">
           <div class="col-md-8 col-lg-6">
-            <omegaup-autocomplete
-              v-model="keyword"
-              class="form-control"
-              :init="(el) => typeahead.problemTypeahead(el)"
+            <input
+              v-model="currentQuery"
+              class="typeahead form-control"
               :placeholder="T.wordsKeywordSearch"
-            ></omegaup-autocomplete>
+            />
           </div>
           <a
             class="btn btn-primary"
             role="button"
-            :href="keyword ? `/problem/mine/?query=${keyword}` : ''"
+            :class="{ disabled: currentQuery === '' }"
+            :href="currentQuery ? `/problem/mine/?query=${currentQuery}` : ''"
             >{{ T.wordsSearch }}</a
           >
         </div>
@@ -50,16 +50,23 @@
               </label>
             </div>
           </div>
-          <div class="col">
-            <select
-              v-model="allProblemsVisibilityOption"
-              class="custom-select"
-              @change="onChangeVisibility"
-            >
+        </div>
+        <div class="row mt-3">
+          <div class="col-6">
+            <select v-model="allProblemsVisibilityOption" class="custom-select">
               <option selected value="-1">{{ T.forSelectedItems }}</option>
               <option value="1">{{ T.makePublic }}</option>
               <option value="0">{{ T.makePrivate }}</option>
             </select>
+          </div>
+          <div class="col px-0">
+            <button
+              :disabled="allProblemsVisibilityOption === -1"
+              class="btn btn-primary"
+              @click="onChangeVisibility"
+            >
+              {{ T.wordsConfirm }}
+            </button>
           </div>
         </div>
       </div>
@@ -182,7 +189,6 @@ import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import { types } from '../../api_types';
 import common_Paginator from '../common/Paginator.vue';
-import Autocomplete from '../Autocomplete.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -207,7 +213,6 @@ library.add(
   components: {
     FontAwesomeIcon,
     'omegaup-common-paginator': common_Paginator,
-    'omegaup-autocomplete': Autocomplete,
   },
 })
 export default class ProblemMine extends Vue {
@@ -216,10 +221,10 @@ export default class ProblemMine extends Vue {
   @Prop() privateProblemsAlert!: boolean;
   @Prop() isSysadmin!: boolean;
   @Prop() visibilityStatuses!: Array<string>;
-  @Prop() initialKeyword!: string | null;
+  @Prop() query!: string | null;
 
   T = T;
-  keyword = this.initialKeyword ?? '';
+  currentQuery = this.query ?? '';
   typeahead = typeahead;
   shouldShowAllProblems = false;
   selectedProblems: types.ProblemListItem[] = [];
