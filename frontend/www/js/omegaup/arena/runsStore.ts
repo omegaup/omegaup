@@ -10,6 +10,7 @@ export interface RunFilters {
   verdict?: string;
   language?: string;
   username?: string;
+  problem?: string;
   status?: string;
 }
 
@@ -21,6 +22,8 @@ export interface RunsState {
   index: Record<string, number>;
 
   filters?: RunFilters;
+
+  totalRuns: number;
 }
 
 export const runsStoreConfig = {
@@ -28,6 +31,7 @@ export const runsStoreConfig = {
     runs: [],
     index: {},
     filters: {},
+    totalRuns: 0,
   },
   mutations: {
     addRun(state: RunsState, run: types.Run) {
@@ -42,6 +46,9 @@ export const runsStoreConfig = {
       Vue.set(state.index, run.guid, state.runs.length);
       state.runs.push(run);
     },
+    setTotalRuns(state: RunsState, totalRuns: number) {
+      Vue.set(state, 'totalRuns', totalRuns);
+    },
     clear(state: RunsState) {
       state.runs.splice(0);
       state.index = {};
@@ -51,7 +58,13 @@ export const runsStoreConfig = {
     },
     removeFilter(
       state: RunsState,
-      filter: 'verdict' | 'language' | 'username' | 'status',
+      filter:
+        | 'verdict'
+        | 'language'
+        | 'username'
+        | 'status'
+        | 'offset'
+        | 'problem',
     ) {
       if (!state.filters) {
         return;
@@ -65,9 +78,10 @@ export const myRunsStore = new Vuex.Store<RunsState>({
   state: {
     runs: [],
     index: {},
+    totalRuns: 0,
   },
   mutations: {
-    addRun(state, run: types.Run) {
+    addRun(state: RunsState, run: types.Run) {
       if (Object.prototype.hasOwnProperty.call(state.index, run.guid)) {
         Vue.set(
           state.runs,
