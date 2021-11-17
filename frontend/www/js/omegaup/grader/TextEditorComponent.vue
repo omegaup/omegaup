@@ -63,10 +63,10 @@ export default {
 
 <style>
 textarea {
-  background: #222;
+  /* background: #222; */
   border: 0px;
   font-family: 'Droid Sans Mono', 'Courier New', monospace,
     'Droid Sans Fallback';
-  color: #d4d4d4;
+  /* color: #d4d4d4; */
 }
 </style>

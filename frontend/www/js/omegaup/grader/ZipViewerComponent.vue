@@ -1,5 +1,5 @@
 <template>
-  <div class="root d-flex flex-row h-100 bg-dark text-white">
+  <div class="root d-flex flex-row h-100">
     <div class="filenames">
       <div class="list-group">
         <button
@@ -11,6 +11,7 @@
         </button>
         <button
           v-for="(item, name) in zip.files"
+          :key="name"
           v-else
           class="list-group-item list-group-item-action"
           type="button"
