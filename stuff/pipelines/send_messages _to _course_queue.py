@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-'''Send messages to Contest queue in rabbitmq'''
+'''Send messages to course queue in rabbitmq'''
 
 import argparse
 import logging
@@ -26,10 +26,10 @@ def send_messages_contest_queue(cur: MySQLdb.cursors.BaseCursor,
                                 rabbit_password: str,
                                 low_date: str,
                                 upper_date: Optional[str] = None) -> None:
-    '''Send messages to contest queue
-    low_date: initial time from which to be taken the finishes contest
+    '''Send messages to course queue
+    low_date: initial time from which to be taken the finishes courses
     upper_date: Optional finish time from which to be taken
-      the finishes contest. By default, the current date will be taken
+      the finishes courses. By default, the current date will be taken
     '''
     if upper_date is None:
         upper_date = str(datetime.date.today())
@@ -38,25 +38,28 @@ def send_messages_contest_queue(cur: MySQLdb.cursors.BaseCursor,
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
     channel.exchange_declare(exchange='logs_exchange', exchange_type='direct')
-    logging.info('Send messages to Contest_Queue')
+    logging.info('Send messages to Course_Queue')
     cur.execute(
         '''
         SELECT
-            contest_id
+            Courses.course_id, Groups_Identities.identity_id
         FROM
-            Contests
+            Courses
+        INNER JOIN
+            Groups_Identities ON Courses.group_id=Groups_Identities.group_id
         WHERE
-            finish_time BETWEEN %s AND %s;
+            Courses.finish_time BETWEEN %s AND %s;
         ''', (low_date, upper_date)
     )
     try:
         for row in cur:
-            data = {"contest_id": str(row['contest_id'])}
+            data = {"course_id": row['course_id'],
+                    "identity_id": row['identity_id']}
             message = json.dumps(data)
             body = message.encode()
             channel.basic_publish(
                 exchange='logs_exchange',
-                routing_key='ContestQueue',
+                routing_key='CourseQueue',
                 body=body)
     finally:
         connection.close()
