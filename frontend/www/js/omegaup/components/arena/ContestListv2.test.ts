@@ -236,41 +236,33 @@ describe('ContestListv2.vue', () => {
     expect(pastContestTab.text()).toContain('Past Contest 1');
   });
 
-  it('Should show dropdown', async () => {
-    const wrapper = mount(arena_ContestList, {
-      propsData: {
-        contests,
-      },
-    });
+  const dropdownMapping = [
+    [{ value: T.contestOrderByTitle }],
+    [{ value: T.contestOrderByEnds }],
+    [{ value: T.contestOrderByDuration }],
+    [{ value: T.contestOrderByOrganizer }],
+    [{ value: T.contestOrderByContestants }],
+    [{ value: T.contestOrderBySignedUp }],
+  ];
 
-    const dropdownOrderBy = wrapper.findComponent({
-      ref: 'dropdownOrderBy',
-    }).element as HTMLInputElement;
+  each(dropdownMapping).it(
+    'Should show dropdown when "%s" field is selected',
+    async (value) => {
+      const wrapper = mount(arena_ContestList, {
+        propsData: {
+          contests,
+        },
+      });
 
-    dropdownOrderBy.value = T.contestOrderByTitle;
-    await dropdownOrderBy.dispatchEvent(new Event('change'));
-    expect(dropdownOrderBy.value).toBe(T.contestOrderByTitle);
+      const dropdownOrderBy = wrapper.findComponent({
+        ref: 'dropdownOrderBy',
+      }).element as HTMLInputElement;
 
-    dropdownOrderBy.value = T.contestOrderByEnds;
-    await dropdownOrderBy.dispatchEvent(new Event('change'));
-    expect(dropdownOrderBy.value).toBe(T.contestOrderByEnds);
-
-    dropdownOrderBy.value = T.contestOrderByDuration;
-    await dropdownOrderBy.dispatchEvent(new Event('change'));
-    expect(dropdownOrderBy.value).toBe(T.contestOrderByDuration);
-
-    dropdownOrderBy.value = T.contestOrderByOrganizer;
-    await dropdownOrderBy.dispatchEvent(new Event('change'));
-    expect(dropdownOrderBy.value).toBe(T.contestOrderByOrganizer);
-
-    dropdownOrderBy.value = T.contestOrderByContestants;
-    await dropdownOrderBy.dispatchEvent(new Event('change'));
-    expect(dropdownOrderBy.value).toBe(T.contestOrderByContestants);
-
-    dropdownOrderBy.value = T.contestOrderBySignedUp;
-    await dropdownOrderBy.dispatchEvent(new Event('change'));
-    expect(dropdownOrderBy.value).toBe(T.contestOrderBySignedUp);
-  });
+      dropdownOrderBy.value = value;
+      await dropdownOrderBy.dispatchEvent(new Event('change'));
+      expect(dropdownOrderBy.value).toBe(value);
+    },
+  );
 
   const orderMapping = [
     [
