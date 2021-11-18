@@ -410,6 +410,42 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
+     * Returns the list of contests created by a certain identity
+     *
+     * @return list<Contest>
+     */
+    final public static function getContestsCreatedByIdentity(
+        int $identityId
+    ) {
+        $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
+        $sql = "
+            SELECT DISTINCT
+                $columns,
+                p.scoreboard_url,
+                p.scoreboard_url_admin
+            FROM
+                Contests
+            INNER JOIN
+                ACLs a ON a.acl_id = Contests.acl_id
+            INNER JOIN
+                Users u ON u.user_id = a.owner_id
+            INNER JOIN
+                Problemsets p ON p.problemset_id = Contests.problemset_id
+            WHERE
+                u.main_identity_id = ?
+                AND archived = false
+            ORDER BY
+                Contests.contest_id DESC;";
+
+        $params = [
+            $identityId,
+        ];
+
+        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, partial_score: bool, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+    }
+
+    /**
      * Returns all contests where a user is participating in.
      *
      * @return list<Contestv2>

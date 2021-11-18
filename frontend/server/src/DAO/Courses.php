@@ -1150,6 +1150,42 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return $courses;
     }
 
+    /**
+     * Returns the list of courses created by a certain identity
+     * @return list<\OmegaUp\DAO\VO\Courses>
+     */
+    final public static function getCoursesCreatedByIdentity(
+        int $identityId
+    ): array {
+        $sql = '
+            SELECT DISTINCT
+                c.*
+            FROM
+                Courses c
+            INNER JOIN
+                ACLs a ON a.acl_id = c.acl_id
+            INNER JOIN
+                Users u ON u.user_id = a.owner_id
+            WHERE
+                u.main_identity_id = ?
+                AND archived = false
+            ORDER BY
+                c.course_id DESC;';
+
+        $params = [
+            $identityId,
+        ];
+
+        /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+
+        $courses = [];
+        foreach ($rs as $row) {
+            $courses[] = new \OmegaUp\DAO\VO\Courses($row);
+        }
+        return $courses;
+    }
+
     final public static function getByAlias(
         string $alias
     ): ?\OmegaUp\DAO\VO\Courses {
