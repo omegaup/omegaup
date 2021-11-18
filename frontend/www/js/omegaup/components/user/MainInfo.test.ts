@@ -29,6 +29,8 @@ const propsData = {
     badges: [],
     contests: {},
     createdProblems: [],
+    createdContests: [],
+    createdCourses: [],
     ownedBadges: [],
     solvedProblems: [
       {
