@@ -20,7 +20,7 @@ describe('ContestListv2.vue', () => {
     current: [
       {
         admission_mode: 'public',
-        alias: 'Current-Contest-1',
+        alias: 'Contest-1',
         description: 'hello contest 1',
         contest_id: 1,
         contestants: 12,
@@ -36,11 +36,51 @@ describe('ContestListv2.vue', () => {
         title: 'Current Contest 1',
         window_length: 300,
       },
+      {
+        admission_mode: 'public',
+        alias: 'Contest-3',
+        description: 'hello contest 3',
+        contest_id: 3,
+        contestants: 15,
+        finish_time: new Date(
+          tomorrow.setDate(tomorrow.getDate() + daySeconds * 2),
+        ),
+        last_updated: yesterday,
+        organizer: 'alfadown',
+        original_finish_time: tomorrow,
+        partial_score: false,
+        participating: false,
+        problemset_id: 1,
+        recommended: false,
+        start_time: yesterday,
+        title: 'Current Contest 3',
+        window_length: 300,
+      },
+      {
+        admission_mode: 'public',
+        alias: 'Contest-2',
+        description: 'hello contest 2',
+        contest_id: 2,
+        contestants: 5,
+        finish_time: new Date(
+          tomorrow.setDate(tomorrow.getDate() + daySeconds),
+        ),
+        last_updated: yesterday,
+        organizer: 'lamdaleft',
+        original_finish_time: tomorrow,
+        partial_score: false,
+        participating: true,
+        problemset_id: 1,
+        recommended: false,
+        start_time: yesterday,
+        title: 'Current Contest 2',
+        window_length: 300,
+      },
     ],
     future: [
       {
         admission_mode: 'public',
-        alias: 'Future-Contest-1',
+        alias: 'Contest-1',
         description: 'hello contest 1',
         contest_id: 1,
         contestants: 12,
@@ -56,11 +96,47 @@ describe('ContestListv2.vue', () => {
         title: 'Future Contest 1',
         window_length: 300,
       },
+      {
+        admission_mode: 'public',
+        alias: 'Contest-3',
+        description: 'hello contest 3',
+        contest_id: 3,
+        contestants: 15,
+        finish_time: new Date(tomorrow.getTime() + daySeconds * 3),
+        last_updated: today,
+        organizer: 'alfadown',
+        original_finish_time: new Date(tomorrow.getTime() + daySeconds),
+        partial_score: false,
+        participating: false,
+        problemset_id: 1,
+        recommended: false,
+        start_time: tomorrow,
+        title: 'Future Contest 3',
+        window_length: 300,
+      },
+      {
+        admission_mode: 'public',
+        alias: 'Contest-2',
+        description: 'hello contest 2',
+        contest_id: 2,
+        contestants: 5,
+        finish_time: new Date(tomorrow.getTime() + daySeconds * 2),
+        last_updated: today,
+        organizer: 'lamdaleft',
+        original_finish_time: new Date(tomorrow.getTime() + daySeconds),
+        partial_score: false,
+        participating: true,
+        problemset_id: 1,
+        recommended: false,
+        start_time: tomorrow,
+        title: 'Future Contest 2',
+        window_length: 300,
+      },
     ],
     past: [
       {
         admission_mode: 'public',
-        alias: 'Past-Contest-1',
+        alias: 'Contest-1',
         description: 'hello contest 1',
         contest_id: 1,
         contestants: 12,
@@ -74,6 +150,42 @@ describe('ContestListv2.vue', () => {
         recommended: false,
         start_time: new Date(yesterday.getTime() - daySeconds),
         title: 'Past Contest 1',
+        window_length: 300,
+      },
+      {
+        admission_mode: 'public',
+        alias: 'Contest-3',
+        description: 'hello contest 3',
+        contest_id: 3,
+        contestants: 15,
+        finish_time: today,
+        last_updated: new Date(yesterday.getTime() - daySeconds),
+        organizer: 'alfadown',
+        original_finish_time: yesterday,
+        partial_score: false,
+        participating: false,
+        problemset_id: 1,
+        recommended: false,
+        start_time: new Date(yesterday.getTime() - daySeconds),
+        title: 'Past Contest 3',
+        window_length: 300,
+      },
+      {
+        admission_mode: 'public',
+        alias: 'Contest-2',
+        description: 'hello contest 2',
+        contest_id: 2,
+        contestants: 5,
+        finish_time: tomorrow,
+        last_updated: new Date(yesterday.getTime() - daySeconds),
+        organizer: 'lambdaleft',
+        original_finish_time: yesterday,
+        partial_score: false,
+        participating: true,
+        problemset_id: 1,
+        recommended: false,
+        start_time: new Date(yesterday.getTime() - daySeconds),
+        title: 'Past Contest 2',
         window_length: 300,
       },
     ],
@@ -161,17 +273,53 @@ describe('ContestListv2.vue', () => {
   });
 
   const orderMapping = [
-    [{ field: ContestOrder.Title, name: 'title' }],
-    [{ field: ContestOrder.Ends, name: 'ends' }],
-    [{ field: ContestOrder.Duration, name: 'duration' }],
-    [{ field: ContestOrder.Organizer, name: 'organizer' }],
-    [{ field: ContestOrder.Contestants, name: 'contestants' }],
-    [{ field: ContestOrder.SignedUp, name: 'signed-up' }],
+    [
+      {
+        field: ContestOrder.Title,
+        name: 'title',
+        expectedOrder: ['Contest-1', 'Contest-2', 'Contest-3'],
+      },
+    ],
+    [
+      {
+        field: ContestOrder.Ends,
+        name: 'ends',
+        expectedOrder: ['Contest-1', 'Contest-2', 'Contest-3'],
+      },
+    ],
+    [
+      {
+        field: ContestOrder.Duration,
+        name: 'duration',
+        expectedOrder: ['Contest-1', 'Contest-2', 'Contest-3'],
+      },
+    ],
+    [
+      {
+        field: ContestOrder.Organizer,
+        name: 'organizer',
+        expectedOrder: ['Contest-3', 'Contest-2', 'Contest-1'],
+      },
+    ],
+    [
+      {
+        field: ContestOrder.Contestants,
+        name: 'contestants',
+        expectedOrder: ['Contest-3', 'Contest-1', 'Contest-2'],
+      },
+    ],
+    [
+      {
+        field: ContestOrder.SignedUp,
+        name: 'signed-up',
+        expectedOrder: ['Contest-1', 'Contest-2', 'Contest-3'],
+      },
+    ],
   ];
 
   each(orderMapping).it(
-    'Should order correct current contest list when "%s" field is selected',
-    async ({ field, name }) => {
+    'Should order correctly current contest list when "%s" field is selected',
+    async ({ field, name, expectedOrder }) => {
       const wrapper = mount(arena_ContestList, {
         propsData: {
           contests,
@@ -183,12 +331,15 @@ describe('ContestListv2.vue', () => {
       await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
 
       expect(wrapper.vm.currentOrder).toBe(field);
+      expect(contests.current.map((contest) => contest.alias)).toEqual(
+        expectedOrder,
+      );
     },
   );
 
   each(orderMapping).it(
     'Should order correct past contest list when "%s" field is selected',
-    async ({ field, name }) => {
+    async ({ field, name, expectedOrder }) => {
       const wrapper = mount(arena_ContestList, {
         propsData: {
           contests,
@@ -199,12 +350,15 @@ describe('ContestListv2.vue', () => {
       await wrapper.find('.b-dropdown').trigger('click');
       await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
       expect(wrapper.vm.currentOrder).toBe(field);
+      expect(contests.past.map((contest) => contest.alias)).toEqual(
+        expectedOrder,
+      );
     },
   );
 
   each(orderMapping).it(
-    'Should order correct future contest list when "%s" field is selected',
-    async ({ field, name }) => {
+    'Should order correctly future contest list when "%s" field is selected',
+    async ({ field, name, expectedOrder }) => {
       const wrapper = mount(arena_ContestList, {
         propsData: {
           contests,
@@ -216,6 +370,9 @@ describe('ContestListv2.vue', () => {
       await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
 
       expect(wrapper.vm.currentOrder).toBe(field);
+      expect(contests.future.map((contest) => contest.alias)).toEqual(
+        expectedOrder,
+      );
     },
   );
 });
