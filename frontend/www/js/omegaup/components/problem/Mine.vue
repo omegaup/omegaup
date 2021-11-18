@@ -30,7 +30,11 @@
             class="btn btn-primary"
             role="button"
             :class="{ disabled: currentQuery === '' }"
-            :href="currentQuery ? `/problem/mine/?query=${encodeURIComponent(currentQuery)}` : ''"
+            :href="
+              currentQuery
+                ? `/problem/mine/?query=${encodeURIComponent(currentQuery)}`
+                : ''
+            "
             >{{ T.wordsSearch }}</a
           >
         </div>
