@@ -9,7 +9,8 @@
  * @psalm-type RunMetadata=array{memory: int, sys_time: int, time: float, verdict: string, wall_time: float}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
  * @psalm-type SubmissionFeedback=array{author: string, author_classname: string, feedback: string, date: \OmegaUp\Timestamp}
- * @psalm-type RunDetails=array{admin: bool, alias: string, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<array{cases: list<CaseResult>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: null|SubmissionFeedback}
+ * @psalm-type RunDetailsGroup=array{cases: list<CaseResult>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}
+ * @psalm-type RunDetails=array{admin: bool, alias: string, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<RunDetailsGroup>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string, feedback: null|SubmissionFeedback}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
@@ -1586,59 +1587,35 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @return array{runs: list<Run>}
      *
-     * @omegaup-request-param mixed $language
+     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null $language
      * @omegaup-request-param int $offset
      * @omegaup-request-param string $problem_alias
      * @omegaup-request-param int $rowcount
-     * @omegaup-request-param mixed $status
+     * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
      * @omegaup-request-param string $username
-     * @omegaup-request-param mixed $verdict
+     * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict
      */
     public static function apiList(\OmegaUp\Request $r): array {
         // Authenticate request
         $r->ensureIdentity();
-
-        // Defaults for offset and rowcount
-        $r->ensureOptionalInt('offset');
-        if (!isset($r['offset'])) {
-            $r['offset'] = 0;
-        }
-        $r->ensureOptionalInt('rowcount');
-        if (!isset($r['rowcount'])) {
-            $r['rowcount'] = 100;
-        }
-
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['status'],
-            'status',
-            self::STATUS
-        );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['verdict'],
-            'verdict',
-            \OmegaUp\Controllers\Run::VERDICTS
-        );
-
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['language'],
-            'language',
-            array_keys(self::SUPPORTED_LANGUAGES)
-        );
 
         [
             'problem' => $problem,
             'identity' => $identity,
         ] = self::validateList($r);
 
-        $runs = \OmegaUp\DAO\Runs::getAllRuns(
+        $languagesKeys = array_keys(self::SUPPORTED_LANGUAGES);
+        [
+            'runs' => $runs,
+        ] = \OmegaUp\DAO\Runs::getAllRuns(
             null,
-            $r['status'],
-            $r['verdict'],
+            $r->ensureOptionalEnum('status', self::STATUS),
+            $r->ensureOptionalEnum('verdict', self::VERDICTS),
             !is_null($problem) ? $problem->problem_id : null,
-            $r['language'],
+            $r->ensureOptionalEnum('language', $languagesKeys),
             !is_null($identity) ? $identity->identity_id : null,
-            intval($r['offset']),
-            intval($r['rowcount'])
+            $r->ensureOptionalInt('offset') ?? 0,
+            $r->ensureOptionalInt('rowcount') ?? 100
         );
 
         $result = [];

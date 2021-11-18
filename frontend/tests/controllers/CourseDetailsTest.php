@@ -162,7 +162,10 @@ class CourseDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $courseData['course_alias']
         ]));
 
-        $this->assertEquals($courseData['request']['name'], $response['name']);
+        $this->assertEquals(
+            $courseData['request']['name'],
+            $response['course']['name']
+        );
         $this->assertArrayNotHasKey('assignments', $response);
     }
 

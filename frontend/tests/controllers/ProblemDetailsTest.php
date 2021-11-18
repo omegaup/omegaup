@@ -77,6 +77,9 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(0, $problemDAO->accepted);
         $this->assertEquals(0, $problemDAO->difficulty);
 
+        // Verify that we have the nomination status
+        $this->assertArrayHasKey('nominationStatus', $response);
+
         // Verify that we have an empty array of runs
         $this->assertEquals(0, count($response['runs']));
 
@@ -126,6 +129,20 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertStringContainsString(
             $expected_text,
             $response['statement']['markdown']
+        );
+
+        // We can get problem details with following function
+        $details = \OmegaUp\Controllers\Problem::getProblemPrintDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        )['smartyProperties']['payload']['details'];
+
+        // Assert data
+        $this->assertStringContainsString(
+            $expected_text,
+            $details['statement']['markdown']
         );
     }
 

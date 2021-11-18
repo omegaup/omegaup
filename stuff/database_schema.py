@@ -1,10 +1,11 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 '''Tool to validate schema.sql.'''
 
 from __future__ import print_function
 
+import argparse
 import difflib
 import os.path
 import re
@@ -18,6 +19,70 @@ from hook_tools import git_tools
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
 _SCHEMA_FILENAME = 'frontend/database/schema.sql'
+
+
+def _check_mutually_exclusive_schema_modifications(
+        *,
+        args: argparse.Namespace,
+        root: str,
+) -> bool:
+    '''Ensures that schema.sql and dao_schema.sql are not modified together.'''
+    merge_base = subprocess.run(
+        [
+            '/usr/bin/git',
+            'rev-parse',
+            '--abbrev-ref',
+            '--symbolic-full-name',
+            '@{u}',
+        ],
+        check=False,
+        universal_newlines=True,
+        stdout=subprocess.PIPE,
+        cwd=root,
+    ).stdout.strip() or 'origin/main'
+    modified_files = set(
+        filename.decode('utf-8') for filename in subprocess.run(
+            [
+                '/usr/bin/git',
+                '--no-pager',
+                'diff',
+                '-z',
+                '--name-only',
+                merge_base,
+            ],
+            check=True,
+            stdout=subprocess.PIPE,
+            cwd=root).stdout.strip(b'\x00').split(b'\x00'))
+    schema_sql_filename = 'frontend/database/schema.sql'
+    dao_schema_sql_filename = 'frontend/database/dao_schema.sql'
+    schema_sql_modified = schema_sql_filename in modified_files
+    dao_schema_sql_modified = dao_schema_sql_filename in modified_files
+
+    if not schema_sql_modified and not dao_schema_sql_modified:
+        # Neither file got modified, all's good.
+        return True
+    if schema_sql_modified and dao_schema_sql_modified:
+        # Welp, both files got modified, this is bad.
+        print('%s%r and %r cannot be modified in the same commit.%s' %
+              (git_tools.COLORS.FAIL, schema_sql_filename,
+               dao_schema_sql_filename, git_tools.COLORS.NORMAL),
+              file=sys.stderr)
+        return False
+    if schema_sql_modified:
+        # This is okay. Only the schema.sql file was modified. The rest of this
+        # script will validate whether it has the correct contents.
+        return True
+    schema_sql = git_tools.file_contents(args, root, schema_sql_filename)
+    dao_schema_sql = git_tools.file_contents(args, root,
+                                             dao_schema_sql_filename)
+    if schema_sql != dao_schema_sql:
+        print('%s%r can only have the same contents as %r.%s' %
+              (git_tools.COLORS.FAIL, dao_schema_sql_filename,
+               schema_sql_filename, git_tools.COLORS.NORMAL),
+              file=sys.stderr)
+        return False
+
+    return True
 
 
 def _expected_database_schema(*,
@@ -74,10 +139,18 @@ def main() -> None:
 
     filtered_files = list(filename for filename in args.files if
                           filename.endswith('.sql'))
+
+    root = git_tools.root_dir()
+    if not _check_mutually_exclusive_schema_modifications(
+            args=args,
+            root=root,
+    ):
+        sys.exit(1)
+    if 'frontend/database/dao_schema.sql' in filtered_files:
+        filtered_files.remove('frontend/database/dao_schema.sql')
     if not filtered_files:
         return
 
-    root = git_tools.root_dir()
     expected = _expected_database_schema(config_file=args.mysql_config_file,
                                          username=args.username,
                                          password=args.password,

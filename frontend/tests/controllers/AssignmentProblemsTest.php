@@ -501,7 +501,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA');
 
-        // Second student will solve problem1, fail on problem0 and won't try problem2
+        // Second student will solve problem1, fail (90%) on problem0 and won't try problem2
         $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
             $problemsData[1],
             $courseData,
@@ -514,7 +514,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             $courseData,
             $identities[1]
         );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA');
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0.9, 'PA');
 
         $results = \OmegaUp\DAO\Assignments::getAssignmentsProblemsStatistics(
             $courseData['course']->course_id,
@@ -529,23 +529,27 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(0, $results[1]['variance']);
         $this->assertEquals(0, $results[2]['variance']);
         // Average
-        $this->assertEquals(50, $results[0]['average']);
+        $this->assertEquals(95, $results[0]['average']);
         $this->assertEquals(100, $results[1]['average']);
         $this->assertEquals(0, $results[2]['average']);
         // Minimum
-        $this->assertEquals(0, $results[0]['minimum']);
+        $this->assertEquals(90, $results[0]['minimum']);
         $this->assertEquals(100, $results[1]['minimum']);
         $this->assertEquals(0, $results[2]['minimum']);
         // Maximum
         $this->assertEquals(100, $results[0]['maximum']);
         $this->assertEquals(100, $results[1]['maximum']);
         $this->assertEquals(0, $results[2]['maximum']);
+        // Percent over 100%
+        $this->assertEquals(50, $results[0]['completed_score_percentage']);
+        $this->assertEquals(100, $results[1]['completed_score_percentage']);
+        $this->assertEquals(0, $results[2]['completed_score_percentage']);
         // Percent over 60%
-        $this->assertEquals(50, $results[0]['high_score_percentage']);
+        $this->assertEquals(100, $results[0]['high_score_percentage']);
         $this->assertEquals(100, $results[1]['high_score_percentage']);
         $this->assertEquals(0, $results[2]['high_score_percentage']);
         // Percent at 0%
-        $this->assertEquals(50, $results[0]['low_score_percentage']);
+        $this->assertEquals(0, $results[0]['low_score_percentage']);
         $this->assertEquals(0, $results[1]['low_score_percentage']);
         $this->assertEquals(100, $results[2]['low_score_percentage']);
         //average runs

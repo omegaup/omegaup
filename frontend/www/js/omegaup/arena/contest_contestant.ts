@@ -5,8 +5,7 @@ import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
 import arena_Contest from '../components/arena/Contest.vue';
-import { PopupDisplayed } from '../components/problem/Details.vue';
-import { getOptionsFromLocation } from './location';
+import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import problemsStore from './problemStore';
 import {
   ContestClarification,
@@ -22,21 +21,45 @@ import {
   SubmissionRequest,
   submitRun,
   submitRunFailed,
+  trackRun,
+  updateRunFallback,
 } from './submissions';
+import { PopupDisplayed } from '../components/problem/Details.vue';
 import { createChart, onRankingChanged, onRankingEvents } from './ranking';
 import { EventsSocket } from './events_socket';
 import rankingStore from './rankingStore';
 import socketStore from './socketStore';
-import { myRunsStore } from './runsStore';
+import { myRunsStore, runsStore } from './runsStore';
+import T from '../lang';
 
-OmegaUp.on('ready', () => {
+OmegaUp.on('ready', async () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
+  const locationHash = window.location.hash.substr(1).split('/');
   const contestAdmin = Boolean(payload.adminPayload);
-  const activeTab = window.location.hash
-    ? window.location.hash.substr(1).split('/')[0]
-    : 'problems';
+  const activeTab = getSelectedValidTab(locationHash[0], contestAdmin);
+  if (activeTab !== locationHash[0]) {
+    window.location.hash = activeTab;
+  }
+  const {
+    guid,
+    popupDisplayed,
+    problem,
+    problemAlias,
+    showNewClarificationPopup,
+  } = getOptionsFromLocation(window.location.hash);
+  let runDetails: null | types.RunDetails = null;
+  let problemDetails: null | types.ProblemDetails = null;
+  try {
+    ({ runDetails, problemDetails } = await getProblemAndRunDetails({
+      contestAlias: payload.contest.alias,
+      problems: payload.problems,
+      location: window.location.hash,
+    }));
+  } catch (e: any) {
+    ui.apiError(e);
+  }
   trackClarifications(payload.clarifications);
 
   let ranking: types.ScoreboardRankingEntry[];
@@ -83,19 +106,25 @@ OmegaUp.on('ready', () => {
     el: '#main-container',
     components: { 'omegaup-arena-contest': arena_Contest },
     data: () => ({
-      problemInfo: null as types.ProblemInfo | null,
-      problem: null as types.NavbarProblemsetProblem | null,
-      problems: payload.problems as types.NavbarProblemsetProblem[],
-      popupDisplayed: PopupDisplayed.None,
-      showNewClarificationPopup: false,
-      guid: null as null | string,
-      problemAlias: null as null | string,
+      problemInfo: problemDetails,
+      problem,
+      problems: payload.problems,
+      popupDisplayed,
+      showNewClarificationPopup,
+      guid,
+      problemAlias,
       digitsAfterDecimalPoint: 2,
       showPenalty: true,
+      searchResultUsers: [] as types.ListItem[],
+      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      runDetailsData: runDetails,
+      shouldShowFirstAssociatedIdentityRunWarning:
+        payload.shouldShowFirstAssociatedIdentityRunWarning,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest', {
         props: {
+          lockdown: commonPayload.omegaUpLockDown,
           contest: payload.contest,
           contestAdmin,
           problems: this.problems,
@@ -116,6 +145,12 @@ OmegaUp.on('ready', () => {
           showPenalty: this.showPenalty,
           socketStatus: socketStore.state.socketStatus,
           runs: myRunsStore.state.runs,
+          allRuns: runsStore.state.runs,
+          searchResultUsers: this.searchResultUsers,
+          runDetailsData: this.runDetailsData,
+          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          shouldShowFirstAssociatedIdentityRunWarning: this
+            .shouldShowFirstAssociatedIdentityRunWarning,
         },
         on: {
           'navigate-to-problem': ({
@@ -131,16 +166,40 @@ OmegaUp.on('ready', () => {
               contestAlias: payload.contest.alias,
             });
           },
-          'show-run': (request: SubmissionRequest) => {
-            const hash = `#problems/${
-              this.problemAlias ?? request.request.problemAlias
-            }/show-run:${request.request.guid}/`;
-            api.Run.details({ run_alias: request.request.guid })
-              .then((runDetails) => {
-                showSubmission({ request, runDetails, hash });
+          'update-search-result-users-contest': ({
+            query,
+            contestAlias,
+          }: {
+            query: string;
+            contestAlias: string;
+          }) => {
+            api.Contest.searchUsers({ query, contest_alias: contestAlias })
+              .then(({ results }) => {
+                this.searchResultUsers = results.map(
+                  ({ key, value }: types.ListItem) => ({
+                    key,
+                    value: `${ui.escape(key)} (<strong>${ui.escape(
+                      value,
+                    )}</strong>)`,
+                  }),
+                );
               })
-              .catch((error) => {
-                ui.apiError(error);
+              .catch(ui.apiError);
+          },
+          'show-run': (request: SubmissionRequest) => {
+            api.Run.details({ run_alias: request.guid })
+              .then((runDetails) => {
+                this.runDetailsData = showSubmission({ request, runDetails });
+                window.location.hash = request.hash;
+              })
+              .catch((run) => {
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
+              })
+              .finally(() => {
                 this.popupDisplayed = PopupDisplayed.None;
               });
           },
@@ -153,7 +212,7 @@ OmegaUp.on('ready', () => {
             problem: types.NavbarProblemsetProblem;
             code: string;
             language: string;
-            target: Vue & { nextSubmissionTimestamp: Date };
+            target: Vue & { currentNextSubmissionTimestamp: Date };
           }) => {
             api.Run.create({
               contest_alias: payload.contest.alias,
@@ -171,7 +230,7 @@ OmegaUp.on('ready', () => {
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
                 });
-                target.nextSubmissionTimestamp =
+                target.currentNextSubmissionTimestamp =
                   response.nextSubmissionTimestamp;
 
                 if (
@@ -229,24 +288,59 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'update:activeTab': (tabName: string) => {
-            window.location.replace(`#${tabName}`);
+          rejudge: (run: types.Run) => {
+            api.Run.rejudge({ run_alias: run.guid, debug: false })
+              .then(() => {
+                run.status = 'rejudging';
+                updateRunFallback({ run });
+              })
+              .catch(ui.ignoreError);
           },
-          'reset-hash': (request: { selectedTab: string; alias: string }) => {
-            window.location.replace(`#${request.selectedTab}/${request.alias}`);
+          disqualify: (run: types.Run) => {
+            if (!window.confirm(T.runDisqualifyConfirm)) {
+              return;
+            }
+            api.Run.disqualify({ run_alias: run.guid })
+              .then(() => {
+                run.type = 'disqualified';
+                updateRunFallback({ run });
+              })
+              .catch(ui.ignoreError);
+          },
+          'update:activeTab': (tabName: string) => {
+            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
+          },
+          'reset-hash': ({
+            selectedTab,
+            alias,
+          }: {
+            selectedTab: string;
+            alias: string;
+          }) => {
+            if (!alias) {
+              history.replaceState(
+                { selectedTab },
+                'resetHash',
+                `#${selectedTab}`,
+              );
+              return;
+            }
+            history.replaceState(
+              { selectedTab, alias },
+              'resetHash',
+              `#${selectedTab}/${alias}`,
+            );
+          },
+          'new-submission-popup-displayed': () => {
+            if (this.shouldShowFirstAssociatedIdentityRunWarning) {
+              this.shouldShowFirstAssociatedIdentityRunWarning = false;
+              ui.warning(T.firstSumbissionWithIdentity);
+            }
           },
         },
       });
     },
   });
-
-  // This needs to be set here and not at the top because it depends
-  // on the `navigate-to-problem` callback being invoked, and that is
-  // not the case if this is set a priori.
-  Object.assign(
-    contestContestant,
-    getOptionsFromLocation(window.location.hash),
-  );
 
   const socket = new EventsSocket({
     disableSockets: false,
@@ -262,6 +356,20 @@ OmegaUp.on('ready', () => {
     intervalInMilliseconds: 5 * 60 * 1000,
   });
   socket.connect();
+
+  function getSelectedValidTab(tab: string, isAdmin: boolean): string {
+    const validTabs = ['problems', 'ranking', 'runs', 'clarifications'];
+    const defaultTab = 'problems';
+    if (tab === 'runs' && !isAdmin) return defaultTab;
+    const isValidTab = validTabs.includes(tab);
+    return isValidTab ? tab : defaultTab;
+  }
+
+  if (payload.adminPayload?.allRuns) {
+    for (const run of payload.adminPayload.allRuns) {
+      trackRun({ run });
+    }
+  }
 
   setInterval(() => {
     refreshContestClarifications({

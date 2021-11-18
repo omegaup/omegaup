@@ -62,11 +62,31 @@ FROM ubuntu:focal AS php
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
+    apt-get install --no-install-recommends -y curl gnupg ca-certificates && \
+    /usr/sbin/update-ca-certificates && \
+    echo 'deb http://apt.newrelic.com/debian/ newrelic non-free' > /etc/apt/sources.list.d/newrelic.list && \
+    curl -sL https://download.newrelic.com/548C16BF.gpg | apt-key add - && \
+    apt-get update -y && \
     apt-get install --no-install-recommends -y \
-        php7.4-fpm php7.4-curl php7.4-mysql php7.4-sqlite3 php7.4-zip \
-        php7.4-mbstring php7.4-json php7.4-opcache php7.4-xml php-apcu && \
+        newrelic-php5 \
+        openjdk-16-jre-headless \
+        php-apcu \
+        php-apcu-bc \
+        php-redis \
+        php7.4-curl \
+        php7.4-fpm \
+        php7.4-json \
+        php7.4-mbstring \
+        php7.4-mysql \
+        php7.4-opcache \
+        php7.4-xml \
+        php7.4-zip \
+        && \
     apt-get autoremove -y && \
     apt-get clean
+
+RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.27/libinteractive.jar \
+        -o /usr/share/java/libinteractive.jar
 
 RUN useradd --create-home --shell=/bin/bash ubuntu && \
     mkdir -p /etc/omegaup/frontend && \
@@ -86,13 +106,12 @@ EXPOSE 9001
 
 CMD ["php-fpm7.4", "--nodaemonize", "--force-stderr"]
 
-FROM ubuntu:focal as frontend-dev-sidecar
+FROM ubuntu:focal as frontend-sidecar
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
-        curl git ca-certificates python3-jinja2 python3-requests \
-        python3-mysqldb python3-pyparsing mysql-client-core-8.0 && \
+        curl git ca-certificates python3-pip python3-mysqldb mysql-client-core-8.0 && \
     apt-get autoremove -y && \
     apt-get clean
 

@@ -1,6 +1,9 @@
 import { types } from '../api_types';
 import { PopupDisplayed } from '../components/problem/Details.vue';
 import clarificationsStore from './clarificationsStore';
+import * as api from '../api';
+import { trackRun } from './submissions';
+import problemsStore from './problemStore';
 
 export interface LocationOptions {
   problem: types.NavbarProblemsetProblem | null;
@@ -22,8 +25,10 @@ export function getOptionsFromLocation(location: string): LocationOptions {
   // Location string is of the forms:
   // - `#problems/${alias}`
   // - `#problems/${alias}/new-run`
-  // - `#problems/${alias}/show-run:xyz`
+  // - `#problems/${alias}/show-run:${guid}`
   // - `#clarifications/${alias}/new`
+  // - `#runs/${alias}/show-run:${guid}` the alias can be "all" when admin runs
+  //   tab is shown.
   // and all the matching forms in the following regex
   const match = /#(?<tab>\w+)\/(?<alias>[^/]+)(?:\/(?<popup>[^/]+))?/g.exec(
     location,
@@ -38,11 +43,11 @@ export function getOptionsFromLocation(location: string): LocationOptions {
         maxScore: 0,
         hasRuns: false,
       };
+      response.problemAlias = match?.groups?.alias;
       if (match.groups.popup === 'new-run') {
         response.popupDisplayed = PopupDisplayed.RunSubmit;
       } else if (match.groups.popup?.startsWith('show-run')) {
         response.guid = match.groups.popup.split(':')[1];
-        response.problemAlias = response.problem.alias;
         response.popupDisplayed = PopupDisplayed.RunDetails;
       }
       break;
@@ -56,10 +61,64 @@ export function getOptionsFromLocation(location: string): LocationOptions {
         );
       }
       break;
+    case 'runs':
+      if (match.groups.popup?.startsWith('show-run')) {
+        response.guid = match.groups.popup.split(':')[1];
+        response.popupDisplayed = PopupDisplayed.RunDetails;
+      }
+      break;
     default:
       response.popupDisplayed = PopupDisplayed.None;
       response.showNewClarificationPopup = false;
   }
 
   return response;
+}
+
+export async function getProblemAndRunDetails({
+  location,
+  contestAlias,
+  problems,
+}: {
+  location: string;
+  contestAlias?: string;
+  problems?: types.NavbarProblemsetProblem[];
+}): Promise<{
+  runDetails: null | types.RunDetails;
+  problemDetails: null | types.ProblemDetails;
+}> {
+  const { guid, problemAlias } = getOptionsFromLocation(location);
+  let problemPromise: Promise<null | types.ProblemDetails> = Promise.resolve(
+    null,
+  );
+  let runPromise: Promise<null | types.RunDetails> = Promise.resolve(null);
+
+  if (problemAlias) {
+    problemPromise = api.Problem.details({
+      problem_alias: problemAlias,
+      prevent_problemset_open: false,
+      contest_alias: contestAlias || undefined,
+    });
+  }
+  if (guid) {
+    runPromise = api.Run.details({ run_alias: guid });
+  }
+
+  const [problemDetails, runDetails] = await Promise.all([
+    problemPromise,
+    runPromise,
+  ]);
+
+  if (problemDetails != null) {
+    for (const run of problemDetails.runs ?? []) {
+      trackRun({ run });
+    }
+    const currentProblem = problems?.find(
+      ({ alias }: { alias: string }) => alias === problemDetails?.alias,
+    );
+    problemDetails.title = currentProblem?.text ?? '';
+    problemsStore.commit('addProblem', problemDetails);
+  }
+
+  return { problemDetails, runDetails };
 }

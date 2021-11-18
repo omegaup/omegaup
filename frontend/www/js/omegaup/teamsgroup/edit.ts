@@ -17,6 +17,8 @@ import {
   identityRequiredFields,
 } from '../groups';
 
+export type CsvTeam = types.Identity & { usernames: string };
+
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.TeamGroupEditPayload();
   const teamsGroupEdit = new Vue({
@@ -32,6 +34,7 @@ OmegaUp.on('ready', () => {
       teamsMembers: payload.teamsMembers,
       userErrorRow: null,
       searchResultUsers: [] as types.ListItem[],
+      isLoading: false,
     }),
     methods: {
       refreshTeamsList: (): void => {
@@ -66,6 +69,7 @@ OmegaUp.on('ready', () => {
           teamsMembers: this.teamsMembers,
           userErrorRow: this.userErrorRow,
           searchResultUsers: this.searchResultUsers,
+          isLoading: this.isLoading,
         },
         on: {
           'update-teams-group': ({
@@ -93,7 +97,7 @@ OmegaUp.on('ready', () => {
             identity,
           }: {
             originalUsername: string;
-            identity: types.Identity;
+            identity: CsvTeam;
           }) => {
             api.Identity.updateIdentityTeam({
               ...identity,
@@ -128,6 +132,23 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 this.refreshTeamsList();
+                ui.success(T.teamsGroupEditTeamsPasswordUpdated);
+              })
+              .catch(ui.apiError);
+          },
+          'change-password-identity': ({
+            username,
+            newPassword,
+          }: {
+            username: string;
+            newPassword: string;
+          }) => {
+            api.Identity.changePassword({
+              group_alias: payload.teamGroup.alias,
+              password: newPassword,
+              username: username,
+            })
+              .then(() => {
                 ui.success(T.teamsGroupEditTeamsPasswordUpdated);
               })
               .catch(ui.apiError);
@@ -169,13 +190,16 @@ OmegaUp.on('ready', () => {
             identitiesTeams,
           }: {
             identities: types.Identity[];
-            identitiesTeams: { [team: string]: string[] };
+            identitiesTeams: {
+              [team: string]: { username: string; password?: string };
+            };
           }) => {
+            this.isLoading = true;
             api.Identity.bulkCreateForTeams({
               team_identities: JSON.stringify(
                 identities.map((identity) => ({
                   ...identity,
-                  usernames: identitiesTeams[identity.username].join(';'),
+                  usernames: JSON.stringify(identitiesTeams[identity.username]),
                 })),
               ),
               team_group_alias: payload.teamGroup.alias,
@@ -190,6 +214,9 @@ OmegaUp.on('ready', () => {
               .catch((data) => {
                 ui.error(data.error);
                 this.userErrorRow = data.parameter;
+              })
+              .finally(() => {
+                this.isLoading = false;
               });
           },
           'invalid-file': () => {
@@ -229,18 +256,18 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'download-identities': (identities: types.Identity[]) => {
+          'download-teams': (identities: types.Participant[]) => {
             downloadCsvFile({
               fileName: `identities_${payload.teamGroup.alias}.csv`,
               columns: [
                 'username',
                 'name',
-                'password',
                 'country_id',
                 'state_id',
                 'gender',
                 'school_name',
-                'usernames',
+                'participant_username',
+                'participant_password',
               ],
               records: identities,
             });
@@ -250,18 +277,24 @@ OmegaUp.on('ready', () => {
             identities,
             file,
             humanReadable,
+            selfGeneratedIdentities,
+            numberOfContestants,
           }: {
-            identitiesTeams: { [team: string]: string[] };
-            identities: types.Identity[];
+            identitiesTeams: {
+              [team: string]: { username: string; password?: string }[];
+            };
+            identities: CsvTeam[];
             file: File;
             humanReadable: boolean;
+            selfGeneratedIdentities: boolean;
+            numberOfContestants: number;
           }) => {
             CSV.fetch({ file }).done((dataset: CSV.Dataset) => {
               if (!dataset.fields) {
                 ui.error(T.groupsInvalidCsv);
                 return;
               }
-              const records = getCSVRecords<types.Identity>({
+              const records = getCSVRecords<CsvTeam>({
                 fields: dataset.fields,
                 records: dataset.records,
                 requiredFields: identityRequiredFields,
@@ -288,9 +321,27 @@ OmegaUp.on('ready', () => {
                   gender: gender ?? 'decline',
                   usernames,
                 });
+                const members: { username: string; password?: string }[] =
+                  usernames?.split(';').map((user) => ({ username: user })) ??
+                  [];
+
+                const group = payload.teamGroup.alias;
+                if (selfGeneratedIdentities) {
+                  const numberOfExistingUsers = members.length;
+                  const numberOfContestantsToGenerate =
+                    numberOfContestants - numberOfExistingUsers;
+                  for (let i = 0; i < numberOfContestantsToGenerate; i++) {
+                    members.push({
+                      username: `${group}:${username}_identity_${i}`,
+                      password: humanReadable
+                        ? generateHumanReadablePassword()
+                        : generatePassword(),
+                    });
+                  }
+                }
                 identitiesTeams[
                   `teams:${payload.teamGroup.alias}:${username}`
-                ] = usernames?.split(';') ?? [];
+                ] = members;
               }
               ui.dismissNotifications();
               this.userErrorRow = null;

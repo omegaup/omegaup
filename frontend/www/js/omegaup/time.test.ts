@@ -62,6 +62,15 @@ describe('time', () => {
 
   describe('formatDelta', () => {
     it('Should handle valid dates with countdown time format', () => {
+      expect(time.formatDelta(-2500000000)).toEqual('−28:22:26:40');
+      expect(time.formatDelta(-1000000000)).toEqual('−11:13:46:40');
+      expect(time.formatDelta(-100000000)).toEqual('−1:03:46:40');
+      expect(time.formatDelta(-10000000)).toEqual('−02:46:40');
+      expect(time.formatDelta(-1000000)).toEqual('−00:16:40');
+      expect(time.formatDelta(-100000)).toEqual('−00:01:40');
+      expect(time.formatDelta(-10000)).toEqual('−00:00:10');
+      expect(time.formatDelta(-1000)).toEqual('−00:00:01');
+      expect(time.formatDelta(0)).toEqual('00:00:00');
       expect(time.formatDelta(1000)).toEqual('00:00:01');
       expect(time.formatDelta(10000)).toEqual('00:00:10');
       expect(time.formatDelta(100000)).toEqual('00:01:40');
@@ -158,6 +167,20 @@ describe('time', () => {
       expect(
         time.formatDateTimeLocal(time.parseDateTimeLocal('2021-02-29T08:55')),
       ).toEqual('2021-03-01T08:55');
+    });
+  });
+
+  describe('convertLocalDateToGMTDate', () => {
+    it('Should convert local dates to GMT (UTC) dates correctly', () => {
+      const dateNow = new Date();
+      const result = time.convertLocalDateToGMTDate(dateNow);
+
+      expect(result.getFullYear()).toEqual(dateNow.getUTCFullYear());
+      expect(result.getMonth()).toEqual(dateNow.getUTCMonth());
+      expect(result.getDate()).toEqual(dateNow.getUTCDate());
+      expect(result.getHours()).toEqual(dateNow.getUTCHours());
+      expect(result.getMinutes()).toEqual(dateNow.getUTCMinutes());
+      expect(result.getSeconds()).toEqual(dateNow.getUTCSeconds());
     });
   });
 });

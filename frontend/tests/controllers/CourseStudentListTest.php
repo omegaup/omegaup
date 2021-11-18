@@ -161,7 +161,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
+        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
             $courseData['course']->course_id,
             $courseData['course']->group_id,
             1,
@@ -169,6 +169,12 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals(3, $results['totalRows']);
+        $this->assertEquals(
+            $results['totalRows'],
+            count(
+                $results['studentsProgress']
+            )
+        );
 
         $this->assertEquals(
             $participants[0]->name,
@@ -253,12 +259,13 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testGetStudentProgressForCourseWithExtraProblems() {
-        // One course, with two assignments
+        // One course, with three assignments
         // A1 has 2 problems that the student will solve => score 100%
         // A2 has 2 problems, the student will solve just one => score 50%
+        // A3 is a lesson, it should not be counted
         // Global score will be 75% (A1: 100% + A2: 50%)
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
-            2
+            3
         );
         $assignmentAliases = $courseData['assignment_aliases'];
 
@@ -266,6 +273,14 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         if (is_null($course)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
+
+        // A3 should be a lesson
+        $lessonAssignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+            $assignmentAliases[2],
+            $course->course_id
+        );
+        $lessonAssignment->assignment_type = 'lesson';
+        \OmegaUp\DAO\Assignments::update($lessonAssignment);
 
         [
             'user' => $user,
@@ -322,7 +337,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
+        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
             $course->course_id,
             $course->group_id,
             1,
@@ -349,6 +364,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Then test studentsProgress info
         $this->assertCount(1, $results['studentsProgress']);
+
         $this->assertEquals(
             $participant->username,
             $results['studentsProgress'][0]['username']
@@ -381,8 +397,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Now add two extra problems and make the user solve them
-        // Only the global score should be different, all the previous
-        // results should be mantained.
+        // Only the global score should be less than the 100%.
         for ($i = 0; $i < 2; $i++) {
             $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
@@ -410,7 +425,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $resultsWithExtraProblem = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
+        $resultsWithExtraProblem = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
             $course->course_id,
             $course->group_id,
             1,
@@ -432,6 +447,10 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertEquals(
             $results['assignmentsProblems'][0]['points'],
+            $resultsWithExtraProblem['assignmentsProblems'][0]['points']
+        );
+        $this->assertEquals(
+            200, // 2 extra problems
             $resultsWithExtraProblem['assignmentsProblems'][0]['points']
         );
         $this->assertEquals(
@@ -479,11 +498,11 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals(
-            $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['score'],
+            $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['score'] + 200, // 2 extra problems solved
             $resultsWithExtraProblem['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['score']
         );
         $this->assertEquals(
-            $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['progress'],
+            $results['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['progress'] + 100,
             $resultsWithExtraProblem['studentsProgress'][0]['assignments'][$assignmentAliases[0]]['progress']
         );
 
@@ -518,11 +537,33 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         [
             'user' => $user,
             'identity' => $participant
-        ] = \OmegaUp\Test\Factories\User::createUser();
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'username' => 'userA',
+                'name' => 'userA',
+            ])
+        );
 
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $courseData,
             $participant
+        );
+
+        // Add extra student to course who will have
+        // 0 course progress and score.
+        [
+            'user' => $extraUser,
+            'identity' => $extraParticipant
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams([
+                'username' => 'userB',
+                'name' => 'userB',
+            ])
+        );
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $extraParticipant
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
@@ -532,14 +573,21 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignmentv2(
+        $results = \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
             $courseData['course']->course_id,
             $courseData['course']->group_id,
             1,
             100
         );
 
-        $this->assertEquals(1, $results['totalRows']);
+        $this->assertEquals(2, $results['totalRows']);
+        $this->assertEquals(
+            $results['totalRows'],
+            count(
+                $results['studentsProgress']
+            )
+        );
+
         $this->assertEquals(
             $participant->name,
             $results['studentsProgress'][0]['name']
@@ -551,6 +599,19 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             100,
             $results['studentsProgress'][0]['assignments'][$assignment]['problems'][$problemData['problem']->alias]['score']
+        );
+
+        $this->assertEquals(
+            $extraParticipant->name,
+            $results['studentsProgress'][1]['name']
+        );
+        $this->assertEquals(
+            0.0,
+            $results['studentsProgress'][1]['courseScore']
+        );
+        $this->assertEquals(
+            0.0,
+            $results['studentsProgress'][1]['courseProgress']
         );
     }
 }

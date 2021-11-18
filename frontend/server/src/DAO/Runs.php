@@ -125,17 +125,17 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>
+     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>, totalRuns: int}
      */
     final public static function getAllRuns(
-        ?int $problemset_id,
+        ?int $problemsetId,
         ?string $status,
         ?string $verdict,
-        ?int $problem_id,
+        ?int $problemId,
         ?string $language,
-        ?int $identity_id,
-        ?int $offset,
-        ?int $rowcount
+        ?int $identityId,
+        ?int $offset = 0,
+        ?int $rowCount = 100
     ): array {
         $sql = '
             SELECT
@@ -201,9 +201,9 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $where = [];
         $val = [];
 
-        if (!is_null($problemset_id)) {
+        if (!is_null($problemsetId)) {
             $where[] = 's.problemset_id = ?';
-            $val[] = $problemset_id;
+            $val[] = $problemsetId;
         }
 
         if (!is_null($status)) {
@@ -219,31 +219,54 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 $val[] = $verdict;
             }
         }
-        if (!is_null($problem_id)) {
+        if (!is_null($problemId)) {
             $where[] = 's.problem_id = ?';
-            $val[] = $problem_id;
+            $val[] = $problemId;
         }
         if (!is_null($language)) {
             $where[] = 's.language = ?';
             $val[] = $language;
         }
-        if (!is_null($identity_id)) {
+        if (!is_null($identityId)) {
             $where[] = 's.identity_id = ?';
-            $val[] = $identity_id;
+            $val[] = $identityId;
         }
         if (!empty($where)) {
             $sql .= 'WHERE ' . implode(' AND ', $where) . ' ';
         }
 
         $sql .= 'ORDER BY s.submission_id DESC ';
-        if (!is_null($offset)) {
-            $sql .= 'LIMIT ?, ?';
-            $val[] = intval($offset);
-            $val[] = intval($rowcount);
+
+        $sqlCount = "
+            SELECT
+                COUNT(*)
+            FROM
+                ({$sql}) AS total;";
+
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sqlCount,
+            $val
+        );
+
+        if (is_null($offset)) {
+            $offset = 0;
+        }
+        if (is_null($rowCount)) {
+            $rowCount = 100;
         }
 
+        $sql .= 'LIMIT ?, ?;';
+        $val[] = $offset * $rowCount;
+        $val[] = $rowCount;
+
         /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
+        $runs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
+
+        return [
+            'runs' => $runs,
+            'totalRuns' => $totalRows,
+        ];
     }
 
     /**
@@ -438,7 +461,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                         i.username,
                         i.name,
                         IFNULL(i.country_id, 'xx') AS country_id,
-                        IFNULL(ri.is_invited, FALSE) AS is_invited,
+                        CAST(IFNULL(ri.is_invited, FALSE) AS UNSIGNED) AS is_invited,
                         $classNameQuery
                     FROM
                         (

@@ -2,6 +2,10 @@ import Vue from 'vue';
 import problem_Details, {
   PopupDisplayed,
 } from '../components/problem/Details.vue';
+import {
+  getOptionsFromLocation,
+  getProblemAndRunDetails,
+} from '../arena/location';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../components/qualitynomination/PromotionPopup.vue';
 import { myRunsStore, runsStore, RunFilters } from '../arena/runsStore';
@@ -28,12 +32,22 @@ import {
   updateRunFallback,
 } from '../arena/submissions';
 
-OmegaUp.on('ready', () => {
+OmegaUp.on('ready', async () => {
   const payload = types.payloadParsers.ProblemDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
   const runs =
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
+
+  const { guid, popupDisplayed } = getOptionsFromLocation(window.location.hash);
+  let runDetails: null | types.RunDetails = null;
+  try {
+    ({ runDetails } = await getProblemAndRunDetails({
+      location: window.location.hash,
+    }));
+  } catch (e: any) {
+    ui.apiError(e);
+  }
 
   trackClarifications(payload.clarifications ?? []);
 
@@ -43,8 +57,8 @@ OmegaUp.on('ready', () => {
       'omegaup-problem-details': problem_Details,
     },
     data: () => ({
-      popupDisplayed: PopupDisplayed.None,
-      runDetailsData: null as types.RunDetails | null,
+      popupDisplayed,
+      runDetailsData: runDetails,
       solutionStatus: payload.solutionStatus,
       solution: null as types.ProblemStatement | null,
       availableTokens: 0,
@@ -55,7 +69,7 @@ OmegaUp.on('ready', () => {
         payload.nominationStatus?.nominated ||
         (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
-      guid: null as null | string,
+      guid,
       nextSubmissionTimestamp: payload.problem.nextSubmissionTimestamp,
       searchResultUsers: [] as types.ListItem[],
     }),
@@ -85,22 +99,26 @@ OmegaUp.on('ready', () => {
           selectedPrivateTags: payload.selectedPrivateTags,
           hasBeenNominated: this.hasBeenNominated,
           guid: this.guid,
-          isAdmin: commonPayload.isAdmin,
+          isAdmin: payload.user.admin,
           showVisibilityIndicators: true,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
           shouldShowTabs: true,
           searchResultUsers: this.searchResultUsers,
+          problemAlias: payload.problem.alias,
         },
         on: {
           'show-run': (request: SubmissionRequest) => {
-            const hash = `#problems/show-run:${request.request.guid}/`;
-            api.Run.details({ run_alias: request.request.guid })
+            api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
-                showSubmission({ request, runDetails, hash });
+                this.runDetailsData = showSubmission({ request, runDetails });
+                window.location.hash = request.hash;
               })
-              .catch((error) => {
-                ui.apiError(error);
-                this.popupDisplayed = PopupDisplayed.None;
+              .catch((run) => {
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
               });
           },
           'apply-filter': (
@@ -309,7 +327,7 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'update:activeTab': (tabName: string) => {
-            window.location.replace(`#${tabName}`);
+            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
           },
           'redirect-login-page': () => {
             window.location.href = `/login/?redirect=${encodeURIComponent(

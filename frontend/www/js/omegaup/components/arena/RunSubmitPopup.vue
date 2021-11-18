@@ -129,7 +129,7 @@ export default class ArenaRunSubmitPopup extends Vue {
       { language: 'rb', name: 'Ruby (2.7)' },
       { language: 'cs', name: 'C# (8.0, dotnet 3.1)' },
       { language: 'pas', name: 'Pascal (fpc 3.0)' },
-      { language: 'cat', name: 'Output Only' },
+      { language: 'cat', name: T.outputOnly },
       { language: 'hs', name: 'Haskell (ghc 8.6)' },
       { language: 'lua', name: 'Lua (5.3)' },
     ];

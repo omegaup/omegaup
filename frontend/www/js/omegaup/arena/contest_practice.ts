@@ -4,15 +4,15 @@ import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import Vue from 'vue';
+import T from '../lang';
 import arena_ContestPractice from '../components/arena/ContestPractice.vue';
-import { PopupDisplayed } from '../components/problem/Details.vue';
 import {
   showSubmission,
   SubmissionRequest,
   submitRun,
   submitRunFailed,
 } from './submissions';
-import { getOptionsFromLocation } from './location';
+import { getOptionsFromLocation, getProblemAndRunDetails } from './location';
 import {
   ContestClarification,
   ContestClarificationType,
@@ -24,34 +24,54 @@ import clarificationStore from './clarificationsStore';
 import { navigateToProblem, NavigationType } from './navigation';
 import { myRunsStore } from './runsStore';
 
-OmegaUp.on('ready', () => {
+OmegaUp.on('ready', async () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestPracticeDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const activeTab = window.location.hash
     ? window.location.hash.substr(1).split('/')[0]
     : 'problems';
-
+  const {
+    guid,
+    popupDisplayed,
+    problem,
+    problemAlias,
+    showNewClarificationPopup,
+  } = getOptionsFromLocation(window.location.hash);
+  let runDetails: null | types.RunDetails = null;
+  let problemDetails: null | types.ProblemDetails = null;
+  try {
+    ({ runDetails, problemDetails } = await getProblemAndRunDetails({
+      contestAlias: payload.contest.alias,
+      problems: payload.problems,
+      location: window.location.hash,
+    }));
+  } catch (e: any) {
+    ui.apiError(e);
+  }
   trackClarifications(payload.clarifications);
 
   const contestPractice = new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contest-practice': arena_ContestPractice },
     data: () => ({
-      problemInfo: null as types.ProblemInfo | null,
-      problem: null as types.NavbarProblemsetProblem | null,
-      problems: payload.problems as types.NavbarProblemsetProblem[],
-      popupDisplayed: PopupDisplayed.None,
-      showNewClarificationPopup: false,
-      guid: null as null | string,
-      problemAlias: null as null | string,
-      isAdmin: false,
+      problemInfo: problemDetails,
+      problem,
+      problems: payload.problems,
+      popupDisplayed,
+      showNewClarificationPopup,
+      guid,
+      problemAlias,
+      nextSubmissionTimestamp: problemDetails?.nextSubmissionTimestamp,
+      runDetailsData: runDetails,
+      shouldShowFirstAssociatedIdentityRunWarning:
+        payload.shouldShowFirstAssociatedIdentityRunWarning,
     }),
     render: function (createElement) {
       return createElement('omegaup-arena-contest-practice', {
         props: {
           contest: payload.contest,
-          contestAdmin: Boolean(payload.adminPayload),
+          contestAdmin: payload.contestAdmin,
           problems: this.problems,
           users: payload.adminPayload?.users,
           problemInfo: this.problemInfo,
@@ -62,8 +82,11 @@ OmegaUp.on('ready', () => {
           activeTab,
           guid: this.guid,
           problemAlias: this.problemAlias,
-          isAdmin: this.isAdmin,
           runs: myRunsStore.state.runs,
+          nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+          runDetailsData: this.runDetailsData,
+          shouldShowFirstAssociatedIdentityRunWarning: this
+            .shouldShowFirstAssociatedIdentityRunWarning,
         },
         on: {
           'navigate-to-problem': ({
@@ -80,26 +103,29 @@ OmegaUp.on('ready', () => {
             });
           },
           'show-run': (request: SubmissionRequest) => {
-            const hash = `#problems/${
-              this.problemAlias ?? request.request.problemAlias
-            }/show-run:${request.request.guid}/`;
-            api.Run.details({ run_alias: request.request.guid })
+            api.Run.details({ run_alias: request.guid })
               .then((runDetails) => {
-                showSubmission({ request, runDetails, hash });
+                this.runDetailsData = showSubmission({ request, runDetails });
+                window.location.hash = request.hash;
               })
-              .catch((error) => {
-                ui.apiError(error);
-                this.popupDisplayed = PopupDisplayed.None;
+              .catch((run) => {
+                submitRunFailed({
+                  error: run.error,
+                  errorname: run.errorname,
+                  run,
+                });
               });
           },
           'submit-run': ({
             problem,
             code,
             language,
+            target,
           }: {
             code: string;
             language: string;
             problem: types.NavbarProblemsetProblem;
+            target: Vue & { currentNextSubmissionTimestamp: Date };
           }) => {
             api.Run.create({
               problem_alias: problem.alias,
@@ -116,6 +142,8 @@ OmegaUp.on('ready', () => {
                   classname: commonPayload.userClassname,
                   problemAlias: problem.alias,
                 });
+                target.currentNextSubmissionTimestamp =
+                  response.nextSubmissionTimestamp;
               })
               .catch((run) => {
                 submitRunFailed({
@@ -161,20 +189,31 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'update:activeTab': (tabName: string) => {
-            window.location.replace(`#${tabName}`);
+            history.replaceState({ tabName }, 'updateTab', `#${tabName}`);
           },
-          'reset-hash': (request: { selectedTab: string; alias: string }) => {
-            window.location.replace(`#${request.selectedTab}/${request.alias}`);
+          'reset-hash': ({
+            selectedTab,
+            alias,
+          }: {
+            selectedTab: string;
+            alias: string;
+          }) => {
+            history.replaceState(
+              { selectedTab, alias },
+              'resetHash',
+              `#${selectedTab}/${alias}`,
+            );
+          },
+          'new-submission-popup-displayed': () => {
+            if (this.shouldShowFirstAssociatedIdentityRunWarning) {
+              this.shouldShowFirstAssociatedIdentityRunWarning = false;
+              ui.warning(T.firstSumbissionWithIdentity);
+            }
           },
         },
       });
     },
   });
-
-  // This needs to be set here and not at the top because it depends
-  // on the `navigate-to-problem` callback being invoked, and that is
-  // not the case if this is set a priori.
-  Object.assign(contestPractice, getOptionsFromLocation(window.location.hash));
 
   setInterval(() => {
     refreshContestClarifications({

@@ -34,7 +34,7 @@ div#title {
 #status {
   position: -webkit-sticky; /* Safari */
   position: sticky;
-  z-index: 1;
+  z-index: 999;
   max-width: 900px;
   margin-right: auto;
   margin-left: auto;

@@ -1,5 +1,4 @@
 import * as moment from 'moment';
-
 import T from './lang';
 
 let momentInitialized: boolean = false;
@@ -18,9 +17,13 @@ export function formatFutureDateRelative(futureDate: Date): string {
 }
 
 export function formatDelta(delta: number): string {
+  const sign = delta < 0 ? '−' : '';
+  if (delta < 0) {
+    delta = -delta;
+  }
   const months = delta / (30 * 24 * 60 * 60 * 1000);
   if (months >= 1.0) {
-    return formatFutureDateRelative(new Date(delta + Date.now()));
+    return sign + formatFutureDateRelative(new Date(delta + Date.now()));
   }
 
   const days = Math.floor(delta / (24 * 60 * 60 * 1000));
@@ -31,14 +34,14 @@ export function formatDelta(delta: number): string {
   delta -= minutes * (60 * 1000);
   const seconds = Math.floor(delta / 1000);
 
-  let clock = '';
-
+  let clock = sign;
   if (days > 0) {
     clock += `${days}:`;
   }
-  clock += `${String(hours).padStart(2, '0')}:`;
-  clock += `${String(minutes).padStart(2, '0')}:`;
-  clock += `${String(seconds).padStart(2, '0')}`;
+  clock += `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+    2,
+    '0',
+  )}:${String(seconds).padStart(2, '0')}`;
 
   return clock;
 }
@@ -246,4 +249,27 @@ export function remoteTimeAdapter<T>(value: T): T {
     }
   }
   return value;
+}
+
+/**
+ * Calculate the duration of a contest based on its start date and its end date.
+ * @param startDate - The start date of a contest
+ * @param finishDate - The finish date of a contest
+ * @returns The duration of a contest in human redeable format (HH:mm:ss)
+ */
+export function formatContestDuration(
+  startDate: Date,
+  finishDate: Date,
+): string {
+  return formatDelta(finishDate.getTime() - startDate.getTime());
+}
+
+/**
+ * Converts a date to a GMT (UTC) date.
+ *
+ * @param date - The local date to be converted.
+ * @returns The same date, but in GMT.
+ */
+export function convertLocalDateToGMTDate(date: Date): Date {
+  return new Date(date.toUTCString().replace('GMT', ''));
 }

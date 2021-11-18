@@ -171,11 +171,14 @@
       </div>
       <div v-if="showTab === 'publish'" class="tab-pane active">
         <omegaup-common-publish
-          :initial-admission-mode="details.admission_mode"
+          :default-show-all-contestants-in-scoreboard="
+            details.default_show_all_contestants_in_scoreboard
+          "
+          :admission-mode="details.admission_mode"
           :should-show-public-option="true"
           :admission-mode-description="T.contestAdmissionModeDescription"
-          @emit-update-admission-mode="
-            (admissionMode) => $emit('update-admission-mode', admissionMode)
+          @update-admission-mode="
+            (request) => $emit('update-admission-mode', request)
           "
         ></omegaup-common-publish>
       </div>
@@ -242,7 +245,12 @@
         ></omegaup-contest-group-admins>
       </div>
       <div v-if="showTab === 'links'" class="tab-pane active">
-        <omegaup-contest-links :data="details"></omegaup-contest-links>
+        <omegaup-contest-links
+          :data="details"
+          @download-csv-scoreboard="
+            (contestAlias) => $emit('download-csv-scoreboard', contestAlias)
+          "
+        ></omegaup-contest-links>
       </div>
       <div v-if="showTab === 'clone'" class="tab-pane active">
         <omegaup-contest-clone
@@ -283,7 +291,7 @@ import contest_Groups from './Groups.vue';
 import contest_TeamsGroups from './TeamsGroup.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
-import common_Publish from '../common/Publishv2.vue';
+import common_Publish from '../common/Publish.vue';
 
 @Component({
   components: {

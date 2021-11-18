@@ -28,6 +28,7 @@ describe('Course.vue', () => {
             scoreboard_url: 'url',
             scoreboard_url_admin: 'admin_url',
             start_time: new Date(),
+            problemCount: 0,
           },
           {
             alias: 't2',
@@ -42,6 +43,7 @@ describe('Course.vue', () => {
             scoreboard_url: 'url',
             scoreboard_url_admin: 'admin_url',
             start_time: new Date(),
+            problemCount: 0,
           },
         ] as types.CourseAssignment[],
         loggedIn: true,

@@ -1,7 +1,7 @@
 <template>
   <omegaup-arena
     :active-tab="activeTab"
-    :contest-title="contest.title"
+    :title="contest.title"
     :should-show-runs="contestAdmin"
     :background-class="'practice'"
     @update:activeTab="(selectedTab) => $emit('update:activeTab', selectedTab)"
@@ -33,6 +33,7 @@
           <div v-else class="problem main">
             <omegaup-problem-details
               :user="{ loggedIn: true, admin: false, reviewer: false }"
+              :next-submission-timestamp="currentNextSubmissionTimestamp"
               :problem="problemInfo"
               :active-tab="'problems'"
               :runs="runs"
@@ -40,7 +41,7 @@
               :guid="guid"
               :problem-alias="problemAlias"
               :contest-alias="contest.alias"
-              :should-show-run-details="shouldShowRunDetails"
+              :run-details-data="currentRunDetailsData"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', {
@@ -49,7 +50,10 @@
                   })
               "
               @submit-run="onRunSubmitted"
-              @show-run="(source) => $emit('show-run', source)"
+              @show-run="onRunDetails"
+              @new-submission-popup-displayed="
+                $emit('new-submission-popup-displayed')
+              "
             >
               <template #quality-nomination-buttons><div></div></template>
               <template #best-solvers-list><div></div></template>
@@ -124,6 +128,7 @@ import arena_Summary from './Summary.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import problem_Details, { PopupDisplayed } from '../problem/Details.vue';
 import { ContestClarificationType } from '../../arena/clarifications';
+import { SubmissionRequest } from '../../arena/submissions';
 
 @Component({
   components: {
@@ -150,13 +155,18 @@ export default class ArenaContestPractice extends Vue {
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
   @Prop({ default: () => [] }) runs!: types.Run[];
+  @Prop({ default: null }) runDetailsData!: null | types.RunDetails;
+  @Prop({ default: null }) nextSubmissionTimestamp!: Date | null;
+  @Prop({ default: false })
+  shouldShowFirstAssociatedIdentityRunWarning!: boolean;
 
   T = T;
   ui = ui;
   currentClarifications = this.clarifications;
   ContestClarificationType = ContestClarificationType;
   activeProblem: types.NavbarProblemsetProblem | null = this.problem;
-  shouldShowRunDetails = false;
+  currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+  currentRunDetailsData = this.runDetailsData;
 
   get activeProblemAlias(): null | string {
     return this.activeProblem?.alias ?? null;
@@ -168,7 +178,18 @@ export default class ArenaContestPractice extends Vue {
   }
 
   onRunSubmitted(run: { code: string; language: string }): void {
-    this.$emit('submit-run', { ...run, problem: this.activeProblem });
+    this.$emit('submit-run', {
+      ...run,
+      problem: this.activeProblem,
+      target: this,
+    });
+  }
+
+  onRunDetails(request: SubmissionRequest): void {
+    this.$emit('show-run', {
+      ...request,
+      hash: `#problems/${this.activeProblemAlias}/show-run:${request.guid}`,
+    });
   }
 
   onClarificationResponse(response: types.Clarification): void {
@@ -191,18 +212,23 @@ export default class ArenaContestPractice extends Vue {
     this.onNavigateToProblem(newValue);
   }
 
+  @Watch('problemInfo')
+  onProblemInfoChanged(newValue: types.ProblemInfo | null): void {
+    if (!newValue) {
+      return;
+    }
+    this.currentNextSubmissionTimestamp =
+      newValue.nextSubmissionTimestamp ?? null;
+  }
+
   @Watch('clarifications')
   onClarificationsChanged(newValue: types.Clarification[]): void {
     this.currentClarifications = newValue;
   }
 
-  @Watch('popupDisplayed')
-  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
-    if (newValue === PopupDisplayed.RunDetails) {
-      this.$nextTick(() => {
-        this.shouldShowRunDetails = true;
-      });
-    }
+  @Watch('runDetailsData')
+  onRunDetailsChanged(newValue: types.RunDetails): void {
+    this.currentRunDetailsData = newValue;
   }
 }
 </script>

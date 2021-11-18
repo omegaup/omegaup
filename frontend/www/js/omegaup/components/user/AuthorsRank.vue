@@ -56,7 +56,7 @@ import * as ui from '../../ui';
 import user_Username from '../user/Username.vue';
 import { types } from '../../api_types';
 import CountryFlag from '../CountryFlag.vue';
-import common_Paginator from '../common/Paginatorv2.vue';
+import common_Paginator from '../common/Paginator.vue';
 
 @Component({
   components: {

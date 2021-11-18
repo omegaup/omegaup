@@ -611,7 +611,8 @@ def update_coder_of_the_month_candidates(
             (
               SELECT
                 user_id,
-                MAX(time) latest_time,
+                MIN(ranking) best_ranking,
+                time,
                 selected_by
               FROM
                 Coder_Of_The_Month
@@ -619,11 +620,14 @@ def update_coder_of_the_month_candidates(
                 category = %s
               GROUP BY
                 user_id,
-                selected_by
+                selected_by,
+                time
+              HAVING
+                best_ranking = 1
             ) AS cm on i.user_id = cm.user_id
           WHERE
             (cm.user_id IS NULL OR
-            DATE_ADD(cm.latest_time, INTERVAL 1 YEAR) < %s) AND
+            DATE_ADD(cm.time, INTERVAL 1 YEAR) < %s) AND
             i.user_id IS NOT NULL
             {gender_clause}
           GROUP BY

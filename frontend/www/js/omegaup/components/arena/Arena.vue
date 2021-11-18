@@ -2,7 +2,7 @@
   <div data-arena-wrapper :class="backgroundClass">
     <div class="text-center mt-4 pt-2">
       <h2 class="mb-4">
-        <span>{{ contestTitle }}</span>
+        <span>{{ title }}</span>
         <slot name="socket-status">
           <sup class="socket-status-error" title="WebSocket">✗</sup>
         </slot>
@@ -52,7 +52,6 @@
         class="tab-pane fade"
         :class="{ 'show active': selectedTab === 'runs' }"
       >
-        <!-- TODO: Add Runs component when we migrate arena.contest.admin.tpl-->
         <slot name="arena-runs"></slot>
       </div>
       <div
@@ -74,9 +73,8 @@ import { Tab } from '../problem/Details.vue';
 @Component
 export default class Arena extends Vue {
   @Prop({ default: false }) shouldShowRuns!: boolean;
-  @Prop({ default: false }) isAdmin!: boolean;
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
-  @Prop() contestTitle!: string;
+  @Prop() title!: string;
   @Prop() activeTab!: string;
   @Prop() backgroundClass!: string;
 

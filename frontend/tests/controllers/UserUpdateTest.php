@@ -486,4 +486,194 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $identity->password = 'omegaup';
         self::login($identity);
     }
+
+    /**
+     * Test update objectives
+     */
+    public function testUpdateObjectives() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'has_competitive_objective' => true,
+            'has_learning_objective' => true,
+            'has_scholar_objective' => false,
+            'has_teaching_objective' => false,
+        ]);
+        \OmegaUp\Controllers\User::apiUpdate($r);
+
+        // Check user from db
+        $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
+        $this->assertEquals(
+            $r['has_competitive_objective'],
+            $userDb->has_competitive_objective
+        );
+        $this->assertEquals(
+            $r['has_learning_objective'],
+            $userDb->has_learning_objective
+        );
+        $this->assertEquals(
+            $r['has_scholar_objective'],
+            $userDb->has_scholar_objective
+        );
+        $this->assertEquals(
+            $r['has_teaching_objective'],
+            $userDb->has_teaching_objective
+        );
+
+        // Edit objectives again with diff values
+        $r = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'has_competitive_objective' => false,
+            'has_learning_objective' => false,
+            'has_scholar_objective' => true,
+            'has_teaching_objective' => true,
+        ]);
+        \OmegaUp\Controllers\User::apiUpdate($r);
+
+        // Check user from apiProfile
+        $r2 = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $identity->username
+        ]);
+        $response = \OmegaUp\Controllers\User::apiProfile($r2);
+
+        $this->assertEquals(
+            $r['has_competitive_objective'],
+            $response['has_competitive_objective']
+        );
+        $this->assertEquals(
+            $r['has_learning_objective'],
+            $response['has_learning_objective']
+        );
+        $this->assertEquals(
+            $r['has_scholar_objective'],
+            $response['has_scholar_objective']
+        );
+        $this->assertEquals(
+            $r['has_teaching_objective'],
+            $response['has_teaching_objective']
+        );
+    }
+
+    /**
+     * Test objectives cannot be null
+     */
+    public function testObjectivesWithNull() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'has_competitive_objective' => true,
+                'has_learning_objective' => true,
+                'has_scholar_objective' => true,
+                'has_teaching_objective' => null,
+            ]));
+            $this->fail('Update should have failed due to empty objectives');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterEmpty', $e->getMessage());
+            $this->assertEquals('has_teaching_objective', $e->parameter);
+        }
+    }
+
+    public function testGetSelfEmailDetailsForTypeScript() {
+        $userInformation = [
+            'username' => 'original_username',
+            'name' => 'Original Name',
+            'email' => 'original@email.com',
+        ];
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams($userInformation)
+        );
+
+        $login = self::login($identity);
+
+        $payload = \OmegaUp\Controllers\User::getEmailEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertEquals($payload['email'], $userInformation['email']);
+        $this->assertEquals(
+            $payload['profile']['username'],
+            $userInformation['username']
+        );
+        $this->assertEquals(
+            $payload['profile']['name'],
+            $userInformation['name']
+        );
+    }
+
+    public function testUpdateUserMainEmailAsNonSysAdmin() {
+        $userToGetInformation = [
+            'username' => 'username_to_get_info',
+            'name' => 'Name To Get Info',
+            'email' => 'email_to_get_info@email.com',
+        ];
+        [
+            'identity' => $identityToGetInformation,
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams($userToGetInformation)
+        );
+
+        // Create user who attempts get the information of previously registered
+        // user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\User::getEmailEditDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'username' => $identityToGetInformation->username,
+                ])
+            );
+            $this->fail(
+                'Non-admin user should not be able to get user details'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+    }
+
+    public function testUpdateUserMainEmailAsSysAdmin() {
+        //createAdminUser
+        $userToGetInformation = [
+            'username' => 'username_to_get_info',
+            'name' => 'Name To Get Info',
+            'email' => 'email_to_get_info@email.com',
+        ];
+        [
+            'identity' => $identityToGetInformation,
+        ] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams($userToGetInformation)
+        );
+
+        // Create user with sysadmin privileges
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $login = self::login($identity);
+
+        $payload = \OmegaUp\Controllers\User::getEmailEditDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $identityToGetInformation->username,
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertEquals($payload['email'], $userToGetInformation['email']);
+        $this->assertEquals(
+            $payload['profile']['username'],
+            $identityToGetInformation->username
+        );
+        $this->assertEquals(
+            $payload['profile']['name'],
+            $identityToGetInformation->name
+        );
+    }
 }

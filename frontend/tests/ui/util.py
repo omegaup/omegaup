@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # type: ignore
 
@@ -310,7 +310,9 @@ def assert_no_js_errors(
 def create_problem(
         driver,
         problem_alias: str,
-        resource_path: str = 'frontend/tests/resources/triangulos.zip'
+        *,
+        resource_path: str = 'frontend/tests/resources/triangulos.zip',
+        private: bool = False,
 ) -> None:
     '''Create a problem.'''
     driver.wait.until(
@@ -343,10 +345,13 @@ def create_problem(
     input_limit.send_keys('1024')
     # Alias should be set automatically
     driver.browser.find_element_by_name('source').send_keys('test')
-    # Make the problem public
-    driver.browser.find_element_by_xpath(
-        '//input[@type="radio" and @name="visibility" and @value="true"]'
-    ).click()
+
+    if not private:
+        # Make the problem public
+        driver.browser.find_element_by_xpath(
+            '//input[@type="radio" and @name="visibility" and @value="true"]'
+        ).click()
+
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.XPATH, '//input[@type = "search"]'))).send_keys('Recur')
@@ -539,8 +544,7 @@ def add_identities_group(driver, group_alias):
     return identities
 
 
-def show_run_details(driver, *, table_classname: str, dropdown_classname: str,
-                     code: str, has_been_migrated: bool) -> None:
+def show_run_details(driver, *, code: str) -> None:
     '''It shows details popup for a certain submission.'''
 
     driver.wait.until(EC.element_to_be_clickable(
@@ -550,30 +554,21 @@ def show_run_details(driver, *, table_classname: str, dropdown_classname: str,
         EC.element_to_be_clickable(
             (By.XPATH,
              '//table[contains(concat(" ", normalize-space(@class), " "), "'
-             ' %s ")]/tbody/tr/td/div[contains(concat(" ", '
-             'normalize-space(@class), " "), " dropdown ")]/button'
-             % table_classname))).click()
+             ' runs ")]/tbody/tr/td/div[contains(concat(" ", normalize-space'
+             '(@class), " "), " dropdown ")]/button'))).click()
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH,
-             '//table[contains(concat(" ", normalize-space(@class), " "), '
-             '" %s ")]/tbody/tr/td/div[contains(concat(" ", '
-             'normalize-space(@class), " "), " %s ")]/ul/li['
-             '@data-actions-details]/button'
-             % (table_classname, dropdown_classname)))).click()
+            (By.CSS_SELECTOR,
+             'table.runs div button[data-run-details]'))).click()
+
+    code_element = driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR,
+             '.show form[data-run-details-view] .CodeMirror-code')))
+    code_text = code_element.get_attribute('innerText')
 
     assert (('show-run:') in
             driver.browser.current_url), driver.browser.current_url
-
-    # It should be removed when everything is migrated
-    if has_been_migrated:
-        selector = '.show form[data-run-details-view] .CodeMirror-code'
-    else:
-        selector = 'form[data-run-details-view] .CodeMirror-code'
-
-    code_element = driver.wait.until(
-        EC.visibility_of_element_located((By.CSS_SELECTOR, selector)))
-    code_text = code_element.get_attribute('innerText')
 
     assert ((code) in code_text), code_text

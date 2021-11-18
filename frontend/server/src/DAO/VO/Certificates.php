@@ -140,7 +140,7 @@ class Certificates extends \OmegaUp\DAO\VO\VO {
     public $verification_code = null;
 
     /**
-     * Si el tipo de certificado es CONTEST y el lugar en el que quedo el estudiante es menor o igual a `certificate_cutoff` entonces en este campo se guarda el lugar en el que quedó. Si no, NULL.
+     * Se guarda el lugar en el que quedo un estudiante si es menor o igual a certificate_cutoff
      *
      * @var int|null
      */

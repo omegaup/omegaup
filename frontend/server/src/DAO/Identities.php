@@ -261,7 +261,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, hide_problem_tags: bool, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null
+     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null
      */
     final public static function getExtendedProfileDataByPk(?int $identityId): ?array {
         if (is_null($identityId)) {
@@ -276,6 +276,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     l.`name` AS locale,
                     u.`birth_date`,
                     u.`scholar_degree`,
+                    u.`has_learning_objective`,
+                    u.`has_teaching_objective`,
+                    u.`has_scholar_objective`,
+                    u.`has_competitive_objective`,
                     u.`hide_problem_tags`,
                     u.`verified`,
                     i.`gender`,
@@ -319,7 +323,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     i.`identity_id` = ?
                 LIMIT
                     1;';
-        /** @var array{birth_date: null|string, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, hide_problem_tags: bool|null, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null */
+        /** @var array{birth_date: null|string, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, has_competitive_objective: bool|null, has_learning_objective: bool|null, has_scholar_objective: bool|null, has_teaching_objective: bool|null, hide_problem_tags: bool|null, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null */
         $identity = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$identityId]
@@ -328,11 +332,26 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             return null;
         }
 
+        $identity['has_learning_objective'] = boolval(
+            $identity['has_learning_objective']
+        );
+        $identity['has_teaching_objective'] = boolval(
+            $identity['has_teaching_objective']
+        );
+        $identity['has_scholar_objective'] = boolval(
+            $identity['has_scholar_objective']
+        );
+        $identity['has_competitive_objective'] = boolval(
+            $identity['has_competitive_objective']
+        );
         $identity['hide_problem_tags'] = boolval(
             $identity['hide_problem_tags']
         );
         $identity['birth_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
             $identity['birth_date']
+        );
+        $identity['graduation_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $identity['graduation_date']
         );
 
         return $identity;
@@ -378,7 +397,6 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 Identities i
             WHERE
                 i.username = ?
-                AND user_id IS NULL
             LIMIT 1;';
         $args = [$username];
 
@@ -527,5 +545,58 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 [$identity->identity_id]
             )
         ) > 0;
+    }
+
+    /**
+     * @return array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null
+     */
+    public static function getTeamIdentity(
+        \OmegaUp\DAO\VO\Identities $identity
+    ) {
+        $sql = 'SELECT
+                    ti.*,
+                    IFNULL(
+                        (
+                            SELECT urc.classname FROM
+                                User_Rank_Cutoffs urc
+                            WHERE
+                                urc.score <= (
+                                        SELECT
+                                            ur.score
+                                        FROM
+                                            User_Rank ur
+                                        WHERE
+                                            ur.user_id = i.user_id
+                                    )
+                            ORDER BY
+                                urc.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        \'user-rank-unranked\'
+                    ) AS classname
+                FROM
+                    Identities i
+                INNER JOIN
+                    Team_Users tu
+                ON
+                    tu.identity_id = i.identity_id
+                INNER JOIN
+                    Teams t
+                ON
+                    t.team_id = tu.team_id
+                INNER JOIN
+                    Identities ti
+                ON
+                    ti.identity_id = t.identity_id
+                WHERE
+                    i.identity_id = ?
+                LIMIT 1;';
+
+        /** @var array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$identity->identity_id]
+        );
     }
 }

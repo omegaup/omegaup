@@ -25,7 +25,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type ArenaProblemDetails=array{accepts_submissions: bool, alias: string, commit: string, input_limit: int, languages: list<string>, letter?: string, points: float, problem_id?: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>,  settings?: ProblemSettingsDistrib, source?: string, statement?: ProblemStatement, title: string, visibility: int}
  * @psalm-type BestSolvers=array{classname: string, language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}
- * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
  * @psalm-type ProblemAdmin=array{role: string, username: string}
@@ -46,6 +46,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type CollectionDetailsByLevelPayload=array{frequentTags: list<TagWithProblemCount>, publicTags: list<TagWithProblemCount>, level: string, selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tagsList: list<string>, difficulty: string}
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
+ * @psalm-type ProblemPrintDetailsPayload=array{details: ProblemDetails}
+ * @psalm-type LibinteractiveError=array{description: string, field: string}
+ * @psalm-type LibinteractiveGenPayload=array{error: LibinteractiveError|null, idl: null|string, language: null|string, name: null|string, os: null|string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -2560,7 +2563,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return ProblemDetails
      */
-    private static function getProblemDetails(
+    public static function getProblemDetails(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
         \OmegaUp\DAO\VO\Problems $problem,
         ?\OmegaUp\DAO\VO\Problemsets $problemset,
@@ -2618,7 +2621,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        // Add the problem the response
+        // Add the problem to the response
         $response['problem_id'] = intval($problem->problem_id);
         $response['title'] = strval($problem->title);
         $response['alias'] = strval($problem->alias);
@@ -2637,6 +2640,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $response['quality_seal'] = $problem->quality_seal;
         $response['version'] = $version;
         $response['commit'] = $commit;
+
+        // Add the default problem's nomination status to response
+        $response['nominationStatus'] = [
+            'alreadyReviewed' => false,
+            'dismissed' => false,
+            'dismissedBeforeAc' => false,
+            'nominated' => false,
+            'nominatedBeforeAc' => false,
+            'language' => '',
+            'canNominateProblem' => false,
+            'solved' => false,
+            'tried' => false,
+        ];
 
         // If the problem is public or if the user has admin privileges, show the
         // problem source and alias of owner.
@@ -2781,6 +2797,35 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $container,
                     $lastRunTime
                 );
+            }
+
+            // Fill nomination status
+            $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
+                intval($problem->problem_id),
+                intval($loggedIdentity->user_id)
+            );
+            $response['nominationStatus'] = [
+                'alreadyReviewed' => \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
+                    $loggedIdentity,
+                    $problem
+                ),
+                'dismissed' => $nominationStatus['dismissed'],
+                'dismissedBeforeAc' => $nominationStatus['dismissedBeforeAc'],
+                'nominated' => $nominationStatus['nominated'],
+                'nominatedBeforeAc' => $nominationStatus['nominatedBeforeAc'],
+                'language' => $response['statement']['language'],
+                'canNominateProblem' => !is_null($loggedIdentity->user_id),
+                'solved' => false,
+                'tried' => false,
+            ];
+
+            foreach ($runsArray as $run) {
+                if ($run['verdict'] === 'AC') {
+                    $response['nominationStatus']['solved'] = true;
+                    break;
+                } elseif ($run['verdict'] !== 'JE' && $run['verdict'] !== 'VE' && $run['verdict'] !== 'CE') {
+                    $response['nominationStatus']['tried'] = true;
+                }
             }
         }
 
@@ -3329,6 +3374,46 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{runs: list<Run>, totalRuns: int}
+     */
+    private static function getAllRuns(
+        int $problemId,
+        ?string $status = null,
+        ?string $verdict = null,
+        ?string $language = null,
+        ?int $identityId = null,
+        ?int $offset = 0,
+        ?int $rowCount = 100
+    ): array {
+        // Get our runs
+        [
+            'runs' => $runs,
+            'totalRuns' => $totalRuns,
+        ] = \OmegaUp\DAO\Runs::getAllRuns(
+            /*$problemsetId=*/            null,
+            $status,
+            $verdict,
+            $problemId,
+            $language,
+            $identityId,
+            $offset,
+            $rowCount
+        );
+
+        $allRuns = [];
+        foreach ($runs as $run) {
+            unset($run['run_id']);
+            $run['contest_score'] = floatval($run['contest_score']);
+            $allRuns[] = $run;
+        }
+
+        return [
+            'runs' => $allRuns,
+            'totalRuns' => $totalRuns,
+        ];
+    }
+
+    /**
      * Entry point for Problem runs API
      *
      * @omegaup-request-param null|string $language
@@ -3354,7 +3439,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Validate request
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
-        if (is_null($problem)) {
+        if (is_null($problem) || is_null($problem->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
@@ -3382,22 +3467,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     );
                 }
             }
-            $response['runs'] = [];
-            foreach (
-                \OmegaUp\DAO\Runs::getAllRuns(
-                    null,
-                    $r->ensureOptionalString('status'),
-                    $r->ensureOptionalString('verdict'),
-                    $problem->problem_id,
-                    $r->ensureOptionalString('language'),
-                    !is_null($identity) ? intval($identity->identity_id) : null,
-                    $r->ensureOptionalInt('offset'),
-                    $r->ensureOptionalInt('rowcount')
-                ) as $run
-            ) {
-                unset($run['run_id']);
-                $response['runs'][] = $run;
-            }
+            [
+                'runs' => $runs,
+            ] = self::getAllRuns(
+                $problem->problem_id,
+                $r->ensureOptionalString('status'),
+                $r->ensureOptionalString('verdict'),
+                $r->ensureOptionalString('language'),
+                !is_null($identity) ? intval($identity->identity_id) : null,
+                $r->ensureOptionalInt('offset') ?? 0,
+                $r->ensureOptionalInt('rowcount') ?? 100
+            );
+            $response['runs'] = $runs;
         } else {
             // Get all the available runs
             $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
@@ -3941,6 +4022,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{pagerItems: list<PageItem>, problems: list<ProblemListItem>}
      *
+     * @omegaup-request-param null|string $query
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      */
@@ -3957,13 +4039,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['page_size']
         ) : \OmegaUp\Controllers\Problem::PAGE_SIZE);
 
+        $query = substr(
+            $r->ensureOptionalString('query') ?? '',
+            0,
+            256
+        );
+
         if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
             [
                 'problems' => $problems,
                 'count' => $count,
             ] = \OmegaUp\DAO\Problems::getAllWithCount(
                 $page,
-                $pageSize
+                $pageSize,
+                $query
             );
         } else {
             [
@@ -3972,7 +4061,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ] = \OmegaUp\DAO\Problems::getAllProblemsAdminedByIdentity(
                 $r->identity->identity_id,
                 $page,
-                $pageSize
+                $pageSize,
+                $query
             );
         }
 
@@ -4025,6 +4115,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{pagerItems: list<PageItem>, problems: list<ProblemListItem>}
      *
+     * @omegaup-request-param null|string $query
      * @omegaup-request-param int $page
      * @omegaup-request-param int|null $rowcount
      */
@@ -4037,13 +4128,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
         $page = $r->ensureOptionalInt('page') ?? 1;
 
+        $query = substr(
+            $r->ensureOptionalString('query') ?? '',
+            0,
+            256
+        );
+
         [
             'problems' => $problems,
             'count' => $count,
         ] = \OmegaUp\DAO\Problems::getAllProblemsOwnedByUser(
             $r->user->user_id,
             $page,
-            $pageSize
+            $pageSize,
+            $query
         );
 
         $addedProblems = [];
@@ -4588,23 +4686,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $response['smartyProperties']['payload']['problem']['nextSubmissionTimestamp'] = $nextSubmissionTimestamp;
 
         if ($isAdmin) {
-            $allRuns = [];
-            foreach (
-                \OmegaUp\DAO\Runs::getAllRuns(
-                    /*$problemset_id=*/                    null,
-                    /*$status=*/null,
-                    /*$verdict=*/null,
-                    $problem->problem_id,
-                    /*$language=*/null,
-                    /*$identity_id=*/null,
-                    /*$offset=*/null,
-                    /*$rowcount=*/null
-                ) as $run
-            ) {
-                unset($run['run_id']);
-                $allRuns[] = $run;
-            }
-            $response['smartyProperties']['payload']['allRuns'] = $allRuns;
+            [
+                'runs' => $runs,
+            ] = self::getAllRuns($problem->problem_id);
+            $response['smartyProperties']['payload']['allRuns'] = $runs;
             $response['smartyProperties']['payload']['problemLevel'] = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
                 $problem
             );
@@ -5084,6 +5169,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return $result;
     }
 
+    /**
+    * @return array{smartyProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString}, entrypoint: string}
+    */
+    public static function getCreatorForTypescript(
+        \OmegaUp\Request $r
+    ): array {
+        return [
+            'smartyProperties' => [
+                'payload' => [],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleProblemCreator'
+                )
+            ],
+            'entrypoint' => 'problem_creator'
+        ];
+    }
     /**
      * @return array{smartyProperties: array{payload: ProblemFormPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
@@ -5625,56 +5726,97 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{error?: string, error_field?: string}, template: string}
+     * @return array{entrypoint: string, smartyProperties: array{payload: LibinteractiveGenPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $idl
      * @omegaup-request-param 'c'|'cpp'|'java' $language
      * @omegaup-request-param null|string $name
-     * @omegaup-request-param mixed $os
+     * @omegaup-request-param 'unix'|'windows' $os
      */
-    public static function getLibinteractiveGenForTypeScript(\OmegaUp\Request $r): array {
+    public static function getLibinteractiveGenForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        $response = [
+            'smartyProperties' => [
+                'payload' => [
+                    'error' => null,
+                    'language' => 'c',
+                    'os' => 'unix',
+                    'name' => null,
+                    'idl' => null,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleLibInteractive'
+                ),
+            ],
+            'entrypoint' => 'libinteractive_gen',
+        ];
         if (count($r) === 0) {
             // \OmegaUp\Request does not support empty().
-            return [
-                'smartyProperties' => [],
-                'template' => 'libinteractive.gen.tpl',
-            ];
+            return $response;
         }
-        try {
-            $language = $r->ensureEnum(
-                'language',
-                ['c', 'cpp', 'java']
-            );
-            \OmegaUp\Validators::validateInEnum(
-                $r['os'],
-                'os',
-                ['unix', 'windows']
-            );
-            $name = $r->ensureString(
-                'name',
-                fn (string $alias) => \OmegaUp\Validators::alias($alias)
-            );
-            \OmegaUp\Validators::validateStringNonEmpty(
-                $r['idl'],
-                'idl'
-            );
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            return [
-                'smartyProperties' => [
-                    'error' => \OmegaUp\Translations::getInstance()->get(
-                        'parameterInvalid'
-                    ),
-                    'error_field' => strval($e->parameter),
-                ],
-                'template' => 'libinteractive.gen.tpl',
+
+        $language = $r->ensureOptionalEnum('language', ['c', 'cpp', 'java']);
+        $os = $r->ensureOptionalEnum('os', ['unix', 'windows']);
+        $name = $r->ensureOptionalString('name');
+        $idl = $r->ensureOptionalString('idl');
+        $response['smartyProperties']['payload'] =  [
+            'language' => $language,
+            'os' => $os,
+            'name' => $name,
+            'idl' => $idl,
+        ];
+        if (empty($language)) {
+            $response['smartyProperties']['payload']['error'] = [
+                'description' => \OmegaUp\Translations::getInstance()->get(
+                    'parameterInvalid'
+                ),
+                'field' => 'language',
             ];
+            return $response;
+        }
+        if (empty($os)) {
+            $response['smartyProperties']['payload']['error'] = [
+                'description' => \OmegaUp\Translations::getInstance()->get(
+                    'parameterInvalid'
+                ),
+                'field' => 'os',
+            ];
+            return $response;
+        }
+        if (empty($name)) {
+            $response['smartyProperties']['payload']['error'] = [
+                'description' => \OmegaUp\Translations::getInstance()->get(
+                    'parameterInvalid'
+                ),
+                'field' => 'name',
+            ];
+            return $response;
+        }
+        if (!\OmegaUp\Validators::alias($name)) {
+            $response['smartyProperties']['payload']['error'] = [
+                'description' => \OmegaUp\Translations::getInstance()->get(
+                    'parameterInvalidAlias'
+                ),
+                'field' => 'name',
+            ];
+            return $response;
+        }
+        if (empty($idl)) {
+            $response['smartyProperties']['payload']['error'] = [
+                'description' => \OmegaUp\Translations::getInstance()->get(
+                    'parameterInvalid'
+                ),
+                'field' => 'idl',
+            ];
+            return $response;
         }
         $dirname = \OmegaUp\FileHandler::TempDir(
             sys_get_temp_dir(),
             'libinteractive'
         );
         try {
-            file_put_contents("{$dirname}/{$name}.idl", $r['idl']);
+            file_put_contents("{$dirname}/{$name}.idl", $idl);
             $args = [
                 '/usr/bin/java',
                 '-jar',
@@ -5684,7 +5826,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $language,
                 $language,
                 '--makefile',
-                "--{$r['os']}",
+                "--{$os}",
             ];
             $descriptorspec = [
                 0 => ['pipe', 'r'],
@@ -5701,12 +5843,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
             if (!is_resource($proc)) {
                 $lastError = error_get_last();
-                return [
-                    'smartyProperties' => [
-                        'error' => $lastError['message'] ?? '',
-                    ],
-                    'template' => 'libinteractive.gen.tpl',
+                $response['smartyProperties']['payload']['error'] = [
+                    'description' => $lastError['message'] ?? \OmegaUp\Translations::getInstance()->get(
+                        'parameterInvalid'
+                    ),
+                    'field' => 'idl',
                 ];
+                return $response;
             }
             fclose($pipes[0]);
             $output = stream_get_contents($pipes[1]);
@@ -5716,12 +5859,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $retval = proc_close($proc);
 
             if ($retval != 0) {
-                return [
-                    'smartyProperties' => [
-                        'error' => "{$output}{$err}",
-                    ],
-                    'template' => 'libinteractive.gen.tpl',
+                $response['smartyProperties']['payload']['error'] = [
+                    'description' => "{$output}{$err}",
+                    'field' => 'idl',
                 ];
+                return $response;
             }
             $zip = new \ZipArchive();
             $zip->open(
@@ -5765,12 +5907,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } catch (\OmegaUp\Exceptions\ExitException $e) {
             throw $e;
         } catch (\Exception $e) {
-            return [
-                'smartyProperties' => [
-                    'error' => strval($e),
-                ],
-                'template' => 'libinteractive.gen.tpl',
+            $response['smartyProperties']['payload']['error'] = [
+                'description' => strval($e),
+                'field' => 'idl',
             ];
+            return $response;
         } finally {
             \OmegaUp\FileHandler::deleteDirRecursively($dirname);
         }
@@ -6118,6 +6259,75 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'fullWidth' => true,
             ],
             'entrypoint' => 'problem_collection_list_by_author',
+        ];
+    }
+
+    /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: ProblemPrintDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param null|string $lang
+     */
+    public static function getProblemPrintDetailsForTypeScript(\OmegaUp\Request $r) {
+        // Get user
+        $r->ensureIdentity();
+
+        // Validate request
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
+            $r->identity,
+            $r
+        );
+        [
+            'problem' => $problem,
+            'problemset' => $problemset,
+        ] = self::getValidProblemAndProblemset(
+            $r->identity,
+            /*$contestAlias=*/ null,
+            $problemAlias,
+            /*statementType=*/ 'markdown',
+            /*$problemsetId=*/ null
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+        $details = self::getProblemDetails(
+            $r->identity,
+            $problem,
+            $problemset,
+            $lang,
+            /*$showSolvers*/ true,
+            /*$preventProblemsetOpen*/ false
+        );
+
+        if (is_null($details) || empty($details['settings'])) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'details' => $details,
+                ],
+                'hideFooterAndHeader' => true,
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleProblemPrint',
+                    [
+                        'problemTitle' => $details['title'],
+                    ]
+                ),
+            ],
+            'entrypoint' => 'problem_print',
         ];
     }
 }
