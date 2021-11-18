@@ -124,7 +124,7 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in contests.current"
+            v-for="contestItem in contestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -157,7 +157,7 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in contests.future"
+            v-for="contestItem in contestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -193,7 +193,7 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in contests.past"
+            v-for="contestItem in contestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -283,6 +283,12 @@ export default class ArenaContestList extends Vue {
   ContestTab = ContestTab;
   ContestOrder = ContestOrder;
   currentTab: ContestTab = this.tab;
+  contestList: types.ContestListItem[] =
+    this.currentTab === ContestTab.Current
+      ? this.contests.current
+      : this.currentTab === ContestTab.Future
+      ? this.contests.future
+      : this.contests.past;
   currentQuery: string = this.query;
   currentOrder: ContestOrder = ContestOrder.None;
 
@@ -335,130 +341,42 @@ export default class ArenaContestList extends Vue {
     if (newValue === ContestOrder.None || newValue === oldValue) {
       return;
     }
-
-    if (newValue === ContestOrder.Title) {
-      switch (this.currentTab) {
-        case ContestTab.Current:
-          this.contests.current.sort((a, b) => (a.title < b.title ? -1 : 1));
-          break;
-        case ContestTab.Future:
-          this.contests.future.sort((a, b) => (a.title < b.title ? -1 : 1));
-          break;
-        case ContestTab.Past:
-          this.contests.past.sort((a, b) => (a.title < b.title ? -1 : 1));
-          break;
+    function compareNumber(a: number, b: number): number {
+      if (a < b) {
+        return 1;
+      } else if (a > b) {
+        return -1;
       }
-      return;
+      return 0;
     }
-    if (newValue === ContestOrder.Ends) {
-      switch (this.currentTab) {
-        case ContestTab.Current:
-          this.contests.current.sort((a, b) =>
-            a.finish_time < b.finish_time ? -1 : 1,
+    let sortBy: (a: types.ContestListItem, b: types.ContestListItem) => number;
+    switch (newValue) {
+      case ContestOrder.Title:
+        sortBy = (a, b) => a.title.localeCompare(b.title);
+        break;
+      case ContestOrder.Ends:
+        sortBy = (a, b) =>
+          compareNumber(a.finish_time.getDate(), b.finish_time.getDate());
+        break;
+      case ContestOrder.Duration:
+        sortBy = (a, b) =>
+          compareNumber(
+            a.finish_time.getTime() - a.start_time.getTime(),
+            b.finish_time.getTime() - a.start_time.getTime(),
           );
-          break;
-        case ContestTab.Future:
-          this.contests.future.sort((a, b) =>
-            a.finish_time < b.finish_time ? -1 : 1,
-          );
-          break;
-        case ContestTab.Past:
-          this.contests.past.sort((a, b) =>
-            a.finish_time < b.finish_time ? -1 : 1,
-          );
-          break;
-      }
-      return;
+        break;
+      case ContestOrder.Organizer:
+        sortBy = (a, b) => a.organizer.localeCompare(b.organizer);
+        break;
+      case ContestOrder.Contestants:
+        sortBy = (a, b) => compareNumber(a.contestants, b.contestants);
+        break;
+      case ContestOrder.SignedUp:
+        sortBy = (a, b) =>
+          compareNumber(a.participating ? 1 : 0, b.participating ? 1 : 0);
+        break;
     }
-    if (newValue === ContestOrder.Duration) {
-      switch (this.currentTab) {
-        case ContestTab.Current:
-          this.contests.current.sort((a, b) =>
-            a.finish_time.getTime() - a.start_time.getTime() <
-            b.finish_time.getTime() - a.start_time.getTime()
-              ? -1
-              : 1,
-          );
-          break;
-        case ContestTab.Future:
-          this.contests.future.sort((a, b) =>
-            a.finish_time.getTime() - a.start_time.getTime() <
-            b.finish_time.getTime() - a.start_time.getTime()
-              ? -1
-              : 1,
-          );
-          break;
-        case ContestTab.Past:
-          this.contests.past.sort((a, b) =>
-            a.finish_time.getTime() - a.start_time.getTime() <
-            b.finish_time.getTime() - a.start_time.getTime()
-              ? -1
-              : 1,
-          );
-          break;
-      }
-      return;
-    }
-    if (newValue === ContestOrder.Organizer) {
-      switch (this.currentTab) {
-        case ContestTab.Current:
-          this.contests.current.sort((a, b) =>
-            a.organizer < b.organizer ? -1 : 1,
-          );
-          break;
-        case ContestTab.Future:
-          this.contests.future.sort((a, b) =>
-            a.organizer < b.organizer ? -1 : 1,
-          );
-          break;
-        case ContestTab.Past:
-          this.contests.past.sort((a, b) =>
-            a.organizer < b.organizer ? -1 : 1,
-          );
-          break;
-      }
-      return;
-    }
-    if (newValue === ContestOrder.Contestants) {
-      switch (this.currentTab) {
-        case ContestTab.Current:
-          this.contests.current.sort((a, b) =>
-            a.contestants > b.contestants ? -1 : 1,
-          );
-          break;
-        case ContestTab.Future:
-          this.contests.future.sort((a, b) =>
-            a.contestants > b.contestants ? -1 : 1,
-          );
-          break;
-        case ContestTab.Past:
-          this.contests.past.sort((a, b) =>
-            a.contestants > b.contestants ? -1 : 1,
-          );
-          break;
-      }
-      return;
-    }
-    if (newValue === ContestOrder.SignedUp) {
-      switch (this.currentTab) {
-        case ContestTab.Current:
-          this.contests.current.sort((a, b) =>
-            a.participating > b.participating ? -1 : 1,
-          );
-          break;
-        case ContestTab.Future:
-          this.contests.future.sort((a, b) =>
-            a.participating > b.participating ? -1 : 1,
-          );
-          break;
-        case ContestTab.Past:
-          this.contests.past.sort((a, b) =>
-            a.participating > b.participating ? -1 : 1,
-          );
-          break;
-      }
-      return;
-    }
+    this.contestList.sort(sortBy);
   }
 
   @Watch('currentTab')
@@ -467,6 +385,17 @@ export default class ArenaContestList extends Vue {
       return;
     }
     this.currentOrder = ContestOrder.None;
+    switch (newValue) {
+      case ContestTab.Current:
+        this.contestList = this.contests.current;
+        break;
+      case ContestTab.Past:
+        this.contestList = this.contests.past;
+        break;
+      case ContestTab.Future:
+        this.contestList = this.contests.future;
+        break;
+    }
   }
 }
 </script>

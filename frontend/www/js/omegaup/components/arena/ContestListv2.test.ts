@@ -195,6 +195,7 @@ describe('ContestListv2.vue', () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {
         contests,
+        tab: ContestTab.Current,
       },
     });
 
@@ -210,6 +211,7 @@ describe('ContestListv2.vue', () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {
         contests,
+        tab: ContestTab.Future,
       },
     });
 
@@ -225,6 +227,7 @@ describe('ContestListv2.vue', () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {
         contests,
+        tab: ContestTab.Past,
       },
     });
 
@@ -323,7 +326,7 @@ describe('ContestListv2.vue', () => {
       await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
 
       expect(wrapper.vm.currentOrder).toBe(field);
-      expect(contests.current.map((contest) => contest.alias)).toEqual(
+      expect(wrapper.vm.contestList.map((contest) => contest.alias)).toEqual(
         expectedOrder,
       );
     },
@@ -342,7 +345,7 @@ describe('ContestListv2.vue', () => {
       await wrapper.find('.b-dropdown').trigger('click');
       await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
       expect(wrapper.vm.currentOrder).toBe(field);
-      expect(contests.past.map((contest) => contest.alias)).toEqual(
+      expect(wrapper.vm.contestList.map((contest) => contest.alias)).toEqual(
         expectedOrder,
       );
     },
@@ -362,7 +365,7 @@ describe('ContestListv2.vue', () => {
       await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
 
       expect(wrapper.vm.currentOrder).toBe(field);
-      expect(contests.future.map((contest) => contest.alias)).toEqual(
+      expect(wrapper.vm.contestList.map((contest) => contest.alias)).toEqual(
         expectedOrder,
       );
     },
