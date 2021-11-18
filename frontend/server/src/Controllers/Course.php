@@ -55,7 +55,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>}
  * @psalm-type IntroDetailsPayload=array{course: CourseDetails, isFirstTimeAccess: bool, needsBasicInformation: bool, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
  * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
- * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, problemset_id: int, runs: null|list<Run>, start_time: \OmegaUp\Timestamp}
+ * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, problemset_id: int, runs: list<Run>, start_time: \OmegaUp\Timestamp}
  * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard: Scoreboard, courseDetails: CourseDetails, currentAssignment: ArenaAssignment, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type AssignmentDetails=array{admin: bool, alias: string, assignmentType: string, courseAssignments: list<CourseAssignment>, description: string, director: string, finishTime: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemsetId: int, startTime: \OmegaUp\Timestamp}
  * @psalm-type CourseScoreboardPayload=array{assignment: AssignmentDetails, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardToken:null|string}
@@ -3357,6 +3357,58 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{progress: list<StudentProgressInCourse>, nextPage: null|int}
+     *
+     * @omegaup-request-param int $length
+     * @omegaup-request-param int $page
+     * @omegaup-request-param string $course
+     */
+    public static function apiStudentsProgress(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureIdentity();
+
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? 100;
+
+        $courseAlias = $r->ensureString(
+            'course',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $course = self::validateCourseExists($courseAlias);
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $studentsProgress = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
+            "{$courseAlias}-{$page}-{$length}",
+            function () use ($course, $page, $length) {
+                if (is_null($course->course_id) || is_null($course->group_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'courseNotFound'
+                    );
+                }
+                return \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
+                    $course->course_id,
+                    $course->group_id,
+                    $page,
+                    $length
+                );
+            },
+            60 * 60 * 12 // 12 hours
+        );
+
+        return [
+            'progress' => $studentsProgress['studentsProgress'],
+            'nextPage' => (
+                $studentsProgress['totalRows'] > ($page * $length)
+            ) ? $page + 1 : null,
+        ];
+    }
+
+    /**
      * @return array{smartyProperties: array{payload: StudentProgressPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $course
@@ -4085,6 +4137,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             $course,
             $assignmentAlias
         );
+        if (is_null($assignment->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'assignmentNotFound'
+            );
+        }
 
         $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             intval($assignment->problemset_id)
@@ -4137,6 +4194,13 @@ class Course extends \OmegaUp\Controllers\Controller {
         $params->admin = $isAdmin;
         $scoreboard = new \OmegaUp\Scoreboard($params);
 
+        $runs = [];
+        if ($isAdmin) {
+            [
+                'runs' => $runs,
+            ] = self::getAllRuns($assignment->problemset_id);
+        }
+
         return [
             'smartyProperties' => [
                 'payload' => [
@@ -4169,16 +4233,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'finish_time' => $assignment->finish_time,
                         'problems' => $problemsResponseArray,
                         'problemset_id' => intval($assignment->problemset_id),
-                        'runs' => $isAdmin ? \OmegaUp\DAO\Runs::getAllRuns(
-                            $assignment->problemset_id,
-                            /*$status=*/ null,
-                            /*$verdict=*/ null,
-                            /*$problem_id=*/ null,
-                            /*$language=*/ null,
-                            /*$identity_id=*/ null,
-                            /*$offset=*/ 0,
-                            /*$rowcount=*/ 100
-                        ) : [],
+                        'runs' => $runs,
                     ],
                     'scoreboard' => $scoreboard->generate(
                         /*$withRunDetails=*/                        false,
@@ -4197,6 +4252,47 @@ class Course extends \OmegaUp\Controllers\Controller {
             // Navbar is only hidden during exams.
             'inContest' => $assignment->assignment_type === 'test',
             'entrypoint' => 'arena_course',
+        ];
+    }
+
+    /**
+     * @return array{runs: list<Run>, totalRuns: int}
+     */
+    private static function getAllRuns(
+        int $problemsetId,
+        ?string $status = null,
+        ?string $verdict = null,
+        ?int $problemId = null,
+        ?string $language = null,
+        ?int $identityId = null,
+        ?int $offset = 0,
+        ?int $rowCount = 100
+    ): array {
+        // Get our runs
+        [
+            'runs' => $runs,
+            'totalRuns' => $totalRuns,
+        ] = \OmegaUp\DAO\Runs::getAllRuns(
+            $problemsetId,
+            $status,
+            $verdict,
+            $problemId,
+            $language,
+            $identityId,
+            $offset,
+            $rowCount
+        );
+
+        $allRuns = [];
+        foreach ($runs as $run) {
+            unset($run['run_id']);
+            $run['contest_score'] = floatval($run['contest_score']);
+            $allRuns[] = $run;
+        }
+
+        return [
+            'runs' => $allRuns,
+            'totalRuns' => $totalRuns,
         ];
     }
 
@@ -4895,9 +4991,9 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null $language
-     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param int|null $offset
      * @omegaup-request-param null|string $problem_alias
-     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
      * @omegaup-request-param null|string $username
      * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict
@@ -4906,69 +5002,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         // Authenticate request
         $r->ensureIdentity();
 
-        // Validate request
-        [
-            'assignment' => $assignment,
-            'problem' => $problem,
-            'identity' => $identity,
-            'language' => $language,
-            'status' => $status,
-            'verdict' => $verdict,
-        ] = self::validateRuns($r);
-
-        // Get our runs
-        $runs = \OmegaUp\DAO\Runs::getAllRuns(
-            $assignment->problemset_id,
-            $status,
-            $verdict,
-            !is_null($problem) ? $problem->problem_id : null,
-            $language,
-            !is_null($identity) ? $identity->identity_id : null,
-            !is_null($r['offset']) ? intval($r['offset']) : null,
-            !is_null($r['rowcount']) ? intval($r['rowcount']) : null
-        );
-
-        $result = [];
-        foreach ($runs as $run) {
-            unset($run['run_id']);
-            $run['contest_score'] = floatval($run['contest_score']);
-            $result[] = $run;
-        }
-
-        return [
-            'runs' => $result,
-        ];
-    }
-
-    /**
-     * Validates runs API
-     *
-     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, identity: \OmegaUp\DAO\VO\Identities|null, language: 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null, problem: \OmegaUp\DAO\VO\Problems|null, status:'compiling'|'new'|'ready'|'running'|'waiting'|null, verdict:'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null}
-     *
-     * @throws \OmegaUp\Exceptions\NotFoundException
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
-     *
-     * @omegaup-request-param string $assignment_alias
-     * @omegaup-request-param string $course_alias
-     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null $language
-     * @omegaup-request-param int $offset
-     * @omegaup-request-param null|string $problem_alias
-     * @omegaup-request-param int $rowcount
-     * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
-     * @omegaup-request-param null|string $username
-     * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict
-     */
-    private static function validateRuns(
-        \OmegaUp\Request $r
-    ): array {
-        $r->ensureIdentity();
-        // Defaults for offset and rowcount
-        if (!isset($r['offset'])) {
-            $r['offset'] = 0;
-        }
-        if (!isset($r['rowcount'])) {
-            $r['rowcount'] = 100;
-        }
         $assignmentAlias = $r->ensureString(
             'assignment_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
@@ -4977,7 +5010,70 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+        $problemAlias = $r->ensureOptionalString(
+            'problem_alias',
+            /*$required=*/false,
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $username = $r->ensureOptionalString('username');
 
+        // Validate request
+        [
+            'assignment' => $assignment,
+            'problem' => $problem,
+            'identity' => $identity,
+        ] = self::validateRuns(
+            $r->identity,
+            $assignmentAlias,
+            $courseAlias,
+            $problemAlias,
+            $username
+        );
+
+        if (is_null($assignment->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'assignmentNotFound'
+            );
+        }
+
+        $languages = array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES);
+        // Get our runs
+        [
+            'runs' => $runs,
+        ] = self::getAllRuns(
+            $assignment->problemset_id,
+            $r->ensureOptionalEnum('status', \OmegaUp\Controllers\Run::STATUS),
+            $r->ensureOptionalEnum(
+                'verdict',
+                \OmegaUp\Controllers\Run::VERDICTS
+            ),
+            !is_null($problem) ? $problem->problem_id : null,
+            $r->ensureOptionalEnum('language', $languages),
+            !is_null($identity) ? $identity->identity_id : null,
+            $r->ensureOptionalInt('offset') ?? 0,
+            $r->ensureOptionalInt('rowcount') ?? 100
+        );
+
+        return [
+            'runs' => $runs,
+        ];
+    }
+
+    /**
+     * Validates runs API
+     *
+     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, identity: \OmegaUp\DAO\VO\Identities|null, problem: \OmegaUp\DAO\VO\Problems|null}
+     *
+     * @throws \OmegaUp\Exceptions\NotFoundException
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     */
+    private static function validateRuns(
+        \OmegaUp\DAO\VO\Identities $loggedIdentity,
+        string $assignmentAlias,
+        string $courseAlias,
+        ?string $problemAlias,
+        ?string $username
+    ): array {
         $course = self::validateCourseExists($courseAlias);
 
         if (is_null($course->course_id)) {
@@ -4994,30 +5090,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($loggedIdentity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
         }
 
-        $r->ensureOptionalInt('offset');
-        $r->ensureOptionalInt('rowcount');
-        $status = $r->ensureOptionalEnum(
-            'status',
-            ['new', 'waiting', 'compiling', 'running', 'ready']
-        );
-        $verdict = $r->ensureOptionalEnum(
-            'verdict',
-            \OmegaUp\Controllers\Run::VERDICTS
-        );
-
         // Check filter by problem, is optional
         $problem = null;
-        $problemAlias = $r->ensureOptionalString(
-            'problem_alias',
-            /*$required=*/false,
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
         if (!is_null($problemAlias)) {
             $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
             if (is_null($problem)) {
@@ -5027,14 +5107,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        $language = $r->ensureOptionalEnum(
-            'language',
-            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
-        );
-
         // Get user if we have something in username
         $identity = null;
-        $username = $r->ensureOptionalString('username');
         if (!is_null($username)) {
             $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
                 $username
@@ -5045,9 +5119,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             'assignment' => $assignment,
             'problem' => $problem,
             'identity' => $identity,
-            'language' => $language,
-            'status' => $status,
-            'verdict' => $verdict,
         ];
     }
 
