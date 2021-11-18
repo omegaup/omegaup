@@ -479,6 +479,8 @@ const translations: { [key: string]: string; } = {
   courseTabFinished: "Cursos terminados (%(course_count)",
   courseTabFinishedUnlogged: "Cursos terminados",
   courseTabPublic: "Explorar cursos",
+  courseTabsEmptyEnrolledCourses: "No est\u00e1s inscrito en ning\u00fan curso",
+  courseTabsEmptyFinishedCourses: "No hay cursos finalizados",
   courseUnarchivedSuccess: "Curso desarchivado exitosamente.",
   courseUpdateAlreadyHasRuns: "La duraci\u00f3n no se puede cambiar si ya existen soluciones revisadas.",
   courseWithoutProblems: "Sin problemas",
