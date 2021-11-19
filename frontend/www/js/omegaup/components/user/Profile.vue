@@ -4,6 +4,7 @@
       :profile="profile"
       :data="data"
       :selected-tab.sync="currentSelectedTab"
+      :has-password="hasPassword"
     >
       <template #message>
         <h1 v-if="!profile.is_own_profile && profile.is_private">
@@ -14,13 +15,13 @@
         <h3>{{ currentTitle }}</h3>
       </template>
       <template #content>
-        <template v-if="currentSelectedTab === 'see-profile'">
-          <omegaup-user-see-profile
+        <template v-if="currentSelectedTab === 'view-profile'">
+          <omegaup-user-view-profile
             :data="data"
             :profile="profile"
             :profile-badges="profileBadges"
             :visitor-badges="visitorBadges"
-          ></omegaup-user-see-profile>
+          ></omegaup-user-view-profile>
         </template>
         <template v-else-if="currentSelectedTab === 'edit-basic-information'">
           <omegaup-user-edit-basic-information
@@ -77,12 +78,12 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import * as ui from '../../ui';
 import T from '../../lang';
 import { dao, types } from '../../api_types';
 import user_ProfileWrapper from './ProfileWrapper.vue';
-import user_SeeProfile from './SeeProfile.vue';
+import user_ViewProfile from './ViewProfile.vue';
 import user_PreferencesEdit from './PreferencesEdit.vue';
 import user_BasicInformationEdit from './BasicInformationEdit.vue';
 import user_PasswordEdit from './PasswordEdit.vue';
@@ -94,7 +95,7 @@ import user_ManageIdentities from './ManageIdentities.vue';
 @Component({
   components: {
     'omegaup-user-profile-wrapper': user_ProfileWrapper,
-    'omegaup-user-see-profile': user_SeeProfile,
+    'omegaup-user-view-profile': user_ViewProfile,
     'omegaup-user-edit-preferences': user_PreferencesEdit,
     'omegaup-user-edit-basic-information': user_BasicInformationEdit,
     'omegaup-user-edit-password': user_PasswordEdit,
@@ -106,7 +107,7 @@ import user_ManageIdentities from './ManageIdentities.vue';
 export default class Profile extends Vue {
   @Prop({ default: null }) data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
-  @Prop({ default: 'see-profile' }) selectedTab!: string;
+  @Prop({ default: 'view-profile' }) selectedTab!: string;
   @Prop() identities!: types.Identity[];
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
@@ -124,8 +125,13 @@ export default class Profile extends Vue {
     }
     return (
       urlMapping.find((url) => url.key === this.currentSelectedTab)?.title ??
-      'see-profile'
+      'view-profile'
     );
+  }
+
+  @Watch('selectedTab')
+  onSelectedTabChanged(newValue: string) {
+    this.currentSelectedTab = newValue;
   }
 }
 </script>

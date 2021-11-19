@@ -10,7 +10,11 @@ import user_Profile from '../components/user/Profile.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
-  const locationHash = window.location.hash.substr(1).split('#');
+  const locationHash = window.location.hash.substr(1).split('&');
+  if (locationHash[1] === 'locale-changed') {
+    window.location.hash = 'edit-preferences';
+    ui.success(T.userEditPreferencesSuccess);
+  }
 
   const userProfile = new Vue({
     el: '#main-container',
@@ -22,24 +26,26 @@ OmegaUp.on('ready', () => {
         profile: payload.profile,
         data: payload.extraProfileDetails,
         identities: payload.identities,
+        hasPassword: payload.extraProfileDetails?.hasPassword,
+        selectedTab: locationHash[0] !== '' ? locationHash[0] : 'view-profile',
       };
     },
     render: function (createElement) {
       return createElement('omegaup-user-profile', {
         props: {
           data: payload.extraProfileDetails,
-          profile: payload.profile,
+          profile: this.profile,
           profileBadges: new Set(
             payload.extraProfileDetails?.ownedBadges?.map(
               (badge) => badge.badge_alias,
             ),
           ),
           visitorBadges: new Set(payload.extraProfileDetails?.badges),
-          selectedTab: locationHash[0] != '' ? locationHash[0] : 'see-profile',
+          selectedTab: this.selectedTab,
           identities: this.identities,
           countries: payload.countries,
           programmingLanguages: payload.programmingLanguages,
-          hasPassword: payload.extraProfileDetails?.hasPassword,
+          hasPassword: this.hasPassword,
         },
         on: {
           'update-user-basic-information': (
@@ -71,10 +77,12 @@ OmegaUp.on('ready', () => {
             };
             api.User.update(profile)
               .then(() => {
-                ui.success(T.userEditPreferencesSuccess);
                 if (localeChanged) {
+                  window.location.hash = 'edit-preferences&locale-changed';
                   window.location.reload();
+                  return;
                 }
+                ui.success(T.userEditPreferencesSuccess);
               })
               .catch(ui.apiError);
           },
@@ -133,7 +141,8 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.passwordAddRequestSuccess);
-                window.location.reload();
+                userProfile.hasPassword = true;
+                userProfile.selectedTab = 'change-password';
               })
               .catch(ui.apiError);
           },
