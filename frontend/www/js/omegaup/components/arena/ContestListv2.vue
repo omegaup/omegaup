@@ -226,7 +226,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -283,12 +283,6 @@ export default class ArenaContestList extends Vue {
   ContestTab = ContestTab;
   ContestOrder = ContestOrder;
   currentTab: ContestTab = this.tab;
-  contestList: types.ContestListItem[] =
-    this.currentTab === ContestTab.Current
-      ? this.contests.current
-      : this.currentTab === ContestTab.Future
-      ? this.contests.future
-      : this.contests.past;
   currentQuery: string = this.query;
   currentOrder: ContestOrder = ContestOrder.None;
 
@@ -314,33 +308,35 @@ export default class ArenaContestList extends Vue {
 
   orderByTitle() {
     this.currentOrder = ContestOrder.Title;
+    this.sortedContestList;
   }
 
   orderByEnds() {
     this.currentOrder = ContestOrder.Ends;
+    this.sortedContestList;
   }
 
   orderByDuration() {
     this.currentOrder = ContestOrder.Duration;
+    this.sortedContestList;
   }
 
   orderByOrganizer() {
     this.currentOrder = ContestOrder.Organizer;
+    this.sortedContestList;
   }
 
   orderByContestants() {
     this.currentOrder = ContestOrder.Contestants;
+    this.sortedContestList;
   }
 
   orderBySignedUp() {
     this.currentOrder = ContestOrder.SignedUp;
+    this.sortedContestList;
   }
 
-  @Watch('currentOrder')
-  onCurrentOrderChanged(newValue: ContestOrder, oldValue: ContestOrder) {
-    if (newValue === ContestOrder.None || newValue === oldValue) {
-      return;
-    }
+  get sortedContestList(): types.ContestListItem[] {
     function compareNumber(a: number, b: number): number {
       if (a < b) {
         return 1;
@@ -350,7 +346,7 @@ export default class ArenaContestList extends Vue {
       return 0;
     }
     let sortBy: (a: types.ContestListItem, b: types.ContestListItem) => number;
-    switch (newValue) {
+    switch (this.currentOrder) {
       case ContestOrder.Title:
         sortBy = (a, b) => a.title.localeCompare(b.title);
         break;
@@ -375,27 +371,27 @@ export default class ArenaContestList extends Vue {
         sortBy = (a, b) =>
           compareNumber(a.participating ? 1 : 0, b.participating ? 1 : 0);
         break;
+      default:
+        sortBy = (a, b) => a.title.localeCompare(b.title);
+        break;
     }
-    this.contestList.sort(sortBy);
+    return this.contestList.sort(sortBy);
   }
 
-  @Watch('currentTab')
-  onCurrentTabChanged(newValue: ContestTab, oldValue: ContestTab) {
-    if (newValue === oldValue) {
-      return;
-    }
-    this.currentOrder = ContestOrder.None;
-    switch (newValue) {
+  get contestList(): types.ContestListItem[] {
+    let contestList: types.ContestListItem[];
+    switch (this.currentTab) {
       case ContestTab.Current:
-        this.contestList = this.contests.current;
+        contestList = this.contests.current;
         break;
       case ContestTab.Past:
-        this.contestList = this.contests.past;
+        contestList = this.contests.past;
         break;
       case ContestTab.Future:
-        this.contestList = this.contests.future;
+        contestList = this.contests.future;
         break;
     }
+    return contestList;
   }
 }
 </script>
