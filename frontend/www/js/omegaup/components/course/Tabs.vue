@@ -103,6 +103,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+import latinize from 'latinize';
 
 import omegaup_Markdown from '../Markdown.vue';
 import course_CardPublic from './CardPublic.vue';
@@ -161,17 +162,26 @@ export default class CourseTabs extends Vue {
       case Tab.Enrolled:
         return this.courses.enrolled.filter(
           (course) =>
-            this.searchText === '' || course.name.includes(this.searchText),
+            this.searchText === '' ||
+            latinize(course.name.toLowerCase()).includes(
+              latinize(this.searchText.toLowerCase()),
+            ),
         );
       case Tab.Finished:
         return this.courses.finished.filter(
           (course) =>
-            this.searchText === '' || course.name.includes(this.searchText),
+            this.searchText === '' ||
+            latinize(course.name.toLowerCase()).includes(
+              latinize(this.searchText.toLowerCase()),
+            ),
         );
       default:
         return this.courses.public.filter(
           (course) =>
-            this.searchText === '' || course.name.includes(this.searchText),
+            this.searchText === '' ||
+            latinize(course.name.toLowerCase()).includes(
+              latinize(this.searchText.toLowerCase()),
+            ),
         );
     }
   }
