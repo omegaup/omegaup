@@ -1,5 +1,9 @@
 <template>
   <div>
+    <a href="/course/">
+      <font-awesome-icon :icon="['fas', 'chevron-left']" />
+      {{ T.navAllCourses }}
+    </a>
     <h3 class="text-center">
       <span :class="{ 'text-secondary': course.archived }">
         {{ course.name }}
@@ -10,7 +14,10 @@
     </h3>
     <div v-if="course.is_admin" class="my-5">
       <div class="my-4 markdown">
-        <omegaup-markdown :markdown="course.description"></omegaup-markdown>
+        <omegaup-markdown
+          :markdown="course.description"
+          :full-width="true"
+        ></omegaup-markdown>
       </div>
       <span>{{
         ui.formatString(T.courseStudentCountLabel, {
@@ -323,8 +330,9 @@ import {
   faEdit,
   faLink,
   faTachometerAlt,
+  faChevronLeft,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faEdit, faLink, faTachometerAlt);
+library.add(faEdit, faLink, faTachometerAlt, faChevronLeft);
 
 export enum Tab {
   Information = 'information',
