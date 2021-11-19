@@ -3562,6 +3562,7 @@ export namespace types {
   export interface ProblemsMineInfoPayload {
     isSysadmin: boolean;
     privateProblemsAlert: boolean;
+    query?: string;
     visibilityStatuses: { [key: string]: number };
   }
 
