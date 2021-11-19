@@ -95,6 +95,7 @@
   - [`/api/course/requests/`](#apicourserequests)
   - [`/api/course/runs/`](#apicourseruns)
   - [`/api/course/studentProgress/`](#apicoursestudentprogress)
+  - [`/api/course/studentsProgress/`](#apicoursestudentsprogress)
   - [`/api/course/update/`](#apicourseupdate)
   - [`/api/course/updateAssignment/`](#apicourseupdateassignment)
   - [`/api/course/updateAssignmentsOrder/`](#apicourseupdateassignmentsorder)
@@ -2067,6 +2068,25 @@ Returns all runs for a course
 | Name       | Type                    |
 | ---------- | ----------------------- |
 | `problems` | `types.CourseProblem[]` |
+
+## `/api/course/studentsProgress/`
+
+### Description
+
+### Parameters
+
+| Name     | Type     | Description |
+| -------- | -------- | ----------- |
+| `course` | `string` |             |
+| `length` | `int`    |             |
+| `page`   | `int`    |             |
+
+### Returns
+
+| Name       | Type                              |
+| ---------- | --------------------------------- |
+| `nextPage` | `number`                          |
+| `progress` | `types.StudentProgressInCourse[]` |
 
 ## `/api/course/update/`
 

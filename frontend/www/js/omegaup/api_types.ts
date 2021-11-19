@@ -3562,6 +3562,7 @@ export namespace types {
   export interface ProblemsMineInfoPayload {
     isSysadmin: boolean;
     privateProblemsAlert: boolean;
+    query?: string;
     visibilityStatuses: { [key: string]: number };
   }
 
@@ -4597,6 +4598,11 @@ export namespace messages {
   export type CourseStudentProgressResponse = {
     problems: types.CourseProblem[];
   };
+  export type CourseStudentsProgressRequest = { [key: string]: any };
+  export type CourseStudentsProgressResponse = {
+    nextPage?: number;
+    progress: types.StudentProgressInCourse[];
+  };
   export type CourseUpdateRequest = { [key: string]: any };
   export type CourseUpdateResponse = {};
   export type CourseUpdateAssignmentRequest = { [key: string]: any };
@@ -5408,6 +5414,9 @@ export namespace controllers {
     studentProgress: (
       params?: messages.CourseStudentProgressRequest,
     ) => Promise<messages.CourseStudentProgressResponse>;
+    studentsProgress: (
+      params?: messages.CourseStudentsProgressRequest,
+    ) => Promise<messages.CourseStudentsProgressResponse>;
     update: (
       params?: messages.CourseUpdateRequest,
     ) => Promise<messages.CourseUpdateResponse>;
