@@ -129,6 +129,7 @@
         @update-search-result-users="
           (request) => $emit('update-search-result-users', request)
         "
+        @filter-changed="(request) => $emit('apply-filter', request)"
       >
         <template #title><div></div></template>
         <template #runs><div></div></template>
