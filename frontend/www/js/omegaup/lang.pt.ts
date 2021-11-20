@@ -153,7 +153,7 @@ const translations: { [key: string]: string; } = {
   codersOfTheMonth: "Programadores do M\u00eas",
   codersOfTheMonthCountry: "Pa\u00eds / Regi\u00e3o",
   codersOfTheMonthDate: "Data",
-  codersOfTheMonthFemale: "Programadores do M\u00eas Feminino",
+  codersOfTheMonthFemale: "Coders do M\u00eas Feminino",
   codersOfTheMonthFemaleListCandidate: "Lista de candidatos ao codificador do m\u00eas feminino",
   codersOfTheMonthFemaleRank: "Top 100 codificadoras do m\u00eas anterior",
   codersOfTheMonthListCandidate: "Lista de candidatos ao codificador do m\u00eas",
