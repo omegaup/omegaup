@@ -34,7 +34,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestList=array{current: list<ContestListItem>, future: list<ContestListItem>, past: list<ContestListItem>}
  * @psalm-type TimeTypeContests=array<string, list<ContestListItem>>
  * @psalm-type ContestListPayload=array{contests: TimeTypeContests, isLogged: bool, query: string}
- * @psalm-type ContestListv2Payload=array{contests: ContestList}
+ * @psalm-type ContestListv2Payload=array{contests: ContestList, query: string | null}
  * @psalm-type ContestNewPayload=array{languages: array<string, string>}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
@@ -45,7 +45,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type ContestScoreboardPayload=array{contest: ContestDetails, contestAdmin: bool, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardEvents: list<ScoreboardEvent>, scoreboardToken:null|string}
- * @psalm-type ContestDetailsPayload=array{adminPayload?: array{allRuns: list<Run>, users: list<ContestUser>}, clarifications: list<Clarification>, contest: ContestPublicDetails, original?: array{contest: \OmegaUp\DAO\VO\Contests, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>}, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardEvents: list<ScoreboardEvent>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null}
+ * @psalm-type ContestDetailsPayload=array{adminPayload?: array{allRuns: list<Run>, totalRuns: int, users: list<ContestUser>}, clarifications: list<Clarification>, contest: ContestPublicDetails, original?: array{contest: \OmegaUp\DAO\VO\Contests, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>}, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardEvents: list<ScoreboardEvent>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null}
  * @psalm-type ContestPracticeDetailsPayload=array{adminPayload?: array{allRuns: list<Run>, users: list<ContestUser>}, clarifications: list<Clarification>, contest: ContestPublicDetails, contestAdmin: bool, original?: array{contest: \OmegaUp\DAO\VO\Contests, scoreboard?: Scoreboard, scoreboardEvents?: list<ScoreboardEvent>}, problems: list<NavbarProblemsetProblem>, shouldShowFirstAssociatedIdentityRunWarning: bool, submissionDeadline: \OmegaUp\Timestamp|null}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
@@ -804,42 +804,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 ),
             );
             if ($contestAdmin) {
-                $allRuns = [];
-
                 // Get our runs
-                $runs = \OmegaUp\DAO\Runs::getAllRuns(
-                    $problemset->problemset_id,
-                    /*$status=*/ null,
-                    /*$verdict=*/ null,
-                    /*$problem_id=*/ null,
-                    /*$language=*/ null,
-                    /*$identity_id=*/ null,
-                    /*$offset=*/ 0,
-                    /*$rowcount=*/ 100
+                [
+                    'totalRuns' => $totalRuns,
+                    'runs' => $runs,
+                ] = self::getAllRuns(
+                    $contest->problemset_id,
+                    $contest->partial_score
                 );
-
-                foreach ($runs as $run) {
-                    unset($run['run_id']);
-                    if ($contest->partial_score || $run['score'] == 1) {
-                        $run['contest_score'] = round(
-                            floatval(
-                                $run['contest_score']
-                            ),
-                            2
-                        );
-                        $run['score'] = round(floatval($run['score']), 4);
-                    } else {
-                        $run['contest_score'] = 0;
-                        $run['score'] = 0;
-                    }
-                    $allRuns[] = $run;
-                }
 
                 $result['smartyProperties']['payload']['adminPayload'] = [
                     'users' => \OmegaUp\DAO\ProblemsetIdentities::getWithExtraInformation(
                         intval($contest->problemset_id)
                     ),
-                    'allRuns' => $allRuns,
+                    'allRuns' => $runs,
+                    'totalRuns' => $totalRuns,
                 ];
             }
 
@@ -1178,6 +1157,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => [
                     'contests' => $contests,
+                    'query' => $r->ensureOptionalString('query'),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleContestList'
@@ -4910,55 +4890,44 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Validates runs API
+     * Returns all runs for a contest
      *
-     * @throws \OmegaUp\Exceptions\NotFoundException
-     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
-     *
-     * @return array{0: \OmegaUp\DAO\VO\Contests, 1: \OmegaUp\DAO\VO\Problems|null, 2: \OmegaUp\DAO\VO\Identities|null}
+     * @return array{runs: list<Run>, totalRuns: int}
      *
      * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param mixed $language
-     * @omegaup-request-param int $offset
+     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null $language
+     * @omegaup-request-param int|null $offset
      * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param int $rowcount
-     * @omegaup-request-param mixed $status
+     * @omegaup-request-param int|null $rowcount
+     * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
      * @omegaup-request-param null|string $username
-     * @omegaup-request-param mixed $verdict
+     * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict
      */
-    private static function validateRuns(\OmegaUp\Request $r): array {
+    public static function apiRuns(\OmegaUp\Request $r): array {
+        // Authenticate request
         $r->ensureIdentity();
-        // Defaults for offset and rowcount
-        if (!isset($r['offset'])) {
-            $r['offset'] = 0;
-        }
-        if (!isset($r['rowcount'])) {
-            $r['rowcount'] = 100;
-        }
 
+        // Contest information
         $contestAlias = $r->ensureString(
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateOptionalStringNonEmpty(
-            $r['username'],
-            'username'
-        );
-
         $contest = self::validateContestAdmin($contestAlias, $r->identity);
+        if (is_null($contest->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
 
-        $r->ensureOptionalInt('offset');
-        $r->ensureOptionalInt('rowcount');
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['status'],
-            'status',
-            ['new', 'waiting', 'compiling', 'running', 'ready']
-        );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['verdict'],
-            'verdict',
-            \OmegaUp\Controllers\Run::VERDICTS
-        );
+        // Get user if we have something in username
+        $username = $r->ensureOptionalString('username');
+
+        $identity = null;
+        if (!is_null($username)) {
+            $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+                $username
+            );
+        }
 
         $problem = null;
         // Check filter by problem, is optional
@@ -4976,77 +4945,58 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['language'],
-            'language',
-            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
-        );
+        $languages = array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES);
 
-        // Get user if we have something in username
-        $identity = null;
-        if (!is_null($r['username'])) {
-            $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
-                $r['username']
-            );
-        }
-        return [$contest, $problem, $identity];
+        // Get our runs
+        return self::getAllRuns(
+            $contest->problemset_id,
+            $contest->partial_score,
+            $r->ensureOptionalEnum('status', \OmegaUp\Controllers\Run::STATUS),
+            $r->ensureOptionalEnum(
+                'verdict',
+                \OmegaUp\Controllers\Run::VERDICTS
+            ),
+            !is_null($problem) ? $problem->problem_id : null,
+            $r->ensureOptionalEnum('language', $languages),
+            !is_null($identity) ? $identity->identity_id : null,
+            $r->ensureOptionalInt('offset') ?? 0,
+            $r->ensureOptionalInt('rowcount') ?? 100
+        );
     }
 
     /**
-     * Returns all runs for a contest
-     *
-     * @return array{runs: list<Run>}
-     *
-     * @omegaup-request-param string $contest_alias
-     * @omegaup-request-param mixed $language
-     * @omegaup-request-param int|null $offset
-     * @omegaup-request-param string $problem_alias
-     * @omegaup-request-param int|null $rowcount
-     * @omegaup-request-param mixed $status
-     * @omegaup-request-param null|string $username
-     * @omegaup-request-param mixed $verdict
+     * @return array{runs: list<Run>, totalRuns: int}
      */
-    public static function apiRuns(\OmegaUp\Request $r): array {
-        // Authenticate request
-        $r->ensureIdentity();
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['status'],
-            'status',
-            \OmegaUp\Controllers\Run::STATUS
-        );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['verdict'],
-            'verdict',
-            \OmegaUp\Controllers\Run::VERDICTS
-        );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['language'],
-            'language',
-            array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
-        );
-        \OmegaUp\Validators::validateOptionalNumber($r['offset'], 'offset');
-        \OmegaUp\Validators::validateOptionalNumber($r['rowcount'], 'rowcount');
-
-        // Validate request
-        [$contest, $problem, $identity] = self::validateRuns($r);
-
+    private static function getAllRuns(
+        int $problemsetId,
+        bool $partialScore,
+        ?string $status = null,
+        ?string $verdict = null,
+        ?int $problemId = null,
+        ?string $language = null,
+        ?int $identityId = null,
+        ?int $offset = 0,
+        ?int $rowCount = 100
+    ): array {
         // Get our runs
-        $runs = \OmegaUp\DAO\Runs::getAllRuns(
-            $contest->problemset_id,
-            $r['status'],
-            $r['verdict'],
-            !is_null($problem) ? $problem->problem_id : null,
-            $r['language'],
-            !is_null($identity) ? $identity->identity_id : null,
-            intval($r['offset']),
-            intval($r['rowcount'])
+        [
+            'runs' => $runs,
+            'totalRuns' => $totalRuns,
+        ] = \OmegaUp\DAO\Runs::getAllRuns(
+            $problemsetId,
+            $status,
+            $verdict,
+            $problemId,
+            $language,
+            $identityId,
+            $offset,
+            $rowCount
         );
 
-        $result = [];
-
+        $allRuns = [];
         foreach ($runs as $run) {
             unset($run['run_id']);
-            if ($contest->partial_score || $run['score'] == 1) {
+            if ($partialScore || $run['score'] == 1) {
                 $run['contest_score'] = round(
                     floatval(
                         $run['contest_score']
@@ -5058,11 +5008,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $run['contest_score'] = 0;
                 $run['score'] = 0;
             }
-            $result[] = $run;
+            $allRuns[] = $run;
         }
 
         return [
-            'runs' => $result,
+            'runs' => $allRuns,
+            'totalRuns' => $totalRuns,
         ];
     }
 

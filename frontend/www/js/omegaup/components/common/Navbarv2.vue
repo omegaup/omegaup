@@ -29,193 +29,71 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse omegaup-navbar">
-          <ul
-            v-if="!omegaUpLockDown && (!inContest || isAdmin)"
-            class="navbar-nav mr-auto"
+          <omegaup-navbar-items
+            :omega-up-lock-down="omegaUpLockDown"
+            :in-contest="inContest"
+            :is-logged-in="isLoggedIn"
+            :is-reviewer="isReviewer"
+            :is-admin="isAdmin"
+            :is-main-user-identity="isMainUserIdentity"
+            :navbar-section="navbarSection"
           >
-            <li
-              v-if="isLoggedIn"
-              class="nav-item dropdown nav-contests"
-              :class="{ active: navbarSection === 'contests' }"
-            >
+            <template v-if="hasTeachingObjective" #contests-items>
               <a
-                class="nav-link px-2 dropdown-toggle"
-                href="#"
-                role="button"
-                data-nav-contests
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
+                v-if="isMainUserIdentity"
+                class="dropdown-item"
+                href="/contest/new/"
+                data-nav-contests-create
               >
-                {{ T.wordsContests }}
+                {{ T.contestsCreate }}
               </a>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="/arena/" data-nav-contests-arena>
-                  {{ T.navAllContests }}
+              <a class="dropdown-item" href="/arena/" data-nav-contests-arena>
+                {{ T.navViewContests }}
+              </a>
+              <a
+                v-if="isMainUserIdentity"
+                class="dropdown-item"
+                href="/scoreboardmerge/"
+              >
+                {{ T.contestsJoinScoreboards }}
+              </a>
+            </template>
+            <template v-if="hasTeachingObjective" #courses-items>
+              <template v-if="isMainUserIdentity">
+                <a
+                  class="dropdown-item"
+                  href="/course/new/"
+                  data-nav-courses-create
+                >
+                  {{ T.courseCreate }}
                 </a>
-                <template v-if="isMainUserIdentity">
-                  <a
-                    class="dropdown-item"
-                    href="/contest/new/"
-                    data-nav-contests-create
-                  >
-                    {{ T.contestsCreateNew }}
-                  </a>
-                  <a class="dropdown-item" href="/scoreboardmerge/">
-                    {{ T.contestsJoinScoreboards }}
-                  </a>
-                </template>
-              </div>
-            </li>
-            <li v-else :class="{ active: navbarSection === 'contests' }">
-              <a class="nav-link px-2" href="/arena/" data-nav-contests-arena>{{
-                T.wordsContests
+              </template>
+              <a class="dropdown-item" href="/course/" data-nav-courses-all>
+                {{ T.navViewCourses }}
+              </a>
+            </template>
+            <template v-if="hasTeachingObjective" #problems-items>
+              <a
+                v-if="isLoggedIn && isMainUserIdentity"
+                class="dropdown-item"
+                href="/problem/new/"
+                data-nav-problems-create
+                >{{ T.myproblemsListCreateProblem }}</a
+              >
+              <a
+                class="dropdown-item"
+                href="/problem/collection/"
+                data-nav-problems-collection
+                >{{ T.navViewProblems }}</a
+              >
+              <a class="dropdown-item" href="/submissions/">{{
+                T.navViewLatestSubmissions
               }}</a>
-            </li>
-            <li
-              v-if="isLoggedIn"
-              class="nav-item dropdown nav-courses"
-              :class="{ active: navbarSection === 'courses' }"
-            >
-              <a
-                class="nav-link px-2 dropdown-toggle"
-                href="#"
-                role="button"
-                data-nav-courses
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                {{ T.navCourses }}
-              </a>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="/course/" data-nav-courses-all>
-                  {{ T.navAllCourses }}
-                </a>
-                <template v-if="isMainUserIdentity">
-                  <a
-                    class="dropdown-item"
-                    href="/course/new/"
-                    data-nav-courses-create
-                  >
-                    {{ T.buttonCreateCourse }}
-                  </a>
-                </template>
-              </div>
-            </li>
-            <li
-              v-else
-              :class="{ active: navbarSection === 'course' }"
-              data-nav-course
-            >
-              <a class="nav-link px-2" href="/course/home/">{{
-                T.navCourses
+              <a v-if="isReviewer" class="dropdown-item" href="/nomination/">{{
+                T.navQualityNominationQueue
               }}</a>
-            </li>
-            <li
-              class="nav-item dropdown nav-problems"
-              :class="{ active: navbarSection === 'problems' }"
-            >
-              <a
-                class="nav-link px-2 dropdown-toggle"
-                href="#"
-                role="button"
-                data-toggle="dropdown"
-                data-nav-problems
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                {{ T.wordsProblems }}
-              </a>
-              <div class="dropdown-menu">
-                <a
-                  class="dropdown-item"
-                  href="/problem/collection/"
-                  data-nav-problems-collection
-                  >{{ T.problemcollectionViewProblems }}</a
-                >
-                <a
-                  v-if="isLoggedIn && isMainUserIdentity"
-                  class="dropdown-item"
-                  href="/problem/new/"
-                  data-nav-problems-create
-                  >{{ T.myproblemsListCreateProblem }}</a
-                >
-                <a class="dropdown-item" href="/submissions/">{{
-                  T.wordsLatestSubmissions
-                }}</a>
-                <a
-                  v-if="isReviewer"
-                  class="dropdown-item"
-                  href="/nomination/"
-                  >{{ T.navQualityNominationQueue }}</a
-                >
-              </div>
-            </li>
-            <li
-              class="nav-item dropdown nav-rank"
-              :class="{ active: navbarSection === 'rank' }"
-            >
-              <a
-                class="nav-link px-2 dropdown-toggle"
-                href="#"
-                role="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                {{ T.navRanking }}
-              </a>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="/rank/">{{
-                  T.navUserRanking
-                }}</a>
-                <a class="dropdown-item" href="/rank/authors/">{{
-                  T.navAuthorRanking
-                }}</a>
-                <a class="dropdown-item" href="/rank/schools/">{{
-                  T.navSchoolRanking
-                }}</a>
-                <a class="dropdown-item" href="/coderofthemonth/">{{
-                  T.navCoderOfTheMonth
-                }}</a>
-                <a href="/coderofthemonth/female/" class="dropdown-item">{{
-                  T.navCoderOfTheMonthFemale
-                }}</a>
-                <a class="dropdown-item" href="/schoolofthemonth/">{{
-                  T.navSchoolOfTheMonth
-                }}</a>
-              </div>
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link px-2 dropdown-toggle"
-                href="#"
-                role="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                {{ T.navHelp }}
-              </a>
-              <div class="dropdown-menu">
-                <a
-                  class="dropdown-item"
-                  href="https://www.youtube.com/playlist?list=PLdSCJwXErQ8FhVwmlySvab3XtEVdE8QH4"
-                  >{{ T.navTutorials }}</a
-                >
-                <a class="dropdown-item" href="http://blog.omegaup.com/">{{
-                  T.navBlog
-                }}</a>
-                <a
-                  class="dropdown-item text-wrap"
-                  href="https://omegaup.com/img/libropre3.pdf"
-                  >{{ T.navAlgorithmsBook }}</a
-                >
-              </div>
-            </li>
-          </ul>
-          <ul v-else class="navbar-nav mr-auto"></ul>
+            </template>
+          </omegaup-navbar-items>
           <!-- in lockdown or contest mode there is no left navbar -->
           <ul v-if="!isLoggedIn" class="navbar-nav navbar-right">
             <li class="nav-item">
@@ -360,6 +238,10 @@
         </div>
       </div>
     </nav>
+    <omegaup-user-objectives-questions
+      v-if="fromLogin && userTypes.length === 0"
+      @submit="(objectives) => $emit('update-user-objectives', objectives)"
+    ></omegaup-user-objectives-questions>
   </header>
 </template>
 
@@ -371,6 +253,8 @@ import notifications_List from '../notification/List.vue';
 import notifications_Clarifications from '../notification/Clarificationsv2.vue';
 import common_GraderStatus from '../common/GraderStatus.vue';
 import common_GraderBadge from '../common/GraderBadge.vue';
+import user_objectives_questions from '../user/ObjectivesQuestions.vue';
+import navbar_items from './NavbarItems.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -384,6 +268,8 @@ library.add(faSignOutAlt, faUser);
     'omegaup-notifications-clarifications': notifications_Clarifications,
     'omegaup-common-grader-status': common_GraderStatus,
     'omegaup-common-grader-badge': common_GraderBadge,
+    'omegaup-user-objectives-questions': user_objectives_questions,
+    'omegaup-navbar-items': navbar_items,
   },
 })
 export default class Navbar extends Vue {
@@ -407,8 +293,14 @@ export default class Navbar extends Vue {
   @Prop() errorMessage!: string | null;
   @Prop({ default: 0 }) profileProgress!: number;
   @Prop() clarifications!: types.Clarification[];
+  @Prop() fromLogin!: boolean;
+  @Prop() userTypes!: string[];
 
   T = T;
+  teachingUserTypes = ['teacher', 'coach', 'independent-teacher'];
+  hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
+    this.userTypes.includes(teachingType),
+  );
 
   get formattedLoginURL(): string {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
