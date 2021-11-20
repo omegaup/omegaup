@@ -124,9 +124,7 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in currentOrder === ContestOrder.None
-              ? contestList
-              : sortedContestList"
+            v-for="contestItem in sortedContestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -159,9 +157,7 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in currentOrder === ContestOrder.None
-              ? contestList
-              : sortedContestList"
+            v-for="contestItem in sortedContestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -197,9 +193,7 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in currentOrder === ContestOrder.None
-              ? contestList
-              : sortedContestList"
+            v-for="contestItem in sortedContestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -347,6 +341,8 @@ export default class ArenaContestList extends Vue {
     }
     let sortBy: (a: types.ContestListItem, b: types.ContestListItem) => number;
     switch (this.currentOrder) {
+      case ContestOrder.None:
+        return this.contestList.slice();
       case ContestOrder.Title:
         sortBy = (a, b) => a.title.localeCompare(b.title);
         break;
@@ -370,9 +366,6 @@ export default class ArenaContestList extends Vue {
       case ContestOrder.SignedUp:
         sortBy = (a, b) =>
           compareNumber(a.participating ? 1 : 0, b.participating ? 1 : 0);
-        break;
-      default:
-        sortBy = (a, b) => a.title.localeCompare(b.title);
         break;
     }
     return this.contestList.slice().sort(sortBy);
