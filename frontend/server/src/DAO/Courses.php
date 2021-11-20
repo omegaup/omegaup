@@ -18,6 +18,7 @@ namespace OmegaUp\DAO;
  * @psalm-type CourseCardPublic=array{alias: string, alreadyStarted: bool, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}
  * @psalm-type AssignmentsProblemsPoints=array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
  * @psalm-type StudentProgressInCourse=array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}
+ * @psalm-type Course=array{acl_id?: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time?: \OmegaUp\Timestamp|null, group_id?: int, languages?: null|string, level?: null|string, minimum_progress_for_certificate?: int|null, name: string, needs_basic_information: bool, objective?: null|string, requests_user_information: string, school_id?: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
@@ -1152,7 +1153,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
     /**
      * Returns the list of courses created by a certain identity
-     * @return list<\OmegaUp\DAO\VO\Courses>
+     * @return list<Course>
      */
     final public static function getCoursesCreatedByIdentity(
         int $identityId
@@ -1177,13 +1178,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         ];
 
         /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
-
-        $courses = [];
-        foreach ($rs as $row) {
-            $courses[] = new \OmegaUp\DAO\VO\Courses($row);
-        }
-        return $courses;
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     final public static function getByAlias(

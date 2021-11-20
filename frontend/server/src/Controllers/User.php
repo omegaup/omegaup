@@ -4037,14 +4037,6 @@ class User extends \OmegaUp\Controllers\Controller {
         ) ? [] : \OmegaUp\DAO\Identities::getAssociatedIdentities(
             $loggedIdentity
         );
-        /** @var list<Contest> */
-        $createdContests = \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(
-            $targetIdentity->identity_id
-        );
-        /** @var list<Course> */
-        $createdCourses = \OmegaUp\DAO\Courses::getCoursesCreatedByIdentity(
-            $targetIdentity->identity_id
-        );
         $response['smartyProperties']['payload'] = array_merge(
             $response['smartyProperties']['payload'],
             [
@@ -4060,8 +4052,12 @@ class User extends \OmegaUp\Controllers\Controller {
                     'createdProblems' => self::getCreatedProblems(
                         $targetIdentity->identity_id
                     ),
-                    'createdContests' => $createdContests,
-                    'createdCourses' => $createdCourses,
+                    'createdContests' => \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(
+                        $targetIdentity->identity_id
+                    ),
+                    'createdCourses' => \OmegaUp\DAO\Courses::getCoursesCreatedByIdentity(
+                        $targetIdentity->identity_id
+                    ),
                     'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
                         $targetIdentity->identity_id
                     ),
