@@ -124,7 +124,9 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in contestList"
+            v-for="contestItem in currentOrder === ContestOrder.None
+              ? contestList
+              : sortedContestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -157,7 +159,9 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in contestList"
+            v-for="contestItem in currentOrder === ContestOrder.None
+              ? contestList
+              : sortedContestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -193,7 +197,9 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in contestList"
+            v-for="contestItem in currentOrder === ContestOrder.None
+              ? contestList
+              : sortedContestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -308,32 +314,26 @@ export default class ArenaContestList extends Vue {
 
   orderByTitle() {
     this.currentOrder = ContestOrder.Title;
-    this.sortedContestList;
   }
 
   orderByEnds() {
     this.currentOrder = ContestOrder.Ends;
-    this.sortedContestList;
   }
 
   orderByDuration() {
     this.currentOrder = ContestOrder.Duration;
-    this.sortedContestList;
   }
 
   orderByOrganizer() {
     this.currentOrder = ContestOrder.Organizer;
-    this.sortedContestList;
   }
 
   orderByContestants() {
     this.currentOrder = ContestOrder.Contestants;
-    this.sortedContestList;
   }
 
   orderBySignedUp() {
     this.currentOrder = ContestOrder.SignedUp;
-    this.sortedContestList;
   }
 
   get sortedContestList(): types.ContestListItem[] {
@@ -352,13 +352,13 @@ export default class ArenaContestList extends Vue {
         break;
       case ContestOrder.Ends:
         sortBy = (a, b) =>
-          compareNumber(a.finish_time.getDate(), b.finish_time.getDate());
+          compareNumber(a.finish_time.getTime(), b.finish_time.getTime());
         break;
       case ContestOrder.Duration:
         sortBy = (a, b) =>
           compareNumber(
             a.finish_time.getTime() - a.start_time.getTime(),
-            b.finish_time.getTime() - a.start_time.getTime(),
+            b.finish_time.getTime() - b.start_time.getTime(),
           );
         break;
       case ContestOrder.Organizer:
@@ -375,23 +375,20 @@ export default class ArenaContestList extends Vue {
         sortBy = (a, b) => a.title.localeCompare(b.title);
         break;
     }
-    return this.contestList.sort(sortBy);
+    return this.contestList.slice().sort(sortBy);
   }
 
   get contestList(): types.ContestListItem[] {
-    let contestList: types.ContestListItem[];
     switch (this.currentTab) {
       case ContestTab.Current:
-        contestList = this.contests.current;
-        break;
+        return this.contests.current;
       case ContestTab.Past:
-        contestList = this.contests.past;
-        break;
+        return this.contests.past;
       case ContestTab.Future:
-        contestList = this.contests.future;
-        break;
+        return this.contests.future;
+      default:
+        return this.contests.current;
     }
-    return contestList;
   }
 }
 </script>

@@ -42,9 +42,7 @@ describe('ContestListv2.vue', () => {
         description: 'hello contest 3',
         contest_id: 3,
         contestants: 15,
-        finish_time: new Date(
-          tomorrow.setDate(tomorrow.getDate() + daySeconds * 2),
-        ),
+        finish_time: new Date(tomorrow.getTime() + daySeconds * 2),
         last_updated: yesterday,
         organizer: 'alfadown',
         original_finish_time: tomorrow,
@@ -62,9 +60,7 @@ describe('ContestListv2.vue', () => {
         description: 'hello contest 2',
         contest_id: 2,
         contestants: 5,
-        finish_time: new Date(
-          tomorrow.setDate(tomorrow.getDate() + daySeconds),
-        ),
+        finish_time: new Date(tomorrow.getTime() + daySeconds),
         last_updated: yesterday,
         organizer: 'lamdaleft',
         original_finish_time: tomorrow,
@@ -140,7 +136,7 @@ describe('ContestListv2.vue', () => {
         description: 'hello contest 1',
         contest_id: 1,
         contestants: 12,
-        finish_time: yesterday,
+        finish_time: new Date(yesterday.getTime() - daySeconds * 2),
         last_updated: new Date(yesterday.getTime() - daySeconds),
         organizer: 'omegaup',
         original_finish_time: yesterday,
@@ -158,7 +154,7 @@ describe('ContestListv2.vue', () => {
         description: 'hello contest 3',
         contest_id: 3,
         contestants: 15,
-        finish_time: today,
+        finish_time: yesterday /*new Date(yesterday.getTime() - daySeconds * 2)*/,
         last_updated: new Date(yesterday.getTime() - daySeconds),
         organizer: 'alfadown',
         original_finish_time: yesterday,
@@ -166,7 +162,7 @@ describe('ContestListv2.vue', () => {
         participating: false,
         problemset_id: 1,
         recommended: false,
-        start_time: new Date(yesterday.getTime() - daySeconds),
+        start_time: new Date(yesterday.getTime() - daySeconds * 3),
         title: 'Past Contest 3',
         window_length: 300,
       },
@@ -176,7 +172,7 @@ describe('ContestListv2.vue', () => {
         description: 'hello contest 2',
         contest_id: 2,
         contestants: 5,
-        finish_time: tomorrow,
+        finish_time: new Date(yesterday.getTime() - daySeconds),
         last_updated: new Date(yesterday.getTime() - daySeconds),
         organizer: 'lambdaleft',
         original_finish_time: yesterday,
@@ -184,7 +180,7 @@ describe('ContestListv2.vue', () => {
         participating: true,
         problemset_id: 1,
         recommended: false,
-        start_time: new Date(yesterday.getTime() - daySeconds),
+        start_time: new Date(yesterday.getTime() - daySeconds * 3),
         title: 'Past Contest 2',
         window_length: 300,
       },
@@ -279,14 +275,14 @@ describe('ContestListv2.vue', () => {
       {
         field: ContestOrder.Ends,
         name: 'ends',
-        expectedOrder: ['Contest-1', 'Contest-2', 'Contest-3'],
+        expectedOrder: ['Contest-3', 'Contest-2', 'Contest-1'],
       },
     ],
     [
       {
         field: ContestOrder.Duration,
         name: 'duration',
-        expectedOrder: ['Contest-1', 'Contest-2', 'Contest-3'],
+        expectedOrder: ['Contest-3', 'Contest-2', 'Contest-1'],
       },
     ],
     [
@@ -326,9 +322,9 @@ describe('ContestListv2.vue', () => {
       await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
 
       expect(wrapper.vm.currentOrder).toBe(field);
-      expect(wrapper.vm.contestList.map((contest) => contest.alias)).toEqual(
-        expectedOrder,
-      );
+      expect(
+        wrapper.vm.sortedContestList.map((contest) => contest.alias),
+      ).toEqual(expectedOrder);
     },
   );
 
@@ -345,9 +341,9 @@ describe('ContestListv2.vue', () => {
       await wrapper.find('.b-dropdown').trigger('click');
       await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
       expect(wrapper.vm.currentOrder).toBe(field);
-      expect(wrapper.vm.contestList.map((contest) => contest.alias)).toEqual(
-        expectedOrder,
-      );
+      expect(
+        wrapper.vm.sortedContestList.map((contest) => contest.alias),
+      ).toEqual(expectedOrder);
     },
   );
 
@@ -365,9 +361,9 @@ describe('ContestListv2.vue', () => {
       await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
 
       expect(wrapper.vm.currentOrder).toBe(field);
-      expect(wrapper.vm.contestList.map((contest) => contest.alias)).toEqual(
-        expectedOrder,
-      );
+      expect(
+        wrapper.vm.sortedContestList.map((contest) => contest.alias),
+      ).toEqual(expectedOrder);
     },
   );
 });
