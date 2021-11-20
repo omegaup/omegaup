@@ -1232,7 +1232,7 @@ const translations: { [key: string]: string; } = {
   schoolsStartUsingCourses: "Start using Courses",
   scoreboardLastUpdated: "Last time updated: %(datetime)",
   scoreboardShowOnlyInvitedIdentities: "Show official contestants only",
-  searchUser: "Search user",
+  searchUser: "Search coder",
   selectProblemLevelDesc: "In order to add the problem, you must to choose its corresponding level",
   serviceUnavailableError: "Oops. The service is currently unavailable. Please try again.",
   showLinks: "Links",
