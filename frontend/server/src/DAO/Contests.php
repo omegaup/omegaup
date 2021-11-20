@@ -419,7 +419,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     ) {
         $columns = \OmegaUp\DAO\Contests::$getContestsColumns;
         $sql = "
-            SELECT DISTINCT
+            SELECT
                 $columns,
                 p.scoreboard_url,
                 p.scoreboard_url_admin

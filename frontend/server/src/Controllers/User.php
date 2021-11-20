@@ -1884,25 +1884,6 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return list<Contest>
-     */
-    private static function getCreatedContests(int $identityId): array {
-        return \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(
-            $identityId
-        );
-    }
-
-    /**
-     * @return list<Course>
-     */
-    private static function getCreatedCourses(int $identityId): array {
-        /** @var list<Course> */
-        return \OmegaUp\DAO\Courses::getCoursesCreatedByIdentity(
-            $identityId
-        );
-    }
-
-    /**
      * Get Contests which a certain user has participated in
      *
      * @return array{contests: UserProfileContests}
@@ -4056,6 +4037,14 @@ class User extends \OmegaUp\Controllers\Controller {
         ) ? [] : \OmegaUp\DAO\Identities::getAssociatedIdentities(
             $loggedIdentity
         );
+        /** @var list<Contest> */
+        $createdContests = \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(
+            $targetIdentity->identity_id
+        );
+        /** @var list<Course> */
+        $createdCourses = \OmegaUp\DAO\Courses::getCoursesCreatedByIdentity(
+            $targetIdentity->identity_id
+        );
         $response['smartyProperties']['payload'] = array_merge(
             $response['smartyProperties']['payload'],
             [
@@ -4071,12 +4060,8 @@ class User extends \OmegaUp\Controllers\Controller {
                     'createdProblems' => self::getCreatedProblems(
                         $targetIdentity->identity_id
                     ),
-                    'createdContests' => self::getCreatedContests(
-                        $targetIdentity->identity_id
-                    ),
-                    'createdCourses' => self::getCreatedCourses(
-                        $targetIdentity->identity_id
-                    ),
+                    'createdContests' => $createdContests,
+                    'createdCourses' => $createdCourses,
                     'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
                         $targetIdentity->identity_id
                     ),

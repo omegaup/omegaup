@@ -1158,7 +1158,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         int $identityId
     ): array {
         $sql = '
-            SELECT DISTINCT
+            SELECT
                 c.*
             FROM
                 Courses c
