@@ -59,16 +59,22 @@
           v-if="tabKey === Tab.Enrolled"
           class="row"
           :class="{
-            'row-cols-1 row-cols-md-2 row-cols-xl-3': loggedIn,
-            'justify-content-center': !loggedIn,
+            'row-cols-1 row-cols-md-2 row-cols-xl-3':
+              loggedIn && filteredCards.length,
+            'justify-content-center': !loggedIn || !filteredCards.length,
           }"
         >
           <template v-if="loggedIn">
-            <omegaup-course-card-enrolled
-              v-for="course in filteredCards"
-              :key="course.alias"
-              :course="course"
-            ></omegaup-course-card-enrolled>
+            <template v-if="filteredCards.length">
+              <omegaup-course-card-enrolled
+                v-for="course in filteredCards"
+                :key="course.alias"
+                :course="course"
+              ></omegaup-course-card-enrolled>
+            </template>
+            <div v-else class="empty-content my-2">
+              {{ T.courseTabsEmptyEnrolledCourses }}
+            </div>
           </template>
           <div v-else class="empty-content my-2">
             {{ T.courseCardMustLogIn }}
@@ -78,16 +84,22 @@
           v-if="tabKey === Tab.Finished"
           class="row"
           :class="{
-            'row-cols-1 row-cols-md-2 row-cols-xl-3': loggedIn,
-            'justify-content-center': !loggedIn,
+            'row-cols-1 row-cols-md-2 row-cols-xl-3':
+              loggedIn && filteredCards.length,
+            'justify-content-center': !loggedIn || !filteredCards.length,
           }"
         >
           <template v-if="loggedIn">
-            <omegaup-course-card-finished
-              v-for="course in filteredCards"
-              :key="course.alias"
-              :course="course"
-            ></omegaup-course-card-finished>
+            <template v-if="filteredCards.length">
+              <omegaup-course-card-finished
+                v-for="course in filteredCards"
+                :key="course.alias"
+                :course="course"
+              ></omegaup-course-card-finished>
+            </template>
+            <div v-else class="empty-content my-2">
+              {{ T.courseTabsEmptyFinishedCourses }}
+            </div>
           </template>
           <div v-else class="empty-content my-2">
             {{ T.courseCardMustLogIn }}
