@@ -137,13 +137,13 @@ export interface Option {
  * @typedef {object}
  * @property {string} prefix Prefix of the name of all the cases
  * @property {string} suffix Suffix of the name of all the cases
- * @property {number} number Number of cases to add
+ * @property {number} numberOfCases Number of cases to add
  * @property {GroupID} groupID UUID of the group
  */
 export interface MultipleCaseAddRequest {
   prefix: string;
   suffix: string;
-  number: number;
+  numberOfCases: number;
   groupID: GroupID;
 }
 
