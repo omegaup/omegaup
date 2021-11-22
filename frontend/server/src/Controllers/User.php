@@ -4159,47 +4159,6 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param null|string $username
      *
-     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{COUNTRIES: list<\OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: UserProfileInfo}, template: string}
-     */
-    public static function getProfileEditDetailsForTypeScript(\OmegaUp\Request $r) {
-        try {
-            self::authenticateOrAllowUnauthenticatedRequest($r);
-
-            $identity = self::resolveTargetIdentity($r);
-            if (is_null($identity)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterNotFound',
-                    'Identity'
-                );
-            }
-            $smartyProperties = [
-                'profile' => self::getUserProfile($r->identity, $identity),
-                'PROGRAMMING_LANGUAGES' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
-                'COUNTRIES' => \OmegaUp\DAO\Countries::getAll(
-                    null,
-                    100,
-                    'name'
-                ),
-            ];
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            \OmegaUp\ApiCaller::logException($e);
-            $smartyProperties = [
-                'STATUS_ERROR' => $e->getErrorMessage(),
-            ];
-        }
-        $template = 'user.edit.tpl';
-        if (is_null($r->identity) || is_null($r->identity->password)) {
-            $template = 'user.basicedit.tpl';
-        }
-        return [
-            'smartyProperties' => $smartyProperties,
-            'template' => $template,
-        ];
-    }
-
-    /**
-     * @omegaup-request-param null|string $username
-     *
      * @return array{entrypoint: string, smartyProperties: array{payload: EmailEditDetailsPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getEmailEditDetailsForTypeScript(\OmegaUp\Request $r) {

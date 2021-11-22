@@ -132,6 +132,188 @@
 				}
 			},
 			{
+				"api": "/problem/create/",
+				"params": {
+					"visibility": "public",
+					"title": "Restas",
+					"problem_alias": "restas",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"show_diff": "examples",
+					"allow_user_add_tags": "true",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"email_clarifications": 1,
+					"problem_level": "problemLevelBasicIntroductionToProgramming",
+					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create/",
+				"params": {
+					"visibility": "public",
+					"title": "Multiplicaciones",
+					"problem_alias": "multiplicaciones",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"show_diff": "examples",
+					"allow_user_add_tags": "true",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"email_clarifications": 1,
+					"problem_level": "problemLevelBasicIntroductionToProgramming",
+					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create/",
+				"params": {
+					"visibility": "public",
+					"title": "Divisiones",
+					"problem_alias": "divisiones",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"show_diff": "examples",
+					"allow_user_add_tags": "true",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"email_clarifications": 1,
+					"problem_level": "problemLevelBasicIntroductionToProgramming",
+					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create/",
+				"params": {
+					"visibility": "public",
+					"title": "Cadenas",
+					"problem_alias": "cadenas",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"show_diff": "examples",
+					"allow_user_add_tags": "true",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"email_clarifications": 1,
+					"problem_level": "problemLevelBasicIntroductionToProgramming",
+					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create/",
+				"params": {
+					"visibility": "public",
+					"title": "Pilas",
+					"problem_alias": "pilas",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"show_diff": "examples",
+					"allow_user_add_tags": "true",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"email_clarifications": 1,
+					"problem_level": "problemLevelBasicIntroductionToProgramming",
+					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create/",
+				"params": {
+					"visibility": "public",
+					"title": "Filas",
+					"problem_alias": "filas",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"show_diff": "examples",
+					"allow_user_add_tags": "true",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"email_clarifications": 1,
+					"problem_level": "problemLevelBasicIntroductionToProgramming",
+					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
+				"api": "/problem/create/",
+				"params": {
+					"visibility": "public",
+					"title": "Colas",
+					"problem_alias": "colas",
+					"validator": "token-numeric",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"source": "omegaUp classics",
+					"show_diff": "examples",
+					"allow_user_add_tags": "true",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"email_clarifications": 1,
+					"problem_level": "problemLevelBasicIntroductionToProgramming",
+					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/testproblem.zip"
+				}
+			},
+			{
 				"api": "/contest/create/",
 				"params": {
 					"visibility": 1,
@@ -174,6 +356,118 @@
 				"api": "/contest/update/",
 				"params": {
 					"contest_alias": "prueba",
+					"admission_mode": "public",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua"
+				}
+			},
+			{
+				"api": "/contest/create/",
+				"params": {
+					"visibility": 1,
+					"title": "Pasado",
+					"alias": "pasado",
+					"description": "Concurso finalizado para probar certificados",
+					"start_time": "$NOW$",
+					"finish_time": "$NOW$+1800",
+					"window_length": "0",
+					"scoreboard": 100,
+					"points_decay_factor": 0,
+					"partial_score": "true",
+					"submissions_gap": 1200,
+					"penalty": 0,
+					"feedback": "detailed",
+					"penalty_type": "contest_start",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
+					"penalty_calc_policy": "sum",
+					"admission_mode": "private",
+					"show_scoreboard_after": "true",
+					"certificate_cutoff": 3
+				}
+			},
+			{
+				"api": "/contest/addProblem/",
+				"params": {
+					"contest_alias": "pasado",
+					"problem_alias": "triangulos",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/addProblem/",
+				"params": {
+					"contest_alias": "pasado",
+					"problem_alias": "sumas",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/addProblem/",
+				"params": {
+					"contest_alias": "pasado",
+					"problem_alias": "restas",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/addProblem/",
+				"params": {
+					"contest_alias": "pasado",
+					"problem_alias": "multiplicaciones",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/addProblem/",
+				"params": {
+					"contest_alias": "pasado",
+					"problem_alias": "divisiones",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/addProblem/",
+				"params": {
+					"contest_alias": "pasado",
+					"problem_alias": "cadenas",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/addProblem/",
+				"params": {
+					"contest_alias": "pasado",
+					"problem_alias": "pilas",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/addProblem/",
+				"params": {
+					"contest_alias": "pasado",
+					"problem_alias": "filas",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/addProblem/",
+				"params": {
+					"contest_alias": "pasado",
+					"problem_alias": "colas",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/addProblem/",
+				"params": {
+					"contest_alias": "pasado",
+					"problem_alias": "triangulos-interactive",
+					"points": 100
+				}
+			},
+			{
+				"api": "/contest/update/",
+				"params": {
+					"contest_alias": "pasado",
 					"admission_mode": "public",
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua"
 				}
@@ -400,6 +694,38 @@
 			{
 				"api": "/user/create/",
 				"params": {
+					"username": "test_user_6",
+					"email": "test_user_6@localhost.localdomain",
+					"password": "test_user_6"
+				}
+			},
+			{
+				"api": "/user/create/",
+				"params": {
+					"username": "test_user_7",
+					"email": "test_user_7@localhost.localdomain",
+					"password": "test_user_7"
+				}
+			},
+			{
+				"api": "/user/create/",
+				"params": {
+					"username": "test_user_8",
+					"email": "test_user_8@localhost.localdomain",
+					"password": "test_user_8"
+				}
+			},
+			{
+				"api": "/user/create/",
+				"params": {
+					"username": "test_user_9",
+					"email": "test_user_9@localhost.localdomain",
+					"password": "test_user_9"
+				}
+			},
+			{
+				"api": "/user/create/",
+				"params": {
 					"username": "course_test_user_0",
 					"email": "course_test_user_0@localhost.localdomain",
 					"password": "course_test_user_0"
@@ -502,6 +828,82 @@
 					"language": "py3",
 					"source": "print(sum(int(x) for x in input().strip().split()))"
 				}
+			},
+			{
+				"api": "/contest/open/",
+				"params": {
+					"contest_alias": "pasado"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "triangulos",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "colas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "filas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "multiplicaciones",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "cadenas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "triangulos-interactive",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
 			}
 		]
 	},
@@ -532,6 +934,52 @@
 					"contest_alias": "prueba",
 					"language": "py3",
 					"source": "print(3)"
+				}
+			},
+			{
+				"api": "/contest/open/",
+				"params": {
+					"contest_alias": "pasado"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "divisiones",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "multiplicaciones",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "filas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
 				}
 			}
 		]
@@ -564,6 +1012,62 @@
 					"language": "py3",
 					"source": "print(0)"
 				}
+			},
+			{
+				"api": "/contest/open/",
+				"params": {
+					"contest_alias": "pasado"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "filas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "colas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "restas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "triangulos-interactive",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
 			}
 		]
 	},
@@ -595,6 +1099,32 @@
 					"language": "py3",
 					"source": "syntax error"
 				}
+			},
+			{
+				"api": "/contest/open/",
+				"params": {
+					"contest_alias": "pasado"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "multiplicaciones",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
 			}
 		]
 	},
@@ -619,6 +1149,442 @@
 					"language": "py3",
 					"source": "syntax error"
 				}
+			},
+			{
+				"api": "/contest/open/",
+				"params": {
+					"contest_alias": "pasado"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "multiplicaciones",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "pilas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "colas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "filas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "divisiones",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "restas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "triangulos",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "triangulos-interactive",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "cadenas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			}
+		]
+	},
+	{
+		"username": "test_user_5",
+		"password": "test_user_5",
+		"requests": [
+			{
+				"api": "/contest/open/",
+				"params": {
+					"contest_alias": "pasado"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "pilas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "filas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "divisiones",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "triangulos",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "triangulos-interactive",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "cadenas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			}
+		]
+	},
+	{
+		"username": "test_user_6",
+		"password": "test_user_6",
+		"requests": [
+			{
+				"api": "/contest/open/",
+				"params": {
+					"contest_alias": "pasado"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "filas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			}
+		]
+	},
+	{
+		"username": "test_user_7",
+		"password": "test_user_7",
+		"requests": [
+			{
+				"api": "/contest/open/",
+				"params": {
+					"contest_alias": "pasado"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "colas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "restas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "cadenas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			}
+		]
+	},
+	{
+		"username": "test_user_8",
+		"password": "test_user_8",
+		"requests": [
+			{
+				"api": "/contest/open/",
+				"params": {
+					"contest_alias": "pasado"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "pilas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "colas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "filas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "divisiones",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "restas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "triangulos",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "triangulos-interactive",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "cadenas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			}
+		]
+	},
+	{
+		"username": "test_user_9",
+		"password": "test_user_9",
+		"requests": [
+			{
+				"api": "/contest/open/",
+				"params": {
+					"contest_alias": "pasado"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "sumas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "pilas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "filas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "divisiones",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "restas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "triangulos",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "triangulos-interactive",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
+			},
+			{
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "cadenas",
+					"contest_alias": "pasado",
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
+				}
 			}
 		]
 	},
@@ -637,7 +1603,7 @@
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"problemset_id": 2,
+					"problemset_id": 3,
 					"language": "py3",
 					"source": "print(1)"
 				}
@@ -659,9 +1625,22 @@
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"problemset_id": 4,
+					"problemset_id": 5,
 					"language": "py3",
 					"source": "print(1)"
+				}
+			}
+		]
+	},
+	{
+		"token": "92d8c5a0eceef3c05f4149fc04b62bb2cd50d9c6",
+		"requests": [
+			{
+				"api": "/contest/update/",
+				"params": {
+					"contest_alias": "pasado",
+					"finish_time": "$NOW$",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua"
 				}
 			}
 		]

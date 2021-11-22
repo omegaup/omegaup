@@ -3357,6 +3357,58 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{progress: list<StudentProgressInCourse>, nextPage: null|int}
+     *
+     * @omegaup-request-param int $length
+     * @omegaup-request-param int $page
+     * @omegaup-request-param string $course
+     */
+    public static function apiStudentsProgress(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureIdentity();
+
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? 100;
+
+        $courseAlias = $r->ensureString(
+            'course',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $course = self::validateCourseExists($courseAlias);
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $studentsProgress = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::SCHOOL_STUDENTS_PROGRESS,
+            "{$courseAlias}-{$page}-{$length}",
+            function () use ($course, $page, $length) {
+                if (is_null($course->course_id) || is_null($course->group_id)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'courseNotFound'
+                    );
+                }
+                return \OmegaUp\DAO\Courses::getStudentsProgressPerAssignment(
+                    $course->course_id,
+                    $course->group_id,
+                    $page,
+                    $length
+                );
+            },
+            60 * 60 * 12 // 12 hours
+        );
+
+        return [
+            'progress' => $studentsProgress['studentsProgress'],
+            'nextPage' => (
+                $studentsProgress['totalRows'] > ($page * $length)
+            ) ? $page + 1 : null,
+        ];
+    }
+
+    /**
      * @return array{smartyProperties: array{payload: StudentProgressPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $course
@@ -3750,14 +3802,15 @@ class Course extends \OmegaUp\Controllers\Controller {
         ] = \OmegaUp\DAO\Courses::getEnrolledAndFinishedCoursesForTabs(
             $r->identity
         );
-        /** @var array<string, bool> */
+        /** @var array<string> */
         $startedCourses = [];
         foreach ($courses['enrolled'] as $studentCourse) {
-            $startedCourses[$studentCourse['alias']] = true;
+            $startedCourses[] = $studentCourse['alias'];
         }
         foreach ($courses['finished'] as $studentCourse) {
-            $startedCourses[$studentCourse['alias']] = true;
+            $startedCourses[] = $studentCourse['alias'];
         }
+        $startedCourses = array_unique($startedCourses);
         foreach ($courses['public'] as &$course) {
             $course['alreadyStarted'] = in_array(
                 $course['alias'],

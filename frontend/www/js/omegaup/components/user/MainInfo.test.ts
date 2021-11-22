@@ -81,7 +81,7 @@ describe('MainInfo.vue', () => {
     });
     expect(wrapper.find('a[href="/profile/"]').exists()).toBe(true);
     expect(wrapper.find('a[href="/profile/"]').text()).toBe(
-      T.userEditSeeProfile,
+      T.userEditViewProfile,
     );
   });
 

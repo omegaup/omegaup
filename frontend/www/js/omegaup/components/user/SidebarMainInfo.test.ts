@@ -114,6 +114,22 @@ describe('SidebarMainInfo.vue', () => {
       expect(wrapper.find(urlSelector).exists()).toBeFalsy();
     }
   });
+
+  it('Should display Add password button when user does not have password', () => {
+    const wrapper = shallowMount(user_SidebarMainInfo, {
+      propsData: {
+        profile,
+        data: { ...data, ...{ hasPassword: false } },
+      },
+    });
+
+    expect(
+      wrapper.find('a[href="/profile/#add-password"]').exists(),
+    ).toBeTruthy();
+    expect(
+      wrapper.find('a[href="/profile/#change-password"]').exists(),
+    ).toBeFalsy();
+  });
 });
 
 describe.each(rankingMapping)(`A user:`, (rank) => {
