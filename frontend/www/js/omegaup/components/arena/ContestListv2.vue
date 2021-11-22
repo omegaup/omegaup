@@ -36,7 +36,7 @@
                   </div>
                 </form>
               </b-col>
-              <b-col cols="6">
+              <b-col cols="6" class="d-flex flex-row-reverse">
                 <b-dropdown ref="dropdownOrderBy" no-caret>
                   <template #button-content>
                     <div>
@@ -111,6 +111,25 @@
                     />{{ T.contestOrderBySignedUp }}</b-dropdown-item
                   >
                 </b-dropdown>
+                <b-dropdown ref="dropdownFilterBy" class="mr-1" no-caret>
+                  <template #button-content>
+                    <div>
+                      <font-awesome-icon icon="filter" />
+                      {{ T.contestFilterBy }}
+                    </div>
+                  </template>
+                  <b-dropdown-item
+                    href="#"
+                    data-filter-by-signed-up
+                    @click="filterBySignedUp"
+                  >
+                    <font-awesome-icon
+                      v-if="currentFilterBySignedUp"
+                      icon="check-square"
+                      class="mr-1"
+                    />{{ T.contestFilterBySignedUp }}</b-dropdown-item
+                  >
+                </b-dropdown>
               </b-col>
             </b-row>
           </b-container>
@@ -124,7 +143,7 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in sortedContestList"
+            v-for="contestItem in filteredContestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -157,7 +176,7 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in sortedContestList"
+            v-for="contestItem in filteredContestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -193,7 +212,7 @@
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in sortedContestList"
+            v-for="contestItem in filteredContestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -285,6 +304,7 @@ export default class ArenaContestList extends Vue {
   currentTab: ContestTab = this.tab;
   currentQuery: string = this.query;
   currentOrder: ContestOrder = ContestOrder.None;
+  currentFilterBySignedUp: boolean = false;
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
@@ -328,6 +348,17 @@ export default class ArenaContestList extends Vue {
 
   orderBySignedUp() {
     this.currentOrder = ContestOrder.SignedUp;
+  }
+
+  filterBySignedUp() {
+    this.currentFilterBySignedUp = this.currentFilterBySignedUp ? false : true;
+  }
+
+  get filteredContestList(): types.ContestListItem[] {
+    if(this.currentFilterBySignedUp){
+      return this.sortedContestList.slice().filter(contestItem => contestItem.participating);
+    }
+    return this.sortedContestList;
   }
 
   get sortedContestList(): types.ContestListItem[] {
