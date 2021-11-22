@@ -125,6 +125,18 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             $problemAdminData[0]['request']['problem_alias'],
             $response['problems'][3]['alias']
         );
+
+        $response = \OmegaUp\Controllers\Problem::apiAdminList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'query' => $problemAdminData[0]['request']['problem_alias']
+            ])
+        );
+        $this->assertCount(1, $response['problems']);
+        $this->assertEquals(
+            $problemAdminData[0]['request']['problem_alias'],
+            $response['problems'][0]['alias']
+        );
     }
 
     /**

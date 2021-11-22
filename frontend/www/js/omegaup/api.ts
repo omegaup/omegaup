@@ -1053,6 +1053,10 @@ export const Course = {
     })(x.problems);
     return x;
   }),
+  studentsProgress: apiCall<
+    messages.CourseStudentsProgressRequest,
+    messages.CourseStudentsProgressResponse
+  >('/api/course/studentsProgress/'),
   update: apiCall<messages.CourseUpdateRequest, messages.CourseUpdateResponse>(
     '/api/course/update/',
   ),

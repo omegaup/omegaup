@@ -134,16 +134,15 @@ export namespace types {
         x.currentAssignment = ((x) => {
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          if (x.runs)
-            x.runs = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                x.time = ((x: number) => new Date(x * 1000))(x.time);
-                return x;
-              });
-            })(x.runs);
+          x.runs = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.runs);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.currentAssignment);
@@ -2063,7 +2062,7 @@ export namespace types {
     name?: string;
     problems: types.NavbarProblemsetProblem[];
     problemset_id: number;
-    runs?: types.Run[];
+    runs: types.Run[];
     start_time: Date;
   }
 
@@ -2472,7 +2471,11 @@ export namespace types {
   }
 
   export interface ContestDetailsPayload {
-    adminPayload?: { allRuns: types.Run[]; users: types.ContestUser[] };
+    adminPayload?: {
+      allRuns: types.Run[];
+      totalRuns: number;
+      users: types.ContestUser[];
+    };
     clarifications: types.Clarification[];
     contest: types.ContestPublicDetails;
     original?: {
@@ -3559,6 +3562,7 @@ export namespace types {
   export interface ProblemsMineInfoPayload {
     isSysadmin: boolean;
     privateProblemsAlert: boolean;
+    query?: string;
     visibilityStatuses: { [key: string]: number };
   }
 
@@ -4414,7 +4418,7 @@ export namespace messages {
   export type ContestRoleResponse = { admin: boolean };
   export type ContestRunsRequest = { [key: string]: any };
   export type _ContestRunsServerResponse = any;
-  export type ContestRunsResponse = { runs: types.Run[] };
+  export type ContestRunsResponse = { runs: types.Run[]; totalRuns: number };
   export type ContestRunsDiffRequest = { [key: string]: any };
   export type ContestRunsDiffResponse = {
     diff: {
@@ -4593,6 +4597,11 @@ export namespace messages {
   export type _CourseStudentProgressServerResponse = any;
   export type CourseStudentProgressResponse = {
     problems: types.CourseProblem[];
+  };
+  export type CourseStudentsProgressRequest = { [key: string]: any };
+  export type CourseStudentsProgressResponse = {
+    nextPage?: number;
+    progress: types.StudentProgressInCourse[];
   };
   export type CourseUpdateRequest = { [key: string]: any };
   export type CourseUpdateResponse = {};
@@ -5405,6 +5414,9 @@ export namespace controllers {
     studentProgress: (
       params?: messages.CourseStudentProgressRequest,
     ) => Promise<messages.CourseStudentProgressResponse>;
+    studentsProgress: (
+      params?: messages.CourseStudentsProgressRequest,
+    ) => Promise<messages.CourseStudentsProgressResponse>;
     update: (
       params?: messages.CourseUpdateRequest,
     ) => Promise<messages.CourseUpdateResponse>;
