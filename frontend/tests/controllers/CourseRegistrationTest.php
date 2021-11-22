@@ -152,6 +152,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $studentLogin->auth_token,
                 'course_alias' => $course->alias,
+                'share_user_information' => true,
             ])
         );
 
@@ -161,6 +162,8 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertNotEmpty($registration);
+        $this->assertTrue($registration->share_user_information);
+        $this->assertNull($registration->accept_teacher);
     }
 
     public function testGetNotificationForRegistrationRequest() {

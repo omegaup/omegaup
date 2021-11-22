@@ -18,29 +18,60 @@
     <div class="card">
       <h5 class="card-header">{{ T.myproblemsListMyProblems }}</h5>
       <div class="card-body">
-        <div class="row align-items-center justify-content-between">
-          <div class="form-check col-7">
-            <label class="form-check-label">
-              <input
-                v-model="shouldShowAllProblems"
-                class="form-check-input"
-                type="checkbox"
-                @change.prevent="
-                  $emit('change-show-all-problems', shouldShowAllProblems)
-                "
-              />
-              <span>{{ statementShowAllProblems }}</span>
-            </label>
+        <div class="row align-items-center mb-3">
+          <div class="col-md-8 col-lg-6">
+            <input
+              v-model="currentQuery"
+              class="typeahead form-control"
+              :placeholder="T.wordsKeywordSearch"
+            />
           </div>
-          <select
-            v-model="allProblemsVisibilityOption"
-            class="custom-select col-5"
-            @change="onChangeVisibility"
+          <a
+            class="btn btn-primary"
+            role="button"
+            :class="{ disabled: currentQuery === '' }"
+            :href="
+              currentQuery
+                ? `/problem/mine/?query=${encodeURIComponent(currentQuery)}`
+                : ''
+            "
+            >{{ T.wordsSearch }}</a
           >
-            <option selected value="-1">{{ T.forSelectedItems }}</option>
-            <option value="1">{{ T.makePublic }}</option>
-            <option value="0">{{ T.makePrivate }}</option>
-          </select>
+        </div>
+        <div class="form-row">
+          <div class="col">
+            <div class="form-check">
+              <label class="form-check-label">
+                <input
+                  v-model="shouldShowAllProblems"
+                  class="form-check-input"
+                  type="checkbox"
+                  @change.prevent="
+                    $emit('change-show-all-problems', shouldShowAllProblems)
+                  "
+                />
+                <span>{{ statementShowAllProblems }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-6">
+            <select v-model="allProblemsVisibilityOption" class="custom-select">
+              <option selected value="-1">{{ T.forSelectedItems }}</option>
+              <option value="1">{{ T.makePublic }}</option>
+              <option value="0">{{ T.makePrivate }}</option>
+            </select>
+          </div>
+          <div class="col px-0">
+            <button
+              :disabled="allProblemsVisibilityOption === -1"
+              class="btn btn-primary"
+              @click="onChangeVisibility"
+            >
+              {{ T.wordsConfirm }}
+            </button>
+          </div>
         </div>
       </div>
       <div class="table-responsive">
@@ -55,7 +86,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="problem in problems">
+            <tr v-for="problem in problems" :key="problem.alias">
               <td class="align-middle">
                 <input
                   v-model="selectedProblems"
@@ -110,6 +141,7 @@
                   <div v-if="problem.tags.length" class="tags-badges">
                     <a
                       v-for="tag in problem.tags"
+                      :key="tag.name"
                       class="badge custom-badge m-1 p-2"
                       :class="[
                         {
@@ -158,6 +190,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import * as typeahead from '../../typeahead';
 import { types } from '../../api_types';
 import common_Paginator from '../common/Paginator.vue';
 
@@ -192,8 +225,11 @@ export default class ProblemMine extends Vue {
   @Prop() privateProblemsAlert!: boolean;
   @Prop() isSysadmin!: boolean;
   @Prop() visibilityStatuses!: Array<string>;
+  @Prop() query!: string | null;
 
   T = T;
+  currentQuery = this.query ?? '';
+  typeahead = typeahead;
   shouldShowAllProblems = false;
   selectedProblems: types.ProblemListItem[] = [];
   allProblemsVisibilityOption = -1;

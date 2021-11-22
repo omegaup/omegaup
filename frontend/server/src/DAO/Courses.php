@@ -59,7 +59,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             SELECT
                 a.*,
                 COUNT(s.submission_id) AS has_runs,
-                COUNT(p.problem_id) AS problem_count,
+                COUNT(DISTINCT p.problem_id) AS problem_count,
                 ps.scoreboard_url,
                 ps.scoreboard_url_admin
             FROM
@@ -87,7 +87,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 c.alias = ? $timeCondition
             GROUP BY
-                a.assignment_id
+                a.assignment_id, ps.problemset_id
             ORDER BY
                 `order`, start_time;";
 
