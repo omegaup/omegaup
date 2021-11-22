@@ -3817,14 +3817,15 @@ class Course extends \OmegaUp\Controllers\Controller {
         ] = \OmegaUp\DAO\Courses::getEnrolledAndFinishedCoursesForTabs(
             $r->identity
         );
-        /** @var array<string, bool> */
+        /** @var array<string> */
         $startedCourses = [];
         foreach ($courses['enrolled'] as $studentCourse) {
-            $startedCourses[$studentCourse['alias']] = true;
+            $startedCourses[] = $studentCourse['alias'];
         }
         foreach ($courses['finished'] as $studentCourse) {
-            $startedCourses[$studentCourse['alias']] = true;
+            $startedCourses[] = $studentCourse['alias'];
         }
+        $startedCourses = array_unique($startedCourses);
         foreach ($courses['public'] as &$course) {
             $course['alreadyStarted'] = in_array(
                 $course['alias'],
