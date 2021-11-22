@@ -113,12 +113,14 @@
           <div class="card-body">
             <a
               class="btn btn-primary btn-sm w-100 my-1"
+              :class="{ disabled: !completeStudentsProgress.length }"
               :download="`${course.alias}.csv`"
               :href="csvDataUrl"
               >.csv</a
             >
             <a
               class="btn btn-primary btn-sm w-100 my-1"
+              :class="{ disabled: !completeStudentsProgress.length }"
               :download="`${course.alias}.ods`"
               :href="odsDataUrl"
               >.ods</a
@@ -190,6 +192,7 @@ export function toOds(courseName: string, table: TableCell[][]): string {
 })
 export default class CourseViewProgress extends Vue {
   @Prop() course!: types.CourseDetails;
+  @Prop() completeStudentsProgress!: types.StudentProgressInCourse[];
   @Prop() students!: types.StudentProgressInCourse[];
   @Prop() assignmentsProblems!: types.AssignmentsProblemsPoints[];
   @Prop() pagerItems!: types.PageItem[];
@@ -227,7 +230,8 @@ export default class CourseViewProgress extends Vue {
     }
   }
 
-  get progressTable(): TableCell[][] {
+  get progressTable(): TableCell[][] | null {
+    if (!this.completeStudentsProgress.length) return null;
     const table: TableCell[][] = [];
     const header = [
       T.profileUsername,
@@ -251,7 +255,7 @@ export default class CourseViewProgress extends Vue {
     }
     table.push(header);
 
-    for (const student of this.students) {
+    for (const student of this.completeStudentsProgress) {
       const row: TableCell[] = [
         student.username,
         student.name || '',
@@ -272,6 +276,7 @@ export default class CourseViewProgress extends Vue {
   }
 
   get csvDataUrl(): string {
+    if (!this.progressTable) return '';
     return window.URL.createObjectURL(
       new Blob([toCsv(this.progressTable)], {
         type: 'text/csv;charset=utf-8;',
@@ -292,6 +297,7 @@ export default class CourseViewProgress extends Vue {
 
   @AsyncComputed()
   async odsDataUrl(): Promise<string> {
+    if (!this.progressTable) return '';
     let zip = new JSZip();
     zip.file('mimetype', 'application/vnd.oasis.opendocument.spreadsheet', {
       compression: 'STORE',

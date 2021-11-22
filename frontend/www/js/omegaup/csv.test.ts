@@ -67,6 +67,32 @@ describe('csv_utils', () => {
         },
       },
     ] as types.StudentProgressInCourse[],
+    completeStudentsProgress: [
+      {
+        username: 'test_user',
+        name: '',
+        country_id: '',
+        classname: 'user-rank-unranked',
+        courseScore: 100,
+        courseProgress: 50,
+        assignments: {
+          'test-assignment-a': {
+            score: 90,
+            progress: 50,
+            problems: {
+              'test-problem-a': {
+                score: 90,
+                progress: 90,
+              },
+              'test-problem-b': {
+                score: 1,
+                progress: 1,
+              },
+            },
+          },
+        },
+      },
+    ] as types.StudentProgressInCourse[],
     pagerItems: [
       {
         class: 'disabled',
