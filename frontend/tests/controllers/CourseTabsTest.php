@@ -75,10 +75,11 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             'finished' => [],
         ];
 
-        // Create two public courses and one private course:
+        // Create three public courses and one private course:
         // - First one with 1 student, 1 lesson and unlimited duration => for public and enrolled tabs
-        // - Second one is an archived course => not listed in tabs
-        // - Third one the user completes totally => for finished tab
+        // - Second one is an public course with no students
+        // - Third one is an archived course => not listed in tabs
+        // - The private one the user completes totally => for finished tab
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
             null,
             null,
@@ -107,6 +108,16 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
                 'course_alias' => $courseData['course_alias'],
                 'assignment_type' => 'lesson'
             ])
+        );
+        $coursesAliases['public'][] = $courseData['course_alias'];
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
+            null,
+            null,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
+            /* $requestsUserInformation */ 'no',
+            /* $showScoreboard */'false',
+            /* $courseDuration= */ null,
         );
         $coursesAliases['public'][] = $courseData['course_alias'];
 
@@ -150,7 +161,7 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertCount(
-            1,
+            2,
             $response['smartyProperties']['payload']['courses']['public']
         );
         $this->assertEquals(
@@ -159,6 +170,13 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertTrue(
             $response['smartyProperties']['payload']['courses']['public'][0]['alreadyStarted']
+        );
+        $this->assertEquals(
+            $coursesAliases['public'][1],
+            $response['smartyProperties']['payload']['courses']['public'][1]['alias']
+        );
+        $this->assertFalse(
+            $response['smartyProperties']['payload']['courses']['public'][1]['alreadyStarted']
         );
         $this->assertEquals(
             $coursesAliases['enrolled'][0],
