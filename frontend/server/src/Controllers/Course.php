@@ -3810,6 +3810,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         foreach ($courses['finished'] as $studentCourse) {
             $startedCourses[] = $studentCourse['alias'];
         }
+        $startedCourses = array_unique($startedCourses);
         foreach ($courses['public'] as &$course) {
             $course['alreadyStarted'] = in_array(
                 $course['alias'],
