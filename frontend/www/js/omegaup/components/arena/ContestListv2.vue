@@ -355,8 +355,10 @@ export default class ArenaContestList extends Vue {
   }
 
   get filteredContestList(): types.ContestListItem[] {
-    if(this.currentFilterBySignedUp){
-      return this.sortedContestList.slice().filter(contestItem => contestItem.participating);
+    if (this.currentFilterBySignedUp) {
+      return this.sortedContestList
+        .slice()
+        .filter((contestItem) => contestItem.participating);
     }
     return this.sortedContestList;
   }

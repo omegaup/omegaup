@@ -31,7 +31,7 @@ describe('ContestListv2.vue', () => {
         partial_score: false,
         participating: true,
         problemset_id: 1,
-        recommended: false,
+        recommended: true,
         start_time: yesterday,
         title: 'Current Contest 1',
         window_length: 300,
@@ -67,7 +67,7 @@ describe('ContestListv2.vue', () => {
         partial_score: false,
         participating: true,
         problemset_id: 1,
-        recommended: false,
+        recommended: true,
         start_time: yesterday,
         title: 'Current Contest 2',
         window_length: 300,
@@ -87,7 +87,7 @@ describe('ContestListv2.vue', () => {
         partial_score: false,
         participating: true,
         problemset_id: 1,
-        recommended: false,
+        recommended: true,
         start_time: tomorrow,
         title: 'Future Contest 1',
         window_length: 300,
@@ -123,7 +123,7 @@ describe('ContestListv2.vue', () => {
         partial_score: false,
         participating: true,
         problemset_id: 1,
-        recommended: false,
+        recommended: true,
         start_time: tomorrow,
         title: 'Future Contest 2',
         window_length: 300,
@@ -143,7 +143,7 @@ describe('ContestListv2.vue', () => {
         partial_score: false,
         participating: true,
         problemset_id: 1,
-        recommended: false,
+        recommended: true,
         start_time: new Date(yesterday.getTime() - daySeconds),
         title: 'Past Contest 1',
         window_length: 300,
@@ -179,7 +179,7 @@ describe('ContestListv2.vue', () => {
         partial_score: false,
         participating: true,
         problemset_id: 1,
-        recommended: false,
+        recommended: true,
         start_time: new Date(yesterday.getTime() - daySeconds * 3),
         title: 'Past Contest 2',
         window_length: 300,
@@ -260,6 +260,29 @@ describe('ContestListv2.vue', () => {
       dropdownOrderBy.value = value;
       await dropdownOrderBy.dispatchEvent(new Event('change'));
       expect(dropdownOrderBy.value).toBe(value);
+    },
+  );
+
+  const filterMapping = [
+    [{ field: 'signed-up', expectedResult: ['Contest-1', 'Contest-2'] }],
+  ];
+
+  each(filterMapping).it(
+    'Should filter current contest list when %s field is selected',
+    async ({ field, expectedResult }) => {
+      const wrapper = mount(arena_ContestList, {
+        propsData: {
+          contests,
+          tab: ContestTab.Current,
+        },
+      });
+
+      await wrapper
+        .find(`.b-dropdown a[data-filter-by-${field}]`)
+        .trigger('click');
+      expect(
+        wrapper.vm.filteredContestList.map((contest) => contest.alias),
+      ).toEqual(expectedResult);
     },
   );
 
