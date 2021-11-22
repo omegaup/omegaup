@@ -286,6 +286,44 @@ describe('ContestListv2.vue', () => {
     },
   );
 
+  each(filterMapping).it(
+    'Should filter future contest list when %s field is selected',
+    async ({ field, expectedResult }) => {
+      const wrapper = mount(arena_ContestList, {
+        propsData: {
+          contests,
+          tab: ContestTab.Future,
+        },
+      });
+
+      await wrapper
+        .find(`.b-dropdown a[data-filter-by-${field}]`)
+        .trigger('click');
+      expect(
+        wrapper.vm.filteredContestList.map((contest) => contest.alias),
+      ).toEqual(expectedResult);
+    },
+  );
+
+  each(filterMapping).it(
+    'Should filter past contest list when %s field is selected',
+    async ({ field, expectedResult }) => {
+      const wrapper = mount(arena_ContestList, {
+        propsData: {
+          contests,
+          tab: ContestTab.Past,
+        },
+      });
+
+      await wrapper
+        .find(`.b-dropdown a[data-filter-by-${field}]`)
+        .trigger('click');
+      expect(
+        wrapper.vm.filteredContestList.map((contest) => contest.alias),
+      ).toEqual(expectedResult);
+    },
+  );
+
   const orderMapping = [
     [
       {
