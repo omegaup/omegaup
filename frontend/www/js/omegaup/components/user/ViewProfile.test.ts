@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
-import user_Profile from './Profilev2.vue';
+import user_ViewProfile from './ViewProfile.vue';
 
 const profile: types.UserProfileInfo = {
   country: 'Mexico',
@@ -49,7 +49,7 @@ const data: types.ExtraProfileDetails = {
 describe('Profilev2.vue', () => {
   it('Should display navtab', () => {
     const badge_alias = 'contestManager';
-    const wrapper = shallowMount(user_Profile, {
+    const wrapper = shallowMount(user_ViewProfile, {
       propsData: {
         profile,
         data,
