@@ -20,68 +20,9 @@ import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 
-def is_contest_finish(
-        cur: MySQLdb.cursors.BaseCursor,
-        contest_id: str) -> bool:
-    '''verificate if contest is finish'''
-    cur.execute('''
-                SELECT
-                    COUNT(*) AS `count`
-                FROM
-                    `Contests`
-                WHERE
-                    `contest_id` = %s AND
-                    `finish_time` >= NOW();
-                ''', (contest_id))
-    for row in cur:
-        if row['count'] > 0:
-            logging.info('Skipping because already contest is not finish')
-            return True
-    return False
-
-
-def selection_cuttoff_contest(
-        cur: MySQLdb.cursors.BaseCursor,
-        contest_id: str) -> str:
-    '''selecting cuttoff from a contest'''
-    cur.execute('''
-                SELECT
-                    `certificate_cutoff`
-                FROM
-                     `Contests`
-                WHERE
-                    `contest_id` = %s
-                ''', (contest_id))
-    for row in cur:
-        cutoff = str(row['certificate_cutoff'])
-    return cutoff
-
-
-def verificate_certificate(
-        cur: MySQLdb.cursors.BaseCursor,
-        user_id: str,
-        contest_id: str) -> bool:
-    '''verificate if certificate exist'''
-    cur.execute('''
-                SELECT
-                    COUNT(*) AS `count`
-                FROM
-                    `Certificates`
-                WHERE
-                    `identity_id` = %s AND
-                    `contest_id` = %s;
-                ''', (user_id, contest_id))
-    for row in cur:
-        if row['count'] > 0:
-            logging.info('Exist certificates')
-            return False
-    return True
-
-
 def receive_contest_messages(
         cur: MySQLdb.cursors.BaseCursor,
         dbconn: MySQLdb.connections.Connection,
-        # pylint: disable=unused-argument,
         rabbit_user: str,
         rabbit_password: str) -> None:
     '''Receive contest messages'''
@@ -100,104 +41,93 @@ def receive_contest_messages(
         routing_key="ContestQueue")
     logging.info('[*] waiting for the messages')
 
-    def callback(channel: pika.adapters.blocking_connection.BlockingChannel,
-                 method: pika.spec.Basic.Deliver,
-                 properties: pika.spec.BasicProperties,
-                 # pylint: disable=unused-argument,
+    def callback(_channel: pika.adapters.blocking_connection.BlockingChannel,
+                 _method: pika.spec.Basic.Deliver,
+                 _properties: pika.spec.BasicProperties,
                  body: bytes) -> None:
         data = json.loads(body.decode())
-        if is_contest_finish(cur, data["contest_id"]):
-            return
         cur.execute('''
                 SELECT
-                    COUNT(*) AS `count`
+                    @n := @n + 1 place,
+                    r.contest_score,
+                    r.username,
+                    r.identity_id,
+                    c.certificate_cutoff,
+                    ce.certificate_id
                 FROM
-                    `Contests`
+                    (
+                        SELECT
+                            SUM(r.contest_score) AS contest_score,
+                            i.username,
+                            i.identity_id,
+                            pp.problemset_id
+                        FROM
+                            Problemset_Problems pp
+                        INNER JOIN
+                            Submissions s
+                        ON
+                            s.problemset_id = pp.problemset_id
+                        INNER JOIN
+                            Runs r
+                        ON
+                            s.current_run_id = r.run_id
+                        INNER JOIN
+                            Identities i
+                        ON
+                            i.identity_id = s.identity_id
+                        INNER JOIN
+                            Contests co
+                        ON
+                            pp.problemset_id = co.problemset_id
+                        WHERE
+                            co.contest_id = %s
+                            AND r.status = 'ready'
+                            AND s.type = 'normal'
+                            AND r.verdict NOT IN ('CE', 'JE', 'VE')
+                        GROUP BY
+                            s.identity_id
+                        ORDER BY
+                            contest_score DESC
+                    ) AS r
+                INNER JOIN
+                    Contests c
+                ON
+                    c.problemset_id = r.problemset_id
+                LEFT JOIN
+                    Certificates ce
+                ON
+                    r.identity_id = ce.identity_id
+                    AND c.contest_id = ce.contest_id
+                CROSS JOIN
+                    (SELECT @n := 0) AS temp
                 WHERE
-                    `contest_id` = %s AND
-                    certificate_cutoff IS NULL;
-                ''', (data["contest_id"]))
+                    certificate_id IS NULL;
+                ''', (data['contest_id'],))
+        certificates = []
         for row in cur:
-            if row['count'] > 0:
-                logging.info('Contest no has places')
-                cur.execute('''
-                    SELECT
-                        user_id
-                    FROM
-                        `Contest_Log`
-                    WHERE
-                        `contest_id` = %s;
-                    ''', (data["contest_id"]))
-                for users in cur:
-                    if verificate_certificate(cur,
-                                              users["user_id"],
-                                              data["contest_id"]):
-                        code_verification = generate_code()
-                        cur.execute('''
-                            INSERT INTO
-                                 `Certificates` (`identity_id`,
-                                            `certificate_type`,
-                                            `contest_id`,
-                                            `verification_code`)
-                            VALUES(%s, %s, %s, %s);''',
-                                    (users["user_id"],
-                                     'contest', data["contest_id"],
-                                     code_verification))
-                        dbconn.commit()
+            contest_place = None
+            if row['certificate_cutoff'] is None:
+                logging.info('The contest has no places')
+            elif row['place'] > row['certificate_cutoff']:
+                logging.info('The user did not reach the place to be reported')
             else:
-                logging.info('Contest has places')
-                cur.execute('''
-                    SELECT
-                        `certificate_cutoff`
-                    FROM
-                         `Contests`
-                    WHERE
-                        `contest_id` = %s
-                ''', (data["contest_id"]))
-
-                cutoff = int(selection_cuttoff_contest(cur,
-                                                       data["contest_id"]))
-                cur.execute('''
-                    SELECT
-                        user_id
-                    FROM
-                        `Contest_Log`
-                    WHERE
-                        `contest_id` = %s
-                    ORDER BY time DESC;
-                    ''', (data["contest_id"]))
-                place = 1
-                for users in cur:
-                    if verificate_certificate(cur,
-                                              users["user_id"],
-                                              data["contest_id"]):
-                        code_verification = generate_code()
-                        if cutoff >= place:
-                            cur.execute('''
-                                INSERT INTO
-                                    `Certificates` (`identity_id`,
-                                                `certificate_type`,
-                                                `contest_id`,
-                                                `verification_code`,
-                                                `contest_place`)
-                                VALUES(%s, %s, %s, %s,%s);''',
-                                        (users["user_id"],
-                                         'contest', data["contest_id"],
-                                         code_verification, str(place)))
-                            dbconn.commit()
-                            place += 1
-                        else:
-                            cur.execute('''
-                                INSERT INTO
-                                    `Certificates` (`identity_id`,
-                                                `certificate_type`,
-                                                `contest_id`,
-                                                `verification_code`)
-                                VALUES(%s, %s, %s, %s);''',
-                                        (users["user_id"],
-                                         'contest', data["contest_id"],
-                                         code_verification))
-                            dbconn.commit()
+                contest_place = row['place']
+            code_verification = generate_code()
+            certificates.append((
+                row['identity_id'], 'contest', data['contest_id'],
+                code_verification, contest_place
+            ))
+        cur.executemany('''
+            INSERT INTO
+                `Certificates` (
+                    `identity_id`,
+                    `certificate_type`,
+                    `contest_id`,
+                    `verification_code`,
+                    `contest_place`)
+            VALUES(%s, %s, %s, %s, %s);
+            ''', certificates)
+        dbconn.commit()
     channel.basic_consume(
         queue=queue_name,
         on_message_callback=callback,
@@ -210,8 +140,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
-    parser.add_argument('--user_rabbit')
-    parser.add_argument('--password_rabbit')
+    parser.add_argument('--rabbitmq-user')
+    parser.add_argument('--rabbitmq-password')
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
     logging.info('Started')
@@ -219,8 +149,8 @@ def main() -> None:
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
             receive_contest_messages(
-                cur, dbconn, args.user_rabbit,
-                args.password_rabbit)
+                cur, dbconn, args.rabbitmq_user,
+                args.rabbitmq_password)
     finally:
         dbconn.close()
         logging.info('Done')
