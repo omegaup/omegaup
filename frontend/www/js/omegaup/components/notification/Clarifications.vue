@@ -1,67 +1,66 @@
 <template>
-  <li class="dropdown">
+  <li class="nav-item dropdown d-none d-lg-flex align-items-center">
     <audio v-if="isAdmin" ref="notification-audio" data-notification-audio>
       <source src="/media/notification.mp3" type="audio/mpeg" />
     </audio>
     <a
       aria-expanded="false"
       aria-haspopup="true"
-      class="notification-button dropdown-toggle"
+      class="nav-link dropdown-toggle px-2 notification-toggle"
       data-toggle="dropdown"
       href="#"
       role="button"
-      ><span class="glyphicon glyphicon-bell"></span>
+    >
+      <font-awesome-icon :icon="['fas', 'bell']" />
       <span
         v-if="unreadClarifications && unreadClarifications.length > 0"
-        class="notification-counter label"
-        :class="{ 'label-danger': unreadClarifications.length > 0 }"
+        class="badge badge-danger count-badge"
         >{{ unreadClarifications.length }}</span
       ></a
     >
-    <ul class="dropdown-menu">
-      <li
-        v-if="!unreadClarifications || unreadClarifications.length === 0"
-        class="empty"
-      >
+    <div class="dropdown-menu dropdown-menu-right notification-dropdown">
+      <div v-if="unreadClarifications.length === 0" class="text-center">
         {{ T.notificationsNoNewNotifications }}
-      </li>
-      <li v-else>
-        <ul class="notification-drawer">
-          <li
-            v-for="clarification in unreadClarifications"
-            :key="clarification.clarification_id"
-            :data-clarification="clarification.clarification_id"
-          >
+      </div>
+      <transition-group name="list">
+        <div
+          v-for="clarification in unreadClarifications"
+          :key="clarification.clarification_id"
+          :data-clarification="clarification.clarification_id"
+          class="d-flex align-items-center flex-wrap px-4"
+        >
+          <hr class="w-100 my-2" />
+          <div class="w-100 justify-content-between">
             <button
-              :aria-label="T.wordsClose"
               class="close"
-              type="button"
               @click.prevent="onCloseClicked(clarification)"
             >
-              <span aria-hidden="true">×</span>
+              ❌
             </button>
-            <a :href="anchor(clarification)"
-              ><span>{{ clarification.problem_alias }}</span> —
+          </div>
+          <div class="w-100 align-items-center pt-1 notification-link">
+            <a :href="anchor(clarification)">
+              <span>{{ clarification.problem_alias }}</span> —
               <span>{{ clarification.author }}</span>
               <pre>{{ clarification.message }}</pre>
               <template v-if="clarification.answer">
                 <hr />
                 <pre>{{ clarification.answer }}</pre>
-              </template></a
-            >
-          </li>
-        </ul>
-      </li>
+              </template>
+            </a>
+          </div>
+        </div>
+      </transition-group>
       <template v-if="unreadClarifications && unreadClarifications.length > 1">
         <li class="divider" role="separator"></li>
         <li data-mark-all-as-read-button>
           <a href="#" @click.prevent="onMarkAllAsRead"
-            ><span class="glyphicon glyphicon-align-right"></span>
+            ><font-awesome-icon :icon="['fas', 'align-right']" />
             {{ T.notificationsMarkAllAsRead }}</a
           >
         </li>
       </template>
-    </ul>
+    </div>
   </li>
 </template>
 
@@ -70,7 +69,16 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import type { types } from '../../api_types';
 import T from '../../lang';
 
-@Component
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faBell, faAlignRight } from '@fortawesome/free-solid-svg-icons';
+library.add(faBell, faAlignRight);
+
+@Component({
+  components: {
+    FontAwesomeIcon,
+  },
+})
 export default class Clarifications extends Vue {
   @Prop({ default: () => [] }) clarifications!: types.Clarification[];
 
@@ -135,88 +143,28 @@ export default class Clarifications extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-.notification-button {
-  padding-top: 6px !important;
-  padding-bottom: 20px !important;
-  padding-right: 12px !important;
-  padding-left: 12px !important;
-  font-size: 22px;
+
+.close {
+  font-size: inherit;
 }
 
-.notification-counter {
-  position: absolute;
-  font-size: 16px;
-  padding: 2px 4px;
-  bottom: 4px;
-  right: 0;
-}
-
-.notification-drawer::-webkit-scrollbar-track {
-  border-radius: 10px;
-  background-color: var(
-    --notifications-clarifications-scrollbar-track-background-color
-  );
-}
-
-.notification-drawer::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-  background-color: var(
-    --notifications-clarifications-scrollbar-background-color
-  );
-}
-
-.notification-drawer::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: var(
-    --notifications-clarifications-scrollbar-thumb-background-color
-  );
-}
-
-.notification-drawer {
-  width: 320px;
-  max-width: 320px;
-  max-height: 380px;
-  overflow-y: scroll;
-}
-
-.notification-drawer li {
-  padding: 3px 20px;
-  list-style: none;
-  border-top: 1px solid
-    var(--notifications-clarifications-drawer-li-border-top-color);
-}
-
-.notification-drawer li a {
-  color: var(--notifications-clarifications-drawer-li-a-font-color);
-  text-decoration: none;
-}
-
-.notification-drawer li a pre {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 100%;
-}
-
-.notification-drawer li:hover,
-.notification-drawer li:focus,
-.notification-drawer li:active {
+.notification-link {
   cursor: pointer;
-  background-color: var(
-    --notifications-clarifications-drawer-li-background-color--active
-  );
-  text-decoration: none;
+
+  &:hover {
+    background-color: rgba(
+      var(--notifications-notification-link-background-color--hover),
+      0.05
+    );
+  }
 }
 
-.notification-drawer li:hover > a,
-.notification-drawer li:focus > a,
-.notification-drawer li:active > a {
-  color: var(--notifications-clarifications-drawer-li-font-color--active);
-}
-
-.notification-drawer li a > h4,
-.notification-drawer li a > p {
-  word-wrap: break-word;
+pre {
+  padding: 16px;
+  background: var(--markdown-pre-background-color);
+  margin: 1em 0;
+  border-radius: 6px;
+  display: block;
+  line-height: 125%;
 }
 </style>

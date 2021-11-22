@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import T from '../../lang';
 
-import notification_Clarifications from './Clarificationsv2.vue';
+import notification_Clarifications from './Clarifications.vue';
 
 describe('Clarifications.vue', () => {
   const clarifications = [

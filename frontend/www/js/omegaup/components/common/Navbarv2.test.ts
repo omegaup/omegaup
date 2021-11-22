@@ -2,11 +2,11 @@ import { mount } from '@vue/test-utils';
 
 import T from '../../lang';
 
-import common_Navbarv2 from './Navbarv2.vue';
+import common_Navbar from './Navbar.vue';
 
-describe('Navbarv2.vue', () => {
+describe('Navbar.vue', () => {
   it('Should handle empty navbar (in contest only)', async () => {
-    const wrapper = mount(common_Navbarv2, {
+    const wrapper = mount(common_Navbar, {
       propsData: {
         currentUsername: 'user',
         errorMessage: null,
@@ -37,7 +37,7 @@ describe('Navbarv2.vue', () => {
   });
 
   it('Should handle common navbar to logged user', async () => {
-    const wrapper = mount(common_Navbarv2, {
+    const wrapper = mount(common_Navbar, {
       propsData: {
         currentUsername: 'user',
         errorMessage: null,
@@ -68,7 +68,7 @@ describe('Navbarv2.vue', () => {
   });
 
   it('Should handle common navbar to not-logged user', async () => {
-    const wrapper = mount(common_Navbarv2, {
+    const wrapper = mount(common_Navbar, {
       propsData: {
         currentUsername: 'user',
         errorMessage: null,

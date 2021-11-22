@@ -89,7 +89,7 @@
     {/if}
     {if $headerPayload.inContest eq false && (!isset($hideFooterAndHeader) || !$hideFooterAndHeader)}
     <div id="common-footer"></div>
-    {js_include entrypoint="common_footer_v2"}
+    {js_include entrypoint="common_footer"}
     {/if}
 
   </body>
