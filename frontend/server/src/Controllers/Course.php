@@ -2013,6 +2013,21 @@ class Course extends \OmegaUp\Controllers\Controller {
             "Arbitrated course for user, username={$targetIdentity->username}, state={$request->accepted}"
         );
 
+        // If the request was accepted, we need to automatically add the student to the course
+        if (!$request->accepted) {
+            return ['status' => 'ok'];
+        }
+
+        $groupIdentity = new \OmegaUp\DAO\VO\GroupsIdentities([
+            'group_id' => $course->group_id,
+            'identity_id' => $targetIdentity->identity_id,
+            'share_user_information' => $request->share_user_information,
+        ]);
+        if (!is_null($request->accept_teacher)) {
+            $groupIdentity->accept_teacher = $request->accept_teacher;
+        }
+        \OmegaUp\DAO\GroupsIdentities::create($groupIdentity);
+
         return ['status' => 'ok'];
     }
 
