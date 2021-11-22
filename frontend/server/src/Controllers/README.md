@@ -1510,7 +1510,7 @@ interested to join the course.
 | -------------- | -------- | ----------- |
 | `course_alias` | `string` |             |
 | `resolution`   | `bool`   |             |
-| `username`     | `string` | \*          |
+| `username`     | `string` |             |
 
 ### Returns
 

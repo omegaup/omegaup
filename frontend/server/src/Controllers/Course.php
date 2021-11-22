@@ -1919,7 +1919,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param bool $resolution
-     * @omegaup-request-param string $username     *
+     * @omegaup-request-param string $username
      *
      * @return array{status: string}
      */
