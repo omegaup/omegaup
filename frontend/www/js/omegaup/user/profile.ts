@@ -11,8 +11,8 @@ import user_Profile from '../components/user/Profile.vue';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
   const locationHash = window.location.hash.substr(1).split('#');
-  let selectedTab = locationHash[0] !== '' ? locationHash[0] : 'view-profile';
-  if (locationHash[0] === 'locale-changed') {
+  let selectedTab = locationHash[0] || 'view-profile';
+  if (selectedTab === 'locale-changed') {
     selectedTab = 'edit-preferences';
     history.replaceState({}, 'updateTab', `#${selectedTab}`);
     ui.success(T.userEditPreferencesSuccess);
