@@ -1,9 +1,14 @@
 jest.mock('../../../../third_party/js/diff_match_patch.js');
 
+import T from '../../lang';
 import { mount } from '@vue/test-utils';
 import type { types } from '../../api_types';
 
-import arena_ContestList from './ContestListv2.vue';
+import arena_ContestList, {
+  ContestOrder,
+  ContestTab,
+} from './ContestListv2.vue';
+import each from 'jest-each';
 
 describe('ContestListv2.vue', () => {
   const daySeconds = 24 * 60 * 60 * 1000;
@@ -15,7 +20,7 @@ describe('ContestListv2.vue', () => {
     current: [
       {
         admission_mode: 'public',
-        alias: 'Current-Contest-1',
+        alias: 'Contest-1',
         description: 'hello contest 1',
         contest_id: 1,
         contestants: 12,
@@ -31,11 +36,47 @@ describe('ContestListv2.vue', () => {
         title: 'Current Contest 1',
         window_length: 300,
       },
+      {
+        admission_mode: 'public',
+        alias: 'Contest-3',
+        description: 'hello contest 3',
+        contest_id: 3,
+        contestants: 15,
+        finish_time: new Date(tomorrow.getTime() + daySeconds * 2),
+        last_updated: yesterday,
+        organizer: 'alfadown',
+        original_finish_time: tomorrow,
+        partial_score: false,
+        participating: false,
+        problemset_id: 1,
+        recommended: false,
+        start_time: yesterday,
+        title: 'Current Contest 3',
+        window_length: 300,
+      },
+      {
+        admission_mode: 'public',
+        alias: 'Contest-2',
+        description: 'hello contest 2',
+        contest_id: 2,
+        contestants: 5,
+        finish_time: new Date(tomorrow.getTime() + daySeconds),
+        last_updated: yesterday,
+        organizer: 'lamdaleft',
+        original_finish_time: tomorrow,
+        partial_score: false,
+        participating: true,
+        problemset_id: 1,
+        recommended: false,
+        start_time: yesterday,
+        title: 'Current Contest 2',
+        window_length: 300,
+      },
     ],
     future: [
       {
         admission_mode: 'public',
-        alias: 'Future-Contest-1',
+        alias: 'Contest-1',
         description: 'hello contest 1',
         contest_id: 1,
         contestants: 12,
@@ -51,15 +92,51 @@ describe('ContestListv2.vue', () => {
         title: 'Future Contest 1',
         window_length: 300,
       },
+      {
+        admission_mode: 'public',
+        alias: 'Contest-3',
+        description: 'hello contest 3',
+        contest_id: 3,
+        contestants: 15,
+        finish_time: new Date(tomorrow.getTime() + daySeconds * 3),
+        last_updated: today,
+        organizer: 'alfadown',
+        original_finish_time: new Date(tomorrow.getTime() + daySeconds),
+        partial_score: false,
+        participating: false,
+        problemset_id: 1,
+        recommended: false,
+        start_time: tomorrow,
+        title: 'Future Contest 3',
+        window_length: 300,
+      },
+      {
+        admission_mode: 'public',
+        alias: 'Contest-2',
+        description: 'hello contest 2',
+        contest_id: 2,
+        contestants: 5,
+        finish_time: new Date(tomorrow.getTime() + daySeconds * 2),
+        last_updated: today,
+        organizer: 'lamdaleft',
+        original_finish_time: new Date(tomorrow.getTime() + daySeconds),
+        partial_score: false,
+        participating: true,
+        problemset_id: 1,
+        recommended: false,
+        start_time: tomorrow,
+        title: 'Future Contest 2',
+        window_length: 300,
+      },
     ],
     past: [
       {
         admission_mode: 'public',
-        alias: 'Past-Contest-1',
+        alias: 'Contest-1',
         description: 'hello contest 1',
         contest_id: 1,
         contestants: 12,
-        finish_time: yesterday,
+        finish_time: new Date(yesterday.getTime() - daySeconds * 2),
         last_updated: new Date(yesterday.getTime() - daySeconds),
         organizer: 'omegaup',
         original_finish_time: yesterday,
@@ -71,6 +148,42 @@ describe('ContestListv2.vue', () => {
         title: 'Past Contest 1',
         window_length: 300,
       },
+      {
+        admission_mode: 'public',
+        alias: 'Contest-3',
+        description: 'hello contest 3',
+        contest_id: 3,
+        contestants: 15,
+        finish_time: yesterday /*new Date(yesterday.getTime() - daySeconds * 2)*/,
+        last_updated: new Date(yesterday.getTime() - daySeconds),
+        organizer: 'alfadown',
+        original_finish_time: yesterday,
+        partial_score: false,
+        participating: false,
+        problemset_id: 1,
+        recommended: false,
+        start_time: new Date(yesterday.getTime() - daySeconds * 3),
+        title: 'Past Contest 3',
+        window_length: 300,
+      },
+      {
+        admission_mode: 'public',
+        alias: 'Contest-2',
+        description: 'hello contest 2',
+        contest_id: 2,
+        contestants: 5,
+        finish_time: new Date(yesterday.getTime() - daySeconds),
+        last_updated: new Date(yesterday.getTime() - daySeconds),
+        organizer: 'lambdaleft',
+        original_finish_time: yesterday,
+        partial_score: false,
+        participating: true,
+        problemset_id: 1,
+        recommended: false,
+        start_time: new Date(yesterday.getTime() - daySeconds * 3),
+        title: 'Past Contest 2',
+        window_length: 300,
+      },
     ],
   };
 
@@ -78,6 +191,7 @@ describe('ContestListv2.vue', () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {
         contests,
+        tab: ContestTab.Current,
       },
     });
 
@@ -93,6 +207,7 @@ describe('ContestListv2.vue', () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {
         contests,
+        tab: ContestTab.Future,
       },
     });
 
@@ -108,6 +223,7 @@ describe('ContestListv2.vue', () => {
     const wrapper = mount(arena_ContestList, {
       propsData: {
         contests,
+        tab: ContestTab.Past,
       },
     });
 
@@ -118,4 +234,136 @@ describe('ContestListv2.vue', () => {
     expect(pastContestTab.exists()).toBe(true);
     expect(pastContestTab.text()).toContain('Past Contest 1');
   });
+
+  const dropdownMapping = [
+    [{ value: T.contestOrderByTitle }],
+    [{ value: T.contestOrderByEnds }],
+    [{ value: T.contestOrderByDuration }],
+    [{ value: T.contestOrderByOrganizer }],
+    [{ value: T.contestOrderByContestants }],
+    [{ value: T.contestOrderBySignedUp }],
+  ];
+
+  each(dropdownMapping).it(
+    'Should show dropdown when "%s" field is selected',
+    async (value) => {
+      const wrapper = mount(arena_ContestList, {
+        propsData: {
+          contests,
+        },
+      });
+
+      const dropdownOrderBy = wrapper.findComponent({
+        ref: 'dropdownOrderBy',
+      }).element as HTMLInputElement;
+
+      dropdownOrderBy.value = value;
+      await dropdownOrderBy.dispatchEvent(new Event('change'));
+      expect(dropdownOrderBy.value).toBe(value);
+    },
+  );
+
+  const orderMapping = [
+    [
+      {
+        field: ContestOrder.Title,
+        name: 'title',
+        expectedOrder: ['Contest-1', 'Contest-2', 'Contest-3'],
+      },
+    ],
+    [
+      {
+        field: ContestOrder.Ends,
+        name: 'ends',
+        expectedOrder: ['Contest-3', 'Contest-2', 'Contest-1'],
+      },
+    ],
+    [
+      {
+        field: ContestOrder.Duration,
+        name: 'duration',
+        expectedOrder: ['Contest-3', 'Contest-2', 'Contest-1'],
+      },
+    ],
+    [
+      {
+        field: ContestOrder.Organizer,
+        name: 'organizer',
+        expectedOrder: ['Contest-3', 'Contest-2', 'Contest-1'],
+      },
+    ],
+    [
+      {
+        field: ContestOrder.Contestants,
+        name: 'contestants',
+        expectedOrder: ['Contest-3', 'Contest-1', 'Contest-2'],
+      },
+    ],
+    [
+      {
+        field: ContestOrder.SignedUp,
+        name: 'signed-up',
+        expectedOrder: ['Contest-1', 'Contest-2', 'Contest-3'],
+      },
+    ],
+  ];
+
+  each(orderMapping).it(
+    'Should order correctly current contest list when "%s" field is selected',
+    async ({ field, name, expectedOrder }) => {
+      const wrapper = mount(arena_ContestList, {
+        propsData: {
+          contests,
+          tab: ContestTab.Current,
+        },
+      });
+
+      await wrapper.find('.b-dropdown').trigger('click');
+      await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
+
+      expect(wrapper.vm.currentOrder).toBe(field);
+      expect(
+        wrapper.vm.sortedContestList.map((contest) => contest.alias),
+      ).toEqual(expectedOrder);
+    },
+  );
+
+  each(orderMapping).it(
+    'Should order correct past contest list when "%s" field is selected',
+    async ({ field, name, expectedOrder }) => {
+      const wrapper = mount(arena_ContestList, {
+        propsData: {
+          contests,
+          tab: ContestTab.Past,
+        },
+      });
+
+      await wrapper.find('.b-dropdown').trigger('click');
+      await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
+      expect(wrapper.vm.currentOrder).toBe(field);
+      expect(
+        wrapper.vm.sortedContestList.map((contest) => contest.alias),
+      ).toEqual(expectedOrder);
+    },
+  );
+
+  each(orderMapping).it(
+    'Should order correctly future contest list when "%s" field is selected',
+    async ({ field, name, expectedOrder }) => {
+      const wrapper = mount(arena_ContestList, {
+        propsData: {
+          contests,
+          tab: ContestTab.Future,
+        },
+      });
+
+      await wrapper.find('.b-dropdown').trigger('click');
+      await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
+
+      expect(wrapper.vm.currentOrder).toBe(field);
+      expect(
+        wrapper.vm.sortedContestList.map((contest) => contest.alias),
+      ).toEqual(expectedOrder);
+    },
+  );
 });

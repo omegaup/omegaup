@@ -242,9 +242,7 @@
           @details="(request) => onRunDetails(request, 'runs')"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
-          @filter-changed="
-            (filter, value) => $emit('apply-filter', filter, value)
-          "
+          @filter-changed="(request) => $emit('apply-filter', request)"
           @update-search-result-users-contest="
             (request) => $emit('update-search-result-users-contest', request)
           "
