@@ -138,6 +138,32 @@
                     }}</a></template
                   >
                 </omegaup-grid-paginator>
+                <omegaup-grid-paginator
+                  :columns="3"
+                  :items="createdContests"
+                  :items-per-page="30"
+                  :title="T.profileCreatedContests"
+                  class="mb-3"
+                >
+                  <template v-if="profile.is_own_profile" #header-link
+                    ><a href="/contest/mine/" class="float-right">{{
+                      T.profileCreatedContentSeeAll
+                    }}</a></template
+                  >
+                </omegaup-grid-paginator>
+                <omegaup-grid-paginator
+                  :columns="3"
+                  :items="createdCourses"
+                  :items-per-page="30"
+                  :title="T.profileCreatedCourses"
+                  class="mb-3"
+                >
+                  <template v-if="profile.is_own_profile" #header-link
+                    ><a href="/course/mine/" class="float-right">{{
+                      T.profileCreatedContentSeeAll
+                    }}</a></template
+                  >
+                </omegaup-grid-paginator>
               </div>
               <div
                 v-if="selectedTab == 'data'"
@@ -183,7 +209,12 @@ import common_GridPaginator from '../common/GridPaginator.vue';
 import { types } from '../../api_types';
 import * as Highcharts from 'highcharts/highstock';
 import * as ui from '../../ui';
-import { Problem, ContestResult } from '../../linkable_resource';
+import {
+  Problem,
+  ContestResult,
+  Contest,
+  Course,
+} from '../../linkable_resource';
 
 @Component({
   components: {
@@ -220,6 +251,24 @@ export default class ViewProfile extends Vue {
     !this.profile.is_own_profile && this.profile.is_private ? 'data' : 'badges';
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
 
+  get createdContests(): Contest[] {
+    if (!this.data?.createdContests) return [];
+    let contests = this.data.createdContests;
+    if (!this.profile.is_own_profile) {
+      contests = contests.filter(
+        (contest) => contest.admission_mode === 'public',
+      );
+    }
+    return contests.map((contest) => new Contest(contest));
+  }
+  get createdCourses(): Course[] {
+    if (!this.data?.createdCourses) return [];
+    let courses = this.data.createdCourses;
+    if (!this.profile.is_own_profile) {
+      courses = courses.filter((course) => course.admission_mode === 'public');
+    }
+    return courses.map((course) => new Course(course));
+  }
   get createdProblems(): Problem[] {
     if (!this.data?.createdProblems) return [];
     return this.data.createdProblems.map((problem) => new Problem(problem));

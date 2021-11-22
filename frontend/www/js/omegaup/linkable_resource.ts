@@ -161,3 +161,55 @@ export class SchoolUser implements LinkableResource {
     return Optional.ofNonNull(`${this.getDisplayValue()}`);
   }
 }
+
+export class Contest implements LinkableResource {
+  alias: string = '';
+  title: string = '';
+
+  constructor(contest: types.Contest) {
+    this.alias = contest.alias;
+    this.title = contest.title;
+  }
+
+  toString(): string {
+    return this.title;
+  }
+
+  getUrl(): string {
+    return `/arena/${this.alias}/`;
+  }
+
+  getBadge(): Optional<string> {
+    return Optional.empty();
+  }
+
+  getLogo(): Logo | null {
+    return null;
+  }
+}
+
+export class Course implements LinkableResource {
+  alias: string = '';
+  name: string = '';
+
+  constructor(contest: types.Course) {
+    this.alias = contest.alias;
+    this.name = contest.name;
+  }
+
+  toString(): string {
+    return this.name;
+  }
+
+  getUrl(): string {
+    return `/course/${this.alias}/`;
+  }
+
+  getBadge(): Optional<string> {
+    return Optional.empty();
+  }
+
+  getLogo(): Logo | null {
+    return null;
+  }
+}
