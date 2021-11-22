@@ -10,9 +10,11 @@ import user_Profile from '../components/user/Profile.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
-  const locationHash = window.location.hash.substr(1).split('&');
-  if (locationHash[1] === 'locale-changed') {
-    window.location.hash = 'edit-preferences';
+  const locationHash = window.location.hash.substr(1).split('#');
+  let selectedTab = locationHash[0] !== '' ? locationHash[0] : 'view-profile';
+  if (locationHash[0] === 'locale-changed') {
+    selectedTab = 'edit-preferences';
+    history.replaceState({}, 'updateTab', `#${selectedTab}`);
     ui.success(T.userEditPreferencesSuccess);
   }
 
@@ -27,7 +29,7 @@ OmegaUp.on('ready', () => {
         data: payload.extraProfileDetails,
         identities: payload.identities,
         hasPassword: payload.extraProfileDetails?.hasPassword,
-        selectedTab: locationHash[0] !== '' ? locationHash[0] : 'view-profile',
+        selectedTab,
       };
     },
     render: function (createElement) {
@@ -78,7 +80,7 @@ OmegaUp.on('ready', () => {
             api.User.update(profile)
               .then(() => {
                 if (localeChanged) {
-                  window.location.hash = 'edit-preferences&locale-changed';
+                  window.location.hash = 'locale-changed';
                   window.location.reload();
                   return;
                 }

@@ -1356,7 +1356,7 @@ const translations: { [key: string]: string; } = {
   userEditSuccessfulEmailUpdate: "Email updated successfully! In a few minutes, you will receive more instructions in your email. Don't forget to check your Spam folder.",
   userEditTertiary: "Community College",
   userEditUpperSecondary: "Senior High / High school",
-  userEditViewProfile: "See my profile",
+  userEditViewProfile: "View my profile",
   userEmailEditEmail: "Email",
   userEmails: "E-mails",
   userEndTimeUpdatedSuccessfully: "Contest end time for user has been updated successfully.",
