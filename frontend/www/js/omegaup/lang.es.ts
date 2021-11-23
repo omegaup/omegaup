@@ -214,6 +214,8 @@ const translations: { [key: string]: string; } = {
   contestEditWithTitle: "Editar concurso %(title)",
   contestEndTime: "Termina: %(endDate)",
   contestEnrollStatus: "Inscrito",
+  contestFilterBy: "Filtrar por",
+  contestFilterBySignedUp: "Inscrito",
   contestForTeamsCanNotChangeToContest: "Un concurso para equipos no se puede cambiar a concurso normal",
   contestGroupAdded: "Grupo agregado correctamente",
   contestGroupRemoved: "Grupo eliminado correctamente",

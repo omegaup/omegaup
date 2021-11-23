@@ -214,6 +214,8 @@ const translations: { [key: string]: string; } = {
   contestEditWithTitle: "Edit contest %(title)",
   contestEndTime: "Ends: %(endDate)",
   contestEnrollStatus: "Signed Up",
+  contestFilterBy: "Filter by",
+  contestFilterBySignedUp: "Signed Up",
   contestForTeamsCanNotChangeToContest: "A contest for teams cannot be changed to a normal contest",
   contestGroupAdded: "Group successfully added.",
   contestGroupRemoved: "Group successfully removed.",
