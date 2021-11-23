@@ -34,6 +34,9 @@ export function escapeCsv(cell: TableCell): string {
   return '"' + cell.replace('"', '""') + '"';
 }
 
-export function toCsv(table: TableCell[][]): string {
+export function toCsv(table: TableCell[][] | null): string {
+  if (table === null) {
+    return '';
+  }
   return table.map((row) => row.map(escapeCsv).join(',')).join('\r\n');
 }
