@@ -121,7 +121,7 @@
                   <b-dropdown-item
                     href="#"
                     data-filter-by-signed-up
-                    @click="filterBySignedUp"
+                    @click="toggleFilterBySignedUp"
                   >
                     <font-awesome-icon
                       v-if="currentFilterBySignedUp"
@@ -350,8 +350,8 @@ export default class ArenaContestList extends Vue {
     this.currentOrder = ContestOrder.SignedUp;
   }
 
-  filterBySignedUp() {
-    this.currentFilterBySignedUp = this.currentFilterBySignedUp ? false : true;
+  toggleFilterBySignedUp() {
+    this.currentFilterBySignedUp = !this.currentFilterBySignedUp;
   }
 
   get filteredContestList(): types.ContestListItem[] {
