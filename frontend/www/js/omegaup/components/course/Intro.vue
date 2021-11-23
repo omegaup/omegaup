@@ -13,7 +13,7 @@
         }}
       </p>
       <template
-        v-if="userRegistrationRequested === null || userRegistrationAccepted"
+        v-if="userRegistrationAccepted || userRegistrationRequested === false"
       >
         <omegaup-markdown
           v-if="needsBasicInformation"
@@ -43,8 +43,15 @@
             class="align-to-markdown"
           ></omegaup-radio-switch>
         </template>
-        <div class="text-center mt-3">
-          <form v-if="loggedIn" @submit.prevent="onSubmit">
+      </template>
+      <div class="text-center mt-3">
+        <template v-if="loggedIn">
+          <form
+            v-if="
+              userRegistrationRequested === null || userRegistrationAccepted
+            "
+            @submit.prevent="onSubmit"
+          >
             <button
               class="btn btn-primary btn-lg"
               name="start-course-submit"
@@ -54,41 +61,40 @@
               {{ T.startCourse }}
             </button>
           </form>
-          <a
-            v-else
-            class="btn btn-primary"
-            :href="`/login/?redirect=${encodeURIComponent(
-              window.location.pathname,
-            )}`"
-            >{{ T.loginLogIn }}</a
+          <form
+            v-else-if="!userRegistrationRequested"
+            class="text-center"
+            @submit.prevent="onRequestAccess"
           >
-        </div>
-      </template>
-      <template v-else>
-        <form
-          v-if="!userRegistrationRequested"
-          class="text-center"
-          @submit.prevent="$emit('request-access-course')"
-        >
+            <omegaup-markdown
+              :markdown="T.mustRegisterToJoinCourse"
+              :full-width="true"
+            ></omegaup-markdown>
+            <button type="submit" class="btn btn-primary btn-lg">
+              {{ T.registerForCourse }}
+            </button>
+          </form>
           <omegaup-markdown
-            :markdown="T.mustRegisterToJoinCourse"
+            v-else-if="!userRegistrationAnswered"
+            :markdown="T.registrationPendingCourse"
             :full-width="true"
           ></omegaup-markdown>
-          <button type="submit" class="btn btn-primary btn-lg">
-            {{ T.registerForCourse }}
-          </button>
-        </form>
-        <omegaup-markdown
-          v-else-if="!userRegistrationAnswered"
-          :markdown="T.registrationPendingCourse"
-          :full-width="true"
-        ></omegaup-markdown>
-        <omegaup-markdown
+          <omegaup-markdown
+            v-else
+            :markdown="T.registrationDenied"
+            :full-width="true"
+          ></omegaup-markdown>
+        </template>
+        <a
           v-else
-          :markdown="T.registrationDenied"
-          :full-width="true"
-        ></omegaup-markdown>
-      </template>
+          class="btn btn-primary"
+          role="button"
+          :href="`/login/?redirect=${encodeURIComponent(
+            window.location.pathname,
+          )}`"
+          >{{ T.loginLogIn }}</a
+        >
+      </div>
     </div>
     <div class="mt-4">
       <div v-if="course.objective" class="mb-4">
@@ -172,6 +178,13 @@ export default class CourseIntro extends Vue {
 
   onSubmit(): void {
     this.$emit('submit', {
+      shareUserInformation: this.shareUserInformation,
+      acceptTeacher: this.acceptTeacher,
+    });
+  }
+
+  onRequestAccess(): void {
+    this.$emit('request-access-course', {
       shareUserInformation: this.shareUserInformation,
       acceptTeacher: this.acceptTeacher,
     });

@@ -78,7 +78,6 @@
   - [`/api/course/details/`](#apicoursedetails)
   - [`/api/course/generateTokenForCloneCourse/`](#apicoursegeneratetokenforclonecourse)
   - [`/api/course/getProblemUsers/`](#apicoursegetproblemusers)
-  - [`/api/course/introDetails/`](#apicourseintrodetails)
   - [`/api/course/listAssignments/`](#apicourselistassignments)
   - [`/api/course/listCourses/`](#apicourselistcourses)
   - [`/api/course/listSolvedProblems/`](#apicourselistsolvedproblems)
@@ -1751,24 +1750,6 @@ types.CourseDetails;
 | Name         | Type       |
 | ------------ | ---------- |
 | `identities` | `string[]` |
-
-## `/api/course/introDetails/`
-
-### Description
-
-Show course intro only on public courses when user is not yet registered
-
-### Parameters
-
-| Name           | Type     | Description |
-| -------------- | -------- | ----------- |
-| `course_alias` | `string` |             |
-
-### Returns
-
-```typescript
-types.IntroDetailsPayload;
-```
 
 ## `/api/course/listAssignments/`
 
