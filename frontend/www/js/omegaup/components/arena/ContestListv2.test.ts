@@ -265,6 +265,7 @@ describe('ContestListv2.vue', () => {
 
   const filterMapping = [
     [{ field: 'signed-up', expectedResult: ['Contest-1', 'Contest-2'] }],
+    [{ field: 'recommended', expectedResult: ['Contest-1', 'Contest-2'] }],
   ];
 
   const tabMapping = [
@@ -290,6 +291,27 @@ describe('ContestListv2.vue', () => {
           wrapper.vm.filteredContestList.map((contest) => contest.alias),
         ).toEqual(expectedResult);
       });
+    },
+  );
+
+  each(tabMapping).it(
+    'Should filter contest list when both filters are selected. When selected tab equal to %s',
+    async ({ tab }) => {
+      const wrapper = mount(arena_ContestList, {
+        propsData: {
+          contests,
+          tab: tab,
+        },
+      });
+      await wrapper
+        .find(`.b-dropdown a[data-filter-by-signed-up]`)
+        .trigger('click');
+      await wrapper
+        .find(`.b-dropdown a[data-filter-by-recommended]`)
+        .trigger('click');
+      expect(
+        wrapper.vm.filteredContestList.map((contest) => contest.alias),
+      ).toEqual(['Contest-1', 'Contest-2']);
     },
   );
 
