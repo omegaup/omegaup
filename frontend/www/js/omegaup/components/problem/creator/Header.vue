@@ -1,7 +1,7 @@
 <template>
   <b-row class="mb-3">
     <b-col class="d-flex align-items-center">
-      <span class="mr-2">{{ T.problemCreatorName }}:</span>
+      <span class="mr-2">{{ T.problemCreatorName }}</span>
       <b-form-input
         v-model="name"
         size="sm"
@@ -35,7 +35,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import T from '../../../lang';
 
-@Component({})
+@Component
 export default class Header extends Vue {
   T = T;
 }

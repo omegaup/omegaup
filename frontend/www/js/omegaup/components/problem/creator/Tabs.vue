@@ -3,7 +3,7 @@
     <b-tab>
       <template #title>
         <BIconPencil class="mr-1" />
-        <span> {{ T.problemCreatorWriting }}</span>
+        <span> {{ T.problemCreatorStatement }}</span>
       </template>
     </b-tab>
     <b-tab>
@@ -30,7 +30,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import T from '../../../lang';
-@Component({})
+@Component
 export default class Tabs extends Vue {
   T = T;
 }
