@@ -371,22 +371,21 @@ export default class ArenaContestList extends Vue {
   }
 
   get filteredContestList(): types.ContestListItem[] {
-    if (this.currentFilterBySignedUp && this.currentFilterByRecommended) {
-      return this.sortedContestList
-        .slice()
-        .filter(
-          (contestItem) => contestItem.participating && contestItem.recommended,
-        );
-    } else if (this.currentFilterByRecommended) {
-      return this.sortedContestList
-        .slice()
-        .filter((contestItem) => contestItem.recommended);
-    } else if (this.currentFilterBySignedUp) {
-      return this.sortedContestList
-        .slice()
-        .filter((contestItem) => contestItem.participating);
+    const filters: Array<(contestItem: types.ContestListItem) => boolean> = [];
+    if (this.currentFilterBySignedUp) {
+      filters.push((item) => item.participating);
     }
-    return this.sortedContestList;
+    if (this.currentFilterByRecommended) {
+      filters.push((item) => item.recommended);
+    }
+    return this.sortedContestList.slice().filter((contestItem) => {
+      for (const filter of filters) {
+        if (!filter(contestItem)) {
+          return false;
+        }
+      }
+      return true;
+    });
   }
 
   get sortedContestList(): types.ContestListItem[] {
