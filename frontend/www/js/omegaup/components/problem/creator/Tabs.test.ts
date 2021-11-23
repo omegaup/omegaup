@@ -1,7 +1,7 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 
 import Tabs from './Tabs.vue';
-import BootstrapVue, { IconsPlugin, BTab } from 'bootstrap-vue';
+import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../lang';
 
 const localVue = createLocalVue();
