@@ -113,14 +113,14 @@
           <div class="card-body">
             <a
               class="btn btn-primary btn-sm w-100 my-1"
-              :class="{ disabled: !completeStudentsProgress.length }"
+              :class="{ disabled: completeStudentsProgress === null }"
               :download="`${course.alias}.csv`"
               :href="csvDataUrl"
               >.csv</a
             >
             <a
               class="btn btn-primary btn-sm w-100 my-1"
-              :class="{ disabled: !completeStudentsProgress.length }"
+              :class="{ disabled: completeStudentsProgress === null }"
               :download="`${course.alias}.ods`"
               :href="odsDataUrl"
               >.ods</a
@@ -158,7 +158,8 @@ export function escapeXml(cell: TableCell): string {
     .replace(/"/g, '&quot;');
 }
 
-export function toOds(courseName: string, table: TableCell[][]): string {
+export function toOds(courseName: string, table: TableCell[][] | null): string {
+  if (table === null) return '';
   let result = `<table:table table:name="${escapeXml(courseName)}">\n`;
   result += `<table:table-column table:number-columns-repeated="${table[0].length}"/>\n`;
   for (const row of table) {
@@ -192,7 +193,8 @@ export function toOds(courseName: string, table: TableCell[][]): string {
 })
 export default class CourseViewProgress extends Vue {
   @Prop() course!: types.CourseDetails;
-  @Prop() completeStudentsProgress!: types.StudentProgressInCourse[];
+  @Prop({ default: null })
+  completeStudentsProgress!: types.StudentProgressInCourse[];
   @Prop() students!: types.StudentProgressInCourse[];
   @Prop() assignmentsProblems!: types.AssignmentsProblemsPoints[];
   @Prop() pagerItems!: types.PageItem[];
@@ -231,7 +233,7 @@ export default class CourseViewProgress extends Vue {
   }
 
   get progressTable(): TableCell[][] | null {
-    if (!this.completeStudentsProgress.length) return null;
+    if (this.completeStudentsProgress === null) return null;
     const table: TableCell[][] = [];
     const header = [
       T.profileUsername,

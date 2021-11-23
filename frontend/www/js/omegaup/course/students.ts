@@ -20,18 +20,23 @@ OmegaUp.on('ready', function () {
       let nextPage: undefined | number = 1;
       let completeStudentsProgress: types.StudentProgressInCourse[] = [];
       while (nextPage) {
-        await api.Course.studentsProgress({
-          page: nextPage,
-          length: 1,
-          course: payload.course.alias,
-        })
-          .then((response) => {
-            completeStudentsProgress = completeStudentsProgress.concat(
-              response.progress,
-            );
-            nextPage = response.nextPage;
-          })
-          .catch(ui.apiError);
+        try {
+          const response: {
+            nextPage?: number;
+            progress: types.StudentProgressInCourse[];
+          } = await api.Course.studentsProgress({
+            page: nextPage,
+            length: 1,
+            course: payload.course.alias,
+          });
+          completeStudentsProgress = completeStudentsProgress.concat(
+            response.progress,
+          );
+          nextPage = response.nextPage;
+        } catch (e: any) {
+          ui.apiError(e);
+          break;
+        }
       }
       this.completeStudentsProgress = completeStudentsProgress;
     },
