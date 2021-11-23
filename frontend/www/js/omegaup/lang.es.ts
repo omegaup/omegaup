@@ -445,6 +445,7 @@ const translations: { [key: string]: string; } = {
   courseNewFormLevel: "Nivel",
   courseNewFormLevelDesc: "El nivel de dificultad del curso.",
   courseNewFormObjective: "Objetivo",
+  courseNewFormObjectiveDesc: "Describe lo que tus estudiantes aprender\u00e1n en este curso.",
   courseNewFormScheduleCourse: "Agendar curso",
   courseNewFormShortTitleAlias: "T\u00edtulo corto (alias)",
   courseNewFormShortTitleAliasDesc: "El t\u00edtulo corto se usa para construir la URL del curso (ejemplos: IPNVERANO2016, ITVERINTRO2016)",
