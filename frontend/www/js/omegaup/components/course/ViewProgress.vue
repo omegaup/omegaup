@@ -194,7 +194,7 @@ export function toOds(courseName: string, table: TableCell[][] | null): string {
 export default class CourseViewProgress extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop({ default: null })
-  completeStudentsProgress!: types.StudentProgressInCourse[];
+  completeStudentsProgress!: types.StudentProgressInCourse[] | null;
   @Prop() students!: types.StudentProgressInCourse[];
   @Prop() assignmentsProblems!: types.AssignmentsProblemsPoints[];
   @Prop() pagerItems!: types.PageItem[];
