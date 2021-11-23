@@ -129,6 +129,17 @@
                       class="mr-1"
                     />{{ T.contestFilterBySignedUp }}</b-dropdown-item
                   >
+                  <b-dropdown-item
+                    href="#"
+                    data-filter-by-recommended
+                    @click="toggleFilterByRecommended"
+                  >
+                    <font-awesome-icon
+                      v-if="currentFilterByRecommended"
+                      icon="check-square"
+                      class="mr-1"
+                    />{{ T.contestFilterByRecommended }}</b-dropdown-item
+                  >
                 </b-dropdown>
               </b-col>
             </b-row>
@@ -139,7 +150,7 @@
           :title="T.contestListCurrent"
           :title-link-class="titleLinkClass(ContestTab.Current)"
         >
-          <div v-if="contests.current.length === 0">
+          <div v-if="filteredContestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
@@ -172,7 +183,7 @@
           :title="T.contestListFuture"
           :title-link-class="titleLinkClass(ContestTab.Future)"
         >
-          <div v-if="contests.future.length === 0">
+          <div v-if="filteredContestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
@@ -208,7 +219,7 @@
           :title="T.contestListPast"
           :title-link-class="titleLinkClass(ContestTab.Past)"
         >
-          <div v-if="contests.past.length === 0">
+          <div v-if="filteredContestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
@@ -305,6 +316,7 @@ export default class ArenaContestList extends Vue {
   currentQuery: string = this.query;
   currentOrder: ContestOrder = ContestOrder.None;
   currentFilterBySignedUp: boolean = false;
+  currentFilterByRecommended: boolean = false;
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
@@ -354,8 +366,22 @@ export default class ArenaContestList extends Vue {
     this.currentFilterBySignedUp = !this.currentFilterBySignedUp;
   }
 
+  toggleFilterByRecommended() {
+    this.currentFilterByRecommended = !this.currentFilterByRecommended;
+  }
+
   get filteredContestList(): types.ContestListItem[] {
-    if (this.currentFilterBySignedUp) {
+    if (this.currentFilterBySignedUp && this.currentFilterByRecommended) {
+      return this.sortedContestList
+        .slice()
+        .filter(
+          (contestItem) => contestItem.participating && contestItem.recommended,
+        );
+    } else if (this.currentFilterByRecommended) {
+      return this.sortedContestList
+        .slice()
+        .filter((contestItem) => contestItem.recommended);
+    } else if (this.currentFilterBySignedUp) {
       return this.sortedContestList
         .slice()
         .filter((contestItem) => contestItem.participating);
