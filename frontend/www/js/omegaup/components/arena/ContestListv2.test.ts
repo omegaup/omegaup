@@ -267,60 +267,29 @@ describe('ContestListv2.vue', () => {
     [{ field: 'signed-up', expectedResult: ['Contest-1', 'Contest-2'] }],
   ];
 
-  each(filterMapping).it(
-    'Should filter current contest list when %s field is selected',
-    async ({ field, expectedResult }) => {
-      const wrapper = mount(arena_ContestList, {
-        propsData: {
-          contests,
-          tab: ContestTab.Current,
-        },
+  const tabMapping = [
+    [{ tab: ContestTab.Current }],
+    [{ tab: ContestTab.Future }],
+    [{ tab: ContestTab.Past }],
+  ];
+
+  each(filterMapping).describe(
+    'Should filter contest list when %s field is selected',
+    ({ field, expectedResult }) => {
+      each(tabMapping).it('When selected tab equal to %s', async ({ tab }) => {
+        const wrapper = mount(arena_ContestList, {
+          propsData: {
+            contests,
+            tab: tab,
+          },
+        });
+        await wrapper
+          .find(`.b-dropdown a[data-filter-by-${field}]`)
+          .trigger('click');
+        expect(
+          wrapper.vm.filteredContestList.map((contest) => contest.alias),
+        ).toEqual(expectedResult);
       });
-
-      await wrapper
-        .find(`.b-dropdown a[data-filter-by-${field}]`)
-        .trigger('click');
-      expect(
-        wrapper.vm.filteredContestList.map((contest) => contest.alias),
-      ).toEqual(expectedResult);
-    },
-  );
-
-  each(filterMapping).it(
-    'Should filter future contest list when %s field is selected',
-    async ({ field, expectedResult }) => {
-      const wrapper = mount(arena_ContestList, {
-        propsData: {
-          contests,
-          tab: ContestTab.Future,
-        },
-      });
-
-      await wrapper
-        .find(`.b-dropdown a[data-filter-by-${field}]`)
-        .trigger('click');
-      expect(
-        wrapper.vm.filteredContestList.map((contest) => contest.alias),
-      ).toEqual(expectedResult);
-    },
-  );
-
-  each(filterMapping).it(
-    'Should filter past contest list when %s field is selected',
-    async ({ field, expectedResult }) => {
-      const wrapper = mount(arena_ContestList, {
-        propsData: {
-          contests,
-          tab: ContestTab.Past,
-        },
-      });
-
-      await wrapper
-        .find(`.b-dropdown a[data-filter-by-${field}]`)
-        .trigger('click');
-      expect(
-        wrapper.vm.filteredContestList.map((contest) => contest.alias),
-      ).toEqual(expectedResult);
     },
   );
 
@@ -369,62 +338,25 @@ describe('ContestListv2.vue', () => {
     ],
   ];
 
-  each(orderMapping).it(
+  each(orderMapping).describe(
     'Should order correctly current contest list when "%s" field is selected',
-    async ({ field, name, expectedOrder }) => {
-      const wrapper = mount(arena_ContestList, {
-        propsData: {
-          contests,
-          tab: ContestTab.Current,
-        },
+    ({ field, name, expectedOrder }) => {
+      each(tabMapping).it('When selected tab equal to %s', async ({ tab }) => {
+        const wrapper = mount(arena_ContestList, {
+          propsData: {
+            contests,
+            tab: tab,
+          },
+        });
+
+        await wrapper.find('.b-dropdown').trigger('click');
+        await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
+
+        expect(wrapper.vm.currentOrder).toBe(field);
+        expect(
+          wrapper.vm.sortedContestList.map((contest) => contest.alias),
+        ).toEqual(expectedOrder);
       });
-
-      await wrapper.find('.b-dropdown').trigger('click');
-      await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
-
-      expect(wrapper.vm.currentOrder).toBe(field);
-      expect(
-        wrapper.vm.sortedContestList.map((contest) => contest.alias),
-      ).toEqual(expectedOrder);
-    },
-  );
-
-  each(orderMapping).it(
-    'Should order correct past contest list when "%s" field is selected',
-    async ({ field, name, expectedOrder }) => {
-      const wrapper = mount(arena_ContestList, {
-        propsData: {
-          contests,
-          tab: ContestTab.Past,
-        },
-      });
-
-      await wrapper.find('.b-dropdown').trigger('click');
-      await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
-      expect(wrapper.vm.currentOrder).toBe(field);
-      expect(
-        wrapper.vm.sortedContestList.map((contest) => contest.alias),
-      ).toEqual(expectedOrder);
-    },
-  );
-
-  each(orderMapping).it(
-    'Should order correctly future contest list when "%s" field is selected',
-    async ({ field, name, expectedOrder }) => {
-      const wrapper = mount(arena_ContestList, {
-        propsData: {
-          contests,
-          tab: ContestTab.Future,
-        },
-      });
-
-      await wrapper.find('.b-dropdown').trigger('click');
-      await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
-
-      expect(wrapper.vm.currentOrder).toBe(field);
-      expect(
-        wrapper.vm.sortedContestList.map((contest) => contest.alias),
-      ).toEqual(expectedOrder);
     },
   );
 });
