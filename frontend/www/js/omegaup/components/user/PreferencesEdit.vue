@@ -37,6 +37,49 @@
       </select>
     </div>
     <div class="form-group">
+      <label>{{ T.userObjectivesModalDescriptionUsage }}</label>
+      <select
+        v-model="firstObjective"
+        data-firstObjective
+        class="custom-select"
+      >
+        <option :value="ObjectivesAnswers.Learning">
+          {{ T.userObjectivesModalAnswerLearning }}
+        </option>
+        <option :value="ObjectivesAnswers.Teaching">
+          {{ T.userObjectivesModalAnswerTeaching }}
+        </option>
+        <option :value="ObjectivesAnswers.LearningAndTeaching">
+          {{ T.userObjectivesModalAnswerLearningAndTeaching }}
+        </option>
+        <option :value="ObjectivesAnswers.None">
+          {{ T.userObjectivesModalAnswerNone }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>{{ secondQuestion }}</label>
+      <select
+        v-model="secondObjective"
+        :disabled="noneObjectiveSelected"
+        data-secondObjective
+        class="custom-select"
+      >
+        <option :value="ObjectivesAnswers.Scholar">
+          {{ T.userObjectivesModalAnswerScholar }}
+        </option>
+        <option :value="ObjectivesAnswers.Competitive">
+          {{ T.userObjectivesModalAnswerCompetitive }}
+        </option>
+        <option :value="ObjectivesAnswers.ScholarAndCompetitive">
+          {{ T.userObjectivesModalAnswerScholarAndCompetitive }}
+        </option>
+        <option :value="ObjectivesAnswers.Other">
+          {{ T.userObjectivesModalAnswerOther }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
       <label>
         <input
           v-model="isPrivate"
@@ -69,6 +112,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import { ObjectivesAnswers } from './ObjectivesQuestions.vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 
@@ -77,20 +121,117 @@ export default class UserPreferencesEdit extends Vue {
   @Prop() profile!: types.UserProfileInfo;
 
   T = T;
+  ObjectivesAnswers = ObjectivesAnswers;
   email = this.profile.email;
   locale = this.profile.locale;
   preferredLanguage = this.profile.preferred_language;
   programmingLanguages = this.profile.programming_languages;
   isPrivate = this.profile.is_private;
   hideProblemTags = this.profile.hide_problem_tags;
+  hasCompetitiveObjective = this.profile.has_competitive_objective ?? false;
+  hasLearningObjective = this.profile.has_learning_objective ?? true;
+  hasScholarObjective = this.profile.has_scholar_objective ?? true;
+  hasTeachingObjective = this.profile.has_teaching_objective ?? false;
+
+  get secondQuestion(): string {
+    if (this.hasLearningObjective && this.hasTeachingObjective) {
+      return this.T.userObjectivesModalDescriptionLearningAndTeaching;
+    }
+    if (this.hasLearningObjective) {
+      return this.T.userObjectivesModalDescriptionLearning;
+    }
+    if (this.hasTeachingObjective) {
+      return this.T.userObjectivesModalDescriptionTeaching;
+    }
+    return T.userObjectivesModalDescriptionUsage;
+  }
+
+  get firstObjective(): string {
+    if (this.hasLearningObjective && this.hasTeachingObjective) {
+      return ObjectivesAnswers.LearningAndTeaching;
+    }
+    if (this.hasLearningObjective) {
+      return ObjectivesAnswers.Learning;
+    }
+    if (this.hasTeachingObjective) {
+      return ObjectivesAnswers.Teaching;
+    }
+    return ObjectivesAnswers.None;
+  }
+
+  set firstObjective(newValue: string) {
+    switch (newValue) {
+      case ObjectivesAnswers.Learning:
+        this.hasLearningObjective = true;
+        this.hasTeachingObjective = false;
+        break;
+      case ObjectivesAnswers.Teaching:
+        this.hasLearningObjective = false;
+        this.hasTeachingObjective = true;
+        break;
+      case ObjectivesAnswers.LearningAndTeaching:
+        this.hasLearningObjective = true;
+        this.hasTeachingObjective = true;
+        break;
+      case ObjectivesAnswers.None:
+        this.hasLearningObjective = false;
+        this.hasTeachingObjective = false;
+        this.hasScholarObjective = false;
+        this.hasCompetitiveObjective = false;
+        break;
+    }
+  }
+
+  get noneObjectiveSelected(): boolean {
+    return this.firstObjective === ObjectivesAnswers.None;
+  }
+
+  get secondObjective(): string {
+    if (this.hasCompetitiveObjective && this.hasScholarObjective) {
+      return ObjectivesAnswers.ScholarAndCompetitive;
+    }
+    if (this.hasCompetitiveObjective) {
+      return ObjectivesAnswers.Competitive;
+    }
+    if (this.hasScholarObjective) {
+      return ObjectivesAnswers.Scholar;
+    }
+    return ObjectivesAnswers.Other;
+  }
+
+  set secondObjective(newValue: string) {
+    switch (newValue) {
+      case ObjectivesAnswers.Scholar:
+        this.hasScholarObjective = true;
+        this.hasCompetitiveObjective = false;
+        break;
+      case ObjectivesAnswers.Competitive:
+        this.hasScholarObjective = false;
+        this.hasCompetitiveObjective = true;
+        break;
+      case ObjectivesAnswers.ScholarAndCompetitive:
+        this.hasScholarObjective = true;
+        this.hasCompetitiveObjective = true;
+        break;
+      case ObjectivesAnswers.Other:
+        this.hasScholarObjective = false;
+        this.hasCompetitiveObjective = false;
+        break;
+    }
+  }
 
   onUpdateUserPreferences(): void {
     this.$emit('update-user-preferences', {
       userPreferences: {
         locale: this.locale,
-        preferred_language: this.preferredLanguage ?? null,
+        preferred_language:
+          this.preferredLanguage !== '' ? this.preferredLanguage : null,
         is_private: this.isPrivate,
         hide_problem_tags: this.hideProblemTags,
+        has_competitive_objective: this.hasCompetitiveObjective,
+        has_learning_objective: this.hasLearningObjective,
+        has_scholar_objective: this.hasScholarObjective,
+        has_teaching_objective: this.hasTeachingObjective,
       },
       localeChanged: this.locale != this.profile.locale,
     });
