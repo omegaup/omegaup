@@ -14,7 +14,7 @@ OmegaUp.on('ready', function () {
       'omegaup-course-viewprogress': course_ViewProgress,
     },
     data: () => ({
-      completeStudentsProgress: [] as types.StudentProgressInCourse[],
+      completeStudentsProgress: null as types.StudentProgressInCourse[] | null,
     }),
     async mounted() {
       let nextPage: undefined | number = 1;
