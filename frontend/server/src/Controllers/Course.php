@@ -2832,8 +2832,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         $registrationResponse = [];
         if (!\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)) {
             [
-                'share_user_information' => $hasSharedUserInformation,
-                'accept_teacher' => $hasAcceptedTeacher,
+              'share_user_information' => $hasSharedUserInformation,
+              'accept_teacher' => $hasAcceptedTeacher,
             ] = \OmegaUp\DAO\Courses::getSharingInformation(
                 $r->identity->identity_id,
                 $course,
@@ -2849,16 +2849,16 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             if (is_null($registration)) {
                 $registrationResponse = [
-                    'userRegistrationAnswered' => false,
-                    'userRegistrationRequested' => false,
+                  'userRegistrationAnswered' => false,
+                  'userRegistrationRequested' => false,
                 ];
             } else {
                 $registrationResponse = [
-                    'userRegistrationAccepted' => $registration->accepted,
-                    'userRegistrationAnswered' => !is_null(
-                        $registration->accepted
-                    ),
-                    'userRegistrationRequested' => true,
+                  'userRegistrationAccepted' => $registration->accepted,
+                'userRegistrationAnswered' => !is_null(
+                    $registration->accepted
+                ),
+                  'userRegistrationRequested' => true,
                 ];
             }
         }
