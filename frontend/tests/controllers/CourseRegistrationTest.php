@@ -339,6 +339,26 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             $result,
             $expectedRequestResult
         );
+
+        // Finally, all the accepted students should be automatically added to the course
+        $response = \OmegaUp\Controllers\Course::apiListStudents(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $course->alias,
+            ])
+        );
+        $this->assertEquals(
+            $students[0]->username,
+            $response['students'][0]['username']
+        );
+        $this->assertEquals(
+            $students[1]->username,
+            $response['students'][1]['username']
+        );
+        $this->assertEquals(
+            $students[3]->username,
+            $response['students'][2]['username']
+        );
     }
 
     public function testAccessRequestNoNeededToInvitedIdentities() {

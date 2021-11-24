@@ -18,7 +18,7 @@ export default {
     },
     theme: {
       type: String,
-      default: 'vs-dark',
+      default: 'vs',
     },
     initialModule: {
       type: String,
