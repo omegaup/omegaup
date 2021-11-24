@@ -163,8 +163,8 @@ export class SchoolUser implements LinkableResource {
 }
 
 export class Contest implements LinkableResource {
-  alias: string = '';
-  title: string = '';
+  alias: string;
+  title: string;
 
   constructor(contest: types.Contest) {
     this.alias = contest.alias;
@@ -176,7 +176,7 @@ export class Contest implements LinkableResource {
   }
 
   getUrl(): string {
-    return `/arena/${this.alias}/`;
+    return `/arena/${encodeURIComponent(this.alias)}/`;
   }
 
   getBadge(): Optional<string> {
@@ -189,12 +189,12 @@ export class Contest implements LinkableResource {
 }
 
 export class Course implements LinkableResource {
-  alias: string = '';
-  name: string = '';
+  alias: string;
+  name: string;
 
-  constructor(contest: types.Course) {
-    this.alias = contest.alias;
-    this.name = contest.name;
+  constructor(course: types.Course) {
+    this.alias = course.alias;
+    this.name = course.name;
   }
 
   toString(): string {
@@ -202,7 +202,7 @@ export class Course implements LinkableResource {
   }
 
   getUrl(): string {
-    return `/course/${this.alias}/`;
+    return `/course/${encodeURIComponent(this.alias)}/`;
   }
 
   getBadge(): Optional<string> {

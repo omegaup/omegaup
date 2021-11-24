@@ -38,6 +38,7 @@
                 v-if="profile.is_own_profile || !profile.is_private"
                 class="nav-item nav-link"
                 data-toggle="tab"
+                data-created-content-tab
                 @click="selectedTab = 'created-content'"
                 >{{ T.profileCreatedContent }}</a
               >
