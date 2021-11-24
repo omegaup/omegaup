@@ -137,26 +137,26 @@ const data: types.ExtraProfileDetails = {
 
 describe('Profilev2.vue', () => {
   it('Should display navtab', () => {
-    const badge_alias = 'contestManager';
+    const badgeAlias = 'contestManager';
     const wrapper = mount(user_ViewProfile, {
       propsData: {
         profile,
         data,
-        profileBadges: new Set(badge_alias) as Set<string>,
-        visitorBadges: new Set(badge_alias) as Set<string>,
+        profileBadges: new Set([badgeAlias]),
+        visitorBadges: new Set([badgeAlias]),
       },
     });
     expect(wrapper.find('[data-profile-navtabs]').exists()).toBe(true);
   });
 
   it('Should display all contests', async () => {
-    const badge_alias = 'contestManager';
+    const badgeAlias = 'contestManager';
     const wrapper = mount(user_ViewProfile, {
       propsData: {
         profile,
         data,
-        profileBadges: new Set(badge_alias) as Set<string>,
-        visitorBadges: new Set(badge_alias) as Set<string>,
+        profileBadges: new Set([badgeAlias]),
+        visitorBadges: new Set([badgeAlias]),
       },
     });
     await wrapper.find('a[data-created-content-tab]').trigger('click');
@@ -166,38 +166,38 @@ describe('Profilev2.vue', () => {
   });
 
   it('Should only display public contests', async () => {
-    const badge_alias = 'contestManager';
+    const badgeAlias = 'contestManager';
     const wrapper = mount(user_ViewProfile, {
       propsData: {
         profile: { ...profile, is_own_profile: false },
         data,
-        profileBadges: new Set(badge_alias) as Set<string>,
-        visitorBadges: new Set(badge_alias) as Set<string>,
+        profileBadges: new Set([badgeAlias]),
+        visitorBadges: new Set([badgeAlias]),
       },
     });
     await wrapper.find('a[data-created-content-tab]').trigger('click');
     const publicContests = createdContests.filter(
       (contest) => contest.admission_mode === 'public',
     );
-    const oterContests = createdContests.filter(
+    const otherContests = createdContests.filter(
       (contest) => contest.admission_mode !== 'public',
     );
     for (const contest of publicContests) {
       expect(wrapper.find(`a[href="/arena/${contest.alias}/"]`)).toBeDefined();
     }
-    for (const contest of oterContests) {
+    for (const contest of otherContests) {
       expect(!wrapper.find(`a[href="/arena/${contest.alias}/"]`));
     }
   });
 
   it('Should display all Courses', async () => {
-    const badge_alias = 'contestManager';
+    const badgeAlias = 'contestManager';
     const wrapper = mount(user_ViewProfile, {
       propsData: {
         profile,
         data,
-        profileBadges: new Set(badge_alias) as Set<string>,
-        visitorBadges: new Set(badge_alias) as Set<string>,
+        profileBadges: new Set([badgeAlias]),
+        visitorBadges: new Set([badgeAlias]),
       },
     });
     await wrapper.find('a[data-created-content-tab]').trigger('click');
@@ -207,26 +207,26 @@ describe('Profilev2.vue', () => {
   });
 
   it('Should only display public Courses', async () => {
-    const badge_alias = 'contestManager';
+    const badgeAlias = 'contestManager';
     const wrapper = mount(user_ViewProfile, {
       propsData: {
         profile: { ...profile, is_own_profile: false },
         data,
-        profileBadges: new Set(badge_alias) as Set<string>,
-        visitorBadges: new Set(badge_alias) as Set<string>,
+        profileBadges: new Set([badgeAlias]),
+        visitorBadges: new Set([badgeAlias]),
       },
     });
     await wrapper.find('a[data-created-content-tab]').trigger('click');
     const publicCourses = createdCourses.filter(
       (course) => course.admission_mode === 'public',
     );
-    const oterCourses = createdCourses.filter(
+    const otherCourses = createdCourses.filter(
       (course) => course.admission_mode !== 'public',
     );
     for (const course of publicCourses) {
       expect(wrapper.find(`a[href="/course/${course.alias}/"]`)).toBeDefined();
     }
-    for (const course of oterCourses) {
+    for (const course of otherCourses) {
       expect(!wrapper.find(`a[href="/course/${course.alias}/"]`));
     }
   });
