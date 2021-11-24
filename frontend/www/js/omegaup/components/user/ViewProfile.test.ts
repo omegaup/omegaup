@@ -128,6 +128,8 @@ const data: types.ExtraProfileDetails = {
   createdContests: createdContests,
   createdCourses: createdCourses,
   createdProblems: [],
+  createdContests: [],
+  createdCourses: [],
   solvedProblems: [],
   stats: [],
   unsolvedProblems: [],

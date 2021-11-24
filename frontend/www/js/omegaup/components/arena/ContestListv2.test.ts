@@ -31,7 +31,7 @@ describe('ContestListv2.vue', () => {
         partial_score: false,
         participating: true,
         problemset_id: 1,
-        recommended: false,
+        recommended: true,
         start_time: yesterday,
         title: 'Current Contest 1',
         window_length: 300,
@@ -67,7 +67,7 @@ describe('ContestListv2.vue', () => {
         partial_score: false,
         participating: true,
         problemset_id: 1,
-        recommended: false,
+        recommended: true,
         start_time: yesterday,
         title: 'Current Contest 2',
         window_length: 300,
@@ -87,7 +87,7 @@ describe('ContestListv2.vue', () => {
         partial_score: false,
         participating: true,
         problemset_id: 1,
-        recommended: false,
+        recommended: true,
         start_time: tomorrow,
         title: 'Future Contest 1',
         window_length: 300,
@@ -123,7 +123,7 @@ describe('ContestListv2.vue', () => {
         partial_score: false,
         participating: true,
         problemset_id: 1,
-        recommended: false,
+        recommended: true,
         start_time: tomorrow,
         title: 'Future Contest 2',
         window_length: 300,
@@ -143,7 +143,7 @@ describe('ContestListv2.vue', () => {
         partial_score: false,
         participating: true,
         problemset_id: 1,
-        recommended: false,
+        recommended: true,
         start_time: new Date(yesterday.getTime() - daySeconds),
         title: 'Past Contest 1',
         window_length: 300,
@@ -179,7 +179,7 @@ describe('ContestListv2.vue', () => {
         partial_score: false,
         participating: true,
         problemset_id: 1,
-        recommended: false,
+        recommended: true,
         start_time: new Date(yesterday.getTime() - daySeconds * 3),
         title: 'Past Contest 2',
         window_length: 300,
@@ -263,6 +263,58 @@ describe('ContestListv2.vue', () => {
     },
   );
 
+  const filterMapping = [
+    [{ field: 'signed-up', expectedResult: ['Contest-1', 'Contest-2'] }],
+    [{ field: 'recommended', expectedResult: ['Contest-1', 'Contest-2'] }],
+  ];
+
+  const tabMapping = [
+    [{ tab: ContestTab.Current }],
+    [{ tab: ContestTab.Future }],
+    [{ tab: ContestTab.Past }],
+  ];
+
+  each(filterMapping).describe(
+    'Should filter contest list when %s field is selected',
+    ({ field, expectedResult }) => {
+      each(tabMapping).it('When selected tab equal to %s', async ({ tab }) => {
+        const wrapper = mount(arena_ContestList, {
+          propsData: {
+            contests,
+            tab: tab,
+          },
+        });
+        await wrapper
+          .find(`.b-dropdown a[data-filter-by-${field}]`)
+          .trigger('click');
+        expect(
+          wrapper.vm.filteredContestList.map((contest) => contest.alias),
+        ).toEqual(expectedResult);
+      });
+    },
+  );
+
+  each(tabMapping).it(
+    'Should filter contest list when both filters are selected. When selected tab equal to %s',
+    async ({ tab }) => {
+      const wrapper = mount(arena_ContestList, {
+        propsData: {
+          contests,
+          tab: tab,
+        },
+      });
+      await wrapper
+        .find(`.b-dropdown a[data-filter-by-signed-up]`)
+        .trigger('click');
+      await wrapper
+        .find(`.b-dropdown a[data-filter-by-recommended]`)
+        .trigger('click');
+      expect(
+        wrapper.vm.filteredContestList.map((contest) => contest.alias),
+      ).toEqual(['Contest-1', 'Contest-2']);
+    },
+  );
+
   const orderMapping = [
     [
       {
@@ -308,62 +360,25 @@ describe('ContestListv2.vue', () => {
     ],
   ];
 
-  each(orderMapping).it(
+  each(orderMapping).describe(
     'Should order correctly current contest list when "%s" field is selected',
-    async ({ field, name, expectedOrder }) => {
-      const wrapper = mount(arena_ContestList, {
-        propsData: {
-          contests,
-          tab: ContestTab.Current,
-        },
+    ({ field, name, expectedOrder }) => {
+      each(tabMapping).it('When selected tab equal to %s', async ({ tab }) => {
+        const wrapper = mount(arena_ContestList, {
+          propsData: {
+            contests,
+            tab: tab,
+          },
+        });
+
+        await wrapper.find('.b-dropdown').trigger('click');
+        await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
+
+        expect(wrapper.vm.currentOrder).toBe(field);
+        expect(
+          wrapper.vm.sortedContestList.map((contest) => contest.alias),
+        ).toEqual(expectedOrder);
       });
-
-      await wrapper.find('.b-dropdown').trigger('click');
-      await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
-
-      expect(wrapper.vm.currentOrder).toBe(field);
-      expect(
-        wrapper.vm.sortedContestList.map((contest) => contest.alias),
-      ).toEqual(expectedOrder);
-    },
-  );
-
-  each(orderMapping).it(
-    'Should order correct past contest list when "%s" field is selected',
-    async ({ field, name, expectedOrder }) => {
-      const wrapper = mount(arena_ContestList, {
-        propsData: {
-          contests,
-          tab: ContestTab.Past,
-        },
-      });
-
-      await wrapper.find('.b-dropdown').trigger('click');
-      await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
-      expect(wrapper.vm.currentOrder).toBe(field);
-      expect(
-        wrapper.vm.sortedContestList.map((contest) => contest.alias),
-      ).toEqual(expectedOrder);
-    },
-  );
-
-  each(orderMapping).it(
-    'Should order correctly future contest list when "%s" field is selected',
-    async ({ field, name, expectedOrder }) => {
-      const wrapper = mount(arena_ContestList, {
-        propsData: {
-          contests,
-          tab: ContestTab.Future,
-        },
-      });
-
-      await wrapper.find('.b-dropdown').trigger('click');
-      await wrapper.find(`a[data-order-by-${name}]`).trigger('click');
-
-      expect(wrapper.vm.currentOrder).toBe(field);
-      expect(
-        wrapper.vm.sortedContestList.map((contest) => contest.alias),
-      ).toEqual(expectedOrder);
     },
   );
 });

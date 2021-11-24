@@ -29,6 +29,8 @@ const data: types.ExtraProfileDetails = {
   badges: [],
   contests: {},
   createdProblems: [],
+  createdContests: [],
+  createdCourses: [],
   ownedBadges: [],
   solvedProblems: [
     {

@@ -36,7 +36,7 @@
                   </div>
                 </form>
               </b-col>
-              <b-col cols="6">
+              <b-col cols="6" class="d-flex flex-row-reverse">
                 <b-dropdown ref="dropdownOrderBy" no-caret>
                   <template #button-content>
                     <div>
@@ -111,6 +111,36 @@
                     />{{ T.contestOrderBySignedUp }}</b-dropdown-item
                   >
                 </b-dropdown>
+                <b-dropdown ref="dropdownFilterBy" class="mr-1" no-caret>
+                  <template #button-content>
+                    <div>
+                      <font-awesome-icon icon="filter" />
+                      {{ T.contestFilterBy }}
+                    </div>
+                  </template>
+                  <b-dropdown-item
+                    href="#"
+                    data-filter-by-signed-up
+                    @click="toggleFilterBySignedUp"
+                  >
+                    <font-awesome-icon
+                      v-if="currentFilterBySignedUp"
+                      icon="check-square"
+                      class="mr-1"
+                    />{{ T.contestFilterBySignedUp }}</b-dropdown-item
+                  >
+                  <b-dropdown-item
+                    href="#"
+                    data-filter-by-recommended
+                    @click="toggleFilterByRecommended"
+                  >
+                    <font-awesome-icon
+                      v-if="currentFilterByRecommended"
+                      icon="check-square"
+                      class="mr-1"
+                    />{{ T.contestFilterByRecommended }}</b-dropdown-item
+                  >
+                </b-dropdown>
               </b-col>
             </b-row>
           </b-container>
@@ -120,11 +150,11 @@
           :title="T.contestListCurrent"
           :title-link-class="titleLinkClass(ContestTab.Current)"
         >
-          <div v-if="contests.current.length === 0">
+          <div v-if="filteredContestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in sortedContestList"
+            v-for="contestItem in filteredContestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -153,11 +183,11 @@
           :title="T.contestListFuture"
           :title-link-class="titleLinkClass(ContestTab.Future)"
         >
-          <div v-if="contests.future.length === 0">
+          <div v-if="filteredContestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in sortedContestList"
+            v-for="contestItem in filteredContestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -189,11 +219,11 @@
           :title="T.contestListPast"
           :title-link-class="titleLinkClass(ContestTab.Past)"
         >
-          <div v-if="contests.past.length === 0">
+          <div v-if="filteredContestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
           </div>
           <omegaup-contest-card
-            v-for="contestItem in sortedContestList"
+            v-for="contestItem in filteredContestList"
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
@@ -285,6 +315,8 @@ export default class ArenaContestList extends Vue {
   currentTab: ContestTab = this.tab;
   currentQuery: string = this.query;
   currentOrder: ContestOrder = ContestOrder.None;
+  currentFilterBySignedUp: boolean = false;
+  currentFilterByRecommended: boolean = false;
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
@@ -328,6 +360,32 @@ export default class ArenaContestList extends Vue {
 
   orderBySignedUp() {
     this.currentOrder = ContestOrder.SignedUp;
+  }
+
+  toggleFilterBySignedUp() {
+    this.currentFilterBySignedUp = !this.currentFilterBySignedUp;
+  }
+
+  toggleFilterByRecommended() {
+    this.currentFilterByRecommended = !this.currentFilterByRecommended;
+  }
+
+  get filteredContestList(): types.ContestListItem[] {
+    const filters: Array<(contestItem: types.ContestListItem) => boolean> = [];
+    if (this.currentFilterBySignedUp) {
+      filters.push((item) => item.participating);
+    }
+    if (this.currentFilterByRecommended) {
+      filters.push((item) => item.recommended);
+    }
+    return this.sortedContestList.slice().filter((contestItem) => {
+      for (const filter of filters) {
+        if (!filter(contestItem)) {
+          return false;
+        }
+      }
+      return true;
+    });
   }
 
   get sortedContestList(): types.ContestListItem[] {
