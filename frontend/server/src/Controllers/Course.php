@@ -2800,6 +2800,85 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Show course intro only on public courses when user is not yet registered
+     *
+     * @throws \OmegaUp\Exceptions\NotFoundException Course not found or trying to directly access a private course.
+     * @throws \OmegaUp\Exceptions\ForbiddenAccessException
+     *
+     * @return IntroDetailsPayload
+     *
+     * @omegaup-request-param string $course_alias
+     */
+    public static function apiIntroDetails(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
+
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
+        );
+        $course = self::validateCourseExists($courseAlias);
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+        $group = self::resolveGroup($course);
+        $shouldShowIntro = !\OmegaUp\Authorization::canViewCourse(
+            $r->identity,
+            $course,
+            $group
+        );
+
+        $hasSharedUserInformation = true;
+        $hasAcceptedTeacher = null;
+        $registrationResponse = [];
+        if (!\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)) {
+            [
+              'share_user_information' => $hasSharedUserInformation,
+              'accept_teacher' => $hasAcceptedTeacher,
+            ] = \OmegaUp\DAO\Courses::getSharingInformation(
+                $r->identity->identity_id,
+                $course,
+                $group
+            );
+        }
+
+        if ($course->admission_mode === self::ADMISSION_MODE_REGISTRATION) {
+            $registration = \OmegaUp\DAO\CourseIdentityRequest::getByPK(
+                $r->identity->identity_id,
+                $course->course_id
+            );
+
+            if (is_null($registration)) {
+                $registrationResponse = [
+                  'userRegistrationAnswered' => false,
+                  'userRegistrationRequested' => false,
+                ];
+            } else {
+                $registrationResponse = [
+                  'userRegistrationAccepted' => $registration->accepted,
+                'userRegistrationAnswered' => !is_null(
+                    $registration->accepted
+                ),
+                  'userRegistrationRequested' => true,
+                ];
+            }
+        }
+
+        $introDetails = self::getIntroDetailsForCourse(
+            $course,
+            $r->identity,
+            $shouldShowIntro,
+            $hasAcceptedTeacher ?? false,
+            $hasSharedUserInformation,
+            $registrationResponse
+        );
+
+        if (!isset($introDetails['smartyProperties']['coursePayload'])) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+        return $introDetails['smartyProperties']['coursePayload'];
+    }
+
+    /**
      * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload|AssignmentDetailsPayload, title: \OmegaUp\TranslationString|string}}
      *
      * @omegaup-request-param null|string $assignment_alias
