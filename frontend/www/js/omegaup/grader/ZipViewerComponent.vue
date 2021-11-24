@@ -11,8 +11,8 @@
         </button>
         <button
           v-for="(item, name) in zip.files"
-          :key="name"
           v-else
+          :key="name"
           class="list-group-item list-group-item-action"
           type="button"
           :class="{ active: active == name }"
