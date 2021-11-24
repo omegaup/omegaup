@@ -1965,6 +1965,42 @@ export namespace types {
               }
               return x;
             })(x.contests);
+            x.createdContests = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+                x.last_updated = ((x: number) => new Date(x * 1000))(
+                  x.last_updated,
+                );
+                if (x.original_finish_time)
+                  x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                    x.original_finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.createdContests);
+            x.createdCourses = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.createdCourses);
             x.ownedBadges = ((x) => {
               if (!Array.isArray(x)) {
                 return x;
@@ -2676,6 +2712,27 @@ export namespace types {
     username: string;
   }
 
+  export interface Course {
+    acl_id?: number;
+    admission_mode: string;
+    alias: string;
+    archived: boolean;
+    course_id: number;
+    description: string;
+    finish_time?: Date;
+    group_id?: number;
+    languages?: string;
+    level?: string;
+    minimum_progress_for_certificate?: number;
+    name: string;
+    needs_basic_information: boolean;
+    objective?: string;
+    requests_user_information: string;
+    school_id?: number;
+    show_scoreboard: boolean;
+    start_time: Date;
+  }
+
   export interface CourseAdmin {
     role: string;
     username: string;
@@ -2943,6 +3000,8 @@ export namespace types {
   export interface ExtraProfileDetails {
     badges: string[];
     contests: types.UserProfileContests;
+    createdContests: types.Contest[];
+    createdCourses: types.Course[];
     createdProblems: types.Problem[];
     hasPassword: boolean;
     ownedBadges: types.Badge[];
