@@ -2832,8 +2832,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         $registrationResponse = [];
         if (!\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)) {
             [
-                'share_user_information' => $hasSharedUserInformation,
-                'accept_teacher' => $hasAcceptedTeacher,
+              'share_user_information' => $hasSharedUserInformation,
+              'accept_teacher' => $hasAcceptedTeacher,
             ] = \OmegaUp\DAO\Courses::getSharingInformation(
                 $r->identity->identity_id,
                 $course,
@@ -2849,16 +2849,16 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             if (is_null($registration)) {
                 $registrationResponse = [
-                    'userRegistrationAnswered' => false,
-                    'userRegistrationRequested' => false,
+                  'userRegistrationAnswered' => false,
+                  'userRegistrationRequested' => false,
                 ];
             } else {
                 $registrationResponse = [
-                    'userRegistrationAccepted' => $registration->accepted,
-                    'userRegistrationAnswered' => !is_null(
-                        $registration->accepted
-                    ),
-                    'userRegistrationRequested' => true,
+                  'userRegistrationAccepted' => $registration->accepted,
+                'userRegistrationAnswered' => !is_null(
+                    $registration->accepted
+                ),
+                  'userRegistrationRequested' => true,
                 ];
             }
         }
@@ -3692,92 +3692,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString('courseList'),
             ],
             'entrypoint' => 'course_single_list',
-        ];
-    }
-
-    /**
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
-     *
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: \OmegaUp\TranslationString, fullWidth: bool}}
-     */
-    public static function getCourseSummaryListDetailsForTypeScript(
-        \OmegaUp\Request $r
-    ): array {
-        $coursesTypes = ['student', 'public'];
-        // Check who is visiting, but a not logged user can still view
-        // the list of courses
-        try {
-            $r->ensureIdentity();
-        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            // Show only public courses for no-logged users
-            $courses = [
-                'admin' => [],
-                'student' => [],
-                'public' => \OmegaUp\DAO\Courses::getPublicCourses(),
-            ];
-
-            $filteredCourses = self::getFilteredCourses(
-                $courses,
-                $coursesTypes
-            );
-
-            return [
-                'smartyProperties' => [
-                    'payload' => [
-                        'courses' => $filteredCourses,
-                        'course_type' => null,
-                    ],
-                    'title' => new \OmegaUp\TranslationString('courseList'),
-                    'fullWidth' => true,
-                ],
-                'entrypoint' => 'course_list',
-            ];
-        }
-        $page = $r->ensureOptionalInt('page') ?? 1;
-        $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
-
-        $courses = self::getCoursesList(
-            $r->identity,
-            $page,
-            $pageSize,
-            $coursesTypes
-        );
-
-        $courses['student'] = array_filter(
-            $courses['student'],
-            fn ($course) => (
-                is_null($course['finish_time']) ||
-                $course['finish_time']->time > \OmegaUp\Time::get()
-            )
-        );
-        $courses['student'] = array_slice($courses['student'], 0, 5);
-
-        // Checks whether a public course has been open already by user
-        foreach ($courses['public'] as &$publicCourse) {
-            $matchedCourses = array_values(
-                array_filter(
-                    $courses['student'],
-                    fn ($course) => $course['alias'] === $publicCourse['alias']
-                )
-            );
-            if (!empty($matchedCourses)) {
-                $publicCourse['is_open'] = $matchedCourses[0]['is_open'];
-            }
-        }
-
-        $filteredCourses = self::getFilteredCourses($courses, $coursesTypes);
-
-        return [
-            'smartyProperties' => [
-                'payload' => [
-                    'courses' => $filteredCourses,
-                    'course_type' => null,
-                ],
-                'title' => new \OmegaUp\TranslationString('courseList'),
-                'fullWidth' => true,
-            ],
-            'entrypoint' => 'course_list',
         ];
     }
 
