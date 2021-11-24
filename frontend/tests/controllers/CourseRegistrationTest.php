@@ -152,6 +152,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $studentLogin->auth_token,
                 'course_alias' => $course->alias,
+                'share_user_information' => true,
             ])
         );
 
@@ -161,6 +162,8 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertNotEmpty($registration);
+        $this->assertTrue($registration->share_user_information);
+        $this->assertNull($registration->accept_teacher);
     }
 
     public function testGetNotificationForRegistrationRequest() {
@@ -335,6 +338,26 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertRequestResultsAreEqualToExpected(
             $result,
             $expectedRequestResult
+        );
+
+        // Finally, all the accepted students should be automatically added to the course
+        $response = \OmegaUp\Controllers\Course::apiListStudents(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $course->alias,
+            ])
+        );
+        $this->assertEquals(
+            $students[0]->username,
+            $response['students'][0]['username']
+        );
+        $this->assertEquals(
+            $students[1]->username,
+            $response['students'][1]['username']
+        );
+        $this->assertEquals(
+            $students[3]->username,
+            $response['students'][2]['username']
         );
     }
 

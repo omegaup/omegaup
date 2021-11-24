@@ -105,10 +105,7 @@ module.exports = {
     teams_group_edit: './frontend/www/js/omegaup/teamsgroup/edit.ts',
     teams_group_list: './frontend/www/js/omegaup/teamsgroup/list.ts',
     teams_group_new: './frontend/www/js/omegaup/teamsgroup/new.ts',
-    user_basic_edit: './frontend/www/js/omegaup/user/basicedit.js',
     user_edit_email_form: './frontend/www/js/omegaup/user/emailedit.ts',
-    user_manage_identities:
-      './frontend/www/js/omegaup/user/manage_identities.js',
     user_profile: './frontend/www/js/omegaup/user/profile.ts',
     user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.ts',
     users_rank: './frontend/www/js/omegaup/user/rank.ts',

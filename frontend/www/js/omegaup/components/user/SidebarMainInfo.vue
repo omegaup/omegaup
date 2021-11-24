@@ -84,12 +84,12 @@ import { types } from '../../api_types';
 import { Problem } from '../../linkable_resource';
 
 export const urlMapping: { key: string; title: string; visible: boolean }[] = [
-  { key: 'see-profile', title: T.userEditSeeProfile, visible: true },
+  { key: 'view-profile', title: T.userEditViewProfile, visible: true },
   { key: 'edit-basic-information', title: T.profileEdit, visible: true },
   { key: 'edit-preferences', title: T.userEditPreferences, visible: true },
   { key: 'manage-schools', title: T.userEditManageSchools, visible: true },
   { key: 'manage-identities', title: T.profileManageIdentities, visible: true },
-  { key: 'change-password', title: T.userEditChangePassword, visible: true },
+  { key: 'change-password', title: T.userEditChangePassword, visible: false },
   { key: 'add-password', title: T.userEditAddPassword, visible: false },
   { key: 'change-email', title: T.userEditChangeEmail, visible: false },
 ];
@@ -104,8 +104,10 @@ export default class UserSidebarMainInfo extends Vue {
   @Prop({ default: null }) data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop() selectedTab!: string;
+  @Prop() hasPassword!: boolean;
 
   T = T;
+  urlMapping = urlMapping;
   currentSelectedTab = this.getSelectedValidTab(
     this.selectedTab,
     this.currentUrlMapping,
@@ -137,7 +139,26 @@ export default class UserSidebarMainInfo extends Vue {
     title: string;
     visible: boolean;
   }[] {
-    return this.profile.is_own_profile ? urlMapping : [];
+    if (!this.profile.is_own_profile) {
+      return [];
+    }
+    const changePasswordRowIndex = urlMapping.findIndex(
+      (url) => url.key === 'change-password',
+    );
+    const addPasswordRowIndex = urlMapping.findIndex(
+      (url) => url.key === 'add-password',
+    );
+    if (!changePasswordRowIndex || !addPasswordRowIndex) {
+      return urlMapping;
+    }
+    if (this.hasPassword) {
+      urlMapping[changePasswordRowIndex].visible = true;
+      urlMapping[addPasswordRowIndex].visible = false;
+      return urlMapping;
+    }
+    urlMapping[addPasswordRowIndex].visible = true;
+    urlMapping[changePasswordRowIndex].visible = false;
+    return urlMapping;
   }
 
   getSelectedValidTab(
@@ -147,8 +168,8 @@ export default class UserSidebarMainInfo extends Vue {
     const validTabs = urls.filter((url) => url.visible).map((url) => url.key);
     const isValidTab = validTabs.includes(tab);
     if (!isValidTab) {
-      this.$emit('update:selectedTab', 'see-profile');
-      return 'see-profile';
+      this.$emit('update:selectedTab', 'view-profile');
+      return 'view-profile';
     }
     return tab;
   }

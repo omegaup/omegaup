@@ -7,6 +7,7 @@ import {
   GroupID,
   LineID,
   CaseRequest,
+  MultipleCaseAddRequest,
 } from '../types';
 import { Module } from 'vuex';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
@@ -226,7 +227,123 @@ export const casesStore: Module<CasesState, RootState> = {
       state.hide = !state.hide;
     },
   },
-  actions: {},
+  actions: {
+    addMultipleCases(
+      { commit, getters, state },
+      multipleCaseRequest: MultipleCaseAddRequest,
+    ) {
+      // This set will store all occupied names in the given group
+      const usedCaseNames: Set<string> = new Set();
+
+      if (multipleCaseRequest.groupID === UUID_NIL) {
+        // We should add group names
+        for (const group of state.groups) {
+          usedCaseNames.add(group.name);
+        }
+      } else {
+        // We should add case names
+        const cases: Case[] = getters.getCasesFromGroup(
+          multipleCaseRequest.groupID,
+        );
+        if (cases) {
+          for (const case_ of cases) {
+            usedCaseNames.add(case_.name);
+          }
+        }
+      }
+
+      let caseNumber = 0;
+      for (let i = 0; i < multipleCaseRequest.numberOfCases; i++) {
+        let caseName = '';
+        do {
+          caseNumber++;
+          caseName = `${multipleCaseRequest.prefix}${caseNumber}${multipleCaseRequest.suffix}`;
+        } while (usedCaseNames.has(caseName));
+
+        usedCaseNames.add(caseName);
+        const newCase = generateCase({
+          name: caseName,
+          groupID: multipleCaseRequest.groupID,
+        });
+        const caseRequest = generateCaseRequest({
+          ...newCase,
+          points: 0,
+          pointsDefined: false,
+        });
+        commit('addCase', caseRequest);
+      }
+    },
+    setLines({ getters }, lines: CaseLine[]) {
+      const selectedCase: Case = getters.getSelectedCase;
+      selectedCase.lines = lines;
+    },
+    addNewLine({ getters }) {
+      const selectedCase: Case = getters.getSelectedCase;
+      const newLine: CaseLine = {
+        lineID: uuid(),
+        label: 'NEW',
+        data: {
+          kind: 'line',
+          value: '',
+        },
+      };
+      selectedCase.lines.push(newLine);
+    },
+    updateLine({ getters }, newLine: CaseLine) {
+      const selectedCase: Case = getters.getSelectedCase;
+      const lineToUpdate = selectedCase.lines.find(
+        (line) => line.lineID === newLine.lineID,
+      );
+      if (lineToUpdate === undefined) {
+        return;
+      }
+      lineToUpdate.label = newLine.label;
+      lineToUpdate.data = newLine.data;
+    },
+    deleteLine({ getters }, lineIDToBeDeleted: LineID) {
+      const selectedCase: Case = getters.getSelectedCase;
+      selectedCase.lines = selectedCase.lines.filter(
+        (line) => line.lineID !== lineIDToBeDeleted,
+      );
+    },
+  },
+  getters: {
+    getCasesFromGroup: (state) => (groupID: GroupID) => {
+      return (
+        state.groups.find((group) => group.groupID === groupID)?.cases ?? null
+      );
+    },
+    getGroupIdsAndNames: (state) => {
+      return state.groups.map((group) => {
+        return { value: group.groupID, text: group.name };
+      });
+    },
+    getAllCases: (state) => {
+      return state.groups.reduce((cases: Case[], currCase) => {
+        return [...cases, ...currCase.cases];
+      }, []);
+    },
+    getSelectedCase: (state) => {
+      const selectedGroup = state.groups.find(
+        (group) => group.groupID === state.selected.groupID,
+      );
+      if (selectedGroup === undefined) {
+        return null;
+      }
+      return (
+        selectedGroup.cases.find(
+          (_case) => _case.caseID === state.selected.caseID,
+        ) ?? null
+      );
+    },
+    getSelectedGroup: (state) => {
+      return (
+        state.groups.find(
+          (group) => group.groupID === state.selected.groupID,
+        ) ?? null
+      );
+    },
+  },
 };
 
 export function assignMissingPoints(state: CasesState): CasesState {
