@@ -45,52 +45,6 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
     protected $identity;
     protected $courseAliases;
 
-    public function testGetCourseForAdminUser() {
-        // Call the details API
-        $adminLogin = self::login($this->adminUser);
-        $response = \OmegaUp\Controllers\Course::apiListCourses(
-            new \OmegaUp\Request([
-                'auth_token' => $adminLogin->auth_token,
-            ])
-        );
-
-        $this->assertArrayHasKey('admin', $response);
-        $this->assertArrayHasKey('student', $response);
-
-        $this->assertEquals(1, count($response['admin']));
-        $course_array = $response['admin'][0];
-        \OmegaUp\Validators::validateNumber(
-            $course_array['finish_time']->time,
-            'finish_time'
-        );
-        $this->assertEquals(3, $course_array['counts']['homework']);
-        $this->assertEquals(2, $course_array['counts']['test']);
-    }
-
-    public function testGetCourseListForNormalUser() {
-        $userLogin = self::login($this->identity);
-        $response = \OmegaUp\Controllers\Course::apiListCourses(
-            new \OmegaUp\Request([
-                'auth_token' => $userLogin->auth_token,
-            ])
-        );
-
-        $this->assertArrayHasKey('admin', $response);
-        $this->assertArrayHasKey('student', $response);
-        $studentCourses = array_filter(
-            $response['student'],
-            fn ($course) => $course['admission_mode'] !== \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
-        );
-        $this->assertEquals(1, count($studentCourses));
-        $course_array = $response['student'][0];
-        \OmegaUp\Validators::validateNumber(
-            $course_array['finish_time']->time,
-            'finish_time'
-        );
-        $this->assertEquals(3, $course_array['counts']['homework']);
-        $this->assertEquals(2, $course_array['counts']['test']);
-    }
-
     public function testListCoursesMine() {
         $adminLogin = self::login($this->adminUser);
 
