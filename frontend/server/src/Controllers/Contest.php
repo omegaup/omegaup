@@ -177,6 +177,68 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Returns 3 list of contests (Current, past and future contests)
+     *
+     * @return array{contests: ContestList}
+     *
+     * @omegaup-request-param string $query
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     */
+    public static function apiListv2(\OmegaUp\Request $r): array {
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing.
+            $r->identity = null;
+        }
+
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('page_size');
+
+        $page = (isset($r['page']) ? intval($r['page']) : 1);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 10);
+
+        \OmegaUp\Validators::validateStringOfLengthInRange(
+            $r['query'],
+            'query',
+            /*$minLength=*/ 0,
+            /*$maxLength=*/ 256,
+            /*$required=*/ false
+        );
+
+        $contests = [
+            'current' => self::getContestList(
+                $r->identity,
+                $r['query'],
+                $page,
+                $pageSize,
+                \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE,
+                \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+            ),
+            'future' => self::getContestList(
+                $r->identity,
+                $r['query'],
+                $page,
+                $pageSize,
+                \OmegaUp\DAO\Enum\ActiveStatus::FUTURE,
+                \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+            ),
+            'past' => self::getContestList(
+                $r->identity,
+                $r['query'],
+                $page,
+                $pageSize,
+                \OmegaUp\DAO\Enum\ActiveStatus::PAST,
+                \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+            )
+        ];
+        return [
+            'contests' => $contests,
+        ];
+    }
+
+    /**
      * @return list<ContestListItem>
      */
     public static function getContestList(

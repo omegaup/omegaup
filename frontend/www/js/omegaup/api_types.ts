@@ -4418,6 +4418,9 @@ export namespace messages {
   export type ContestListParticipatingRequest = { [key: string]: any };
   export type _ContestListParticipatingServerResponse = any;
   export type ContestListParticipatingResponse = { contests: types.Contest[] };
+  export type ContestListv2Request = { [key: string]: any };
+  export type _ContestListv2ServerResponse = any;
+  export type ContestListv2Response = { contests: types.ContestList };
   export type ContestMyListRequest = { [key: string]: any };
   export type _ContestMyListServerResponse = any;
   export type ContestMyListResponse = { contests: types.Contest[] };
@@ -5284,6 +5287,9 @@ export namespace controllers {
     listParticipating: (
       params?: messages.ContestListParticipatingRequest,
     ) => Promise<messages.ContestListParticipatingResponse>;
+    listv2: (
+      params?: messages.ContestListv2Request,
+    ) => Promise<messages.ContestListv2Response>;
     myList: (
       params?: messages.ContestMyListRequest,
     ) => Promise<messages.ContestMyListResponse>;
