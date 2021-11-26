@@ -1047,94 +1047,6 @@ export namespace types {
       );
     }
 
-    export function CourseListPayload(
-      elementId: string = 'payload',
-    ): types.CourseListPayload {
-      return ((x) => {
-        x.courses = ((x) => {
-          if (x instanceof Object) {
-            Object.keys(x).forEach(
-              (y) =>
-                (x[y] = ((x) => {
-                  x.filteredCourses = ((x) => {
-                    x.current = ((x) => {
-                      x.courses = ((x) => {
-                        if (!Array.isArray(x)) {
-                          return x;
-                        }
-                        return x.map((x) => {
-                          x.assignments = ((x) => {
-                            if (!Array.isArray(x)) {
-                              return x;
-                            }
-                            return x.map((x) => {
-                              if (x.finish_time)
-                                x.finish_time = ((x: number) =>
-                                  new Date(x * 1000))(x.finish_time);
-                              x.start_time = ((x: number) =>
-                                new Date(x * 1000))(x.start_time);
-                              return x;
-                            });
-                          })(x.assignments);
-                          if (x.finish_time)
-                            x.finish_time = ((x: number) => new Date(x * 1000))(
-                              x.finish_time,
-                            );
-                          x.start_time = ((x: number) => new Date(x * 1000))(
-                            x.start_time,
-                          );
-                          return x;
-                        });
-                      })(x.courses);
-                      return x;
-                    })(x.current);
-                    x.past = ((x) => {
-                      x.courses = ((x) => {
-                        if (!Array.isArray(x)) {
-                          return x;
-                        }
-                        return x.map((x) => {
-                          x.assignments = ((x) => {
-                            if (!Array.isArray(x)) {
-                              return x;
-                            }
-                            return x.map((x) => {
-                              if (x.finish_time)
-                                x.finish_time = ((x: number) =>
-                                  new Date(x * 1000))(x.finish_time);
-                              x.start_time = ((x: number) =>
-                                new Date(x * 1000))(x.start_time);
-                              return x;
-                            });
-                          })(x.assignments);
-                          if (x.finish_time)
-                            x.finish_time = ((x: number) => new Date(x * 1000))(
-                              x.finish_time,
-                            );
-                          x.start_time = ((x: number) => new Date(x * 1000))(
-                            x.start_time,
-                          );
-                          return x;
-                        });
-                      })(x.courses);
-                      return x;
-                    })(x.past);
-                    return x;
-                  })(x.filteredCourses);
-                  return x;
-                })(x[y])),
-            );
-          }
-          return x;
-        })(x.courses);
-        return x;
-      })(
-        JSON.parse(
-          (document.getElementById(elementId) as HTMLElement).innerText,
-        ),
-      );
-    }
-
     export function CourseNewPayload(
       elementId: string = 'payload',
     ): types.CourseNewPayload {
@@ -2839,11 +2751,6 @@ export namespace types {
 
   export interface CourseListMinePayload {
     courses: types.AdminCourses;
-  }
-
-  export interface CourseListPayload {
-    course_type?: string;
-    courses: types.StudentCourses;
   }
 
   export interface CourseNewPayload {
@@ -4608,9 +4515,6 @@ export namespace messages {
   export type CourseListAssignmentsResponse = {
     assignments: types.CourseAssignment[];
   };
-  export type CourseListCoursesRequest = { [key: string]: any };
-  export type _CourseListCoursesServerResponse = any;
-  export type CourseListCoursesResponse = types.CoursesList;
   export type CourseListSolvedProblemsRequest = { [key: string]: any };
   export type CourseListSolvedProblemsResponse = {
     user_problems: {
@@ -5428,9 +5332,6 @@ export namespace controllers {
     listAssignments: (
       params?: messages.CourseListAssignmentsRequest,
     ) => Promise<messages.CourseListAssignmentsResponse>;
-    listCourses: (
-      params?: messages.CourseListCoursesRequest,
-    ) => Promise<messages.CourseListCoursesResponse>;
     listSolvedProblems: (
       params?: messages.CourseListSolvedProblemsRequest,
     ) => Promise<messages.CourseListSolvedProblemsResponse>;
