@@ -4186,6 +4186,23 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Gets the course and specific assignment details
+     *
+     * @return array{smartyProperties: array{fullWidth: bool, title: \OmegaUp\TranslationString}, entrypoint: string}
+     */
+    public static function getArenaCourseDetailsForTypeScript(\OmegaUp\Request $r): array {
+        return [
+          'smartyProperties' => [
+              'fullWidth' => true,
+            'title' => new \OmegaUp\TranslationString(
+                'courseAssignmentTitle',
+            ),
+          ],
+          'entrypoint' => 'arena_coursev2',
+        ];
+    }
+
+    /**
      * @return array{runs: list<Run>, totalRuns: int}
      */
     private static function getAllRuns(
