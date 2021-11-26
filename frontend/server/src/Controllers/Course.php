@@ -9,6 +9,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Progress=array{score: float, max_score: float}
  * @psalm-type AssignmentProgress=array<string, Progress>
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
+ * @psalm-type ArenaCoursePayload=array{course: array{alias: string, name: string}, assignment: array{alias: string, name: string, description: string}, problems: list<array{alias: string, text: string}>, currentProblem: null|array{alias: string, title: string}}
  * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, is_extra_problem: bool, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, classname: string, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, name: null|string, request_time: \OmegaUp\Timestamp, username: string}
  * @psalm-type CourseAdmin=array{role: string, username: string}
@@ -4117,20 +4118,112 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Gets the course and specific assignment details
+     * Gets the course assignment (and problem) details for ArenaCourse
      *
-     * @return array{smartyProperties: array{fullWidth: bool, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string|null $problem_alias
+     *
+     * @return array{smartyProperties: array{payload: ArenaCoursePayload, fullWidth: bool, title: \OmegaUp\TranslationString}, inContest: bool, entrypoint: string}
+     *
      */
-    public static function getArenaCourseDetailsForTypeScript(\OmegaUp\Request $r): array {
-        return [
-          'smartyProperties' => [
-              'fullWidth' => true,
-            'title' => new \OmegaUp\TranslationString(
-                'courseAssignmentTitle',
-            ),
-          ],
-          'entrypoint' => 'arena_coursev2',
+    public static function getArenaCourseDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        $r->ensureIdentity();
+
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $course = self::validateCourseExists($courseAlias);
+
+        $assignmentAlias = $r->ensureString(
+            'assignment_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $assignment = self::validateCourseAssignmentAlias(
+            $course,
+            $assignmentAlias
+        );
+        if (is_null($assignment->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'assignmentNotFound'
+            );
+        }
+
+        $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+            intval($assignment->problemset_id)
+        );
+
+        $problemsResponseArray = [];
+        $letter = 0;
+        foreach ($problemsInAssignment as $problem) {
+            $problem['letter'] = \OmegaUp\Controllers\Contest::columnName(
+                $letter++
+            );
+            $problemsResponseArray[] = [
+                'alias' => strval($problem['alias']),
+                'text' => "{$problem['letter']}. {$problem['title']}",
+            ];
+        }
+
+        $response = [
+            'smartyProperties' => [
+                'payload' => [
+                    'course' => [
+                        'alias' => strval($course->alias),
+                        'name' => strval($course->name),
+                    ],
+                    'assignment' => [
+                        'alias' => strval($assignment->alias),
+                        'name' => strval($assignment->name),
+                        'description' => strval($assignment->description),
+                    ],
+                    'problems' => $problemsResponseArray,
+                    'currentProblem' => null,
+                ],
+                'fullWidth' => true,
+                'title' => new \OmegaUp\TranslationString(
+                    'courseAssignmentTitle',
+                    [
+                        'courseName' => $course->name,
+                        'assignmentName' => $assignment->name,
+                    ],
+                ),
+            ],
+            'inContest' => $assignment->assignment_type === 'test',
+            'entrypoint' => 'arena_coursev2',
         ];
+
+        $problemAlias = $r->ensureOptionalString(
+            'problem_alias',
+            /*required=*/false,
+            fn (string $alias) => \OmegaUp\Validators::alias($alias),
+        );
+
+        if (is_null($problemAlias)) {
+            return $response;
+        }
+
+        $problem = \OmegaUp\DAO\Problems::getByAliasAndProblemset(
+            $problemAlias,
+            intval($assignment->problemset_id)
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+
+        $response['smartyProperties']['payload']['currentProblem'] = [
+            'alias' => strval($problem->alias),
+            'title' => strval($problem->title),
+            // TODO: Add more information about the currentProblem
+        ];
+        return $response;
     }
 
     /**

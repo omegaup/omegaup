@@ -99,6 +99,14 @@ export namespace types {
       );
     }
 
+    export function ArenaCoursePayload(
+      elementId: string = 'payload',
+    ): types.ArenaCoursePayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function AssignmentDetailsPayload(
       elementId: string = 'payload',
     ): types.AssignmentDetailsPayload {
@@ -2022,6 +2030,13 @@ export namespace types {
     start_time?: Date;
     title: string;
     window_length?: number;
+  }
+
+  export interface ArenaCoursePayload {
+    assignment: { alias: string; description: string; name: string };
+    course: { alias: string; name: string };
+    currentProblem?: { alias: string; title: string };
+    problems: { alias: string; text: string }[];
   }
 
   export interface ArenaProblemDetails {
