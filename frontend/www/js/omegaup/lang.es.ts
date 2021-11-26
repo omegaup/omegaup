@@ -1106,6 +1106,8 @@ const translations: { [key: string]: string; } = {
   profileCountry: "Pa\u00eds / Regi\u00f3n",
   profileCreatedContent: "Contenido creado",
   profileCreatedContentSeeAll: "Ver todo",
+  profileCreatedContests: "Concursos creados",
+  profileCreatedCourses: "Cursos creados",
   profileCreatedProblems: "Problemas creados",
   profileEdit: "Editar perfil",
   profileEmail: "Correo",
