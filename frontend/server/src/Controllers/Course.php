@@ -34,7 +34,6 @@ namespace OmegaUp\Controllers;
  * @psalm-type AdminCourses=array{admin: array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType, archived: CoursesByTimeType}}}
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
- * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses}
  * @psalm-type CourseProblemVerdict=array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: null|string}
  * @psalm-type CourseProblemStatistics=array{assignment_alias: string, average: float, avg_runs: float, completed_score_percentage: float, high_score_percentage: float, low_score_percentage: float, max_points: float, maximum: float, minimum: float, problem_alias: string, variance: float}
  * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemStats: list<CourseProblemStatistics>, verdicts: list<CourseProblemVerdict>}
@@ -1793,33 +1792,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             $course->course_id
         );
         return $arr;
-    }
-
-    /**
-     * Lists all the courses this user is associated with.
-     *
-     * Returns courses for which the current user is an admin and
-     * for in which the user is a student.
-     *
-     * @return CoursesList
-     *
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
-     *
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
-     */
-    public static function apiListCourses(\OmegaUp\Request $r) {
-        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
-
-        $r->ensureIdentity();
-
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('page_size');
-
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
-
-        return self::getCoursesList($r->identity, $page, $pageSize);
     }
 
     /**
@@ -3655,47 +3627,6 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param 'student'|'public' $course_type
-     * @omegaup-request-param int $page
-     * @omegaup-request-param int $page_size
-     *
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: \OmegaUp\TranslationString}}
-     */
-    public static function getCourseListDetailsForTypeScript(\OmegaUp\Request $r): array {
-        $r->ensureIdentity();
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('page_size');
-
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
-
-        $courseType = $r->ensureEnum(
-            'course_type',
-            ['student', 'public']
-        );
-
-        $courses = self::getCoursesList(
-            $r->identity,
-            $page,
-            $pageSize,
-            [$courseType]
-        );
-
-        $filteredCourses = self::getFilteredCourses($courses, [$courseType]);
-
-        return [
-            'smartyProperties' => [
-                'payload' => [
-                    'courses' => $filteredCourses,
-                    'course_type' => $courseType,
-                ],
-                'title' => new \OmegaUp\TranslationString('courseList'),
-            ],
-            'entrypoint' => 'course_single_list',
-        ];
-    }
-
-    /**
      *
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseTabsPayload, title: \OmegaUp\TranslationString, fullWidth: bool}}
      */
@@ -4182,6 +4113,23 @@ class Course extends \OmegaUp\Controllers\Controller {
             // Navbar is only hidden during exams.
             'inContest' => $assignment->assignment_type === 'test',
             'entrypoint' => 'arena_course',
+        ];
+    }
+
+    /**
+     * Gets the course and specific assignment details
+     *
+     * @return array{smartyProperties: array{fullWidth: bool, title: \OmegaUp\TranslationString}, entrypoint: string}
+     */
+    public static function getArenaCourseDetailsForTypeScript(\OmegaUp\Request $r): array {
+        return [
+          'smartyProperties' => [
+              'fullWidth' => true,
+            'title' => new \OmegaUp\TranslationString(
+                'courseAssignmentTitle',
+            ),
+          ],
+          'entrypoint' => 'arena_coursev2',
         ];
     }
 
