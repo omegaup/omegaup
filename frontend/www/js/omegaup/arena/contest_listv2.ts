@@ -29,51 +29,28 @@ OmegaUp.on('ready', () => {
           tab,
         },
         on: {
-          'get-next-chunk': (page: number, pageSize: number, query: string) => {
+          'get-chunk': (page: number, pageSize: number, query: string) => {
             api.Contest.list({
               page: page,
               page_size: pageSize,
               query: query,
             })
               .then((data) => {
-                const currentContest: types.ContestListItem[] = [];
-                const futureContest: types.ContestListItem[] = [];
-                const pastContest: types.ContestListItem[] = [];
-
+                const newChunk: types.ContestList = {
+                  future: [],
+                  past: [],
+                  current: [],
+                };
                 const today = new Date();
-
-                data.results.forEach((item) => {
-                  const contest: types.ContestListItem = {
-                    admission_mode: item.admission_mode,
-                    alias: item.alias,
-                    contest_id: item.contest_id,
-                    contestants: item.contestants,
-                    description: item.description,
-                    finish_time: item.finish_time,
-                    last_updated: item.last_updated,
-                    organizer: item.organizer,
-                    original_finish_time: item.original_finish_time,
-                    partial_score: item.partial_score,
-                    participating: item.participating,
-                    problemset_id: item.problemset_id,
-                    recommended: item.recommended,
-                    start_time: item.start_time,
-                    title: item.title,
-                  };
-                  if (item.start_time <= today && today <= item.finish_time) {
-                    currentContest.push(contest);
-                  } else if (today < item.start_time) {
-                    futureContest.push(contest);
-                  } else if (today > item.finish_time) {
-                    pastContest.push(contest);
+                data.results.forEach((contest) => {
+                  if (today < contest.start_time) {
+                    newChunk.future.push(contest);
+                  } else if (today > contest.finish_time) {
+                    newChunk.past.push(contest);
+                  } else {
+                    newChunk.current.push(contest);
                   }
                 });
-
-                const newChunk: types.ContestList = {
-                  current: currentContest,
-                  future: futureContest,
-                  past: pastContest,
-                };
                 this.contests = newChunk;
               })
               .catch(ui.apiError);
