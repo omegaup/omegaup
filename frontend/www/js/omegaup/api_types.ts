@@ -4403,10 +4403,14 @@ export namespace messages {
       admission_mode: string;
       alias: string;
       contest_id: number;
+      contestants: number;
       description: string;
       finish_time: Date;
       last_updated: Date;
+      organizer: string;
       original_finish_time: Date;
+      partial_score: boolean;
+      participating: boolean;
       problemset_id: number;
       recommended: boolean;
       rerun_id?: number;
