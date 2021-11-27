@@ -10,10 +10,10 @@
         <a
           class="nav-link"
           :href="`#${tabKey}`"
-          :class="{ active: selectedTab === tabKey }"
+          :class="{ active: currentSelectedTab === tabKey }"
           data-toggle="tab"
           role="tab"
-          @click="selectedTab = tabKey"
+          @click="currentSelectedTab = tabKey"
           >{{ tabName }}</a
         >
       </li>
@@ -39,8 +39,8 @@
         :key="tabKey"
         class="tab-pane fade py-4 px-2"
         :class="{
-          show: selectedTab === tabKey,
-          active: selectedTab === tabKey,
+          show: currentSelectedTab === tabKey,
+          active: currentSelectedTab === tabKey,
         }"
         role="tabpanel"
       >
@@ -143,11 +143,12 @@ export default class CourseTabs extends Vue {
     finished: types.CourseCardFinished[];
   };
   @Prop({ default: false }) loggedIn!: boolean;
+  @Prop({ default: Tab.Public }) selectedTab!: Tab;
 
   T = T;
   ui = ui;
   Tab = Tab;
-  selectedTab = Tab.Public;
+  currentSelectedTab = this.selectedTab;
   searchText = '';
 
   get tabNames(): Record<Tab, string> {
@@ -170,7 +171,7 @@ export default class CourseTabs extends Vue {
     | types.CourseCardEnrolled[]
     | types.CourseCardPublic[]
     | types.CourseCardFinished[] {
-    switch (this.selectedTab) {
+    switch (this.currentSelectedTab) {
       case Tab.Enrolled:
         return this.courses.enrolled.filter(
           (course) =>

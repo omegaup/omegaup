@@ -190,18 +190,18 @@
                   <a class="dropdown-item" href="/badge/list/">{{
                     T.navViewBadges
                   }}</a>
-                  <a class="dropdown-item" href="/problem/mine/">{{
+                  <a class="dropdown-item" :href="myProblemsUrl">{{
                     T.navMyProblems
                   }}</a>
                   <a
                     class="dropdown-item"
-                    href="/course/mine/"
+                    :href="myCoursesUrl"
                     data-nav-courses-mine
                     >{{ T.navMyCourses }}</a
                   >
                   <a
                     class="dropdown-item"
-                    href="/contest/mine/"
+                    :href="myContestsUrl"
                     data-nav-user-contests
                     >{{ T.navMyContests }}</a
                   >
@@ -301,6 +301,13 @@ export default class Navbar extends Vue {
   hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
     this.userTypes.includes(teachingType),
   );
+  myProblemsUrl = this.hasTeachingObjective
+    ? '/problem/mine/'
+    : '/profile/#problems';
+  myContestsUrl = this.hasTeachingObjective ? '/contest/mine/' : '/arena/';
+  myCoursesUrl = this.hasTeachingObjective
+    ? '/course/mine/'
+    : '/course/#enrolled';
 
   get formattedLoginURL(): string {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
