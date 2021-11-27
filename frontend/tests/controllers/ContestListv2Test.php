@@ -111,40 +111,6 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
         return $aliases;
     }
 
-    /**
-     * Basic test. Check that most recent contest is at the top of the list
-     */
-    public function testLatestPublicContest() {
-        [
-            'contestData' => $contestData
-        ] = $this->createContests();
-
-        $r = new \OmegaUp\Request([
-            'page' => 1,
-            'page_size' => 10
-        ]);
-        $response = \OmegaUp\Controllers\Contest::apiListv2($r);
-
-        $contestListApiAliases = $this->extractAliases(
-            $response['contests']
-        );
-
-        $this->assertEqualsCanonicalizing(
-            [
-                'current' => [
-                    'current-public',
-                ],
-                'future' => [
-                    'future-public',
-                ],
-                'past' => [
-                    'past-public'
-                ]
-            ],
-            $contestListApiAliases
-        );
-    }
-
     public function testPublicContestsNotLoggedIn() {
         [
             'contestData' => $contestData,

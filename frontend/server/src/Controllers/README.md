@@ -32,7 +32,6 @@
   - [`/api/contest/details/`](#apicontestdetails)
   - [`/api/contest/list/`](#apicontestlist)
   - [`/api/contest/listParticipating/`](#apicontestlistparticipating)
-  - [`/api/contest/listv2/`](#apicontestlistv2)
   - [`/api/contest/myList/`](#apicontestmylist)
   - [`/api/contest/open/`](#apicontestopen)
   - [`/api/contest/problemClarifications/`](#apicontestproblemclarifications)
@@ -841,26 +840,6 @@ Returns a list of contests where current user is participating in
 | Name       | Type              |
 | ---------- | ----------------- |
 | `contests` | `types.Contest[]` |
-
-## `/api/contest/listv2/`
-
-### Description
-
-Returns 3 list of contests (Current, past and future contests)
-
-### Parameters
-
-| Name        | Type     | Description |
-| ----------- | -------- | ----------- |
-| `page`      | `int`    |             |
-| `page_size` | `int`    |             |
-| `query`     | `string` |             |
-
-### Returns
-
-| Name       | Type                |
-| ---------- | ------------------- |
-| `contests` | `types.ContestList` |
 
 ## `/api/contest/myList/`
 

@@ -376,58 +376,6 @@ export const Contest = {
     })(x.contests);
     return x;
   }),
-  listv2: apiCall<
-    messages.ContestListv2Request,
-    messages._ContestListv2ServerResponse,
-    messages.ContestListv2Response
-  >('/api/contest/listv2/', (x) => {
-    x.contests = ((x) => {
-      x.current = ((x) => {
-        if (!Array.isArray(x)) {
-          return x;
-        }
-        return x.map((x) => {
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-          x.original_finish_time = ((x: number) => new Date(x * 1000))(
-            x.original_finish_time,
-          );
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        });
-      })(x.current);
-      x.future = ((x) => {
-        if (!Array.isArray(x)) {
-          return x;
-        }
-        return x.map((x) => {
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-          x.original_finish_time = ((x: number) => new Date(x * 1000))(
-            x.original_finish_time,
-          );
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        });
-      })(x.future);
-      x.past = ((x) => {
-        if (!Array.isArray(x)) {
-          return x;
-        }
-        return x.map((x) => {
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-          x.original_finish_time = ((x: number) => new Date(x * 1000))(
-            x.original_finish_time,
-          );
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        });
-      })(x.past);
-      return x;
-    })(x.contests);
-    return x;
-  }),
   myList: apiCall<
     messages.ContestMyListRequest,
     messages._ContestMyListServerResponse,
