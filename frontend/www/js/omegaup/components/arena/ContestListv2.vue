@@ -326,10 +326,6 @@ export default class ArenaContestList extends Vue {
     }
   }
 
-  mounted() {
-    this.$emit('get-next-chunk', 1, 10);
-  }
-
   get queryURL(): string {
     return `/arenav2/#${this.currentTab}`;
   }
