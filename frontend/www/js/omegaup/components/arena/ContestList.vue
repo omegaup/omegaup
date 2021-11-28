@@ -254,11 +254,11 @@ export default class ArenaContestList extends Vue {
   @Prop() initialQuery!: string;
   @Prop() contests!: types.TimeTypeContests;
   @Prop() isLogged!: boolean;
-  @Prop() selectedTab!: ContestsTab;
+  @Prop({ default: null }) selectedTab!: ContestsTab | null;
 
   T = T;
   ContestsTab = ContestsTab;
-  showTab = this.selectedTab;
+  showTab = this.selectedTab ?? ContestsTab.Participating;
   query = this.initialQuery;
 
   get activeTab(): string {
