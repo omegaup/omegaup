@@ -1,13 +1,7 @@
 <template>
-  <div class="container-fluid p-5 mt-0" data-user-profile-root>
-    <h1 v-if="!profile.is_own_profile && profile.is_private">
-      {{ ui.info(T.userProfileIsPrivate) }}
-    </h1>
+  <div class="container-fluid p-0 mt-0">
     <div class="row">
-      <div class="col-md-2">
-        <omegaup-user-maininfo :profile="profile" :data="data" :edit="false" />
-      </div>
-      <div class="col-md-10">
+      <div class="col-md-12">
         <div class="card">
           <div class="card-header">
             <nav class="nav nav-tabs" role="tablist" data-profile-navtabs>
@@ -44,6 +38,7 @@
                 v-if="profile.is_own_profile || !profile.is_private"
                 class="nav-item nav-link"
                 data-toggle="tab"
+                data-created-content-tab
                 @click="selectedTab = 'created-content'"
                 >{{ T.profileCreatedContent }}</a
               >
@@ -94,6 +89,13 @@
                   :title="T.profileUnsolvedProblems"
                   class="mb-3"
                 ></omegaup-grid-paginator>
+                <omegaup-grid-paginator
+                  :columns="3"
+                  :items="createdProblems"
+                  :items-per-page="30"
+                  :title="T.profileCreatedProblems"
+                  class="mb-3"
+                ></omegaup-grid-paginator>
               </div>
               <div
                 v-show="selectedTab == 'contests'"
@@ -110,7 +112,7 @@
                     <thead>
                       <tr>
                         <th>{{ T.profileContestsTableContest }}</th>
-                        <th class="numericColumn">
+                        <th class="text-right">
                           {{ T.profileContestsTablePlace }}
                         </th>
                       </tr>
@@ -133,6 +135,32 @@
                 >
                   <template v-if="profile.is_own_profile" #header-link
                     ><a href="/problem/mine/" class="float-right">{{
+                      T.profileCreatedContentSeeAll
+                    }}</a></template
+                  >
+                </omegaup-grid-paginator>
+                <omegaup-grid-paginator
+                  :columns="3"
+                  :items="createdContests"
+                  :items-per-page="30"
+                  :title="T.profileCreatedContests"
+                  class="mb-3"
+                >
+                  <template v-if="profile.is_own_profile" #header-link
+                    ><a href="/contest/mine/" class="float-right">{{
+                      T.profileCreatedContentSeeAll
+                    }}</a></template
+                  >
+                </omegaup-grid-paginator>
+                <omegaup-grid-paginator
+                  :columns="3"
+                  :items="createdCourses"
+                  :items-per-page="30"
+                  :title="T.profileCreatedCourses"
+                  class="mb-3"
+                >
+                  <template v-if="profile.is_own_profile" #header-link
+                    ><a href="/course/mine/" class="float-right">{{
                       T.profileCreatedContentSeeAll
                     }}</a></template
                   >
@@ -182,7 +210,12 @@ import common_GridPaginator from '../common/GridPaginator.vue';
 import { types } from '../../api_types';
 import * as Highcharts from 'highcharts/highstock';
 import * as ui from '../../ui';
-import { Problem, ContestResult } from '../../linkable_resource';
+import {
+  Problem,
+  ContestResult,
+  Contest,
+  Course,
+} from '../../linkable_resource';
 
 @Component({
   components: {
@@ -195,7 +228,7 @@ import { Problem, ContestResult } from '../../linkable_resource';
     'omegaup-countryflag': country_Flag,
   },
 })
-export default class UserProfile extends Vue {
+export default class ViewProfile extends Vue {
   @Prop() data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop() profileBadges!: Set<string>;
@@ -219,6 +252,24 @@ export default class UserProfile extends Vue {
     !this.profile.is_own_profile && this.profile.is_private ? 'data' : 'badges';
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
 
+  get createdContests(): Contest[] {
+    if (!this.data?.createdContests) return [];
+    let contests = this.data.createdContests;
+    if (!this.profile.is_own_profile) {
+      contests = contests.filter(
+        (contest) => contest.admission_mode === 'public',
+      );
+    }
+    return contests.map((contest) => new Contest(contest));
+  }
+  get createdCourses(): Course[] {
+    if (!this.data?.createdCourses) return [];
+    let courses = this.data.createdCourses;
+    if (!this.profile.is_own_profile) {
+      courses = courses.filter((course) => course.admission_mode === 'public');
+    }
+    return courses.map((course) => new Course(course));
+  }
   get createdProblems(): Problem[] {
     if (!this.data?.createdProblems) return [];
     return this.data.createdProblems.map((problem) => new Problem(problem));
@@ -253,13 +304,5 @@ export default class UserProfile extends Vue {
 <style lang="scss" scoped>
 a:hover {
   cursor: pointer;
-}
-
-th.numericColumn {
-  text-align: right;
-}
-
-[data-user-profile-root] {
-  font-size: 1rem;
 }
 </style>

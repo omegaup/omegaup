@@ -69,24 +69,6 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($course->admission_mode, 'registration');
     }
 
-    public function testCourseWithRegistrationModeIsNotPresentInStudentList() {
-        $course = self::createCourseWithRegistrationMode()['course'];
-        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
-        $studentLogin = self::login($student);
-
-        // Course should appear in public course list for students
-        $coursesList = \OmegaUp\Controllers\Course::apiListCourses(
-            new \OmegaUp\Request([
-                'auth_token' => $studentLogin->auth_token,
-            ])
-        );
-
-        $this->assertArrayNotContainsWithPredicate(
-            $coursesList['student'],
-            fn ($studentCourse) => $studentCourse['alias'] === $course->alias
-        );
-    }
-
     public function testRequestIsShownInIntroDetails() {
         [
             'course' => $course,
@@ -338,6 +320,26 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertRequestResultsAreEqualToExpected(
             $result,
             $expectedRequestResult
+        );
+
+        // Finally, all the accepted students should be automatically added to the course
+        $response = \OmegaUp\Controllers\Course::apiListStudents(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $course->alias,
+            ])
+        );
+        $this->assertEquals(
+            $students[0]->username,
+            $response['students'][0]['username']
+        );
+        $this->assertEquals(
+            $students[1]->username,
+            $response['students'][1]['username']
+        );
+        $this->assertEquals(
+            $students[3]->username,
+            $response['students'][2]['username']
         );
     }
 

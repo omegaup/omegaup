@@ -27,7 +27,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
- * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, hasPassword: bool}
+ * @psalm-type Contest=array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int|null, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}
+ * @psalm-type Course=array{acl_id?: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time?: \OmegaUp\Timestamp|null, group_id?: int, languages?: null|string, level?: null|string, minimum_progress_for_certificate?: int|null, name: string, needs_basic_information: bool, objective?: null|string, requests_user_information: string, school_id?: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}
+ * @psalm-type ExtraProfileDetails=array{contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, createdContests: list<Contest>, createdCourses: list<Course>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, hasPassword: bool}
  * @psalm-type UserProfileDetailsPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, identities: list<AssociatedIdentity>, programmingLanguages: array<string, string>, profile: UserProfileInfo, extraProfileDetails: ExtraProfileDetails|null}
  * @psalm-type ScoreboardRankingProblemDetailsGroup=array{cases: list<array{meta: RunMetadata}>}
  * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<ScoreboardRankingProblemDetailsGroup>}}, runs: int}
@@ -4050,6 +4052,12 @@ class User extends \OmegaUp\Controllers\Controller {
                     'createdProblems' => self::getCreatedProblems(
                         $targetIdentity->identity_id
                     ),
+                    'createdContests' => \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(
+                        $targetIdentity->identity_id
+                    ),
+                    'createdCourses' => \OmegaUp\DAO\Courses::getCoursesCreatedByIdentity(
+                        $targetIdentity->identity_id
+                    ),
                     'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
                         $targetIdentity->identity_id
                     ),
@@ -4145,47 +4153,6 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'admin_user',
-        ];
-    }
-
-    /**
-     * @omegaup-request-param null|string $username
-     *
-     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{COUNTRIES: list<\OmegaUp\DAO\VO\Countries>, PROGRAMMING_LANGUAGES: array<string, string>, profile: UserProfileInfo}, template: string}
-     */
-    public static function getProfileEditDetailsForTypeScript(\OmegaUp\Request $r) {
-        try {
-            self::authenticateOrAllowUnauthenticatedRequest($r);
-
-            $identity = self::resolveTargetIdentity($r);
-            if (is_null($identity)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterNotFound',
-                    'Identity'
-                );
-            }
-            $smartyProperties = [
-                'profile' => self::getUserProfile($r->identity, $identity),
-                'PROGRAMMING_LANGUAGES' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
-                'COUNTRIES' => \OmegaUp\DAO\Countries::getAll(
-                    null,
-                    100,
-                    'name'
-                ),
-            ];
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            \OmegaUp\ApiCaller::logException($e);
-            $smartyProperties = [
-                'STATUS_ERROR' => $e->getErrorMessage(),
-            ];
-        }
-        $template = 'user.edit.tpl';
-        if (is_null($r->identity) || is_null($r->identity->password)) {
-            $template = 'user.basicedit.tpl';
-        }
-        return [
-            'smartyProperties' => $smartyProperties,
-            'template' => $template,
         ];
     }
 
