@@ -21,7 +21,7 @@ OmegaUp.on('ready', () => {
     });
   }
   const locationHashTab = window.location.hash.substr(1);
-  let selectedTab: ContestsTab | null = null;
+  let selectedTab: string | null = null;
   for (const tab of Object.values(ContestsTab)) {
     if (locationHashTab === tab) {
       selectedTab = locationHashTab;
