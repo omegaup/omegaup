@@ -2,7 +2,9 @@ import { OmegaUp } from '../omegaup';
 import * as time from '../time';
 import { types } from '../api_types';
 import Vue from 'vue';
-import arena_ContestList from '../components/arena/ContestList.vue';
+import arena_ContestList, {
+  ContestsTab,
+} from '../components/arena/ContestList.vue';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
@@ -18,6 +20,23 @@ OmegaUp.on('ready', () => {
       contest.start_time = time.remoteDate(contest.start_time);
     });
   }
+  const locationHashTab = window.location.hash.substr(1);
+  let selectedTab: ContestsTab = null;
+  for (const tab of Object.values(ContestsTab)) {
+    if (locationHashTab === tab) {
+      selectedTab = locationHashTab;
+      break;
+    }
+  }
+  if (!selectedTab) {
+    for (const [timeType, contests] of Object.entries(payload.contests)) {
+      if (contests.length > 0) {
+        selectedTab = timeType;
+        break;
+      }
+    }
+  }
+
   new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contestlist': arena_ContestList },
@@ -32,6 +51,7 @@ OmegaUp.on('ready', () => {
           initialQuery: this.initialQuery,
           contests: this.contests,
           isLogged: this.isLogged,
+          selectedTab,
         },
       });
     },

@@ -121,6 +121,7 @@
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false"
+                @click="showSubmenu = false"
               >
                 <img :src="gravatarURL51" height="45" class="mr-2" /><span
                   class="username"
@@ -190,21 +191,56 @@
                   <a class="dropdown-item" href="/badge/list/">{{
                     T.navViewBadges
                   }}</a>
-                  <a class="dropdown-item" :href="myProblemsUrl">{{
-                    T.navMyProblems
+                  <a class="dropdown-item" :href="problemsUrl">{{
+                    problemsText
                   }}</a>
                   <a
                     class="dropdown-item"
-                    :href="myCoursesUrl"
+                    :href="coursesUrl"
                     data-nav-courses-mine
-                    >{{ T.navMyCourses }}</a
+                    >{{ coursesText }}</a
                   >
                   <a
                     class="dropdown-item"
-                    :href="myContestsUrl"
+                    :href="contestsUrl"
                     data-nav-user-contests
-                    >{{ T.navMyContests }}</a
+                    >{{ contestsText }}</a
                   >
+                  <a
+                    v-if="hasTeachingObjective"
+                    class="dropdown-item"
+                    href="/profile/#created-content"
+                    >{{ T.navMyContent }}</a
+                  >
+                  <div v-else class="btn-group dropdown-submenu">
+                    <a class="dropdown-item" href="/profile/#created-content">{{
+                      T.navMyContent
+                    }}</a>
+                    <button
+                      type="button"
+                      class="dropdown-item btn dropdown-toggle dropdown-toggle-split"
+                      aria-haspopup="true"
+                      :aria-expanded="showSubmenu"
+                      @click="onSubmenuCliked($event)"
+                    ></button>
+                    <div class="dropdown-menu" :class="{ show: showSubmenu }">
+                      <a class="dropdown-item" href="/problem/mine">{{
+                        T.navMyProblems
+                      }}</a>
+                      <a
+                        class="dropdown-item"
+                        href="/course/mine"
+                        data-nav-courses-mine
+                        >{{ T.navMyCourses }}</a
+                      >
+                      <a
+                        class="dropdown-item"
+                        href="/contest/mine"
+                        data-nav-user-contests
+                        >{{ T.navMyContests }}</a
+                      >
+                    </div>
+                  </div>
                   <a
                     class="dropdown-item"
                     href="/group/"
@@ -301,13 +337,25 @@ export default class Navbar extends Vue {
   hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
     this.userTypes.includes(teachingType),
   );
-  myProblemsUrl = this.hasTeachingObjective
+  problemsUrl = this.hasTeachingObjective
     ? '/problem/mine/'
     : '/profile/#problems';
-  myContestsUrl = this.hasTeachingObjective ? '/contest/mine/' : '/arena/';
-  myCoursesUrl = this.hasTeachingObjective
+  contestsUrl = this.hasTeachingObjective
+    ? '/contest/mine/'
+    : '/arena/#participating';
+  coursesUrl = this.hasTeachingObjective
     ? '/course/mine/'
     : '/course/#enrolled';
+  problemsText = this.hasTeachingObjective
+    ? T.navMyProblems
+    : T.navProfileProblems;
+  contestsText = this.hasTeachingObjective
+    ? T.navMyContests
+    : T.navContestsEnrolled;
+  coursesText = this.hasTeachingObjective
+    ? T.navMyCourses
+    : T.navCoursesEnrolled;
+  showSubmenu = false;
 
   get formattedLoginURL(): string {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
@@ -321,6 +369,11 @@ export default class Navbar extends Vue {
 
   readNotifications(notifications: types.Notification[], url?: string): void {
     this.$emit('read-notifications', notifications, url);
+  }
+
+  onSubmenuCliked(event: Event) {
+    event.stopPropagation();
+    this.showSubmenu = !this.showSubmenu;
   }
 }
 </script>
@@ -338,5 +391,14 @@ nav.navbar {
   a.dropdown-item {
     color: var(--header-navbar-dropdown-item-font-color);
   }
+}
+
+.dropdown-submenu > .dropdown-menu {
+  top: 0;
+  left: -10rem; /* 10rem is the min-width of dropdown-menu */
+  margin-top: -6px;
+}
+.dropdown-submenu > .btn:focus {
+  box-shadow: 0 0 0 0;
 }
 </style>
