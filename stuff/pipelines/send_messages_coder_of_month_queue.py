@@ -11,6 +11,8 @@ import json
 import MySQLdb
 import MySQLdb.cursors
 import pika
+from rabbit_connection import Rabbit
+import rabbit_connection
 
 sys.path.insert(
     0,
@@ -20,18 +22,14 @@ import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 
-def send_messages_coder_month(cur: MySQLdb.cursors.BaseCursor,
-                              category: str,
-                              rabbit_user: str,
-                              rabbit_password: str) -> None:
-    '''Send messages to queues'''
+def send_coder_month(cur: MySQLdb.cursors.BaseCursor,
+                     channel:
+                     pika.adapters.blocking_connection.BlockingChannel,
+                     category: str) -> None:
+    '''Send messages to coder of the month queue'''
     today = datetime.date.today()
     first_day_of_current_month = today.replace(day=1)
-    credentials = pika.PlainCredentials(rabbit_user, rabbit_password)
-    parameters = pika.ConnectionParameters('rabbitmq', 5672, '/', credentials)
-    connection = pika.BlockingConnection(parameters)
-    channel = connection.channel()
-    channel.exchange_declare(exchange='logs_exchange', exchange_type='direct')
+    channel.exchange_declare(exchange='certificates', exchange_type='direct')
     logging.info('Send messages to Coder_Month_Queue')
     if first_day_of_current_month.month == 12:
         first_day_of_next_month = datetime.date(
@@ -43,30 +41,27 @@ def send_messages_coder_month(cur: MySQLdb.cursors.BaseCursor,
             first_day_of_current_month.year,
             first_day_of_current_month.month + 1,
             1)
-    try:
-        cur.execute(
-            '''
-            SELECT
-                user_id, time, category
-            FROM
-                Coder_Of_The_Month
-            WHERE
-                        `time` = %s AND
-                        `selected_by` IS NOT NULL AND
-                        `category` = %s;
-                    ''', (first_day_of_next_month, category))
-        for row in cur:
-            data = {"user_id": row['user_id'],
-                    "time": row['time'],
-                    "category": row['category']}
-            message = json.dumps(data)
-            body = message.encode()
-            channel.basic_publish(
-                exchange='logs_exchange',
-                routing_key='CoderOfTheMonthQueue',
-                body=body)
-    finally:
-        connection.close()
+    cur.execute(
+        '''
+        SELECT
+            user_id, time, category
+        FROM
+            Coder_Of_The_Month
+        WHERE
+            `time` = %s AND
+            `selected_by` IS NOT NULL AND
+            `category` = %s;
+        ''', (first_day_of_next_month, category))
+    for row in cur:
+        data = {"user_id": row['user_id'],
+                "time": row['time'],
+                "category": row['category']}
+        message = json.dumps(data)
+        body = message.encode()
+        channel.basic_publish(
+            exchange='certificates',
+            routing_key='CoderOfTheMonthQueue',
+            body=body)
 
 
 def main() -> None:
@@ -75,22 +70,23 @@ def main() -> None:
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
 
-    parser.add_argument('--user_rabbit')
-    parser.add_argument('--password_rabbit')
+    rabbit_connection.configure_parser(parser)
 
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
     logging.info('Started')
     dbconn = lib.db.connect(args)
+    rabbit_conn = Rabbit(args)
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
-            send_messages_coder_month(cur, 'all', args.user_rabbit,
-                                      args.password_rabbit)
-            send_messages_coder_month(cur, 'female', args.user_rabbit,
-                                      args.password_rabbit)
+            send_coder_month(cur, rabbit_conn.channel,
+                             'all')
+            send_coder_month(cur, rabbit_conn.channel,
+                             'female')
     finally:
         dbconn.close()
+        rabbit_conn.close()
         logging.info('Done')
 
 
