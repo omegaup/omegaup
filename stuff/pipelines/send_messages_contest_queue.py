@@ -11,7 +11,7 @@ import datetime
 import MySQLdb
 import MySQLdb.cursors
 import pika
-from rabbit_connection import rabbit
+from rabbit_connection import Rabbit
 import rabbit_connection
 
 sys.path.insert(
@@ -66,7 +66,7 @@ def main() -> None:
 
     logging.info('Started')
     dbconn = lib.db.connect(args)
-    rabbit_conn = rabbit(args)
+    rabbit_conn = Rabbit(args)
 
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
