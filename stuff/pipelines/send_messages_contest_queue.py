@@ -27,10 +27,11 @@ def send_contest(cur: MySQLdb.cursors.BaseCursor,
                  channel: pika.adapters.blocking_connection.BlockingChannel,
                  date_lower_limit: datetime.date,
                  date_upper_limit: datetime.date) -> None:
-    '''Send messages to contest queue
-    date-lower-limit: initial time from which to be taken the finishes contest
-    date-upper-limit: Optional finish time from which to be taken
-      the finishes contest. By default, the current date will be taken
+    '''Send messages to contest queue.
+     date-lower-limit: initial time from which to be taken the finish contests.
+     By default. the 2005/01/01 date will be taken.
+     date-upper-limit: finish time from which to be taken the finish contests.
+     By default, the current date will be taken.
     '''
     logging.info('Send messages to Contest_Queue')
     cur.execute(
