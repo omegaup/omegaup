@@ -9,7 +9,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type Progress=array{score: float, max_score: float}
  * @psalm-type AssignmentProgress=array<string, Progress>
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
- * @psalm-type ArenaCoursePayload=array{course: array{alias: string, name: string}, assignment: array{alias: string, name: string, description: string}, problems: list<array{alias: string, text: string}>, currentProblem: null|array{alias: string, title: string}}
+ * @psalm-type ArenaCoursePayload=array{course: array{alias: string, name: string}, assignment: array{alias: string, name: string, description: string}, problems: list<array{alias: string, letter: string, title: string}>, currentProblem: null|array{alias: string, title: string}}
  * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, is_extra_problem: bool, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, classname: string, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, name: null|string, request_time: \OmegaUp\Timestamp, username: string}
  * @psalm-type CourseAdmin=array{role: string, username: string}
@@ -4166,7 +4166,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
             $problemsResponseArray[] = [
                 'alias' => strval($problem['alias']),
-                'text' => "{$problem['letter']}. {$problem['title']}",
+                'letter' => $problem['letter'],
+                'title' => strval($problem['title']),
             ];
         }
 

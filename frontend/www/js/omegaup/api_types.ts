@@ -2036,7 +2036,7 @@ export namespace types {
     assignment: { alias: string; description: string; name: string };
     course: { alias: string; name: string };
     currentProblem?: { alias: string; title: string };
-    problems: { alias: string; text: string }[];
+    problems: { alias: string; letter: string; title: string }[];
   }
 
   export interface ArenaProblemDetails {
