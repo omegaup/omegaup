@@ -1047,94 +1047,6 @@ export namespace types {
       );
     }
 
-    export function CourseListPayload(
-      elementId: string = 'payload',
-    ): types.CourseListPayload {
-      return ((x) => {
-        x.courses = ((x) => {
-          if (x instanceof Object) {
-            Object.keys(x).forEach(
-              (y) =>
-                (x[y] = ((x) => {
-                  x.filteredCourses = ((x) => {
-                    x.current = ((x) => {
-                      x.courses = ((x) => {
-                        if (!Array.isArray(x)) {
-                          return x;
-                        }
-                        return x.map((x) => {
-                          x.assignments = ((x) => {
-                            if (!Array.isArray(x)) {
-                              return x;
-                            }
-                            return x.map((x) => {
-                              if (x.finish_time)
-                                x.finish_time = ((x: number) =>
-                                  new Date(x * 1000))(x.finish_time);
-                              x.start_time = ((x: number) =>
-                                new Date(x * 1000))(x.start_time);
-                              return x;
-                            });
-                          })(x.assignments);
-                          if (x.finish_time)
-                            x.finish_time = ((x: number) => new Date(x * 1000))(
-                              x.finish_time,
-                            );
-                          x.start_time = ((x: number) => new Date(x * 1000))(
-                            x.start_time,
-                          );
-                          return x;
-                        });
-                      })(x.courses);
-                      return x;
-                    })(x.current);
-                    x.past = ((x) => {
-                      x.courses = ((x) => {
-                        if (!Array.isArray(x)) {
-                          return x;
-                        }
-                        return x.map((x) => {
-                          x.assignments = ((x) => {
-                            if (!Array.isArray(x)) {
-                              return x;
-                            }
-                            return x.map((x) => {
-                              if (x.finish_time)
-                                x.finish_time = ((x: number) =>
-                                  new Date(x * 1000))(x.finish_time);
-                              x.start_time = ((x: number) =>
-                                new Date(x * 1000))(x.start_time);
-                              return x;
-                            });
-                          })(x.assignments);
-                          if (x.finish_time)
-                            x.finish_time = ((x: number) => new Date(x * 1000))(
-                              x.finish_time,
-                            );
-                          x.start_time = ((x: number) => new Date(x * 1000))(
-                            x.start_time,
-                          );
-                          return x;
-                        });
-                      })(x.courses);
-                      return x;
-                    })(x.past);
-                    return x;
-                  })(x.filteredCourses);
-                  return x;
-                })(x[y])),
-            );
-          }
-          return x;
-        })(x.courses);
-        return x;
-      })(
-        JSON.parse(
-          (document.getElementById(elementId) as HTMLElement).innerText,
-        ),
-      );
-    }
-
     export function CourseNewPayload(
       elementId: string = 'payload',
     ): types.CourseNewPayload {
@@ -1965,6 +1877,42 @@ export namespace types {
               }
               return x;
             })(x.contests);
+            x.createdContests = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+                x.last_updated = ((x: number) => new Date(x * 1000))(
+                  x.last_updated,
+                );
+                if (x.original_finish_time)
+                  x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                    x.original_finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.createdContests);
+            x.createdCourses = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.createdCourses);
             x.ownedBadges = ((x) => {
               if (!Array.isArray(x)) {
                 return x;
@@ -2676,6 +2624,27 @@ export namespace types {
     username: string;
   }
 
+  export interface Course {
+    acl_id?: number;
+    admission_mode: string;
+    alias: string;
+    archived: boolean;
+    course_id: number;
+    description: string;
+    finish_time?: Date;
+    group_id?: number;
+    languages?: string;
+    level?: string;
+    minimum_progress_for_certificate?: number;
+    name: string;
+    needs_basic_information: boolean;
+    objective?: string;
+    requests_user_information: string;
+    school_id?: number;
+    show_scoreboard: boolean;
+    start_time: Date;
+  }
+
   export interface CourseAdmin {
     role: string;
     username: string;
@@ -2782,11 +2751,6 @@ export namespace types {
 
   export interface CourseListMinePayload {
     courses: types.AdminCourses;
-  }
-
-  export interface CourseListPayload {
-    course_type?: string;
-    courses: types.StudentCourses;
   }
 
   export interface CourseNewPayload {
@@ -2943,6 +2907,8 @@ export namespace types {
   export interface ExtraProfileDetails {
     badges: string[];
     contests: types.UserProfileContests;
+    createdContests: types.Contest[];
+    createdCourses: types.Course[];
     createdProblems: types.Problem[];
     hasPassword: boolean;
     ownedBadges: types.Badge[];
@@ -4549,9 +4515,6 @@ export namespace messages {
   export type CourseListAssignmentsResponse = {
     assignments: types.CourseAssignment[];
   };
-  export type CourseListCoursesRequest = { [key: string]: any };
-  export type _CourseListCoursesServerResponse = any;
-  export type CourseListCoursesResponse = types.CoursesList;
   export type CourseListSolvedProblemsRequest = { [key: string]: any };
   export type CourseListSolvedProblemsResponse = {
     user_problems: {
@@ -5369,9 +5332,6 @@ export namespace controllers {
     listAssignments: (
       params?: messages.CourseListAssignmentsRequest,
     ) => Promise<messages.CourseListAssignmentsResponse>;
-    listCourses: (
-      params?: messages.CourseListCoursesRequest,
-    ) => Promise<messages.CourseListCoursesResponse>;
     listSolvedProblems: (
       params?: messages.CourseListSolvedProblemsRequest,
     ) => Promise<messages.CourseListSolvedProblemsResponse>;
