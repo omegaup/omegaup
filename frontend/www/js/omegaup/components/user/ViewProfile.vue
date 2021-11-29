@@ -275,11 +275,15 @@ export default class ViewProfile extends Vue {
   T = T;
   ui = ui;
   columns = 3;
-  currentSelectedTab =
-    !this.profile.is_own_profile && this.profile.is_private
-      ? ViewProfileTabs.Data
-      : this.selectedTab ?? ViewProfileTabs.Badges;
+  currentSelectedTab = this.getInitialSelectedTab();
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
+
+  getInitialSelectedTab(): string {
+    if (!this.profile.is_own_profile && this.profile.is_private) {
+      return ViewProfileTabs.Data;
+    }
+    return this.selectedTab ?? ViewProfileTabs.Badges;
+  }
 
   get createdContests(): Contest[] {
     if (!this.data?.createdContests) return [];

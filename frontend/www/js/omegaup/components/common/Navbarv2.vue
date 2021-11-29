@@ -121,7 +121,6 @@
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false"
-                @click="showSubmenu = false"
               >
                 <img :src="gravatarURL51" height="45" class="mr-2" /><span
                   class="username"
@@ -191,55 +190,76 @@
                   <a class="dropdown-item" href="/badge/list/">{{
                     T.navViewBadges
                   }}</a>
-                  <a class="dropdown-item" :href="problemsUrl">{{
-                    problemsText
-                  }}</a>
-                  <a
-                    class="dropdown-item"
-                    :href="coursesUrl"
-                    data-nav-courses-mine
-                    >{{ coursesText }}</a
-                  >
-                  <a
-                    class="dropdown-item"
-                    :href="contestsUrl"
-                    data-nav-user-contests
-                    >{{ contestsText }}</a
-                  >
-                  <a
-                    v-if="hasTeachingObjective"
-                    class="dropdown-item"
-                    href="/profile/#created-content"
-                    >{{ T.navMyContent }}</a
-                  >
-                  <div v-else class="btn-group dropdown-submenu">
+                  <div v-if="hasTeachingObjective">
+                    <a class="dropdown-item" href="/problem/mine">{{
+                      T.navMyProblems
+                    }}</a>
+                    <a
+                      class="dropdown-item"
+                      href="/course/mine"
+                      data-nav-courses-mine
+                      >{{ T.navMyCourses }}</a
+                    >
+                    <a
+                      class="dropdown-item"
+                      href="/contest/mine"
+                      data-nav-user-contests
+                      >{{ T.navMyContests }}</a
+                    >
                     <a class="dropdown-item" href="/profile/#created-content">{{
                       T.navMyContent
                     }}</a>
-                    <button
-                      type="button"
-                      class="dropdown-item btn dropdown-toggle dropdown-toggle-split"
-                      aria-haspopup="true"
-                      :aria-expanded="showSubmenu"
-                      @click="onSubmenuCliked($event)"
-                    ></button>
-                    <div class="dropdown-menu" :class="{ show: showSubmenu }">
-                      <a class="dropdown-item" href="/problem/mine">{{
-                        T.navMyProblems
-                      }}</a>
-                      <a
-                        class="dropdown-item"
-                        href="/course/mine"
-                        data-nav-courses-mine
-                        >{{ T.navMyCourses }}</a
-                      >
-                      <a
-                        class="dropdown-item"
-                        href="/contest/mine"
-                        data-nav-user-contests
-                        >{{ T.navMyContests }}</a
-                      >
-                    </div>
+                  </div>
+                  <div v-else>
+                    <a class="dropdown-item" href="/profile/#problems">{{
+                      T.navProfileProblems
+                    }}</a>
+                    <a
+                      class="dropdown-item"
+                      href="/course/#enrolled"
+                      data-nav-courses-mine
+                      >{{ T.navCoursesEnrolled }}</a
+                    >
+                    <a
+                      class="dropdown-item"
+                      href="/arena/#participating"
+                      data-nav-user-contests
+                      >{{ T.navContestsEnrolled }}</a
+                    >
+                    <form class="collapse-submenu">
+                      <div class="btn-group">
+                        <a
+                          class="dropdown-item"
+                          href="/profile/#created-content"
+                          >{{ T.navMyContent }}</a
+                        >
+                        <button
+                          type="button"
+                          class="btn dropdown-item dropdown-toggle dropdown-toggle-split"
+                          data-toggle="collapse"
+                          data-target=".collapse-links"
+                          aria-expanded="false"
+                          aria-controls="collapse-links"
+                        ></button>
+                      </div>
+                      <div class="collapse collapse-links pl-3">
+                        <a class="dropdown-item" href="/problem/mine">{{
+                          T.navMyProblems
+                        }}</a>
+                        <a
+                          class="dropdown-item"
+                          href="/course/mine"
+                          data-nav-courses-mine
+                          >{{ T.navMyCourses }}</a
+                        >
+                        <a
+                          class="dropdown-item"
+                          href="/contest/mine"
+                          data-nav-user-contests
+                          >{{ T.navMyContests }}</a
+                        >
+                      </div>
+                    </form>
                   </div>
                   <a
                     class="dropdown-item"
@@ -337,25 +357,6 @@ export default class Navbar extends Vue {
   hasTeachingObjective = this.teachingUserTypes.some((teachingType) =>
     this.userTypes.includes(teachingType),
   );
-  problemsUrl = this.hasTeachingObjective
-    ? '/problem/mine/'
-    : '/profile/#problems';
-  contestsUrl = this.hasTeachingObjective
-    ? '/contest/mine/'
-    : '/arena/#participating';
-  coursesUrl = this.hasTeachingObjective
-    ? '/course/mine/'
-    : '/course/#enrolled';
-  problemsText = this.hasTeachingObjective
-    ? T.navMyProblems
-    : T.navProfileProblems;
-  contestsText = this.hasTeachingObjective
-    ? T.navMyContests
-    : T.navContestsEnrolled;
-  coursesText = this.hasTeachingObjective
-    ? T.navMyCourses
-    : T.navCoursesEnrolled;
-  showSubmenu = false;
 
   get formattedLoginURL(): string {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
@@ -369,11 +370,6 @@ export default class Navbar extends Vue {
 
   readNotifications(notifications: types.Notification[], url?: string): void {
     this.$emit('read-notifications', notifications, url);
-  }
-
-  onSubmenuCliked(event: Event) {
-    event.stopPropagation();
-    this.showSubmenu = !this.showSubmenu;
   }
 }
 </script>
@@ -393,12 +389,7 @@ nav.navbar {
   }
 }
 
-.dropdown-submenu > .dropdown-menu {
-  top: 0;
-  left: -10rem; /* 10rem is the min-width of dropdown-menu */
-  margin-top: -6px;
-}
-.dropdown-submenu > .btn:focus {
+.collapse-submenu .btn:focus {
   box-shadow: 0 0 0 0;
 }
 </style>

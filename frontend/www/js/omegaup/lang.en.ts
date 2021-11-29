@@ -646,7 +646,7 @@ const translations: { [key: string]: string; } = {
   navHelp: "Help",
   navLogIn: "Log in / Sign up",
   navLogOut: "Log out",
-  navMyContent: "Mi content",
+  navMyContent: "My content",
   navMyContests: "My contests",
   navMyCourses: "My courses",
   navMyGroups: "My groups",
