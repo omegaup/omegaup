@@ -1,23 +1,31 @@
-import common_NavbarV2 from '../components/common/Navbarv2.vue';
+import common_Navbar from '../components/common/Navbar.vue';
+import common_NavbarBs3 from '../components/common/NavbarBs3.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import { types } from '../api_types';
 import * as ui from '../ui';
 import Vue from 'vue';
-import T from '../lang';
 import clarificationsStore from '../arena/clarificationsStore';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload('header-payload');
-  const fromLogin =
-    new URL(document.location.toString()).searchParams.get('fromLogin') !==
-    null;
   const commonNavbar = new Vue({
     el: '#common-navbar',
     components: {
-      'omegaup-common-navbar': common_NavbarV2,
+      'omegaup-common-navbar': !payload.bootstrap4
+        ? common_NavbarBs3
+        : common_Navbar,
     },
     data: () => ({
+      omegaUpLockDown: payload.omegaUpLockDown,
+      inContest: payload.inContest,
+      isLoggedIn: payload.isLoggedIn,
+      isReviewer: payload.isReviewer,
+      gravatarURL51: payload.gravatarURL51,
+      currentUsername: payload.currentUsername,
+      isMainUserIdentity: payload.isMainUserIdentity,
+      lockDownImage: payload.lockDownImage,
+      navbarSection: payload.navbarSection,
       notifications: [] as types.Notification[],
       graderInfo: null as types.GraderStatus | null,
       graderQueueLength: -1,
@@ -26,34 +34,28 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-common-navbar', {
         props: {
-          omegaUpLockDown: payload.omegaUpLockDown,
-          inContest: payload.inContest,
-          isLoggedIn: payload.isLoggedIn,
-          isReviewer: payload.isReviewer,
-          gravatarURL51: payload.gravatarURL51,
+          omegaUpLockDown: this.omegaUpLockDown,
+          inContest: this.inContest,
+          isLoggedIn: this.isLoggedIn,
+          isReviewer: this.isReviewer,
+          gravatarURL51: this.gravatarURL51,
           gravatarURL128: payload.gravatarURL128,
           associatedIdentities: payload.associatedIdentities,
           currentEmail: payload.currentEmail,
           currentName: payload.currentName,
-          currentUsername: payload.currentUsername,
+          currentUsername: this.currentUsername,
           isAdmin: payload.isAdmin,
-          isMainUserIdentity: payload.isMainUserIdentity,
-          lockDownImage: payload.lockDownImage,
-          navbarSection: payload.navbarSection,
-          profileProgress: payload.profileProgress,
+          isMainUserIdentity: this.isMainUserIdentity,
+          lockDownImage: this.lockDownImage,
+          navbarSection: this.navbarSection,
           notifications: this.notifications,
           graderInfo: this.graderInfo,
           graderQueueLength: this.graderQueueLength,
           errorMessage: this.errorMessage,
           clarifications: clarificationsStore.state.clarifications,
-          fromLogin: fromLogin,
-          userTypes: payload.userTypes,
         },
         on: {
-          'read-notifications': (
-            notifications: types.Notification[],
-            redirectTo?: string,
-          ) => {
+          'read-notifications': (notifications: types.Notification[]) => {
             api.Notification.readNotifications({
               notifications: notifications.map(
                 (notification) => notification.notification_id,
@@ -62,9 +64,6 @@ OmegaUp.on('ready', () => {
               .then(() => api.Notification.myList())
               .then((data) => {
                 commonNavbar.notifications = data.notifications;
-                if (redirectTo) {
-                  ui.navigateTo(redirectTo);
-                }
               })
               .catch(ui.apiError);
           },
@@ -74,28 +73,6 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 window.location.reload();
-              })
-              .catch(ui.apiError);
-          },
-          'update-user-objectives': ({
-            hasCompetitiveObjective,
-            hasLearningObjective,
-            hasScholarObjective,
-            hasTeachingObjective,
-          }: {
-            hasCompetitiveObjective: string;
-            hasLearningObjective: string;
-            hasScholarObjective: string;
-            hasTeachingObjective: string;
-          }) => {
-            api.User.update({
-              has_competitive_objective: hasCompetitiveObjective,
-              has_learning_objective: hasLearningObjective,
-              has_scholar_objective: hasScholarObjective,
-              has_teaching_objective: hasTeachingObjective,
-            })
-              .then(() => {
-                ui.success(T.userObjectivesUpdateSuccess);
               })
               .catch(ui.apiError);
           },
