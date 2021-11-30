@@ -2,9 +2,9 @@ import { mount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import T from '../../lang';
 
-import notification_Clarifications from './Clarificationsv2.vue';
+import notification_Clarifications from './ClarificationsBs3.vue';
 
-describe('Clarifications.vue', () => {
+describe('ClarificationsBs3.vue', () => {
   const clarifications = [
     {
       answer: 'yes',
@@ -60,7 +60,7 @@ describe('Clarifications.vue', () => {
       T.notificationsMarkAllAsRead,
     );
     await wrapper
-      .find('div[data-clarification="1"] button[class="close"]')
+      .find('li[data-clarification="1"] button[class="close"]')
       .trigger('click');
     // There is only one notification, so "Mark as all read" button does not appear
     expect(wrapper.text()).not.toContain(T.notificationsMarkAllAsRead);
