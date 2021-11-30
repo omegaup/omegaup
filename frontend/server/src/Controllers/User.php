@@ -4037,36 +4037,52 @@ class User extends \OmegaUp\Controllers\Controller {
         ) ? [] : \OmegaUp\DAO\Identities::getAssociatedIdentities(
             $loggedIdentity
         );
-        $response['smartyProperties']['payload'] = array_merge(
-            $response['smartyProperties']['payload'],
-            [
+
+        $extraProfileDetails = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::USER_PROFILE,
+            "{$targetIdentity->username}-extraProfileDetails",
+            function () use (
+                $profile,
+                $targetIdentity,
+                $ownedBadges,
+                $associatedIdentities
+            ): array {
+                return
+                [
                 'profile' => $profile,
                 'extraProfileDetails' => [
-                    'contests' => self::getContestStats($targetIdentity),
-                    'solvedProblems' => self::getSolvedProblems(
-                        $targetIdentity->identity_id
-                    ),
-                    'unsolvedProblems' => self::getUnsolvedProblems(
-                        $targetIdentity->identity_id
-                    ),
-                    'createdProblems' => self::getCreatedProblems(
-                        $targetIdentity->identity_id
-                    ),
-                    'createdContests' => \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(
-                        $targetIdentity->identity_id
-                    ),
-                    'createdCourses' => \OmegaUp\DAO\Courses::getCoursesCreatedByIdentity(
-                        $targetIdentity->identity_id
-                    ),
-                    'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
-                        $targetIdentity->identity_id
-                    ),
-                    'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
-                    'ownedBadges' => $ownedBadges,
-                    'hasPassword' => !is_null($targetIdentity->password),
+                'contests' => self::getContestStats($targetIdentity),
+                'solvedProblems' => self::getSolvedProblems(
+                    $targetIdentity->identity_id
+                ),
+                'unsolvedProblems' => self::getUnsolvedProblems(
+                    $targetIdentity->identity_id
+                ),
+                'createdProblems' => self::getCreatedProblems(
+                    $targetIdentity->identity_id
+                ),
+                'createdContests' => \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(
+                    $targetIdentity->identity_id
+                ),
+                'createdCourses' => \OmegaUp\DAO\Courses::getCoursesCreatedByIdentity(
+                    $targetIdentity->identity_id
+                ),
+                'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
+                    $targetIdentity->identity_id
+                ),
+                'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
+                'ownedBadges' => $ownedBadges,
+                'hasPassword' => !is_null($targetIdentity->password),
                 ],
                 'identities' => $associatedIdentities,
-            ]
+                ];
+            },
+            APC_USER_CACHE_USER_RANK_TIMEOUT
+        );
+
+        $response['smartyProperties']['payload'] = array_merge(
+            $response['smartyProperties']['payload'],
+            $extraProfileDetails
         );
 
         return $response;
