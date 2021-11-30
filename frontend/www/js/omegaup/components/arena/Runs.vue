@@ -18,20 +18,30 @@
             T.wordsSubmissions
           }}
           <div v-if="showPager">
-            <button :disabled="filterOffset <= 0" @click="filterOffset--">
-              &lt;
-            </button>
-            {{ filterOffset + 1 }}
-            <button
-              :disabled="runs && runs.length < rowCount"
-              @click="filterOffset++"
-            >
-              &gt;
-            </button>
-
+            <div class="pager-controls">
+              <button
+                data-button-page-previous
+                :disabled="filterOffset <= 0"
+                @click="filterOffset--"
+              >
+                &lt;
+              </button>
+              {{ filterOffset + 1 }}
+              <button
+                data-button-page-next
+                :disabled="runs && runs.length < rowCount"
+                @click="filterOffset++"
+              >
+                &gt;
+              </button>
+            </div>
             <label
               >{{ T.wordsVerdict }}:
-              <select v-model="filterVerdict" class="form-control">
+              <select
+                v-model="filterVerdict"
+                data-select-verdict
+                class="form-control"
+              >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="AC">AC</option>
                 <option value="PA">PA</option>
@@ -50,7 +60,11 @@
 
             <label
               >{{ T.wordsStatus }}:
-              <select v-model="filterStatus" class="form-control">
+              <select
+                v-model="filterStatus"
+                data-select-status
+                class="form-control"
+              >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="new">new</option>
                 <option value="waiting">waiting</option>
@@ -62,7 +76,11 @@
 
             <label
               >{{ T.wordsLanguage }}:
-              <select v-model="filterLanguage" class="form-control">
+              <select
+                v-model="filterLanguage"
+                data-select-language
+                class="form-control"
+              >
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="cpp17-gcc">C++17 (g++ 9.3)</option>
                 <option value="cpp17-clang">C++17 (clang++ 10.0)</option>
@@ -115,9 +133,12 @@
             </template>
 
             <div class="row">
-              <div v-if="filters.length > 0" class="col-sm col-12">
+              <div
+                v-if="filtersExcludingOffset.length > 0"
+                class="col-sm col-12"
+              >
                 <span
-                  v-for="filter in filters"
+                  v-for="filter in filtersExcludingOffset"
                   :key="filter.name"
                   class="btn-secondary mr-3"
                 >
@@ -128,7 +149,7 @@
                     <font-awesome-icon :icon="['fas', 'times']" />
                   </a>
                 </span>
-                <a href="#" @click="onRemoveFilter('all')">
+                <a href="#runs" @click="onRemoveFilter('all')">
                   <span class="mr-2">{{ T.wordsRemoveFilter }}</span>
                 </a>
               </div>
@@ -195,8 +216,13 @@
             </td>
             <td v-if="showContest" class="text-break-all">
               <a
-                href="#"
-                @click="onEmitFilterChanged(run.contest_alias, 'contest')"
+                href="#runs"
+                @click="
+                  onEmitFilterChanged({
+                    filter: 'contest',
+                    value: run.contest_alias,
+                  })
+                "
                 >{{ run.contest_alias }}</a
               >
               <a
@@ -208,7 +234,7 @@
               </a>
             </td>
             <td v-if="showProblem" class="text-break-all">
-              <a href="#" @click.prevent="filterProblem = run.alias">{{
+              <a href="#runs" @click.prevent="filterProblem = run.alias">{{
                 run.alias
               }}</a>
               <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
@@ -446,6 +472,10 @@ export default class Runs extends Vue {
     });
   }
 
+  get filtersExcludingOffset(): { name: string; value: string }[] {
+    return this.filters.filter((filter) => filter.name !== 'offset');
+  }
+
   get sortedRuns(): types.Run[] {
     if (!this.runs) {
       return [];
@@ -633,36 +663,42 @@ export default class Runs extends Vue {
 
   @Watch('filterLanguage')
   onFilterLanguageChanged(newValue: string) {
-    this.onEmitFilterChanged(newValue, 'language');
+    this.onEmitFilterChanged({ filter: 'language', value: newValue });
   }
 
   @Watch('filterOffset')
-  onFilterOffsetChanged() {
-    this.$emit('filter-changed');
+  onFilterOffsetChanged(newValue: number) {
+    this.$emit('filter-changed', { filter: 'offset', value: `${newValue}` });
   }
 
   @Watch('filterProblem')
   onFilterProblemChanged(newValue: string) {
-    this.onEmitFilterChanged(newValue, 'problem');
+    this.onEmitFilterChanged({ filter: 'problem', value: newValue });
   }
 
   @Watch('filterStatus')
   onFilterStatusChanged(newValue: string) {
-    this.onEmitFilterChanged(newValue, 'status');
+    this.onEmitFilterChanged({ filter: 'status', value: newValue });
   }
 
   @Watch('filterUsername')
   onFilterUsernameChanged(newValue: string) {
-    this.onEmitFilterChanged(newValue, 'username');
+    this.onEmitFilterChanged({ filter: 'username', value: newValue });
   }
 
   @Watch('filterVerdict')
   onFilterVerdictChanged(newValue: string) {
-    this.onEmitFilterChanged(newValue, 'verdict');
+    this.onEmitFilterChanged({ filter: 'verdict', value: newValue });
   }
 
   @Emit('filter-changed')
-  onEmitFilterChanged(value: string, filter: string): void {
+  onEmitFilterChanged({
+    filter,
+    value,
+  }: {
+    filter: string;
+    value: string;
+  }): void {
     this.filterOffset = 0;
     if (!value) {
       this.filters = this.filters.filter((item) => item.name !== filter);

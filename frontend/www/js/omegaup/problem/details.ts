@@ -121,10 +121,13 @@ OmegaUp.on('ready', async () => {
                 });
               });
           },
-          'apply-filter': (
-            filter: 'verdict' | 'language' | 'username' | 'status',
-            value: string,
-          ) => {
+          'apply-filter': ({
+            filter,
+            value,
+          }: {
+            filter: 'verdict' | 'language' | 'username' | 'status' | 'offset';
+            value: string;
+          }) => {
             if (value) {
               runsStore.commit('applyFilter', {
                 [filter]: value,

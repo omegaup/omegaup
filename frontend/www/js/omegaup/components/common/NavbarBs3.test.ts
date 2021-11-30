@@ -1,12 +1,12 @@
-import { mount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 
 import T from '../../lang';
 
-import common_Navbarv2 from './Navbarv2.vue';
+import common_NavbarBs3 from './NavbarBs3.vue';
 
-describe('Navbarv2.vue', () => {
+describe('NavbarBs3.vue', () => {
   it('Should handle empty navbar (in contest only)', async () => {
-    const wrapper = mount(common_Navbarv2, {
+    const wrapper = shallowMount(common_NavbarBs3, {
       propsData: {
         currentUsername: 'user',
         errorMessage: null,
@@ -24,9 +24,6 @@ describe('Navbarv2.vue', () => {
         navbarSection: '',
         omegaUpLockDown: false,
         allIdentities: [{ username: 'user', default: true }],
-        notifications: [],
-        fromLogin: false,
-        userTypes: [],
       },
     });
 
@@ -37,7 +34,7 @@ describe('Navbarv2.vue', () => {
   });
 
   it('Should handle common navbar to logged user', async () => {
-    const wrapper = mount(common_Navbarv2, {
+    const wrapper = shallowMount(common_NavbarBs3, {
       propsData: {
         currentUsername: 'user',
         errorMessage: null,
@@ -55,9 +52,6 @@ describe('Navbarv2.vue', () => {
         navbarSection: '',
         omegaUpLockDown: false,
         associatedIdentities: [{ username: 'user', default: true }],
-        notifications: [],
-        fromLogin: false,
-        userTypes: ['student', 'teacher'],
       },
     });
 
@@ -68,7 +62,7 @@ describe('Navbarv2.vue', () => {
   });
 
   it('Should handle common navbar to not-logged user', async () => {
-    const wrapper = mount(common_Navbarv2, {
+    const wrapper = shallowMount(common_NavbarBs3, {
       propsData: {
         currentUsername: 'user',
         errorMessage: null,
@@ -86,14 +80,10 @@ describe('Navbarv2.vue', () => {
         navbarSection: '',
         omegaUpLockDown: false,
         associatedIdentities: [{ username: 'user', default: true }],
-        notifications: [],
-        fromLogin: false,
-        userTypes: [],
       },
     });
 
     expect(wrapper.find('.nav-problems').exists()).toBe(true);
-    expect(wrapper.find('[data-nav-course]').exists()).toBe(true);
     expect(wrapper.find('.nav-rank').exists()).toBe(true);
     expect(wrapper.find('.navbar-right').text()).toBe(T.navLogIn);
   });

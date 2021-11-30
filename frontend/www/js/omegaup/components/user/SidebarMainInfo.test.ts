@@ -29,6 +29,8 @@ const data: types.ExtraProfileDetails = {
   badges: [],
   contests: {},
   createdProblems: [],
+  createdContests: [],
+  createdCourses: [],
   ownedBadges: [],
   solvedProblems: [
     {
@@ -111,6 +113,22 @@ describe('SidebarMainInfo.vue', () => {
       const urlSelector = `a[href="/profile/#${url.key}"]`;
       expect(wrapper.find(urlSelector).exists()).toBeFalsy();
     }
+  });
+
+  it('Should display Add password button when user does not have password', () => {
+    const wrapper = shallowMount(user_SidebarMainInfo, {
+      propsData: {
+        profile,
+        data: { ...data, ...{ hasPassword: false } },
+      },
+    });
+
+    expect(
+      wrapper.find('a[href="/profile/#add-password"]').exists(),
+    ).toBeTruthy();
+    expect(
+      wrapper.find('a[href="/profile/#change-password"]').exists(),
+    ).toBeFalsy();
   });
 });
 

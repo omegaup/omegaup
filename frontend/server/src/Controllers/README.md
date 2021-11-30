@@ -80,7 +80,6 @@
   - [`/api/course/getProblemUsers/`](#apicoursegetproblemusers)
   - [`/api/course/introDetails/`](#apicourseintrodetails)
   - [`/api/course/listAssignments/`](#apicourselistassignments)
-  - [`/api/course/listCourses/`](#apicourselistcourses)
   - [`/api/course/listSolvedProblems/`](#apicourselistsolvedproblems)
   - [`/api/course/listStudents/`](#apicourseliststudents)
   - [`/api/course/listUnsolvedProblems/`](#apicourselistunsolvedproblems)
@@ -95,6 +94,7 @@
   - [`/api/course/requests/`](#apicourserequests)
   - [`/api/course/runs/`](#apicourseruns)
   - [`/api/course/studentProgress/`](#apicoursestudentprogress)
+  - [`/api/course/studentsProgress/`](#apicoursestudentsprogress)
   - [`/api/course/update/`](#apicourseupdate)
   - [`/api/course/updateAssignment/`](#apicourseupdateassignment)
   - [`/api/course/updateAssignmentsOrder/`](#apicourseupdateassignmentsorder)
@@ -1787,28 +1787,6 @@ List course assignments
 | ------------- | -------------------------- |
 | `assignments` | `types.CourseAssignment[]` |
 
-## `/api/course/listCourses/`
-
-### Description
-
-Lists all the courses this user is associated with.
-
-Returns courses for which the current user is an admin and
-for in which the user is a student.
-
-### Parameters
-
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `page`      | `int` |             |
-| `page_size` | `int` |             |
-
-### Returns
-
-```typescript
-types.CoursesList;
-```
-
 ## `/api/course/listSolvedProblems/`
 
 ### Description
@@ -2067,6 +2045,25 @@ Returns all runs for a course
 | Name       | Type                    |
 | ---------- | ----------------------- |
 | `problems` | `types.CourseProblem[]` |
+
+## `/api/course/studentsProgress/`
+
+### Description
+
+### Parameters
+
+| Name     | Type     | Description |
+| -------- | -------- | ----------- |
+| `course` | `string` |             |
+| `length` | `int`    |             |
+| `page`   | `int`    |             |
+
+### Returns
+
+| Name       | Type                              |
+| ---------- | --------------------------------- |
+| `nextPage` | `number`                          |
+| `progress` | `types.StudentProgressInCourse[]` |
 
 ## `/api/course/update/`
 
