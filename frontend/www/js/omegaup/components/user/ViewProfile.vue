@@ -242,6 +242,16 @@ export enum ViewProfileTabs {
   Charts = 'charts',
 }
 
+function getInitialSelectedTab(
+  profile: types.UserProfileInfo,
+  selectedTab: string | null,
+): string {
+  if (!profile.is_own_profile && profile.is_private) {
+    return ViewProfileTabs.Data;
+  }
+  return selectedTab ?? ViewProfileTabs.Badges;
+}
+
 @Component({
   components: {
     'omegaup-user-basicinfo': user_BasicInfo,
@@ -275,15 +285,8 @@ export default class ViewProfile extends Vue {
   T = T;
   ui = ui;
   columns = 3;
-  currentSelectedTab = this.getInitialSelectedTab();
+  currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
-
-  getInitialSelectedTab(): string {
-    if (!this.profile.is_own_profile && this.profile.is_private) {
-      return ViewProfileTabs.Data;
-    }
-    return this.selectedTab ?? ViewProfileTabs.Badges;
-  }
 
   get createdContests(): Contest[] {
     if (!this.data?.createdContests) return [];
