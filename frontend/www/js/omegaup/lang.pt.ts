@@ -44,6 +44,7 @@ const translations: { [key: string]: string; } = {
   arenaContestPracticeOriginalRunsText: "Para ver as solu\u00e7\u00f5es do concurso original, clique [aqui](/arena/%(contestAlias)/#runs)",
   arenaContestPracticeOriginalScoreboardText: "Para ver o painel de avalia\u00e7\u00e3o, clique [aqui](/arena/%(contestAlias)/#ranking)",
   arenaContestWindowLength: "Tempo de resolver todos os problemas",
+  arenaCourseAllContent: "Todo o conte\u00fado",
   arenaCurrentContests: "Concursos atuais",
   arenaCurrentPublicContests: "Concursos p\u00fablicos recentes",
   arenaFutureContests: "Concursos futuros",
