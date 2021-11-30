@@ -135,55 +135,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ?int $rowCount = 100
     ): array {
         $sql = '
-            SELECT
-                `r`.`run_id`,
-                `s`.`guid`,
-                `s`.`language`,
-                `r`.`status`,
-                `r`.`verdict`,
-                `r`.`runtime`,
-                `r`.`penalty`,
-                `r`.`memory`,
-                IF(
-                    COALESCE(`c`.`partial_score`, 1) = 0 AND `r`.`score` <> 1,
-                        0,
-                        `r`.`score`
-                ) AS `score`,
-                IF(
-                    COALESCE(`c`.`partial_score`, 1) = 0 AND `r`.`score` <> 1,
-                        0,
-                        `r`.`contest_score`
-                ) AS `contest_score`,
-                `s`.`time`,
-                `s`.`submit_delay`,
-                `s`.`type`,
-                `i`.`username`,
-                `p`.`alias`,
-                IFNULL(`i`.`country_id`, "xx") `country`,
-                `c`.`alias` AS `contest_alias`,
-                IFNULL(
-                    (
-                        SELECT `urc`.`classname` FROM
-                            `User_Rank_Cutoffs` `urc`
-                        WHERE
-                            `urc`.`score` <= (
-                                    SELECT
-                                        `ur`.`score`
-                                    FROM
-                                        `User_Rank` `ur`
-                                    WHERE
-                                        `ur`.`user_id` = `i`.`user_id`
-                                )
-                        ORDER BY
-                            `urc`.`percentile` ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) `classname`
             FROM
                 Submissions s
-            USE INDEX(PRIMARY)
             INNER JOIN
                 Runs r
             ON
@@ -232,13 +185,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= 'WHERE ' . implode(' AND ', $where) . ' ';
         }
 
-        $sql .= 'ORDER BY s.submission_id DESC ';
-
         $sqlCount = "
             SELECT
-                COUNT(*)
-            FROM
-                ({$sql}) AS total;";
+                COUNT(*) AS total
+            {$sql};
+        ";
 
         /** @var int */
         $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
@@ -253,7 +204,57 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $rowCount = 100;
         }
 
-        $sql .= 'LIMIT ?, ?;';
+        $sql = '
+            SELECT
+                `r`.`run_id`,
+                `s`.`guid`,
+                `s`.`language`,
+                `r`.`status`,
+                `r`.`verdict`,
+                `r`.`runtime`,
+                `r`.`penalty`,
+                `r`.`memory`,
+                IF(
+                    COALESCE(`c`.`partial_score`, 1) = 0 AND `r`.`score` <> 1,
+                        0,
+                        `r`.`score`
+                ) AS `score`,
+                IF(
+                    COALESCE(`c`.`partial_score`, 1) = 0 AND `r`.`score` <> 1,
+                        0,
+                        `r`.`contest_score`
+                ) AS `contest_score`,
+                `s`.`time`,
+                `s`.`submit_delay`,
+                `s`.`type`,
+                `i`.`username`,
+                `p`.`alias`,
+                IFNULL(`i`.`country_id`, "xx") `country`,
+                `c`.`alias` AS `contest_alias`,
+                IFNULL(
+                    (
+                        SELECT `urc`.`classname` FROM
+                            `User_Rank_Cutoffs` `urc`
+                        WHERE
+                            `urc`.`score` <= (
+                                    SELECT
+                                        `ur`.`score`
+                                    FROM
+                                        `User_Rank` `ur`
+                                    WHERE
+                                        `ur`.`user_id` = `i`.`user_id`
+                                )
+                        ORDER BY
+                            `urc`.`percentile` ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) `classname`
+        ' . $sql . '
+            ORDER BY s.submission_id DESC
+            LIMIT ?, ?;
+        ';
         $val[] = $offset * $rowCount;
         $val[] = $rowCount;
 
