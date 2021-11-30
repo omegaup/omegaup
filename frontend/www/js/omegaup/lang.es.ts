@@ -477,7 +477,7 @@ const translations: { [key: string]: string; } = {
   courseSubmissionsList: "Lista de env\u00edos en un curso",
   courseTabEnrolled: "Cursos que estudio (%(course_count))",
   courseTabEnrolledUnlogged: "Cursos que estudio",
-  courseTabFinished: "Cursos terminados (%(course_count)",
+  courseTabFinished: "Cursos terminados (%(course_count))",
   courseTabFinishedUnlogged: "Cursos terminados",
   courseTabPublic: "Explorar cursos",
   courseTabsEmptyEnrolledCourses: "No est\u00e1s inscrito en ning\u00fan curso",
