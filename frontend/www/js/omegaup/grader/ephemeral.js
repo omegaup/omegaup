@@ -1377,9 +1377,117 @@ document.getElementById('download').addEventListener('click', (e) => {
     .catch(Util.asyncError);
 });
 
-document.getElementsByTagName('form')[0].addEventListener('submit', (e) => {
+const submitButton = document.querySelector('button[data-submit-button]');
+document.querySelector('form.ephemeral-form').addEventListener('submit', (e) => {
   e.preventDefault();
-  document.getElementsByTagName('button')[0].setAttribute('disabled', '');
+  submitButton.setAttribute('disabled', '');
+  fetch('/api/run/create/', {
+    method: 'POST',
+    headers: new Headers({
+      'Content-Type': 'application/json',
+    }),
+    body: JSON.stringify({
+      problemset_id: payload.currentAssignment.problemset_id,
+      problem_alias: problem.alias,
+      language: language,
+      source: code,
+    }),
+  })
+    // .then(time.remoteTimeAdapter)
+    .then((response) => {
+      console.log('submitted');
+      console.log(response);
+      // submitRun({
+      //   guid: response.guid,
+      //   submitDelay: response.submit_delay,
+      //   language,
+      //   username: commonPayload.currentUsername,
+      //   classname: commonPayload.userClassname,
+      //   problemAlias: problem.alias,
+      // });
+    })
+    .catch((run) => {
+      console.log('error', run);
+      // submitRunFailed({
+      //   error: run.error,
+      //   errorname: run.errorname,
+      //   run,
+      // });
+    });
+  // fetch('/api/run/create/', {
+  //   method: 'POST',
+  //   headers: new Headers({
+  //     'Content-Type': 'application/json',
+  //   }),
+  //   body: JSON.stringify(store.state.request),
+  // })
+  //   .then((response) => { console.log(response) });
+  // fetch('run/new/', {
+  //   method: 'POST',
+  //   headers: new Headers({
+  //     'Content-Type': 'application/json',
+  //   }),
+  //   body: JSON.stringify(store.state.request),
+  // })
+  //   .then((response) => {
+  //     if (!response.ok) return null;
+  //     history.replaceState(
+  //       undefined,
+  //       undefined,
+  //       '#' + response.headers.get('X-OmegaUp-EphemeralToken'),
+  //     );
+  //     return response.formData();
+  //   })
+  //   .then((formData) => {
+  //     document.getElementsByTagName('button')[0].removeAttribute('disabled');
+  //     if (!formData) {
+  //       onDetailsJsonReady({
+  //         verdict: 'JE',
+  //         contest_score: 0,
+  //         max_score: this.state.max_score,
+  //       });
+  //       store.commit('logs', '');
+  //       onFilesZipReady(null);
+  //       return;
+  //     }
+
+  //     if (formData.has('details.json')) {
+  //       let reader = new FileReader();
+  //       reader.addEventListener('loadend', function () {
+  //         onDetailsJsonReady(JSON.parse(reader.result));
+  //       });
+  //       reader.readAsText(formData.get('details.json'));
+  //     }
+
+  //     if (formData.has('logs.txt.gz')) {
+  //       let reader = new FileReader();
+  //       reader.addEventListener('loadend', function () {
+  //         if (reader.result.byteLength == 0) {
+  //           store.commit('logs', '');
+  //           return;
+  //         }
+
+  //         store.commit(
+  //           'logs',
+  //           new TextDecoder('utf-8').decode(pako.inflate(reader.result)),
+  //         );
+  //       });
+  //       reader.readAsArrayBuffer(formData.get('logs.txt.gz'));
+  //     } else {
+  //       store.commit('logs', '');
+  //     }
+
+  //     onFilesZipReady(formData.get('files.zip'));
+  //   })
+  //   .catch(Util.asyncError);
+});
+
+const runButton = document.querySelector('button[data-run-button]');
+console.log(runButton);
+runButton.addEventListener('click', () => {
+  // e.preventDefault();
+  runButton.setAttribute('disabled', '');
+  console.log(JSON.stringify(store.state.request));
   fetch('run/new/', {
     method: 'POST',
     headers: new Headers({
@@ -1397,7 +1505,7 @@ document.getElementsByTagName('form')[0].addEventListener('submit', (e) => {
       return response.formData();
     })
     .then((formData) => {
-      document.getElementsByTagName('button')[0].removeAttribute('disabled');
+      runButton.removeAttribute('disabled');
       if (!formData) {
         onDetailsJsonReady({
           verdict: 'JE',

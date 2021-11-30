@@ -6,14 +6,10 @@ textarea.editor {
 	font-family: "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
 }
 
-button[type="submit"] {
-	width: 7ex;
-}
-
-button[type="submit"]:disabled img, button[type="submit"] span {
+button.ephemeral-button:disabled img, button.ephemeral-button span {
 	display: inline;
 }
-button[type="submit"] img, button[type="submit"]:disabled span {
+button.ephemeral-button img, button.ephemeral-button:disabled span {
 	display: none;
 }
 input[type="file"] {
