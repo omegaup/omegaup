@@ -193,8 +193,8 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create and add two problems
         $problemsData = [
-        \OmegaUp\Test\Factories\Problem::createProblem(),
-        \OmegaUp\Test\Factories\Problem::createProblem(),
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+            \OmegaUp\Test\Factories\Problem::createProblem(),
         ];
 
         $adminLogin = self::login($courseData['admin']);
@@ -203,7 +203,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             $adminLogin,
             $courseData['course_alias'],
             $courseData['assignment_alias'],
-            [ $problemsData[0], $problemsData[1] ]
+            [$problemsData[0], $problemsData[1]]
         );
 
         $payload = \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
