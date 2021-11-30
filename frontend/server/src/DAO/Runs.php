@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
-     * Gets an array of the guids of the pending runs
+     * Gets an array of the best solving runs for a problem.
      * @return list<array{classname: string, username: string, language: string, runtime: float, memory: float, time: \OmegaUp\Timestamp}>
      */
     final public static function getBestSolvingRunsForProblem(
@@ -45,48 +45,45 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                             1
                     ),
                     "user-rank-unranked"
-                ) `classname`
+                ) `classname`,
+                ROW_NUMBER() OVER(
+                    PARTITION BY i.identity_id ORDER BY r.runtime ASC, s.submission_id ASC
+                ) AS per_identity_rank
             FROM
-                (SELECT
-                    MIN(s.submission_id) submission_id, s.identity_id, r.runtime
-                FROM
-                    Submissions s
-                INNER JOIN
-                    Runs r
-                ON
-                    r.run_id = s.current_run_id
-                INNER JOIN
-                    (
-                        SELECT
-                            ss.identity_id, MIN(rr.runtime) AS runtime
-                        FROM
-                            Submissions ss
-                        INNER JOIN
-                            Runs rr
-                        ON
-                            rr.run_id = ss.current_run_id
-                        WHERE
-                            ss.problem_id = ? AND rr.status = "ready" AND rr.verdict = "AC" AND ss.type = "normal"
-                        GROUP BY
-                            ss.identity_id
-                    ) AS sr ON sr.identity_id = s.identity_id AND sr.runtime = r.runtime
-                WHERE
-                    s.problem_id = ? AND r.status = "ready" AND r.verdict = "AC" AND s.type= "normal"
-                GROUP BY
-                    s.identity_id, r.runtime
-                ORDER BY
-                    r.runtime, submission_id
-                LIMIT 0, 10) as runs
+                Submissions s
             INNER JOIN
-                Identities i ON i.identity_id = runs.identity_id
+            Runs r ON r.run_id = s.current_run_id
             INNER JOIN
-                Submissions s ON s.submission_id = runs.submission_id
-            INNER JOIN
-                Runs r ON r.run_id = s.current_run_id;';
-        $val = [$problemId, $problemId];
+                Identities i ON i.identity_id = s.identity_id
+            WHERE
+                s.problem_id = ? AND
+                r.status = "ready" AND
+                r.verdict = "AC" AND
+                s.type = "normal"
+            ORDER BY
+                per_identity_rank ASC, r.runtime ASC, s.submission_id ASC
+            LIMIT 0, 10;
+        ';
+        $val = [$problemId];
 
-        /** @var list<array{classname: string, language: string, memory: int, runtime: int, time: \OmegaUp\Timestamp, username: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
+        $result = [];
+        /** @var array{classname: string, language: string, memory: int, per_identity_rank: int, runtime: int, time: \OmegaUp\Timestamp, username: string} $row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $val
+            ) as $row
+        ) {
+            if ($row['per_identity_rank'] != 1) {
+                // This means that there were fewer than 10 distinct identities
+                // that solved this problem, and the rest of the rows are
+                // repeated users.
+                break;
+            }
+            unset($row['per_identity_rank']);
+            $result[] = $row;
+        }
+        return $result;
     }
 
     /**
