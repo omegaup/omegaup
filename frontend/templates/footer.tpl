@@ -4,7 +4,7 @@
 
 	<div id="common-footer"></div>
     <script type="text/json" id="payload">{$payload|json_encode}</script>
-	{js_include entrypoint="common_footer"}
+	{js_include entrypoint="common_footer_bs3"}
 </div>
 
 {if $OMEGAUP_GA_TRACK eq 1}
