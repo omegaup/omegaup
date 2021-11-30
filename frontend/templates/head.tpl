@@ -57,7 +57,7 @@
 {if isset($headerPayload) && $headerPayload.bootstrap4}
 	<script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
 	<div id="common-navbar"></div>
-	{js_include entrypoint="common_navbar"}
+	{js_include entrypoint="common_navbar_bs3"}
 	<main role="main">
 		{if isset($ERROR_MESSAGE)}
 			<div class="alert alert-danger">
@@ -74,7 +74,7 @@
 	{else}
 		<script type="text/json" id="header-payload">{[]}</script>
 	{/if}
-	{js_include entrypoint="common_navbar"}
+	{js_include entrypoint="common_navbar_bs3"}
 	<div id="content">
 	{if isset($ERROR_MESSAGE)}
 	<div class="alert alert-danger">

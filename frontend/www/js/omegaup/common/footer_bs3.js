@@ -1,4 +1,4 @@
-import common_Footer from '../components/common/Footer.vue';
+import common_FooterBs3 from '../components/common/FooterBs3.vue';
 import { OmegaUp } from '../omegaup-legacy';
 import Vue from 'vue';
 
@@ -13,7 +13,7 @@ OmegaUp.on('ready', function () {
     isLoggedIn = payload.isLoggedIn;
     omegaUpLockDown = payload.omegaUpLockDown;
   }
-  const commonFooter = new Vue({
+  const commonFooterBs3 = new Vue({
     el: '#common-footer',
     render: function (createElement) {
       return createElement('omegaup-common-footer', {
@@ -28,7 +28,7 @@ OmegaUp.on('ready', function () {
       omegaUpLockDown: omegaUpLockDown,
     },
     components: {
-      'omegaup-common-footer': common_Footer,
+      'omegaup-common-footer': common_FooterBs3,
     },
   });
 });
