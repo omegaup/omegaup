@@ -12,9 +12,11 @@
       <b-card no-body class="col-md-3 col-lg-2 p-0 text-center">
         <b-card-header header-tag="nav">
           <b-nav card-header pills justified>
-            <b-nav-item :active="currentProblem === null">{{
-              T.wordsSummary
-            }}</b-nav-item>
+            <b-nav-item
+              :href="`/course/${course.alias}/arena/${assignment.alias}/`"
+              :active="currentProblem === null"
+              >{{ T.wordsSummary }}</b-nav-item
+            >
             <b-nav-item>{{ T.wordsRanking }}</b-nav-item>
           </b-nav>
           <b-nav card-header pills vertical>

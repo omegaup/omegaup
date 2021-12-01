@@ -24,10 +24,6 @@ describe('Coursev2.vue', () => {
       letter: 'B',
     },
   ];
-  const currentProblem: types.ArenaCourseCurrentProblem = {
-    alias: 'test-problem-1',
-    title: 'Test Problem 1',
-  };
 
   it('Should show the course summary', () => {
     const wrapper = shallowMount(arena_Course, {
