@@ -3997,7 +3997,6 @@ class User extends \OmegaUp\Controllers\Controller {
         $response = [
             'smartyProperties' => [
                 'payload' => [
-                    'profile' => null,
                     'countries' => \OmegaUp\DAO\Countries::getAll(
                         null,
                         100,
