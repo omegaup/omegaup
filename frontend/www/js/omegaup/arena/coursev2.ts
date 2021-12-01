@@ -5,7 +5,6 @@ import arena_Course from '../components/arena/Coursev2.vue';
 
 OmegaUp.on('ready', async () => {
   const payload = types.payloadParsers.ArenaCoursePayload();
-  console.log(payload);
 
   new Vue({
     el: '#main-container',
