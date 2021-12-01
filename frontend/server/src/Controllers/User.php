@@ -3991,19 +3991,13 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
         $targetUser = null;
-        $ownedBadges = [];
         if (!is_null($targetIdentity->user_id)) {
             $targetUser = \OmegaUp\DAO\Users::getByPK($targetIdentity->user_id);
-        }
-        if (!is_null($targetUser)) {
-            $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
-                $targetUser
-            );
         }
         $response = [
             'smartyProperties' => [
                 'payload' => [
-                    'profile' => self::getPrivateUserProfile($targetIdentity),
+                    'profile' => null,
                     'countries' => \OmegaUp\DAO\Countries::getAll(
                         null,
                         100,
@@ -4028,8 +4022,46 @@ class User extends \OmegaUp\Controllers\Controller {
                 $targetUser
             )
         ) {
+            // Only construct a private profile if it's actually needed.
+            $response['smartyProperties']['payload']['profile'] = self::getPrivateUserProfile($targetIdentity);
             return $response;
         }
+
+        $targetIdentityId = $targetIdentity->identity_id;
+        $cachedExtraProfileDetails = \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::USER_PROFILE,
+            "{$targetIdentity->username}-extraProfileDetails",
+            function () use (
+                $targetIdentityId
+            ): array {
+                return
+                [
+                'extraProfileDetails' => [
+                    'contests' => self::getContestStats($targetIdentity),
+                    'solvedProblems' => self::getSolvedProblems(
+                        $targetIdentityId
+                    ),
+                    'unsolvedProblems' => self::getUnsolvedProblems(
+                        $targetIdentityId
+                    ),
+                    'createdProblems' => self::getCreatedProblems(
+                        $targetIdentityId
+                    ),
+                    'createdContests' => \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(
+                        $targetIdentityId
+                    ),
+                    'createdCourses' => \OmegaUp\DAO\Courses::getCoursesCreatedByIdentity(
+                        $targetIdentityId
+                    ),
+                    'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
+                        $targetIdentityId
+                    ),
+                    'badges' => \OmegaUp\Controllers\Badge::getAllBadges()
+                    ]
+                ];
+            },
+            APC_USER_CACHE_USER_RANK_TIMEOUT
+        );
 
         $profile = self::getUserProfile($loggedIdentity, $targetIdentity);
         $associatedIdentities = is_null(
@@ -4037,52 +4069,23 @@ class User extends \OmegaUp\Controllers\Controller {
         ) ? [] : \OmegaUp\DAO\Identities::getAssociatedIdentities(
             $loggedIdentity
         );
-
-        $extraProfileDetails = \OmegaUp\Cache::getFromCacheOrSet(
-            \OmegaUp\Cache::USER_PROFILE,
-            "{$targetIdentity->username}-extraProfileDetails",
-            function () use (
-                $profile,
-                $targetIdentity,
-                $ownedBadges,
-                $associatedIdentities
-            ): array {
-                return
-                [
-                'profile' => $profile,
-                'extraProfileDetails' => [
-                'contests' => self::getContestStats($targetIdentity),
-                'solvedProblems' => self::getSolvedProblems(
-                    $targetIdentity->identity_id
-                ),
-                'unsolvedProblems' => self::getUnsolvedProblems(
-                    $targetIdentity->identity_id
-                ),
-                'createdProblems' => self::getCreatedProblems(
-                    $targetIdentity->identity_id
-                ),
-                'createdContests' => \OmegaUp\DAO\Contests::getContestsCreatedByIdentity(
-                    $targetIdentity->identity_id
-                ),
-                'createdCourses' => \OmegaUp\DAO\Courses::getCoursesCreatedByIdentity(
-                    $targetIdentity->identity_id
-                ),
-                'stats' => \OmegaUp\DAO\Runs::countRunsOfIdentityPerDatePerVerdict(
-                    $targetIdentity->identity_id
-                ),
-                'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
-                'ownedBadges' => $ownedBadges,
-                'hasPassword' => !is_null($targetIdentity->password),
-                ],
-                'identities' => $associatedIdentities,
-                ];
-            },
-            APC_USER_CACHE_USER_RANK_TIMEOUT
-        );
-
+        $ownedBadges = [];
+        if (!is_null($targetUser)) {
+            $ownedBadges = \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
+                $targetUser
+            );
+        }
         $response['smartyProperties']['payload'] = array_merge(
             $response['smartyProperties']['payload'],
-            $extraProfileDetails
+            $cachedExtraProfileDetails,
+            [
+                'profile' => $profile,
+                'extraProfileDetails' => [
+                    'ownedBadges' => $ownedBadges,
+                    'hasPassword' => !is_null($targetIdentity->password),
+                ],
+                'identities' => $associatedIdentities,
+            ]
         );
 
         return $response;
