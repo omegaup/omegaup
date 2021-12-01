@@ -4034,6 +4034,7 @@ class User extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Cache::USER_PROFILE,
             "{$targetIdentity->username}-extraProfileDetails",
             function () use (
+                $targetIdentity,
                 $targetIdentityId
             ): array {
                 return
