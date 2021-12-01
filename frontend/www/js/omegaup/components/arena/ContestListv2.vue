@@ -166,7 +166,7 @@
             <template #text-contest-date>
               <b-card-text>
                 <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.finish_time.iso())">
+                <a :href="getTimeLink(contestItem.finish_time)">
                   {{
                     ui.formatString(T.contestEndTime, {
                       endDate: finishContestDate(contestItem),
@@ -201,7 +201,7 @@
             <template #text-contest-date>
               <b-card-text>
                 <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.start_time.iso())">
+                <a :href="getTimeLink(contestItem.start_time)">
                   {{
                     ui.formatString(T.contestStartTime, {
                       startDate: startContestDate(contestItem),
@@ -239,7 +239,7 @@
             <template #text-contest-date>
               <b-card-text>
                 <font-awesome-icon icon="calendar-alt" />
-                <a :href="getTimeLink(contestItem.start_time.iso())">
+                <a :href="getTimeLink(contestItem.start_time)">
                   {{
                     ui.formatString(T.contestStartedTime, {
                       startedDate: startContestDate(contestItem),
@@ -344,8 +344,8 @@ export default class ArenaContestList extends Vue {
     return contest.start_time.toLocaleDateString();
   }
 
-  getTimeLink(time: string): string {
-    return `http://timeanddate.com/worldclock/fixedtime.html?iso=${time}`;
+  getTimeLink(time: Date): string {
+    return `http://timeanddate.com/worldclock/fixedtime.html?iso=${time.toISOString()}`;
   }
 
   orderByTitle() {
