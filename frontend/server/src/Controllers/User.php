@@ -4023,7 +4023,9 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         ) {
             // Only construct a private profile if it's actually needed.
-            $response['smartyProperties']['payload']['profile'] = self::getPrivateUserProfile($targetIdentity);
+            $response['smartyProperties']['payload']['profile'] = self::getPrivateUserProfile(
+                $targetIdentity
+            );
             return $response;
         }
 
