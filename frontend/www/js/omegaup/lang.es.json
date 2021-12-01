@@ -44,6 +44,7 @@
 	"arenaContestPracticeOriginalScoreboardText": "Para ver el scoreboard original, da clic [aqu\u00ed](/arena/%(contestAlias)/#ranking)",
 	"arenaContestWindowLength": "Tiempo para resolver los problemas",
 	"arenaCourseAllContent": "Todo el contenido",
+	"arenaCourseProblemTitle": "%(letter). %(title)",
 	"arenaCurrentContests": "Concursos actuales",
 	"arenaCurrentPublicContests": "Concursos p\u00fablicos recientes",
 	"arenaFutureContests": "Concursos futuros",

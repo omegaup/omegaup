@@ -13,7 +13,9 @@
         <b-card-header header-tag="nav">
           <b-nav card-header pills justified>
             <b-nav-item
-              :href="`/course/${course.alias}/arena/${assignment.alias}/`"
+              :href="`/course/${encodeURIComponent(
+                course.alias,
+              )}/arena/${encodeURIComponent(assignment.alias)}/`"
               :active="currentProblem === null"
               >{{ T.wordsSummary }}</b-nav-item
             >
@@ -23,16 +25,25 @@
             <b-nav-item
               v-for="problem in problems"
               :key="problem.alias"
-              :href="`/course/${course.alias}/arena/${assignment.alias}/problem/${problem.alias}/`"
+              :href="`/course/${encodeURIComponent(
+                course.alias,
+              )}/arena/${encodeURIComponent(
+                assignment.alias,
+              )}/problem/${encodeURIComponent(problem.alias)}/`"
               :active="currentProblem && currentProblem.alias === problem.alias"
-              >{{ `${problem.letter}. ${problem.title}` }}</b-nav-item
+              >{{
+                ui.formatString(T.arenaCourseProblemTitle, {
+                  letter: problem.letter,
+                  title: problem.title,
+                })
+              }}</b-nav-item
             >
           </b-nav>
         </b-card-header>
       </b-card>
 
       <b-col md="9" lg="10">
-        <!-- This is just for the case of the resume -->
+        <!-- This is just for the case of the summary -->
         <omegaup-markdown
           :markdown="assignment.description"
           :full-width="true"
@@ -47,6 +58,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 import omegaup_Markdown from '../Markdown.vue';
 
 import { BIconChevronLeft, BootstrapVue } from 'bootstrap-vue';
@@ -67,6 +79,7 @@ export default class ArenaCourse extends Vue {
   @Prop() currentProblem!: types.ArenaCourseCurrentProblem;
 
   T = T;
+  ui = ui;
 }
 </script>
 

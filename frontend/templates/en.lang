@@ -43,6 +43,7 @@ arenaContestPracticeOriginalRunsText = "To see the runs from the original contes
 arenaContestPracticeOriginalScoreboardText = "To see the original scoreboard, click [here](/arena/%(contestAlias)/#ranking)"
 arenaContestWindowLength = "Time to solve all problems"
 arenaCourseAllContent = "All content"
+arenaCourseProblemTitle = "%(letter). %(title)"
 arenaCurrentContests = "Current contests"
 arenaCurrentPublicContests = "Recent public contests"
 arenaFutureContests = "Future contests"

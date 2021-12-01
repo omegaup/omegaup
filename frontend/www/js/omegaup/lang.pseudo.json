@@ -44,6 +44,7 @@
 	"arenaContestPracticeOriginalScoreboardText": "(T0 533 7h3 0rigina1 5c0r3b0ard, c1ick [h3r3](/ar3na/%(contestAlias)/#ranking))",
 	"arenaContestWindowLength": "(Tim3 70 501v3 a11 pr0b13m5)",
 	"arenaCourseAllContent": "(A11 c0n73n7)",
+	"arenaCourseProblemTitle": "(%(letter). %(title))",
 	"arenaCurrentContests": "(Curr3n7 c0n73575)",
 	"arenaCurrentPublicContests": "(R3c3n7 pub1ic c0n73575)",
 	"arenaFutureContests": "(Fu7ur3 c0n73575)",
