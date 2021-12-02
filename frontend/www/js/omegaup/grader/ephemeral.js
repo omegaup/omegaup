@@ -174,6 +174,7 @@ Vue.use(Vuex);
 let store = new Vuex.Store({
   state: {
     alias: null,
+    problemsetId: null,
     localStorageSources: null,
     request: {
       input: {
@@ -192,6 +193,9 @@ let store = new Vuex.Store({
   getters: {
     alias(state) {
       return state.alias;
+    },
+    problemsetId(state) {
+      return state.problemsetId;
     },
     localStorageSources(state) {
       return state.localStorageSources;
@@ -349,6 +353,9 @@ let store = new Vuex.Store({
           Util.languageExtensionMapping[state.localStorageSources.language]
         ];
       document.getElementById('language').value = state.request.language;
+    },
+    problemsetId(state, value) {
+      state.problemsetId = value;
     },
     currentCase(state, value) {
       state.currentCase = value;
@@ -1380,17 +1387,24 @@ document.getElementById('download').addEventListener('click', (e) => {
 const submitButton = document.querySelector('button[data-submit-button]');
 document.querySelector('form.ephemeral-form').addEventListener('submit', (e) => {
   e.preventDefault();
+  console.log({
+    problem_alias: store.state.alias,
+    problemset_id: store.state.problemsetId,
+    language: store.state.request.language,
+    source: store.state.request.source,
+  });
   submitButton.setAttribute('disabled', '');
   fetch('/api/run/create/', {
     method: 'POST',
-    headers: new Headers({
-      'Content-Type': 'application/json',
-    }),
+    headers: {
+      'Content-Type':
+        'application/x-www-form-urlencoded;charset=UTF-8',
+    },
     body: JSON.stringify({
-      problemset_id: payload.currentAssignment.problemset_id,
-      problem_alias: problem.alias,
-      language: language,
-      source: code,
+      problem_alias: store.state.alias,
+      problemset_id: store.state.problemsetId,
+      language: store.state.request.language,
+      source: store.state.request.source,
     }),
   })
     // .then(time.remoteTimeAdapter)
@@ -1548,7 +1562,7 @@ runButton.addEventListener('click', () => {
     .catch(Util.asyncError);
 });
 
-function setSettings({ alias, settings }) {
+function setSettings({ alias, settings, problemsetId }) {
   if (!settings) {
     return;
   }
@@ -1567,6 +1581,7 @@ function setSettings({ alias, settings }) {
       }
     }
   }
+  store.commit('problemsetId', problemsetId);
   store.commit('updatingSettings', true);
   store.commit('reset');
   store.commit('Interactive', !!settings.interactive);

@@ -14,6 +14,7 @@ import { types } from '../../api_types';
 export default class EphemeralGrader extends Vue {
   @Ref() grader!: HTMLIFrameElement;
   @Prop() problem!: types.ProblemInfo;
+  @Prop({default: null}) problemsetId!: number | null;
 
   loaded = false;
 
@@ -38,6 +39,7 @@ export default class EphemeralGrader extends Vue {
         params: {
           alias: this.problem.alias,
           settings: this.problem.settings,
+          problemsetId: this.problemsetId,
         },
       },
       `${window.location.origin}/grader/ephemeral/embedded/`,
