@@ -187,4 +187,79 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         // The student should not see the runs
         $this->assertEmpty($studentPayload['currentAssignment']['runs']);
     }
+
+    public function testGetArenaCourseDetails() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+
+        // Create and add two problems
+        $problemsData = [
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+        ];
+
+        $adminLogin = self::login($courseData['admin']);
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $adminLogin,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [$problemsData[0], $problemsData[1]]
+        );
+
+        $payload = \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment']->alias,
+            ])
+        )['smartyProperties']['payload'];
+        $this->assertEquals(
+            $courseData['course']->name,
+            $payload['course']['name']
+        );
+        $this->assertEquals(
+            $courseData['assignment']->alias,
+            $payload['assignment']['alias']
+        );
+        $this->assertCount(2, $payload['problems']);
+        $this->assertEquals(
+            $problemsData[0]['problem']->alias,
+            $payload['problems'][0]['alias']
+        );
+        $this->assertEquals(
+            $problemsData[1]['problem']->alias,
+            $payload['problems'][1]['alias']
+        );
+        $this->assertNull($payload['currentProblem']);
+
+        $payload = \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment']->alias,
+                'problem_alias' => $problemsData[0]['problem']->alias,
+            ])
+        )['smartyProperties']['payload'];
+        $this->assertEquals(
+            $courseData['course']->name,
+            $payload['course']['name']
+        );
+        $this->assertEquals(
+            $courseData['assignment']->alias,
+            $payload['assignment']['alias']
+        );
+        $this->assertCount(2, $payload['problems']);
+        $this->assertEquals(
+            $problemsData[0]['problem']->alias,
+            $payload['problems'][0]['alias']
+        );
+        $this->assertEquals(
+            $problemsData[1]['problem']->alias,
+            $payload['problems'][1]['alias']
+        );
+        $this->assertEquals(
+            $problemsData[0]['problem']->alias,
+            $payload['currentProblem']['alias']
+        );
+    }
 }
