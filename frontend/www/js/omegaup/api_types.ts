@@ -99,6 +99,14 @@ export namespace types {
       );
     }
 
+    export function ArenaCoursePayload(
+      elementId: string = 'payload',
+    ): types.ArenaCoursePayload {
+      return JSON.parse(
+        (document.getElementById(elementId) as HTMLElement).innerText,
+      );
+    }
+
     export function AssignmentDetailsPayload(
       elementId: string = 'payload',
     ): types.AssignmentDetailsPayload {
@@ -1037,94 +1045,6 @@ export namespace types {
             })(x.filteredCourses);
             return x;
           })(x.admin);
-          return x;
-        })(x.courses);
-        return x;
-      })(
-        JSON.parse(
-          (document.getElementById(elementId) as HTMLElement).innerText,
-        ),
-      );
-    }
-
-    export function CourseListPayload(
-      elementId: string = 'payload',
-    ): types.CourseListPayload {
-      return ((x) => {
-        x.courses = ((x) => {
-          if (x instanceof Object) {
-            Object.keys(x).forEach(
-              (y) =>
-                (x[y] = ((x) => {
-                  x.filteredCourses = ((x) => {
-                    x.current = ((x) => {
-                      x.courses = ((x) => {
-                        if (!Array.isArray(x)) {
-                          return x;
-                        }
-                        return x.map((x) => {
-                          x.assignments = ((x) => {
-                            if (!Array.isArray(x)) {
-                              return x;
-                            }
-                            return x.map((x) => {
-                              if (x.finish_time)
-                                x.finish_time = ((x: number) =>
-                                  new Date(x * 1000))(x.finish_time);
-                              x.start_time = ((x: number) =>
-                                new Date(x * 1000))(x.start_time);
-                              return x;
-                            });
-                          })(x.assignments);
-                          if (x.finish_time)
-                            x.finish_time = ((x: number) => new Date(x * 1000))(
-                              x.finish_time,
-                            );
-                          x.start_time = ((x: number) => new Date(x * 1000))(
-                            x.start_time,
-                          );
-                          return x;
-                        });
-                      })(x.courses);
-                      return x;
-                    })(x.current);
-                    x.past = ((x) => {
-                      x.courses = ((x) => {
-                        if (!Array.isArray(x)) {
-                          return x;
-                        }
-                        return x.map((x) => {
-                          x.assignments = ((x) => {
-                            if (!Array.isArray(x)) {
-                              return x;
-                            }
-                            return x.map((x) => {
-                              if (x.finish_time)
-                                x.finish_time = ((x: number) =>
-                                  new Date(x * 1000))(x.finish_time);
-                              x.start_time = ((x: number) =>
-                                new Date(x * 1000))(x.start_time);
-                              return x;
-                            });
-                          })(x.assignments);
-                          if (x.finish_time)
-                            x.finish_time = ((x: number) => new Date(x * 1000))(
-                              x.finish_time,
-                            );
-                          x.start_time = ((x: number) => new Date(x * 1000))(
-                            x.start_time,
-                          );
-                          return x;
-                        });
-                      })(x.courses);
-                      return x;
-                    })(x.past);
-                    return x;
-                  })(x.filteredCourses);
-                  return x;
-                })(x[y])),
-            );
-          }
           return x;
         })(x.courses);
         return x;
@@ -2112,6 +2032,35 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ArenaCourseAssignment {
+    alias: string;
+    description: string;
+    name: string;
+  }
+
+  export interface ArenaCourseCurrentProblem {
+    alias: string;
+    title: string;
+  }
+
+  export interface ArenaCourseDetails {
+    alias: string;
+    name: string;
+  }
+
+  export interface ArenaCoursePayload {
+    assignment: types.ArenaCourseAssignment;
+    course: types.ArenaCourseDetails;
+    currentProblem?: types.ArenaCourseCurrentProblem;
+    problems: types.ArenaCourseProblem[];
+  }
+
+  export interface ArenaCourseProblem {
+    alias: string;
+    letter: string;
+    title: string;
+  }
+
   export interface ArenaProblemDetails {
     accepts_submissions: boolean;
     alias: string;
@@ -2839,11 +2788,6 @@ export namespace types {
 
   export interface CourseListMinePayload {
     courses: types.AdminCourses;
-  }
-
-  export interface CourseListPayload {
-    course_type?: string;
-    courses: types.StudentCourses;
   }
 
   export interface CourseNewPayload {
@@ -4594,9 +4538,6 @@ export namespace messages {
   export type CourseListAssignmentsResponse = {
     assignments: types.CourseAssignment[];
   };
-  export type CourseListCoursesRequest = { [key: string]: any };
-  export type _CourseListCoursesServerResponse = any;
-  export type CourseListCoursesResponse = types.CoursesList;
   export type CourseListSolvedProblemsRequest = { [key: string]: any };
   export type CourseListSolvedProblemsResponse = {
     user_problems: {
@@ -5414,9 +5355,6 @@ export namespace controllers {
     listAssignments: (
       params?: messages.CourseListAssignmentsRequest,
     ) => Promise<messages.CourseListAssignmentsResponse>;
-    listCourses: (
-      params?: messages.CourseListCoursesRequest,
-    ) => Promise<messages.CourseListCoursesResponse>;
     listSolvedProblems: (
       params?: messages.CourseListSolvedProblemsRequest,
     ) => Promise<messages.CourseListSolvedProblemsResponse>;

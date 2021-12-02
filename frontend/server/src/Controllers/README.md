@@ -80,7 +80,6 @@
   - [`/api/course/getProblemUsers/`](#apicoursegetproblemusers)
   - [`/api/course/introDetails/`](#apicourseintrodetails)
   - [`/api/course/listAssignments/`](#apicourselistassignments)
-  - [`/api/course/listCourses/`](#apicourselistcourses)
   - [`/api/course/listSolvedProblems/`](#apicourselistsolvedproblems)
   - [`/api/course/listStudents/`](#apicourseliststudents)
   - [`/api/course/listUnsolvedProblems/`](#apicourselistunsolvedproblems)
@@ -1787,28 +1786,6 @@ List course assignments
 | Name          | Type                       |
 | ------------- | -------------------------- |
 | `assignments` | `types.CourseAssignment[]` |
-
-## `/api/course/listCourses/`
-
-### Description
-
-Lists all the courses this user is associated with.
-
-Returns courses for which the current user is an admin and
-for in which the user is a student.
-
-### Parameters
-
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `page`      | `int` |             |
-| `page_size` | `int` |             |
-
-### Returns
-
-```typescript
-types.CoursesList;
-```
 
 ## `/api/course/listSolvedProblems/`
 
