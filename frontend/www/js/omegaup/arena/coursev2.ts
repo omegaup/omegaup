@@ -1,10 +1,13 @@
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import Vue from 'vue';
-import arena_Course from '../components/arena/Coursev2.vue';
+import arena_Course, { Tabs } from '../components/arena/Coursev2.vue';
 
 OmegaUp.on('ready', async () => {
   const payload = types.payloadParsers.ArenaCoursePayload();
+
+  const locationHash = window.location.hash.substr(1).split('/');
+  const activeTab = getSelectedValidTab(locationHash[0]);
 
   new Vue({
     el: '#main-container',
@@ -18,8 +21,14 @@ OmegaUp.on('ready', async () => {
           assignment: payload.assignment,
           problems: payload.problems,
           currentProblem: payload.currentProblem,
+          selectedTab: activeTab,
         },
       });
     },
   });
+
+  function getSelectedValidTab(tab: string): string {
+    const validTabs = [Tabs.Summary, Tabs.Ranking];
+    return validTabs.includes(tab) ? tab : Tabs.Summary;
+  }
 });
