@@ -166,11 +166,13 @@
             <template #text-contest-date>
               <b-card-text>
                 <font-awesome-icon icon="calendar-alt" />
-                {{
-                  ui.formatString(T.contestEndTime, {
-                    endDate: finishContestDate(contestItem),
-                  })
-                }}
+                <a :href="getTimeLink(contestItem.finish_time)">
+                  {{
+                    ui.formatString(T.contestEndTime, {
+                      endDate: finishContestDate(contestItem),
+                    })
+                  }}
+                </a>
               </b-card-text>
             </template>
             <template #contest-dropdown>
@@ -199,11 +201,13 @@
             <template #text-contest-date>
               <b-card-text>
                 <font-awesome-icon icon="calendar-alt" />
-                {{
-                  ui.formatString(T.contestStartTime, {
-                    startDate: startContestDate(contestItem),
-                  })
-                }}
+                <a :href="getTimeLink(contestItem.start_time)">
+                  {{
+                    ui.formatString(T.contestStartTime, {
+                      startDate: startContestDate(contestItem),
+                    })
+                  }}
+                </a>
               </b-card-text>
             </template>
             <template #contest-button-enter>
@@ -235,11 +239,13 @@
             <template #text-contest-date>
               <b-card-text>
                 <font-awesome-icon icon="calendar-alt" />
-                {{
-                  ui.formatString(T.contestStartedTime, {
-                    startedDate: startContestDate(contestItem),
-                  })
-                }}
+                <a :href="getTimeLink(contestItem.start_time)">
+                  {{
+                    ui.formatString(T.contestStartedTime, {
+                      startedDate: startContestDate(contestItem),
+                    })
+                  }}
+                </a>
               </b-card-text>
             </template>
             <template #contest-button-enter>
@@ -336,6 +342,10 @@ export default class ArenaContestList extends Vue {
 
   startContestDate(contest: types.ContestListItem): string {
     return contest.start_time.toLocaleDateString();
+  }
+
+  getTimeLink(time: Date): string {
+    return `http://timeanddate.com/worldclock/fixedtime.html?iso=${time.toISOString()}`;
   }
 
   orderByTitle() {
