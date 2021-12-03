@@ -8,7 +8,7 @@ import * as ui from '../ui';
 OmegaUp.on('ready', function () {
   const payload = types.payloadParsers.StudentsProgressPayload();
 
-  new Vue({
+  const ViewProgress = new Vue({
     el: '#main-container',
     components: {
       'omegaup-course-viewprogress': course_ViewProgress,
@@ -16,30 +16,6 @@ OmegaUp.on('ready', function () {
     data: () => ({
       completeStudentsProgress: null as types.StudentProgressInCourse[] | null,
     }),
-    async mounted() {
-      let nextPage: undefined | number = 1;
-      let completeStudentsProgress: types.StudentProgressInCourse[] = [];
-      while (nextPage) {
-        try {
-          const response: {
-            nextPage?: number;
-            progress: types.StudentProgressInCourse[];
-          } = await api.Course.studentsProgress({
-            page: nextPage,
-            length: 1,
-            course: payload.course.alias,
-          });
-          completeStudentsProgress = completeStudentsProgress.concat(
-            response.progress,
-          );
-          nextPage = response.nextPage;
-        } catch (e: any) {
-          ui.apiError(e);
-          break;
-        }
-      }
-      this.completeStudentsProgress = completeStudentsProgress;
-    },
     render: function (createElement) {
       return createElement('omegaup-course-viewprogress', {
         props: {
@@ -55,4 +31,31 @@ OmegaUp.on('ready', function () {
       });
     },
   });
+
+  const getCSV = async () => {
+    let nextPage: undefined | number = 1;
+    let completeStudentsProgress: types.StudentProgressInCourse[] = [];
+    while (nextPage) {
+      try {
+        const response: {
+          nextPage?: number;
+          progress: types.StudentProgressInCourse[];
+        } = await api.Course.studentsProgress({
+          page: nextPage,
+          length: 1,
+          course: payload.course.alias,
+        });
+        completeStudentsProgress = completeStudentsProgress.concat(
+          response.progress,
+        );
+        nextPage = response.nextPage;
+      } catch (e: any) {
+        ui.apiError(e);
+        break;
+      }
+    }
+    ViewProgress.completeStudentsProgress = completeStudentsProgress;
+  };
+
+  getCSV();
 });
