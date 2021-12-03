@@ -237,8 +237,8 @@ export default class ArenaClarificationList extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-// Deep allows child components to inherit the styles (see: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors)
-/deep/ pre {
+// >>> allows child components to inherit the styles (see: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors)
+>>> pre {
   display: block;
   padding: 0.5rem;
   font-size: 0.8rem;
