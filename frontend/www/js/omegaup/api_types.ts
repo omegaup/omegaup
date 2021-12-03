@@ -4354,21 +4354,7 @@ export namespace messages {
   export type _ContestListServerResponse = any;
   export type ContestListResponse = {
     number_of_results: number;
-    results: {
-      admission_mode: string;
-      alias: string;
-      contest_id: number;
-      description: string;
-      finish_time: Date;
-      last_updated: Date;
-      original_finish_time: Date;
-      problemset_id: number;
-      recommended: boolean;
-      rerun_id?: number;
-      start_time: Date;
-      title: string;
-      window_length?: number;
-    }[];
+    results: types.ContestListItem[];
   };
   export type ContestListParticipatingRequest = { [key: string]: any };
   export type _ContestListParticipatingServerResponse = any;
