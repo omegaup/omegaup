@@ -21,6 +21,7 @@
             :profile="profile"
             :profile-badges="profileBadges"
             :visitor-badges="visitorBadges"
+            :selected-tab.sync="currentViewProfileSelectedTab"
           ></omegaup-user-view-profile>
         </template>
         <template v-else-if="currentSelectedTab === 'edit-basic-information'">
@@ -108,6 +109,7 @@ export default class Profile extends Vue {
   @Prop({ default: null }) data!: types.ExtraProfileDetails | null;
   @Prop() profile!: types.UserProfileInfo;
   @Prop({ default: 'view-profile' }) selectedTab!: string;
+  @Prop({ default: null }) viewProfileSelectedTab!: string | null;
   @Prop() identities!: types.Identity[];
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
@@ -118,6 +120,7 @@ export default class Profile extends Vue {
   T = T;
   ui = ui;
   currentSelectedTab = this.selectedTab;
+  currentViewProfileSelectedTab = this.viewProfileSelectedTab;
 
   get currentTitle(): string {
     if (!this.profile.is_own_profile) {
