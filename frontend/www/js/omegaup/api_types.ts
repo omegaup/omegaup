@@ -2213,6 +2213,17 @@ export namespace types {
     username: string;
   }
 
+  export interface CachedExtraProfileDetails {
+    badges: string[];
+    contests: types.UserProfileContests;
+    createdContests: types.Contest[];
+    createdCourses: types.Course[];
+    createdProblems: types.Problem[];
+    solvedProblems: types.Problem[];
+    stats: types.UserProfileStats[];
+    unsolvedProblems: types.Problem[];
+  }
+
   export interface CaseResult {
     contest_score: number;
     max_score: number;
