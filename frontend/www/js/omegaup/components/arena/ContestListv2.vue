@@ -458,7 +458,7 @@ export default class ArenaContestList extends Vue {
 @import '../../../../sass/main.scss';
 
 .sidebar {
-  /deep/ .contest-list-nav {
+  >>> .contest-list-nav {
     background-color: var(
       --arena-contest-list-sidebar-tab-list-background-color
     );
