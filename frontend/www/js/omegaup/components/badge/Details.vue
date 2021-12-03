@@ -118,7 +118,7 @@ export default class BadgeDetails extends Vue {
   &-text {
     font-size: 1.1em;
 
-    /deep/ &-icon {
+    >>> &-icon {
       // See: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors
       font-size: 30px;
     }

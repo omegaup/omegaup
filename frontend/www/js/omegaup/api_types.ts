@@ -2032,11 +2032,33 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ArenaCourseAssignment {
+    alias: string;
+    description: string;
+    name: string;
+  }
+
+  export interface ArenaCourseCurrentProblem {
+    alias: string;
+    title: string;
+  }
+
+  export interface ArenaCourseDetails {
+    alias: string;
+    name: string;
+  }
+
   export interface ArenaCoursePayload {
-    assignment: { alias: string; description: string; name: string };
-    course: { alias: string; name: string };
-    currentProblem?: { alias: string; title: string };
-    problems: { alias: string; letter: string; title: string }[];
+    assignment: types.ArenaCourseAssignment;
+    course: types.ArenaCourseDetails;
+    currentProblem?: types.ArenaCourseCurrentProblem;
+    problems: types.ArenaCourseProblem[];
+  }
+
+  export interface ArenaCourseProblem {
+    alias: string;
+    letter: string;
+    title: string;
   }
 
   export interface ArenaProblemDetails {
@@ -2174,6 +2196,17 @@ export namespace types {
     runtime: number;
     time: Date;
     username: string;
+  }
+
+  export interface CachedExtraProfileDetails {
+    badges: string[];
+    contests: types.UserProfileContests;
+    createdContests: types.Contest[];
+    createdCourses: types.Course[];
+    createdProblems: types.Problem[];
+    solvedProblems: types.Problem[];
+    stats: types.UserProfileStats[];
+    unsolvedProblems: types.Problem[];
   }
 
   export interface CaseResult {
@@ -4321,21 +4354,7 @@ export namespace messages {
   export type _ContestListServerResponse = any;
   export type ContestListResponse = {
     number_of_results: number;
-    results: {
-      admission_mode: string;
-      alias: string;
-      contest_id: number;
-      description: string;
-      finish_time: Date;
-      last_updated: Date;
-      original_finish_time: Date;
-      problemset_id: number;
-      recommended: boolean;
-      rerun_id?: number;
-      start_time: Date;
-      title: string;
-      window_length?: number;
-    }[];
+    results: types.ContestListItem[];
   };
   export type ContestListParticipatingRequest = { [key: string]: any };
   export type _ContestListParticipatingServerResponse = any;
