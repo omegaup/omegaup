@@ -959,7 +959,7 @@ EOD;
         echo "\n";
         echo "import omegaup.api\n";
         echo "\n";
-        echo "client = omegaup.api.Client(api_token='my API token')\n";
+        echo "client = api.Client(api_token='my API token')\n";
         echo "session = client.session.currentSession()\n";
         echo "pprint.pprint(session)\n";
         echo "```\n";

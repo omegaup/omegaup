@@ -4015,7 +4015,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest' => $contest,
             'contest_admin' => $contestAdmin,
             'problemset' => $problemset
-        ] = self::validateDetails($contestAlias, $identity, $scoreboardToken);
+        ] = self::validateDetails($contestAlias, $identity);
 
         if (is_null($problemset->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -4049,8 +4049,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contestDetails = self::getContestDetails(
             $contest,
             $contestAdmin,
-            $identity,
-            $scoreboardToken
+            $identity
         );
 
         return [
