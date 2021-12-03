@@ -2032,11 +2032,33 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ArenaCourseAssignment {
+    alias: string;
+    description: string;
+    name: string;
+  }
+
+  export interface ArenaCourseCurrentProblem {
+    alias: string;
+    title: string;
+  }
+
+  export interface ArenaCourseDetails {
+    alias: string;
+    name: string;
+  }
+
   export interface ArenaCoursePayload {
-    assignment: { alias: string; description: string; name: string };
-    course: { alias: string; name: string };
-    currentProblem?: { alias: string; title: string };
-    problems: { alias: string; letter: string; title: string }[];
+    assignment: types.ArenaCourseAssignment;
+    course: types.ArenaCourseDetails;
+    currentProblem?: types.ArenaCourseCurrentProblem;
+    problems: types.ArenaCourseProblem[];
+  }
+
+  export interface ArenaCourseProblem {
+    alias: string;
+    letter: string;
+    title: string;
   }
 
   export interface ArenaProblemDetails {
