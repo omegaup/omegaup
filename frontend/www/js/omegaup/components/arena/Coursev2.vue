@@ -15,13 +15,13 @@
             <b-nav-item
               :href="`#${Tabs.Summary}`"
               :active="currentSelectedTab === Tabs.Summary"
-              @click="selectedTab = Tabs.Summary"
+              @click="currentSelectedTab = Tabs.Summary"
               >{{ T.wordsSummary }}</b-nav-item
             >
             <b-nav-item
               :href="`#${Tabs.Ranking}`"
               :active="currentSelectedTab === Tabs.Ranking"
-              @click="selectedTab = Tabs.Ranking"
+              @click="currentSelectedTab = Tabs.Ranking"
               >{{ T.wordsRanking }}</b-nav-item
             >
           </b-nav>

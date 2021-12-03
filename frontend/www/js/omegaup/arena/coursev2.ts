@@ -27,8 +27,10 @@ OmegaUp.on('ready', async () => {
     },
   });
 
-  function getSelectedValidTab(tab: string): string {
-    const validTabs = [Tabs.Summary, Tabs.Ranking];
-    return validTabs.includes(tab) ? tab : Tabs.Summary;
+  function getSelectedValidTab(tab: string): string | null {
+    if (tab === '') {
+      return null;
+    }
+    return tab in Tabs ? tab : Tabs.Summary;
   }
 });
