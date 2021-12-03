@@ -7,7 +7,7 @@ import logging
 import os
 import sys
 import json
-from typing import Any, List, Optional, Tuple
+from typing import List, Optional, Tuple
 import MySQLdb
 import MySQLdb.cursors
 import pika
@@ -27,7 +27,8 @@ import lib.logs  # pylint: disable=wrong-import-position
 def certificate_contests_receive_messages(
         cur: MySQLdb.cursors.BaseCursor,
         dbconn: MySQLdb.connections.Connection,
-        channel: pika.adapters.blocking_connection.BlockingChannel) -> None:
+        channel: pika.adapters.blocking_connection.BlockingChannel,
+        args: argparse.Namespace) -> None:
     '''Receive contest messages'''
     result = channel.queue_declare(queue='', exclusive=True)
     queue_name = result.method.queue
@@ -44,12 +45,11 @@ def certificate_contests_receive_messages(
             _properties: pika.spec.BasicProperties,
             body: bytes) -> None:
         data = json.loads(body.decode())
-        client = omegaup.api.Client(
-            api_token='01fef0b0d78f56be29d42a25dacc69b743158039')
+        client = omegaup.api.Client(api_token=args.api_token)
         scoreboard = client.contest.scoreboard(contest_alias=data['alias'],
                                                token=data['scoreboard_url'])
         ranking = scoreboard['ranking']
-        certificates: List[Tuple[str, Any, str, Optional[Any], Any]] = []
+        certificates: List[Tuple[str, int, str, Optional[int], str]] = []
         for user in ranking:
             contest_place: Optional[int] = None
             if (data['certificate_cutoff']
@@ -57,8 +57,8 @@ def certificate_contests_receive_messages(
                 contest_place = user['place']
             verification_code = generate_code()
             certificates.append((
-                'contest', data['contest_id'], verification_code,
-                contest_place, user['username']
+                'contest', int(data['contest_id']), verification_code,
+                contest_place, str(user['username'])
             ))
         cur.executemany('''
             INSERT INTO
@@ -95,8 +95,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
-
     rabbitmq_connection.configure_parser(parser)
+
+    parser.add_argument('--api-token', type=str, help='omegaup api token')
 
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
@@ -105,7 +106,7 @@ def main() -> None:
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur, \
             rabbitmq_connection.connect(args) as channel:
-            certificate_contests_receive_messages(cur, dbconn, channel)
+            certificate_contests_receive_messages(cur, dbconn, channel, args)
     finally:
         dbconn.close()
         logging.info('Done')
