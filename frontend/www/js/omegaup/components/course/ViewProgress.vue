@@ -406,7 +406,7 @@ export default class CourseViewProgress extends Vue {
     }
   }
 
-  tbody /deep/ th {
+  tbody >>> th {
     position: sticky;
     left: 0;
     background: white;

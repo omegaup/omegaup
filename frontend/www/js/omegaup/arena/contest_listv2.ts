@@ -1,6 +1,8 @@
 import { OmegaUp } from '../omegaup';
 import * as time from '../time';
 import { types } from '../api_types';
+import * as api from '../api';
+import * as ui from '../ui';
 import Vue from 'vue';
 import arena_ContestList, {
   ContestTab,
@@ -25,6 +27,34 @@ OmegaUp.on('ready', () => {
           contests: this.contests,
           query: this.query,
           tab,
+        },
+        on: {
+          'get-chunk': (page: number, pageSize: number, query: string) => {
+            api.Contest.list({
+              page: page,
+              page_size: pageSize,
+              query: query,
+            })
+              .then((data) => {
+                const newChunk: types.ContestList = {
+                  future: [],
+                  past: [],
+                  current: [],
+                };
+                const today = new Date();
+                data.results.forEach((contest) => {
+                  if (today < contest.start_time) {
+                    newChunk.future.push(contest);
+                  } else if (today > contest.finish_time) {
+                    newChunk.past.push(contest);
+                  } else {
+                    newChunk.current.push(contest);
+                  }
+                });
+                this.contests = newChunk;
+              })
+              .catch(ui.apiError);
+          },
         },
       });
     },
