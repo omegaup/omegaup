@@ -2,30 +2,35 @@
 
 '''Send messages to Contest queue in rabbitmq'''
 
+import contextlib
+
+from typing import Iterator
+
 import argparse
 import datetime
 import pika
 
 
-class Rabbit:
-    '''Class to connect rabbitmq'''
-    def __init__(self, args: argparse.Namespace) -> None:
-        '''Connects to rabbitmq with the arguments provided.'''
-        username = args.rabbitmq_username
-        password = args.rabbitmq_password
-        credentials = pika.PlainCredentials(username, password)
-        parameters = pika.ConnectionParameters('rabbitmq', 5672, '/',
-                                               credentials, heartbeat=600)
-        self.connection = pika.BlockingConnection(parameters)
-        self.channel = self.connection.channel()
+@contextlib.contextmanager
+def connect(
+        args: argparse.Namespace
+) -> Iterator[pika.adapters.blocking_connection.BlockingChannel]:
+    '''Connects to rabbitmq with the arguments provided.'''
+    username = args.rabbitmq_username
+    password = args.rabbitmq_password
+    credentials = pika.PlainCredentials(username, password)
+    parameters = pika.ConnectionParameters('rabbitmq', 5672, '/',
+                                           credentials, heartbeat=600)
+    connection = pika.BlockingConnection(parameters)
+    channel = connection.channel()
 
-        self.channel.exchange_declare(exchange='certificates',
-                                      exchange_type='direct',
-                                      durable=True)
-
-    def close(self) -> None:
-        '''Close connection'''
-        self.connection.close()
+    channel.exchange_declare(exchange='certificates',
+                             exchange_type='direct',
+                             durable=True)
+    try:
+        yield channel
+    finally:
+        connection.close()
 
 
 def configure_parser(parser: argparse.ArgumentParser) -> None:

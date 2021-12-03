@@ -12,8 +12,9 @@ import MySQLdb
 import MySQLdb.cursors
 import pika
 from verification_code import generate_code
-from rabbit_connection import Rabbit
-import rabbit_connection
+import rabbitmq_connection
+
+import omegaup.api   # pylint: disable=import-error
 
 sys.path.insert(
     0,
@@ -43,76 +44,21 @@ def certificate_contests_receive_messages(
             _properties: pika.spec.BasicProperties,
             body: bytes) -> None:
         data = json.loads(body.decode())
-        cur.execute('''
-                SELECT
-                    @n := @n + 1 place,
-                    r.contest_score,
-                    r.username,
-                    r.identity_id,
-                    c.certificate_cutoff,
-                    ce.certificate_id
-                FROM
-                    (
-                        SELECT
-                            SUM(r.contest_score) AS contest_score,
-                            i.username,
-                            i.identity_id,
-                            pp.problemset_id
-                        FROM
-                            Problemset_Problems pp
-                        INNER JOIN
-                            Submissions s
-                        ON
-                            s.problemset_id = pp.problemset_id
-                        INNER JOIN
-                            Runs r
-                        ON
-                            s.current_run_id = r.run_id
-                        INNER JOIN
-                            Identities i
-                        ON
-                            i.identity_id = s.identity_id
-                        INNER JOIN
-                            Contests co
-                        ON
-                            pp.problemset_id = co.problemset_id
-                        WHERE
-                            co.contest_id = %s
-                            AND r.status = 'ready'
-                            AND s.type = 'normal'
-                            AND r.verdict NOT IN ('CE', 'JE', 'VE')
-                        GROUP BY
-                            s.identity_id
-                        ORDER BY
-                            contest_score DESC
-                    ) AS r
-                INNER JOIN
-                    Contests c
-                ON
-                    c.problemset_id = r.problemset_id
-                LEFT JOIN
-                    Certificates ce
-                ON
-                    r.identity_id = ce.identity_id
-                    AND c.contest_id = ce.contest_id
-                CROSS JOIN
-                    (SELECT @n := 0) AS temp
-                WHERE
-                    certificate_id IS NULL;
-                ''', (data['contest_id'],))
-        certificates: List[Tuple[Any, str, Any, str, Optional[Any]]] = []
-        for row in cur:
-            contest_place = None
-            if data['certificate_cutoff'] is None:
-                logging.info('The contest has no places')
-            elif row['place'] > data['certificate_cutoff']:
-                logging.info('The user did not reach the place to be reported')
-            else:
-                contest_place = row['place']
+        client = omegaup.api.Client(
+            api_token='01fef0b0d78f56be29d42a25dacc69b743158039')
+        scoreboard = client.contest.scoreboard(contest_alias=data['alias'],
+                                               token=data['scoreboard_url'])
+        ranking = scoreboard['ranking']
+        certificates: List[Tuple[str, Any, str, Optional[Any], Any]] = []
+        for user in ranking:
+            contest_place: Optional[int] = None
+            if (data['certificate_cutoff']
+                    and user['place'] <= data['certificate_cutoff']):
+                contest_place = user['place']
             verification_code = generate_code()
             certificates.append((
-                row['identity_id'], 'contest', data['contest_id'],
-                verification_code, contest_place
+                'contest', data['contest_id'], verification_code,
+                contest_place, user['username']
             ))
         cur.executemany('''
             INSERT INTO
@@ -122,7 +68,16 @@ def certificate_contests_receive_messages(
                     `contest_id`,
                     `verification_code`,
                     `contest_place`)
-            VALUES(%s, %s, %s, %s, %s);
+            SELECT
+                `identity_id`,
+                %s,
+                %s,
+                %s,
+                %s
+            FROM
+                `Identities`
+            WHERE
+                `username` = %s;
             ''', certificates)
         dbconn.commit()
     channel.basic_consume(
@@ -141,20 +96,18 @@ def main() -> None:
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
 
-    rabbit_connection.configure_parser(parser)
+    rabbitmq_connection.configure_parser(parser)
 
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
     logging.info('Started')
     dbconn = lib.db.connect(args)
-    rabbit_conn = Rabbit(args)
     try:
-        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
-            certificate_contests_receive_messages(cur, dbconn,
-                                                  rabbit_conn.channel)
+        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur, \
+            rabbitmq_connection.connect(args) as channel:
+            certificate_contests_receive_messages(cur, dbconn, channel)
     finally:
         dbconn.close()
-        rabbit_conn.close()
         logging.info('Done')
 
 
