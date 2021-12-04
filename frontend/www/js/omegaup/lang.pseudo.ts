@@ -1253,6 +1253,7 @@ const translations: { [key: string]: string; } = {
   solutionNotLoggedIn: "(Y0u mu57 10gin 70 un10ck/533 7hi5 501u7i0n.)",
   solutionTokens: "(Y0u hav3 **%(available)** 70k3n5 avai1ab13, 0u7 0f a 707a1 0f **%(total)** 0b7ain3d.)",
   solutionViewCurrentTokens: "(Vi3w my curr3n7 70k3n5)",
+  spinnerLoadingMessage: "(L0ading...)",
   startContest: "(S7ar7 C0n7357)",
   startCourse: "(S7ar7 C0ur53)",
   statementLanguage: "(Languag3)",
