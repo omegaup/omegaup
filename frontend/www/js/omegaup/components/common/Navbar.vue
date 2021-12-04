@@ -190,21 +190,77 @@
                   <a class="dropdown-item" href="/badge/list/">{{
                     T.navViewBadges
                   }}</a>
-                  <a class="dropdown-item" href="/problem/mine/">{{
-                    T.navMyProblems
-                  }}</a>
-                  <a
-                    class="dropdown-item"
-                    href="/course/mine/"
-                    data-nav-courses-mine
-                    >{{ T.navMyCourses }}</a
-                  >
-                  <a
-                    class="dropdown-item"
-                    href="/contest/mine/"
-                    data-nav-user-contests
-                    >{{ T.navMyContests }}</a
-                  >
+                  <template v-if="hasTeachingObjective">
+                    <a class="dropdown-item" href="/problem/mine">{{
+                      T.navMyProblems
+                    }}</a>
+                    <a
+                      class="dropdown-item"
+                      href="/course/mine"
+                      data-nav-courses-mine
+                      >{{ T.navMyCourses }}</a
+                    >
+                    <a
+                      class="dropdown-item"
+                      href="/contest/mine"
+                      data-nav-user-contests
+                      >{{ T.navMyContests }}</a
+                    >
+                    <a class="dropdown-item" href="/profile/#created-content">{{
+                      T.navMyContent
+                    }}</a>
+                  </template>
+                  <template v-else>
+                    <a class="dropdown-item" href="/profile/#problems">{{
+                      T.navProfileProblems
+                    }}</a>
+                    <a
+                      class="dropdown-item"
+                      href="/course/#enrolled"
+                      data-nav-courses-mine
+                      >{{ T.navCoursesEnrolled }}</a
+                    >
+                    <a
+                      class="dropdown-item"
+                      href="/arena/#participating"
+                      data-nav-user-contests
+                      >{{ T.navContestsEnrolled }}</a
+                    >
+                    <form class="collapse-submenu">
+                      <div class="btn-group">
+                        <a
+                          class="dropdown-item"
+                          href="/profile/#created-content"
+                          >{{ T.navMyContent }}</a
+                        >
+                        <button
+                          type="button"
+                          class="btn dropdown-item dropdown-toggle dropdown-toggle-split"
+                          data-toggle="collapse"
+                          data-target=".collapse-links"
+                          aria-expanded="false"
+                          aria-controls="collapse-links"
+                        ></button>
+                      </div>
+                      <div class="collapse collapse-links pl-3">
+                        <a class="dropdown-item" href="/problem/mine">{{
+                          T.navMyProblems
+                        }}</a>
+                        <a
+                          class="dropdown-item"
+                          href="/course/mine"
+                          data-nav-courses-mine
+                          >{{ T.navMyCourses }}</a
+                        >
+                        <a
+                          class="dropdown-item"
+                          href="/contest/mine"
+                          data-nav-user-contests
+                          >{{ T.navMyContests }}</a
+                        >
+                      </div>
+                    </form>
+                  </template>
                   <a
                     class="dropdown-item"
                     href="/group/"
@@ -330,6 +386,10 @@ nav.navbar {
 
   a.dropdown-item {
     color: var(--header-navbar-dropdown-item-font-color);
+  }
+
+  .collapse-submenu .btn:focus {
+    box-shadow: 0 0 0 0;
   }
 }
 </style>

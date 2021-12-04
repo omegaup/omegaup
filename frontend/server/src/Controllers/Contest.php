@@ -74,7 +74,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of contests
      *
-     * @return array{number_of_results: int, results: list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}>}
+     * @return array{number_of_results: int, results: list<ContestListItem>}
      *
      * @omegaup-request-param int|null $active
      * @omegaup-request-param mixed $admission_mode
@@ -94,7 +94,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             /** @var null $r->identity */
         }
 
-        /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int|null, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
+        /** @var list<ContestListItem> */
         $contests = [];
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('page_size');
@@ -4015,7 +4015,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest' => $contest,
             'contest_admin' => $contestAdmin,
             'problemset' => $problemset
-        ] = self::validateDetails($contestAlias, $identity);
+        ] = self::validateDetails($contestAlias, $identity, $scoreboardToken);
 
         if (is_null($problemset->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -4049,7 +4049,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contestDetails = self::getContestDetails(
             $contest,
             $contestAdmin,
-            $identity
+            $identity,
+            $scoreboardToken
         );
 
         return [

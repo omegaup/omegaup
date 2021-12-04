@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-'''Send messages to Contest queue in rabbitmq'''
+'''Send messages to queues in rabbitmq'''
 
 import contextlib
 
