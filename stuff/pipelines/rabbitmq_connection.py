@@ -26,7 +26,8 @@ def connect(
 
     channel.exchange_declare(exchange='certificates',
                              exchange_type='direct',
-                             durable=True)
+                             durable=True,
+                             blocked_connection_timeout=300)
     try:
         yield channel
     finally:
