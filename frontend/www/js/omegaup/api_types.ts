@@ -102,8 +102,22 @@ export namespace types {
     export function ArenaCoursePayload(
       elementId: string = 'payload',
     ): types.ArenaCoursePayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
+      return ((x) => {
+        if (x.scoreboard)
+          x.scoreboard = ((x) => {
+            if (x.finish_time)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          })(x.scoreboard);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -2053,6 +2067,7 @@ export namespace types {
     course: types.ArenaCourseDetails;
     currentProblem?: types.ArenaCourseCurrentProblem;
     problems: types.ArenaCourseProblem[];
+    scoreboard?: types.Scoreboard;
   }
 
   export interface ArenaCourseProblem {
