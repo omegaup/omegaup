@@ -122,7 +122,7 @@
                 class="spinner-border"
                 role="status"
               >
-                <span class="sr-only">Loading...</span>
+                <span class="sr-only">{{ T.spinnerLoadingMessage }}</span>
               </div>
               <span v-else>.csv</span>
             </a>
@@ -137,7 +137,7 @@
                 class="spinner-border"
                 role="status"
               >
-                <span class="sr-only">Loading...</span>
+                <span class="sr-only">{{ T.spinnerLoadingMessage }}</span>
               </div>
               <span v-else>.ods</span>
             </a>

@@ -1249,6 +1249,7 @@ const translations: { [key: string]: string; } = {
   solutionNotLoggedIn: "Voc\u00ea deve fazer o login para desbloquear/visualizar esta solu\u00e7\u00e3o.",
   solutionTokens: "Voc\u00ea tem **%(available)** tokens dispon\u00edveis, de um total de **%(total)** obtido(s).",
   solutionViewCurrentTokens: "Ver meus tokens atuais",
+  spinnerLoadingMessage: "Carregando...",
   startContest: "Iniciar concurso",
   startCourse: "Iniciar curso",
   statementLanguage: "Idioma",
