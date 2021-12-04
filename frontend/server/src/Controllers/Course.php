@@ -9,11 +9,6 @@ namespace OmegaUp\Controllers;
  * @psalm-type Progress=array{score: float, max_score: float}
  * @psalm-type AssignmentProgress=array<string, Progress>
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
- * @psalm-type ArenaCourseDetails=array{alias: string, name: string}
- * @psalm-type ArenaCourseAssignment=array{alias: string, name: string, description: string}
- * @psalm-type ArenaCourseProblem=array{alias: string, letter: string, title: string}
- * @psalm-type ArenaCourseCurrentProblem=array{alias: string, title: string}
- * @psalm-type ArenaCoursePayload=array{course: ArenaCourseDetails, assignment: ArenaCourseAssignment, problems: list<ArenaCourseProblem>, currentProblem: null|ArenaCourseCurrentProblem}
  * @psalm-type ProblemsetProblem=array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, has_submissions: bool, input_limit: int, is_extra_problem: bool, languages: string, letter?: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, classname: string, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, name: null|string, request_time: \OmegaUp\Timestamp, username: string}
  * @psalm-type CourseAdmin=array{role: string, username: string}
@@ -72,6 +67,11 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
  * @psalm-type CourseCardFinished=array{alias: string, name: string}
  * @psalm-type CourseTabsPayload=array{courses: array{enrolled: list<CourseCardEnrolled>, finished: list<CourseCardFinished>, public: list<CourseCardPublic>}}
+ * @psalm-type ArenaCourseDetails=array{alias: string, name: string}
+ * @psalm-type ArenaCourseAssignment=array{alias: string, name: string, description: string}
+ * @psalm-type ArenaCourseProblem=array{alias: string, letter: string, title: string}
+ * @psalm-type ArenaCourseCurrentProblem=array{alias: string, title: string}
+ * @psalm-type ArenaCoursePayload=array{course: ArenaCourseDetails, assignment: ArenaCourseAssignment, problems: list<ArenaCourseProblem>, currentProblem: null|ArenaCourseCurrentProblem, scoreboard: null|Scoreboard}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -4175,6 +4175,38 @@ class Course extends \OmegaUp\Controllers\Controller {
             ];
         }
 
+        $isAdmin = (
+            \OmegaUp\Authorization::isCourseAdmin(
+                $r->identity,
+                $course
+            ) ||
+            \OmegaUp\Authorization::canCreatePublicCourse(
+                $r->identity
+            )
+        );
+
+        $scoreboard = null;
+        if (
+            \OmegaUp\Controllers\Course::shouldShowScoreboard(
+                $r->identity,
+                $course,
+                self::resolveGroup($course)
+            )
+        ) {
+            // Get scoreboard;
+            $params = \OmegaUp\ScoreboardParams::fromAssignment(
+                $assignment,
+                intval($course->group_id),
+                /*showAllRuns*/false
+            );
+            $params->admin = $isAdmin;
+            $scoreboard = new \OmegaUp\Scoreboard($params);
+            $scoreboard = $scoreboard->generate(
+                /*$withRunDetails=*/                false,
+                /*$sortByName=*/false
+            );
+        }
+
         $response = [
             'smartyProperties' => [
                 'payload' => [
@@ -4189,6 +4221,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ],
                     'problems' => $problemsResponseArray,
                     'currentProblem' => null,
+                    'scoreboard' => $scoreboard,
                 ],
                 'fullWidth' => true,
                 'title' => new \OmegaUp\TranslationString(
