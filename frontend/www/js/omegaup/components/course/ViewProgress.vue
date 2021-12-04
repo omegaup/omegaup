@@ -116,15 +116,31 @@
               :class="{ disabled: completeStudentsProgress === null }"
               :download="`${course.alias}.csv`"
               :href="csvDataUrl"
-              >.csv</a
             >
+              <div
+                v-if="completeStudentsProgress === null"
+                class="spinner-border"
+                role="status"
+              >
+                <span class="sr-only">Loading...</span>
+              </div>
+              <span v-else>.csv</span>
+            </a>
             <a
               class="btn btn-primary btn-sm w-100 my-1"
               :class="{ disabled: completeStudentsProgress === null }"
               :download="`${course.alias}.ods`"
               :href="odsDataUrl"
-              >.ods</a
             >
+              <div
+                v-if="completeStudentsProgress === null"
+                class="spinner-border"
+                role="status"
+              >
+                <span class="sr-only">Loading...</span>
+              </div>
+              <span v-else>.ods</span>
+            </a>
           </div>
         </div>
       </div>
