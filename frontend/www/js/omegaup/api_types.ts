@@ -102,8 +102,22 @@ export namespace types {
     export function ArenaCoursePayload(
       elementId: string = 'payload',
     ): types.ArenaCoursePayload {
-      return JSON.parse(
-        (document.getElementById(elementId) as HTMLElement).innerText,
+      return ((x) => {
+        if (x.scoreboard)
+          x.scoreboard = ((x) => {
+            if (x.finish_time)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          })(x.scoreboard);
+        return x;
+      })(
+        JSON.parse(
+          (document.getElementById(elementId) as HTMLElement).innerText,
+        ),
       );
     }
 
@@ -2053,6 +2067,7 @@ export namespace types {
     course: types.ArenaCourseDetails;
     currentProblem?: types.ArenaCourseCurrentProblem;
     problems: types.ArenaCourseProblem[];
+    scoreboard?: types.Scoreboard;
   }
 
   export interface ArenaCourseProblem {
@@ -2196,6 +2211,17 @@ export namespace types {
     runtime: number;
     time: Date;
     username: string;
+  }
+
+  export interface CachedExtraProfileDetails {
+    badges: string[];
+    contests: types.UserProfileContests;
+    createdContests: types.Contest[];
+    createdCourses: types.Course[];
+    createdProblems: types.Problem[];
+    solvedProblems: types.Problem[];
+    stats: types.UserProfileStats[];
+    unsolvedProblems: types.Problem[];
   }
 
   export interface CaseResult {
@@ -4343,21 +4369,7 @@ export namespace messages {
   export type _ContestListServerResponse = any;
   export type ContestListResponse = {
     number_of_results: number;
-    results: {
-      admission_mode: string;
-      alias: string;
-      contest_id: number;
-      description: string;
-      finish_time: Date;
-      last_updated: Date;
-      original_finish_time: Date;
-      problemset_id: number;
-      recommended: boolean;
-      rerun_id?: number;
-      start_time: Date;
-      title: string;
-      window_length?: number;
-    }[];
+    results: types.ContestListItem[];
   };
   export type ContestListParticipatingRequest = { [key: string]: any };
   export type _ContestListParticipatingServerResponse = any;

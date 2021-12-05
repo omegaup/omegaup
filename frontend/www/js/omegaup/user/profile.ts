@@ -7,15 +7,25 @@ import * as ui from '../ui';
 import T from '../lang';
 
 import user_Profile from '../components/user/Profile.vue';
+import { ViewProfileTabs } from '../components/user/ViewProfile.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
   const locationHash = window.location.hash.substr(1).split('#');
   let selectedTab = locationHash[0] || 'view-profile';
+  let viewProfileSelectedTab: string | null = null;
   if (selectedTab === 'locale-changed') {
     selectedTab = 'edit-preferences';
     history.replaceState({}, 'updateTab', `#${selectedTab}`);
     ui.success(T.userEditPreferencesSuccess);
+  } else {
+    for (const viewProfileTab of Object.values(ViewProfileTabs)) {
+      if (selectedTab === viewProfileTab) {
+        viewProfileSelectedTab = viewProfileTab;
+        selectedTab = 'view-profile';
+        break;
+      }
+    }
   }
 
   const userProfile = new Vue({
@@ -48,6 +58,7 @@ OmegaUp.on('ready', () => {
           countries: payload.countries,
           programmingLanguages: payload.programmingLanguages,
           hasPassword: this.hasPassword,
+          viewProfileSelectedTab,
         },
         on: {
           'update-user-basic-information': (

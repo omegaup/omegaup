@@ -13,13 +13,17 @@
         <b-card-header header-tag="nav">
           <b-nav card-header pills justified>
             <b-nav-item
-              :href="`/course/${encodeURIComponent(
-                course.alias,
-              )}/arena/${encodeURIComponent(assignment.alias)}/`"
-              :active="currentProblem === null"
+              :href="`#${Tabs.Summary}`"
+              :active="currentSelectedTab === Tabs.Summary"
+              @click="currentSelectedTab = Tabs.Summary"
               >{{ T.wordsSummary }}</b-nav-item
             >
-            <b-nav-item>{{ T.wordsRanking }}</b-nav-item>
+            <b-nav-item
+              :href="`#${Tabs.Ranking}`"
+              :active="currentSelectedTab === Tabs.Ranking"
+              @click="currentSelectedTab = Tabs.Ranking"
+              >{{ T.wordsRanking }}</b-nav-item
+            >
           </b-nav>
           <b-nav card-header pills vertical>
             <b-nav-item
@@ -30,7 +34,11 @@
               )}/arena/${encodeURIComponent(
                 assignment.alias,
               )}/problem/${encodeURIComponent(problem.alias)}/`"
-              :active="currentProblem && currentProblem.alias === problem.alias"
+              :active="
+                !currentSelectedTab &&
+                currentProblem &&
+                currentProblem.alias === problem.alias
+              "
               >{{
                 ui.formatString(T.arenaCourseProblemTitle, {
                   letter: problem.letter,
@@ -42,9 +50,10 @@
         </b-card-header>
       </b-card>
 
-      <b-col md="9" lg="10">
+      <b-col md="9" lg="10" class="mt-3 mt-md-0">
         <!-- This is just for the case of the summary -->
         <omegaup-markdown
+          v-if="currentSelectedTab === Tabs.Summary"
           :markdown="assignment.description"
           :full-width="true"
         ></omegaup-markdown>
@@ -55,7 +64,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -65,6 +74,11 @@ import { BIconChevronLeft, BootstrapVue } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 Vue.use(BootstrapVue);
+
+export enum Tabs {
+  Summary = 'summary',
+  Ranking = 'ranking',
+}
 
 @Component({
   components: {
@@ -77,9 +91,17 @@ export default class ArenaCourse extends Vue {
   @Prop() assignment!: types.ArenaCourseAssignment;
   @Prop() problems!: types.ArenaCourseProblem[];
   @Prop() currentProblem!: types.ArenaCourseCurrentProblem;
+  @Prop({ default: Tabs.Summary }) selectedTab!: string | null;
 
   T = T;
   ui = ui;
+  Tabs = Tabs;
+  currentSelectedTab: string | null = this.selectedTab;
+
+  @Watch('selectedTab')
+  onSelectedTabChanged(newValue: string | null) {
+    this.currentSelectedTab = newValue;
+  }
 }
 </script>
 
