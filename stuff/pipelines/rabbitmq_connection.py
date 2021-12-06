@@ -19,15 +19,18 @@ def connect(
     username = args.rabbitmq_username
     password = args.rabbitmq_password
     credentials = pika.PlainCredentials(username, password)
-    parameters = pika.ConnectionParameters('rabbitmq', 5672, '/',
-                                           credentials, heartbeat=600)
+    parameters = pika.ConnectionParameters('rabbitmq',
+                                           5672,
+                                           '/',
+                                           credentials,
+                                           heartbeat=600,
+                                           blocked_connection_timeout=300.0)
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
 
     channel.exchange_declare(exchange='certificates',
                              exchange_type='direct',
-                             durable=True,
-                             blocked_connection_timeout=300)
+                             durable=True)
     try:
         yield channel
     finally:
