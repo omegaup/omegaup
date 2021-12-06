@@ -19,7 +19,7 @@
               <th class="text-center">{{ pointsTableHeaderLabel }}</th>
               <th class="text-center">{{ T.courseExtraPointsProblem }}</th>
               <th class="text-center">
-                {{ T.contestAddproblemProblemRemove }}
+                {{ T.wordsActions }}
               </th>
             </tr>
           </thead>
@@ -43,7 +43,14 @@
               <td class="align-middle text-center">
                 {{ problem.is_extra_problem ? T.wordsYes : T.wordsNo }}
               </td>
-              <td class="button-column">
+              <td class="button-column text-center">
+                <button
+                  class="btn btn-link"
+                  :title="T.problemEditFormUpdateProblem"
+                  @click.prevent="onEditProblem(problem)"
+                >
+                  <font-awesome-icon icon="edit" />
+                </button>
                 <button
                   class="btn btn-link"
                   :title="removeButtonLabel"
@@ -337,6 +344,10 @@ export default class CourseProblemList extends Vue {
     this.$emit('save-problem', assignment, problem);
   }
 
+  onEditProblem(problem: types.AddedProblem): void {
+    this.problemAlias = problem.alias;
+  }
+
   onRemoveProblem(
     assignment: types.CourseAssignment,
     problem: types.AddedProblem,
@@ -372,6 +383,15 @@ export default class CourseProblemList extends Vue {
       target: this,
       request: { problemAlias: newProblemAlias },
     });
+  }
+
+  @Watch('publishedRevision')
+  onPublishedRevisionChange(newPublishedRevision: types.ProblemVersion) {
+    if (!newPublishedRevision) {
+      return;
+    }
+    this.useLatestVersion =
+      newPublishedRevision.commit === this.versionLog[0].commit;
   }
 
   @Watch('assignmentProblems')
