@@ -7,14 +7,13 @@ import logging
 import os
 import sys
 import json
+import omegaup.api
 from typing import List, Optional, Tuple
 import MySQLdb
 import MySQLdb.cursors
 import pika
 from verification_code import generate_code
 import rabbitmq_connection
-
-import omegaup.api   # pylint: disable=import-error
 
 sys.path.insert(
     0,
