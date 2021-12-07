@@ -39,8 +39,8 @@
     <div class="form-group">
       <label>{{ T.userObjectivesModalDescriptionUsage }}</label>
       <select
-        v-model="firstObjective"
-        data-firstObjective
+        v-model="learningTeachingObjective"
+        data-learning-teaching-objective
         class="custom-select"
       >
         <option :value="ObjectivesAnswers.Learning">
@@ -60,8 +60,8 @@
     <div class="form-group">
       <label>{{ T.userObjectivesModalDescriptionUsage }}</label>
       <select
-        v-model="secondObjective"
-        data-secondObjective
+        v-model="scholarCompetitiveObjective"
+        data-scholar-competitive-objective
         class="custom-select"
       >
         <option :value="ObjectivesAnswers.Scholar">
@@ -132,7 +132,7 @@ export default class UserPreferencesEdit extends Vue {
   hasScholarObjective = this.profile.has_scholar_objective ?? true;
   hasTeachingObjective = this.profile.has_teaching_objective ?? false;
 
-  get firstObjective(): string {
+  get learningTeachingObjective(): string {
     if (this.hasLearningObjective && this.hasTeachingObjective) {
       return ObjectivesAnswers.LearningAndTeaching;
     }
@@ -145,7 +145,7 @@ export default class UserPreferencesEdit extends Vue {
     return ObjectivesAnswers.None;
   }
 
-  set firstObjective(newValue: string) {
+  set learningTeachingObjective(newValue: string) {
     switch (newValue) {
       case ObjectivesAnswers.Learning:
         this.hasLearningObjective = true;
@@ -168,7 +168,7 @@ export default class UserPreferencesEdit extends Vue {
     }
   }
 
-  get secondObjective(): string {
+  get scholarCompetitiveObjective(): string {
     if (this.hasCompetitiveObjective && this.hasScholarObjective) {
       return ObjectivesAnswers.ScholarAndCompetitive;
     }
@@ -181,7 +181,7 @@ export default class UserPreferencesEdit extends Vue {
     return ObjectivesAnswers.Other;
   }
 
-  set secondObjective(newValue: string) {
+  set scholarCompetitiveObjective(newValue: string) {
     switch (newValue) {
       case ObjectivesAnswers.Scholar:
         this.hasScholarObjective = true;

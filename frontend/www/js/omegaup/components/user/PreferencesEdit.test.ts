@@ -78,32 +78,32 @@ describe('PreferencesEdit.vue', () => {
 
   each([
     {
-      objectiveA: 'learning',
-      objectiveB: 'scholar',
+      objectiveLearningTeaching: 'learning',
+      objectiveScholarCompetitive: 'scholar',
       valueCompetitive: false,
       valueLearning: true,
       valueScholar: true,
       valueTeaching: false,
     },
     {
-      objectiveA: 'learning',
-      objectiveB: 'competitive',
+      objectiveLearningTeaching: 'learning',
+      objectiveScholarCompetitive: 'competitive',
       valueCompetitive: true,
       valueLearning: true,
       valueScholar: false,
       valueTeaching: false,
     },
     {
-      objectiveA: 'learning',
-      objectiveB: 'scholarAndcompetitive',
+      objectiveLearningTeaching: 'learning',
+      objectiveScholarCompetitive: 'scholarAndcompetitive',
       valueCompetitive: true,
       valueLearning: true,
       valueScholar: true,
       valueTeaching: false,
     },
     {
-      objectiveA: 'learning',
-      objectiveB: 'other',
+      objectiveLearningTeaching: 'learning',
+      objectiveScholarCompetitive: 'other',
       valueCompetitive: false,
       valueLearning: true,
       valueScholar: false,
@@ -111,32 +111,32 @@ describe('PreferencesEdit.vue', () => {
     },
 
     {
-      objectiveA: 'teaching',
-      objectiveB: 'scholar',
+      objectiveLearningTeaching: 'teaching',
+      objectiveScholarCompetitive: 'scholar',
       valueCompetitive: false,
       valueLearning: false,
       valueScholar: true,
       valueTeaching: true,
     },
     {
-      objectiveA: 'teaching',
-      objectiveB: 'competitive',
+      objectiveLearningTeaching: 'teaching',
+      objectiveScholarCompetitive: 'competitive',
       valueCompetitive: true,
       valueLearning: false,
       valueScholar: false,
       valueTeaching: true,
     },
     {
-      objectiveA: 'teaching',
-      objectiveB: 'scholarAndcompetitive',
+      objectiveLearningTeaching: 'teaching',
+      objectiveScholarCompetitive: 'scholarAndcompetitive',
       valueCompetitive: true,
       valueLearning: false,
       valueScholar: true,
       valueTeaching: true,
     },
     {
-      objectiveA: 'teaching',
-      objectiveB: 'other',
+      objectiveLearningTeaching: 'teaching',
+      objectiveScholarCompetitive: 'other',
       valueCompetitive: false,
       valueLearning: false,
       valueScholar: false,
@@ -144,42 +144,42 @@ describe('PreferencesEdit.vue', () => {
     },
 
     {
-      objectiveA: 'learningAndTeaching',
-      objectiveB: 'scholar',
+      objectiveLearningTeaching: 'learningAndTeaching',
+      objectiveScholarCompetitive: 'scholar',
       valueCompetitive: false,
       valueLearning: true,
       valueScholar: true,
       valueTeaching: true,
     },
     {
-      objectiveA: 'learningAndTeaching',
-      objectiveB: 'competitive',
+      objectiveLearningTeaching: 'learningAndTeaching',
+      objectiveScholarCompetitive: 'competitive',
       valueCompetitive: true,
       valueLearning: true,
       valueScholar: false,
       valueTeaching: true,
     },
     {
-      objectiveA: 'learningAndTeaching',
-      objectiveB: 'scholarAndcompetitive',
+      objectiveLearningTeaching: 'learningAndTeaching',
+      objectiveScholarCompetitive: 'scholarAndcompetitive',
       valueCompetitive: true,
       valueLearning: true,
       valueScholar: true,
       valueTeaching: true,
     },
     {
-      objectiveA: 'learningAndTeaching',
-      objectiveB: 'other',
+      objectiveLearningTeaching: 'learningAndTeaching',
+      objectiveScholarCompetitive: 'other',
       valueCompetitive: false,
       valueLearning: true,
       valueScholar: false,
       valueTeaching: true,
     },
   ]).test(
-    'Should emit correct objectives values when "$objectiveA" and "$objectiveB" options are selected',
+    'Should emit correct objectives values when "$objectiveLearningTeaching" and "$objectiveScholarCompetitive" options are selected',
     async ({
-      objectiveA,
-      objectiveB,
+      objectiveLearningTeaching,
+      objectiveScholarCompetitive,
       valueCompetitive,
       valueLearning,
       valueScholar,
@@ -189,12 +189,12 @@ describe('PreferencesEdit.vue', () => {
         propsData: { profile },
       });
       await wrapper
-        .find('select[data-firstObjective]')
-        .find(`option[value="${objectiveA}"]`)
+        .find('select[data-learning-teaching-objective]')
+        .find(`option[value="${objectiveLearningTeaching}"]`)
         .setSelected();
       await wrapper
-        .find('select[data-secondObjective]')
-        .find(`option[value="${objectiveB}"]`)
+        .find('select[data-scholar-competitive-objective]')
+        .find(`option[value="${objectiveScholarCompetitive}"]`)
         .setSelected();
       await wrapper.find('button[type="submit"]').trigger('submit');
       expect(wrapper.emitted('update-user-preferences')).toBeDefined();
@@ -223,7 +223,7 @@ describe('PreferencesEdit.vue', () => {
       propsData: { profile },
     });
     await wrapper
-      .find('select[data-firstObjective]')
+      .find('select[data-learning-teaching-objective]')
       .find('option[value="none"]')
       .setSelected();
     await wrapper.find('button[type="submit"]').trigger('submit');
