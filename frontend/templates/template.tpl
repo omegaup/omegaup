@@ -50,7 +50,7 @@
     <script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
     {if !isset($hideFooterAndHeader) || !$hideFooterAndHeader}
       <div id="common-navbar"></div>
-      {js_include entrypoint="common_navbar_v2"}
+      {js_include entrypoint="common_navbar"}
     {/if}
 	  <main role="main" {if (!isset($fullWidth) || !$fullWidth)}class="container-lg p-5"{/if}>
       {if isset($ERROR_MESSAGE)}
@@ -89,7 +89,7 @@
     {/if}
     {if $headerPayload.inContest eq false && (!isset($hideFooterAndHeader) || !$hideFooterAndHeader)}
     <div id="common-footer"></div>
-    {js_include entrypoint="common_footer_v2"}
+    {js_include entrypoint="common_footer"}
     {/if}
 
   </body>

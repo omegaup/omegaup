@@ -42,6 +42,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
             }
             $r = new \OmegaUp\Request($params);
             $r->method = $req['api'];
+            $r->methodName = $req['api'];
             $fullResponse = \OmegaUp\ApiCaller::call($r);
             self::assertEquals(
                 'ok',

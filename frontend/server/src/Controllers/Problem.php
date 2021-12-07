@@ -4514,7 +4514,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problem,
             $problemset,
             \OmegaUp\Controllers\Identity::getPreferredLanguage($r->identity),
-            /*showSolvers=*/true,
+            /*showSolvers=*/false,
             $preventProblemsetOpen,
             $contestAlias
         );
