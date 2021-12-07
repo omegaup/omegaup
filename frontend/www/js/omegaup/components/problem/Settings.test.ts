@@ -36,13 +36,5 @@ describe('Settings.vue', () => {
     expect(
       wrapper.find('input[name="validator_time_limit"]').attributes('disabled'),
     ).toBeFalsy();
-    expect(
-      (wrapper.find('select[name="languages"]').element as HTMLInputElement)
-        .value,
-    ).toBe('cat');
-    expect(
-      (wrapper.find('select[name="validator"]').element as HTMLInputElement)
-        .value,
-    ).toBe('custom');
   });
 });
