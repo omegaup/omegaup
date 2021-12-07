@@ -47,6 +47,7 @@
                 <button
                   class="btn btn-link"
                   :title="T.problemEditFormUpdateProblem"
+                  data-edit-problem-version
                   @click.prevent="onEditProblem(problem)"
                 >
                   <font-awesome-icon icon="edit" />
@@ -129,6 +130,7 @@
                       <input
                         v-model="useLatestVersion"
                         class="form-check-input"
+                        data-use-latest-version-true
                         type="radio"
                         :value="true"
                       />{{ T.contestAddproblemLatestVersion }}
@@ -139,6 +141,7 @@
                       <input
                         v-model="useLatestVersion"
                         class="form-check-input"
+                        data-use-latest-version-false
                         type="radio"
                         :value="false"
                       />{{ T.contestAddproblemOtherVersion }}
