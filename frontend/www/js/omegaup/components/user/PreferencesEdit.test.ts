@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
+import { ObjectivesAnswers } from './ObjectivesQuestions.vue';
 import user_Preferences_Edit from './PreferencesEdit.vue';
 
 const profile: types.UserProfileInfo = {
@@ -24,6 +25,10 @@ const profile: types.UserProfileInfo = {
   birth_date: new Date('1999-09-09'),
   locale: 'es',
   gender: 'decline',
+  has_competitive_objective: false,
+  has_learning_objective: true,
+  has_scholar_objective: true,
+  has_teaching_objective: false,
 };
 
 describe('PreferencesEdit.vue', () => {
@@ -47,6 +52,14 @@ describe('PreferencesEdit.vue', () => {
       .find('select[data-preferred-language]')
       .find('option[value="rb"]')
       .setSelected();
+    await wrapper
+      .find('select[data-firstObjective]')
+      .find(`option[value="${ObjectivesAnswers.Teaching}"]`)
+      .setSelected();
+    await wrapper
+      .find('select[data-secondObjective]')
+      .find(`option[value="${ObjectivesAnswers.Competitive}"]`)
+      .setSelected();
     await wrapper.find('input[data-is-private]').setChecked();
     await wrapper.find('input[data-hide-problem-tags]').setChecked();
 
@@ -60,6 +73,10 @@ describe('PreferencesEdit.vue', () => {
             preferred_language: 'rb',
             is_private: true,
             hide_problem_tags: true,
+            has_competitive_objective: true,
+            has_learning_objective: false,
+            has_scholar_objective: false,
+            has_teaching_objective: true,
           },
           localeChanged: true,
         },
