@@ -23,16 +23,6 @@ describe('Settings.vue', () => {
       wrapper.find('input[name="validator_time_limit"]').attributes('disabled'),
     ).toBe('disabled');
 
-    const languages = wrapper.find('select[name="languages"]')
-      .element as HTMLInputElement;
-    languages.value = 'cat';
-    await languages.dispatchEvent(new Event('change'));
-
-    const validator = wrapper.find('select[name="validator"]')
-      .element as HTMLInputElement;
-    validator.value = 'custom';
-    await validator.dispatchEvent(new Event('change'));
-
     expect(
       wrapper.find('input[name="validator_time_limit"]').attributes('disabled'),
     ).toBeFalsy();
