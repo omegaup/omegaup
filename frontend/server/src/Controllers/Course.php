@@ -67,6 +67,11 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
  * @psalm-type CourseCardFinished=array{alias: string, name: string}
  * @psalm-type CourseTabsPayload=array{courses: array{enrolled: list<CourseCardEnrolled>, finished: list<CourseCardFinished>, public: list<CourseCardPublic>}}
+ * @psalm-type ArenaCourseDetails=array{alias: string, name: string}
+ * @psalm-type ArenaCourseAssignment=array{alias: string, name: string, description: string}
+ * @psalm-type ArenaCourseProblem=array{alias: string, letter: string, title: string}
+ * @psalm-type ArenaCourseCurrentProblem=array{alias: string, title: string}
+ * @psalm-type ArenaCoursePayload=array{course: ArenaCourseDetails, assignment: ArenaCourseAssignment, problems: list<ArenaCourseProblem>, currentProblem: null|ArenaCourseCurrentProblem, scoreboard: null|Scoreboard}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -4117,20 +4122,146 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Gets the course and specific assignment details
+     * Gets the course assignment (and problem) details for ArenaCourse
      *
-     * @return array{smartyProperties: array{fullWidth: bool, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string|null $problem_alias
+     *
+     * @return array{smartyProperties: array{payload: ArenaCoursePayload, fullWidth: bool, title: \OmegaUp\TranslationString}, inContest: bool, entrypoint: string}
+     *
      */
-    public static function getArenaCourseDetailsForTypeScript(\OmegaUp\Request $r): array {
-        return [
-          'smartyProperties' => [
-              'fullWidth' => true,
-            'title' => new \OmegaUp\TranslationString(
-                'courseAssignmentTitle',
-            ),
-          ],
-          'entrypoint' => 'arena_coursev2',
+    public static function getArenaCourseDetailsForTypeScript(
+        \OmegaUp\Request $r
+    ): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        $r->ensureIdentity();
+
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $course = self::validateCourseExists($courseAlias);
+
+        $assignmentAlias = $r->ensureString(
+            'assignment_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $assignment = self::validateCourseAssignmentAlias(
+            $course,
+            $assignmentAlias
+        );
+        if (is_null($assignment->problemset_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'assignmentNotFound'
+            );
+        }
+
+        $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
+            intval($assignment->problemset_id)
+        );
+
+        $problemsResponseArray = [];
+        $letter = 0;
+        foreach ($problemsInAssignment as $problem) {
+            $problem['letter'] = \OmegaUp\Controllers\Contest::columnName(
+                $letter++
+            );
+            $problemsResponseArray[] = [
+                'alias' => strval($problem['alias']),
+                'letter' => $problem['letter'],
+                'title' => strval($problem['title']),
+            ];
+        }
+
+        $isAdmin = (
+            \OmegaUp\Authorization::isCourseAdmin(
+                $r->identity,
+                $course
+            ) ||
+            \OmegaUp\Authorization::canCreatePublicCourse(
+                $r->identity
+            )
+        );
+
+        $scoreboard = null;
+        if (
+            \OmegaUp\Controllers\Course::shouldShowScoreboard(
+                $r->identity,
+                $course,
+                self::resolveGroup($course)
+            )
+        ) {
+            // Get scoreboard;
+            $params = \OmegaUp\ScoreboardParams::fromAssignment(
+                $assignment,
+                intval($course->group_id),
+                /*showAllRuns*/false
+            );
+            $params->admin = $isAdmin;
+            $scoreboard = new \OmegaUp\Scoreboard($params);
+            $scoreboard = $scoreboard->generate(
+                /*$withRunDetails=*/                false,
+                /*$sortByName=*/false
+            );
+        }
+
+        $response = [
+            'smartyProperties' => [
+                'payload' => [
+                    'course' => [
+                        'alias' => strval($course->alias),
+                        'name' => strval($course->name),
+                    ],
+                    'assignment' => [
+                        'alias' => strval($assignment->alias),
+                        'name' => strval($assignment->name),
+                        'description' => strval($assignment->description),
+                    ],
+                    'problems' => $problemsResponseArray,
+                    'currentProblem' => null,
+                    'scoreboard' => $scoreboard,
+                ],
+                'fullWidth' => true,
+                'title' => new \OmegaUp\TranslationString(
+                    'courseAssignmentTitle',
+                    [
+                        'courseName' => $course->name,
+                        'assignmentName' => $assignment->name,
+                    ],
+                ),
+            ],
+            'inContest' => $assignment->assignment_type === 'test',
+            'entrypoint' => 'arena_coursev2',
         ];
+
+        $problemAlias = $r->ensureOptionalString(
+            'problem_alias',
+            /*required=*/false,
+            fn (string $alias) => \OmegaUp\Validators::alias($alias),
+        );
+
+        if (is_null($problemAlias)) {
+            return $response;
+        }
+
+        $problem = \OmegaUp\DAO\Problems::getByAliasAndProblemset(
+            $problemAlias,
+            intval($assignment->problemset_id)
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+
+        $response['smartyProperties']['payload']['currentProblem'] = [
+            'alias' => strval($problem->alias),
+            'title' => strval($problem->title),
+            // TODO: Add more information about the currentProblem
+        ];
+        return $response;
     }
 
     /**
