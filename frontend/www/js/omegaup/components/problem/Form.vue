@@ -428,7 +428,7 @@
               :title="
                 !problemLevel && !isUpdate ? T.selectProblemLevelDesc : ''
               "
-              @click="openCollapsedIfRequired"
+              @click="openCollapsedIfRequired()"
             >
               {{ buttonText }}
             </button>
@@ -602,7 +602,6 @@ export default class ProblemForm extends Vue {
     formData.forEach((value, key) => {
       const isEmpty = value === '';
       if (isEmpty) {
-        console.log(value, key);
         if (
           this.basicInfoRef.classList.contains('collapsed') &&
           (key === 'title' ||

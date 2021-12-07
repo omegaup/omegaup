@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
 
 import T from '../../lang';
@@ -6,18 +6,18 @@ import T from '../../lang';
 import Form from './Form.vue';
 
 const props: types.ProblemFormPayload = {
-  title: '',
-  alias: '',
+  title: 'title',
+  alias: 'title',
   validator: 'token',
   emailClarifications: false,
-  source: '',
+  source: 'title',
   visibility: 0,
   statusError: '',
   allowUserAddTags: true,
   showDiff: 'none',
   timeLimit: 1000,
   validatorTimeLimit: 1000,
-  overallWallTimeLimit: 60000,
+  overallWallTimeLimit: '',
   extraWallTime: 0,
   outputLimit: 10240,
   inputLimit: 10240,
@@ -66,5 +66,15 @@ describe('Settings.vue', () => {
     expect(
       wrapper.find('select[name="languages"]').findAll('option').at(3).text(),
     ).toContain(T.wordsNoSubmissions);
+  });
+
+  it('Should show a collapsed group', async () => {
+    const wrapper = mount(Form, { propsData: { data: props } });
+
+    expect(wrapper.find('.limits').classes()).not.toContain('show');
+    await wrapper.find('button[type="submit"]').trigger('click');
+    setTimeout(() => {
+      expect(wrapper.find('.limits').classes()).not.toContain('show');
+    }, 3000);
   });
 });
