@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 
 import Tabs from './Tabs.vue';
 import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
@@ -10,9 +10,8 @@ localVue.use(IconsPlugin);
 
 describe('Tabs.vue', () => {
   it('Should contain all 4 tabs', async () => {
-    const wrapper = shallowMount(Tabs, { localVue });
+    const wrapper = mount(Tabs, { localVue });
 
-    const buttons = wrapper.findAll('span');
     const expectedText = [
       T.problemCreatorStatement,
       T.problemCreatorCode,
@@ -20,8 +19,14 @@ describe('Tabs.vue', () => {
       T.problemCreatorSolution,
     ];
 
-    for (let i = 0; i < buttons.length; i++) {
-      expect(buttons.at(i).text()).toBe(expectedText[i]);
-    }
+    // BootstrapVue takes a tick to render the content inside the tabs
+    wrapper.vm.$nextTick(() => {
+      const buttons = wrapper.findAll('span');
+
+      expect(expectedText.length).toEqual(buttons.length);
+      for (let i = 0; i < buttons.length; i++) {
+        expect(buttons.at(i).text()).toEqual(expectedText[i]);
+      }
+    });
   });
 });

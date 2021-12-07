@@ -19,7 +19,8 @@ describe('Header.vue', () => {
       T.problemCreatorNewProblem,
     ];
 
-    for (let i = 0; i < buttons.length; i++) {
+    expect(expectedText.length).toBe(buttons.length);
+    for (let i = 0; i < expectedText.length; i++) {
       expect(buttons.at(i).text()).toBe(expectedText[i]);
     }
 
