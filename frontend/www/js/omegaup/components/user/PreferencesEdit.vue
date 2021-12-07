@@ -58,10 +58,9 @@
       </select>
     </div>
     <div class="form-group">
-      <label>{{ secondQuestion }}</label>
+      <label>{{ T.userObjectivesModalDescriptionUsage }}</label>
       <select
         v-model="secondObjective"
-        :disabled="noneObjectiveSelected"
         data-secondObjective
         class="custom-select"
       >
@@ -133,19 +132,6 @@ export default class UserPreferencesEdit extends Vue {
   hasScholarObjective = this.profile.has_scholar_objective ?? true;
   hasTeachingObjective = this.profile.has_teaching_objective ?? false;
 
-  get secondQuestion(): string {
-    if (this.hasLearningObjective && this.hasTeachingObjective) {
-      return this.T.userObjectivesModalDescriptionLearningAndTeaching;
-    }
-    if (this.hasLearningObjective) {
-      return this.T.userObjectivesModalDescriptionLearning;
-    }
-    if (this.hasTeachingObjective) {
-      return this.T.userObjectivesModalDescriptionTeaching;
-    }
-    return T.userObjectivesModalDescriptionUsage;
-  }
-
   get firstObjective(): string {
     if (this.hasLearningObjective && this.hasTeachingObjective) {
       return ObjectivesAnswers.LearningAndTeaching;
@@ -180,10 +166,6 @@ export default class UserPreferencesEdit extends Vue {
         this.hasCompetitiveObjective = false;
         break;
     }
-  }
-
-  get noneObjectiveSelected(): boolean {
-    return this.firstObjective === ObjectivesAnswers.None;
   }
 
   get secondObjective(): string {
@@ -224,8 +206,7 @@ export default class UserPreferencesEdit extends Vue {
     this.$emit('update-user-preferences', {
       userPreferences: {
         locale: this.locale,
-        preferred_language:
-          this.preferredLanguage !== '' ? this.preferredLanguage : null,
+        preferred_language: this.preferredLanguage ?? null,
         is_private: this.isPrivate,
         hide_problem_tags: this.hideProblemTags,
         has_competitive_objective: this.hasCompetitiveObjective,
