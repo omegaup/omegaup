@@ -797,7 +797,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorCode: "C\u00f3digo",
   problemCreatorGenerateProblem: "Generar Problema",
   problemCreatorLoadProblem: "Cargar Problema",
-  problemCreatorName: "Nombre:",
+  problemCreatorName: "Nombre",
   problemCreatorNewProblem: "Nuevo Problema",
   problemCreatorSolution: "Soluci\u00f3n",
   problemCreatorStatement: "Redacci\u00f3n",
