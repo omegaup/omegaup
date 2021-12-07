@@ -24,6 +24,10 @@ def connect(
                                            '/',
                                            credentials,
                                            heartbeat=600,
+                                           # mypy does not support structural
+                                           # typing yet
+                                           # https://github.com/python/mypy/issues/3186
+                                           # type: ignore:
                                            blocked_connection_timeout=300.0)
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
