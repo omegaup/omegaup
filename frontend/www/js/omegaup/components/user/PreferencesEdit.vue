@@ -58,9 +58,10 @@
       </select>
     </div>
     <div class="form-group">
-      <label>{{ T.userObjectivesModalDescriptionUsage }}</label>
+      <label>{{ scholarCompetitiveObjectiveQuestion }}</label>
       <select
         v-model="scholarCompetitiveObjective"
+        :disabled="learningTeachingObjective === ObjectivesAnswers.None"
         data-scholar-competitive-objective
         class="custom-select"
       >
@@ -131,6 +132,19 @@ export default class UserPreferencesEdit extends Vue {
   hasLearningObjective = this.profile.has_learning_objective ?? true;
   hasScholarObjective = this.profile.has_scholar_objective ?? true;
   hasTeachingObjective = this.profile.has_teaching_objective ?? false;
+
+  get scholarCompetitiveObjectiveQuestion(): string {
+    if (this.hasLearningObjective && this.hasTeachingObjective) {
+      return this.T.userObjectivesModalDescriptionLearningAndTeaching;
+    }
+    if (this.hasLearningObjective) {
+      return this.T.userObjectivesModalDescriptionLearning;
+    }
+    if (this.hasTeachingObjective) {
+      return this.T.userObjectivesModalDescriptionTeaching;
+    }
+    return T.userObjectivesModalDescriptionUsage;
+  }
 
   get learningTeachingObjective(): string {
     if (this.hasLearningObjective && this.hasTeachingObjective) {

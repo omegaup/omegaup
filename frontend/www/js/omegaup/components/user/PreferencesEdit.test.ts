@@ -2,6 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
 import user_Preferences_Edit from './PreferencesEdit.vue';
 import each from 'jest-each';
+import T from '../../lang';
 
 const profile: types.UserProfileInfo = {
   name: 'omegaUp admin',
@@ -75,6 +76,57 @@ describe('PreferencesEdit.vue', () => {
       ],
     ]);
   });
+
+  it('Should disable ScholarCompetitive objective select when "none" option is selected', async () => {
+    const wrapper = shallowMount(user_Preferences_Edit, {
+      propsData: { profile },
+    });
+    await wrapper
+      .find('select[data-learning-teaching-objective]')
+      .find('option[value="none"]')
+      .setSelected();
+    expect(
+      wrapper.find('select[data-scholar-competitive-objective]').element,
+    ).toBeDisabled();
+  });
+
+  each([
+    {
+      objectiveLearningTeaching: 'learning',
+      objectiveScholarCompetitiveQuestion:
+        T.userObjectivesModalDescriptionLearning,
+    },
+    {
+      objectiveLearningTeaching: 'teaching',
+      objectiveScholarCompetitiveQuestion:
+        T.userObjectivesModalDescriptionTeaching,
+    },
+    {
+      objectiveLearningTeaching: 'learningAndTeaching',
+      objectiveScholarCompetitiveQuestion:
+        T.userObjectivesModalDescriptionLearningAndTeaching,
+    },
+    {
+      objectiveLearningTeaching: 'none',
+      objectiveScholarCompetitiveQuestion:
+        T.userObjectivesModalDescriptionUsage,
+    },
+  ]).test(
+    'Should display the correct ScholarCompetitive objective question when "$objectiveLearningTeaching" option is selected',
+    async ({
+      objectiveLearningTeaching,
+      objectiveScholarCompetitiveQuestion,
+    }) => {
+      const wrapper = shallowMount(user_Preferences_Edit, {
+        propsData: { profile },
+      });
+      await wrapper
+        .find('select[data-learning-teaching-objective]')
+        .find(`option[value="${objectiveLearningTeaching}"]`)
+        .setSelected();
+      expect(wrapper.text()).toContain(objectiveScholarCompetitiveQuestion);
+    },
+  );
 
   each([
     {
