@@ -68,6 +68,7 @@
               :guid="guid"
               :run-details-data="runDetailsData"
               :problem-alias="problemAlias"
+              :in-contest-or-course="true"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', { selectedTab, problemAlias })

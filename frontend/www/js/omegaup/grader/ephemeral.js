@@ -174,7 +174,7 @@ Vue.use(Vuex);
 let store = new Vuex.Store({
   state: {
     alias: null,
-    problemsetId: null,
+    hideSubmitButton: false,
     localStorageSources: null,
     request: {
       input: {
@@ -194,8 +194,8 @@ let store = new Vuex.Store({
     alias(state) {
       return state.alias;
     },
-    problemsetId(state) {
-      return state.problemsetId;
+    hideSubmitButton(state) {
+      return state.hideSubmitButton;
     },
     localStorageSources(state) {
       return state.localStorageSources;
@@ -354,8 +354,14 @@ let store = new Vuex.Store({
         ];
       document.getElementById('language').value = state.request.language;
     },
-    problemsetId(state, value) {
+    hideSubmitButton(state, value) {
       state.problemsetId = value;
+      if (value) {
+        const submitButton = document.querySelector(
+          'button[data-submit-button]',
+        );
+        submitButton.classList.add('d-none');
+      }
     },
     currentCase(state, value) {
       state.currentCase = value;
@@ -1385,123 +1391,46 @@ document.getElementById('download').addEventListener('click', (e) => {
 });
 
 const submitButton = document.querySelector('button[data-submit-button]');
-document.querySelector('form.ephemeral-form').addEventListener('submit', (e) => {
-  e.preventDefault();
-  console.log({
-    problem_alias: store.state.alias,
-    problemset_id: store.state.problemsetId,
-    language: store.state.request.language,
-    source: store.state.request.source,
-  });
-  submitButton.setAttribute('disabled', '');
-  fetch('/api/run/create/', {
-    method: 'POST',
-    headers: {
-      'Content-Type':
-        'application/x-www-form-urlencoded;charset=UTF-8',
-    },
-    body: JSON.stringify({
+document
+  .querySelector('form.ephemeral-form')
+  .addEventListener('submit', (e) => {
+    e.preventDefault();
+    submitButton.setAttribute('disabled', '');
+    const params = {
       problem_alias: store.state.alias,
-      problemset_id: store.state.problemsetId,
       language: store.state.request.language,
       source: store.state.request.source,
-    }),
-  })
-    // .then(time.remoteTimeAdapter)
-    .then((response) => {
-      console.log('submitted');
-      console.log(response);
-      // submitRun({
-      //   guid: response.guid,
-      //   submitDelay: response.submit_delay,
-      //   language,
-      //   username: commonPayload.currentUsername,
-      //   classname: commonPayload.userClassname,
-      //   problemAlias: problem.alias,
-      // });
+    };
+    fetch('/api/run/create/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      },
+      body: Object.keys(params)
+        .filter(
+          (key) => params[key] !== null && typeof params[key] !== 'undefined',
+        )
+        .map((key) => {
+          if (params[key] instanceof Date) {
+            return `${encodeURIComponent(key)}=${encodeURIComponent(
+              Math.round(params[key].getTime() / 1000),
+            )}`;
+          }
+          return `${encodeURIComponent(key)}=${encodeURIComponent(
+            params[key],
+          )}`;
+        })
+        .join('&'),
     })
-    .catch((run) => {
-      console.log('error', run);
-      // submitRunFailed({
-      //   error: run.error,
-      //   errorname: run.errorname,
-      //   run,
-      // });
-    });
-  // fetch('/api/run/create/', {
-  //   method: 'POST',
-  //   headers: new Headers({
-  //     'Content-Type': 'application/json',
-  //   }),
-  //   body: JSON.stringify(store.state.request),
-  // })
-  //   .then((response) => { console.log(response) });
-  // fetch('run/new/', {
-  //   method: 'POST',
-  //   headers: new Headers({
-  //     'Content-Type': 'application/json',
-  //   }),
-  //   body: JSON.stringify(store.state.request),
-  // })
-  //   .then((response) => {
-  //     if (!response.ok) return null;
-  //     history.replaceState(
-  //       undefined,
-  //       undefined,
-  //       '#' + response.headers.get('X-OmegaUp-EphemeralToken'),
-  //     );
-  //     return response.formData();
-  //   })
-  //   .then((formData) => {
-  //     document.getElementsByTagName('button')[0].removeAttribute('disabled');
-  //     if (!formData) {
-  //       onDetailsJsonReady({
-  //         verdict: 'JE',
-  //         contest_score: 0,
-  //         max_score: this.state.max_score,
-  //       });
-  //       store.commit('logs', '');
-  //       onFilesZipReady(null);
-  //       return;
-  //     }
-
-  //     if (formData.has('details.json')) {
-  //       let reader = new FileReader();
-  //       reader.addEventListener('loadend', function () {
-  //         onDetailsJsonReady(JSON.parse(reader.result));
-  //       });
-  //       reader.readAsText(formData.get('details.json'));
-  //     }
-
-  //     if (formData.has('logs.txt.gz')) {
-  //       let reader = new FileReader();
-  //       reader.addEventListener('loadend', function () {
-  //         if (reader.result.byteLength == 0) {
-  //           store.commit('logs', '');
-  //           return;
-  //         }
-
-  //         store.commit(
-  //           'logs',
-  //           new TextDecoder('utf-8').decode(pako.inflate(reader.result)),
-  //         );
-  //       });
-  //       reader.readAsArrayBuffer(formData.get('logs.txt.gz'));
-  //     } else {
-  //       store.commit('logs', '');
-  //     }
-
-  //     onFilesZipReady(formData.get('files.zip'));
-  //   })
-  //   .catch(Util.asyncError);
-});
+      .then(() => {
+        parent.location.reload();
+      })
+      .catch(console.log);
+  });
 
 const runButton = document.querySelector('button[data-run-button]');
-console.log(runButton);
 runButton.addEventListener('click', () => {
-  // e.preventDefault();
   runButton.setAttribute('disabled', '');
-  console.log(JSON.stringify(store.state.request));
   fetch('run/new/', {
     method: 'POST',
     headers: new Headers({
@@ -1562,7 +1491,7 @@ runButton.addEventListener('click', () => {
     .catch(Util.asyncError);
 });
 
-function setSettings({ alias, settings, problemsetId }) {
+function setSettings({ alias, settings, hideSubmitButton }) {
   if (!settings) {
     return;
   }
@@ -1581,11 +1510,11 @@ function setSettings({ alias, settings, problemsetId }) {
       }
     }
   }
-  store.commit('problemsetId', problemsetId);
   store.commit('updatingSettings', true);
   store.commit('reset');
   store.commit('Interactive', !!settings.interactive);
   store.commit('alias', alias);
+  store.commit('hideSubmitButton', hideSubmitButton);
   store.commit('removeCase', 'long');
   store.commit('MemoryLimit', settings.limits.MemoryLimit * 1024);
   store.commit('OutputLimit', settings.limits.OutputLimit);
@@ -1641,6 +1570,7 @@ window.addEventListener(
         setSettings({
           alias: e.data.params.alias,
           settings: e.data.params.settings,
+          hideSubmitButton: e.data.params.hideSubmitButton,
         });
         break;
     }

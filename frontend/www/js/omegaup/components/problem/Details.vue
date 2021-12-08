@@ -177,6 +177,8 @@
           <omegaup-arena-ephemeral-grader
             v-if="!problem.karel_problem"
             :problem="problem"
+            :is-logged-in="user.loggedIn"
+            :in-contest-or-course="inContestOrCourse"
           ></omegaup-arena-ephemeral-grader>
           <omegaup-arena-runs
             :problem-alias="problem.alias"
@@ -388,6 +390,7 @@ export default class ProblemDetails extends Vue {
   @Prop() selectedPublicTags!: string[];
   @Prop() selectedPrivateTags!: string[];
   @Prop() hasBeenNominated!: boolean;
+  @Prop({ default: false }) inContestOrCourse!: boolean;
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop({ default: null }) guid!: null | string;
   @Prop({ default: null }) problemAlias!: null | string;
