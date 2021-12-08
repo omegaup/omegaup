@@ -7,8 +7,8 @@ import logging
 import os
 import sys
 import json
-import omegaup.api
 from typing import List, Optional, Tuple
+import omegaup.api
 import MySQLdb
 import MySQLdb.cursors
 import pika
@@ -49,12 +49,32 @@ def certificate_contests_receive_messages(
                                                token=data['scoreboard_url'])
         ranking = scoreboard['ranking']
         certificates: List[Tuple[str, int, str, Optional[int], str]] = []
+        codes: List[str] = []
+        for _ in ranking:
+            codes.append(generate_code())
+
+        format_strings: str = ','.join(['%s'] * len(codes))
+        while True:
+            cur.execute(
+                '''
+                SELECT
+                    *
+                FROM
+                    Certificates c
+                WHERE
+                    verification_code IN (%s);
+                ''' % format_strings, tuple(codes)
+            )
+            count = cur.fetchone()
+            if count is None:
+                break
+
         for user in ranking:
             contest_place: Optional[int] = None
             if (data['certificate_cutoff']
                     and user['place'] <= data['certificate_cutoff']):
                 contest_place = user['place']
-            verification_code = generate_code()
+            verification_code = codes.pop(0)
             certificates.append((
                 'contest', int(data['contest_id']), verification_code,
                 contest_place, str(user['username'])
