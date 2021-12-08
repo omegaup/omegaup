@@ -1116,7 +1116,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureOptionalInt('page_size');
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 10);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 100);
 
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['query'],
