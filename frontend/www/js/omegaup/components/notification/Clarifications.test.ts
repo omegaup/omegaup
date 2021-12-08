@@ -60,7 +60,7 @@ describe('Clarifications.vue', () => {
       T.notificationsMarkAllAsRead,
     );
     await wrapper
-      .find('li[data-clarification="1"] button[class="close"]')
+      .find('div[data-clarification="1"] button[class="close"]')
       .trigger('click');
     // There is only one notification, so "Mark as all read" button does not appear
     expect(wrapper.text()).not.toContain(T.notificationsMarkAllAsRead);

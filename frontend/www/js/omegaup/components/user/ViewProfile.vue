@@ -7,9 +7,12 @@
             <nav class="nav nav-tabs" role="tablist" data-profile-navtabs>
               <a
                 v-if="profile.is_own_profile || !profile.is_private"
-                class="nav-item nav-link active"
-                data-toggle="tab"
-                @click="selectedTab = 'badges'"
+                :href="`#${ViewProfileTabs.Badges}`"
+                class="nav-item nav-link"
+                :class="{
+                  active: currentSelectedTab === ViewProfileTabs.Badges,
+                }"
+                @click="currentSelectedTab = ViewProfileTabs.Badges"
               >
                 {{ T.wordsBadgesObtained }}
                 <span class="badge badge-secondary">
@@ -18,16 +21,22 @@
               </a>
               <a
                 v-if="profile.is_own_profile || !profile.is_private"
+                :href="`#${ViewProfileTabs.Problems}`"
                 class="nav-item nav-link"
-                data-toggle="tab"
-                @click="selectedTab = 'problems'"
+                :class="{
+                  active: currentSelectedTab === ViewProfileTabs.Problems,
+                }"
+                @click="currentSelectedTab = ViewProfileTabs.Problems"
                 >{{ T.wordsProblems }}</a
               >
               <a
                 v-if="profile.is_own_profile || !profile.is_private"
+                :href="`#${ViewProfileTabs.Contests}`"
                 class="nav-item nav-link"
-                data-toggle="tab"
-                @click="selectedTab = 'contests'"
+                :class="{
+                  active: currentSelectedTab === ViewProfileTabs.Contests,
+                }"
+                @click="currentSelectedTab = ViewProfileTabs.Contests"
               >
                 {{ T.profileContests }}
                 <span class="badge badge-secondary">
@@ -36,22 +45,30 @@
               </a>
               <a
                 v-if="profile.is_own_profile || !profile.is_private"
+                :href="`#${ViewProfileTabs.CreatedContent}`"
                 class="nav-item nav-link"
-                data-toggle="tab"
-                @click="selectedTab = 'created-content'"
+                :class="{
+                  active: currentSelectedTab === ViewProfileTabs.CreatedContent,
+                }"
+                data-created-content-tab
+                @click="currentSelectedTab = ViewProfileTabs.CreatedContent"
                 >{{ T.profileCreatedContent }}</a
               >
               <a
+                :href="`#${ViewProfileTabs.Data}`"
                 class="nav-item nav-link"
-                data-toggle="tab"
-                @click="selectedTab = 'data'"
+                :class="{ active: currentSelectedTab === ViewProfileTabs.Data }"
+                @click="currentSelectedTab = ViewProfileTabs.Data"
                 >{{ T.profilePersonalData }}</a
               >
               <a
                 v-if="profile.is_own_profile || !profile.is_private"
+                :href="`#${ViewProfileTabs.Charts}`"
                 class="nav-item nav-link"
-                data-toggle="tab"
-                @click="selectedTab = 'charts'"
+                :class="{
+                  active: currentSelectedTab === ViewProfileTabs.Charts,
+                }"
+                @click="currentSelectedTab = ViewProfileTabs.Charts"
                 >{{ T.wordsStatistics }}</a
               >
             </nav>
@@ -62,14 +79,14 @@
                 aria-labelledby="nav-badges-tab"
               >
                 <omegaup-badge-list
-                  v-if="selectedTab == 'badges'"
+                  v-if="currentSelectedTab == ViewProfileTabs.Badges"
                   :all-badges="profileBadges"
                   :show-all-badges-link="true"
                   :visitor-badges="visitorBadges"
                 ></omegaup-badge-list>
               </div>
               <div
-                v-if="selectedTab == 'problems'"
+                v-if="currentSelectedTab == ViewProfileTabs.Problems"
                 class="tab-pane fade show active"
                 role="tab"
                 aria-labelledby="nav-problems-tab"
@@ -97,7 +114,7 @@
                 ></omegaup-grid-paginator>
               </div>
               <div
-                v-show="selectedTab == 'contests'"
+                v-show="currentSelectedTab == ViewProfileTabs.Contests"
                 class="tab-pane fade show active"
                 role="tab"
                 aria-labelledby="nav-contests-tab"
@@ -120,7 +137,7 @@
                 </omegaup-grid-paginator>
               </div>
               <div
-                v-if="selectedTab == 'created-content'"
+                v-if="currentSelectedTab == ViewProfileTabs.CreatedContent"
                 class="tab-pane fade show active"
                 role="tab"
                 aria-labelledby="nav-created-content-tab"
@@ -138,9 +155,35 @@
                     }}</a></template
                   >
                 </omegaup-grid-paginator>
+                <omegaup-grid-paginator
+                  :columns="3"
+                  :items="createdContests"
+                  :items-per-page="30"
+                  :title="T.profileCreatedContests"
+                  class="mb-3"
+                >
+                  <template v-if="profile.is_own_profile" #header-link
+                    ><a href="/contest/mine/" class="float-right">{{
+                      T.profileCreatedContentSeeAll
+                    }}</a></template
+                  >
+                </omegaup-grid-paginator>
+                <omegaup-grid-paginator
+                  :columns="3"
+                  :items="createdCourses"
+                  :items-per-page="30"
+                  :title="T.profileCreatedCourses"
+                  class="mb-3"
+                >
+                  <template v-if="profile.is_own_profile" #header-link
+                    ><a href="/course/mine/" class="float-right">{{
+                      T.profileCreatedContentSeeAll
+                    }}</a></template
+                  >
+                </omegaup-grid-paginator>
               </div>
               <div
-                v-if="selectedTab == 'data'"
+                v-if="currentSelectedTab == ViewProfileTabs.Data"
                 class="tab-pane fade show active"
                 role="tab"
                 aria-labelledby="nav-user-info-tab"
@@ -151,7 +194,7 @@
                 ></omegaup-user-basicinfo>
               </div>
               <div
-                v-if="selectedTab == 'charts'"
+                v-if="currentSelectedTab == ViewProfileTabs.Charts"
                 class="tab-pane fade show active"
                 role="tab"
                 aria-labelledby="nav-charts-tab"
@@ -171,7 +214,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import country_Flag from '../CountryFlag.vue';
 import user_BasicInfo from './BasicInfov2.vue';
@@ -183,7 +226,31 @@ import common_GridPaginator from '../common/GridPaginator.vue';
 import { types } from '../../api_types';
 import * as Highcharts from 'highcharts/highstock';
 import * as ui from '../../ui';
-import { Problem, ContestResult } from '../../linkable_resource';
+import {
+  Problem,
+  ContestResult,
+  Contest,
+  Course,
+} from '../../linkable_resource';
+
+export enum ViewProfileTabs {
+  Badges = 'badges',
+  Problems = 'problems',
+  Contests = 'contests',
+  CreatedContent = 'created-content',
+  Data = 'data',
+  Charts = 'charts',
+}
+
+function getInitialSelectedTab(
+  profile: types.UserProfileInfo,
+  selectedTab: string | null,
+): string {
+  if (!profile.is_own_profile && profile.is_private) {
+    return ViewProfileTabs.Data;
+  }
+  return selectedTab ?? ViewProfileTabs.Badges;
+}
 
 @Component({
   components: {
@@ -201,6 +268,7 @@ export default class ViewProfile extends Vue {
   @Prop() profile!: types.UserProfileInfo;
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
+  @Prop({ default: null }) selectedTab!: string | null;
   contests = Object.values(
     this.data?.contests ?? ({} as types.UserProfileContests),
   )
@@ -213,13 +281,31 @@ export default class ViewProfile extends Vue {
     })
     .filter((contest) => Boolean(contest));
   charts: types.UserProfileStats[] = this.data?.stats ?? [];
+  ViewProfileTabs = ViewProfileTabs;
   T = T;
   ui = ui;
   columns = 3;
-  selectedTab =
-    !this.profile.is_own_profile && this.profile.is_private ? 'data' : 'badges';
+  currentSelectedTab = getInitialSelectedTab(this.profile, this.selectedTab);
   normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
 
+  get createdContests(): Contest[] {
+    if (!this.data?.createdContests) return [];
+    let contests = this.data.createdContests;
+    if (!this.profile.is_own_profile) {
+      contests = contests.filter(
+        (contest) => contest.admission_mode === 'public',
+      );
+    }
+    return contests.map((contest) => new Contest(contest));
+  }
+  get createdCourses(): Course[] {
+    if (!this.data?.createdCourses) return [];
+    let courses = this.data.createdCourses;
+    if (!this.profile.is_own_profile) {
+      courses = courses.filter((course) => course.admission_mode === 'public');
+    }
+    return courses.map((course) => new Course(course));
+  }
   get createdProblems(): Problem[] {
     if (!this.data?.createdProblems) return [];
     return this.data.createdProblems.map((problem) => new Problem(problem));
@@ -247,6 +333,11 @@ export default class ViewProfile extends Vue {
       default:
         return T.profileRankUnrated;
     }
+  }
+
+  @Watch('currentSelectedTab')
+  onCurrentSelectedTabChanged(newValue: string) {
+    this.$emit('update:selectedTab', newValue);
   }
 }
 </script>

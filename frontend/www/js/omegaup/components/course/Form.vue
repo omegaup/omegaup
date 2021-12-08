@@ -173,6 +173,10 @@
           <div class="form-group container-fluid col-md-6">
             <label class="font-weight-bold w-100"
               >{{ T.courseNewFormObjective }}
+              <font-awesome-icon
+                :title="T.courseNewFormObjectiveDesc"
+                icon="info-circle"
+              />
               <textarea
                 v-model="objective"
                 class="form-control"
