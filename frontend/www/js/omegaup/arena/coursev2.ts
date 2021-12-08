@@ -8,7 +8,6 @@ OmegaUp.on('ready', async () => {
 
   const locationHash = window.location.hash.substr(1).split('/');
   const activeTab = getSelectedValidTab(locationHash[0]);
-
   new Vue({
     el: '#main-container',
     components: {
@@ -22,15 +21,16 @@ OmegaUp.on('ready', async () => {
           problems: payload.problems,
           currentProblem: payload.currentProblem,
           selectedTab: activeTab,
+          scoreboard: payload.scoreboard,
         },
       });
     },
   });
 
   function getSelectedValidTab(tab: string): string | null {
-    if (tab === '') {
+    if (payload.currentProblem && tab === '') {
       return null;
     }
-    return tab in Tabs ? tab : Tabs.Summary;
+    return Object.values<string>(Tabs).includes(tab) ? tab : Tabs.Summary;
   }
 });
