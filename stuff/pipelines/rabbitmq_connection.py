@@ -27,7 +27,7 @@ def connect(
         heartbeat=600,
         # mypy does not support structural typing yet
         # https://github.com/python/mypy/issues/3186
-        blocked_connection_timeout=300.0  # type: ignore
+        blocked_connection_timeout=300.0,  # type: ignore
     )
 
     connection = pika.BlockingConnection(parameters)
