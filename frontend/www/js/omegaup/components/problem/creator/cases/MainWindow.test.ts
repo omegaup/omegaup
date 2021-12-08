@@ -2,9 +2,7 @@ import { createLocalVue, shallowMount } from '@vue/test-utils';
 
 import MainWindow from './MainWindow.vue';
 import Sidebar from './Sidebar.vue';
-import BootstrapVue, { IconsPlugin, BButton } from 'bootstrap-vue';
-
-import T from '../../../../lang';
+import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 
 const localVue = createLocalVue();
 localVue.use(BootstrapVue);
