@@ -8,7 +8,6 @@ OmegaUp.on('ready', async () => {
 
   const locationHash = window.location.hash.substr(1).split('/');
   const activeTab = getSelectedValidTab(locationHash[0]);
-  console.log(activeTab);
   new Vue({
     el: '#main-container',
     components: {
@@ -32,6 +31,6 @@ OmegaUp.on('ready', async () => {
     if (payload.currentProblem && tab === '') {
       return null;
     }
-    return Object.values(Tabs).includes(tab) ? tab : Tabs.Summary;
+    return Object.values<string>(Tabs).includes(tab) ? tab : Tabs.Summary;
   }
 });
