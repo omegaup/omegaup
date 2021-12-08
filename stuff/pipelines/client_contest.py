@@ -7,7 +7,7 @@ import logging
 import os
 import sys
 import json
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import omegaup.api
 import MySQLdb
 import MySQLdb.cursors
@@ -48,7 +48,7 @@ def certificate_contests_receive_messages(
         scoreboard = client.contest.scoreboard(contest_alias=data['alias'],
                                                token=data['scoreboard_url'])
         ranking = scoreboard['ranking']
-        certificates: List[List[str, int, str, Optional[int], str]] = []
+        certificates: List[Tuple[str, int, str, Optional[int], str]] = []
 
         for user in ranking:
             contest_place: Optional[int] = None
@@ -56,13 +56,13 @@ def certificate_contests_receive_messages(
                     and user['place'] <= data['certificate_cutoff']):
                 contest_place = user['place']
             verification_code = generate_code()
-            certificates.append(list((
+            certificates.append((
                 'contest',
                 int(data['contest_id']),
                 verification_code,
                 contest_place,
                 str(user['username'])
-            )))
+            ))
         while True:
             try:
                 cur.executemany('''
@@ -87,8 +87,20 @@ def certificate_contests_receive_messages(
                 dbconn.commit()
                 break
             except:  # noqa: bare-except
-                for certificate in certificates:
-                    certificate[2] = generate_code()
+                certificates = []
+                for user in ranking:
+                    contest_place = None
+                    if (data['certificate_cutoff']
+                            and user['place'] <= data['certificate_cutoff']):
+                        contest_place = user['place']
+                    verification_code = generate_code()
+                    certificates.append((
+                        'contest',
+                        int(data['contest_id']),
+                        verification_code,
+                        contest_place,
+                        str(user['username'])
+                    ))
                 logging.exception(
                     'At least one of the verification codes was conflict')
                 dbconn.rollback()
