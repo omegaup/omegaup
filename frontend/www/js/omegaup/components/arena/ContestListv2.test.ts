@@ -235,6 +235,24 @@ describe('ContestListv2.vue', () => {
     expect(pastContestTab.text()).toContain('Past Contest 1');
   });
 
+  it('Should load all current contest', async () => {
+    const wrapper = mount(arena_ContestList, {
+      propsData: {
+        contests,
+      },
+    });
+
+    wrapper.vm.loadMoreContests();
+
+    expect(wrapper.emitted('get-chunk')).toBeTruthy();
+    expect(wrapper.vm.currentPageSize).toBe(20);
+    expect(wrapper.vm.contestList.map((contest) => contest.alias)).toEqual([
+      'Contest-1',
+      'Contest-3',
+      'Contest-2',
+    ]);
+  });
+
   const dropdownMapping = [
     [{ value: T.contestOrderByTitle }],
     [{ value: T.contestOrderByEnds }],
