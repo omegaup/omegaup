@@ -26,6 +26,7 @@
               >{{ T.wordsRanking }}</b-nav-item
             >
           </b-nav>
+          <hr />
           <b-nav card-header pills vertical>
             <b-nav-item
               v-for="problem in problems"
