@@ -6,7 +6,13 @@
     "downlevelIteration": true,
     "strict": true,
     "lib": ["DOM", "ES5", "ScriptHost", "ES2020.Promise"],
-    "types": ["cypress"],
+    "types": [
+      "cypress",
+      "gapi",
+      "gapi.auth2",
+      "bootstrap-datepicker",
+      "bootstrap.v3.datetimepicker"
+    ],
     "module": "es6",
     "moduleResolution": "node",
     "experimentalDecorators": true,

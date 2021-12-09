@@ -24,6 +24,7 @@
     "@types/bootstrap-datepicker": "0.0.13",
     "@types/bootstrap.v3.datetimepicker": "^4.17.47",
     "@types/codemirror": "^0.0",
+    "@types/cypress": "^1.1.3",
     "@types/gapi": "^0.0.41",
     "@types/gapi.auth2": "0.0.52",
     "@types/jest": "^26.0.23",
