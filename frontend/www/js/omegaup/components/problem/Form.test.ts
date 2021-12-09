@@ -45,8 +45,8 @@ const props: types.ProblemFormPayload = {
     'c11-clang,c11-gcc,cpp11-clang,cpp11-gcc,cpp17-clang,cpp17-gcc,cs,hs,java,lua,pas,py2,py3,rb':
       'C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua',
     'kj,kp': 'Karel',
-    cat: 'Solo Salida',
-    '': 'Lectura (Sin envíos)',
+    cat: T.wordsJustOutput,
+    '': T.wordsNoSubmissions,
   },
 };
 
@@ -54,18 +54,18 @@ describe('Settings.vue', () => {
   it('Should handle problem settings', () => {
     const wrapper = shallowMount(Form, { propsData: { data: props } });
 
-    expect(
-      wrapper.find('select[name="languages"]').findAll('option').at(0).text(),
-    ).toContain('C, C++, C++11, C#, Haskell, Java, Pascal, Python, Ruby, Lua');
-    expect(
-      wrapper.find('select[name="languages"]').findAll('option').at(1).text(),
-    ).toContain('Karel');
-    expect(
-      wrapper.find('select[name="languages"]').findAll('option').at(2).text(),
-    ).toContain(T.wordsJustOutput);
-    expect(
-      wrapper.find('select[name="languages"]').findAll('option').at(3).text(),
-    ).toContain(T.wordsNoSubmissions);
+    const optionsWrapper = wrapper
+      .find('select[name="languages"]')
+      .findAll('option');
+
+    const optionsObject: { [key: string]: string } = {};
+    optionsWrapper.wrappers.forEach((option) => {
+      const value = option.attributes('value');
+      if (typeof value === 'string') {
+        optionsObject[value] = option.text();
+      }
+    });
+    expect(props.validLanguages).toEqual(optionsObject);
   });
 
   it('Should show a collapsed group', async () => {

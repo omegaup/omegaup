@@ -200,9 +200,9 @@
                     required
                   >
                     <option
-                      v-for="(languageText, languageIndex) in validLanguages"
-                      :key="languageIndex"
-                      :value="languageIndex"
+                      v-for="(languageText, languageName) in validLanguages"
+                      :key="languageName"
+                      :value="languageName"
                     >
                       {{ languageText }}
                     </option>
