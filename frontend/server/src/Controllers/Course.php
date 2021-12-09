@@ -4187,6 +4187,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $scoreboard = null;
         if (
+            $assignment->assignment_type !== 'lesson' &&
             \OmegaUp\Controllers\Course::shouldShowScoreboard(
                 $r->identity,
                 $course,
