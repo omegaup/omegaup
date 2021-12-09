@@ -19,6 +19,7 @@
               >{{ T.wordsSummary }}</b-nav-item
             >
             <b-nav-item
+              v-if="scoreboard"
               :href="`#${Tabs.Ranking}`"
               :active="currentSelectedTab === Tabs.Ranking"
               @click="currentSelectedTab = Tabs.Ranking"
@@ -58,7 +59,7 @@
           :full-width="true"
         ></omegaup-markdown>
         <omegaup-arena-scoreboard
-          v-if="currentSelectedTab === Tabs.Ranking"
+          v-if="currentSelectedTab === Tabs.Ranking && scoreboard"
           :show-invited-users-filter="false"
           :problems="scoreboard.problems"
           :ranking="scoreboard.ranking"

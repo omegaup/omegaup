@@ -31,6 +31,9 @@ OmegaUp.on('ready', async () => {
     if (payload.currentProblem && tab === '') {
       return null;
     }
+    if (tab === Tabs.Ranking && payload.scoreboard === null) {
+      return Tabs.Summary;
+    }
     return Object.values<string>(Tabs).includes(tab) ? tab : Tabs.Summary;
   }
 });

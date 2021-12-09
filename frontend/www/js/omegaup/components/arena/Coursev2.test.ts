@@ -106,4 +106,19 @@ describe('Coursev2.vue', () => {
     expect(wrapper.text()).toContain(T.wordsRanking);
     expect(wrapper.text()).toContain(scoreboard.ranking[0].username);
   });
+
+  it('Should hide the course scoreboard tab when scoreboard is null', () => {
+    const wrapper = mount(arena_Course, {
+      propsData: {
+        course,
+        assignment,
+        problems,
+        currentProblem: null,
+        selectedTab: 'ranking',
+        scoreboard: null,
+      },
+    });
+
+    expect(wrapper.text()).not.toContain(T.wordsRanking);
+  });
 });
