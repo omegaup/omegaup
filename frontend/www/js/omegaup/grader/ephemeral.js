@@ -174,7 +174,7 @@ Vue.use(Vuex);
 let store = new Vuex.Store({
   state: {
     alias: null,
-    hideSubmitButton: false,
+    showSubmitButton: false,
     localStorageSources: null,
     request: {
       input: {
@@ -194,8 +194,8 @@ let store = new Vuex.Store({
     alias(state) {
       return state.alias;
     },
-    hideSubmitButton(state) {
-      return state.hideSubmitButton;
+    showSubmitButton(state) {
+      return state.showSubmitButton;
     },
     localStorageSources(state) {
       return state.localStorageSources;
@@ -354,13 +354,13 @@ let store = new Vuex.Store({
         ];
       document.getElementById('language').value = state.request.language;
     },
-    hideSubmitButton(state, value) {
+    showSubmitButton(state, value) {
       state.problemsetId = value;
       if (value) {
         const submitButton = document.querySelector(
           'button[data-submit-button]',
         );
-        submitButton.classList.add('d-none');
+        submitButton.classList.remove('d-none');
       }
     },
     currentCase(state, value) {
@@ -1491,7 +1491,7 @@ runButton.addEventListener('click', () => {
     .catch(Util.asyncError);
 });
 
-function setSettings({ alias, settings, hideSubmitButton }) {
+function setSettings({ alias, settings, showSubmitButton }) {
   if (!settings) {
     return;
   }
@@ -1514,7 +1514,7 @@ function setSettings({ alias, settings, hideSubmitButton }) {
   store.commit('reset');
   store.commit('Interactive', !!settings.interactive);
   store.commit('alias', alias);
-  store.commit('hideSubmitButton', hideSubmitButton);
+  store.commit('showSubmitButton', showSubmitButton);
   store.commit('removeCase', 'long');
   store.commit('MemoryLimit', settings.limits.MemoryLimit * 1024);
   store.commit('OutputLimit', settings.limits.OutputLimit);
@@ -1570,7 +1570,7 @@ window.addEventListener(
         setSettings({
           alias: e.data.params.alias,
           settings: e.data.params.settings,
-          hideSubmitButton: e.data.params.hideSubmitButton,
+          showSubmitButton: e.data.params.showSubmitButton,
         });
         break;
     }

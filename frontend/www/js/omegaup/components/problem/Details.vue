@@ -177,8 +177,7 @@
           <omegaup-arena-ephemeral-grader
             v-if="!problem.karel_problem"
             :problem="problem"
-            :is-logged-in="user.loggedIn"
-            :in-contest-or-course="inContestOrCourse"
+            :can-submit="user.loggedIn && !inContestOrCourse"
           ></omegaup-arena-ephemeral-grader>
           <omegaup-arena-runs
             :problem-alias="problem.alias"
