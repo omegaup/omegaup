@@ -9,7 +9,7 @@ import os
 import sys
 import json
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List
 import omegaup.api
 import MySQLdb
 import MySQLdb.cursors
@@ -30,7 +30,7 @@ import lib.logs  # pylint: disable=wrong-import-position
 class Certificate:
     '''A dataclass for certificate.'''
     certificate_type: str
-    course_id: Optional[int]
+    course_id: int
     verification_code: str
     username: str
 
@@ -96,11 +96,7 @@ def certificate_course_receive_messages(
                 dbconn.commit()
                 break
             except:  # noqa: bare-except
-                certificates = []
-                for user in progress:
-                    minimum_progress = data['minimum_progress_for_certificate']
-                    if user['progress'] < minimum_progress:
-                        continue
+                for certificate in certificates:
                     certificate.verification_code = generate_code()
                 logging.exception(
                     'At least one of the verification codes had a conflict')
