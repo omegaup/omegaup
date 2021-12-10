@@ -1,5 +1,5 @@
 <template>
-  <b-card>
+  <b-card class="mb-2">
     <b-container>
       <b-row class="p-1" align-v="center">
         <b-col>

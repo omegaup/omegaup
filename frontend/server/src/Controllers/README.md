@@ -80,7 +80,6 @@
   - [`/api/course/getProblemUsers/`](#apicoursegetproblemusers)
   - [`/api/course/introDetails/`](#apicourseintrodetails)
   - [`/api/course/listAssignments/`](#apicourselistassignments)
-  - [`/api/course/listCourses/`](#apicourselistcourses)
   - [`/api/course/listSolvedProblems/`](#apicourselistsolvedproblems)
   - [`/api/course/listStudents/`](#apicourseliststudents)
   - [`/api/course/listUnsolvedProblems/`](#apicourselistunsolvedproblems)
@@ -815,10 +814,10 @@ Returns a list of contests
 
 ### Returns
 
-| Name                | Type                                                                                                                                                                                                                                                                              |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `number_of_results` | `number`                                                                                                                                                                                                                                                                          |
-| `results`           | `{ admission_mode: string; alias: string; contest_id: number; description: string; finish_time: Date; last_updated: Date; original_finish_time: Date; problemset_id: number; recommended: boolean; rerun_id: number; start_time: Date; title: string; window_length: number; }[]` |
+| Name                | Type                      |
+| ------------------- | ------------------------- |
+| `number_of_results` | `number`                  |
+| `results`           | `types.ContestListItem[]` |
 
 ## `/api/contest/listParticipating/`
 
@@ -1787,28 +1786,6 @@ List course assignments
 | Name          | Type                       |
 | ------------- | -------------------------- |
 | `assignments` | `types.CourseAssignment[]` |
-
-## `/api/course/listCourses/`
-
-### Description
-
-Lists all the courses this user is associated with.
-
-Returns courses for which the current user is an admin and
-for in which the user is a student.
-
-### Parameters
-
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `page`      | `int` |             |
-| `page_size` | `int` |             |
-
-### Returns
-
-```typescript
-types.CoursesList;
-```
 
 ## `/api/course/listSolvedProblems/`
 

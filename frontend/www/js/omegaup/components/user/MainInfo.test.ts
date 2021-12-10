@@ -29,6 +29,8 @@ const propsData = {
     badges: [],
     contests: {},
     createdProblems: [],
+    createdContests: [],
+    createdCourses: [],
     ownedBadges: [],
     solvedProblems: [
       {
@@ -79,7 +81,7 @@ describe('MainInfo.vue', () => {
     });
     expect(wrapper.find('a[href="/profile/"]').exists()).toBe(true);
     expect(wrapper.find('a[href="/profile/"]').text()).toBe(
-      T.userEditSeeProfile,
+      T.userEditViewProfile,
     );
   });
 

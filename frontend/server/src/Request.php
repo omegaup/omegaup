@@ -67,8 +67,11 @@ class Request extends \ArrayObject {
      * @return array<int, mixed>|array<string, mixed>
      */
     public function execute(): array {
-        if (is_null($this->method)) {
+        if (is_null($this->method) || is_null($this->methodName)) {
             throw new \OmegaUp\Exceptions\NotFoundException('apiNotFound');
+        }
+        if (extension_loaded('newrelic')) {
+            newrelic_name_transaction("/api/{$this->methodName}");
         }
 
         /** @var mixed */

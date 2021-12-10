@@ -113,16 +113,34 @@
           <div class="card-body">
             <a
               class="btn btn-primary btn-sm w-100 my-1"
+              :class="{ disabled: completeStudentsProgress === null }"
               :download="`${course.alias}.csv`"
               :href="csvDataUrl"
-              >.csv</a
             >
+              <div
+                v-if="completeStudentsProgress === null"
+                class="spinner-border"
+                role="status"
+              >
+                <span class="sr-only">{{ T.spinnerLoadingMessage }}</span>
+              </div>
+              <span v-else>.csv</span>
+            </a>
             <a
               class="btn btn-primary btn-sm w-100 my-1"
+              :class="{ disabled: completeStudentsProgress === null }"
               :download="`${course.alias}.ods`"
               :href="odsDataUrl"
-              >.ods</a
             >
+              <div
+                v-if="completeStudentsProgress === null"
+                class="spinner-border"
+                role="status"
+              >
+                <span class="sr-only">{{ T.spinnerLoadingMessage }}</span>
+              </div>
+              <span v-else>.ods</span>
+            </a>
           </div>
         </div>
       </div>
@@ -156,7 +174,8 @@ export function escapeXml(cell: TableCell): string {
     .replace(/"/g, '&quot;');
 }
 
-export function toOds(courseName: string, table: TableCell[][]): string {
+export function toOds(courseName: string, table: TableCell[][] | null): string {
+  if (table === null) return '';
   let result = `<table:table table:name="${escapeXml(courseName)}">\n`;
   result += `<table:table-column table:number-columns-repeated="${table[0].length}"/>\n`;
   for (const row of table) {
@@ -190,6 +209,8 @@ export function toOds(courseName: string, table: TableCell[][]): string {
 })
 export default class CourseViewProgress extends Vue {
   @Prop() course!: types.CourseDetails;
+  @Prop({ default: null })
+  completeStudentsProgress!: types.StudentProgressInCourse[] | null;
   @Prop() students!: types.StudentProgressInCourse[];
   @Prop() assignmentsProblems!: types.AssignmentsProblemsPoints[];
   @Prop() pagerItems!: types.PageItem[];
@@ -227,7 +248,8 @@ export default class CourseViewProgress extends Vue {
     }
   }
 
-  get progressTable(): TableCell[][] {
+  get progressTable(): TableCell[][] | null {
+    if (this.completeStudentsProgress === null) return null;
     const table: TableCell[][] = [];
     const header = [
       T.profileUsername,
@@ -251,7 +273,7 @@ export default class CourseViewProgress extends Vue {
     }
     table.push(header);
 
-    for (const student of this.students) {
+    for (const student of this.completeStudentsProgress) {
       const row: TableCell[] = [
         student.username,
         student.name || '',
@@ -272,6 +294,7 @@ export default class CourseViewProgress extends Vue {
   }
 
   get csvDataUrl(): string {
+    if (!this.progressTable) return '';
     return window.URL.createObjectURL(
       new Blob([toCsv(this.progressTable)], {
         type: 'text/csv;charset=utf-8;',
@@ -292,6 +315,7 @@ export default class CourseViewProgress extends Vue {
 
   @AsyncComputed()
   async odsDataUrl(): Promise<string> {
+    if (!this.progressTable) return '';
     let zip = new JSZip();
     zip.file('mimetype', 'application/vnd.oasis.opendocument.spreadsheet', {
       compression: 'STORE',
@@ -398,7 +422,7 @@ export default class CourseViewProgress extends Vue {
     }
   }
 
-  tbody /deep/ th {
+  tbody >>> th {
     position: sticky;
     left: 0;
     background: white;

@@ -17,6 +17,7 @@ import {
 import { navigateToProblem, NavigationType } from './navigation';
 import clarificationStore from './clarificationsStore';
 import {
+  onRefreshRuns,
   showSubmission,
   SubmissionRequest,
   submitRun,
@@ -29,7 +30,7 @@ import { createChart, onRankingChanged, onRankingEvents } from './ranking';
 import { EventsSocket } from './events_socket';
 import rankingStore from './rankingStore';
 import socketStore from './socketStore';
-import { myRunsStore, runsStore } from './runsStore';
+import { myRunsStore, RunFilters, runsStore } from './runsStore';
 import T from '../lang';
 
 OmegaUp.on('ready', async () => {
@@ -146,6 +147,7 @@ OmegaUp.on('ready', async () => {
           socketStatus: socketStore.state.socketStatus,
           runs: myRunsStore.state.runs,
           allRuns: runsStore.state.runs,
+          totalRuns: runsStore.state.totalRuns,
           searchResultUsers: this.searchResultUsers,
           runDetailsData: this.runDetailsData,
           nextSubmissionTimestamp: this.nextSubmissionTimestamp,
@@ -337,6 +339,21 @@ OmegaUp.on('ready', async () => {
               ui.warning(T.firstSumbissionWithIdentity);
             }
           },
+          'apply-filter': ({
+            filter,
+            value,
+          }: {
+            filter: 'verdict' | 'language' | 'username' | 'status' | 'offset';
+            value: string;
+          }) => {
+            if (value != '') {
+              const newFilter: RunFilters = { [filter]: value };
+              runsStore.commit('applyFilter', newFilter);
+            } else {
+              runsStore.commit('removeFilter', filter);
+            }
+            refreshRuns();
+          },
         },
       });
     },
@@ -357,6 +374,25 @@ OmegaUp.on('ready', async () => {
   });
   socket.connect();
 
+  function refreshRuns(): void {
+    api.Contest.runs({
+      contest_alias: payload.contest.alias,
+      show_all: true,
+      problem_alias: runsStore.state.filters?.problem,
+      offset: runsStore.state.filters?.offset,
+      rowcount: runsStore.state.filters?.rowcount,
+      verdict: runsStore.state.filters?.verdict,
+      language: runsStore.state.filters?.language,
+      username: runsStore.state.filters?.username,
+      status: runsStore.state.filters?.status,
+    })
+      .then(time.remoteTimeAdapter)
+      .then((response) => {
+        onRefreshRuns({ runs: response.runs });
+      })
+      .catch(ui.apiError);
+  }
+
   function getSelectedValidTab(tab: string, isAdmin: boolean): string {
     const validTabs = ['problems', 'ranking', 'runs', 'clarifications'];
     const defaultTab = 'problems';
@@ -366,6 +402,7 @@ OmegaUp.on('ready', async () => {
   }
 
   if (payload.adminPayload?.allRuns) {
+    runsStore.commit('setTotalRuns', payload.adminPayload.totalRuns);
     for (const run of payload.adminPayload.allRuns) {
       trackRun({ run });
     }

@@ -1,5 +1,9 @@
 <template>
-  <iframe ref="grader" src="/grader/ephemeral/?embedded"></iframe>
+  <iframe
+    ref="grader"
+    class="mt-2 border border-white"
+    src="/grader/ephemeral/?embedded"
+  ></iframe>
 </template>
 
 <script lang="ts">

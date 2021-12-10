@@ -51,8 +51,18 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'request-access-course': () => {
-            api.Course.registerForCourse({ course_alias: payload.course.alias })
+          'request-access-course': ({
+            shareUserInformation,
+            acceptTeacher,
+          }: {
+            shareUserInformation: boolean;
+            acceptTeacher: boolean;
+          }) => {
+            api.Course.registerForCourse({
+              course_alias: payload.course.alias,
+              accept_teacher: acceptTeacher,
+              share_user_information: shareUserInformation,
+            })
               .then(() => {
                 courseIntro.userRegistrationRequested = true;
               })

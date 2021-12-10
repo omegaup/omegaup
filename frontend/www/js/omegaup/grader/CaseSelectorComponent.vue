@@ -1,5 +1,5 @@
 <template>
-  <div class="root d-flex flex-column h-100 bg-dark text-white">
+  <div class="root d-flex flex-column h-100">
     <div class="summary">
       {{ summary }}
     </div>
@@ -15,6 +15,7 @@
         <template v-for="group in groups" v-else :title="name">
           <div
             v-if="group.explicit"
+            :key="group.name"
             class="list-group-item list-group-item-secondary"
           >
             <div>
@@ -32,6 +33,7 @@
           </div>
           <button
             v-for="item in group.cases"
+            :key="item.name"
             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
             type="button"
             :class="{
