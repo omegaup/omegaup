@@ -270,19 +270,19 @@ jobs:
               "frontend/tests/runfiles/containers/${name}.log" 2>&1
           done
 
-      # - name: Upload artifacts
-      #   if: ${{ always() }}
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: test-logs
-      #     path: frontend/tests/ui/results/
+      - name: Upload cypress screenshot artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-logs
+          path: cypress/screenshots
 
-      # - name: Upload artifacts
-      #   if: ${{ always() }}
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: test-logs
-      #     path: frontend/tests/runfiles/*/*.log
+      - name: Upload cypress videos artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-logs
+          path: cypress/videos
 
   selenium:
     runs-on: ubuntu-20.04

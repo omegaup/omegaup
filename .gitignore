@@ -107,5 +107,5 @@ omegaup.db
 stuff/docker/go/*/
 
 # Ignore cypress media
-cypress/videos/
-cypress/screenshots/
+cypress/videos/*
+cypress/screenshots/*
