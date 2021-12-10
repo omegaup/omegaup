@@ -269,7 +269,6 @@ export function formatContestDuration(
   const minutes = Math.floor(delta / (60 * 1000));
   delta -= minutes * (60 * 1000);
   const seconds = Math.floor(delta / 1000);
-  days > 0 && days < 10 ? '0' + days : days;
   let clock = '';
   if (days > 0) {
     clock += `${days} d `;
