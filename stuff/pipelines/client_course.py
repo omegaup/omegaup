@@ -7,86 +7,105 @@ import logging
 import os
 import sys
 import json
+from typing import List, Tuple
+import omegaup.api
 import MySQLdb
 import MySQLdb.cursors
 import pika
 from verification_code import generate_code
+import rabbitmq_connection
 
 
 sys.path.insert(
     0,
     os.path.join(
-        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__))), '.'))
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 
-def verificate_certificate(
-        cur: MySQLdb.cursors.BaseCursor,
-        identity_id: str,
-        course_id: str) -> bool:
-    '''verificate if certificate exist'''
-    cur.execute('''
-                SELECT
-                    COUNT(*) AS `count`
-                FROM
-                    `Certificates`
-                WHERE
-                    `identity_id` = %s AND
-                    `course_id` = %s;
-                ''', (identity_id, course_id))
-    for row in cur:
-        if row['count'] > 0:
-            logging.info('Skipping because already exist certificate')
-            return True
-    return False
-
-
-def receive_course_messages(
+def certificate_course_receive_messages(
         cur: MySQLdb.cursors.BaseCursor,
         dbconn: MySQLdb.connections.Connection,
-        rabbit_user: str,
-        rabbit_password: str) -> None:
+        channel: pika.adapters.blocking_connection.BlockingChannel,
+        args: argparse.Namespace) -> None:
     '''Receive courses messages'''
 
-    credentials = pika.PlainCredentials(rabbit_user, rabbit_password)
-    parameters = pika.ConnectionParameters('rabbitmq', 5672, '/', credentials)
-    connection = pika.BlockingConnection(parameters)
-    channel = connection.channel()
-    channel.exchange_declare(exchange='logs_exchange', exchange_type='direct')
     result = channel.queue_declare(queue='', exclusive=True)
     queue_name = result.method.queue
     assert queue_name is not None
     channel.queue_bind(
-        exchange='logs_exchange',
+        exchange='certificates',
         queue=queue_name,
-        routing_key="CourseQueue")
+        routing_key='CourseQueue')
     logging.info('[*] waiting for the messages')
 
-    def callback(channel: pika.adapters.blocking_connection.BlockingChannel,
-                 method: pika.spec.Basic.Deliver,
-                 properties: pika.spec.BasicProperties,
-                 # pylint: disable=unused-argument,
-                 body: bytes) -> None:
+    def certificate_course_callback(
+            _channel: pika.adapters.blocking_connection.BlockingChannel,
+            _method: pika.spec.Basic.Deliver,
+            _properties: pika.spec.BasicProperties,
+            body: bytes) -> None:
         '''Function to receive messages'''
         data = json.loads(body.decode())
-        if verificate_certificate(cur, data["identity_id"], data["course_id"]):
-            return
-        code_verification = generate_code()
-        cur.execute('''
+        client = omegaup.api.Client(api_token=args.api_token, url=args.url)
+        progress = client.course.studentProgress(course=data['alias'])
+
+        certificates: List[Tuple[str, int, str, str]] = []
+
+        for user in progress:
+            if user['progress'] < data['minimum_progress_for_certificate']:
+                continue
+            verification_code = generate_code()
+            certificates.append((
+                'course',
+                int(data['course_id']),
+                verification_code,
+                str(user['username'])
+            ))
+        while True:
+            try:
+                cur.execute('''
                     INSERT INTO
-                        `Certificates` (`identity_id`,
-                                     `certificate_type`,
-                                     `course_id`, `verification_code`)
-                    VALUES(%s, %s, %s, %s);''',
-                    (data["identity_id"],
-                     'course', data["course_id"], code_verification))
-        dbconn.commit()
+                        `Certificates` (
+                            `identity_id`,
+                            `certificate_type`,
+                            `course_id`,
+                            `verification_code`)
+                    SELECT
+                        `identity_id`,
+                        %s,
+                        %s,
+                        %s
+                    FROM
+                        `Identities`
+                    WHERE
+                        `username` = %s;
+                    ''', certificates)
+                dbconn.commit()
+                break
+            except:  # noqa: bare-except
+                certificates = []
+                for user in progress:
+                    if user['progress'] < data['minimum_progress_for_certificate']:
+                        continue
+                    verification_code = generate_code()
+                    certificates.append((
+                        'course',
+                        int(data['course_id']),
+                        verification_code,
+                        str(user['username'])
+                    ))
+                logging.exception(
+                    'At least one of the verification codes has conflict')
+                dbconn.rollback()
     channel.basic_consume(
         queue=queue_name,
-        on_message_callback=callback,
+        on_message_callback=certificate_course_callback,
         auto_ack=True)
-    channel.start_consuming()
+    try:
+        channel.start_consuming()
+    except KeyboardInterrupt:
+        channel.stop_consuming()
 
 
 def main() -> None:
@@ -95,22 +114,22 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
+    rabbitmq_connection.configure_parser(parser)
 
-    parser.add_argument('--user_rabbit')
-    parser.add_argument('--password_rabbit')
+    parser.add_argument('--api-token', type=str, help='omegaup api token')
+    parser.add_argument('--url',
+                        type=str,
+                        help='omegaup api URL',
+                        default='https://omegaup.com')
 
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
-
     logging.info('Started')
     dbconn = lib.db.connect(args)
     try:
-        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
-            receive_course_messages(
-                cur,
-                dbconn,
-                args.user_rabbit,
-                args.password_rabbit)
+        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur, \
+            rabbitmq_connection.connect(args) as channel:
+            certificate_course_receive_messages(cur, dbconn, channel, args)
     finally:
         dbconn.close()
         logging.info('Done')
