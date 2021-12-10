@@ -1,0 +1,30 @@
+name: Update libomegaup
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Update libomegaup
+        run: |
+          SUBJECT="$(git show ${{ github.sha }} --format=%s --no-patch)"
+          MESSAGE="$(printf "omegaUp API change for \"%s\"\n\nAPI changes from https://github.com/omegaup/omegaup/commit/%s\n" "${SUBJECT}" "${{ github.sha }}")"
+          git clone --depth=1 https://omegaup-bot:${{ secrets.OMEGAUPBOT_RELEASE_TOKEN }}@github.com/omegaup/libomegaup /tmp/libomegaup
+          php frontend/server/cmd/APITool.php --file api.py | yapf | sed -e 's/^\s\+$//' > /tmp/libomegaup/omegaup/api.py
+          (cd /tmp/libomegaup &&
+           git config --local user.name "omegaup-bot" &&
+           git config --local user.email "omegaup-bot@users.noreply.github.com" &&
+           python3 -m pip install yapf==0.30.0 -r requirements/test.txt -r requirements.txt &&
+           make docs &&
+           ([[ -z "$(git status --porcelain)" ]] || (git commit -am "${MESSAGE}" && git push)))
+          rm -rf /tmp/libomegaup
