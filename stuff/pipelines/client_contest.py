@@ -8,7 +8,6 @@ import logging
 import os
 import sys
 import json
-from dataclasses import dataclass
 from typing import List, Optional
 import omegaup.api
 import MySQLdb
@@ -25,7 +24,7 @@ import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 
-@dataclass
+@dataclasses.dataclass
 class Certificate:
     '''A dataclass for certificate.'''
     certificate_type: str
@@ -68,14 +67,13 @@ def certificate_contests_receive_messages(
                     and user['place'] <= data['certificate_cutoff']):
                 contest_place = user['place']
             verification_code = generate_code()
-            certificate = Certificate(
+            certificates.append(Certificate(
                 'contest',
                 int(data['contest_id']),
                 verification_code,
                 contest_place,
                 str(user['username'])
-            )
-            certificates.append(certificate)
+            ))
         while True:
             try:
                 cur.executemany('''
