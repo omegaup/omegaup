@@ -1,2 +1,1 @@
-mysqlclient==2.0.1
 python-json-logger>=2.0.2

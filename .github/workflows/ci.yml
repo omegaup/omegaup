@@ -58,7 +58,8 @@ jobs:
           python3 -m pip install --user setuptools
           python3 -m pip install --user wheel
           python3 -m pip install --user \
-            -r stuff/docker/requirements.txt
+            -r stuff/docker/requirements.txt \
+            mysqlclient==2.0.1
 
       - name: Validate composer.json and composer.lock
         run: composer validate
@@ -242,6 +243,7 @@ jobs:
           python3 -m pip install --user --upgrade urllib3
           python3 -m pip install --user \
             -r stuff/docker/requirements.txt \
+            mysqlclient==2.0.1 \
             selenium \
             pytest \
             pytest-xdist \
@@ -313,6 +315,7 @@ jobs:
           python3 -m pip install --user --upgrade urllib3
           python3 -m pip install --user \
             -r stuff/docker/requirements.txt \
+            mysqlclient==2.0.1 \
             pandas \
             pytest
 
