@@ -3,11 +3,13 @@
 '''Processing contest messages.'''
 
 import argparse
+import dataclasses
 import logging
 import os
 import sys
 import json
-from typing import List, Optional, Tuple
+from dataclasses import dataclass
+from typing import List, Optional
 import omegaup.api
 import MySQLdb
 import MySQLdb.cursors
@@ -21,6 +23,16 @@ sys.path.insert(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "."))
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+
+
+@dataclass
+class Certificate:
+    '''A dataclass for certificate.'''
+    certificate_type: str
+    contest_id: int
+    verification_code: str
+    contest_place: Optional[int]
+    username: str
 
 
 def certificate_contests_receive_messages(
@@ -48,7 +60,7 @@ def certificate_contests_receive_messages(
         scoreboard = client.contest.scoreboard(contest_alias=data['alias'],
                                                token=data['scoreboard_url'])
         ranking = scoreboard['ranking']
-        certificates: List[Tuple[str, int, str, Optional[int], str]] = []
+        certificates: List[Certificate] = []
 
         for user in ranking:
             contest_place: Optional[int] = None
@@ -56,13 +68,14 @@ def certificate_contests_receive_messages(
                     and user['place'] <= data['certificate_cutoff']):
                 contest_place = user['place']
             verification_code = generate_code()
-            certificates.append((
+            certificate = Certificate(
                 'contest',
                 int(data['contest_id']),
                 verification_code,
                 contest_place,
                 str(user['username'])
-            ))
+            )
+            certificates.append(certificate)
         while True:
             try:
                 cur.executemany('''
@@ -83,26 +96,18 @@ def certificate_contests_receive_messages(
                         `Identities`
                     WHERE
                         `username` = %s;
-                    ''', certificates)
+                    ''',
+                                [
+                                    dataclasses.astuple(
+                                        certificate
+                                    ) for certificate in certificates])
                 dbconn.commit()
                 break
             except:  # noqa: bare-except
-                certificates = []
-                for user in ranking:
-                    contest_place = None
-                    if (data['certificate_cutoff']
-                            and user['place'] <= data['certificate_cutoff']):
-                        contest_place = user['place']
-                    verification_code = generate_code()
-                    certificates.append((
-                        'contest',
-                        int(data['contest_id']),
-                        verification_code,
-                        contest_place,
-                        str(user['username'])
-                    ))
+                for certificate in certificates:
+                    certificate.verification_code = generate_code()
                 logging.exception(
-                    'At least one of the verification codes was conflict')
+                    'At least one of the verification codes had a conflict')
                 dbconn.rollback()
     channel.basic_consume(
         queue=queue_name,
