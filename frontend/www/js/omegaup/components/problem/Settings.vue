@@ -2,45 +2,6 @@
   <div>
     <div class="row">
       <div class="form-group col-md-6">
-        <label>{{ T.problemEditFormLanguages }}</label>
-        <select
-          v-model="currentLanguages"
-          name="languages"
-          class="form-control"
-          :class="{ 'is-invalid': errors.includes('languages') }"
-          required
-        >
-          <option
-            v-for="(languageText, languageIndex) in validLanguages"
-            :key="languageIndex"
-            :value="languageIndex"
-          >
-            {{ languageText }}
-          </option>
-        </select>
-      </div>
-      <div class="form-group col-md-6">
-        <label>{{ T.problemEditFormValidatorType }}</label>
-        <select
-          v-model="validator"
-          name="validator"
-          class="form-control"
-          :class="{ 'is-invalid': errors.includes('validator') }"
-          :disabled="currentLanguages === ''"
-          required
-        >
-          <option
-            v-for="(validatorText, validatorIndex) in validatorTypes"
-            :key="validatorIndex"
-            :value="validatorIndex"
-          >
-            {{ validatorText }}
-          </option>
-        </select>
-      </div>
-    </div>
-    <div class="row">
-      <div class="form-group col-md-6">
         <label for="validator_time_limit">{{
           T.problemEditFormValidatorTimeLimit
         }}</label>
@@ -146,7 +107,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component
@@ -158,26 +119,8 @@ export default class Settings extends Vue {
   @Prop() inputLimit!: number;
   @Prop() overallWallTimeLimit!: number;
   @Prop() validatorTimeLimit!: number;
-  @Prop() languages!: string;
-  @Prop() validLanguages!: Array<string>;
-  @Prop() initialValidator!: string;
-  @Prop() validatorTypes!: Array<string>;
   @Prop() errors!: Array<string>;
 
   T = T;
-
-  validator = this.initialValidator;
-  currentLanguages = this.languages;
-
-  @Watch('initialValidator')
-  onInitialValidatorChange(newInitial: string): void {
-    this.validator = newInitial;
-  }
-
-  @Emit('update:languages')
-  @Watch('currentLanguages')
-  onCurrentLanguagesChange(newValue: string): string {
-    return newValue;
-  }
 }
 </script>
