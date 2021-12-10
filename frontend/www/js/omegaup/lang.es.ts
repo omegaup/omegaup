@@ -100,7 +100,7 @@ const translations: { [key: string]: string; } = {
   badge_karelExpert_description: "Otorgado a personas que han resuelto m\u00e1s de 10 problemas en Karel.",
   badge_karelExpert_name: "Especialista en Karel",
   badge_legacyUser_description: "Otorgado a personas que realizaron alg\u00fan env\u00edo hace m\u00e1s de 3 a\u00f1os.",
-  badge_legacyUser_name: "Trayectoria Hist\u00f3rica",
+  badge_legacyUser_name: "Usuario Hist\u00f3rico",
   badge_pascalExpert_description: "Otorgado a personas que han resuelto m\u00e1s de 10 problemas en Pascal.",
   badge_pascalExpert_name: "Especialista en Pascal",
   badge_problemOfTheWeekWithOmegaUp_description: "Otorgado a personas que han resuelto un problema del curso de Resolviendo Problemas en omegaUp.",
