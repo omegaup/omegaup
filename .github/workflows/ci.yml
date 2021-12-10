@@ -45,7 +45,7 @@ jobs:
 
       - name: Download gitserver
         run: |
-          DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.8.2/omegaup-gitserver.tar.xz'
+          DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.8.11/omegaup-gitserver.tar.xz'
           curl --location "${DOWNLOAD_URL}" | sudo tar -xJv -C /
 
           # omegaup-gitserver depends on libinteractive.
@@ -58,6 +58,7 @@ jobs:
           python3 -m pip install --user setuptools
           python3 -m pip install --user wheel
           python3 -m pip install --user \
+            -r stuff/docker/requirements.txt \
             mysqlclient==2.0.1
 
       - name: Validate composer.json and composer.lock
@@ -360,6 +361,7 @@ jobs:
           python3 -m pip install --user wheel
           python3 -m pip install --user --upgrade urllib3
           python3 -m pip install --user \
+            -r stuff/docker/requirements.txt \
             mysqlclient==2.0.1 \
             selenium \
             pytest \
@@ -431,6 +433,7 @@ jobs:
           python3 -m pip install --user wheel
           python3 -m pip install --user --upgrade urllib3
           python3 -m pip install --user \
+            -r stuff/docker/requirements.txt \
             mysqlclient==2.0.1 \
             pandas \
             pytest
