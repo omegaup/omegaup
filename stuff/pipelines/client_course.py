@@ -3,11 +3,13 @@
 '''Processing course messages.'''
 
 import argparse
+import dataclasses
 import logging
 import os
 import sys
 import json
-from typing import List, Tuple
+from dataclasses import dataclass
+from typing import List, Optional
 import omegaup.api
 import MySQLdb
 import MySQLdb.cursors
@@ -22,6 +24,15 @@ sys.path.insert(
         os.path.dirname(os.path.dirname(os.path.realpath(__file__))), '.'))
 import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
+
+
+@dataclass
+class Certificate:
+    '''A dataclass for certificate.'''
+    certificate_type: str
+    course_id: Optional[int]
+    verification_code: str
+    username: str
 
 
 def certificate_course_receive_messages(
@@ -48,20 +59,17 @@ def certificate_course_receive_messages(
         '''Function to receive messages'''
         data = json.loads(body.decode())
         client = omegaup.api.Client(api_token=args.api_token, url=args.url)
-        progress = client.course.studentProgress(course=data['alias'])
+        progress = client.course.studentsProgress(course=data['alias'])
 
-        certificates: List[Tuple[str, int, str, str]] = []
+        certificates: List[Certificate] = []
 
         for user in progress:
             if user['progress'] < data['minimum_progress_for_certificate']:
                 continue
             verification_code = generate_code()
-            certificates.append((
-                'course',
-                int(data['course_id']),
-                verification_code,
-                str(user['username'])
-            ))
+            certificate = Certificate('course', int(data['course_id']),
+                                      verification_code, str(user['username']))
+            certificates.append(certificate)
         while True:
             try:
                 cur.execute('''
@@ -80,23 +88,22 @@ def certificate_course_receive_messages(
                         `Identities`
                     WHERE
                         `username` = %s;
-                    ''', certificates)
+                    ''',
+                            [
+                                dataclasses.astuple(
+                                    certificate
+                                ) for certificate in certificates])
                 dbconn.commit()
                 break
             except:  # noqa: bare-except
                 certificates = []
                 for user in progress:
-                    if user['progress'] < data['minimum_progress_for_certificate']:
+                    minimum_progress = data['minimum_progress_for_certificate']
+                    if user['progress'] < minimum_progress:
                         continue
-                    verification_code = generate_code()
-                    certificates.append((
-                        'course',
-                        int(data['course_id']),
-                        verification_code,
-                        str(user['username'])
-                    ))
+                    certificate.verification_code = generate_code()
                 logging.exception(
-                    'At least one of the verification codes has conflict')
+                    'At least one of the verification codes had a conflict')
                 dbconn.rollback()
     channel.basic_consume(
         queue=queue_name,
