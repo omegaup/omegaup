@@ -8,9 +8,9 @@
       <h2 class="mb-0">{{ course.name }}</h2>
       <h4>{{ assignment.name }}</h4>
     </div>
-    <b-row class="px-3 mt-4">
+    <b-row class="px-3 mt-4 align-items-start">
       <b-card no-body class="col-md-3 col-lg-2 p-0 text-center">
-        <b-card-header header-tag="nav">
+        <b-card-header header-tag="nav" class="border-0">
           <b-nav card-header pills justified>
             <b-nav-item
               :href="`#${Tabs.Summary}`"
@@ -19,12 +19,14 @@
               >{{ T.wordsSummary }}</b-nav-item
             >
             <b-nav-item
+              v-if="scoreboard"
               :href="`#${Tabs.Ranking}`"
               :active="currentSelectedTab === Tabs.Ranking"
               @click="currentSelectedTab = Tabs.Ranking"
               >{{ T.wordsRanking }}</b-nav-item
             >
           </b-nav>
+          <hr />
           <b-nav card-header pills vertical>
             <b-nav-item
               v-for="problem in problems"
@@ -57,7 +59,17 @@
           :markdown="assignment.description"
           :full-width="true"
         ></omegaup-markdown>
-        <!-- TODO: Ranking, Problem -->
+        <omegaup-arena-scoreboard
+          v-if="currentSelectedTab === Tabs.Ranking && scoreboard"
+          :show-invited-users-filter="false"
+          :problems="scoreboard.problems"
+          :ranking="scoreboard.ranking"
+          :last-updated="scoreboard.time"
+        >
+          <template #scoreboard-header>
+            <h3 class="text-center">{{ T.wordsRanking }}</h3>
+          </template>
+        </omegaup-arena-scoreboard>
       </b-col>
     </b-row>
   </b-container>
@@ -69,6 +81,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import omegaup_Markdown from '../Markdown.vue';
+import arena_Scoreboard from './Scoreboard.vue';
 
 import { BIconChevronLeft, BootstrapVue } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -84,6 +97,7 @@ export enum Tabs {
   components: {
     BIconChevronLeft,
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-arena-scoreboard': arena_Scoreboard,
   },
 })
 export default class ArenaCourse extends Vue {
@@ -92,6 +106,7 @@ export default class ArenaCourse extends Vue {
   @Prop() problems!: types.ArenaCourseProblem[];
   @Prop() currentProblem!: types.ArenaCourseCurrentProblem;
   @Prop({ default: Tabs.Summary }) selectedTab!: string | null;
+  @Prop() scoreboard!: types.Scoreboard;
 
   T = T;
   ui = ui;
