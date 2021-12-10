@@ -325,6 +325,28 @@ def create_problem(
                 (By.CSS_SELECTOR,
                  'a[data-nav-problems-create]'))).click()
 
+    # open all collapsed panels
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//button[@data-target=".tags"]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//button[@data-target=".limits"]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//button[@data-target=".validation"]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//button[@data-target=".access"]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//button[@data-target=".evaluation"]'))).click()
+
     with assert_js_errors(
             driver,
             expected_messages=('/api/problem/details/',)
