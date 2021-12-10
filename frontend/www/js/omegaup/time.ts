@@ -255,7 +255,7 @@ export function remoteTimeAdapter<T>(value: T): T {
  * Calculate the duration of a contest based on its start date and its end date.
  * @param startDate - The start date of a contest
  * @param finishDate - The finish date of a contest
- * @returns The duration of a contest in human redeable format (HH:mm:ss)
+ * @returns The duration of a contest in human redeable format (DD d HH:mm:ss)
  */
 export function formatContestDuration(
   startDate: Date,
