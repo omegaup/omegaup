@@ -261,7 +261,24 @@ export function formatContestDuration(
   startDate: Date,
   finishDate: Date,
 ): string {
-  return formatDelta(finishDate.getTime() - startDate.getTime());
+  let delta = finishDate.getTime() - startDate.getTime();
+  const days = Math.floor(delta / (24 * 60 * 60 * 1000));
+  delta -= days * (24 * 60 * 60 * 1000);
+  const hours = Math.floor(delta / (60 * 60 * 1000));
+  delta -= hours * (60 * 60 * 1000);
+  const minutes = Math.floor(delta / (60 * 1000));
+  delta -= minutes * (60 * 1000);
+  const seconds = Math.floor(delta / 1000);
+  days > 0 && days < 10 ? '0' + days : days;
+  let clock = '';
+  if (days > 0) {
+    clock += `${days} d `;
+  }
+  clock += `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+    2,
+    '0',
+  )}:${String(seconds).padStart(2, '0')}`;
+  return clock;
 }
 
 /**
