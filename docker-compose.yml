@@ -27,7 +27,7 @@ services:
       CI: "${CI:-false}"
 
   gitserver:
-    image: omegaup/gitserver:v1.8.2
+    image: omegaup/gitserver:v1.8.11
     entrypoint: ["wait-for-it", "mysql:3306", "--", "/usr/bin/omegaup-gitserver"]
     user: "${UID_GID}"
     restart: always
