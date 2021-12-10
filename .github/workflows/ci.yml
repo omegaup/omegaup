@@ -225,6 +225,7 @@ jobs:
           define('REDIS_HOST', 'localhost');
           define('REDIS_PASS', '');
           define('SMARTY_CACHE_DIR', '/tmp');
+          define('OMEGAUP_CSRF_HOSTS', ['frontend', '127.0.0.1']);
           EOF
 
           cat > ~/.my.cnf << EOF
