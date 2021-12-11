@@ -183,4 +183,14 @@ describe('time', () => {
       expect(result.getSeconds()).toEqual(dateNow.getUTCSeconds());
     });
   });
+
+  describe('formatContestDuration', () => {
+    it('Should show correct time format', () => {
+      const daySeconds = 24 * 60 * 60 * 1000;
+      const today = new Date();
+      const tomorrow = new Date(today.getTime() + daySeconds);
+      const result = time.formatContestDuration(today, tomorrow);
+      expect(result).toBe('1 día');
+    });
+  });
 });
