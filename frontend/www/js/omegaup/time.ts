@@ -1,23 +1,34 @@
-import * as moment from 'moment';
 import formatDuration from 'date-fns/formatDuration';
 import esLocale from 'date-fns/locale/es';
 import enLocale from 'date-fns/locale/en-US';
 import ptLocale from 'date-fns/locale/pt-BR';
 import T from './lang';
 
-let momentInitialized: boolean = false;
 let remoteDeltaTime: number = 0;
 
 export function formatFutureDateRelative(futureDate: Date): string {
-  if (!momentInitialized) {
-    moment.locale(T.locale);
-    momentInitialized = true;
+  let currentLocale;
+  switch (T.locale) {
+    case 'pt':
+      currentLocale = ptLocale;
+      break;
+    case 'en':
+      currentLocale = enLocale;
+      break;
+    default:
+      currentLocale = esLocale;
+      break;
   }
-
-  // moment is a weird library. The top-level import can be a function or an
-  // object, and it depends on whether it was processed by webpack (in regular
-  // compilation) or just babel (in tests).
-  return ((moment as any)?.default ?? moment)(futureDate).endOf().fromNow();
+  return formatDuration(
+    {
+      months: futureDate.getMonth(),
+      days: futureDate.getDay(),
+    },
+    {
+      format: ['months', 'days'],
+      locale: currentLocale,
+    },
+  );
 }
 
 export function formatDelta(delta: number): string {
@@ -275,9 +286,6 @@ export function formatContestDuration(
   const seconds = Math.floor(delta / 1000);
   let currentLocale;
   switch (T.locale) {
-    case 'es':
-      currentLocale = esLocale;
-      break;
     case 'pt':
       currentLocale = ptLocale;
       break;
@@ -285,7 +293,7 @@ export function formatContestDuration(
       currentLocale = enLocale;
       break;
     default:
-      currentLocale = enLocale;
+      currentLocale = esLocale;
       break;
   }
   return formatDuration(
