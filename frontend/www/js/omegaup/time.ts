@@ -1,4 +1,8 @@
 import * as moment from 'moment';
+import formatDuration from 'date-fns/formatDuration';
+import esLocale from 'date-fns/locale/es';
+import enLocale from 'date-fns/locale/en-US';
+import ptLocale from 'date-fns/locale/pt-BR';
 import T from './lang';
 
 let momentInitialized: boolean = false;
@@ -269,15 +273,32 @@ export function formatContestDuration(
   const minutes = Math.floor(delta / (60 * 1000));
   delta -= minutes * (60 * 1000);
   const seconds = Math.floor(delta / 1000);
-  let clock = '';
-  if (days > 0) {
-    clock += `${days} d `;
+  let currentLocale;
+  switch (T.locale) {
+    case 'es':
+      currentLocale = esLocale;
+      break;
+    case 'pt':
+      currentLocale = ptLocale;
+      break;
+    case 'en':
+      currentLocale = enLocale;
+      break;
+    default:
+      currentLocale = enLocale;
+      break;
   }
-  clock += `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
-    2,
-    '0',
-  )}:${String(seconds).padStart(2, '0')}`;
-  return clock;
+  return formatDuration(
+    {
+      days: days,
+      hours: hours,
+      minutes: minutes,
+      seconds: seconds,
+    },
+    {
+      locale: currentLocale,
+    },
+  );
 }
 
 /**
