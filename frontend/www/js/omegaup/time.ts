@@ -6,7 +6,7 @@ import T from './lang';
 
 let remoteDeltaTime: number = 0;
 
-export function formatFutureDateRelative(futureDate: Date): string {
+export function formatFutureDateRelative(delta: number): string {
   let currentLocale;
   switch (T.locale) {
     case 'pt':
@@ -19,13 +19,16 @@ export function formatFutureDateRelative(futureDate: Date): string {
       currentLocale = esLocale;
       break;
   }
+  const years = Math.floor(delta / 31536000000);
+  delta -= years * 31536000000;
+  const months = Math.floor(delta / 2629746000);
   return formatDuration(
     {
-      months: futureDate.getMonth(),
-      days: futureDate.getDay(),
+      years: years,
+      months: months,
     },
     {
-      format: ['months', 'days'],
+      format: ['years', 'months'],
       locale: currentLocale,
     },
   );
@@ -38,7 +41,7 @@ export function formatDelta(delta: number): string {
   }
   const months = delta / (30 * 24 * 60 * 60 * 1000);
   if (months >= 1.0) {
-    return sign + formatFutureDateRelative(new Date(delta + Date.now()));
+    return sign + formatFutureDateRelative(delta);
   }
 
   const days = Math.floor(delta / (24 * 60 * 60 * 1000));

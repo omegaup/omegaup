@@ -82,12 +82,12 @@ describe('time', () => {
     });
 
     it('Should handle valid human readable dates', () => {
-      expect(time.formatDelta(3000000000)).toEqual('en un mes');
-      expect(time.formatDelta(5000000000)).toEqual('en 2 meses');
-      expect(time.formatDelta(7500000000)).toEqual('en 3 meses');
-      expect(time.formatDelta(10000000000)).toEqual('en 4 meses');
-      expect(time.formatDelta(50000000000)).toEqual('en 2 años');
-      expect(time.formatDelta(100000000000)).toEqual('en 3 años');
+      expect(time.formatDelta(3000000000)).toEqual('1 mes');
+      expect(time.formatDelta(5259492000)).toEqual('2 meses');
+      expect(time.formatDelta(7889238000)).toEqual('3 meses');
+      expect(time.formatDelta(10518984000)).toEqual('4 meses');
+      expect(time.formatDelta(63113904000)).toEqual('2 años');
+      expect(time.formatDelta(94670856000)).toEqual('3 años');
     });
   });
 
