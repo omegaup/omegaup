@@ -14,7 +14,7 @@ import { types } from '../../api_types';
 export default class EphemeralGrader extends Vue {
   @Ref() grader!: HTMLIFrameElement;
   @Prop() problem!: types.ProblemInfo;
-  @Prop({ default: [] }) acceptedLanguages!: string[];
+  @Prop({ default: () => [] }) acceptedLanguages!: string[];
 
   loaded = false;
 
