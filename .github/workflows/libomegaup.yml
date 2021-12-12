@@ -1,0 +1,60 @@
+name: Update libomegaup
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Use PHP 7.4
+        run: |
+          sudo update-alternatives --install /usr/bin/php php /usr/bin/php7.4 100
+          # Enable coverage for XDebug so that codecov can do its magic.
+          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/7.4/cli/conf.d/20-xdebug.ini >/dev/null
+
+      - name: Install composer dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Install Python dependencies
+        run: python3 -m pip install yapf==0.30.0
+
+      - name: Prepare Psalm
+        run: |
+          # Create optional directories to simplify psalm config.
+          mkdir -p frontend/www/{phpminiadmin,preguntas}
+          touch 'frontend/server/config.php'
+          touch 'frontend/tests/test_config.php'
+
+      - name: Update libomegaup
+        run: |
+          set -e
+
+          SUBJECT="omegaUp API change for \"$(git show "${{ github.sha }}" --format=%s --no-patch)\""
+          BODY="API changes from https://github.com/omegaup/omegaup/commit/${{ github.sha }}"
+          MESSAGE="$(printf "%s\n\n%s\n" "${SUBJECT}" "${BODY}")"
+
+          git clone --depth=1 "https://omegaup-bot:${{ secrets.OMEGAUPBOT_RELEASE_TOKEN }}@github.com/omegaup/libomegaup" /tmp/libomegaup
+          php frontend/server/cmd/APITool.php --file api.py | yapf | sed -e 's/^\s\+$//' > /tmp/libomegaup/omegaup/api.py
+          (cd /tmp/libomegaup &&
+           git config --local user.name "omegaup-bot" &&
+           git config --local user.email "omegaup-bot@users.noreply.github.com" &&
+           python3 -m pip install -r requirements/test.txt -r requirements.txt &&
+           make docs &&
+           ([[ -z "$(git status --porcelain)" ]] || (
+              git commit -am "${MESSAGE}" &&
+              git push origin "HEAD:refs/heads/pr-${{ github.sha }}" &&
+              GITHUB_TOKEN="${{ secrets.OMEGAUPBOT_RELEASE_TOKEN }}" gh pr create --title "${SUBJECT}" --body "${BODY}" --head "pr-${{ github.sha }}" --base main
+            ))
+          )
+          rm -rf /tmp/libomegaup
