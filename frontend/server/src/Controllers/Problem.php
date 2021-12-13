@@ -3475,7 +3475,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $r->ensureOptionalString('verdict'),
                 $r->ensureOptionalString('language'),
                 !is_null($identity) ? intval($identity->identity_id) : null,
-                $r->ensureOptionalInt('offset') ?? 0,
+                max($r->ensureOptionalInt('offset') ?? 0, 0),
                 $r->ensureOptionalInt('rowcount') ?? 100
             );
             $response['runs'] = $runs;
@@ -4752,6 +4752,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $pageSize = $r->ensureOptionalInt(
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
+        if ($offset < 0) {
+            $offset = 0;
+        }
 
         [
             'sortOrder' => $sortOrder,
@@ -5961,6 +5964,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
         $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
+        if ($offset < 0) {
+            $offset = 0;
+        }
 
         [
             'sortOrder' => $sortOrder,
@@ -6195,6 +6201,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
         $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
+        if ($offset < 0) {
+            $offset = 0;
+        }
 
         [
             'sortOrder' => $sortOrder,
