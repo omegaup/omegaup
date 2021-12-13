@@ -3748,6 +3748,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $offset = $r->ensureOptionalInt('offset');
         $rowcount = $r->ensureOptionalInt('rowcount') ?? 1000;
+        if ($offset < 0) {
+            $offset = 0;
+        }
 
         $contest = self::validateContest(
             $r->ensureString(
@@ -3786,6 +3789,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $offset = $r->ensureOptionalInt('offset');
         $rowcount = $r->ensureOptionalInt('rowcount') ?? 1000;
+        if ($offset < 0) {
+            $offset = 0;
+        }
 
         $contest = self::validateContest(
             $r->ensureString(
@@ -4960,7 +4966,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             !is_null($problem) ? $problem->problem_id : null,
             $r->ensureOptionalEnum('language', $languages),
             !is_null($identity) ? $identity->identity_id : null,
-            $r->ensureOptionalInt('offset') ?? 0,
+            max($r->ensureOptionalInt('offset') ?? 0, 0),
             $r->ensureOptionalInt('rowcount') ?? 100
         );
     }
