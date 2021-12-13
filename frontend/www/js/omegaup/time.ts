@@ -1,4 +1,5 @@
 import formatDuration from 'date-fns/formatDuration';
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import esLocale from 'date-fns/locale/es';
 import enLocale from 'date-fns/locale/en-US';
 import ptLocale from 'date-fns/locale/pt-BR';
@@ -6,7 +7,7 @@ import T from './lang';
 
 let remoteDeltaTime: number = 0;
 
-export function formatFutureDateRelative(delta: number): string {
+export function formatFutureDateRelative(futureDate: Date): string {
   let currentLocale;
   switch (T.locale) {
     case 'pt':
@@ -19,19 +20,10 @@ export function formatFutureDateRelative(delta: number): string {
       currentLocale = esLocale;
       break;
   }
-  const years = Math.floor(delta / 31536000000);
-  delta -= years * 31536000000;
-  const months = Math.floor(delta / 2629746000);
-  return formatDuration(
-    {
-      years: years,
-      months: months,
-    },
-    {
-      format: ['years', 'months'],
-      locale: currentLocale,
-    },
-  );
+  return formatDistanceToNow(futureDate, {
+    addSuffix: true,
+    locale: currentLocale,
+  });
 }
 
 export function formatDelta(delta: number): string {
@@ -41,7 +33,7 @@ export function formatDelta(delta: number): string {
   }
   const months = delta / (30 * 24 * 60 * 60 * 1000);
   if (months >= 1.0) {
-    return sign + formatFutureDateRelative(delta);
+    return sign + formatFutureDateRelative(new Date(delta + Date.now()));
   }
 
   const days = Math.floor(delta / (24 * 60 * 60 * 1000));
