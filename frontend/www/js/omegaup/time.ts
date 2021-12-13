@@ -1,19 +1,29 @@
-import * as moment from 'moment';
+import formatDuration from 'date-fns/formatDuration';
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import esLocale from 'date-fns/locale/es';
+import enLocale from 'date-fns/locale/en-US';
+import ptLocale from 'date-fns/locale/pt-BR';
 import T from './lang';
 
-let momentInitialized: boolean = false;
 let remoteDeltaTime: number = 0;
 
 export function formatFutureDateRelative(futureDate: Date): string {
-  if (!momentInitialized) {
-    moment.locale(T.locale);
-    momentInitialized = true;
+  let currentLocale;
+  switch (T.locale) {
+    case 'pt':
+      currentLocale = ptLocale;
+      break;
+    case 'en':
+      currentLocale = enLocale;
+      break;
+    default:
+      currentLocale = esLocale;
+      break;
   }
-
-  // moment is a weird library. The top-level import can be a function or an
-  // object, and it depends on whether it was processed by webpack (in regular
-  // compilation) or just babel (in tests).
-  return ((moment as any)?.default ?? moment)(futureDate).endOf().fromNow();
+  return formatDistanceToNow(futureDate, {
+    addSuffix: true,
+    locale: currentLocale,
+  });
 }
 
 export function formatDelta(delta: number): string {
@@ -255,13 +265,43 @@ export function remoteTimeAdapter<T>(value: T): T {
  * Calculate the duration of a contest based on its start date and its end date.
  * @param startDate - The start date of a contest
  * @param finishDate - The finish date of a contest
- * @returns The duration of a contest in human redeable format (HH:mm:ss)
+ * @returns The duration of a contest in human readable format (Locale based)
  */
 export function formatContestDuration(
   startDate: Date,
   finishDate: Date,
 ): string {
-  return formatDelta(finishDate.getTime() - startDate.getTime());
+  let delta = finishDate.getTime() - startDate.getTime();
+  const days = Math.floor(delta / (24 * 60 * 60 * 1000));
+  delta -= days * (24 * 60 * 60 * 1000);
+  const hours = Math.floor(delta / (60 * 60 * 1000));
+  delta -= hours * (60 * 60 * 1000);
+  const minutes = Math.floor(delta / (60 * 1000));
+  delta -= minutes * (60 * 1000);
+  const seconds = Math.floor(delta / 1000);
+  let currentLocale;
+  switch (T.locale) {
+    case 'pt':
+      currentLocale = ptLocale;
+      break;
+    case 'en':
+      currentLocale = enLocale;
+      break;
+    default:
+      currentLocale = esLocale;
+      break;
+  }
+  return formatDuration(
+    {
+      days: days,
+      hours: hours,
+      minutes: minutes,
+      seconds: seconds,
+    },
+    {
+      locale: currentLocale,
+    },
+  );
 }
 
 /**

@@ -81,13 +81,19 @@ describe('time', () => {
       expect(time.formatDelta(2500000000)).toEqual('28:22:26:40');
     });
 
+    const millMapping = [
+      [{ milliseconds: 3000000000, expected: 'en alrededor de 1 mes' }],
+      [{ milliseconds: 5259492000, expected: 'en 2 meses' }],
+      [{ milliseconds: 7889238000, expected: 'en 3 meses' }],
+      [{ milliseconds: 10518984000, expected: 'en 4 meses' }],
+      [{ milliseconds: 63113904000, expected: 'en alrededor de 2 años' }],
+      [{ milliseconds: 94670856000, expected: 'en casi 3 años' }],
+    ];
+
     it('Should handle valid human readable dates', () => {
-      expect(time.formatDelta(3000000000)).toEqual('en un mes');
-      expect(time.formatDelta(5000000000)).toEqual('en 2 meses');
-      expect(time.formatDelta(7500000000)).toEqual('en 3 meses');
-      expect(time.formatDelta(10000000000)).toEqual('en 4 meses');
-      expect(time.formatDelta(50000000000)).toEqual('en 2 años');
-      expect(time.formatDelta(100000000000)).toEqual('en 3 años');
+      for (const [{ milliseconds, expected }] of millMapping) {
+        expect(time.formatDelta(milliseconds)).toEqual(expected);
+      }
     });
   });
 
@@ -181,6 +187,16 @@ describe('time', () => {
       expect(result.getHours()).toEqual(dateNow.getUTCHours());
       expect(result.getMinutes()).toEqual(dateNow.getUTCMinutes());
       expect(result.getSeconds()).toEqual(dateNow.getUTCSeconds());
+    });
+  });
+
+  describe('formatContestDuration', () => {
+    it('Should show correct time format', () => {
+      const daySeconds = 24 * 60 * 60 * 1000;
+      const today = new Date();
+      const tomorrow = new Date(today.getTime() + daySeconds);
+      const result = time.formatContestDuration(today, tomorrow);
+      expect(result).toBe('1 día');
     });
   });
 });
