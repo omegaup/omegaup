@@ -131,6 +131,8 @@ def main() -> None:
     lib.logs.configure_parser(parser)
     rabbitmq_connection.configure_parser(parser)
 
+    parser.add_argument('--username', type=str, help='omegaup username')
+    parser.add_argument('--password', type=str, help='omegaup password')
     parser.add_argument('--api-token', type=str, help='omegaup api token')
     parser.add_argument('--url',
                         type=str,
