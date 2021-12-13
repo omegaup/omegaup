@@ -68,11 +68,11 @@ def certificate_contests_receive_messages(
                 contest_place = user['place']
             verification_code = generate_code()
             certificates.append(Certificate(
-                'contest',
-                int(data['contest_id']),
-                verification_code,
-                contest_place,
-                str(user['username'])
+                certificate_type='contest',
+                contest_id=int(data['contest_id']),
+                verification_code=verification_code,
+                contest_place=contest_place,
+                username=str(user['username'])
             ))
         while True:
             try:
