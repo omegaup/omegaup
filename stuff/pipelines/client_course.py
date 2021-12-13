@@ -59,17 +59,29 @@ def certificate_course_receive_messages(
         '''Function to receive messages'''
         data = json.loads(body.decode())
         client = omegaup.api.Client(api_token=args.api_token, url=args.url)
-        progress = client.course.studentsProgress(course=data['alias'])
+        login = client.user.login(
+            password=args.password,
+            usernameOrEmail=args.username,
+        )
+        result = client.course.studentsProgress(
+            auth_token=login['auth_token'],
+            course=data['alias'],
+        )
+        progress = result['progress']
 
         certificates: List[Certificate] = []
 
         for user in progress:
-            if user['progress'] < data['minimum_progress_for_certificate']:
+            minimum_progress = data['minimum_progress_for_certificate']
+            if user['courseProgress'] < minimum_progress:
                 continue
             verification_code = generate_code()
-            certificate = Certificate('course', int(data['course_id']),
-                                      verification_code, str(user['username']))
-            certificates.append(certificate)
+            certificates.append(Certificate(
+                certificate_type='course',
+                course_id=int(data['course_id']),
+                verification_code=verification_code,
+                username=str(user['username']),
+            ))
         while True:
             try:
                 cur.execute('''
