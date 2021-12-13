@@ -1396,36 +1396,15 @@ document
   .addEventListener('submit', (e) => {
     e.preventDefault();
     submitButton.setAttribute('disabled', '');
-    const params = {
-      problem_alias: store.state.alias,
-      language: store.state.request.language,
-      source: store.state.request.source,
-    };
-    fetch('/api/run/create/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+    parent.postMessage({
+      method: 'submitRun',
+      params: {
+        problem_alias: store.state.alias,
+        language: store.state.request.language,
+        source: store.state.request.source,
       },
-      body: Object.keys(params)
-        .filter(
-          (key) => params[key] !== null && typeof params[key] !== 'undefined',
-        )
-        .map((key) => {
-          if (params[key] instanceof Date) {
-            return `${encodeURIComponent(key)}=${encodeURIComponent(
-              Math.round(params[key].getTime() / 1000),
-            )}`;
-          }
-          return `${encodeURIComponent(key)}=${encodeURIComponent(
-            params[key],
-          )}`;
-        })
-        .join('&'),
-    })
-      .then(() => {
-        parent.location.reload();
-      })
-      .catch(console.log);
+    });
+    submitButton.removeAttribute('disabled');
   });
 
 const runButton = document.querySelector('button[data-run-button]');
