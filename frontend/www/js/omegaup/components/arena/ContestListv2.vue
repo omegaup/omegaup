@@ -19,11 +19,14 @@
                 <form :action="queryURL" method="GET">
                   <div class="input-group">
                     <input
-                      v-model="currentQuery"
+                      v-model.lazy="currentQuery"
                       class="form-control"
                       type="text"
                       name="query"
                       autocomplete="off"
+                      autocorrect="off"
+                      autocapitalize="off"
+                      spellcheck="false"
                       :placeholder="T.wordsKeyword"
                     />
                     <div class="input-group-append">
