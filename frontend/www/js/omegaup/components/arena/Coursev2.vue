@@ -53,7 +53,6 @@
       </b-card>
 
       <b-col md="9" lg="10" class="mt-3 mt-md-0">
-        <!-- This is just for the case of the summary -->
         <omegaup-markdown
           v-if="currentSelectedTab === Tabs.Summary"
           :markdown="assignment.description"
@@ -70,6 +69,9 @@
             <h3 class="text-center">{{ T.wordsRanking }}</h3>
           </template>
         </omegaup-arena-scoreboard>
+        <omegaup-problem-details
+          v-if="currentSelectedTab === null && currentProblem"
+        ></omegaup-problem-details>
       </b-col>
     </b-row>
   </b-container>
@@ -82,6 +84,7 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import omegaup_Markdown from '../Markdown.vue';
 import arena_Scoreboard from './Scoreboard.vue';
+import problem_Details from '../problem/Detailsv2.vue';
 
 import { BIconChevronLeft, BootstrapVue } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -98,6 +101,7 @@ export enum Tabs {
     BIconChevronLeft,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-arena-scoreboard': arena_Scoreboard,
+    'omegaup-problem-details': problem_Details,
   },
 })
 export default class ArenaCourse extends Vue {
