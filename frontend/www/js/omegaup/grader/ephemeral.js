@@ -356,14 +356,14 @@ let store = new Vuex.Store({
     },
     languages(state, value) {
       state.languages = value;
-      if (!state.languages.length) {
-        return;
-      }
       document
         .querySelectorAll('select[data-language-select] option')
         .forEach((option) => {
-          if (!state.languages.includes(option.value)) {
-            option.classList.add('d-none');
+          if (
+            !state.languages.length ||
+            state.languages.includes(option.value)
+          ) {
+            option.classList.remove('d-none');
           }
         });
     },
