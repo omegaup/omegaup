@@ -2,6 +2,7 @@
 import 'cypress-wait-until';
 import 'cypress-file-upload';
 
+// Example command
 Cypress.Commands.add('login', (username, password) => {
   cy.visit('/');
   cy.get('.navbar-right > .nav-item > .nav-link').click();
