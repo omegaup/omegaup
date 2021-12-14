@@ -272,6 +272,8 @@ export function formatContestDuration(
   finishDate: Date,
 ): string {
   let delta = finishDate.getTime() - startDate.getTime();
+  const months = Math.floor(delta / (30 * 24 * 60 * 60 * 1000));
+  delta -= months * (30 * 24 * 60 * 60 * 1000);
   const days = Math.floor(delta / (24 * 60 * 60 * 1000));
   delta -= days * (24 * 60 * 60 * 1000);
   const hours = Math.floor(delta / (60 * 60 * 1000));
@@ -291,17 +293,34 @@ export function formatContestDuration(
       currentLocale = esLocale;
       break;
   }
-  return formatDuration(
-    {
-      days: days,
-      hours: hours,
-      minutes: minutes,
-      seconds: seconds,
-    },
-    {
-      locale: currentLocale,
-    },
-  );
+  if (months >= 1.0) {
+    return formatDuration(
+      {
+        months: months,
+        days: days,
+        hours: hours,
+        minutes: minutes,
+        seconds: seconds,
+      },
+      {
+        locale: currentLocale,
+      },
+    );
+  }
+  let clock = '';
+  if (days > 0) {
+    clock +=
+      formatDuration(
+        { days: days },
+        { format: ['days'], locale: currentLocale },
+      ) + ' ';
+  }
+  clock += `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+    2,
+    '0',
+  )}:${String(seconds).padStart(2, '0')}`;
+
+  return clock;
 }
 
 /**

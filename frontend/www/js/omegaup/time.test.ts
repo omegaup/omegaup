@@ -208,21 +208,34 @@ describe('time', () => {
                 minutesSeconds * 30 +
                 seconds * 10,
             ),
-            expected: '2 días 5 horas 30 minutos 10 segundos',
+            expected: '2 días 05:30:10',
           },
         ],
         [
           {
             startDate: today,
             finishDate: new Date(tomorrow.getTime() + daySeconds * 30),
-            expected: '31 días',
+            expected: '1 mes 1 día',
+          },
+        ],
+        [
+          {
+            startDate: today,
+            finishDate: new Date(
+              tomorrow.getTime() +
+                daySeconds * 31 +
+                hoursSeconds * 5 +
+                minutesSeconds * 30 +
+                seconds * 10,
+            ),
+            expected: '1 mes 2 días 5 horas 30 minutos 10 segundos',
           },
         ],
         [
           {
             startDate: today,
             finishDate: new Date(tomorrow.getTime() - minutesSeconds),
-            expected: '23 horas 59 minutos',
+            expected: '23:59:00',
           },
         ],
         [
@@ -231,14 +244,14 @@ describe('time', () => {
             finishDate: new Date(
               tomorrow.getTime() - minutesSeconds * 15 - seconds * 5,
             ),
-            expected: '23 horas 44 minutos 55 segundos',
+            expected: '23:44:55',
           },
         ],
         [
           {
             startDate: today,
             finishDate: new Date(today.getTime() + minutesSeconds * 45),
-            expected: '45 minutos',
+            expected: '00:45:00',
           },
         ],
         [
@@ -247,7 +260,7 @@ describe('time', () => {
             finishDate: new Date(
               today.getTime() + hoursSeconds * 3 + minutesSeconds * 45,
             ),
-            expected: '3 horas 45 minutos',
+            expected: '03:45:00',
           },
         ],
       ];
