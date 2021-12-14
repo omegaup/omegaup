@@ -1,14 +1,14 @@
 {
   "es": {
-    "name": "Usuario Histórico",
+    "name": "Trayectoria Histórica",
     "description": "Otorgado a personas que realizaron algún envío hace más de 3 años."
   },
   "en": {
-    "name": "Legacy User",
+    "name": "Historical Trajectory",
     "description": "User has made a submission for three years in a row."
   },
   "pt": {
-    "name": "Usuário Histórico",
+    "name": "Trajetória Histórica",
     "description": "Concedido a pessoas que enviaram uma solução há mais de 3 anos."
   }
 }
