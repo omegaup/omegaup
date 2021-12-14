@@ -71,6 +71,7 @@
         </omegaup-arena-scoreboard>
         <omegaup-problem-details
           v-if="currentSelectedTab === null && currentProblem"
+          :problem="currentProblem"
         ></omegaup-problem-details>
       </b-col>
     </b-row>
