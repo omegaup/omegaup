@@ -104,7 +104,7 @@
                 <h2 class="mb-0">
                   <button
                     ref="tags"
-                    class="btn btn-link btn-block text-left collapsed"
+                    class="btn btn-link btn-block text-left"
                     type="button"
                     data-toggle="collapse"
                     data-target=".tags"
@@ -115,7 +115,13 @@
                   </button>
                 </h2>
               </div>
-              <div class="collapse card-body tags">
+              <div class="collapse show card-body tags">
+                <div
+                  v-show="selectedTags.length === 0"
+                  class="alert alert-info"
+                >
+                  {{ T.problemEditTagPublicRequired }}
+                </div>
                 <omegaup-problem-tags
                   :public-tags="data.publicTags"
                   :level-tags="data.levelTags"
