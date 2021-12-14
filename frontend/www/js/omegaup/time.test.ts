@@ -81,16 +81,15 @@ describe('time', () => {
       expect(time.formatDelta(2500000000)).toEqual('28:22:26:40');
     });
 
-    const millMapping = [
-      [{ milliseconds: 3000000000, expected: 'en alrededor de 1 mes' }],
-      [{ milliseconds: 5259492000, expected: 'en 2 meses' }],
-      [{ milliseconds: 7889238000, expected: 'en 3 meses' }],
-      [{ milliseconds: 10518984000, expected: 'en 4 meses' }],
-      [{ milliseconds: 63113904000, expected: 'en alrededor de 2 años' }],
-      [{ milliseconds: 94670856000, expected: 'en casi 3 años' }],
-    ];
-
     it('Should handle valid human readable dates', () => {
+      const millMapping = [
+        [{ milliseconds: 3000000000, expected: 'en alrededor de 1 mes' }],
+        [{ milliseconds: 5259492000, expected: 'en 2 meses' }],
+        [{ milliseconds: 7889238000, expected: 'en 3 meses' }],
+        [{ milliseconds: 10518984000, expected: 'en 4 meses' }],
+        [{ milliseconds: 63113904000, expected: 'en alrededor de 2 años' }],
+        [{ milliseconds: 94670856000, expected: 'en casi 3 años' }],
+      ];
       for (const [{ milliseconds, expected }] of millMapping) {
         expect(time.formatDelta(milliseconds)).toEqual(expected);
       }
@@ -193,10 +192,70 @@ describe('time', () => {
   describe('formatContestDuration', () => {
     it('Should show correct time format', () => {
       const daySeconds = 24 * 60 * 60 * 1000;
+      const hoursSeconds = 60 * 60 * 1000;
+      const minutesSeconds = 60 * 1000;
+      const seconds = 1000;
       const today = new Date();
       const tomorrow = new Date(today.getTime() + daySeconds);
-      const result = time.formatContestDuration(today, tomorrow);
-      expect(result).toBe('1 día');
+      const millMapping = [
+        [
+          {
+            startDate: today,
+            finishDate: new Date(
+              tomorrow.getTime() +
+                daySeconds +
+                hoursSeconds * 5 +
+                minutesSeconds * 30 +
+                seconds * 10,
+            ),
+            expected: '2 días 5 horas 30 minutos 10 segundos',
+          },
+        ],
+        [
+          {
+            startDate: today,
+            finishDate: new Date(tomorrow.getTime() + daySeconds * 30),
+            expected: '31 días',
+          },
+        ],
+        [
+          {
+            startDate: today,
+            finishDate: new Date(tomorrow.getTime() - minutesSeconds),
+            expected: '23 horas 59 minutos',
+          },
+        ],
+        [
+          {
+            startDate: today,
+            finishDate: new Date(
+              tomorrow.getTime() - minutesSeconds * 15 - seconds * 5,
+            ),
+            expected: '23 horas 44 minutos 55 segundos',
+          },
+        ],
+        [
+          {
+            startDate: today,
+            finishDate: new Date(today.getTime() + minutesSeconds * 45),
+            expected: '45 minutos',
+          },
+        ],
+        [
+          {
+            startDate: today,
+            finishDate: new Date(
+              today.getTime() + hoursSeconds * 3 + minutesSeconds * 45,
+            ),
+            expected: '3 horas 45 minutos',
+          },
+        ],
+      ];
+      for (const [{ startDate, finishDate, expected }] of millMapping) {
+        expect(time.formatContestDuration(startDate, finishDate)).toEqual(
+          expected,
+        );
+      }
     });
   });
 });
