@@ -153,7 +153,7 @@
             <div class="card-header">
               <h2 class="mb-0">
                 <button
-                  ref="limits"
+                  ref="limitsRef"
                   class="btn btn-link btn-block text-left collapsed"
                   type="button"
                   data-toggle="collapse"
@@ -467,7 +467,7 @@ export default class ProblemForm extends Vue {
 
   @Ref('basic-info') basicInfoRef!: HTMLDivElement;
   @Ref('tags') tagsRef!: HTMLDivElement;
-  @Ref('limits') limitsRef!: HTMLDivElement;
+  @Ref('limitsRef') limitsRef!: HTMLDivElement;
   @Ref('form') formRef!: HTMLFormElement;
 
   T = T;
@@ -605,28 +605,40 @@ export default class ProblemForm extends Vue {
 
   openCollapsedIfRequired() {
     const formData = new FormData(this.formRef);
-    formData.forEach((value, key) => {
+
+    let basicInfoCollapsed = this.basicInfoRef.classList.contains('collapsed');
+    let limitsCollapsed = this.limitsRef.classList.contains('collapsed');
+    let tagsCollapsed = !this.isUpdate
+      ? this.tagsRef.classList.contains('collapsed')
+      : false;
+
+    for (const [key, value] of formData.entries()) {
       const isEmpty = value === '';
+      console.log(key, value);
       if (isEmpty) {
         if (
-          this.basicInfoRef.classList.contains('collapsed') &&
-          (key === 'title' ||
-            key === 'alias' ||
-            key === 'source' ||
-            !this.hasFile)
+          basicInfoCollapsed &&
+          (key === 'title' || key === 'alias' || key === 'source')
         ) {
           this.basicInfoRef.click();
-          return;
+          basicInfoCollapsed = false;
+          continue;
         }
-        if (
-          this.tagsRef.classList.contains('collapsed') &&
-          key === 'problem_level'
-        ) {
+        // To avoid making a complex logic check
+        if (basicInfoCollapsed && !this.isUpdate && !this.hasFile) {
+          this.basicInfoRef.click();
+          basicInfoCollapsed = false;
+          continue;
+        }
+
+        if (tagsCollapsed && key === 'problem_level') {
           this.tagsRef.click();
-          return;
+          tagsCollapsed = false;
+
+          continue;
         }
         if (
-          this.limitsRef.classList.contains('collapsed') &&
+          limitsCollapsed &&
           (key === 'time_limit' ||
             key === 'overall_wall_time_limit' ||
             key === 'extra_wall_time' ||
@@ -635,10 +647,11 @@ export default class ProblemForm extends Vue {
             key === 'input_limit')
         ) {
           this.limitsRef.click();
-          return;
+          limitsCollapsed = false;
+          continue;
         }
       }
-    });
+    }
   }
 
   @Watch('alias')
