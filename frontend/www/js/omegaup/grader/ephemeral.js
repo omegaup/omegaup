@@ -356,11 +356,13 @@ let store = new Vuex.Store({
     },
     showSubmitButton(state, value) {
       state.problemsetId = value;
+      const submitButton = document.querySelector(
+        'button[data-submit-button]',
+      );
       if (value) {
-        const submitButton = document.querySelector(
-          'button[data-submit-button]',
-        );
         submitButton.classList.remove('d-none');
+      } else {
+        submitButton.classList.add('d-none');
       }
     },
     currentCase(state, value) {
