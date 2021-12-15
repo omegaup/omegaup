@@ -52,8 +52,12 @@ abstract class CourseIdentityRequest {
                     `request_time`,
                     `last_update`,
                     `accepted`,
-                    `extra_note`
+                    `extra_note`,
+                    `accept_teacher`,
+                    `share_user_information`
                 ) VALUES (
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -76,6 +80,16 @@ abstract class CourseIdentityRequest {
                 null
             ),
             $Course_Identity_Request->extra_note,
+            (
+                !is_null($Course_Identity_Request->accept_teacher) ?
+                intval($Course_Identity_Request->accept_teacher) :
+                null
+            ),
+            (
+                !is_null($Course_Identity_Request->share_user_information) ?
+                intval($Course_Identity_Request->share_user_information) :
+                null
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -98,7 +112,9 @@ abstract class CourseIdentityRequest {
                 `request_time` = ?,
                 `last_update` = ?,
                 `accepted` = ?,
-                `extra_note` = ?
+                `extra_note` = ?,
+                `accept_teacher` = ?,
+                `share_user_information` = ?
             WHERE
                 (
                     `identity_id` = ? AND
@@ -117,6 +133,16 @@ abstract class CourseIdentityRequest {
                 intval($Course_Identity_Request->accepted)
             ),
             $Course_Identity_Request->extra_note,
+            (
+                is_null($Course_Identity_Request->accept_teacher) ?
+                null :
+                intval($Course_Identity_Request->accept_teacher)
+            ),
+            (
+                is_null($Course_Identity_Request->share_user_information) ?
+                null :
+                intval($Course_Identity_Request->share_user_information)
+            ),
             (
                 is_null($Course_Identity_Request->identity_id) ?
                 null :
@@ -153,7 +179,9 @@ abstract class CourseIdentityRequest {
                 `Course_Identity_Request`.`request_time`,
                 `Course_Identity_Request`.`last_update`,
                 `Course_Identity_Request`.`accepted`,
-                `Course_Identity_Request`.`extra_note`
+                `Course_Identity_Request`.`extra_note`,
+                `Course_Identity_Request`.`accept_teacher`,
+                `Course_Identity_Request`.`share_user_information`
             FROM
                 `Course_Identity_Request`
             WHERE
@@ -243,7 +271,9 @@ abstract class CourseIdentityRequest {
                 `Course_Identity_Request`.`request_time`,
                 `Course_Identity_Request`.`last_update`,
                 `Course_Identity_Request`.`accepted`,
-                `Course_Identity_Request`.`extra_note`
+                `Course_Identity_Request`.`extra_note`,
+                `Course_Identity_Request`.`accept_teacher`,
+                `Course_Identity_Request`.`share_user_information`
             FROM
                 `Course_Identity_Request`
         ';
@@ -299,8 +329,12 @@ abstract class CourseIdentityRequest {
                     `request_time`,
                     `last_update`,
                     `accepted`,
-                    `extra_note`
+                    `extra_note`,
+                    `accept_teacher`,
+                    `share_user_information`
                 ) VALUES (
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -331,6 +365,16 @@ abstract class CourseIdentityRequest {
                 intval($Course_Identity_Request->accepted)
             ),
             $Course_Identity_Request->extra_note,
+            (
+                is_null($Course_Identity_Request->accept_teacher) ?
+                null :
+                intval($Course_Identity_Request->accept_teacher)
+            ),
+            (
+                is_null($Course_Identity_Request->share_user_information) ?
+                null :
+                intval($Course_Identity_Request->share_user_information)
+            ),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

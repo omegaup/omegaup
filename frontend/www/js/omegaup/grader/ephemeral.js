@@ -174,6 +174,7 @@ Vue.use(Vuex);
 let store = new Vuex.Store({
   state: {
     alias: null,
+    languages: [],
     localStorageSources: null,
     request: {
       input: {
@@ -192,6 +193,9 @@ let store = new Vuex.Store({
   getters: {
     alias(state) {
       return state.alias;
+    },
+    languages(state) {
+      return state.languages;
     },
     localStorageSources(state) {
       return state.localStorageSources;
@@ -349,6 +353,18 @@ let store = new Vuex.Store({
           Util.languageExtensionMapping[state.localStorageSources.language]
         ];
       document.getElementById('language').value = state.request.language;
+    },
+    languages(state, value) {
+      state.languages = value;
+      document
+        .querySelectorAll('select[data-language-select] option')
+        .forEach((option) => {
+          if (!state.languages.includes(option.value)) {
+            option.classList.add('d-none');
+          } else {
+            option.classList.remove('d-none');
+          }
+        });
     },
     currentCase(state, value) {
       state.currentCase = value;
@@ -1440,7 +1456,7 @@ document.getElementsByTagName('form')[0].addEventListener('submit', (e) => {
     .catch(Util.asyncError);
 });
 
-function setSettings({ alias, settings }) {
+function setSettings({ alias, settings, languages }) {
   if (!settings) {
     return;
   }
@@ -1459,6 +1475,7 @@ function setSettings({ alias, settings }) {
       }
     }
   }
+  store.commit('languages', languages);
   store.commit('updatingSettings', true);
   store.commit('reset');
   store.commit('Interactive', !!settings.interactive);
@@ -1518,6 +1535,7 @@ window.addEventListener(
         setSettings({
           alias: e.data.params.alias,
           settings: e.data.params.settings,
+          languages: e.data.params.languages,
         });
         break;
     }

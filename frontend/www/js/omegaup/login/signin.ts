@@ -27,14 +27,17 @@ OmegaUp.on('ready', () => {
     const params = new URL(document.location.toString()).searchParams;
     const pathname = params.get('redirect');
     if (pathname && pathname.indexOf('/') === 0) {
-      window.location.href = pathname;
+      const url = new URL(document.location.origin + pathname);
+      url.searchParams.set('fromLogin', '');
+      window.location.href = url.toString();
       return;
     }
+    const fromLoginParam = '?fromLogin';
     if (isAccountCreation) {
-      window.location.href = '/profile/';
+      window.location.href = `/profile/${fromLoginParam}`;
       return;
     }
-    window.location.href = '/';
+    window.location.href = `/${fromLoginParam}`;
   }
 
   const payload = types.payloadParsers.LoginDetailsPayload();

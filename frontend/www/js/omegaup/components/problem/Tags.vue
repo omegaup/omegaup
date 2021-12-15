@@ -115,7 +115,11 @@
             name="problem-level"
             @change="onSelectProblemLevel"
           >
-            <option v-for="levelTag in levelTags" :value="levelTag">
+            <option
+              v-for="levelTag in levelTags"
+              :key="levelTag"
+              :value="levelTag"
+            >
               {{ T[levelTag] }}
             </option>
           </select>

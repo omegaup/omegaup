@@ -29,6 +29,8 @@ const data: types.ExtraProfileDetails = {
   badges: [],
   contests: {},
   createdProblems: [],
+  createdContests: [],
+  createdCourses: [],
   ownedBadges: [],
   solvedProblems: [
     {
@@ -37,6 +39,7 @@ const data: types.ExtraProfileDetails = {
       difficulty: 0,
       submissions: 2,
       title: 'title',
+      quality_seal: false,
     },
     {
       accepted: 1,
@@ -44,6 +47,7 @@ const data: types.ExtraProfileDetails = {
       difficulty: 1,
       submissions: 3,
       title: 'title2',
+      quality_seal: false,
     },
     {
       accepted: 1,
@@ -51,10 +55,12 @@ const data: types.ExtraProfileDetails = {
       difficulty: 2,
       submissions: 5,
       title: 'title3',
+      quality_seal: false,
     },
   ],
   stats: [],
   unsolvedProblems: [],
+  hasPassword: true,
 };
 
 const rankingMapping: { classname: string; rank: string }[] = [
@@ -107,6 +113,22 @@ describe('SidebarMainInfo.vue', () => {
       const urlSelector = `a[href="/profile/#${url.key}"]`;
       expect(wrapper.find(urlSelector).exists()).toBeFalsy();
     }
+  });
+
+  it('Should display Add password button when user does not have password', () => {
+    const wrapper = shallowMount(user_SidebarMainInfo, {
+      propsData: {
+        profile,
+        data: { ...data, ...{ hasPassword: false } },
+      },
+    });
+
+    expect(
+      wrapper.find('a[href="/profile/#add-password"]').exists(),
+    ).toBeTruthy();
+    expect(
+      wrapper.find('a[href="/profile/#change-password"]').exists(),
+    ).toBeFalsy();
   });
 });
 

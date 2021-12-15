@@ -22,6 +22,8 @@ class CourseIdentityRequest extends \OmegaUp\DAO\VO\VO {
         'last_update' => true,
         'accepted' => true,
         'extra_note' => true,
+        'accept_teacher' => true,
+        'share_user_information' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -80,6 +82,16 @@ class CourseIdentityRequest extends \OmegaUp\DAO\VO\VO {
                 $data['extra_note']
             ) ? strval($data['extra_note']) : '';
         }
+        if (isset($data['accept_teacher'])) {
+            $this->accept_teacher = boolval(
+                $data['accept_teacher']
+            );
+        }
+        if (isset($data['share_user_information'])) {
+            $this->share_user_information = boolval(
+                $data['share_user_information']
+            );
+        }
     }
 
     /**
@@ -125,4 +137,18 @@ class CourseIdentityRequest extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $extra_note = null;
+
+    /**
+     * Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.
+     *
+     * @var bool|null
+     */
+    public $accept_teacher = null;
+
+    /**
+     * Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.
+     *
+     * @var bool|null
+     */
+    public $share_user_information = null;
 }

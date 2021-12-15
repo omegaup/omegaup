@@ -22,22 +22,21 @@
           })
         }}
       </h5>
-      <div v-if="includeUser" class="card-body">
-        <label>
-          <omegaup-common-typeahead
-            :existing-options="searchResultUsers"
-            :value.sync="searchedUsername"
-            :max-results="10"
-            @update-existing-options="
-              (query) => $emit('update-search-result-users', query)
-            "
-        /></label>
-        <a
-          class="btn btn-primary"
-          type="button"
-          :href="`/submissions/${encodeURIComponent(searchedUsername)}/`"
-        >
-          {{ T.searchUser }}
+      <div v-if="includeUser" class="card-body d-flex align-items-center">
+        <omegaup-common-typeahead
+          :existing-options="searchResultUsers"
+          :value.sync="searchedUsername"
+          :max-results="10"
+          class="mr-2"
+          @update-existing-options="
+            (query) => $emit('update-search-result-users', query)
+          "
+        />
+
+        <a :href="`/submissions/${encodeURIComponent(searchedUsername)}/`">
+          <button class="btn btn-primary" type="button">
+            {{ T.searchUser }}
+          </button>
         </a>
       </div>
       <div class="table-responsive">
@@ -138,7 +137,7 @@ import * as ui from '../../ui';
 import * as time from '../../time';
 import UserName from '../user/Username.vue';
 import common_Typeahead from '../common/Typeahead.vue';
-import common_Paginator from '../common/Paginatorv2.vue';
+import common_Paginator from '../common/Paginator.vue';
 
 @Component({
   components: {

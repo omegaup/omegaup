@@ -10,10 +10,10 @@
         <a
           class="nav-link"
           :href="`#${tabKey}`"
-          :class="{ active: selectedTab === tabKey }"
+          :class="{ active: currentSelectedTab === tabKey }"
           data-toggle="tab"
           role="tab"
-          @click="selectedTab = tabKey"
+          @click="currentSelectedTab = tabKey"
           >{{ tabName }}</a
         >
       </li>
@@ -39,8 +39,8 @@
         :key="tabKey"
         class="tab-pane fade py-4 px-2"
         :class="{
-          show: selectedTab === tabKey,
-          active: selectedTab === tabKey,
+          show: currentSelectedTab === tabKey,
+          active: currentSelectedTab === tabKey,
         }"
         role="tabpanel"
       >
@@ -59,16 +59,22 @@
           v-if="tabKey === Tab.Enrolled"
           class="row"
           :class="{
-            'row-cols-1 row-cols-md-2 row-cols-xl-3': loggedIn,
-            'justify-content-center': !loggedIn,
+            'row-cols-1 row-cols-md-2 row-cols-xl-3':
+              loggedIn && filteredCards.length,
+            'justify-content-center': !loggedIn || !filteredCards.length,
           }"
         >
           <template v-if="loggedIn">
-            <omegaup-course-card-enrolled
-              v-for="course in filteredCards"
-              :key="course.alias"
-              :course="course"
-            ></omegaup-course-card-enrolled>
+            <template v-if="filteredCards.length">
+              <omegaup-course-card-enrolled
+                v-for="course in filteredCards"
+                :key="course.alias"
+                :course="course"
+              ></omegaup-course-card-enrolled>
+            </template>
+            <div v-else class="empty-content my-2">
+              {{ T.courseTabsEmptyEnrolledCourses }}
+            </div>
           </template>
           <div v-else class="empty-content my-2">
             {{ T.courseCardMustLogIn }}
@@ -78,16 +84,22 @@
           v-if="tabKey === Tab.Finished"
           class="row"
           :class="{
-            'row-cols-1 row-cols-md-2 row-cols-xl-3': loggedIn,
-            'justify-content-center': !loggedIn,
+            'row-cols-1 row-cols-md-2 row-cols-xl-3':
+              loggedIn && filteredCards.length,
+            'justify-content-center': !loggedIn || !filteredCards.length,
           }"
         >
           <template v-if="loggedIn">
-            <omegaup-course-card-finished
-              v-for="course in filteredCards"
-              :key="course.alias"
-              :course="course"
-            ></omegaup-course-card-finished>
+            <template v-if="filteredCards.length">
+              <omegaup-course-card-finished
+                v-for="course in filteredCards"
+                :key="course.alias"
+                :course="course"
+              ></omegaup-course-card-finished>
+            </template>
+            <div v-else class="empty-content my-2">
+              {{ T.courseTabsEmptyFinishedCourses }}
+            </div>
           </template>
           <div v-else class="empty-content my-2">
             {{ T.courseCardMustLogIn }}
@@ -103,6 +115,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+import latinize from 'latinize';
 
 import omegaup_Markdown from '../Markdown.vue';
 import course_CardPublic from './CardPublic.vue';
@@ -130,11 +143,12 @@ export default class CourseTabs extends Vue {
     finished: types.CourseCardFinished[];
   };
   @Prop({ default: false }) loggedIn!: boolean;
+  @Prop({ default: Tab.Public }) selectedTab!: Tab;
 
   T = T;
   ui = ui;
   Tab = Tab;
-  selectedTab = Tab.Public;
+  currentSelectedTab = this.selectedTab;
   searchText = '';
 
   get tabNames(): Record<Tab, string> {
@@ -157,21 +171,30 @@ export default class CourseTabs extends Vue {
     | types.CourseCardEnrolled[]
     | types.CourseCardPublic[]
     | types.CourseCardFinished[] {
-    switch (this.selectedTab) {
+    switch (this.currentSelectedTab) {
       case Tab.Enrolled:
         return this.courses.enrolled.filter(
           (course) =>
-            this.searchText === '' || course.name.includes(this.searchText),
+            this.searchText === '' ||
+            latinize(course.name.toLowerCase()).includes(
+              latinize(this.searchText.toLowerCase()),
+            ),
         );
       case Tab.Finished:
         return this.courses.finished.filter(
           (course) =>
-            this.searchText === '' || course.name.includes(this.searchText),
+            this.searchText === '' ||
+            latinize(course.name.toLowerCase()).includes(
+              latinize(this.searchText.toLowerCase()),
+            ),
         );
       default:
         return this.courses.public.filter(
           (course) =>
-            this.searchText === '' || course.name.includes(this.searchText),
+            this.searchText === '' ||
+            latinize(course.name.toLowerCase()).includes(
+              latinize(this.searchText.toLowerCase()),
+            ),
         );
     }
   }

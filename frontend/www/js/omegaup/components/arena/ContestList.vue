@@ -35,71 +35,73 @@
                 <a
                   v-if="isLogged"
                   class="dropdown-item tab-participating"
-                  :class="{ active: showTab === 'participating' }"
+                  :class="{ active: showTab === ContestsTab.Participating }"
                   data-toggle="tab"
                   data-list-participating
                   href="#"
-                  @click="showTab = 'participating'"
+                  @click="showTab = ContestsTab.Participating"
                 >
                   {{ T.arenaMyActiveContests }}</a
                 >
                 <a
                   class="dropdown-item tab-recommended-current"
-                  :class="{ active: showTab === 'recommended_current' }"
+                  :class="{
+                    active: showTab === ContestsTab.RecommendedCurrent,
+                  }"
                   data-toggle="tab"
                   data-list-recommended-current
                   href="#"
-                  @click="showTab = 'recommended_current'"
+                  @click="showTab = ContestsTab.RecommendedCurrent"
                 >
                   {{ T.arenaRecommendedCurrentContests }}</a
                 >
                 <a
                   class="dropdown-item tab-current"
-                  :class="{ active: showTab === 'current' }"
+                  :class="{ active: showTab === ContestsTab.Current }"
                   data-toggle="tab"
                   data-list-current
                   href="#"
-                  @click="showTab = 'current'"
+                  @click="showTab = ContestsTab.Current"
                 >
                   {{ T.arenaCurrentContests }}</a
                 >
                 <a
                   class="dropdown-item tab-public"
-                  :class="{ active: showTab === 'public' }"
+                  :class="{ active: showTab === ContestsTab.Public }"
                   data-toggle="tab"
                   data-list-public
                   href="#"
-                  @click="showTab = 'public'"
+                  @click="showTab = ContestsTab.Public"
                 >
                   {{ T.arenaCurrentPublicContests }}</a
                 >
                 <a
                   class="dropdown-item tab-future"
-                  :class="{ active: showTab === 'future' }"
+                  :class="{ active: showTab === ContestsTab.Future }"
                   data-toggle="tab"
                   data-list-future
                   href="#"
-                  @click="showTab = 'future'"
+                  @click="showTab = ContestsTab.Future"
                 >
                   {{ T.arenaFutureContests }}</a
                 >
                 <a
                   class="dropdown-item tab-recommended-past"
-                  :class="{ active: showTab === 'recommended_past' }"
+                  :class="{ active: showTab === ContestsTab.RecommendedPast }"
                   data-toggle="tab"
                   data-list-recommended-past
                   href="#"
-                  @click="showTab = 'recommended_past'"
+                  @click="showTab = ContestsTab.RecommendedPast"
                 >
                   {{ T.arenaRecommendedOldContests }}</a
                 >
                 <a
                   class="dropdown-item tab-past"
-                  :class="{ active: showTab === 'past' }"
+                  :class="{ active: showTab === ContestsTab.Past }"
                   data-toggle="tab"
                   data-list-past
                   href="#"
-                  @click="showTab = 'past'"
+                  @click="showTab = ContestsTab.Past"
                 >
                   {{ T.arenaOldContests }}</a
                 >
@@ -132,7 +134,7 @@
 
       <div class="tab-content">
         <div
-          v-if="showTab === 'participating'"
+          v-if="showTab === ContestsTab.Participating"
           class="tab-pane active list-participating"
         >
           <omegaup-contest-filtered-list
@@ -145,7 +147,7 @@
           ></omegaup-contest-filtered-list>
         </div>
         <div
-          v-if="showTab === 'recommended_current'"
+          v-if="showTab === ContestsTab.RecommendedCurrent"
           class="tab-pane active list-recommended-current"
         >
           <omegaup-contest-filtered-list
@@ -157,7 +159,10 @@
             :recommended="true"
           ></omegaup-contest-filtered-list>
         </div>
-        <div v-if="showTab === 'current'" class="tab-pane active list-current">
+        <div
+          v-if="showTab === ContestsTab.Current"
+          class="tab-pane active list-current"
+        >
           <omegaup-contest-filtered-list
             :contests="contests.current"
             :show-times="true"
@@ -167,7 +172,10 @@
             :recommended="false"
           ></omegaup-contest-filtered-list>
         </div>
-        <div v-if="showTab === 'public'" class="tab-pane active list-public">
+        <div
+          v-if="showTab === ContestsTab.Public"
+          class="tab-pane active list-public"
+        >
           <omegaup-contest-filtered-list
             :contests="contests.public"
             :show-times="true"
@@ -177,7 +185,10 @@
             :recommended="false"
           ></omegaup-contest-filtered-list>
         </div>
-        <div v-if="showTab === 'future'" class="tab-pane active list-future">
+        <div
+          v-if="showTab === ContestsTab.Future"
+          class="tab-pane active list-future"
+        >
           <omegaup-contest-filtered-list
             :contests="contests.future"
             :show-times="true"
@@ -188,7 +199,7 @@
           ></omegaup-contest-filtered-list>
         </div>
         <div
-          v-if="showTab === 'recommended_past'"
+          v-if="showTab === ContestsTab.RecommendedPast"
           class="tab-pane active list-recommended-past"
         >
           <omegaup-contest-filtered-list
@@ -200,7 +211,10 @@
             :recommended="true"
           ></omegaup-contest-filtered-list>
         </div>
-        <div v-if="showTab === 'past'" class="tab-pane active list-past">
+        <div
+          v-if="showTab === ContestsTab.Past"
+          class="tab-pane active list-past"
+        >
           <omegaup-contest-filtered-list
             :contests="contests.past"
             :show-times="false"
@@ -221,6 +235,16 @@ import T from '../../lang';
 import contest_FilteredList from '../contest/FilteredList.vue';
 import { types } from '../../api_types';
 
+export enum ContestsTab {
+  Participating = 'participating',
+  RecommendedCurrent = 'recommended_current',
+  Current = 'current',
+  Public = 'public',
+  Future = 'future',
+  RecommendedPast = 'recommended_past',
+  Past = 'past',
+}
+
 @Component({
   components: {
     'omegaup-contest-filtered-list': contest_FilteredList,
@@ -230,38 +254,31 @@ export default class ArenaContestList extends Vue {
   @Prop() initialQuery!: string;
   @Prop() contests!: types.TimeTypeContests;
   @Prop() isLogged!: boolean;
+  @Prop({ default: null }) selectedTab!: ContestsTab | null;
 
   T = T;
-  showTab = '';
+  ContestsTab = ContestsTab;
+  showTab = this.selectedTab ?? ContestsTab.Participating;
   query = this.initialQuery;
 
   get activeTab(): string {
     switch (this.showTab) {
-      case 'participating':
+      case ContestsTab.Participating:
         return T.arenaMyActiveContests;
-      case 'recommended_current':
+      case ContestsTab.RecommendedCurrent:
         return T.arenaRecommendedCurrentContests;
-      case 'current':
+      case ContestsTab.Current:
         return T.arenaCurrentContests;
-      case 'public':
+      case ContestsTab.Public:
         return T.arenaCurrentPublicContests;
-      case 'future':
+      case ContestsTab.Future:
         return T.arenaFutureContests;
-      case 'recommended_past':
+      case ContestsTab.RecommendedPast:
         return T.arenaRecommendedOldContests;
-      case 'past':
+      case ContestsTab.Past:
         return T.arenaOldContests;
       default:
         return T.arenaMyActiveContests;
-    }
-  }
-
-  mounted() {
-    for (const [timeType, contests] of Object.entries(this.contests)) {
-      if (contests.length > 0) {
-        this.showTab = timeType;
-        break;
-      }
     }
   }
 }

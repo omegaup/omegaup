@@ -177,6 +177,7 @@
           <omegaup-arena-ephemeral-grader
             v-if="!problem.karel_problem"
             :problem="problem"
+            :accepted-languages="filteredLanguages"
           ></omegaup-arena-ephemeral-grader>
           <omegaup-arena-runs
             :problem-alias="problem.alias"
@@ -242,9 +243,7 @@
           @details="(request) => onRunDetails(request, 'runs')"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
-          @filter-changed="
-            (filter, value) => $emit('apply-filter', filter, value)
-          "
+          @filter-changed="(request) => $emit('apply-filter', request)"
           @update-search-result-users-contest="
             (request) => $emit('update-search-result-users-contest', request)
           "

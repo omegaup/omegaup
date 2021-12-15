@@ -18,6 +18,7 @@ namespace OmegaUp\DAO;
  * @psalm-type CourseCardPublic=array{alias: string, alreadyStarted: bool, lessonCount: int, level: null|string, name: string, school_name: null|string, studentCount: int}
  * @psalm-type AssignmentsProblemsPoints=array{alias: string, extraPoints: float, name: string, points: float, problems: list<array{alias: string, title: string, isExtraProblem: bool, order: int, points: float}>, order: int}
  * @psalm-type StudentProgressInCourse=array{assignments: array<string, array{problems: array<string, array{progress: float, score: float}>, progress: float, score: float}>, classname: string, country_id: null|string, courseProgress: float, courseScore: float, name: null|string, username: string}
+ * @psalm-type Course=array{acl_id?: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time?: \OmegaUp\Timestamp|null, group_id?: int, languages?: null|string, level?: null|string, minimum_progress_for_certificate?: int|null, name: string, needs_basic_information: bool, objective?: null|string, requests_user_information: string, school_id?: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
@@ -59,7 +60,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             SELECT
                 a.*,
                 COUNT(s.submission_id) AS has_runs,
-                COUNT(p.problem_id) AS problem_count,
+                COUNT(DISTINCT p.problem_id) AS problem_count,
                 ps.scoreboard_url,
                 ps.scoreboard_url_admin
             FROM
@@ -87,7 +88,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 c.alias = ? $timeCondition
             GROUP BY
-                a.assignment_id
+                a.assignment_id, ps.problemset_id
             ORDER BY
                 `order`, start_time;";
 
@@ -622,7 +623,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             INNER JOIN
                 Problems p ON p.problem_id = psp.problem_id
             WHERE
-                a.course_id = ?
+                a.course_id = ? AND a.assignment_type <> "lesson"
             ORDER BY
                 a.`order`, psp.`order`';
 
@@ -789,7 +790,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             INNER JOIN
                 Assignments a ON a.problemset_id = s.problemset_id
             WHERE
-                a.course_id = ?
+                a.course_id = ? AND a.assignment_type <> "lesson"
             GROUP BY
                 students.identity_id, a.assignment_id, p.problem_id
             HAVING
@@ -1148,6 +1149,36 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             array_push($courses, new \OmegaUp\DAO\VO\Courses($row));
         }
         return $courses;
+    }
+
+    /**
+     * Returns the list of courses created by a certain identity
+     * @return list<Course>
+     */
+    final public static function getCoursesCreatedByIdentity(
+        int $identityId
+    ): array {
+        $sql = '
+            SELECT
+                c.*
+            FROM
+                Courses c
+            INNER JOIN
+                ACLs a ON a.acl_id = c.acl_id
+            INNER JOIN
+                Users u ON u.user_id = a.owner_id
+            WHERE
+                u.main_identity_id = ?
+                AND archived = false
+            ORDER BY
+                c.course_id DESC;';
+
+        $params = [
+            $identityId,
+        ];
+
+        /** @var list<array{acl_id: int, admission_mode: string, alias: string, archived: bool, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, languages: null|string, level: null|string, minimum_progress_for_certificate: int|null, name: string, needs_basic_information: bool, objective: null|string, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
     final public static function getByAlias(

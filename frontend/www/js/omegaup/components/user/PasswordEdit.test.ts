@@ -13,15 +13,15 @@ describe('PasswordEdit.vue', () => {
     await wrapper.find('input[data-old-password]').setValue(oldPassword);
     await wrapper.find('input[data-new-password]').setValue(newPassword);
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);
-
     await wrapper.find('button[type="submit"]').trigger('submit');
-
     expect(wrapper.emitted('update-password')).toBeDefined();
-    expect(wrapper.emitted('update-password')?.[0]).toEqual([
-      {
-        oldPassword: oldPassword,
-        newPassword: newPassword,
-      },
+    expect(wrapper.emitted('update-password')).toEqual([
+      [
+        {
+          oldPassword: oldPassword,
+          newPassword: newPassword,
+        },
+      ],
     ]);
   });
 
@@ -51,11 +51,10 @@ describe('PasswordEdit.vue', () => {
     await wrapper.find('input[data-old-password]').setValue(oldPassword);
     await wrapper.find('input[data-new-password]').setValue(newPassword);
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);
-
     expect(wrapper.find('button[type="submit"]').element).toBeEnabled();
   });
 
-  it('Should disable submit button when there is new password mismatch or empty passwords', async () => {
+  it('Should disable submit button when there is new password mismatch or empty inputs', async () => {
     const wrapper = shallowMount(user_Password_Edit);
 
     let oldPassword = 'oldPassword';
@@ -65,11 +64,17 @@ describe('PasswordEdit.vue', () => {
     await wrapper.find('input[data-old-password]').setValue(oldPassword);
     await wrapper.find('input[data-new-password]').setValue(newPassword);
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);
-
     expect(wrapper.find('button[type="submit"]').element).toBeDisabled();
 
     oldPassword = '';
     newPassword2 = 'newPassword';
+
+    await wrapper.find('input[data-old-password]').setValue(oldPassword);
+    await wrapper.find('input[data-new-password2]').setValue(newPassword2);
+    expect(wrapper.find('button[type="submit"]').element).toBeDisabled();
+
+    oldPassword = 'oldPassword';
+    newPassword2 = '';
 
     await wrapper.find('input[data-old-password]').setValue(oldPassword);
     await wrapper.find('input[data-new-password2]').setValue(newPassword2);

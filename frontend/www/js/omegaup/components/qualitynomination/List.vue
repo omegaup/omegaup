@@ -149,7 +149,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
-import common_Paginator from '../common/Paginatorv2.vue';
+import common_Paginator from '../common/Paginator.vue';
 import { types } from '../../api_types';
 import Autocomplete from '../Autocomplete.vue';
 import common_Typeahead from '../common/Typeahead.vue';

@@ -13,7 +13,7 @@
     </div>
     <div class="form-group">
       <label>{{ T.userEditLanguage }}</label>
-      <select v-model="locale" data-locale class="form-control">
+      <select v-model="locale" data-locale class="custom-select">
         <option value="es">{{ T.wordsSpanish }}</option>
         <option value="en">{{ T.wordsEnglish }}</option>
         <option value="pt">{{ T.wordsPortuguese }}</option>
@@ -24,7 +24,7 @@
       <select
         v-model="preferredLanguage"
         data-preferred-language
-        class="form-control"
+        class="custom-select"
       >
         <option value=""></option>
         <option
@@ -33,6 +33,49 @@
           :value="extension"
         >
           {{ name }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>{{ T.userObjectivesModalDescriptionUsage }}</label>
+      <select
+        v-model="learningTeachingObjective"
+        data-learning-teaching-objective
+        class="custom-select"
+      >
+        <option :value="ObjectivesAnswers.Learning">
+          {{ T.userObjectivesModalAnswerLearning }}
+        </option>
+        <option :value="ObjectivesAnswers.Teaching">
+          {{ T.userObjectivesModalAnswerTeaching }}
+        </option>
+        <option :value="ObjectivesAnswers.LearningAndTeaching">
+          {{ T.userObjectivesModalAnswerLearningAndTeaching }}
+        </option>
+        <option :value="ObjectivesAnswers.None">
+          {{ T.userObjectivesModalAnswerNone }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>{{ scholarCompetitiveObjectiveQuestion }}</label>
+      <select
+        v-model="scholarCompetitiveObjective"
+        :disabled="learningTeachingObjective === ObjectivesAnswers.None"
+        data-scholar-competitive-objective
+        class="custom-select"
+      >
+        <option :value="ObjectivesAnswers.Scholar">
+          {{ T.userObjectivesModalAnswerScholar }}
+        </option>
+        <option :value="ObjectivesAnswers.Competitive">
+          {{ T.userObjectivesModalAnswerCompetitive }}
+        </option>
+        <option :value="ObjectivesAnswers.ScholarAndCompetitive">
+          {{ T.userObjectivesModalAnswerScholarAndCompetitive }}
+        </option>
+        <option :value="ObjectivesAnswers.Other">
+          {{ T.userObjectivesModalAnswerOther }}
         </option>
       </select>
     </div>
@@ -62,13 +105,14 @@
       <button type="submit" class="btn btn-primary mr-2">
         {{ T.wordsSaveChanges }}
       </button>
-      <a href="/profile" class="btn btn-cancel">{{ T.wordsCancel }}</a>
+      <a href="/profile/" class="btn btn-cancel">{{ T.wordsCancel }}</a>
     </div>
   </form>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import { ObjectivesAnswers } from './ObjectivesQuestions.vue';
 import { types } from '../../api_types';
 import T from '../../lang';
 
@@ -77,20 +121,114 @@ export default class UserPreferencesEdit extends Vue {
   @Prop() profile!: types.UserProfileInfo;
 
   T = T;
+  ObjectivesAnswers = ObjectivesAnswers;
   email = this.profile.email;
   locale = this.profile.locale;
   preferredLanguage = this.profile.preferred_language;
   programmingLanguages = this.profile.programming_languages;
   isPrivate = this.profile.is_private;
   hideProblemTags = this.profile.hide_problem_tags;
+  hasCompetitiveObjective = this.profile.has_competitive_objective ?? false;
+  hasLearningObjective = this.profile.has_learning_objective ?? true;
+  hasScholarObjective = this.profile.has_scholar_objective ?? true;
+  hasTeachingObjective = this.profile.has_teaching_objective ?? false;
+
+  get scholarCompetitiveObjectiveQuestion(): string {
+    if (this.hasLearningObjective && this.hasTeachingObjective) {
+      return this.T.userObjectivesModalDescriptionLearningAndTeaching;
+    }
+    if (this.hasLearningObjective) {
+      return this.T.userObjectivesModalDescriptionLearning;
+    }
+    if (this.hasTeachingObjective) {
+      return this.T.userObjectivesModalDescriptionTeaching;
+    }
+    return T.userObjectivesModalDescriptionUsage;
+  }
+
+  get learningTeachingObjective(): string {
+    if (this.hasLearningObjective && this.hasTeachingObjective) {
+      return ObjectivesAnswers.LearningAndTeaching;
+    }
+    if (this.hasLearningObjective) {
+      return ObjectivesAnswers.Learning;
+    }
+    if (this.hasTeachingObjective) {
+      return ObjectivesAnswers.Teaching;
+    }
+    return ObjectivesAnswers.None;
+  }
+
+  set learningTeachingObjective(newValue: string) {
+    switch (newValue) {
+      case ObjectivesAnswers.Learning:
+        this.hasLearningObjective = true;
+        this.hasTeachingObjective = false;
+        break;
+      case ObjectivesAnswers.Teaching:
+        this.hasLearningObjective = false;
+        this.hasTeachingObjective = true;
+        break;
+      case ObjectivesAnswers.LearningAndTeaching:
+        this.hasLearningObjective = true;
+        this.hasTeachingObjective = true;
+        break;
+      case ObjectivesAnswers.None:
+        this.hasLearningObjective = false;
+        this.hasTeachingObjective = false;
+        this.hasScholarObjective = false;
+        this.hasCompetitiveObjective = false;
+        break;
+    }
+  }
+
+  get scholarCompetitiveObjective(): string {
+    if (this.hasCompetitiveObjective && this.hasScholarObjective) {
+      return ObjectivesAnswers.ScholarAndCompetitive;
+    }
+    if (this.hasCompetitiveObjective) {
+      return ObjectivesAnswers.Competitive;
+    }
+    if (this.hasScholarObjective) {
+      return ObjectivesAnswers.Scholar;
+    }
+    return ObjectivesAnswers.Other;
+  }
+
+  set scholarCompetitiveObjective(newValue: string) {
+    switch (newValue) {
+      case ObjectivesAnswers.Scholar:
+        this.hasScholarObjective = true;
+        this.hasCompetitiveObjective = false;
+        break;
+      case ObjectivesAnswers.Competitive:
+        this.hasScholarObjective = false;
+        this.hasCompetitiveObjective = true;
+        break;
+      case ObjectivesAnswers.ScholarAndCompetitive:
+        this.hasScholarObjective = true;
+        this.hasCompetitiveObjective = true;
+        break;
+      case ObjectivesAnswers.Other:
+        this.hasScholarObjective = false;
+        this.hasCompetitiveObjective = false;
+        break;
+    }
+  }
 
   onUpdateUserPreferences(): void {
     this.$emit('update-user-preferences', {
-      locale: this.locale,
+      userPreferences: {
+        locale: this.locale,
+        preferred_language: this.preferredLanguage ?? null,
+        is_private: this.isPrivate,
+        hide_problem_tags: this.hideProblemTags,
+        has_competitive_objective: this.hasCompetitiveObjective,
+        has_learning_objective: this.hasLearningObjective,
+        has_scholar_objective: this.hasScholarObjective,
+        has_teaching_objective: this.hasTeachingObjective,
+      },
       localeChanged: this.locale != this.profile.locale,
-      preferredLanguage: this.preferredLanguage ?? null,
-      isPrivate: this.isPrivate,
-      hideProblemTags: this.hideProblemTags,
     });
   }
 }

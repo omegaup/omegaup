@@ -12,22 +12,22 @@
             })
       }}
     </h5>
-    <div v-if="!isIndex" class="card-body">
-      <label>
-        <omegaup-common-typeahead
-          :existing-options="searchResultUsers"
-          :value.sync="searchedUsername"
-          :max-results="10"
-          @update-existing-options="
-            (query) => $emit('update-search-result-users', query)
-          "
-        />
-      </label>
-      <button class="btn btn-primary" type="button" @click="onSubmit">
-        {{ T.searchUser }}
-      </button>
+    <div v-if="!isIndex" class="card-body form-row">
+      <omegaup-common-typeahead
+        class="col-md-4"
+        :existing-options="searchResultUsers"
+        :value.sync="searchedUsername"
+        :max-results="10"
+        @update-existing-options="
+          (query) => $emit('update-search-result-users', query)
+        "
+      />
       <template v-if="Object.keys(availableFilters).length > 0">
-        <select v-model="filter" class="filter" @change="onFilterChange">
+        <select
+          v-model="filter"
+          class="filter form-control col-md-4"
+          @change="onFilterChange"
+        >
           <option value="">
             {{ T.wordsSelectFilter }}
           </option>
@@ -41,13 +41,24 @@
         </select>
       </template>
       <template v-else-if="!isLogged &amp;&amp; !isIndex">
-        <span class="badge badge-info">{{ T.mustLoginToFilterUsers }}</span>
+        <span
+          class="badge badge-info col-md-5 d-flex align-items-center justify-content-center"
+          >{{ T.mustLoginToFilterUsers }}</span
+        >
       </template>
       <template v-else-if="!isIndex">
-        <span class="badge badge-info">{{
-          T.mustUpdateBasicInfoToFilterUsers
-        }}</span>
+        <span
+          class="badge badge-info col-md-5 d-flex align-items-center justify-content-center"
+          >{{ T.mustUpdateBasicInfoToFilterUsers }}</span
+        >
       </template>
+      <button
+        class="btn btn-primary form-control col-md-2 ml-auto"
+        type="button"
+        @click="onSubmit"
+      >
+        {{ T.searchUser }}
+      </button>
     </div>
     <table class="table mb-0">
       <thead>
@@ -102,7 +113,7 @@ import * as ui from '../../ui';
 import common_Typeahead from '../common/Typeahead.vue';
 import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
-import common_Paginator from '../common/Paginatorv2.vue';
+import common_Paginator from '../common/Paginator.vue';
 
 interface Rank {
   country: string;

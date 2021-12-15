@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-'''Send messages to Contest queue in rabbitmq'''
+'''Send messages to queues in rabbitmq'''
 
 import contextlib
 
@@ -12,13 +12,24 @@ import pika
 
 
 @contextlib.contextmanager
-def connect(args: argparse.Namespace) -> Iterator[pika.adapters.blocking_connection.BlockingChannel]:
+def connect(
+        args: argparse.Namespace
+) -> Iterator[pika.adapters.blocking_connection.BlockingChannel]:
     '''Connects to rabbitmq with the arguments provided.'''
     username = args.rabbitmq_username
     password = args.rabbitmq_password
     credentials = pika.PlainCredentials(username, password)
-    parameters = pika.ConnectionParameters('rabbitmq', 5672, '/',
-                                           credentials, heartbeat=600)
+    parameters = pika.ConnectionParameters(
+        'rabbitmq',
+        5672,
+        '/',
+        credentials,
+        heartbeat=600,
+        # mypy does not support structural typing yet
+        # https://github.com/python/mypy/issues/3186
+        blocked_connection_timeout=300.0,  # type: ignore
+    )
+
     connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
 

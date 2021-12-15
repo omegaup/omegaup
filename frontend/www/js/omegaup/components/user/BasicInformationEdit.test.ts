@@ -1,7 +1,8 @@
 import { mount } from '@vue/test-utils';
-import { types } from '../../api_types';
+import { dao, types } from '../../api_types';
 import user_Basic_Information_Edit from './BasicInformationEdit.vue';
 import date_Picker from '../DatePicker.vue';
+import T from '../../lang';
 
 const profile: types.UserProfileInfo = {
   name: 'omegaUp admin',
@@ -29,6 +30,7 @@ const profile: types.UserProfileInfo = {
 const basicInformationEditProps: {
   profile: types.UserProfileInfo;
   data: types.UserProfileDetailsPayload;
+  countries: dao.Countries[];
 } = {
   profile,
   data: {
@@ -46,6 +48,16 @@ const basicInformationEditProps: {
     profile: profile,
     identities: [],
   },
+  countries: [
+    {
+      country_id: 'MX',
+      name: 'México',
+    },
+    {
+      country_id: 'CA',
+      name: 'Canada',
+    },
+  ],
 };
 
 describe('BasicInformationEdit.vue', () => {
@@ -96,9 +108,34 @@ describe('BasicInformationEdit.vue', () => {
           username: 'omegaup modified',
           name: 'omegaUp admin modified',
           gender: 'other',
-          countryId: 'CA',
-          stateId: 'AB',
-          birthDate: new Date('2001-01-01'),
+          country_id: 'CA',
+          state_id: 'AB',
+          birth_date: new Date('2001-01-01'),
+        },
+      ],
+    ]);
+  });
+
+  it('Should show message error when a long name is given', async () => {
+    const wrapper = mount(user_Basic_Information_Edit, {
+      propsData: basicInformationEditProps,
+    });
+
+    await wrapper
+      .find('input[data-name]')
+      .setValue(
+        'A name that exceeds the allowed limit of charachters for this field',
+      );
+
+    await wrapper.find('button[type="submit"]').trigger('submit');
+
+    expect(
+      wrapper.emitted('update-user-basic-information-error'),
+    ).toBeDefined();
+    expect(wrapper.emitted('update-user-basic-information-error')).toEqual([
+      [
+        {
+          description: T.userEditNameTooLong,
         },
       ],
     ]);

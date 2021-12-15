@@ -5,11 +5,15 @@
     "target": "es6",
     "downlevelIteration": true,
     "strict": true,
-    "lib": [
-        "DOM",
-        "ES5",
-        "ScriptHost",
-        "ES2020.Promise"
+    "lib": ["DOM", "ES5", "ScriptHost", "ES2020.Promise"],
+    "types": [
+      "cypress",
+      "cypress-wait-until",
+      "cypress-file-upload",
+      "gapi",
+      "gapi.auth2",
+      "bootstrap-datepicker",
+      "bootstrap.v3.datetimepicker"
     ],
     "module": "es6",
     "moduleResolution": "node",
@@ -24,9 +28,8 @@
   },
   "include": [
     "./frontend/www/js/omegaup/**/*.vue",
-    "./frontend/www/**/*.ts"
+    "./frontend/www/**/*.ts",
+    "./cypress"
   ],
-  "exclude": [
-    "./node_modules"
-  ]
+  "exclude": ["./node_modules"]
 }

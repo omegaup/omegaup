@@ -250,6 +250,8 @@ CREATE TABLE `Course_Identity_Request` (
   `last_update` timestamp NULL DEFAULT NULL COMMENT 'Última fecha de actualización del request',
   `accepted` tinyint(1) DEFAULT NULL COMMENT 'Indica si la respuesta del request fue aceptada',
   `extra_note` mediumtext COMMENT 'Indica una descripción con el motivo de aceptar o rechazar un usuario al curso',
+  `accept_teacher` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si acepta al organizador como su maestro.',
+  `share_user_information` tinyint(1) DEFAULT NULL COMMENT 'Almacena la respuesta del participante de un curso si está de acuerdo en divulgar su información.',
   PRIMARY KEY (`identity_id`,`course_id`),
   KEY `course_id` (`course_id`),
   KEY `identity_id` (`identity_id`),
