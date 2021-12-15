@@ -153,7 +153,7 @@
             <div class="card-header">
               <h2 class="mb-0">
                 <button
-                  ref="limitsRef"
+                  ref="limits"
                   class="btn btn-link btn-block text-left collapsed"
                   type="button"
                   data-toggle="collapse"
@@ -467,7 +467,7 @@ export default class ProblemForm extends Vue {
 
   @Ref('basic-info') basicInfoRef!: HTMLDivElement;
   @Ref('tags') tagsRef!: HTMLDivElement;
-  @Ref('limitsRef') limitsRef!: HTMLDivElement;
+  @Ref('limits') limitsRef!: HTMLDivElement;
   @Ref('form') formRef!: HTMLFormElement;
 
   T = T;
@@ -614,7 +614,6 @@ export default class ProblemForm extends Vue {
 
     for (const [key, value] of formData.entries()) {
       const isEmpty = value === '';
-      console.log(key, value);
       if (isEmpty) {
         if (
           basicInfoCollapsed &&
@@ -634,7 +633,6 @@ export default class ProblemForm extends Vue {
         if (tagsCollapsed && key === 'problem_level') {
           this.tagsRef.click();
           tagsCollapsed = false;
-
           continue;
         }
         if (
