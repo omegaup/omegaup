@@ -19,11 +19,14 @@
                 <form :action="queryURL" method="GET">
                   <div class="input-group">
                     <input
-                      v-model="currentQuery"
+                      v-model.lazy="currentQuery"
                       class="form-control"
                       type="text"
                       name="query"
                       autocomplete="off"
+                      autocorrect="off"
+                      autocapitalize="off"
+                      spellcheck="false"
                       :placeholder="T.wordsKeyword"
                     />
                     <div class="input-group-append">
@@ -147,6 +150,8 @@
         </b-card>
         <b-tab
           ref="currentContestTab"
+          v-infinite-scroll="loadMoreContests"
+          class="scroll-content"
           :title="T.contestListCurrent"
           :title-link-class="titleLinkClass(ContestTab.Current)"
         >
@@ -182,6 +187,8 @@
         </b-tab>
         <b-tab
           ref="futureContestTab"
+          v-infinite-scroll="loadMoreContests"
+          class="scroll-content"
           :title="T.contestListFuture"
           :title-link-class="titleLinkClass(ContestTab.Future)"
         >
@@ -220,6 +227,8 @@
         </b-tab>
         <b-tab
           ref="pastContestTab"
+          v-infinite-scroll="loadMoreContests"
+          class="scroll-content"
           :title="T.contestListPast"
           :title-link-class="titleLinkClass(ContestTab.Past)"
         >
@@ -275,6 +284,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import infiniteScroll from 'vue-infinite-scroll';
 import {
   TabsPlugin,
   CardPlugin,
@@ -286,6 +296,7 @@ Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
 Vue.use(LayoutPlugin);
+Vue.use(infiniteScroll);
 library.add(fas);
 
 export enum ContestTab {
@@ -323,6 +334,7 @@ export default class ArenaContestList extends Vue {
   currentOrder: ContestOrder = ContestOrder.None;
   currentFilterBySignedUp: boolean = false;
   currentFilterByRecommended: boolean = false;
+  currentPageSize: number = 10;
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
@@ -334,6 +346,11 @@ export default class ArenaContestList extends Vue {
 
   get queryURL(): string {
     return `/arenav2/#${this.currentTab}`;
+  }
+
+  loadMoreContests() {
+    this.$emit('get-chunk', 1, this.currentPageSize, this.query);
+    this.currentPageSize += 10;
   }
 
   finishContestDate(contest: types.ContestListItem): string {
@@ -475,6 +492,11 @@ export default class ArenaContestList extends Vue {
       ) !important;
     }
   }
+}
+
+.scroll-content {
+  overflow-y: scroll;
+  max-height: 500px;
 }
 
 .empty-category {

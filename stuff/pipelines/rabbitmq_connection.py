@@ -24,6 +24,9 @@ def connect(
         virtual_host='/',
         credentials=pika.PlainCredentials(username, password),
         heartbeat=600,
+        # mypy does not support structural typing yet
+        # https://github.com/python/mypy/issues/3186
+        blocked_connection_timeout=300.0,  # type: ignore
     ))
     channel = connection.channel()
 

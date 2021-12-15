@@ -1614,7 +1614,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             !is_null($problem) ? $problem->problem_id : null,
             $r->ensureOptionalEnum('language', $languagesKeys),
             !is_null($identity) ? $identity->identity_id : null,
-            $r->ensureOptionalInt('offset') ?? 0,
+            max($r->ensureOptionalInt('offset') ?? 0, 0),
             $r->ensureOptionalInt('rowcount') ?? 100
         );
 

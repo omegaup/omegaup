@@ -324,7 +324,31 @@ def create_problem(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
                  'a[data-nav-problems-create]'))).click()
+    driver.screenshot()
 
+    # open all collapsed panels
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//button[@data-target=".tags"]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//button[@data-target=".limits"]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//button[@data-target=".validation"]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//button[@data-target=".access"]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//button[@data-target=".evaluation"]'))).click()
+
+    driver.screenshot()
     with assert_js_errors(
             driver,
             expected_messages=('/api/problem/details/',)
@@ -368,6 +392,7 @@ def create_problem(
             )
         )
     ).select_by_value('problemLevelBasicKarel')
+    driver.screenshot()
     contents_element = driver.browser.find_element_by_name(
         'problem_contents')
     contents_element.send_keys(os.path.join(OMEGAUP_ROOT, resource_path))

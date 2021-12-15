@@ -23,16 +23,22 @@ def test_rabbitmq_connection(exchange: str, expected: bool):
         credentials=pika.PlainCredentials('omegaup', 'omegaup')))
     channel = conn.channel()
 
-    def on_message(channel, _method_frame, _header_frame, body):
+    def on_message(
+            channel: pika.adapters.blocking_connection.BlockingChannel,
+            _method: pika.spec.Basic.Deliver,
+            _properties: pika.spec.BasicProperties,
+            body: bytes) -> None:
+        '''Mocking on_message function'''
         message = body.decode()
         assert message == 'value'
         channel.basic_cancel('test-consumer')
 
-    def publish_message(body):
+    def publish_message(body: str) -> None:
+        '''Mocking publish_message function'''
         channel.basic_publish(
             exchange=exchange,
             routing_key='ContestQueue',
-            body=body,
+            body=body.encode(),
         )
 
     result = channel.queue_declare(queue='', exclusive=True)
@@ -46,5 +52,5 @@ def test_rabbitmq_connection(exchange: str, expected: bool):
             on_message_callback=on_message,
         )
         assert expected is True
-    except pika.exceptions.ChannelClosedByBroker:
+    except:  # noqa: bare-except
         assert expected is False
