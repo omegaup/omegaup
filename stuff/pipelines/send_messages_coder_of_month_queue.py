@@ -11,8 +11,7 @@ import json
 import MySQLdb
 import MySQLdb.cursors
 import pika
-from rabbit_connection import Rabbit
-import rabbit_connection
+import rabbitmq_connection
 
 sys.path.insert(
     0,
@@ -29,7 +28,8 @@ def send_coder_month(cur: MySQLdb.cursors.BaseCursor,
     '''Send messages to coder of the month queue'''
     today = datetime.date.today()
     first_day_of_current_month = today.replace(day=1)
-    channel.exchange_declare(exchange='certificates', exchange_type='direct')
+    channel.queue_declare("coder_month", passive=False, durable=False, exclusive=False, auto_delete=False)
+    channel.exchange_declare(exchange='certificates', auto_delete=False, durable=True, exchange_type='direct')
     logging.info('Send messages to Coder_Month_Queue')
     if first_day_of_current_month.month == 12:
         first_day_of_next_month = datetime.date(
@@ -62,6 +62,12 @@ def send_coder_month(cur: MySQLdb.cursors.BaseCursor,
             exchange='certificates',
             routing_key='CoderOfTheMonthQueue',
             body=body)
+    data = "Example"
+    message = json.dumps(data)
+    body = message.encode()
+    channel.basic_publish(exchange='certificates',
+            routing_key='CoderOfTheMonthQueue',
+            body=body)
 
 
 def main() -> None:
@@ -70,25 +76,20 @@ def main() -> None:
     lib.db.configure_parser(parser)
     lib.logs.configure_parser(parser)
 
-    rabbit_connection.configure_parser(parser)
+    rabbitmq_connection.configure_parser(parser)
 
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
-
     logging.info('Started')
     dbconn = lib.db.connect(args)
-    rabbit_conn = Rabbit(args)
     try:
-        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
-            send_coder_month(cur, rabbit_conn.channel,
-                             'all')
-            send_coder_month(cur, rabbit_conn.channel,
-                             'female')
+        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur, \
+            rabbitmq_connection.connect(args) as channel:
+            send_coder_month(cur, channel, 'all')
+            send_coder_month(cur, channel, 'female')
     finally:
         dbconn.close()
-        rabbit_conn.close()
         logging.info('Done')
-
-
+    
 if __name__ == '__main__':
     main()
