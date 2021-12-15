@@ -208,14 +208,14 @@ describe('time', () => {
                 minutesSeconds * 30 +
                 seconds * 10,
             ),
-            expected: '2 días 05:30:10',
+            expected: '2:05:30:10',
           },
         ],
         [
           {
             startDate: today,
             finishDate: new Date(tomorrow.getTime() + daySeconds * 30),
-            expected: '1 mes 1 día',
+            expected: '1 mes',
           },
         ],
         [
@@ -228,7 +228,7 @@ describe('time', () => {
                 minutesSeconds * 30 +
                 seconds * 10,
             ),
-            expected: '1 mes 2 días 5 horas 30 minutos 10 segundos',
+            expected: '1 mes 1 día 5 horas 30 minutos 10 segundos',
           },
         ],
         [

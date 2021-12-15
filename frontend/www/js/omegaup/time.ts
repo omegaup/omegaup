@@ -1,4 +1,5 @@
 import formatDuration from 'date-fns/formatDuration';
+import intervalToDuration from 'date-fns/intervalToDuration';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import esLocale from 'date-fns/locale/es';
 import enLocale from 'date-fns/locale/en-US';
@@ -271,16 +272,6 @@ export function formatContestDuration(
   startDate: Date,
   finishDate: Date,
 ): string {
-  let delta = finishDate.getTime() - startDate.getTime();
-  const months = Math.floor(delta / (30 * 24 * 60 * 60 * 1000));
-  delta -= months * (30 * 24 * 60 * 60 * 1000);
-  const days = Math.floor(delta / (24 * 60 * 60 * 1000));
-  delta -= days * (24 * 60 * 60 * 1000);
-  const hours = Math.floor(delta / (60 * 60 * 1000));
-  delta -= hours * (60 * 60 * 1000);
-  const minutes = Math.floor(delta / (60 * 1000));
-  delta -= minutes * (60 * 1000);
-  const seconds = Math.floor(delta / 1000);
   let currentLocale;
   switch (T.locale) {
     case 'pt':
@@ -293,34 +284,20 @@ export function formatContestDuration(
       currentLocale = esLocale;
       break;
   }
+  const delta = finishDate.getTime() - startDate.getTime();
+  const months = Math.floor(delta / (30 * 24 * 60 * 60 * 1000));
   if (months >= 1.0) {
     return formatDuration(
-      {
-        months: months,
-        days: days,
-        hours: hours,
-        minutes: minutes,
-        seconds: seconds,
-      },
+      intervalToDuration({
+        start: startDate,
+        end: finishDate,
+      }),
       {
         locale: currentLocale,
       },
     );
   }
-  let clock = '';
-  if (days > 0) {
-    clock +=
-      formatDuration(
-        { days: days },
-        { format: ['days'], locale: currentLocale },
-      ) + ' ';
-  }
-  clock += `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
-    2,
-    '0',
-  )}:${String(seconds).padStart(2, '0')}`;
-
-  return clock;
+  return formatDelta(delta);
 }
 
 /**
