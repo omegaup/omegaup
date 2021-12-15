@@ -77,4 +77,20 @@ describe('Settings.vue', () => {
       expect(wrapper.find('.limits').classes()).not.toContain('show');
     }, 3000);
   });
+  it('Should open collapsed tabs automatically when submitting without completing the required info', async () => {
+    const wrapper = mount(Form, { propsData: { data: props } });
+    expect(wrapper.find('.basic-info').classes()).toContain('show');
+    expect(wrapper.find('.tags').classes()).toContain('show');
+    await wrapper.find('button[data-target=".basic-info"]').trigger('click');
+    await wrapper.find('button[data-target=".basic-info"]').trigger('click');
+    setTimeout(() => {
+      expect(wrapper.find('.basic-info').classes()).not.toContain('show');
+      expect(wrapper.find('.tags').classes()).not.toContain('show');
+    }, 3000);
+    await wrapper.find('button[type="submit"]').trigger('click');
+    setTimeout(() => {
+      expect(wrapper.find('.basic-info').classes()).toContain('show');
+      expect(wrapper.find('.tags').classes()).toContain('show');
+    }, 3000);
+  });
 });
