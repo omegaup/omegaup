@@ -175,6 +175,7 @@ let store = new Vuex.Store({
   state: {
     alias: null,
     showSubmitButton: false,
+    languages: [],
     localStorageSources: null,
     request: {
       input: {
@@ -196,6 +197,9 @@ let store = new Vuex.Store({
     },
     showSubmitButton(state) {
       return state.showSubmitButton;
+    },
+    languages(state) {
+      return state.languages;
     },
     localStorageSources(state) {
       return state.localStorageSources;
@@ -362,6 +366,18 @@ let store = new Vuex.Store({
         );
         submitButton.classList.remove('d-none');
       }
+    },
+    languages(state, value) {
+      state.languages = value;
+      document
+        .querySelectorAll('select[data-language-select] option')
+        .forEach((option) => {
+          if (!state.languages.includes(option.value)) {
+            option.classList.add('d-none');
+          } else {
+            option.classList.remove('d-none');
+          }
+        });
     },
     currentCase(state, value) {
       state.currentCase = value;
@@ -1470,7 +1486,7 @@ runButton.addEventListener('click', () => {
     .catch(Util.asyncError);
 });
 
-function setSettings({ alias, settings, showSubmitButton }) {
+function setSettings({ alias, settings, languages, showSubmitButton }) {
   if (!settings) {
     return;
   }
@@ -1489,6 +1505,7 @@ function setSettings({ alias, settings, showSubmitButton }) {
       }
     }
   }
+  store.commit('languages', languages);
   store.commit('updatingSettings', true);
   store.commit('reset');
   store.commit('Interactive', !!settings.interactive);
@@ -1550,6 +1567,7 @@ window.addEventListener(
           alias: e.data.params.alias,
           settings: e.data.params.settings,
           showSubmitButton: e.data.params.showSubmitButton,
+          languages: e.data.params.languages,
         });
         break;
     }

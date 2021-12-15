@@ -178,6 +178,7 @@
             v-if="!problem.karel_problem"
             :problem="problem"
             :can-submit="user.loggedIn && !inContestOrCourse"
+            :accepted-languages="filteredLanguages"
           ></omegaup-arena-ephemeral-grader>
           <omegaup-arena-runs
             :problem-alias="problem.alias"
