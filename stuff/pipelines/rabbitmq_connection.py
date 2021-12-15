@@ -18,10 +18,13 @@ def connect(
     '''Connects to rabbitmq with the arguments provided.'''
     username = args.rabbitmq_username
     password = args.rabbitmq_password
-    credentials = pika.PlainCredentials(username, password)
-    parameters = pika.ConnectionParameters('rabbitmq', 5672, '/',
-                                           credentials, heartbeat=600)
-    connection = pika.BlockingConnection(parameters)
+    connection = pika.BlockingConnection(pika.ConnectionParameters(
+        host='rabbitmq',
+        port=5672,
+        virtual_host='/',
+        credentials=pika.PlainCredentials(username, password),
+        heartbeat=600,
+    ))
     channel = connection.channel()
 
     channel.exchange_declare(exchange='certificates',
