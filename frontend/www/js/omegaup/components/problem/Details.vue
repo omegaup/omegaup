@@ -177,6 +177,7 @@
           <omegaup-arena-ephemeral-grader
             v-if="!problem.karel_problem"
             :problem="problem"
+            :accepted-languages="filteredLanguages"
           ></omegaup-arena-ephemeral-grader>
           <omegaup-arena-runs
             :problem-alias="problem.alias"
