@@ -5519,7 +5519,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
-        include_once 'libs/third_party/ZipStream.php';
+        include_once __DIR__ . '/../../libs/third_party/ZipStream.php';
         $zip = new \ZipStream("{$contestAlias}.zip");
         \OmegaUp\Controllers\Problemset::downloadRuns(
             $contest->problemset_id,
