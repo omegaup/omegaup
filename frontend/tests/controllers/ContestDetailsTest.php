@@ -911,7 +911,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
             // Create a mock that stores the file name-contents mapping into an associative array.
             $files = [];
-            include_once 'libs/third_party/ZipStream.php';
+            include_once __DIR__ . '/../../server/libs/third_party/ZipStream.php';
             $zip = $this->createMock(ZipStream::class);
             $zip->method('add_file')
                 ->will($this->returnCallback(function (

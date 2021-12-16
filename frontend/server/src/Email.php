@@ -34,9 +34,6 @@ class Email {
             return;
         }
 
-        require_once 'libs/third_party/phpmailer/class.phpmailer.php';
-        require_once 'libs/third_party/phpmailer/class.smtp.php';
-
         self::$log->debug('Sending email to ' . join(',', $emails));
 
         $mail = new \PHPMailer();

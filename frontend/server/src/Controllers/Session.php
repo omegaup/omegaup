@@ -9,8 +9,6 @@ class ScopedFacebook {
     public $facebook;
 
     public function __construct() {
-        require_once 'libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php';
-
         $this->scopedSession = new \OmegaUp\ScopedSession();
         $this->facebook = new \Facebook\Facebook([
             'app_id' => OMEGAUP_FB_APPID,
@@ -505,8 +503,6 @@ class Session extends \OmegaUp\Controllers\Controller {
             $r['storeToken'],
             'storeToken'
         );
-
-        require_once 'libs/third_party/google-api-php-client/src/Google/autoload.php';
 
         $client = new \Google_Client();
         $client->setClientId(OMEGAUP_GOOGLE_CLIENTID);
