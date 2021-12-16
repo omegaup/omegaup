@@ -17,7 +17,6 @@
 </template>
 
 <script lang="ts">
-import { Component, Emit, Vue } from 'vue-property-decorator';
 import cases_Sidebar from './Sidebar.vue';
 import add_Window from './AddWindow.vue';
 @Component({

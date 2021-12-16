@@ -20,7 +20,7 @@ describe('Tabs.vue', () => {
   it('Should render "AddWindow.vue" conditionally', async () => {
     const wrapper = shallowMount(MainWindow, { localVue });
 
-    let addWindow = wrapper.findComponent(AddWindow);
+    const addWindow = wrapper.findComponent(AddWindow);
     expect(addWindow.element).not.toBeVisible();
 
     wrapper.setData({ shouldShowAddWindow: true });

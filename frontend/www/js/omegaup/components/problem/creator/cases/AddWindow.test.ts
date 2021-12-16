@@ -1,7 +1,7 @@
-import { createLocalVue, mount, shallowMount } from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 
 import AddWindow from './AddWindow.vue';
-import BootstrapVue, { BTab, IconsPlugin } from 'bootstrap-vue';
+import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../../lang';
 import Vue from 'vue';
 
