@@ -6,8 +6,7 @@ namespace OmegaUp;
 if (!defined('OMEGAUP_ROOT')) {
     define('OMEGAUP_ROOT', dirname(__DIR__));
 }
-ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . __DIR__);
-require_once 'autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 // Set default time
 date_default_timezone_set('UTC');
@@ -110,7 +109,6 @@ function appenderConfig(string $filename): array {
     ];
 }
 
-require_once('libs/third_party/log4php/src/main/php/Logger.php');
 \Logger::configure([
     'rootLogger' => [
         'appenders' => ['default'],

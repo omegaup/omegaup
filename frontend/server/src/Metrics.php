@@ -13,19 +13,9 @@ class Metrics {
     private $registry;
 
     private function __construct() {
-        require_once 'libs/third_party/prometheus_client_php/src/Prometheus/Exception/MetricNotFoundException.php';
-        require_once 'libs/third_party/prometheus_client_php/src/Prometheus/Storage/Adapter.php';
-        require_once 'libs/third_party/prometheus_client_php/src/Prometheus/Collector.php';
-        require_once 'libs/third_party/prometheus_client_php/src/Prometheus/CollectorRegistry.php';
-        require_once 'libs/third_party/prometheus_client_php/src/Prometheus/Counter.php';
-        require_once 'libs/third_party/prometheus_client_php/src/Prometheus/MetricFamilySamples.php';
-        require_once 'libs/third_party/prometheus_client_php/src/Prometheus/RenderTextFormat.php';
-        require_once 'libs/third_party/prometheus_client_php/src/Prometheus/Sample.php';
         if (function_exists('apcu_clear_cache')) {
-            require_once 'libs/third_party/prometheus_client_php/src/Prometheus/Storage/APC.php';
             $adapter = new \Prometheus\Storage\APC();
         } else {
-            require_once 'libs/third_party/prometheus_client_php/src/Prometheus/Storage/InMemory.php';
             $adapter = new \Prometheus\Storage\InMemory();
         }
         $this->registry = new \Prometheus\CollectorRegistry($adapter);
