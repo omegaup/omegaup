@@ -1,8 +1,6 @@
 <?php
 
 define('OMEGAUP_ROOT', dirname(__DIR__, 2));
-require_once(__DIR__ . '/../libs/third_party/log4php/src/main/php/Logger.php');
-require_once(__DIR__ . '/../autoload.php');
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
 class ConversionResult {

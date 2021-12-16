@@ -22,22 +22,21 @@
           })
         }}
       </h5>
-      <div v-if="includeUser" class="card-body">
-        <label>
-          <omegaup-common-typeahead
-            :existing-options="searchResultUsers"
-            :value.sync="searchedUsername"
-            :max-results="10"
-            @update-existing-options="
-              (query) => $emit('update-search-result-users', query)
-            "
-        /></label>
-        <a
-          class="btn btn-primary"
-          type="button"
-          :href="`/submissions/${encodeURIComponent(searchedUsername)}/`"
-        >
-          {{ T.searchUser }}
+      <div v-if="includeUser" class="card-body d-flex align-items-center">
+        <omegaup-common-typeahead
+          :existing-options="searchResultUsers"
+          :value.sync="searchedUsername"
+          :max-results="10"
+          class="mr-2"
+          @update-existing-options="
+            (query) => $emit('update-search-result-users', query)
+          "
+        />
+
+        <a :href="`/submissions/${encodeURIComponent(searchedUsername)}/`">
+          <button class="btn btn-primary" type="button">
+            {{ T.searchUser }}
+          </button>
         </a>
       </div>
       <div class="table-responsive">
