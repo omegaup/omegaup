@@ -2,15 +2,15 @@
   <b-row class="mt-3">
     <b-col cols="3" class="border-1 border-right">
       <cases-sidebar
+        :show-window="shouldShowAddWindow"
         @toggle-add-window="toggleAddWindow"
-        :showWindow="shouldShowAddWindow"
       />
     </b-col>
     <b-col>
       <add-window
         v-show="shouldShowAddWindow"
+        :show-window="shouldShowAddWindow"
         @toggle-add-window="toggleAddWindow"
-        :showWindow="shouldShowAddWindow"
       />
     </b-col>
   </b-row>
