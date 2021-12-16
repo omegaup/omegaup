@@ -360,9 +360,7 @@ let store = new Vuex.Store({
     },
     showSubmitButton(state, value) {
       state.problemsetId = value;
-      const submitButton = document.querySelector(
-        'button[data-submit-button]',
-      );
+      const submitButton = document.querySelector('button[data-submit-button]');
       if (value) {
         submitButton.classList.remove('d-none');
       } else {
