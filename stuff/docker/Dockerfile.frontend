@@ -19,7 +19,7 @@ RUN apt-get update -y && \
     apt-get autoremove -y && \
     apt-get clean
 
-RUN curl -sL https://getcomposer.org/download/1.10.10/composer.phar -o /usr/bin/composer && \
+RUN curl -sL https://getcomposer.org/download/2.1.14/composer.phar -o /usr/bin/composer && \
     chmod +x /usr/bin/composer
 
 RUN useradd --create-home --shell=/bin/bash ubuntu
@@ -30,7 +30,7 @@ ARG BRANCH=release
 ENV BRANCH=$BRANCH
 RUN git clone --branch=${BRANCH} --depth=1 --recurse-submodules --shallow-submodules https://github.com/omegaup/omegaup .
 RUN yarn install && yarn build
-RUN composer install --no-dev
+RUN composer install --no-dev --classmap-authoritative
 
 FROM alpine:latest AS frontend
 RUN apk add rsync
