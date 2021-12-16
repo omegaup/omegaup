@@ -4219,6 +4219,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'alias' => strval($assignment->alias),
                         'name' => strval($assignment->name),
                         'description' => strval($assignment->description),
+                        // TODO: add the languages accepted by assignment
                     ],
                     'problems' => $problemsResponseArray,
                     'currentProblem' => null,
@@ -4261,6 +4262,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             'alias' => strval($problem->alias),
             'title' => strval($problem->title),
             // TODO: Add more information about the currentProblem
+            // Los settings (para settings summary)
+            // Banderita diciendo si es karel_problem
+            // El statement, como siempre + los settings
+            // La source
+            // El problemsetter con su info (nombre, fecha de creación).
+            // El lenguaje preferido del problema, los lenguajes que acepta
+
+            // TODO: Add the nomination details...
         ];
         return $response;
     }
