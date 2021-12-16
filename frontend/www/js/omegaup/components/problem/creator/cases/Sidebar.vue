@@ -6,7 +6,13 @@
         <b-button size="sm" variant="primary" class="mr-2">
           <BIconLayoutSidebar />
         </b-button>
-        <b-button size="sm" variant="success" class="mr-2" @click="openModal">
+        <b-button
+          size="sm"
+          variant="success"
+          class="mr-2"
+          :pressed="showWindow"
+          @click="toggleAddWindow"
+        >
           <span class="d-none d-xl-inline">{{ T.problemCreatorAdd }}</span>
           <BIconPlusCircle class="d-inline d-xl-none" />
         </b-button>
@@ -14,26 +20,22 @@
           <BIconThreeDotsVertical />
         </b-button>
       </div>
-      <!-- Modals -->
-      <problem-creator-add-modal ref="add-case-modal" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Ref, Vue } from 'vue-property-decorator';
-import problemCreatorAddModal from './AddModal.vue';
+import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
 import T from '../../../../lang';
 
-@Component({
-  components: { 'problem-creator-add-modal': problemCreatorAddModal },
-})
+@Component
 export default class Sidebar extends Vue {
   T = T;
-  @Ref('add-case-modal') addCaseModalRef!: problemCreatorAddModal;
 
-  openModal() {
-    this.addCaseModalRef.openModal();
+  @Prop() showWindow!: boolean;
+
+  toggleAddWindow() {
+    this.$emit('toggle-add-window');
   }
 }
 </script>
