@@ -824,7 +824,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
-            self::$log->error('Failed to resolve demotion request', $e);
+            self::$log->error(
+                'Failed to resolve demotion request',
+                ['exception' => $e],
+            );
             throw $e;
         }
 

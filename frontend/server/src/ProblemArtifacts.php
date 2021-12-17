@@ -6,7 +6,7 @@ namespace OmegaUp;
  * Class to abstract access to a problem's artifacts.
  */
 class ProblemArtifacts {
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     private $log;
 
     /** @var string */
@@ -16,7 +16,7 @@ class ProblemArtifacts {
     private $revision;
 
     public function __construct(string $alias, string $revision = 'published') {
-        $this->log = \Logger::getLogger('ProblemArtifacts');
+        $this->log = \Monolog\Registry::omegaup()->withName('ProblemArtifacts');
         $this->alias = $alias;
         $this->revision = $revision;
     }
@@ -377,7 +377,7 @@ class GitServerBrowser {
         if (!is_string($response)) {
             $curlErrno = curl_errno($this->curl);
             $curlError = curl_error($this->curl);
-            \Logger::getLogger('GitBrowser')->error(
+            \Monolog\Registry::omegaup()->withName('GitBrowser')->error(
                 "Failed to get contents for {$this->url}. " .
                 "cURL {$curlErrno}: \"{$curlError}\""
             );

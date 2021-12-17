@@ -672,7 +672,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             } catch (\Exception $e) {
                 self::$log->error(
                     "Error decoding token for course {$courseAlias}",
-                    $e
+                    ['exception' => $e],
                 );
 
                 \OmegaUp\DAO\CourseCloneLog::create(
@@ -2165,7 +2165,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 } catch (\Exception $e) {
                     self::$log->error(
                         "Error fetching source for {$run['guid']}",
-                        $e
+                        ['exception' => $e],
                     );
                 }
                 $problem['runs'][] = $run;
