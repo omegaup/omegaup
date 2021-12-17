@@ -588,11 +588,8 @@ let store = new Vuex.Store({
         !Object.prototype.hasOwnProperty.call(state.request.input.cases, name)
       )
         return;
-      if (
-        (name == 'sample' || name == state.currentCase) &&
-        Object.keys(state.request.input.cases).length === 1
-      )
-        return;
+      // If there is only one test case, don't remove it
+      if (Object.keys(state.request.input.cases).length === 1) return;
       Vue.delete(state.request.input.cases, name);
       state.dirty = true;
     },
