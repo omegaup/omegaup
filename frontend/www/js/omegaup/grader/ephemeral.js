@@ -588,8 +588,11 @@ let store = new Vuex.Store({
         !Object.prototype.hasOwnProperty.call(state.request.input.cases, name)
       )
         return;
-      if (name == 'sample') return;
-      if (name == state.currentCase) state.currentCase = 'sample';
+      if (
+        (name == 'sample' || name == state.currentCase) &&
+        Object.keys(state.request.input.cases).length === 1
+      )
+        return;
       Vue.delete(state.request.input.cases, name);
       state.dirty = true;
     },
@@ -1541,6 +1544,7 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
     store.commit('inputIn', caseData['in']);
     store.commit('inputOut', caseData.out);
   }
+  store.commit('removeCase', 'sample');
 
   // Given that the current case will change several times, schedule the
   // flag to avoid swapping into the cases view for the next tick.
