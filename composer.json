@@ -22,7 +22,7 @@
     "psr-4": {"OmegaUp\\": "frontend/server/src"}
   },
   "require": {
-    "phpmailer/phpmailer": "=v5.2.21",
+    "phpmailer/phpmailer": "=v6.5.0",
     "smarty/smarty": "^4.0",
     "facebook/graph-sdk": "^5.7",
     "google/apiclient": "=v1.1.9",
