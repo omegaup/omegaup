@@ -532,7 +532,10 @@ class Run extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Submissions::update($submission);
             \OmegaUp\DAO\Runs::delete($run);
             \OmegaUp\DAO\Submissions::delete($submission);
-            self::$log->error('Call to \OmegaUp\Grader::grade() failed', $e);
+            self::$log->error(
+                'Call to \OmegaUp\Grader::grade() failed',
+                ['exception' => $e],
+            );
             throw $e;
         }
         $userId = $r->identity->user_id;
@@ -773,7 +776,10 @@ class Run extends \OmegaUp\Controllers\Controller {
                 $r['debug'] || false
             );
         } catch (\Exception $e) {
-            self::$log->error('Call to \OmegaUp\Grader::rejudge() failed', $e);
+            self::$log->error(
+                'Call to \OmegaUp\Grader::rejudge() failed',
+                ['exception' => $e],
+            );
         }
 
         self::invalidateCacheOnRejudge($run);
@@ -853,11 +859,10 @@ class Run extends \OmegaUp\Controllers\Controller {
             }
         } catch (\Exception $e) {
             // We did our best effort to invalidate the cache...
-            self::$log->warn(
-                "Failed to invalidate cache on rejudge {$run->run_id}, skipping: ",
-                $e
+            self::$log->warning(
+                "Failed to invalidate cache on rejudge {$run->run_id}, skipping",
+                ['exception' => $e],
             );
-            self::$log->warn($e);
         }
     }
 

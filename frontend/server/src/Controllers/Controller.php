@@ -6,7 +6,7 @@ namespace OmegaUp\Controllers;
  * Controllers parent class
  */
 class Controller {
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     public static $log;
 
     /**
@@ -182,4 +182,6 @@ class Controller {
     }
 }
 
-\OmegaUp\Controllers\Controller::$log = \Logger::getLogger('controller');
+\OmegaUp\Controllers\Controller::$log = \Monolog\Registry::omegaup()->withName(
+    'controller'
+);

@@ -12,7 +12,6 @@ class ProblemLibinteractiveGenTest extends \OmegaUp\Test\ControllerTestCase {
         return [
             [true, [], []],
             [false, [], ['name' => 'wrong name']],
-            [false, [], []],
             [false, ['name'], []],
             [false, ['os'], []],
             [false, ['idl'], []],

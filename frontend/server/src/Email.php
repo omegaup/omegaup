@@ -3,7 +3,7 @@
 namespace OmegaUp;
 
 class Email {
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     public static $log;
 
     /** @var null|\OmegaUp\EmailSender */
@@ -68,4 +68,4 @@ class Email {
     }
 }
 
-Email::$log = \Logger::getLogger('email');
+Email::$log = \Monolog\Registry::omegaup()->withName('email');

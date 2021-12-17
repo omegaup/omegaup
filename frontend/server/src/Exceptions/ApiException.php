@@ -6,7 +6,7 @@ namespace OmegaUp\Exceptions;
  * Exception that works with arrays instead of plain strings
  */
 abstract class ApiException extends \Exception {
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     public static $log;
 
     /** @var string */
@@ -91,4 +91,6 @@ abstract class ApiException extends \Exception {
     }
 }
 
-\OmegaUp\Exceptions\ApiException::$log = \Logger::getLogger('ApiException');
+\OmegaUp\Exceptions\ApiException::$log = \Monolog\Registry::omegaup()->withName(
+    'ApiException'
+);

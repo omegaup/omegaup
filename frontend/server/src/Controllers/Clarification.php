@@ -474,7 +474,10 @@ class Clarification extends \OmegaUp\Controllers\Controller {
                 }
             }
         } catch (\Exception $e) {
-            self::$log->error('Failed to broadcast clarification', $e);
+            self::$log->error(
+                'Failed to broadcast clarification',
+                ['exception' => $e],
+            );
             return;
         }
         self::getBroadcasterInstance()->broadcastClarification(
