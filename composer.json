@@ -4,7 +4,7 @@
   "license": "BSD-3-Clause",
   "config": {
     "platform": {
-      "php": "7.4.3"
+      "php": "8.0.13"
     },
     "process-timeout": 1200
   },
@@ -22,13 +22,13 @@
     "psr-4": {"OmegaUp\\": "frontend/server/src"}
   },
   "require": {
-    "phpmailer/phpmailer": "=v6.5.0",
-    "smarty/smarty": "^4.0",
-    "facebook/graph-sdk": "^5.7",
-    "google/apiclient": "=v1.1.9",
-    "promphp/prometheus_client_php": "=v1.0.3",
-    "paragonie/paseto": "v1.*",
+    "google/apiclient": "^v1.1.9",
+    "league/oauth2-facebook": "^2.0",
     "monolog/monolog": "^2.3",
-    "newrelic/monolog-enricher": "^2.0"
+    "newrelic/monolog-enricher": "^2.0",
+    "paragonie/paseto": "^v1.1.0",
+    "phpmailer/phpmailer": "^v6.5.0",
+    "promphp/prometheus_client_php": "^v2.4.0",
+    "smarty/smarty": "^4.0"
   }
 }

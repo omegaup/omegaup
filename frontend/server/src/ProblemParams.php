@@ -347,8 +347,8 @@ class ProblemParams {
                 $value = $transform($value);
             }
             // Important property, so check if it changes.
-            if ($important) {
-                $importantChange |= ($value != $object->$objectFieldName);
+            if ($important && !$importantChange) {
+                $importantChange = ($value != $object->$objectFieldName);
             }
             $object->$objectFieldName = $value;
         }

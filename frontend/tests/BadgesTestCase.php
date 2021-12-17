@@ -4,6 +4,7 @@ namespace OmegaUp\Test;
 
 /**
  * Parent class of all Test cases for omegaUp badges
+ * @psalm-suppress PropertyNotSetInConstructor For some reason psalm is complaining about some phpunit statics.
  */
 class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
     /** @psalm-suppress MixedOperand OMEGAUP_ROOT is definitely defined. */

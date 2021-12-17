@@ -22,7 +22,7 @@ function listDir(string $path): Generator {
 function pathJoin(string $parent, string ...$components): string {
     $path = rtrim($parent, '/');
     foreach ($components as $component) {
-        if (strpos('/', $component) === 0) {
+        if (strpos($component, '/') === 0) {
             $path = rtrim($component, '/');
             continue;
         }
