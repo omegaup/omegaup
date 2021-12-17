@@ -7,7 +7,7 @@ namespace OmegaUp\Test;
  * Implements common methods for setUp and asserts
  */
 class ControllerTestCase extends \PHPUnit\Framework\TestCase {
-    /** @var \Logger|null */
+    /** @var \Monolog\Logger|null */
     private static $logObj = null;
 
     public static function setUpBeforeClass(): void {
@@ -450,7 +450,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
 
     public static function log(string $message): void {
         if (is_null(self::$logObj)) {
-            self::$logObj = \Logger::getLogger('tests');
+            self::$logObj = \Monolog\Registry::omegaup()->withName('tests');
         }
 
         self::$logObj->info($message);

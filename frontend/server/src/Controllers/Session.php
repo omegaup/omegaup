@@ -393,7 +393,10 @@ class Session extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\AuthTokens::delete($authToken);
         } catch (\Exception $e) {
             // Best effort
-            self::$log->error('Failed to delete expired tokens', $e);
+            self::$log->error(
+                'Failed to delete expired tokens',
+                ['exception' => $e],
+            );
         }
 
         setcookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, 'deleted', 1, '/');
@@ -421,7 +424,8 @@ class Session extends \OmegaUp\Controllers\Controller {
         } catch (\Exception $e) {
             // Best effort
             self::$log->error(
-                "Failed to delete expired tokens: {$e->getMessage()}"
+                'Failed to delete expired tokens',
+                ['exception' => $e],
             );
         }
 
@@ -553,13 +557,12 @@ class Session extends \OmegaUp\Controllers\Controller {
         try {
             $accessToken = $helper->getAccessToken();
         } catch (\Facebook\Exceptions\FacebookResponseException $e) {
-            $errorMessage = $e->getMessage();
-            self::$log->error("Graph returned an error: {$errorMessage}");
+            self::$log->error('Graph returned an error', ['exception' => $e]);
             throw $e;
         } catch (\Facebook\Exceptions\FacebookSDKException $e) {
-            $errorMessage = $e->getMessage();
             self::$log->error(
-                "Facebook SDK returned an error: {$errorMessage}"
+                'Facebook SDK returned an error',
+                ['exception' => $e],
             );
             throw $e;
         }
@@ -653,14 +656,14 @@ class Session extends \OmegaUp\Controllers\Controller {
                 $usernameOrEmail
             );
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            self::$log->warn("Identity {$usernameOrEmail} not found.");
+            self::$log->warning("Identity {$usernameOrEmail} not found.");
             throw new \OmegaUp\Exceptions\InvalidCredentialsException();
         }
 
         if (
             !\OmegaUp\Controllers\Identity::testPassword($identity, $password)
         ) {
-            self::$log->warn(
+            self::$log->warning(
                 "Identity {$identity->username} has introduced invalid credentials."
             );
             throw new \OmegaUp\Exceptions\InvalidCredentialsException();
@@ -670,7 +673,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             && \OmegaUp\SecurityTools::isOldHash($identity->password)
         ) {
             // Update the password using the new Argon2i algorithm.
-            self::$log->warn(
+            self::$log->warning(
                 "Identity {$identity->username}'s password hash is being upgraded."
             );
             $identity->password = \OmegaUp\SecurityTools::hashString($password);
@@ -693,7 +696,10 @@ class Session extends \OmegaUp\Controllers\Controller {
         try {
             return self::registerSession($identity, $user);
         } catch (\Exception $e) {
-            self::$log->error($e);
+            self::$log->error(
+                'failed to register session',
+                ['exception' => $e],
+            );
             throw new \OmegaUp\Exceptions\InvalidCredentialsException();
         }
     }
@@ -729,7 +735,7 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         $currentSession = self::getCurrentSession($r);
         if (is_null($currentSession['auth_token'])) {
-            self::$log->warn('Auth token not found.');
+            self::$log->warning('Auth token not found.');
             throw new \OmegaUp\Exceptions\UnauthorizedException(
                 'loginRequired'
             );
@@ -742,7 +748,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             ) ? $loggedIdentity : $targetIdentity
         );
         if (is_null($identity) || is_null($identity->identity_id)) {
-            self::$log->warn("Identity {$usernameOrEmail} not found.");
+            self::$log->warning("Identity {$usernameOrEmail} not found.");
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
@@ -759,7 +765,10 @@ class Session extends \OmegaUp\Controllers\Controller {
 
             self::getCurrentSession($r);
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            self::$log->error($e);
+            self::$log->error(
+                'failed to update acting identity id',
+                ['exception' => $e],
+            );
             throw $e;
         }
     }
@@ -797,7 +806,10 @@ class Session extends \OmegaUp\Controllers\Controller {
                     /*forceVerification=*/true
                 );
             } catch (\OmegaUp\Exceptions\ApiException $e) {
-                self::$log->error("Unable to login via $provider: $e");
+                self::$log->error(
+                    'Unable to login via provider',
+                    ['provider' => $provider, 'exception' => $e],
+                );
                 throw $e;
             }
             $identity = \OmegaUp\DAO\Identities::findByUsername($username);

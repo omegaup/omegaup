@@ -11,7 +11,7 @@ class ProblemDeployer {
     const UPDATE_STATEMENTS = 2;
     const CREATE = 3;
     const ZIP_MAX_SIZE = 100 * 1024 * 1024;  // 100 MiB
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     private $log;
 
     /** @var string */
@@ -65,7 +65,7 @@ class ProblemDeployer {
         bool $acceptsSubmissions = true,
         bool $updatePublished = true
     ) {
-        $this->log = \Logger::getLogger('ProblemDeployer');
+        $this->log = \Monolog\Registry::omegaup()->withName('ProblemDeployer');
         $this->alias = $alias;
 
         if (

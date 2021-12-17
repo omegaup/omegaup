@@ -20,7 +20,7 @@ class Scoreboard {
     /** @var \OmegaUp\ScoreboardParams */
     private $params;
 
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     public $log;
 
     /** @var bool */
@@ -31,7 +31,7 @@ class Scoreboard {
 
     public function __construct(\OmegaUp\ScoreboardParams $params) {
         $this->params = $params;
-        $this->log = \Logger::getLogger('Scoreboard');
+        $this->log = \Monolog\Registry::omegaup()->withName('Scoreboard');
         \OmegaUp\Scoreboard::setIsLastRunFromCacheForTesting(false);
     }
 
@@ -244,7 +244,7 @@ class Scoreboard {
      * @param \OmegaUp\ScoreboardParams $params
      */
     public static function invalidateScoreboardCache(\OmegaUp\ScoreboardParams $params): void {
-        $log = \Logger::getLogger('Scoreboard');
+        $log = \Monolog\Registry::omegaup()->withName('Scoreboard');
         $log->info('Invalidating scoreboard cache.');
 
         // Invalidar cache del contestant
@@ -388,7 +388,7 @@ class Scoreboard {
         ), $timeout);
 
         // Try to broadcast the updated scoreboards:
-        $log = \Logger::getLogger('Scoreboard');
+        $log = \Monolog\Registry::omegaup()->withName('Scoreboard');
         try {
             $log->debug('Sending updated scoreboards');
             \OmegaUp\Grader::getInstance()->broadcast(
@@ -420,7 +420,7 @@ class Scoreboard {
                 false  // user_only
             );
         } catch (\Exception $e) {
-            $log->error('Error broadcasting scoreboard', $e);
+            $log->error('Error broadcasting scoreboard', ['exception' => $e]);
         }
     }
 
