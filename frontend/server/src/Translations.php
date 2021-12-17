@@ -66,7 +66,7 @@ class Translations {
      */
     public function get(string $key): string {
         if (!array_key_exists($key, $this->_translations)) {
-            \Logger::getLogger('Translations')->error(
+            \Monolog\Registry::omegaup()->withName('Translations')->error(
                 "Untranslated error message: {$key}"
             );
             return "{untranslated:{$key}}";

@@ -1267,7 +1267,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $identity->language_id
                 );
                 if (is_null($result) || is_null($result->name)) {
-                    self::$log->warn('Invalid language id for identity');
+                    self::$log->warning('Invalid language id for identity');
                 } else {
                     return \OmegaUp\Controllers\Identity::convertToSupportedLanguage(
                         $result->name
@@ -1275,9 +1275,15 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 }
             }
         } catch (\OmegaUp\Exceptions\NotFoundException $ex) {
-            self::$log->debug($ex);
+            self::$log->debug(
+                'convertToSupportedLanguage',
+                ['exception' => $ex],
+            );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $ex) {
-            self::$log->debug($ex);
+            self::$log->debug(
+                'convertToSupportedLanguage',
+                ['exception' => $ex],
+            );
         }
 
         /** @var array<string, float> */

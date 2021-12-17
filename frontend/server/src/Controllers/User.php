@@ -302,7 +302,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 return false;
             }
         } catch (\Exception $e) {
-            self::$log->warn('Email lookup failed', $e);
+            self::$log->warning('Email lookup failed', ['exception' => $e]);
             return false;
         }
 

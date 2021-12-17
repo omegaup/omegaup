@@ -3,6 +3,16 @@
 define('OMEGAUP_ROOT', dirname(__DIR__, 2));
 require_once(__DIR__ . '/../../../vendor/autoload.php');
 
+$rootLogger = new \Monolog\Logger('omegaup');
+$handler = new \Monolog\Handler\StreamHandler(
+    'php://stderr',
+    \Monolog\Logger::DEBUG,
+);
+$handler->setFormatter(new \Monolog\Formatter\LineFormatter());
+$rootLogger->pushHandler($handler);
+\Monolog\Registry::addLogger($rootLogger);
+\Monolog\ErrorHandler::register($rootLogger);
+
 class ConversionResult {
     /**
      * @var string

@@ -570,7 +570,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
-            self::$log->error("Failed to create problem {$problem->alias}", $e);
+            self::$log->error(
+                "Failed to create problem {$problem->alias}",
+                ['exception' => $e],
+            );
 
             try {
                 // Operation failed in the data layer, try to rollback transaction
@@ -578,7 +581,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             } catch (\Exception $rollbackException) {
                 self::$log->error(
                     'Failed to roll back transaction: ',
-                    $rollbackException
+                    ['exception' => $rollbackException],
                 );
             }
 
@@ -1166,15 +1169,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } catch (\Exception $e) {
             self::$log->error(
                 "Failed to rejudge problem {$problem->alias}",
-                $e
+                ['exception' => $e],
             );
             try {
                 // Operation failed in the data layer, try to rollback transaction
                 \OmegaUp\DAO\DAO::transRollback();
             } catch (\Exception $rollbackException) {
                 self::$log->error(
-                    'Failed to roll back transaction: ',
-                    $rollbackException
+                    'Failed to roll back transaction',
+                    ['exception' => $rollbackException],
                 );
             }
             throw $e;
@@ -1584,16 +1587,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             self::$log->error(
-                "Failed to update problem {$problem->alias}: ",
-                $e
+                "Failed to update problem {$problem->alias}",
+                ['exception' => $e],
             );
             try {
                 // Operation failed in the data layer, try to rollback transaction
                 \OmegaUp\DAO\DAO::transRollback();
             } catch (\Exception $rollbackException) {
                 self::$log->error(
-                    'Failed to roll back transaction: ',
-                    $rollbackException
+                    'Failed to roll back transaction',
+                    ['exception' => $rollbackException],
                 );
             }
 
@@ -1622,7 +1625,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             } catch (\Exception $e) {
                 self::$log->error(
                     'Best effort \OmegaUp\Controllers\Problem::apiRejudge failed',
-                    $e
+                    ['exception' => $e],
                 );
             }
         }
@@ -3205,7 +3208,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } catch (\Exception $e) {
             self::$log->error(
                 "Failed to update problem {$problem->alias}: ",
-                $e
+                ['exception' => $e],
             );
             try {
                 // Operation failed in the data layer, try to rollback transaction
@@ -3213,7 +3216,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             } catch (\Exception $rollbackException) {
                 self::$log->error(
                     'Failed to roll back transaction: ',
-                    $rollbackException
+                    ['exception' => $rollbackException],
                 );
             }
 
@@ -3243,7 +3246,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             } catch (\Exception $e) {
                 self::$log->error(
                     'Best effort \OmegaUp\Controllers\Problem::apiRejudge failed',
-                    $e
+                    ['exception' => $e],
                 );
             }
         }
@@ -4320,7 +4323,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } catch (\Exception $e) {
             self::$log->error(
                 "Failed to update languages for problem {$problem->alias}: ",
-                $e
+                ['exception' => $e],
             );
             try {
                 // Operation failed in the data layer, try to rollback transaction
@@ -4328,7 +4331,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             } catch (\Exception $rollbackException) {
                 self::$log->error(
                     'Failed to roll back transaction: ',
-                    $rollbackException
+                    ['exception' => $rollbackException],
                 );
             }
             throw $e;
@@ -5645,7 +5648,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } catch (\Exception $e) {
             self::$log->error(
                 "Failed to create input .zip for {$problem->alias}",
-                $e
+                ['exception' => $e],
             );
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'problemDeployerLibinteractiveValidationError',

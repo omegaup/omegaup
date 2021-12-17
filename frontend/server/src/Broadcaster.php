@@ -3,11 +3,11 @@
 namespace OmegaUp;
 
 class Broadcaster {
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     private $log;
 
     public function __construct() {
-        $this->log = \Logger::getLogger('broadcaster');
+        $this->log = \Monolog\Registry::omegaup()->withName('broadcaster');
     }
 
     public function broadcastClarification(
@@ -42,7 +42,10 @@ class Broadcaster {
                 false  // user_only
             );
         } catch (\Exception $e) {
-            $this->log->error('Failed to send to broadcaster', $e);
+            $this->log->error(
+                'Failed to send to broadcaster',
+                ['exception' => $e],
+            );
         }
         $this->sendClarificationEmail(
             $contest,
