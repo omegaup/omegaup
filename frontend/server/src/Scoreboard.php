@@ -573,7 +573,9 @@ class Scoreboard {
                 continue;
             }
 
-            $testOnly[$identityId] &= $isTest;
+            if ($testOnly[$identityId]) {
+                $testOnly[$identityId] = $isTest;
+            }
             $noRuns[$identityId] = false;
             if (!$showAllRuns) {
                 if ($isTest || $scoreboardPct === 0) {

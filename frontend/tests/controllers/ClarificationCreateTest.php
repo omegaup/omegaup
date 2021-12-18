@@ -53,7 +53,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'problemData' => $problemData,
             'contestData' => $contestData,
             'contestant' => $contestant,
-        ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/true);
+        ] = $this->setupContest(isGraderExpectedToBeCalled: true);
 
         $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
@@ -104,7 +104,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'problemData' => $problemData,
             'contestData' => $contestData,
             'contestant' => $contestant,
-        ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
+        ] = $this->setupContest(isGraderExpectedToBeCalled: false);
 
         $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
@@ -141,7 +141,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'problemData' => $problemData,
             'contestData' => $contestData,
             'contestant' => $contestant,
-        ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
+        ] = $this->setupContest(isGraderExpectedToBeCalled: false);
 
         $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
@@ -177,7 +177,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'problemData' => $problemData,
             'contestData' => $contestData,
             'contestant' => $contestant,
-        ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
+        ] = $this->setupContest(isGraderExpectedToBeCalled: false);
 
         $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
@@ -226,7 +226,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'problemData' => $problemData,
             'contestData' => $contestData,
             'contestant' => $contestant,
-        ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
+        ] = $this->setupContest(isGraderExpectedToBeCalled: false);
 
         $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
             $problemData,
@@ -263,7 +263,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'problemData' => $problemData,
             'contestData' => $contestData,
             'contestant' => $contestant,
-        ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
+        ] = $this->setupContest(isGraderExpectedToBeCalled: false);
 
         try {
             \OmegaUp\Test\Factories\Clarification::createClarification(
@@ -287,7 +287,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'problemData' => $problemData,
             'contestData' => $contestData,
             'contestant' => $contestant,
-        ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
+        ] = $this->setupContest(isGraderExpectedToBeCalled: false);
 
         // Create 5 users
         $n = 5;

@@ -426,12 +426,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     foreach ($selfGeneratedIdentities as $selfGeneratedIdentity) {
                         $newIdentity = self::createIdentity(
                             $selfGeneratedIdentity['username'],
-                            /*$name=*/ null,
-                            $selfGeneratedIdentity['password'],
-                            $countryId,
-                            $stateId,
-                            /*$gender=*/ 'decline',
-                            $teamGroup->alias
+                            name: null,
+                            password: $selfGeneratedIdentity['password'],
+                            countryId: $countryId,
+                            stateId: $stateId,
+                            gender: 'decline',
+                            aliasGroup: $teamGroup->alias
                         );
 
                         $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(

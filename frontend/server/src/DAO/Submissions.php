@@ -121,11 +121,9 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 SELECT
                     MAX(s.time)
                 FROM
-                    Identities AS i
-                LEFT JOIN
-                    Submissions s ON s.identity_id = i.identity_id
+                    Submissions s
                 WHERE
-                    i.identity_id = ? AND s.problem_id = ?
+                    s.identity_id = ? AND s.problem_id = ?
                 FOR UPDATE;
             ';
             $val = [$identityId, $problemId];
@@ -134,11 +132,9 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 SELECT
                     MAX(s.time)
                 FROM
-                    Identities AS i
-                LEFT JOIN
-                    Submissions s ON s.identity_id = i.identity_id
+                    Submissions s
                 WHERE
-                    i.identity_id = ? AND s.problem_id = ? AND s.problemset_id = ?
+                    s.identity_id = ? AND s.problem_id = ? AND s.problemset_id = ?
                 FOR UPDATE;
             ';
             $val = [$identityId, $problemId, $problemsetId];

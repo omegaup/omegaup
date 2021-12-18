@@ -782,7 +782,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $problemParams = new \OmegaUp\ProblemParams([
             'visibility' => $newProblemVisibility,
             'problem_alias' => $problemAlias,
-        ], /*$isRequired=*/ false);
+        ], isRequired: false);
 
         try {
             \OmegaUp\DAO\DAO::transBegin();
@@ -792,7 +792,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 $problemParams,
                 $message,
                 $problemParams->updatePublished,
-                /*$redirect=*/ false
+                redirect: false
             );
             foreach ($nominations as $nomination) {
                 \OmegaUp\DAO\QualityNominationLog::create(
@@ -1054,8 +1054,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $response['totalRows'],
             $rowCount,
             $offset,
-            /*$adjacent=*/5,
-            /*$params=*/ []
+            adjacent: 5,
+            params: []
         );
 
         return [
@@ -1126,8 +1126,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $response['totalRows'],
             $rowCount,
             $offset,
-            /*$adjacent=*/5,
-            /*$params=*/[]
+            adjacent: 5,
+            params: []
         );
 
         return [
@@ -1208,8 +1208,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             if ($currentUserReviewer) {
                 $response['original_contents']['tags'] = \OmegaUp\DAO\Problems::getTagsForProblem(
                     $problem,
-                    /*$public=*/false,
-                    $problem->allow_user_add_tags
+                    public: false,
+                    showUserTags: $problem->allow_user_add_tags,
                 );
             }
 
