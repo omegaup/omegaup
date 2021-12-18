@@ -471,7 +471,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData,
             $contestData,
             $identity,
-            /*$inPracticeMode=*/ true
+            inPracticeMode: true
         );
 
         // Grade the run

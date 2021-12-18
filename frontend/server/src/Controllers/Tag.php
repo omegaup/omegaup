@@ -119,7 +119,7 @@ class Tag extends \OmegaUp\Controllers\Controller {
             'problemLevel',
             fn (string $problemAlias) => \OmegaUp\Validators::alias(
                 $problemAlias,
-                /*$length=*/75,
+                maxLength: 75,
             )
         );
 
