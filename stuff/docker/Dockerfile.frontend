@@ -17,7 +17,7 @@ RUN apt-get update -y && \
         php8.0-gmp \
         php8.0-mbstring \
         php8.0-zip \
-        php8.0-xml
+        php8.0-xml \
         && \
     /usr/sbin/update-ca-certificates && \
     apt-get autoremove -y && \
