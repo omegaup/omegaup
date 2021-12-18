@@ -59,8 +59,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         $sql = "
             SELECT
                 a.*,
-                COUNT(s.submission_id) AS has_runs,
-                COUNT(DISTINCT p.problem_id) AS problem_count,
+                IFNULL((SELECT COUNT(*) FROM Submissions s WHERE s.problemset_id = a.problemset_id), 0) AS has_runs,
+                COUNT(psp.problem_id) AS problem_count,
                 ps.scoreboard_url,
                 ps.scoreboard_url_admin
             FROM
@@ -77,20 +77,12 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 Problemset_Problems psp
             ON
                 psp.problemset_id = ps.problemset_id
-            LEFT JOIN
-                Problems p
-            ON
-                p.problem_id = psp.problem_id
-            LEFT JOIN
-                Submissions s
-            ON
-                ps.problemset_id = s.problemset_id
             WHERE
                 c.alias = ? $timeCondition
             GROUP BY
-                a.assignment_id, ps.problemset_id
+                a.assignment_id, ps.problemset_id, psp.problemset_id
             ORDER BY
-                `order`, start_time;";
+                a.`order`, a.start_time;";
 
         /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problem_count: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);
