@@ -82,8 +82,10 @@ class Controller {
 
         $username = $r->ensureOptionalString(
             'username',
-            /*$required=*/ false,
-            fn (string $name) => \OmegaUp\Validators::normalUsername($name)
+            required: false,
+            validator: fn (string $name) => \OmegaUp\Validators::normalUsername(
+                $name
+            )
         );
 
         if (!is_null($username)) {

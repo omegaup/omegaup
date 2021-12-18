@@ -15,9 +15,9 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
-            /* $requestsUserInformation */ 'no',
-            /* $showScoreboard */'false',
-            /* $courseDuration= */ null,
+            requestsUserInformation: 'no',
+            showScoreboard: 'false',
+            courseDuration: null,
         );
         $admin = $courseData['admin'];
         [ 'identity' => $identity ] = \OmegaUp\Test\Factories\User::createUser();
@@ -84,9 +84,9 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
-            /* $requestsUserInformation */ 'no',
-            /* $showScoreboard */'false',
-            /* $courseDuration= */ null,
+            requestsUserInformation: 'no',
+            showScoreboard: 'false',
+            courseDuration: null,
         );
         $admin = $courseData['admin'];
         [ 'identity' => $identity ] = \OmegaUp\Test\Factories\User::createUser();
@@ -115,9 +115,9 @@ class CourseTabsTest extends \OmegaUp\Test\ControllerTestCase {
             null,
             null,
             \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
-            /* $requestsUserInformation */ 'no',
-            /* $showScoreboard */'false',
-            /* $courseDuration= */ null,
+            requestsUserInformation: 'no',
+            showScoreboard: 'false',
+            courseDuration: null,
         );
         $coursesAliases['public'][] = $courseData['course_alias'];
 

@@ -109,7 +109,10 @@ jobs:
         run: |
           # Create optional directories to simplify psalm config.
           mkdir -p frontend/www/{phpminiadmin,preguntas}
-          touch 'frontend/server/config.php'
+          cat > frontend/server/config.php <<EOF
+          <?php
+          define('OMEGAUP_LOG_FILE', 'php://stderr');
+          EOF
           ./vendor/bin/psalm \
             --output-format=github \
             --long-progress \
@@ -166,6 +169,13 @@ jobs:
           # Enable coverage for XDebug so that codecov can do its magic.
           echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/8.0/cli/conf.d/20-xdebug.ini >/dev/null
 
+      - name: Create default configuration files
+        run: |
+          cat > frontend/server/config.php <<EOF
+          <?php
+          define('OMEGAUP_LOG_FILE', 'php://stderr');
+          EOF
+
       - name: Install yarn dependencies
         run: yarn install
 
@@ -179,7 +189,10 @@ jobs:
         run: |
           # Create optional directories to simplify psalm config.
           mkdir -p frontend/www/{phpminiadmin,preguntas}
-          touch 'frontend/server/config.php'
+          cat > frontend/server/config.php <<EOF
+          <?php
+          define('OMEGAUP_LOG_FILE', 'php://stderr');
+          EOF
           touch 'frontend/tests/test_config.php'
 
           ./stuff/lint.sh --diagnostics-output=github validate --all < /dev/null

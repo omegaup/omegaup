@@ -175,7 +175,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
             $problemDistribSettings = json_decode(
                 $problemArtifacts->get('settings.distrib.json'),
-                true /* assoc */
+                associative: true,
             );
 
             // This example comes from the problem statement.
@@ -220,7 +220,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
             $problemDistribSettings = json_decode(
                 $problemArtifacts->get('settings.distrib.json'),
-                true /* assoc */
+                associative: true,
             );
             $this->assertEquals(
                 [
@@ -341,7 +341,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $problemArtifacts->get(
                     'settings.json'
                 ),
-                /*$assoc=*/true
+                associative: true
             );
             $this->assertEquals(
                 ($newTimeLimit / 1000.0) . 's',

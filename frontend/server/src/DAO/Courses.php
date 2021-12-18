@@ -236,7 +236,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         foreach ($rs as $row) {
             $row['assignments'] = \OmegaUp\DAO\Courses::getAllAssignments(
                 $row['alias'],
-                /*$isAdmin=*/false
+                isAdmin: false
             );
             $row['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
                 $row['course_id']
@@ -1098,7 +1098,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         foreach ($rs as $row) {
             $row['assignments'] = \OmegaUp\DAO\Courses::getAllAssignments(
                 $row['alias'],
-                /*$isAdmin=*/true
+                isAdmin: true
             );
             $row['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
                 $row['course_id']

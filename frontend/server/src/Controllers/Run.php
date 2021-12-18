@@ -946,7 +946,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             $submission,
             $run,
             $contest,
-            /*$showDetails=*/$showRunDetails !== 'none'
+            showDetails: $showRunDetails !== 'none'
         );
 
         $response['source'] = $details['source'];
@@ -1153,7 +1153,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             $submission,
             $run,
             /*$contest*/ null,
-            /*$showDetails=*/ false
+            showDetails: false
         );
     }
 
@@ -1244,8 +1244,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             !self::downloadSubmission(
                 $runAlias,
                 $r->identity,
-                /*$passthru=*/true,
-                /*$skipAuthorization=*/$showDiff
+                passthru: true,
+                skipAuthorization: $showDiff
             )
         ) {
             http_response_code(404);

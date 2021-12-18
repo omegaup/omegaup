@@ -571,7 +571,7 @@ class ProblemDeployer {
         if ($retval != 0) {
             $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
                 'problemDeployerInternalError',
-                /*$context=*/null
+                context: null
             );
             $this->log->error(
                 "rename problem failed: HTTP/{$statusCode}: {$error}"

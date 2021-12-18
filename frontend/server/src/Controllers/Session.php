@@ -249,7 +249,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             $identityExt,
             $authToken,
             $authToken,
-            /*$apiTokenId=*/null,
+            apiTokenId: null,
         );
     }
 
@@ -730,7 +730,7 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         $identity = \OmegaUp\DAO\Identities::resolveAssociatedIdentity(
             $usernameOrEmail,
-            /*$currentIdentity=*/ !is_null(
+            currentIdentity: !is_null(
                 $loggedIdentity->user_id
             ) ? $loggedIdentity : $targetIdentity
         );

@@ -6,9 +6,7 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         parent::setUp();
         foreach (range(0, 1) as $course) {
             $publicCourseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
-                /*$admin=*/                null,
-                /*$adminLogin=*/null,
-                \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+                admissionMode: \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
             );
             $this->courseAliases[] = $publicCourseData['course_alias'];
         }
