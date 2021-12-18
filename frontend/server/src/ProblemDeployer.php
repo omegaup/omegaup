@@ -307,6 +307,7 @@ class ProblemDeployer {
         ];
 
         $cmd = join(' ', array_map('escapeshellarg', $args));
+        $pipes = [];
         $proc = proc_open(
             $cmd,
             $descriptorspec,

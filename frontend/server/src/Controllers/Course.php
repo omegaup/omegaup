@@ -702,6 +702,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\DAO::transBegin();
         $course = null;
 
+        $result = 'unknown';
         try {
             // Create the course (and group)
             $course = \OmegaUp\Controllers\Course::createCourseAndGroup(

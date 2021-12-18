@@ -166,8 +166,8 @@ class Controller {
                 $value = $transform($value);
             }
             // Important property, so check if it changes.
-            if ($important) {
-                $importantChange |= ($value != $object->$fieldName);
+            if ($important && !$importantChange) {
+                $importantChange = ($value != $object->$fieldName);
             }
             $object->$fieldName = $value;
         }

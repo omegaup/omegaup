@@ -5,15 +5,17 @@ namespace OmegaUp\Controllers;
 class ScopedFacebook {
     /** @var \OmegaUp\ScopedSession */
     public $scopedSession;
-    /** @var \Facebook\Facebook */
+    /** @var \League\OAuth2\Client\Provider\Facebook */
     public $facebook;
 
     public function __construct() {
         $this->scopedSession = new \OmegaUp\ScopedSession();
-        $this->facebook = new \Facebook\Facebook([
-            'app_id' => OMEGAUP_FB_APPID,
-            'app_secret' => OMEGAUP_FB_SECRET,
-            'default_graph_version' => 'v2.5',
+        $this->facebook = new \League\OAuth2\Client\Provider\Facebook([
+            'clientId' => OMEGAUP_FB_APPID,
+            'clientSecret' => OMEGAUP_FB_SECRET,
+            'graphApiVersion' => 'v2.5',
+            'redirectUri' => OMEGAUP_URL . '/login?fb',
+            'fields' => ['name', 'email'],
         ]);
     }
 }
@@ -43,8 +45,9 @@ class Session extends \OmegaUp\Controllers\Controller {
 
     public static function getFacebookLoginUrl(): string {
         $scopedFacebook = new ScopedFacebook();
-        $helper = $scopedFacebook->facebook->getRedirectLoginHelper();
-        return $helper->getLoginUrl(OMEGAUP_URL . '/login?fb', ['email']);
+        return $scopedFacebook->facebook->getAuthorizationUrl([
+            'scope' => ['email'],
+        ]);
     }
 
     private static function isAuthTokenValid(string $authToken): bool {
@@ -521,6 +524,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        /** @var array{email: string, email_verified: int, name?: string, picture: string, locale: string} */
         $payload = $loginTicket->getAttributes()['payload'];
 
         // payload will have a superset of:
@@ -553,45 +557,28 @@ class Session extends \OmegaUp\Controllers\Controller {
         // Mostly taken from
         // https://developers.facebook.com/docs/php/howto/example_facebook_login
         $scopedFacebook = new ScopedFacebook();
-        $helper = $scopedFacebook->facebook->getRedirectLoginHelper();
         try {
-            $accessToken = $helper->getAccessToken();
-        } catch (\Facebook\Exceptions\FacebookResponseException $e) {
-            self::$log->error('Graph returned an error', ['exception' => $e]);
-            throw $e;
-        } catch (\Facebook\Exceptions\FacebookSDKException $e) {
+            /** @var \League\OAuth2\Client\Token\AccessToken */
+            $accessToken = $scopedFacebook->facebook->getAccessToken('authorization_code', [
+                'code' => $_GET['code'],
+            ]);
+        } catch (\Exception $e) {
             self::$log->error(
-                'Facebook SDK returned an error',
-                ['exception' => $e],
+                'getAccessToken returned an error',
+                ['exception' => $e]
             );
             throw $e;
         }
 
-        if (is_null($accessToken) && !is_null($helper->getError())) {
-            $errorDescription = $helper->getErrorDescription();
-            self::$log->error(
-                "Unable to login via Facebook: {$errorDescription}"
-            );
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterNotFound',
-                'token'
-            );
-        }
-
         try {
-            $fbResponse = $scopedFacebook->facebook->get(
-                '/me?fields=name,email',
+            $fbUserProfile = $scopedFacebook->facebook->getResourceOwner(
                 $accessToken
             );
-        } catch (\Facebook\Exceptions\FacebookResponseException $e) {
-            self::$log->error("Unable to login via Facebook: {$e}");
-            throw $e;
-        } catch (\Facebook\Exceptions\FacebookSDKException $e) {
+        } catch (\Exception $e) {
             self::$log->error("Unable to login via Facebook: {$e}");
             throw $e;
         }
 
-        $fbUserProfile = $fbResponse->getGraphUser();
         self::$log->info('User is logged in via facebook !!');
         if (is_null($fbUserProfile->getEmail())) {
             self::$log->error('Facebook email empty');

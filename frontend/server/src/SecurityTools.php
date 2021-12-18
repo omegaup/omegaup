@@ -92,7 +92,7 @@ class SecurityTools {
                 self::PASSWORD_HASH_OPTIONS
             );
         }
-        if ($hashedString === false || is_null($hashedString)) {
+        if (is_null($hashedString)) {
             throw new \OmegaUp\Exceptions\InternalServerErrorException(
                 'generalError',
                 new \Exception('Hash function returned false')

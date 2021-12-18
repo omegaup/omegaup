@@ -5,6 +5,7 @@ namespace OmegaUp\Test;
 /**
  * Parent class of all controller test cases for omegaUp.
  * Implements common methods for setUp and asserts
+ * @psalm-suppress PropertyNotSetInConstructor For some reason psalm is complaining about some phpunit statics.
  */
 class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     /** @var \Monolog\Logger|null */

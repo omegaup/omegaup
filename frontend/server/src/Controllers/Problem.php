@@ -1494,7 +1494,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'languages' => [
                 'transform' =>
                 /** @param list<string>|string $value */
-                fn ($value): string => is_array($value) ? join(',', $value) : $value
+                fn ($value): string => (is_array(
+                    $value
+                ) ? join(
+                    ',',
+                    $value
+                ) : $value)
             ],
         ];
         $params->updateValueParams($problem, $valueProperties);
@@ -2311,8 +2316,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return ProblemSettingsDistrib
      */
     public static function getProblemSettingsDistribImpl(array $params): array {
-        /** @var ProblemSettingsDistrib */
-        return json_decode(
+        /** @var array */
+        $settings = json_decode(
             (new \OmegaUp\ProblemArtifacts(
                 $params['alias'],
                 $params['commit']
@@ -2321,6 +2326,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ),
             /*assoc=*/true
         );
+        if (empty($settings)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+        /** @var ProblemSettingsDistrib */
+        return $settings;
     }
 
     /**
@@ -2575,8 +2585,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         bool $preventProblemsetOpen,
         ?string $contestAlias = null
     ): ?array {
-        $response = [];
-
         // Get the expected commit version.
         $commit = $problem->commit;
         $version = strval($problem->current_version);
@@ -2592,6 +2600,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $version = strval($problemsetProblem->version);
         }
 
+        $response = [];
         $response['statement'] = \OmegaUp\Controllers\Problem::getProblemStatement(
             strval($problem->alias),
             $commit,
@@ -5844,6 +5853,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 2 => ['pipe', 'w']
             ];
             $cmd = join(' ', array_map('escapeshellarg', $args));
+            $pipes = [];
             $proc = proc_open(
                 $cmd,
                 $descriptorspec,
@@ -6326,7 +6336,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             /*$preventProblemsetOpen*/ false
         );
 
-        if (is_null($details) || empty($details['settings'])) {
+        if (is_null($details)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
