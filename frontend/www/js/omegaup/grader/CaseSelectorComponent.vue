@@ -55,7 +55,7 @@
               <span :title="item.name">{{ item.name }}</span>
             </div>
             <button
-              v-if="item.name != 'sample'"
+              v-if="groups.length > 1"
               aria-label="Close"
               class="close"
               type="button"
