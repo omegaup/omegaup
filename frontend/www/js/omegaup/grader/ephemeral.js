@@ -1530,6 +1530,10 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
       settings.interactive.main_source,
     );
   }
+
+  // If there are cases for a problem, then delete the sample case
+  if (Object.keys(settings.cases).length) store.commit('removeCase', 'sample');
+
   for (let caseName in settings.cases) {
     if (!Object.prototype.hasOwnProperty.call(settings.cases, caseName))
       continue;
@@ -1541,7 +1545,6 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
     store.commit('inputIn', caseData['in']);
     store.commit('inputOut', caseData.out);
   }
-  store.commit('removeCase', 'sample');
 
   // Given that the current case will change several times, schedule the
   // flag to avoid swapping into the cases view for the next tick.
