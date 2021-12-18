@@ -4292,9 +4292,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Controllers\Identity::getPreferredLanguage(
                 $r->identity,
             ),
-            /*showSolvers=*/false,
-            /*preventProblemsetOpen=*/false,
-            /*contestAlias=*/null,
+            showSolvers: false,
+            preventProblemsetOpen: false,
+            contestAlias: null,
         );
         if (is_null($problemDetails)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
