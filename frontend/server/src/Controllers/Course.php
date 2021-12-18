@@ -371,7 +371,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r,
         string $courseAlias
     ): \OmegaUp\DAO\VO\Courses {
-        self::validateBasicCreateOrUpdate($r, true /*is update*/);
+        self::validateBasicCreateOrUpdate($r, isUpdate: true);
 
         // Get the actual start and finish time of the course, considering that
         // in case of update, parameters can be optional.
@@ -443,18 +443,18 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['objective'],
             'objective',
-            /*required=*/false // TODO: This should be $isRequired when the UI is ready
+            required: false // TODO: This should be $isRequired when the UI is ready
         );
 
         $r->ensureOptionalInt('start_time', null, null, !$isUpdate);
         $r->ensureOptionalInt(
             'finish_time',
-            null,
-            null,
-            /* required */ (
+            lowerBound: null,
+            upperBound: null,
+            required: (
                 !$isUpdate &&
                 !($r->ensureOptionalBool('unlimited_duration') ?? false)
-            )
+            ),
         );
 
         $r->ensureOptionalString(
@@ -4067,7 +4067,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $params = \OmegaUp\ScoreboardParams::fromAssignment(
             $assignment,
             intval($course->group_id),
-            /*showAllRuns*/false
+            showAllRuns: false,
         );
 
         $params->admin = $isAdmin;
@@ -4212,13 +4212,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             $params = \OmegaUp\ScoreboardParams::fromAssignment(
                 $assignment,
                 intval($course->group_id),
-                /*showAllRuns*/false
+                showAllRuns: false,
             );
             $params->admin = $isAdmin;
             $scoreboard = new \OmegaUp\Scoreboard($params);
             $scoreboard = $scoreboard->generate(
                 withRunDetails: false,
-                sortByName: false
+                sortByName: false,
             );
         }
 
@@ -5375,12 +5375,15 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         return [
             'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
-                /* contest */                null,
-                $course,
-                \OmegaUp\Authorization::isCourseAdmin($r->identity, $course),
-                $r->identity,
-                $offset,
-                $rowcount
+                contest: null,
+                course: $course,
+                isAdmin: \OmegaUp\Authorization::isCourseAdmin(
+                    $r->identity,
+                    $course
+                ),
+                currentIdentity: $r->identity,
+                offset: $offset,
+                rowcount: $rowcount
             )['clarifications'],
         ];
     }
@@ -5418,12 +5421,15 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         $list = \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
-            /* contest */            null,
-            $course,
-            \OmegaUp\Authorization::isCourseAdmin($r->identity, $course),
-            $r->identity,
-            $page,
-            $pageSize
+            contest: null,
+            course: $course,
+            isAdmin: \OmegaUp\Authorization::isCourseAdmin(
+                $r->identity,
+                $course
+            ),
+            currentIdentity: $r->identity,
+            offset: $page,
+            rowcount: $pageSize
         );
 
         return [
@@ -5516,9 +5522,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     $r->identity,
                     $course
                 ),
-                /* currentIdentity */ $r->identity,
-                $offset,
-                $rowcount
+                currentIdentity: $r->identity,
+                offset: $offset,
+                rowcount: $rowcount,
             ),
         ];
     }
@@ -5623,7 +5629,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\ScoreboardParams::fromAssignment(
                 $tokenAuthenticationResult['assignment'],
                 $tokenAuthenticationResult['course']->group_id,
-                $tokenAuthenticationResult['courseAdmin']/*show_all_runs*/
+                showAllRuns: $tokenAuthenticationResult['courseAdmin'],
             )
         );
 

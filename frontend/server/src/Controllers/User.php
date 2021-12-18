@@ -98,8 +98,8 @@ class User extends \OmegaUp\Controllers\Controller {
         $createUserParams = new \OmegaUp\CreateUserParams($r->toStringArray());
         self::createUser(
             $createUserParams,
-            /*ignorePassword=*/false,
-            /*forceVerification=*/false
+            ignorePassword: false,
+            forceVerification: false
         );
         return [
             'username' => strval($createUserParams->username),
@@ -214,7 +214,7 @@ class User extends \OmegaUp\Controllers\Controller {
             }
 
             /** @var null|mixed */
-            $resultAsJson = json_decode($result, /*assoc=*/true);
+            $resultAsJson = json_decode($result, associative: true);
             if (is_null($resultAsJson)) {
                 self::$log->error('Captcha response was not a json');
                 self::$log->error("Here is the result: {$result}");
@@ -1818,8 +1818,8 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $codersOfTheMonth = \OmegaUp\DAO\CoderOfTheMonth::getByTimeAndSelected(
             $dateToSelect,
-            /*autoselected=*/false,
-            $category
+            autoselected: false,
+            category: $category,
         );
         if (!empty($codersOfTheMonth)) {
             throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
@@ -3944,8 +3944,8 @@ class User extends \OmegaUp\Controllers\Controller {
                 !empty(
                     \OmegaUp\DAO\CoderOfTheMonth::getByTimeAndSelected(
                         $dateToSelect,
-                        false,
-                        $category
+                        autoselected: false,
+                        category: $category,
                     )
                 ),
         ];

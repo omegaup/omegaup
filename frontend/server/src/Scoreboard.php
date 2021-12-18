@@ -75,10 +75,11 @@ class Scoreboard {
         $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
             $this->params->problemset_id,
             $this->params->acl_id,
-            true /* show all runs */,
-            $filterUsersBy,
-            $this->params->group_id,
-            !$this->params->virtual /* Treat admin as contestant in virtual contest*/
+            showAllRuns: true,
+            filterUsersBy: $filterUsersBy,
+            groupId: $this->params->group_id,
+            // Treat admin as contestant in virtual contest.
+            excludeAdmin: !$this->params->virtual,
         );
 
         // Get all problems given problemset
@@ -183,10 +184,11 @@ class Scoreboard {
         $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
             $this->params->problemset_id,
             $this->params->acl_id,
-            $this->params->admin,
-            null,
-            null,
-            !$this->params->virtual /* Treat admin as contestant */
+            showAllRuns: $this->params->admin,
+            filterUsersBy: null,
+            groupId: null,
+            // Treat admin as contestant.
+            excludeAdmin: !$this->params->virtual,
         );
 
         // Get all problems given problemset
@@ -284,10 +286,11 @@ class Scoreboard {
         $rawContestIdentities = \OmegaUp\DAO\Runs::getAllRelevantIdentities(
             $params->problemset_id,
             $params->acl_id,
-            true /* show all runs */,
-            null,
-            null,
-            !$params->virtual /* Treat admin as contestant in virtual contest */
+            showAllRuns: true,
+            filterUsersBy: null,
+            groupId: null,
+            // Treat admin as contestant in virtual contest.
+            excludeAdmin: !$params->virtual,
         );
 
         // Get all problems given problemset
@@ -335,7 +338,7 @@ class Scoreboard {
             $params->finish_time,
             $params->admin,
             $params->scoreboard_pct,
-            false  /* sortByName */
+            sortByName: false,
         );
 
         $contestantEventCache = new \OmegaUp\Cache(
@@ -371,7 +374,7 @@ class Scoreboard {
             $params->finish_time,
             $params->admin,
             $params->scoreboard_pct,
-            false /* sortByName */
+            sortByName: false,
         );
         $adminScoreboardCache->set($adminScoreboard, $timeout);
         $params->admin = false;

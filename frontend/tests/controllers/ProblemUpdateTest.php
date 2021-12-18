@@ -1058,7 +1058,6 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $problemData['author'],
                 $problemData['problem']
             ),
-            /*public=*/ false
         );
         $this->assertEquals($testTags, $privateTags);
 
@@ -1069,7 +1068,6 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $extraIdentity,
                 $problemData['problem']
             ),
-            /*public=*/ false
         );
         $this->assertEmpty($privateTags);
     }
