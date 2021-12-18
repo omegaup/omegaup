@@ -238,11 +238,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         {
             $login = self::login($contestData['director']);
             $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
-                /*$owner=*/                null,
-                /*$name=*/null,
-                /*$description=*/null,
-                /*$alias=*/null,
-                $login
+                login: $login
             );
             \OmegaUp\Test\Factories\Groups::addUserToGroup(
                 $groupData,
@@ -1061,8 +1057,8 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
                     'team_identities.csv',
                     $teamGroup->alias,
-                    /*$password=*/ null,
-                    /*$forTeams=*/ true
+                    password: null,
+                    forTeams: true
                 ),
                 'team_group_alias' => $teamGroup->alias,
             ])

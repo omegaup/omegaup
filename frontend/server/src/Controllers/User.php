@@ -451,8 +451,8 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $password = $r->ensureOptionalString(
             'password',
-            /*$required=*/false,
-            fn (string $password) => \OmegaUp\Validators::stringNonEmpty(
+            required: false,
+            validator: fn (string $password) => \OmegaUp\Validators::stringNonEmpty(
                 $password
             )
         );
@@ -595,8 +595,8 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiVerifyEmail(\OmegaUp\Request $r): array {
         $usernameOrEmail = $r->ensureOptionalString(
             'usernameOrEmail',
-            /*$required=*/false,
-            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
                 $username
             )
         );
@@ -2102,13 +2102,17 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiList(\OmegaUp\Request $r): array {
         $term = $r->ensureOptionalString(
             'term',
-            /*$required=*/false,
-            fn (string $term) => \OmegaUp\Validators::stringNonEmpty($term)
+            required: false,
+            validator: fn (string $term) => \OmegaUp\Validators::stringNonEmpty(
+                $term
+            )
         );
         $query = $r->ensureOptionalString(
             'query',
-            /*$required=*/false,
-            fn (string $query) => \OmegaUp\Validators::stringNonEmpty($query)
+            required: false,
+            validator: fn (string $query) => \OmegaUp\Validators::stringNonEmpty(
+                $query
+            )
         );
         if (is_null($term) && is_null($query)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -2734,8 +2738,8 @@ class User extends \OmegaUp\Controllers\Controller {
                         $length,
                         $page,
                         '/rank/authors/',
-                        /*$adjacent=*/5,
-                        /*$params=*/[]
+                        adjacent: 5,
+                        params: []
                     ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
@@ -2780,8 +2784,8 @@ class User extends \OmegaUp\Controllers\Controller {
         $user = $r->user;
         $originalEmail = $r->ensureOptionalString(
             'originalEmail',
-            /*$required=*/ false,
-            fn (string $originalEmail) => \OmegaUp\Validators::email(
+            required: false,
+            validator: fn (string $originalEmail) => \OmegaUp\Validators::email(
                 $originalEmail
             )
         );
@@ -3031,8 +3035,10 @@ class User extends \OmegaUp\Controllers\Controller {
                     ]));
                     $contestAlias = $r2->ensureOptionalString(
                         'contest_alias',
-                        /*$required=*/false,
-                        fn (string $alias) => \OmegaUp\Validators::alias($alias)
+                        required: false,
+                        validator: fn (string $alias) => \OmegaUp\Validators::alias(
+                            $alias
+                        )
                     );
                     if (
                         !empty($contestAlias) &&
@@ -3723,8 +3729,8 @@ class User extends \OmegaUp\Controllers\Controller {
                         $length,
                         $page,
                         '/rank/',
-                        /*$adjacent=*/5,
-                        $filter === '' ? [] : [ 'filter' => $filter ]
+                        adjacent: 5,
+                        params: $filter === '' ? [] : [ 'filter' => $filter ]
                     ),
                 ],
                 'title' => new \OmegaUp\TranslationString(
@@ -3798,8 +3804,8 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         $date = $r->ensureOptionalString(
             'date',
-            /*$required=*/false,
-            fn (string $date): bool => \OmegaUp\Validators::stringNonEmpty(
+            required: false,
+            validator: fn (string $date): bool => \OmegaUp\Validators::stringNonEmpty(
                 $date
             )
         );
@@ -3968,8 +3974,8 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function getProfileDetailsForTypeScript(\OmegaUp\Request $r) {
         $username = $r->ensureOptionalString(
             'username',
-            /*$required=*/false,
-            fn (string $username) => \OmegaUp\Validators::normalUsername(
+            required: false,
+            validator: fn (string $username) => \OmegaUp\Validators::normalUsername(
                 $username
             )
         );

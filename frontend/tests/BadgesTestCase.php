@@ -72,15 +72,15 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
 
         // Create course
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
-            /*$admin=*/            null,
-            /*$adminLogin=*/ null,
-            /*$admissionMode=*/ \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
-            /*$requestsUserInformation=*/ 'no',
-            /*$showScoreboard=*/ 'false',
-            /*$startTimeDelay=*/ 0,
-            /*$courseDuration=*/ 120,
-            /*$assignmentDuration=*/ 120,
-            $courseAlias
+            admin: null,
+            adminLogin: null,
+            admissionMode: \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
+            requestsUserInformation: 'no',
+            showScoreboard: 'false',
+            startTimeDelay: 0,
+            courseDuration: 120,
+            assignmentDuration: 120,
+            courseAlias: $courseAlias
         );
         $assignmentAlias = $courseData['assignment_alias'];
 
