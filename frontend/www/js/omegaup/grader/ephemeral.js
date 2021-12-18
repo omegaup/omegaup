@@ -588,8 +588,8 @@ let store = new Vuex.Store({
         !Object.prototype.hasOwnProperty.call(state.request.input.cases, name)
       )
         return;
-      if (name == 'sample') return;
-      if (name == state.currentCase) state.currentCase = 'sample';
+      // If there is only one test case, don't remove it
+      if (Object.keys(state.request.input.cases).length === 1) return;
       Vue.delete(state.request.input.cases, name);
       state.dirty = true;
     },
@@ -1530,6 +1530,10 @@ function setSettings({ alias, settings, languages, showSubmitButton }) {
       settings.interactive.main_source,
     );
   }
+
+  // If there are cases for a problem, then delete the sample case
+  if (Object.keys(settings.cases).length) store.commit('removeCase', 'sample');
+
   for (let caseName in settings.cases) {
     if (!Object.prototype.hasOwnProperty.call(settings.cases, caseName))
       continue;
