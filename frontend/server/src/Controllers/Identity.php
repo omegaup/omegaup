@@ -618,8 +618,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
         if ($originalSchoolId !== $schoolId) {
             $newIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
                 $identity,
-                $schoolId, /* new school_id */
-                null /* graduation_date */
+                schoolId: $schoolId,
+                graduationDate: null,
             );
             $identity->current_identity_school_id = $newIdentitySchool->identity_school_id;
         }
@@ -917,8 +917,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
         if ($originalSchoolId !== $schoolId) {
             $newIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
                 $identity,
-                $schoolId, /* new school_id */
-                null /* graduation_date */
+                schoolId: $schoolId,
+                graduationDate: null,
             );
             $identity->current_identity_school_id = $newIdentitySchool->identity_school_id;
         }

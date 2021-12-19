@@ -2623,7 +2623,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $userData = \OmegaUp\Controllers\User::getUserProfile(
                 $loggedIdentity,
                 $loggedIdentity,
-                /**$omitRank=*/true
+                omitRank: true
             );
             if (
                 !empty($userData) &&
@@ -3687,11 +3687,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $detailsJson = \OmegaUp\Grader::getInstance()->getGraderResource(
                 $run,
                 'details.json',
-                /*missingOk=*/true
+                missingOk: true
             );
             if (!is_null($detailsJson)) {
                 /** @var null|array{verdict: string, compile_meta: array{Main: RunMetadata}, score: int, contest_score: int, max_score: int, time: float, wall_time: float, memory: int, judged_by: string, groups: list<array{group: string, score: float, contest_score: int, max_score: int, cases: list<CaseResult>}>} */
-                $details = json_decode($detailsJson, /*associative=*/true);
+                $details = json_decode($detailsJson, associative: true);
                 if (!is_array($details)) {
                     self::$log->error(
                         "Failed to interpret run details: {$detailsJson}"
@@ -4528,9 +4528,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problem,
             $problemset,
             \OmegaUp\Controllers\Identity::getPreferredLanguage($r->identity),
-            /*showSolvers=*/false,
-            $preventProblemsetOpen,
-            $contestAlias
+            showSolvers: false,
+            preventProblemsetOpen: $preventProblemsetOpen,
+            contestAlias: $contestAlias,
         );
         if (is_null($details)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
@@ -5135,10 +5135,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $details = self::getProblemDetails(
             $identity,
             $problem,
-            /*$problemset*/null,
-            /*$statementLanguage*/'',
-            /*$showSolvers*/false,
-            /*$preventProblemsetOpen*/false
+            problemset: null,
+            statementLanguage: '',
+            showSolvers: false,
+            preventProblemsetOpen: false,
         );
         if (is_null($details)) {
             throw new \OmegaUp\Exceptions\NotFoundException(

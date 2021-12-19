@@ -62,7 +62,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     ];
 
     /** @var int */
-    public static $defaultSubmissionGap = 60; /*seconds*/
+    public static $defaultSubmissionGap = 60; // seconds.
 
     public const VERDICTS = [
         'AC',
@@ -586,7 +586,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Happy ending
         $response['nextSubmissionTimestamp'] = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
             $contest,
-            /*lastSubmissionTime=*/$submission->time
+            lastSubmissionTime: $submission->time
         );
 
         if (is_null($submission->guid)) {
@@ -1152,7 +1152,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         return self::getOptionalRunDetails(
             $submission,
             $run,
-            /*$contest*/ null,
+            contest: null,
             showDetails: false
         );
     }
@@ -1310,12 +1310,12 @@ class Run extends \OmegaUp\Controllers\Controller {
         $result = \OmegaUp\Grader::getInstance()->getGraderResource(
             $run,
             $filename,
-            /*missingOk=*/true
+            missingOk: true
         );
         if (is_null($result)) {
             $result = self::downloadResourceFromS3(
                 "{$run->run_id}/{$filename}",
-                /*passthru=*/false
+                passthru: false
             );
         }
         return $result;
@@ -1333,14 +1333,14 @@ class Run extends \OmegaUp\Controllers\Controller {
         $result = \OmegaUp\Grader::getInstance()->getGraderResourcePassthru(
             $run,
             $filename,
-            /*missingOk=*/true,
-            $headers
+            missingOk: true,
+            fileHeaders: $headers,
         );
         if (is_null($result)) {
             $result = self::downloadResourceFromS3(
                 "{$run->run_id}/{$filename}",
-                /*passthru=*/true,
-                $headers
+                passthru: true,
+                httpHeaders: $headers,
             );
         }
         return $result;

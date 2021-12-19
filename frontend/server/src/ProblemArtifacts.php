@@ -127,7 +127,7 @@ class ProblemArtifacts {
             return [];
         }
         /** @var null|array{id: string, entries?: null|list<array{mode: int, type: string, id: string, name: string, size: int}>} */
-        $response = json_decode($response, /*assoc=*/true);
+        $response = json_decode($response, associative: true);
         if (!is_array($response) || !array_key_exists('entries', $response)) {
             $this->log->error(
                 "Failed to get entries of {$path} for problem {$this->alias} at revision {$this->revision}"
@@ -207,7 +207,7 @@ class ProblemArtifacts {
             return null;
         }
         /** @var null|array{commit: string, tree: string, parents: list<string>, author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string} */
-        $response = json_decode($response, /*assoc=*/true);
+        $response = json_decode($response, associative: true);
         if (!is_array($response)) {
             $this->log->error(
                 "Invalid commit for problem {$this->alias} at revision {$this->revision}"
@@ -240,7 +240,7 @@ class ProblemArtifacts {
             return [];
         }
         /** @var null|array{log?: null|list<array{commit: string, tree: string, parents: list<string>, author: array{name: string, email: string, time: string}, committer: array{name: string, email: string, time: string}, message: string}>, next?: string} */
-        $response = json_decode($response, /*assoc=*/true);
+        $response = json_decode($response, associative: true);
         if (!is_array($response) || !array_key_exists('log', $response)) {
             $this->log->error(
                 "Failed to get log for problem {$this->alias} at revision {$this->revision}"
@@ -262,7 +262,7 @@ class ProblemArtifacts {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildArchiveURL($this->alias, $this->revision),
-            /*passthru=*/true
+            passthru: true
         );
         $browser->headers[] = 'Accept: application/zip';
         $response = $browser->exec();
