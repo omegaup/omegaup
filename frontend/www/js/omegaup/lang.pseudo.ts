@@ -833,6 +833,7 @@ const translations: { [key: string]: string; } = {
   problemDeployerTestsBadLayout: "(Th3 73575/ dir3c70ry'5 1ay0u7 i5 n07 va1id.)",
   problemDeployerTooManyObjectsInPackfile: "(Th3r3 w3r3 700 many 0bj3c75 in 7h3 packfi13.)",
   problemDeprecated: "(Pr0b13m i5 d3pr3ca73d.)",
+  problemDetailsSource: "(S0urc3: %(source))",
   problemEditAccess: "(Acc355 (0p7i0na1))",
   problemEditAddAdmin: "(Admini57ra70r5)",
   problemEditAddTags: "(Tag5)",

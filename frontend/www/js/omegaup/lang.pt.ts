@@ -833,6 +833,7 @@ const translations: { [key: string]: string; } = {
   problemDeployerTestsBadLayout: "O formato do diret\u00f3rio tests/ n\u00e3o \u00e9 v\u00e1lido.",
   problemDeployerTooManyObjectsInPackfile: "Hay demasiados objetos en el packfile.",
   problemDeprecated: "Problema \u00e9 obsoleto",
+  problemDetailsSource: "Fonte: %(source)",
   problemEditAccess: "Acesso (opcional)",
   problemEditAddAdmin: "Administradores",
   problemEditAddTags: "Etiquetas",

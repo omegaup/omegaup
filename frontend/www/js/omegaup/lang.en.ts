@@ -833,6 +833,7 @@ const translations: { [key: string]: string; } = {
   problemDeployerTestsBadLayout: "The tests/ directory's layout is not valid.",
   problemDeployerTooManyObjectsInPackfile: "There were too many objects in the packfile.",
   problemDeprecated: "Problem is deprecated.",
+  problemDetailsSource: "Source: %(source)",
   problemEditAccess: "Access (optional)",
   problemEditAddAdmin: "Administrators",
   problemEditAddTags: "Tags",
