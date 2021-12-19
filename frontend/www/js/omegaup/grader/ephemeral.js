@@ -174,6 +174,8 @@ Vue.use(Vuex);
 let store = new Vuex.Store({
   state: {
     alias: null,
+    showSubmitButton: false,
+    languages: [],
     localStorageSources: null,
     request: {
       input: {
@@ -192,6 +194,12 @@ let store = new Vuex.Store({
   getters: {
     alias(state) {
       return state.alias;
+    },
+    showSubmitButton(state) {
+      return state.showSubmitButton;
+    },
+    languages(state) {
+      return state.languages;
     },
     localStorageSources(state) {
       return state.localStorageSources;
@@ -349,6 +357,27 @@ let store = new Vuex.Store({
           Util.languageExtensionMapping[state.localStorageSources.language]
         ];
       document.getElementById('language').value = state.request.language;
+    },
+    showSubmitButton(state, value) {
+      state.problemsetId = value;
+      const submitButton = document.querySelector('button[data-submit-button]');
+      if (value) {
+        submitButton.classList.remove('d-none');
+      } else {
+        submitButton.classList.add('d-none');
+      }
+    },
+    languages(state, value) {
+      state.languages = value;
+      document
+        .querySelectorAll('select[data-language-select] option')
+        .forEach((option) => {
+          if (!state.languages.includes(option.value)) {
+            option.classList.add('d-none');
+          } else {
+            option.classList.remove('d-none');
+          }
+        });
     },
     currentCase(state, value) {
       state.currentCase = value;
@@ -559,8 +588,8 @@ let store = new Vuex.Store({
         !Object.prototype.hasOwnProperty.call(state.request.input.cases, name)
       )
         return;
-      if (name == 'sample') return;
-      if (name == state.currentCase) state.currentCase = 'sample';
+      // If there is only one test case, don't remove it
+      if (Object.keys(state.request.input.cases).length === 1) return;
       Vue.delete(state.request.input.cases, name);
       state.dirty = true;
     },
@@ -1377,9 +1406,26 @@ document.getElementById('download').addEventListener('click', (e) => {
     .catch(Util.asyncError);
 });
 
-document.getElementsByTagName('form')[0].addEventListener('submit', (e) => {
-  e.preventDefault();
-  document.getElementsByTagName('button')[0].setAttribute('disabled', '');
+const submitButton = document.querySelector('button[data-submit-button]');
+document
+  .querySelector('form.ephemeral-form')
+  .addEventListener('submit', (e) => {
+    e.preventDefault();
+    submitButton.setAttribute('disabled', '');
+    parent.postMessage({
+      method: 'submitRun',
+      params: {
+        problem_alias: store.state.alias,
+        language: store.state.request.language,
+        source: store.state.request.source,
+      },
+    });
+    submitButton.removeAttribute('disabled');
+  });
+
+const runButton = document.querySelector('button[data-run-button]');
+runButton.addEventListener('click', () => {
+  runButton.setAttribute('disabled', '');
   fetch('run/new/', {
     method: 'POST',
     headers: new Headers({
@@ -1397,7 +1443,7 @@ document.getElementsByTagName('form')[0].addEventListener('submit', (e) => {
       return response.formData();
     })
     .then((formData) => {
-      document.getElementsByTagName('button')[0].removeAttribute('disabled');
+      runButton.removeAttribute('disabled');
       if (!formData) {
         onDetailsJsonReady({
           verdict: 'JE',
@@ -1440,7 +1486,7 @@ document.getElementsByTagName('form')[0].addEventListener('submit', (e) => {
     .catch(Util.asyncError);
 });
 
-function setSettings({ alias, settings }) {
+function setSettings({ alias, settings, languages, showSubmitButton }) {
   if (!settings) {
     return;
   }
@@ -1459,10 +1505,12 @@ function setSettings({ alias, settings }) {
       }
     }
   }
+  store.commit('languages', languages);
   store.commit('updatingSettings', true);
   store.commit('reset');
   store.commit('Interactive', !!settings.interactive);
   store.commit('alias', alias);
+  store.commit('showSubmitButton', showSubmitButton);
   store.commit('removeCase', 'long');
   store.commit('MemoryLimit', settings.limits.MemoryLimit * 1024);
   store.commit('OutputLimit', settings.limits.OutputLimit);
@@ -1482,6 +1530,10 @@ function setSettings({ alias, settings }) {
       settings.interactive.main_source,
     );
   }
+
+  // If there are cases for a problem, then delete the sample case
+  if (Object.keys(settings.cases).length) store.commit('removeCase', 'sample');
+
   for (let caseName in settings.cases) {
     if (!Object.prototype.hasOwnProperty.call(settings.cases, caseName))
       continue;
@@ -1518,6 +1570,8 @@ window.addEventListener(
         setSettings({
           alias: e.data.params.alias,
           settings: e.data.params.settings,
+          showSubmitButton: e.data.params.showSubmitButton,
+          languages: e.data.params.languages,
         });
         break;
     }

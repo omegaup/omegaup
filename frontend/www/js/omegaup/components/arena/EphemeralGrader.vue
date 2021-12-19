@@ -14,6 +14,8 @@ import { types } from '../../api_types';
 export default class EphemeralGrader extends Vue {
   @Ref() grader!: HTMLIFrameElement;
   @Prop() problem!: types.ProblemInfo;
+  @Prop({ default: false }) canSubmit!: boolean;
+  @Prop({ default: () => [] }) acceptedLanguages!: string[];
 
   loaded = false;
 
@@ -38,6 +40,8 @@ export default class EphemeralGrader extends Vue {
         params: {
           alias: this.problem.alias,
           settings: this.problem.settings,
+          languages: this.acceptedLanguages,
+          showSubmitButton: this.canSubmit,
         },
       },
       `${window.location.origin}/grader/ephemeral/embedded/`,

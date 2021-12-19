@@ -48,7 +48,6 @@ class UITools {
         if (!is_null(self::$smarty)) {
             return self::$smarty;
         }
-        require_once 'libs/third_party/smarty/libs/Smarty.class.php';
 
         $smarty = new \Smarty();
         $smarty->setTemplateDir(dirname(__DIR__, 2) . '/templates/');
@@ -103,6 +102,9 @@ class UITools {
                 'CURRENT_USER_IS_REVIEWER',
                 \OmegaUp\Authorization::isQualityReviewer($identity)
             );
+            if (is_null($email)) {
+                $email = '';
+            }
             $smarty->assign(
                 'CURRENT_USER_GRAVATAR_URL_128',
                 \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '128')
@@ -137,7 +139,7 @@ class UITools {
         ) {
             $smarty->force_compile = true;
         } else {
-            $smarty->compile_check = false;
+            $smarty->compile_check = \Smarty::COMPILECHECK_OFF;
         }
 
         /** @var string */

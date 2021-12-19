@@ -363,14 +363,14 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testAddUserWithBasicInformation() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
-            /*$admin=*/            null,
-            /*$adminLogin=*/ null,
-            /*$admissionMode=*/ \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
-            /*$requestsUserInformation=*/ 'no',
-            /*$showScoreboard=*/ 'false',
-            /*$courseDuration=*/ 120,
-            /*$courseAlias=*/ null,
-            /*$needsBasicInformation=*/ true
+            admin: null,
+            adminLogin: null,
+            admissionMode: \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
+            requestsUserInformation: 'no',
+            showScoreboard: 'false',
+            courseDuration: 120,
+            courseAlias: null,
+            needsBasicInformation: true
         );
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 

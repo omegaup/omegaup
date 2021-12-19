@@ -479,8 +479,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $problem['ratio'] = floatval($row['ratio']);
             $problem['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problemObject,
-                /*$public=*/true,
-                /*$showUserTags=*/$row['allow_user_add_tags']
+                public: true,
+                showUserTags: $row['allow_user_add_tags']
             );
             $problems[] = $problem;
         }

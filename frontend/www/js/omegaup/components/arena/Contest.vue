@@ -65,6 +65,7 @@
               :run-details-data="currentRunDetailsData"
               :contest-alias="contest.alias"
               :is-contest-finished="isContestFinished"
+              :in-contest-or-course="true"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', {
