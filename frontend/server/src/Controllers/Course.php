@@ -56,7 +56,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type NavbarProblemsetProblem=array{acceptsSubmissions: bool, alias: string, bestScore: int, hasRuns: bool, maxScore: float|int, text: string}
  * @psalm-type ArenaAssignment=array{alias: string|null, assignment_type: string, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string|null, problems: list<NavbarProblemsetProblem>, problemset_id: int, runs: list<Run>, start_time: \OmegaUp\Timestamp}
  * @psalm-type AssignmentDetailsPayload=array{showRanking: bool, scoreboard: Scoreboard, courseDetails: CourseDetails, currentAssignment: ArenaAssignment, shouldShowFirstAssociatedIdentityRunWarning: bool}
- * @psalm-type AssignmentDetails=array{admin: bool, alias: string, assignmentType: string, courseAssignments: list<CourseAssignment>, description: string, director: string, finishTime: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemsetId: int, startTime: \OmegaUp\Timestamp}
+ * @psalm-type AssignmentDetails=array{admin: bool, alias: string, assignmentType: string, courseAssignments: null|list<CourseAssignment>, description: string, director: string, finishTime: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemsetId: int, startTime: \OmegaUp\Timestamp}
  * @psalm-type CourseScoreboardPayload=array{assignment: AssignmentDetails, problems: list<NavbarProblemsetProblem>, scoreboard: Scoreboard, scoreboardToken:null|string}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float, is_extra_problem?: bool}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
@@ -2942,7 +2942,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             $courseAlias,
             $assignmentAlias,
             $scoreboardToken,
-            $r
+            $r,
+            getAllAssignments: true
         );
         $group = self::resolveGroup($tokenAuthenticationResult['course']);
 
@@ -4741,13 +4742,14 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, course: \OmegaUp\DAO\VO\Courses, courseAdmin: bool, courseAssignments: list<CourseAssignment>, hasToken: bool}
+     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, course: \OmegaUp\DAO\VO\Courses, courseAdmin: bool, courseAssignments: null|list<CourseAssignment>, hasToken: bool}
      */
     private static function authenticateAndValidateToken(
         string $courseAlias,
         string $assignmentAlias,
         ?string $token,
-        \OmegaUp\Request $r
+        \OmegaUp\Request $r,
+        bool $getAllAssignments
     ): array {
         if (is_null($token)) {
             $r->ensureIdentity();
@@ -4767,10 +4769,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             return [
                 'hasToken' => false,
                 'courseAdmin' => $isAdmin,
-                'courseAssignments' => \OmegaUp\DAO\Courses::getAllAssignments(
+                'courseAssignments' => $getAllAssignments ? \OmegaUp\DAO\Courses::getAllAssignments(
                     strval($course->alias),
                     $isAdmin
-                ),
+                ) : null,
                 'assignment' => $assignment,
                 'course' => $course,
             ];
@@ -4809,10 +4811,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         // hasToken is true, it means we do not autenticate request user
         return [
             'courseAdmin' => $courseAdmin,
-            'courseAssignments' => \OmegaUp\DAO\Courses::getAllAssignments(
+            'courseAssignments' => $getAllAssignments ? \OmegaUp\DAO\Courses::getAllAssignments(
                 strval($course->alias),
                 $courseAdmin
-            ),
+            ) : null,
             'hasToken' => true,
             'assignment' => $assignment,
             'course' => $course,
@@ -4869,7 +4871,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns details of a given assignment
      *
-     * @return array{admin: bool, alias: string, assignment_type: null|string, courseAssignments: list<CourseAssignment>, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemset_id: int, start_time: \OmegaUp\Timestamp}
+     * @return array{admin: bool, alias: string, assignment_type: null|string, courseAssignments: null|list<CourseAssignment>, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemset_id: int, start_time: \OmegaUp\Timestamp}
      *
      * @omegaup-request-param string $assignment
      * @omegaup-request-param string $course
@@ -4894,7 +4896,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             $courseAlias,
             $assignmentAlias,
             $r['token'],
-            $r
+            $r,
+            getAllAssignments: true
         );
         if (
             is_null($tokenAuthenticationResult['course']->acl_id)
@@ -5556,7 +5559,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             $courseAlias,
             $assignmentAlias,
             $r['token'],
-            $r
+            $r,
+            getAllAssignments: false
         );
         $group = self::resolveGroup($tokenAuthenticationResult['course']);
 
@@ -5619,7 +5623,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             $courseAlias,
             $assignmentAlias,
             $r['token'],
-            $r
+            $r,
+            getAllAssignments: false
         );
         if (is_null($tokenAuthenticationResult['course']->group_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
