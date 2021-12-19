@@ -153,9 +153,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['query'],
             'query',
-            null,
-            255,
-            false /* not required */
+            minLength: null,
+            maxLength: 255,
+            required: false,
         );
         $query = $r['query'];
 
@@ -615,11 +615,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return [
             'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
                 $contest,
-                /*course=*/ null,
-                $contestAdmin,
-                $identity,
+                course: null,
+                isAdmin: $contestAdmin,
+                currentIdentity: $identity,
                 offset: null,
-                rowcount: 100
+                rowcount: 100,
             )['clarifications'],
             'problems' => $problems,
             'submissionDeadline' => $contestDetails['submission_deadline'] ?? $contest->finish_time,
@@ -677,9 +677,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Controllers\Identity::getPreferredLanguage(
                     $r->identity
                 ),
-                /*showSolvers=*/false,
-                /*preventProblemsetOpen=*/false,
-                $contestAlias
+                showSolvers: false,
+                preventProblemsetOpen: false,
+                contestAlias: $contestAlias,
             );
             $problems[$index]['letter'] = $problem['letter'] ?? '';
         }
@@ -2816,7 +2816,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r,
             $identity,
             $contest,
-            false /* is required*/
+            isRequired: false,
         );
 
         // Prevent date changes if a contest already has runs
@@ -3764,14 +3764,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return [
             'clarifications' => \OmegaUp\DAO\Clarifications::getProblemsetClarifications(
                 $contest,
-                /* course */ null,
-                \OmegaUp\Authorization::isContestAdmin(
+                course: null,
+                isAdmin: \OmegaUp\Authorization::isContestAdmin(
                     $r->identity,
                     $contest
                 ),
-                $r->identity,
-                $offset,
-                $rowcount
+                currentIdentity: $r->identity,
+                offset: $offset,
+                rowcount: $rowcount,
             )['clarifications'],
         ];
     }
@@ -3823,9 +3823,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $r->identity,
                     $contest
                 ),
-                /* currentIdentity */ $r->identity,
-                $offset,
-                $rowcount
+                currentIdentity: $r->identity,
+                offset: $offset,
+                rowcount: $rowcount,
             ),
         ];
     }

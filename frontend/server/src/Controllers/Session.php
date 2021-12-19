@@ -789,8 +789,8 @@ class Session extends \OmegaUp\Controllers\Controller {
                         'username' => $username,
                         'email' => $email,
                     ]),
-                    /*ignorePassword=*/true,
-                    /*forceVerification=*/true
+                    ignorePassword: true,
+                    forceVerification: true
                 );
             } catch (\OmegaUp\Exceptions\ApiException $e) {
                 self::$log->error(

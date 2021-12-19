@@ -185,7 +185,7 @@ class ProblemDeployer {
         /** @var null|array{interactive?: array{module_name: string, language: string}, cases: array<string, mixed>} */
         $distribSettings = json_decode(
             $problemArtifacts->get('settings.distrib.json'),
-            /*assoc=*/true
+            associative: true
         );
         if (empty($distribSettings['interactive'])) {
             // oops, this was not an interactive problem.
@@ -453,7 +453,7 @@ class ProblemDeployer {
             $context = null;
             if (!empty($result['output'])) {
                 /** @var null|array{error: string} */
-                $output = json_decode($result['output'], /*assoc=*/true);
+                $output = json_decode($result['output'], associative: true);
                 if (is_null($output)) {
                     $context = $result['output'];
                 } else {
@@ -480,7 +480,7 @@ class ProblemDeployer {
         }
 
         /** @var array{status: string, error?: string, updated_refs?: array{name: string, from: string, to: string, from_tree: string, to_tree: string}[], updated_files: array{path: string, type: string}[]} */
-        return json_decode($result['output'], /*assoc=*/true);
+        return json_decode($result['output'], associative: true);
     }
 
     /**
