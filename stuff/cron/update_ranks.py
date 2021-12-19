@@ -57,10 +57,6 @@ def update_problem_accepted_stats(cur: MySQLdb.cursors.BaseCursor) -> None:
                     `Identities` AS `i`
                 ON
                     `i`.`identity_id` = `s`.`identity_id`
-                INNER JOIN
-                    `Users` AS `u`
-                ON
-                    `u`.`user_id` = `i`.`user_id`
                 WHERE
                     `s`.`problem_id` = `p`.`problem_id` AND `r`.verdict = 'AC'
                     AND NOT EXISTS (
@@ -70,7 +66,7 @@ def update_problem_accepted_stats(cur: MySQLdb.cursors.BaseCursor) -> None:
                             `Problems_Forfeited` AS `pf`
                         WHERE
                             `pf`.`problem_id` = `p`.`problem_id` AND
-                            `pf`.`user_id` = `u`.`user_id`
+                            `pf`.`user_id` = `i`.`user_id`
                     )
                     AND NOT EXISTS (
                         SELECT
@@ -79,7 +75,7 @@ def update_problem_accepted_stats(cur: MySQLdb.cursors.BaseCursor) -> None:
                             `ACLs` AS `a`
                         WHERE
                             `a`.`acl_id` = `p`.`acl_id` AND
-                            `a`.`owner_id` = `u`.`user_id`
+                            `a`.`owner_id` = `i`.`user_id`
                     )
             );
     ''')
