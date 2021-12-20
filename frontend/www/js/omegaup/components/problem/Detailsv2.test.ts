@@ -80,6 +80,12 @@ describe('Detailsv2.vue', () => {
     const wrapper = shallowMount(problem_Details, {
       propsData: {
         problem,
+        user: {
+          loggedIn: true,
+          admin: true,
+          reviewer: true,
+        },
+        languages: ['py2', 'py3'],
       },
       localVue,
     });
@@ -90,5 +96,23 @@ describe('Detailsv2.vue', () => {
     for (let i = 0; i < expectedTabs.length; i++) {
       expect(tabs.at(i).attributes('title')).toBe(expectedTabs[i]);
     }
+  });
+
+  it('Should show the problem tab details', () => {
+    const wrapper = shallowMount(problem_Details, {
+      propsData: {
+        problem,
+        user: {
+          loggedIn: true,
+          admin: true,
+          reviewer: true,
+        },
+        languages: ['py2', 'py3'],
+      },
+      localVue,
+    });
+
+    const problemTab = wrapper.findComponent(BTab);
+    expect(problemTab.text()).toContain(problem.title);
   });
 });
