@@ -53,7 +53,7 @@ class ClientContest:
         channel.exchange_declare(exchange=self.exchange,
                                  durable=True,
                                  exchange_type='direct')
-        channel.queue_declare(queue=self.queue, durable=True, exclusive=True)
+        channel.queue_declare(queue=self.queue, durable=True, exclusive=False)
         channel.queue_bind(
             exchange=self.exchange,
             queue=self.queue,
@@ -61,7 +61,7 @@ class ClientContest:
         logging.info('[*] waiting for the messages')
 
         def certificate_contests_callback(
-                _channel: pika.adapters.blocking_connection.BlockingChannel,
+                channel: pika.adapters.blocking_connection.BlockingChannel,
                 _method: pika.spec.Basic.Deliver,
                 _properties: pika.spec.BasicProperties,
                 body: bytes) -> None:
@@ -120,6 +120,7 @@ class ClientContest:
                         'At least one of the verification codes had a conflict'
                     )
                     dbconn.rollback()
+            channel.close()
         channel.basic_consume(
             queue=self.queue,
             on_message_callback=certificate_contests_callback,

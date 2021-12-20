@@ -7,8 +7,6 @@ import os
 import argparse
 import logging
 import sys
-import json
-from unittest.mock import MagicMock, patch
 import MySQLdb
 import MySQLdb.cursors
 import rabbitmq_connection
@@ -22,8 +20,7 @@ import lib.db   # pylint: disable=wrong-import-position
 import lib.logs  # pylint: disable=wrong-import-position
 
 
-@patch('omegaup.api.Client')  # type: ignore
-def test_client_contest(mock_api_call) -> None:
+def test_client_contest() -> None:
     '''Test checksum digit'''
     parser = argparse.ArgumentParser(description=__doc__)
     lib.db.configure_parser(parser)
@@ -49,15 +46,6 @@ def test_client_contest(mock_api_call) -> None:
                                           'ContestQueue')
     with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur, \
         rabbitmq_connection.connect(args) as channel:
-        data = {
-            'alias': 'prueba',
-            'scoreboard_ur': 'abcde',
-            'contest_id': 1,
-            'certificate_cutoff': 3
-        }
-        mock_api_call.return_value = MagicMock(
-            status_code=200,
-            response=json.dumps(data))
         client.certificate_contests_receive_messages(cur,
                                                      dbconn,
                                                      channel,
