@@ -22,8 +22,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Get a problem
         $this->problemData = \OmegaUp\Test\Factories\Problem::createProblem(
-            /*$params=*/            null,
-            $adminLogin
+            login: $adminLogin,
         );
 
         // Add the problem to the contest
@@ -154,13 +153,13 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Factories\Run::gradeRun(
             $runData,
-            /*$points=*/1,
-            /*$verdict=*/'AC',
-            /*$submitDelay=*/50,
-            /*$runGuid=*/null,
-            /*$runID*/null,
-            /*$problemsetPoints*/100,
-            \OmegaUp\Test\Utils::zipFileForContents($outputFilesContent)
+            points: 1,
+            verdict: 'AC',
+            submitDelay: 50,
+            problemsetPoints: 100,
+            outputFilesContent: \OmegaUp\Test\Utils::zipFileForContents(
+                $outputFilesContent
+            ),
         );
 
         ob_start();
@@ -413,13 +412,13 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Factories\Run::gradeRun(
             $runData,
-            /*$points=*/1,
-            /*$verdict=*/'AC',
-            /*$submitDelay=*/50,
-            /*$runGuid=*/null,
-            /*$runID*/null,
-            /*$problemsetPoints*/100,
-            \OmegaUp\Test\Utils::zipFileForContents($outputFilesContent)
+            points: 1,
+            verdict: 'AC',
+            submitDelay: 50,
+            problemsetPoints: 100,
+            outputFilesContent: \OmegaUp\Test\Utils::zipFileForContents(
+                $outputFilesContent
+            ),
         );
 
         $response = \OmegaUp\Controllers\Run::apiDetails(
@@ -456,13 +455,13 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Factories\Run::gradeRun(
             $runData,
-            /*$points=*/1,
-            /*$verdict=*/'AC',
-            /*$submitDelay=*/50,
-            /*$runGuid=*/null,
-            /*$runID*/null,
-            /*$problemsetPoints*/100,
-            \OmegaUp\Test\Utils::zipFileForContents($outputFilesContent)
+            points: 1,
+            verdict: 'AC',
+            submitDelay: 50,
+            problemsetPoints: 100,
+            outputFilesContent: \OmegaUp\Test\Utils::zipFileForContents(
+                $outputFilesContent
+            ),
         );
 
         $response = \OmegaUp\Controllers\Run::apiDetails(

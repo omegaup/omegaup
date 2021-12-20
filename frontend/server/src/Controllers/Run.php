@@ -62,7 +62,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     ];
 
     /** @var int */
-    public static $defaultSubmissionGap = 60; /*seconds*/
+    public static $defaultSubmissionGap = 60; // seconds.
 
     public const VERDICTS = [
         'AC',
@@ -532,7 +532,10 @@ class Run extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\Submissions::update($submission);
             \OmegaUp\DAO\Runs::delete($run);
             \OmegaUp\DAO\Submissions::delete($submission);
-            self::$log->error('Call to \OmegaUp\Grader::grade() failed', $e);
+            self::$log->error(
+                'Call to \OmegaUp\Grader::grade() failed',
+                ['exception' => $e],
+            );
             throw $e;
         }
         $userId = $r->identity->user_id;
@@ -583,7 +586,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Happy ending
         $response['nextSubmissionTimestamp'] = \OmegaUp\DAO\Runs::nextSubmissionTimestamp(
             $contest,
-            /*lastSubmissionTime=*/$submission->time
+            lastSubmissionTime: $submission->time
         );
 
         if (is_null($submission->guid)) {
@@ -773,7 +776,10 @@ class Run extends \OmegaUp\Controllers\Controller {
                 $r['debug'] || false
             );
         } catch (\Exception $e) {
-            self::$log->error('Call to \OmegaUp\Grader::rejudge() failed', $e);
+            self::$log->error(
+                'Call to \OmegaUp\Grader::rejudge() failed',
+                ['exception' => $e],
+            );
         }
 
         self::invalidateCacheOnRejudge($run);
@@ -853,11 +859,10 @@ class Run extends \OmegaUp\Controllers\Controller {
             }
         } catch (\Exception $e) {
             // We did our best effort to invalidate the cache...
-            self::$log->warn(
-                "Failed to invalidate cache on rejudge {$run->run_id}, skipping: ",
-                $e
+            self::$log->warning(
+                "Failed to invalidate cache on rejudge {$run->run_id}, skipping",
+                ['exception' => $e],
             );
-            self::$log->warn($e);
         }
     }
 
@@ -941,7 +946,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             $submission,
             $run,
             $contest,
-            /*$showDetails=*/$showRunDetails !== 'none'
+            showDetails: $showRunDetails !== 'none'
         );
 
         $response['source'] = $details['source'];
@@ -1147,8 +1152,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         return self::getOptionalRunDetails(
             $submission,
             $run,
-            /*$contest*/ null,
-            /*$showDetails=*/ false
+            contest: null,
+            showDetails: false
         );
     }
 
@@ -1239,8 +1244,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             !self::downloadSubmission(
                 $runAlias,
                 $r->identity,
-                /*$passthru=*/true,
-                /*$skipAuthorization=*/$showDiff
+                passthru: true,
+                skipAuthorization: $showDiff
             )
         ) {
             http_response_code(404);
@@ -1305,12 +1310,12 @@ class Run extends \OmegaUp\Controllers\Controller {
         $result = \OmegaUp\Grader::getInstance()->getGraderResource(
             $run,
             $filename,
-            /*missingOk=*/true
+            missingOk: true
         );
         if (is_null($result)) {
             $result = self::downloadResourceFromS3(
                 "{$run->run_id}/{$filename}",
-                /*passthru=*/false
+                passthru: false
             );
         }
         return $result;
@@ -1328,14 +1333,14 @@ class Run extends \OmegaUp\Controllers\Controller {
         $result = \OmegaUp\Grader::getInstance()->getGraderResourcePassthru(
             $run,
             $filename,
-            /*missingOk=*/true,
-            $headers
+            missingOk: true,
+            fileHeaders: $headers,
         );
         if (is_null($result)) {
             $result = self::downloadResourceFromS3(
                 "{$run->run_id}/{$filename}",
-                /*passthru=*/true,
-                $headers
+                passthru: true,
+                httpHeaders: $headers,
             );
         }
         return $result;

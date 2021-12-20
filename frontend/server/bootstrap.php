@@ -88,94 +88,20 @@ header('Content-Security-Policy: ' . implode('; ', array_map(
 )));
 header('X-Frame-Options: DENY');
 
-/**
- * Creates a log4php appender configuration.
- */
-function appenderConfig(string $filename): array {
-    if ($filename === 'php://stderr') {
-        return [
-            'class' => 'LoggerAppenderConsole',
-            'params' => [
-                'target' => 'stderr',
-            ],
-        ];
-    }
-    return [
-        'class' => 'LoggerAppenderFile',
-        'params' => [
-            'file' => $filename,
-            'append' => true,
-        ],
-    ];
-}
+// Configure the root logger
+/** @psalm-suppress UndefinedDocblockClass Level is declared in a phpstan-type annotation. */
+$logLevel = \Monolog\Logger::toMonologLevel(OMEGAUP_LOG_LEVEL);
+$logFormatter = new \NewRelic\Monolog\Enricher\Formatter();
+$logHandler = new \Monolog\Handler\StreamHandler(OMEGAUP_LOG_FILE, $logLevel);
+$logHandler->setFormatter($logFormatter);
 
-\Logger::configure([
-    'rootLogger' => [
-        'appenders' => ['default'],
-        'level' => OMEGAUP_LOG_LEVEL,
-    ],
-    'loggers' => [
-        'csp' => [
-            'appenders' => ['csp'],
-            'additivity' => false,
-        ],
-        'jserror' => [
-            'appenders' => ['jserror'],
-            'additivity' => false,
-        ],
-        'mysqltypes' => [
-            'appenders' => ['mysqltypes'],
-            'additivity' => false,
-        ],
-    ],
-    'appenders' => [
-        'default' => array_merge(
-            appenderConfig(OMEGAUP_LOG_FILE),
-            [
-                'layout' => [
-                    'class' => 'LoggerLayoutPattern',
-                    'params' => [
-                        'conversionPattern' => (
-                            '%date [%level]: ' .
-                            \OmegaUp\Request::requestId() .
-                            ' %server{REQUEST_URI} %message (%F:%L) %newline'
-                        ),
-                    ],
-                ],
-            ],
-        ),
-        'csp' => array_merge(
-            appenderConfig(OMEGAUP_CSP_LOG_FILE),
-            [
-                'layout' => [
-                    'class' => 'LoggerLayoutPattern',
-                    'params' => [
-                        'conversionPattern' => '%date: %message %newline',
-                    ],
-                ],
-            ],
-        ),
-        'jserror' => array_merge(
-            appenderConfig(OMEGAUP_JSERROR_LOG_FILE),
-            [
-                'layout' => [
-                    'class' => 'LoggerLayoutPattern',
-                    'params' => [
-                        'conversionPattern' => '%date: %message %newline',
-                    ],
-                ],
-            ],
-        ),
-        'mysqltypes' => array_merge(
-            appenderConfig(OMEGAUP_MYSQL_TYPES_LOG_FILE),
-            [
-                'layout' => [
-                    'class' => 'LoggerLayoutPattern',
-                    'params' => [
-                        'conversionPattern' => '%message %newline',
-                    ],
-                ],
-            ],
-        ),
-    ],
-]);
+$rootLogger = new \Monolog\Logger('omegaup');
+$rootLogger->pushProcessor(
+    new \Monolog\Processor\WebProcessor()
+);
+$rootLogger->pushProcessor(
+    new \NewRelic\Monolog\Enricher\Processor()
+);
+$rootLogger->pushHandler($logHandler);
+\Monolog\Registry::addLogger($rootLogger);
+\Monolog\ErrorHandler::register($rootLogger);

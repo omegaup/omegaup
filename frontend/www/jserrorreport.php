@@ -6,6 +6,6 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     die();
 }
 
-$log = Logger::getLogger('jserror');
+$log = \Monolog\Registry::omegaup()->withName('jserror');
 $log->error(file_get_contents('php://input'));
 die();

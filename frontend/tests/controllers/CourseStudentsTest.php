@@ -168,7 +168,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testStudentASsignmentProgress() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
-            /*$nAssignments=*/            2
+            nAssignments: 2
         );
         $studentsInCourse = 2;
 
@@ -222,11 +222,9 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'source' => $submissionSource,
             ]));
             \OmegaUp\Test\Factories\Run::gradeRun(
-                /*$runData=*/                null,
-                1,
-                'AC',
-                null,
-                $runResponse['guid']
+                points: 1,
+                verdict: 'AC',
+                runGuid: $runResponse['guid']
             );
 
             // Add one run to the third problem in the second assignment
@@ -238,11 +236,9 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'source' => $submissionSource,
             ]));
             \OmegaUp\Test\Factories\Run::gradeRun(
-                /*$runData=*/                null,
-                1,
-                'AC',
-                null,
-                $runResponse['guid']
+                points: 1,
+                verdict: 'AC',
+                runGuid: $runResponse['guid']
             );
 
             $response = \OmegaUp\Controllers\Course::apiMyProgress(

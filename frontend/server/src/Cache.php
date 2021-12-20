@@ -106,7 +106,7 @@ abstract class CacheAdapter {
             }
             return $returnValue;
         }
-        $log = \Logger::getLogger('cache');
+        $log = \Monolog\Registry::omegaup()->withName('cache');
 
         // Get a lock to prevent multiple requests from trying to create the
         // same cache entry. The name of the lockfile is derived from the
@@ -547,7 +547,7 @@ class Cache {
     const DATA_CASES_FILES = 'data-cases-files-';
     const PROBLEM_CASES_METADATA = 'problem-cases-metadata-';
 
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     private $log;
 
     /** @var string */
@@ -558,7 +558,7 @@ class Cache {
      * @param string $key el id del cache
      */
     public function __construct(string $prefix, string $id = '') {
-        $this->log = \Logger::getLogger('cache');
+        $this->log = \Monolog\Registry::omegaup()->withName('cache');
 
         if (!self::isEnabled()) {
             $this->log->debug('Cache disabled');
@@ -609,7 +609,7 @@ class Cache {
             return false;
         }
         if (CacheAdapter::getInstance()->delete($this->key) !== true) {
-            $this->log->warn(
+            $this->log->warning(
                 "Failed to invalidate cache for key: {$this->key}"
             );
             return false;

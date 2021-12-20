@@ -426,12 +426,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     foreach ($selfGeneratedIdentities as $selfGeneratedIdentity) {
                         $newIdentity = self::createIdentity(
                             $selfGeneratedIdentity['username'],
-                            /*$name=*/ null,
-                            $selfGeneratedIdentity['password'],
-                            $countryId,
-                            $stateId,
-                            /*$gender=*/ 'decline',
-                            $teamGroup->alias
+                            name: null,
+                            password: $selfGeneratedIdentity['password'],
+                            countryId: $countryId,
+                            stateId: $stateId,
+                            gender: 'decline',
+                            aliasGroup: $teamGroup->alias
                         );
 
                         $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(
@@ -618,8 +618,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
         if ($originalSchoolId !== $schoolId) {
             $newIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
                 $identity,
-                $schoolId, /* new school_id */
-                null /* graduation_date */
+                schoolId: $schoolId,
+                graduationDate: null,
             );
             $identity->current_identity_school_id = $newIdentitySchool->identity_school_id;
         }
@@ -917,8 +917,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
         if ($originalSchoolId !== $schoolId) {
             $newIdentitySchool = \OmegaUp\DAO\IdentitiesSchools::createNewSchoolForIdentity(
                 $identity,
-                $schoolId, /* new school_id */
-                null /* graduation_date */
+                schoolId: $schoolId,
+                graduationDate: null,
             );
             $identity->current_identity_school_id = $newIdentitySchool->identity_school_id;
         }
@@ -1267,7 +1267,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $identity->language_id
                 );
                 if (is_null($result) || is_null($result->name)) {
-                    self::$log->warn('Invalid language id for identity');
+                    self::$log->warning('Invalid language id for identity');
                 } else {
                     return \OmegaUp\Controllers\Identity::convertToSupportedLanguage(
                         $result->name
@@ -1275,9 +1275,15 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 }
             }
         } catch (\OmegaUp\Exceptions\NotFoundException $ex) {
-            self::$log->debug($ex);
+            self::$log->debug(
+                'convertToSupportedLanguage',
+                ['exception' => $ex],
+            );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $ex) {
-            self::$log->debug($ex);
+            self::$log->debug(
+                'convertToSupportedLanguage',
+                ['exception' => $ex],
+            );
         }
 
         /** @var array<string, float> */
