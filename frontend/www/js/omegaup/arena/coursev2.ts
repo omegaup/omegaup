@@ -1,5 +1,6 @@
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
+import { setLocationHash } from '../location';
 import Vue from 'vue';
 import arena_Course, { Tabs } from '../components/arena/Coursev2.vue';
 
@@ -37,8 +38,13 @@ OmegaUp.on('ready', async () => {
       return null;
     }
     if (tab === Tabs.Ranking && payload.scoreboard === null) {
+      setLocationHash(Tabs.Summary);
       return Tabs.Summary;
     }
-    return Object.values<string>(Tabs).includes(tab) ? tab : Tabs.Summary;
+    if (Object.values<string>(Tabs).includes(tab)) {
+      return tab;
+    }
+    setLocationHash(Tabs.Summary);
+    return Tabs.Summary;
   }
 });

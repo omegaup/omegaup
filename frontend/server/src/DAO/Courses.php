@@ -59,7 +59,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         $sql = "
             SELECT
                 a.*,
-                IFNULL((SELECT COUNT(*) FROM Submissions s WHERE s.problemset_id = a.problemset_id), 0) AS has_runs,
+                EXISTS(SELECT * FROM Submissions s WHERE s.problemset_id = a.problemset_id) AS has_runs,
                 COUNT(psp.problem_id) AS problem_count,
                 ps.scoreboard_url,
                 ps.scoreboard_url_admin
