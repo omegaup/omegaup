@@ -36,7 +36,6 @@ RUN add-apt-repository ppa:ondrej/php && \
         php8.0-xml \
         php8.0-zip \
         python3-jinja2 \
-        python3-mysqldb \
         python3-pip \
         python3-pyparsing \
         python3-requests \

@@ -1,1 +1,2 @@
 python-json-logger>=2.0.2
+mysql-connector-python>=8.0.27
