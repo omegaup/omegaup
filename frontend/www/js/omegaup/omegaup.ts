@@ -80,6 +80,7 @@ export namespace omegaup {
 
   export enum CountdownFormat {
     EventCountdown,
+    EventHasNotStarted,
     WaitBetweenUploadsSeconds,
   }
 

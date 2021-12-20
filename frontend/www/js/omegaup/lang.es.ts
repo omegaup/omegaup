@@ -39,6 +39,7 @@ const translations: { [key: string]: string; } = {
   arenaCommonOverallWallTimeLimit: "L\u00edmite de tiempo (total)",
   arenaCommonTimeLimit: "L\u00edmite de tiempo (caso)",
   arenaContestEndedUsePractice: "Este concurso ha terminado. Para continuar enviando soluciones usa nuestro Modo Pr\u00e1ctica haciendo clic aqu\u00ed.",
+  arenaContestHasNotStarted: "Este concurso comienza en %(time)",
   arenaContestNotOpened: "Necesitas abrir el concurso como no-administrador para hacer env\u00edos.",
   arenaContestOrganizer: "Organiza",
   arenaContestPracticeOriginalRunsText: "Para ver los env\u00edos del concurso, da clic [aqu\u00ed](/arena/%(contestAlias)/#runs)",

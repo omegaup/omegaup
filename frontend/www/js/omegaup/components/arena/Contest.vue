@@ -16,6 +16,12 @@
         <a :href="urlPractice">{{ T.arenaContestEndedUsePractice }}</a>
       </div>
       <omegaup-countdown
+        v-else-if="!isContestStarted"
+        :countdown-format="omegaup.CountdownFormat.EventHasNotStarted"
+        :target-time="contest.start_time"
+        @finish="now = new Date()"
+      ></omegaup-countdown>
+      <omegaup-countdown
         v-else
         class="clock"
         :target-time="deadline"
@@ -263,6 +269,7 @@ export default class ArenaContest extends Vue {
 
   T = T;
   ui = ui;
+  omegaup = omegaup;
   AdmissionMode = AdmissionMode;
   PopupDisplayed = PopupDisplayed;
   ContestClarificationType = ContestClarificationType;
@@ -303,6 +310,10 @@ export default class ArenaContest extends Vue {
 
   get isContestFinished(): boolean {
     return this.deadline < this.now;
+  }
+
+  get isContestStarted(): boolean {
+    return this.contest.start_time < this.now;
   }
 
   get urlPractice(): string {

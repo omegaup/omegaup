@@ -38,6 +38,7 @@
 	"arenaCommonOverallWallTimeLimit": "Prazo (total)",
 	"arenaCommonTimeLimit": "Limite de tempo (caso)",
 	"arenaContestEndedUsePractice": "Este concurso terminou. Para continuar a enviar solu\u00e7\u00f5es use o Modo de Pr\u00e1tica clicando aqui.",
+	"arenaContestHasNotStarted": "Este concurso come\u00e7a em %(time)",
 	"arenaContestNotOpened": "Voc\u00ea precisa abrir o conjunto de problemas no modo n\u00e3o administrativo para fazer envios.",
 	"arenaContestOrganizer": "Organizador",
 	"arenaContestPracticeOriginalRunsText": "Para ver as solu\u00e7\u00f5es do concurso original, clique [aqui](/arena/%(contestAlias)/#runs)",

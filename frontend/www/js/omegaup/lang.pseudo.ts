@@ -39,6 +39,7 @@ const translations: { [key: string]: string; } = {
   arenaCommonOverallWallTimeLimit: "(Tim3 1imi7 (707a1))",
   arenaCommonTimeLimit: "(Tim3 1imi7 (ca53))",
   arenaContestEndedUsePractice: "(Thi5 c0n7357 ha5 3nd3d. T0 c0n7inu3 53nding 501u7i0n5 p13a53 u53 0ur Prac7ic3 M0d3 by c1icking h3r3.)",
+  arenaContestHasNotStarted: "(Thi5 c0n7357 57ar75 in %(time))",
   arenaContestNotOpened: "(Y0u n33d 70 0p3n 7h3 pr0b13m537 in n0n-admin m0d3 70 mak3 5ubmi55i0n5.)",
   arenaContestOrganizer: "(Organiz3r)",
   arenaContestPracticeOriginalRunsText: "(T0 533 7h3 run5 fr0m 7h3 0rigina1 c0n7357, c1ick [h3r3](/ar3na/%(contestAlias)/#run5))",
