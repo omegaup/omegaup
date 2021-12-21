@@ -7,10 +7,12 @@ describe('Basic Commands Test', () => {
   });
 
   it('Should register an user', () => {
-    cy.register(uuid(), uuid());
+    const username = uuid();
+    const password = uuid();
+    cy.register({ username, password });
   });
 
   it('Should login an user', () => {
-    cy.login('omegaup', 'omegaup');
+    cy.login({ username: 'omegaup', password: 'omegaup' });
   });
 });

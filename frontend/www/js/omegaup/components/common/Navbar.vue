@@ -97,9 +97,12 @@
           <!-- in lockdown or contest mode there is no left navbar -->
           <ul v-if="!isLoggedIn" class="navbar-nav navbar-right">
             <li class="nav-item">
-              <a class="nav-link px-2" :href="formattedLoginURL">{{
-                T.navLogIn
-              }}</a>
+              <a
+                class="nav-link px-2"
+                :href="formattedLoginURL"
+                data-login-btn
+                >{{ T.navLogIn }}</a
+              >
             </li>
           </ul>
           <ul v-else class="navbar-nav navbar-right">
