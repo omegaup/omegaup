@@ -7,7 +7,7 @@
       />
     </b-col>
     <b-col>
-      <add-window
+      <add-panel
         v-show="shouldShowAddWindow"
         :show-window="shouldShowAddWindow"
         @close-add-window="closeAddWindow"
@@ -19,11 +19,11 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import cases_Sidebar from './Sidebar.vue';
-import add_Window from './AddWindow.vue';
+import add_Panel from './AddPanel.vue';
 @Component({
-  components: { 'cases-sidebar': cases_Sidebar, 'add-window': add_Window },
+  components: { 'cases-sidebar': cases_Sidebar, 'add-panel': add_Panel },
 })
-export default class MainWindow extends Vue {
+export default class CasesTab extends Vue {
   shouldShowAddWindow = false;
 
   closeAddWindow() {

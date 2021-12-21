@@ -31,7 +31,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import T from '../../../../lang';
 
 @Component
-export default class AddWindow extends Vue {
+export default class AddPanel extends Vue {
   tabIndex = 0;
 
   T = T;
