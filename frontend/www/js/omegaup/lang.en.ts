@@ -46,6 +46,8 @@ const translations: { [key: string]: string; } = {
   arenaContestPracticeOriginalScoreboardText: "To see the original scoreboard, click [here](/arena/%(contestAlias)/#ranking)",
   arenaContestWindowLength: "Time to solve all problems",
   arenaCourseAllContent: "All content",
+  arenaCourseAssignmentHasAlreadyStarted: "This content has already started",
+  arenaCourseAssignmentWillBeginIn: "This content will begin in %(time)",
   arenaCourseProblemTitle: "%(letter). %(title)",
   arenaCurrentContests: "Current contests",
   arenaCurrentPublicContests: "Recent public contests",

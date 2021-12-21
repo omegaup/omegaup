@@ -48,7 +48,7 @@ describe('Countdown.vue', () => {
     );
   });
 
-  it('Should handle countdown in mode ContestHasNotStarted when event has started', async () => {
+  it('Should handle countdown in mode ContestHasNotStarted when contest has started', async () => {
     const seconds = 10;
     const wrapper = shallowMount(omegaup_Countdown, {
       propsData: {
@@ -57,6 +57,32 @@ describe('Countdown.vue', () => {
       },
     });
     expect(wrapper.find('span').text()).toBe(T.arenaContestHasAlreadyStarted);
+  });
+
+  it('Should handle countdown in mode AssignmentHasNotStarted', async () => {
+    const seconds = 10;
+    const wrapper = shallowMount(omegaup_Countdown, {
+      propsData: {
+        targetTime: new Date(now + 1000 * seconds),
+        countdownFormat: omegaup.CountdownFormat.AssignmentHasNotStarted,
+      },
+    });
+    expect(wrapper.find('span').text()).toBe(
+      ui.formatString(T.arenaCourseAssignmentWillBeginIn, { time: '00:00:10' }),
+    );
+  });
+
+  it('Should handle countdown in mode AssignmentHasNotStarted when assignment has started', async () => {
+    const seconds = 10;
+    const wrapper = shallowMount(omegaup_Countdown, {
+      propsData: {
+        targetTime: new Date(now - 1000 * seconds),
+        countdownFormat: omegaup.CountdownFormat.AssignmentHasNotStarted,
+      },
+    });
+    expect(wrapper.find('span').text()).toBe(
+      T.arenaCourseAssignmentHasAlreadyStarted,
+    );
   });
 
   it('Should handle countdown in mode WaitBetweenUploadsSeconds', async () => {
