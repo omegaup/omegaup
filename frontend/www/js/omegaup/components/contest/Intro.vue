@@ -12,13 +12,11 @@
         <template v-if="isLoggedIn">
           <!-- Wait for contest start -->
           <div v-if="now < contest.start_time.getTime()">
-            <p>
-              {{ T.contestWillBeginIn }}
-              <omegaup-countdown
-                :target-time="contest.start_time"
-                @finish="now = Date.now()"
-              ></omegaup-countdown>
-            </p>
+            <omegaup-countdown
+              :target-time="contest.start_time"
+              :countdown-format="omegaup.CountdownFormat.EventHasNotStarted"
+              @finish="now = Date.now()"
+            ></omegaup-countdown>
           </div>
 
           <div v-if="now > contest.start_time.getTime()">
@@ -141,6 +139,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+import { omegaup } from '../../omegaup';
 import omegaup_Countdown from '../Countdown.vue';
 import omegaup_Markdown from '../Markdown.vue';
 
@@ -159,6 +158,7 @@ export default class ContestIntro extends Vue {
 
   T = T;
   ui = ui;
+  omegaup = omegaup;
   penaltyTypes = {
     none: T.contestNewFormNoPenalty,
     problem_open: T.contestNewFormByProblem,

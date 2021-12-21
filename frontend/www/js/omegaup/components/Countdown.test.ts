@@ -44,8 +44,19 @@ describe('Countdown.vue', () => {
       },
     });
     expect(wrapper.find('span').text()).toBe(
-      ui.formatString(T.arenaContestHasNotStarted, { time: '00:00:10' }),
+      ui.formatString(T.contestWillBeginIn, { time: '00:00:10' }),
     );
+  });
+
+  it('Should handle countdown in mode EventHasNotStarted when event has started', async () => {
+    const seconds = 10;
+    const wrapper = shallowMount(omegaup_Countdown, {
+      propsData: {
+        targetTime: new Date(now - 1000 * seconds),
+        countdownFormat: omegaup.CountdownFormat.EventHasNotStarted,
+      },
+    });
+    expect(wrapper.find('span').text()).toBe(T.arenaContestHasAlreadyStarted);
   });
 
   it('Should handle countdown in mode WaitBetweenUploadsSeconds', async () => {

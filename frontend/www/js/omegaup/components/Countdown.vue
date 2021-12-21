@@ -38,7 +38,10 @@ export default class Countdown extends Vue {
           submissionGap: Math.ceil(this.timeLeft / 1000),
         });
       case omegaup.CountdownFormat.EventHasNotStarted:
-        return ui.formatString(T.arenaContestHasNotStarted, {
+        if (this.timeLeft < 0) {
+          return T.arenaContestHasAlreadyStarted;
+        }
+        return ui.formatString(T.contestWillBeginIn, {
           time: time.formatDelta(this.timeLeft),
         });
       default:

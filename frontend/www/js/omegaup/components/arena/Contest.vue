@@ -16,13 +16,13 @@
         <a :href="urlPractice">{{ T.arenaContestEndedUsePractice }}</a>
       </div>
       <omegaup-countdown
-        v-else-if="!isContestStarted"
+        v-show="!isContestStarted"
         :countdown-format="omegaup.CountdownFormat.EventHasNotStarted"
         :target-time="contest.start_time"
         @finish="now = new Date()"
       ></omegaup-countdown>
       <omegaup-countdown
-        v-else
+        v-show="isContestStarted"
         class="clock"
         :target-time="deadline"
         @finish="now = new Date()"
