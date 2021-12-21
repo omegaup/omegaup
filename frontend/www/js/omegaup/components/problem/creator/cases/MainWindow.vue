@@ -3,14 +3,14 @@
     <b-col cols="3" class="border-1 border-right">
       <cases-sidebar
         :show-window="shouldShowAddWindow"
-        @toggle-add-window="toggleAddWindow"
+        @open-add-window="openAddWindow"
       />
     </b-col>
     <b-col>
       <add-window
         v-show="shouldShowAddWindow"
         :show-window="shouldShowAddWindow"
-        @toggle-add-window="toggleAddWindow"
+        @close-add-window="closeAddWindow"
       />
     </b-col>
   </b-row>
@@ -26,8 +26,12 @@ import add_Window from './AddWindow.vue';
 export default class MainWindow extends Vue {
   shouldShowAddWindow = false;
 
-  toggleAddWindow() {
-    this.shouldShowAddWindow = !this.shouldShowAddWindow;
+  closeAddWindow() {
+    this.shouldShowAddWindow = false;
+  }
+
+  openAddWindow() {
+    this.shouldShowAddWindow = true;
   }
 }
 </script>

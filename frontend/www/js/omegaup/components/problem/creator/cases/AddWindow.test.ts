@@ -18,7 +18,7 @@ describe('AddWindow.vue', () => {
 
     const expectedText = [
       T.problemCreatorCase,
-      T.problemCreatorMulticase,
+      T.problemCreatorMultipleCases,
       T.problemCreatorGroup,
     ];
 

@@ -805,7 +805,7 @@ const translations: { [key: string]: string; } = {
   problemCreatorGroup: "Group",
   problemCreatorGroups: "Groups",
   problemCreatorLoadProblem: "Load Problem",
-  problemCreatorMulticase: "Multiple cases",
+  problemCreatorMultipleCases: "Multiple cases",
   problemCreatorName: "Name",
   problemCreatorNewProblem: "New Problem",
   problemCreatorSolution: "Solution",

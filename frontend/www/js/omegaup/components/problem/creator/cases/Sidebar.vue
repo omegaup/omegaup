@@ -11,7 +11,7 @@
           variant="success"
           class="mr-2"
           :pressed="showWindow"
-          @click="toggleAddWindow"
+          @click="$emit('open-add-window')"
         >
           <span class="d-none d-xl-inline">{{ T.problemCreatorAdd }}</span>
           <BIconPlusCircle class="d-inline d-xl-none" />
@@ -33,9 +33,5 @@ export default class Sidebar extends Vue {
   T = T;
 
   @Prop() showWindow!: boolean;
-
-  toggleAddWindow() {
-    this.$emit('toggle-add-window');
-  }
 }
 </script>
