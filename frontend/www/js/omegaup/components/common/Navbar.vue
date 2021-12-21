@@ -100,7 +100,7 @@
               <a
                 class="nav-link px-2"
                 :href="formattedLoginURL"
-                data-login-btn
+                data-login-button
                 >{{ T.navLogIn }}</a
               >
             </li>

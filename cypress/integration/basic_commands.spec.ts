@@ -17,7 +17,7 @@ describe('Basic Commands Test', () => {
     const username = uuid();
     const password = uuid();
     cy.visit('/');
-    cy.get('[data-login-btn]').click();
+    cy.get('[data-login-button]').click();
     cy.get('[data-signup-username]').type(username);
     cy.get('[data-signup-password]').type(password);
     cy.get('[data-signup-repeat-password]').type(password);
@@ -37,7 +37,7 @@ describe('Basic Commands Test', () => {
     const username = 'user';
     const password = 'user';
     cy.visit('/');
-    cy.get('[data-login-btn]').click();
+    cy.get('[data-login-button]').click();
     cy.get('[data-login-username]').type(username);
     cy.get('[data-login-password]').type(password);
     cy.get('[data-login-submit]').click();
