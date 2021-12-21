@@ -37,11 +37,21 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Use PHP 7.4
+      - name: Use PHP 8.0
         run: |
-          sudo update-alternatives --install /usr/bin/php php /usr/bin/php7.4 100
+          sudo update-alternatives --install /usr/bin/php php /usr/bin/php8.0 100
+          # Enable APCu for tests
+          echo 'apc.enable_cli=1' | sudo tee --append /etc/php/8.0/cli/conf.d/20-apcu.ini >/dev/null
           # Enable coverage for XDebug so that codecov can do its magic.
-          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/7.4/cli/conf.d/20-xdebug.ini >/dev/null
+          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/8.0/cli/conf.d/20-xdebug.ini >/dev/null
+
+      - name: Create default configuration files
+        run: |
+          cat > frontend/tests/test_config.php <<EOF
+          <?php
+          define('REDIS_HOST', 'localhost');
+          define('REDIS_PASS', '');
+          EOF
 
       - name: Download gitserver
         run: |
@@ -99,8 +109,10 @@ jobs:
         run: |
           # Create optional directories to simplify psalm config.
           mkdir -p frontend/www/{phpminiadmin,preguntas}
-          touch 'frontend/server/config.php'
-          touch 'frontend/tests/test_config.php'
+          cat > frontend/server/config.php <<EOF
+          <?php
+          define('OMEGAUP_LOG_FILE', 'php://stderr');
+          EOF
           ./vendor/bin/psalm \
             --output-format=github \
             --long-progress \
@@ -149,11 +161,20 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Use PHP 7.4
+      - name: Use PHP 8.0
         run: |
-          sudo update-alternatives --install /usr/bin/php php /usr/bin/php7.4 100
+          sudo update-alternatives --install /usr/bin/php php /usr/bin/php8.0 100
+          # Enable APCu for tests
+          echo 'apc.enable_cli=1' | sudo tee --append /etc/php/8.0/cli/conf.d/20-apcu.ini >/dev/null
           # Enable coverage for XDebug so that codecov can do its magic.
-          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/7.4/cli/conf.d/20-xdebug.ini >/dev/null
+          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/8.0/cli/conf.d/20-xdebug.ini >/dev/null
+
+      - name: Create default configuration files
+        run: |
+          cat > frontend/server/config.php <<EOF
+          <?php
+          define('OMEGAUP_LOG_FILE', 'php://stderr');
+          EOF
 
       - name: Install yarn dependencies
         run: yarn install
@@ -168,7 +189,10 @@ jobs:
         run: |
           # Create optional directories to simplify psalm config.
           mkdir -p frontend/www/{phpminiadmin,preguntas}
-          touch 'frontend/server/config.php'
+          cat > frontend/server/config.php <<EOF
+          <?php
+          define('OMEGAUP_LOG_FILE', 'php://stderr');
+          EOF
           touch 'frontend/tests/test_config.php'
 
           ./stuff/lint.sh --diagnostics-output=github validate --all < /dev/null
@@ -205,12 +229,22 @@ jobs:
 
           # Add the container names as aliases to localhost
           cat << EOF | sudo tee --append /etc/hosts
-          127.0.0.1 mysql grader runner gitserver broadcaster
+          127.0.0.1 mysql grader runner gitserver broadcaster redis
           EOF
 
           # Wait for some of the containers
           wait-for-it -t 30 mysql:13306
           wait-for-it -t 30 gitserver:33861
+          wait-for-it -t 30 redis:6379
+
+          for i in $(seq 10); do
+            if [[ "$(mysql \
+                     -uomegaup -pomegaup --host=mysql --port= 13306 --skip-column-names --batch \
+                     -e 'SELECT 1;' || echo 0)" == "1" ]]; then
+              break
+            fi
+            sleep 1
+          done
 
       - name: Create default configuration files
         run: |
@@ -228,7 +262,7 @@ jobs:
           define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
           define('OMEGAUP_GRADER_URL', 'https://grader:21680');
           define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
-          define('REDIS_HOST', 'localhost');
+          define('REDIS_HOST', 'redis');
           define('REDIS_PASS', '');
           define('SMARTY_CACHE_DIR', '/tmp');
           define('OMEGAUP_CSRF_HOSTS', ['frontend', '127.0.0.1']);
@@ -322,12 +356,13 @@ jobs:
 
           # Add the container names as aliases to localhost
           cat << EOF | sudo tee --append /etc/hosts
-          127.0.0.1 mysql grader runner gitserver broadcaster
+          127.0.0.1 mysql grader runner gitserver broadcaster redis
           EOF
 
           # Wait for some of the containers
           wait-for-it -t 30 mysql:13306
           wait-for-it -t 30 gitserver:33861
+          wait-for-it -t 30 redis:6379
 
       - name: Create default configuration files
         run: |
@@ -345,7 +380,7 @@ jobs:
           define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
           define('OMEGAUP_GRADER_URL', 'https://grader:21680');
           define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
-          define('REDIS_HOST', 'localhost');
+          define('REDIS_HOST', 'redis');
           define('REDIS_PASS', '');
           define('SMARTY_CACHE_DIR', '/tmp');
           EOF

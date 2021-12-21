@@ -10,7 +10,7 @@ import os
 import sys
 from typing import Optional, Set
 
-import MySQLdb
+import mysql.connector.cursor
 
 sys.path.insert(
     0,
@@ -25,7 +25,7 @@ BADGES_PATH = os.path.abspath(os.path.join(__file__, '..', '..',
 
 
 def get_all_owners(badge: str, current_timestamp: Optional[datetime.datetime],
-                   cur: MySQLdb.cursors.DictCursor) -> Set[int]:
+                   cur: mysql.connector.cursor.MySQLCursorDict) -> Set[int]:
     '''Returns a set of ids of users who should receive the badge'''
     with open(os.path.join(BADGES_PATH, badge, 'query.sql')) as fd:
         query = fd.read()
@@ -39,8 +39,10 @@ def get_all_owners(badge: str, current_timestamp: Optional[datetime.datetime],
     return results
 
 
-def get_current_owners(badge: str,
-                       cur: MySQLdb.cursors.DictCursor) -> Set[int]:
+def get_current_owners(
+        badge: str,
+        cur: mysql.connector.cursor.MySQLCursorDict,
+) -> Set[int]:
     '''Returns a set of ids of current badge owners'''
     cur.execute('''
         SELECT
@@ -56,7 +58,7 @@ def get_current_owners(badge: str,
 
 
 def save_new_owners(badge: str, users: Set[int],
-                    cur: MySQLdb.cursors.DictCursor) -> None:
+                    cur: mysql.connector.cursor.MySQLCursorDict) -> None:
     '''Adds new badge owners entries to Users_Badges table'''
     badges_tuples = []
     notifications_tuples = []
@@ -75,7 +77,7 @@ def save_new_owners(badge: str, users: Set[int],
 
 
 def process_badges(current_timestamp: Optional[datetime.datetime],
-                   cur: MySQLdb.cursors.DictCursor) -> None:
+                   cur: mysql.connector.cursor.MySQLCursorDict) -> None:
     '''Processes all badges'''
     badges = [f.name for f in os.scandir(BADGES_PATH) if f.is_dir()]
     for badge in badges:
@@ -110,11 +112,11 @@ def main() -> None:
     logging.info('Started')
     dbconn = lib.db.connect(args)
     try:
-        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
-            process_badges(args.current_timestamp, cur)  # type: ignore
-        dbconn.commit()
+        with dbconn.cursor(dictionary=True) as cur:
+            process_badges(args.current_timestamp, cur)
+        dbconn.conn.commit()
     finally:
-        dbconn.close()
+        dbconn.conn.close()
         logging.info('Finished')
 
 

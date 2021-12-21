@@ -594,7 +594,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $course->alias,
             $assignmentAliases[0],
             [ $problemsData[4], $problemsData[5] ],
-            /*extraProblems=*/true
+            extraProblems: true
         );
 
         $runData = \OmegaUp\Test\Factories\Run::createAssignmentRun(

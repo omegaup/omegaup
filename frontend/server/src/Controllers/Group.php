@@ -282,8 +282,8 @@ class Group extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['query'],
             'query',
-            /*$minLength=*/2,
-            /*$maxLength=*/null
+            minLength: 2,
+            maxLength: null
         );
 
         $groups = \OmegaUp\DAO\Groups::searchByName($r['query']);
@@ -543,11 +543,11 @@ class Group extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'availableContests' => \OmegaUp\Controllers\Contest::getContestList(
                         $r->identity,
-                        /*$query=*/ null,
-                        /*$page=*/ 1,
-                        /*$pageSize=*/ 20,
-                        \OmegaUp\DAO\Enum\ActiveStatus::ALL,
-                        \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+                        query: null,
+                        page: 1,
+                        pageSize: 20,
+                        activeContests: \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+                        recommended: \OmegaUp\DAO\Enum\RecommendedStatus::ALL
                     ),
                     'contests' => $contests,
                     'scoreboardAlias' => $scoreboard,

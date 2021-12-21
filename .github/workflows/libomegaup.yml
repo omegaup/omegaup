@@ -17,11 +17,13 @@ jobs:
         with:
           python-version: '3.9'
 
-      - name: Use PHP 7.4
+      - name: Use PHP 8.0
         run: |
-          sudo update-alternatives --install /usr/bin/php php /usr/bin/php7.4 100
+          sudo update-alternatives --install /usr/bin/php php /usr/bin/php8.0 100
+          # Enable APCu for tests
+          echo 'apc.enable_cli=1' | sudo tee --append /etc/php/8.0/cli/conf.d/20-apcu.ini >/dev/null
           # Enable coverage for XDebug so that codecov can do its magic.
-          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/7.4/cli/conf.d/20-xdebug.ini >/dev/null
+          echo 'xdebug.mode=coverage' | sudo tee --append /etc/php/8.0/cli/conf.d/20-xdebug.ini >/dev/null
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress

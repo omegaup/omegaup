@@ -346,9 +346,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAccessRequestNoNeededToInvitedIdentities() {
         // create a course with access mode = registration
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
-            /*$admin=*/            null,
-            /*$adminLogin=*/ null,
-            \OmegaUp\Controllers\Course::ADMISSION_MODE_REGISTRATION,
+            admissionMode: \OmegaUp\Controllers\Course::ADMISSION_MODE_REGISTRATION,
         );
 
         // make it "registrable"

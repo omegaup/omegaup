@@ -9,9 +9,6 @@ and ensures that only canonical tags are used.
 import argparse
 import json
 import logging
-import warnings
-
-import MySQLdb.constants.ER
 
 import lib.db as db
 import lib.logs as logs
@@ -34,7 +31,7 @@ MAPPINGS = {
 }
 
 
-def standardize_tags(dbconn: MySQLdb.connections.Connection) -> None:
+def standardize_tags(dbconn: db.Connection) -> None:
     '''Reads quality_tag suggestions and updates or deletes them'''
     with dbconn.cursor() as cur:
         cur.execute('''
@@ -43,7 +40,7 @@ def standardize_tags(dbconn: MySQLdb.connections.Connection) -> None:
             WHERE `nomination` = 'quality_tag';
         ''')
         to_update = []
-        for qualitynomination_id, json_contents in cur:
+        for qualitynomination_id, json_contents in cur.fetchall():
             try:
                 contents = json.loads(json_contents)
             except json.JSONDecodeError:  # pylint: disable=no-member
@@ -83,14 +80,13 @@ def main() -> None:
 
     logging.info('Started')
     dbconn = db.connect(args)
-    warnings.filterwarnings('ignore', category=dbconn.Warning)
     try:
         standardize_tags(dbconn)
-        dbconn.commit()
+        dbconn.conn.commit()
     except:  # noqa: bare-except
         logging.exception('Failed to standardize tags.')
     finally:
-        dbconn.close()
+        dbconn.conn.close()
         logging.info('Finished')
 
 

@@ -598,10 +598,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         $creatorLogin = self::login($creator);
         $group = \OmegaUp\Test\Factories\Groups::createGroup(
             $creator,
-            /*$name=*/ null,
-            /*$description=*/ null,
-            /*$alias=*/ null,
-            $creatorLogin
+            login: $creatorLogin
         );
         $password = \OmegaUp\Test\Utils::createRandomString();
 
@@ -701,10 +698,10 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Call function
         $response = \OmegaUp\Controllers\User::getRankByProblemsSolved(
-            /*$loggedIdentity=*/            null,
-            /*$filteredBy=*/ '',
-            /*$offset=*/ 1,
-            /*$rowcount=*/ 100
+            loggedIdentity: null,
+            filteredBy: '',
+            offset: 1,
+            rowCount: 100,
         );
 
         // Unassociated identities do not appear in user rank report
