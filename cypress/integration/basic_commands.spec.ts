@@ -6,14 +6,14 @@ describe('Basic Commands Test', () => {
     cy.clearLocalStorage();
   });
 
-  it('Should register an user using the API', () => {
+  it('Should register a user using the API', () => {
     cy.visit('/');
     const username = uuid();
     const password = uuid();
     cy.register({ username, password, shouldLogin: true });
   });
 
-  it('Should register an user', () => {
+  it('Should register a user', () => {
     const username = uuid();
     const password = uuid();
     cy.visit('/');
@@ -26,14 +26,14 @@ describe('Basic Commands Test', () => {
     cy.waitUntil(() => cy.get('.username').should('have.text', username));
   });
 
-  it('Should login an user using the API', () => {
+  it('Should login a user using the API', () => {
     cy.visit('/');
     const username = 'user';
     const password = 'user';
     cy.login({ username, password });
   });
 
-  it('Should login an user', () => {
+  it('Should login a user', () => {
     const username = 'user';
     const password = 'user';
     cy.visit('/');
