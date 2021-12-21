@@ -289,8 +289,8 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         $teamsGroup->description = $r->ensureString('description');
         $teamsGroup->number_of_contestants = $r->ensureInt(
             'numberOfContestants',
-            /*$lowerBound=*/ 1,
-            /*$upperBound=*/ self::MAX_NUMBER_OF_CONTESTANTS,
+            lowerBound: 1,
+            upperBound: self::MAX_NUMBER_OF_CONTESTANTS,
         );
         \OmegaUp\DAO\TeamGroups::update($teamsGroup);
         self::$log->info(

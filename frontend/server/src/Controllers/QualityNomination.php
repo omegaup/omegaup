@@ -645,7 +645,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         /**
          * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
          */
-        $contents = json_decode($r['contents'], true /*assoc*/);
+        $contents = json_decode($r['contents'], associative: true);
         if (!is_array($contents)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
@@ -782,7 +782,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $problemParams = new \OmegaUp\ProblemParams([
             'visibility' => $newProblemVisibility,
             'problem_alias' => $problemAlias,
-        ], /*$isRequired=*/ false);
+        ], isRequired: false);
 
         try {
             \OmegaUp\DAO\DAO::transBegin();
@@ -792,7 +792,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 $problemParams,
                 $message,
                 $problemParams->updatePublished,
-                /*$redirect=*/ false
+                redirect: false
             );
             foreach ($nominations as $nomination) {
                 \OmegaUp\DAO\QualityNominationLog::create(
@@ -824,7 +824,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
-            self::$log->error('Failed to resolve demotion request', $e);
+            self::$log->error(
+                'Failed to resolve demotion request',
+                ['exception' => $e],
+            );
             throw $e;
         }
 
@@ -1037,22 +1040,22 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         );
 
         $response = \OmegaUp\DAO\QualityNominations::getNominations(
-            /* nominator */            null,
-            /* assignee */ null,
-            $offset,
-            $rowCount,
-            $types,
-            $status,
-            $query,
-            $column
+            nominatorUserId: null,
+            assigneeUserId: null,
+            page: $offset,
+            rowcount: $rowCount,
+            types: $types,
+            status: $status,
+            query: $query,
+            column: $column,
         );
 
         $pagerItems = \OmegaUp\Pager::paginate(
             $response['totalRows'],
             $rowCount,
             $offset,
-            /*$adjacent=*/5,
-            /*$params=*/ []
+            adjacent: 5,
+            params: []
         );
 
         return [
@@ -1080,7 +1083,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         self::validateMemberOfReviewerGroup($r);
 
-        return self::getListImpl($r, null /* nominator */, $r->user->user_id);
+        return self::getListImpl(
+            $r,
+            nominator: null,
+            assignee: $r->user->user_id,
+        );
     }
 
     /**
@@ -1112,19 +1119,19 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         $response = \OmegaUp\DAO\QualityNominations::getNominations(
-            $r->user->user_id,
-            /* assignee */ null,
-            $offset,
-            $rowCount,
-            $types
+            nominatorUserId: $r->user->user_id,
+            assigneeUserId: null,
+            page: $offset,
+            rowcount: $rowCount,
+            types: $types,
         );
 
         $pagerItems = \OmegaUp\Pager::paginate(
             $response['totalRows'],
             $rowCount,
             $offset,
-            /*$adjacent=*/5,
-            /*$params=*/[]
+            adjacent: 5,
+            params: []
         );
 
         return [
@@ -1205,8 +1212,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             if ($currentUserReviewer) {
                 $response['original_contents']['tags'] = \OmegaUp\DAO\Problems::getTagsForProblem(
                     $problem,
-                    /*$public=*/false,
-                    $problem->allow_user_add_tags
+                    public: false,
+                    showUserTags: $problem->allow_user_add_tags,
                 );
             }
 

@@ -25,7 +25,7 @@ export interface Tab {
 
 @Component
 export default class ProblemDetails extends Vue {
-  @Prop() problem!: types.ArenaCourseCurrentProblem;
+  @Prop() problem!: types.ProblemDetails;
 
   T = T;
 }

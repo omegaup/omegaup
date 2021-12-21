@@ -313,7 +313,9 @@ class Utils {
     }
 
     private static function shellExec(string $command): void {
-        $log = \Logger::getLogger('\\OmegaUp\\Test\\Utils::shellExec()');
+        $log = \Monolog\Registry::omegaup()->withName(
+            '\\OmegaUp\\Test\\Utils::shellExec()'
+        );
         $log->info("========== Starting {$command}");
         $pipes = [];
         /** @psalm-suppress ForbiddenCode this only runs in tests. */
