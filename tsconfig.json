@@ -10,7 +10,6 @@
       "cypress",
       "cypress-wait-until",
       "cypress-file-upload",
-      "cypress-xpath",
       "gapi",
       "gapi.auth2",
       "bootstrap-datepicker",
