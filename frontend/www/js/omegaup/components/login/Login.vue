@@ -24,8 +24,8 @@
             <div class="form-group">
               <label for="user">{{ T.loginEmailUsername }}</label>
               <input
-                data-login-username
                 v-model="usernameOrEmail"
+                data-login-username
                 name="login_username"
                 type="text"
                 class="form-control"
@@ -42,8 +42,8 @@
                 >)</label
               >
               <input
-                data-login-password
                 v-model="password"
+                data-login-password
                 name="login_password"
                 type="password"
                 class="form-control"

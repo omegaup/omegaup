@@ -10,8 +10,8 @@
             <div class="form-group">
               <label class="control-label">{{ T.wordsUser }}</label>
               <input
-                data-signup-username
                 v-model="username"
+                data-signup-username
                 name="reg_username"
                 class="form-control"
                 autocomplete="username"
@@ -22,8 +22,8 @@
             <div class="form-group">
               <label class="control-label">{{ T.loginEmail }}</label>
               <input
-                data-signup-email
                 v-model="email"
+                data-signup-email
                 name="reg_email"
                 type="email"
                 class="form-control"
@@ -37,8 +37,8 @@
             <div class="form-group">
               <label class="control-label">{{ T.loginPasswordCreate }}</label>
               <input
-                data-signup-password
                 v-model="password"
+                data-signup-password
                 name="reg_password"
                 type="password"
                 class="form-control"
@@ -50,8 +50,8 @@
             <div class="form-group">
               <label class="control-label">{{ T.loginRepeatPassword }}</label>
               <input
-                data-signup-repeat-password
                 v-model="passwordConfirmation"
+                data-signup-repeat-password
                 name="reg_password_confirmation"
                 type="password"
                 class="form-control"
