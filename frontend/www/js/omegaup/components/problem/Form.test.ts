@@ -15,7 +15,7 @@ const props: types.ProblemFormPayload = {
   statusError: '',
   allowUserAddTags: true,
   showDiff: 'none',
-  timeLimit: 1000,
+  timeLimit: '',
   validatorTimeLimit: 1000,
   overallWallTimeLimit: '',
   extraWallTime: 0,
@@ -50,7 +50,19 @@ const props: types.ProblemFormPayload = {
   },
 };
 
+// TODO: Add tests that simulates user interaction
 describe('Settings.vue', () => {
+  it('Should call the function that opens collapsed panels', async () => {
+    const openCollapsed = jest.spyOn(
+      Form.options.methods,
+      'openCollapsedIfRequired',
+    );
+    const wrapper = shallowMount(Form, { propsData: { data: props } });
+    wrapper.find('[type="submit"]').trigger('click');
+    await wrapper.vm.$nextTick();
+    expect(openCollapsed).toBeCalled();
+  });
+
   it('Should handle problem settings', () => {
     const wrapper = shallowMount(Form, { propsData: { data: props } });
 
@@ -66,31 +78,5 @@ describe('Settings.vue', () => {
       }
     });
     expect(props.validLanguages).toEqual(optionsObject);
-  });
-
-  it('Should show a collapsed group', async () => {
-    const wrapper = mount(Form, { propsData: { data: props } });
-
-    expect(wrapper.find('.limits').classes()).not.toContain('show');
-    await wrapper.find('button[type="submit"]').trigger('click');
-    setTimeout(() => {
-      expect(wrapper.find('.limits').classes()).not.toContain('show');
-    }, 3000);
-  });
-  it('Should open collapsed tabs automatically when submitting without completing the required info', async () => {
-    const wrapper = mount(Form, { propsData: { data: props } });
-    expect(wrapper.find('.basic-info').classes()).toContain('show');
-    expect(wrapper.find('.tags').classes()).toContain('show');
-    await wrapper.find('button[data-target=".basic-info"]').trigger('click');
-    await wrapper.find('button[data-target=".basic-info"]').trigger('click');
-    setTimeout(() => {
-      expect(wrapper.find('.basic-info').classes()).not.toContain('show');
-      expect(wrapper.find('.tags').classes()).not.toContain('show');
-    }, 3000);
-    await wrapper.find('button[type="submit"]').trigger('click');
-    setTimeout(() => {
-      expect(wrapper.find('.basic-info').classes()).toContain('show');
-      expect(wrapper.find('.tags').classes()).toContain('show');
-    }, 3000);
   });
 });
