@@ -17,7 +17,7 @@
       </div>
       <omegaup-countdown
         v-show="!isContestStarted"
-        :countdown-format="omegaup.CountdownFormat.EventHasNotStarted"
+        :countdown-format="omegaup.CountdownFormat.ContestHasNotStarted"
         :target-time="contest.start_time"
         @finish="now = new Date()"
       ></omegaup-countdown>

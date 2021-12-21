@@ -35,12 +35,12 @@ describe('Countdown.vue', () => {
     expect(wrapper.find('span').text()).toBe('00:00:05');
   });
 
-  it('Should handle countdown in mode EventHasNotStarted', async () => {
+  it('Should handle countdown in mode ContestHasNotStarted', async () => {
     const seconds = 10;
     const wrapper = shallowMount(omegaup_Countdown, {
       propsData: {
         targetTime: new Date(now + 1000 * seconds),
-        countdownFormat: omegaup.CountdownFormat.EventHasNotStarted,
+        countdownFormat: omegaup.CountdownFormat.ContestHasNotStarted,
       },
     });
     expect(wrapper.find('span').text()).toBe(
@@ -48,12 +48,12 @@ describe('Countdown.vue', () => {
     );
   });
 
-  it('Should handle countdown in mode EventHasNotStarted when event has started', async () => {
+  it('Should handle countdown in mode ContestHasNotStarted when event has started', async () => {
     const seconds = 10;
     const wrapper = shallowMount(omegaup_Countdown, {
       propsData: {
         targetTime: new Date(now - 1000 * seconds),
-        countdownFormat: omegaup.CountdownFormat.EventHasNotStarted,
+        countdownFormat: omegaup.CountdownFormat.ContestHasNotStarted,
       },
     });
     expect(wrapper.find('span').text()).toBe(T.arenaContestHasAlreadyStarted);

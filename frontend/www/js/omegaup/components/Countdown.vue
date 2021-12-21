@@ -37,7 +37,7 @@ export default class Countdown extends Vue {
         return ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
           submissionGap: Math.ceil(this.timeLeft / 1000),
         });
-      case omegaup.CountdownFormat.EventHasNotStarted:
+      case omegaup.CountdownFormat.ContestHasNotStarted:
         if (this.timeLeft < 0) {
           return T.arenaContestHasAlreadyStarted;
         }
