@@ -159,7 +159,7 @@ export function formatTimestampSecondLess(date: Date): string {
   return `${formatDateLocal(date)} ${String(date.getHours()).padStart(
     2,
     '0',
-  )}:${String(date.getMinutes()).padStart(2, '0')}`
+  )}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
 export function parseDuration(str: string): number | null {
