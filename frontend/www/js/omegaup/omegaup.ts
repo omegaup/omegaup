@@ -79,6 +79,7 @@ export namespace omegaup {
   }
 
   export enum CountdownFormat {
+    AssignmentHasNotStarted,
     ContestHasNotStarted,
     EventCountdown,
     WaitBetweenUploadsSeconds,
