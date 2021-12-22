@@ -15,7 +15,7 @@ const props: types.ProblemFormPayload = {
   statusError: '',
   allowUserAddTags: true,
   showDiff: 'none',
-  timeLimit: '',
+  timeLimit: 1000,
   validatorTimeLimit: 1000,
   overallWallTimeLimit: '',
   extraWallTime: 0,
