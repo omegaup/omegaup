@@ -124,7 +124,7 @@ def load_mysql(args: argparse.Namespace) -> pd.DataFrame:
         logging.info('Found %d runs', len(runs))
         return runs
     finally:
-        dbconn.close()
+        dbconn.conn.close()
 
 
 def train_test_split(runs: pd.DataFrame,

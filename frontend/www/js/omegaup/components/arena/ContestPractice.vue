@@ -41,6 +41,7 @@
               :guid="guid"
               :problem-alias="problemAlias"
               :contest-alias="contest.alias"
+              :in-contest-or-course="true"
               :run-details-data="currentRunDetailsData"
               @update:activeTab="
                 (selectedTab) =>

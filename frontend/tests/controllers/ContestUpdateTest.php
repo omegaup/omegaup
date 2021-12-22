@@ -1118,8 +1118,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
-            /*$params=*/            null,
-            $directorLogin
+            login: $directorLogin,
         );
 
         // Add the problem to the contest
@@ -1158,11 +1157,8 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun(
             $runData,
             0.05,
-            /*$verdict=*/'PA',
-            /*$submitDelay=*/null,
-            /*$runGuid=*/null,
-            /*$runId=*/null,
-            $problemsetProblemPoints
+            verdict: 'PA',
+            problemsetPoints: $problemsetProblemPoints,
         );
 
         $directorLogin = self::login($contestData['director']);

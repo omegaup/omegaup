@@ -130,6 +130,7 @@
                 </div>
                 <div class="mt-3">
                   <a
+                    class="text-primary"
                     role="button"
                     data-show-feedback-form
                     @click="showFeedbackForm = !showFeedbackForm"

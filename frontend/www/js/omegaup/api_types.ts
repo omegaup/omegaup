@@ -103,6 +103,45 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ArenaCoursePayload {
       return ((x) => {
+        if (x.currentProblem)
+          x.currentProblem = ((x) => {
+            x.creation_date = ((x: number) => new Date(x * 1000))(
+              x.creation_date,
+            );
+            if (x.nextSubmissionTimestamp)
+              x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
+                x.nextSubmissionTimestamp,
+              );
+            if (x.problemsetter)
+              x.problemsetter = ((x) => {
+                if (x.creation_date)
+                  x.creation_date = ((x: number) => new Date(x * 1000))(
+                    x.creation_date,
+                  );
+                return x;
+              })(x.problemsetter);
+            if (x.runs)
+              x.runs = ((x) => {
+                if (!Array.isArray(x)) {
+                  return x;
+                }
+                return x.map((x) => {
+                  x.time = ((x: number) => new Date(x * 1000))(x.time);
+                  return x;
+                });
+              })(x.runs);
+            if (x.solvers)
+              x.solvers = ((x) => {
+                if (!Array.isArray(x)) {
+                  return x;
+                }
+                return x.map((x) => {
+                  x.time = ((x: number) => new Date(x * 1000))(x.time);
+                  return x;
+                });
+              })(x.solvers);
+            return x;
+          })(x.currentProblem);
         if (x.scoreboard)
           x.scoreboard = ((x) => {
             if (x.finish_time)
@@ -2052,20 +2091,16 @@ export namespace types {
     name: string;
   }
 
-  export interface ArenaCourseCurrentProblem {
-    alias: string;
-    title: string;
-  }
-
   export interface ArenaCourseDetails {
     alias: string;
+    languages?: string[];
     name: string;
   }
 
   export interface ArenaCoursePayload {
     assignment: types.ArenaCourseAssignment;
     course: types.ArenaCourseDetails;
-    currentProblem?: types.ArenaCourseCurrentProblem;
+    currentProblem?: types.ProblemDetails;
     problems: types.ArenaCourseProblem[];
     scoreboard?: types.Scoreboard;
   }
