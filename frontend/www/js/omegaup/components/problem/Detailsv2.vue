@@ -10,7 +10,9 @@
           <a
             class="p-3"
             :href="`/karel.js/${
-              problem.sample_input ? `#mundo:${problem.sample_input}` : ''
+              problem.sample_input
+                ? `#mundo:${encodeURIComponent(problem.sample_input)}`
+                : ''
             }`"
             target="_blank"
           >
@@ -219,7 +221,9 @@ export default class ProblemDetails extends Vue {
           const extension = os == 'unix' ? '.tar.bz2' : '.zip';
 
           ui.navigateTo(
-            `${window.location.protocol}//${window.location.host}/templates/${alias}/${commit}/${alias}_${os}_${lang}${extension}`,
+            encodeURIComponent(
+              `${window.location.protocol}//${window.location.host}/templates/${alias}/${commit}/${alias}_${os}_${lang}${extension}`,
+            ),
           );
         },
       );
