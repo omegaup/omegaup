@@ -55,10 +55,10 @@
     "cypress-wait-until": "^1.7.2",
     "date-fns": "^2.27.0",
     "eslint": "^7.24",
-    "eslint_d": "^10.0.4",
     "eslint-config-prettier": "^6.12.0",
     "eslint-plugin-jest-dom": "^3.6.5",
     "eslint-plugin-vue": "^7.0.0",
+    "eslint_d": "^10.0.4",
     "file-loader": "^6.2",
     "fork-ts-checker-webpack-plugin": "^6.1",
     "highcharts": "^9.1.0",
@@ -134,5 +134,6 @@
     "build-development": "cross-env webpack --mode=development",
     "build-development-frontend": "cross-env webpack --config-name=frontend --mode=development",
     "refactor": "cross-env ./stuff/refactor.js"
-  }
+  },
+  "dependencies": {}
 }
