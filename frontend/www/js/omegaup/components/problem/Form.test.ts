@@ -53,8 +53,10 @@ const props: types.ProblemFormPayload = {
 // TODO: Add tests that simulates user interaction
 describe('Settings.vue', () => {
   it('Should call the function that opens collapsed panels', async () => {
+    // We need to use any here because `.options.methods` is not inside the public API, yet that's the only way
+    // to access the method in order to spy on it and check whether or not it has been called.
     const openCollapsed = jest.spyOn(
-      Form.options.methods,
+      (Form as any).options.methods,
       'openCollapsedIfRequired',
     );
     const wrapper = shallowMount(Form, { propsData: { data: props } });
