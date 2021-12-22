@@ -10,7 +10,7 @@ describe('Basic Commands Test', () => {
     cy.visit('/');
     const username = uuid();
     const password = uuid();
-    cy.register({ username, password, shouldLogin: true });
+    cy.register({ username, password });
   });
 
   it('Should register a user', () => {
@@ -23,7 +23,9 @@ describe('Basic Commands Test', () => {
     cy.get('[data-signup-repeat-password]').type(password);
     cy.get('[data-signup-email]').type(`${username}@omegaup.com`);
     cy.get('[data-signup-submit]').click();
-    cy.waitUntil(() => cy.get('.username').should('have.text', username));
+    cy.waitUntil(() =>
+      cy.get('header .username').should('have.text', username),
+    );
   });
 
   it('Should login a user using the API', () => {
@@ -41,6 +43,8 @@ describe('Basic Commands Test', () => {
     cy.get('[data-login-username]').type(username);
     cy.get('[data-login-password]').type(password);
     cy.get('[data-login-submit]').click();
-    cy.waitUntil(() => cy.get('.username').should('have.text', username));
+    cy.waitUntil(() =>
+      cy.get('header .username').should('have.text', username),
+    );
   });
 });

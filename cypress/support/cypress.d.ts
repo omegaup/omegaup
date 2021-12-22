@@ -8,7 +8,7 @@ declare namespace Cypress {
 
   interface Chainable {
     login(loginInfo: LoginInfo): void;
-    register(loginInfo: LoginInfo & { shouldLogin: boolean }): void;
+    register(loginInfo: LoginInfo): void;
   }
 }
 

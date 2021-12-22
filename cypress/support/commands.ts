@@ -11,19 +11,16 @@ Cypress.Commands.add('login', ({ username, password }) => {
   ).then((response) => {
     expect(response.status).to.eq(200);
     cy.reload();
-    cy.get('.username').should('have.text', username);
+    cy.get('header .username').should('have.text', username);
   });
 });
 
-// Register a new user given a username and password. If shouldLogin is true, then the user will be logged in after the registration
-Cypress.Commands.add(
-  'register',
-  ({ username, password, shouldLogin = false }) => {
-    cy.request(
-      `/api/user/create?username=${username}&password=${password}&email=${username}@omegaup.com`,
-    ).then((response) => {
-      expect(response.status).to.eq(200);
-      if (shouldLogin) cy.login({ username, password });
-    });
-  },
-);
+// Registers and logs in a new user given a username and password.
+Cypress.Commands.add('register', ({ username, password }) => {
+  cy.request(
+    `/api/user/create?username=${username}&password=${password}&email=${username}@omegaup.com`,
+  ).then((response) => {
+    expect(response.status).to.eq(200);
+    cy.login({ username, password });
+  });
+});
