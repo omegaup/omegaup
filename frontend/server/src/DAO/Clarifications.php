@@ -103,7 +103,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         // If we didn't get an offset, we know the total number of rows
         // already, no need to query the database for it.
         $totalRows = count($clarifications);
-        if (!is_null($offset)) {
+        if (!is_null($offset) && $offset != 0) {
             if ($totalRows != $rowcount) {
                 // If we did get an offset, but the number of rows we got is
                 // less than what we allowed, we've already reached the end
