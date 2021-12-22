@@ -4022,6 +4022,25 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $isAdmin = (
+            \OmegaUp\Authorization::isCourseAdmin(
+                $currentIdentity,
+                $course
+            ) ||
+            \OmegaUp\Authorization::canCreatePublicCourse(
+                $currentIdentity
+            )
+        );
+
+        if (
+            $assignment->start_time->time > \OmegaUp\Time::get() &&
+            !$isAdmin
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'assignmentNotStarted'
+            );
+        }
+
         $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             intval($assignment->problemset_id)
         );
@@ -4052,16 +4071,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($director)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-
-        $isAdmin = (
-            \OmegaUp\Authorization::isCourseAdmin(
-                $currentIdentity,
-                $course
-            ) ||
-            \OmegaUp\Authorization::canCreatePublicCourse(
-                $currentIdentity
-            )
-        );
 
         // Get scoreboard;
         $params = \OmegaUp\ScoreboardParams::fromAssignment(
@@ -4172,6 +4181,25 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $isAdmin = (
+            \OmegaUp\Authorization::isCourseAdmin(
+                $r->identity,
+                $course
+            ) ||
+            \OmegaUp\Authorization::canCreatePublicCourse(
+                $r->identity
+            )
+        );
+
+        if (
+            $assignment->start_time->time > \OmegaUp\Time::get() &&
+            !$isAdmin
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'assignmentNotStarted'
+            );
+        }
+
         $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             intval($assignment->problemset_id)
         );
@@ -4188,16 +4216,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'title' => strval($problem['title']),
             ];
         }
-
-        $isAdmin = (
-            \OmegaUp\Authorization::isCourseAdmin(
-                $r->identity,
-                $course
-            ) ||
-            \OmegaUp\Authorization::canCreatePublicCourse(
-                $r->identity
-            )
-        );
 
         $scoreboard = null;
         if (
