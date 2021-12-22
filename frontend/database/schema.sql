@@ -1095,6 +1095,7 @@ CREATE TABLE `User_Rank` (
   `school_id` int DEFAULT NULL,
   `author_score` double NOT NULL DEFAULT '0',
   `author_ranking` int DEFAULT NULL,
+  `classname` varchar(50) DEFAULT NULL COMMENT 'Almacena la clase precalculada para no tener que determinarla en tiempo de ejecucion.',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
   KEY `rank` (`ranking`),
