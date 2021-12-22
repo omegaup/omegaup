@@ -16,7 +16,13 @@
         <a :href="urlPractice">{{ T.arenaContestEndedUsePractice }}</a>
       </div>
       <omegaup-countdown
-        v-else
+        v-show="!isContestStarted"
+        :countdown-format="omegaup.CountdownFormat.ContestHasNotStarted"
+        :target-time="contest.start_time"
+        @finish="now = new Date()"
+      ></omegaup-countdown>
+      <omegaup-countdown
+        v-show="isContestStarted"
         class="clock"
         :target-time="deadline"
         @finish="now = new Date()"
@@ -65,6 +71,7 @@
               :run-details-data="currentRunDetailsData"
               :contest-alias="contest.alias"
               :is-contest-finished="isContestFinished"
+              :in-contest-or-course="true"
               @update:activeTab="
                 (selectedTab) =>
                   $emit('reset-hash', {
@@ -262,6 +269,7 @@ export default class ArenaContest extends Vue {
 
   T = T;
   ui = ui;
+  omegaup = omegaup;
   AdmissionMode = AdmissionMode;
   PopupDisplayed = PopupDisplayed;
   ContestClarificationType = ContestClarificationType;
@@ -302,6 +310,10 @@ export default class ArenaContest extends Vue {
 
   get isContestFinished(): boolean {
     return this.deadline < this.now;
+  }
+
+  get isContestStarted(): boolean {
+    return this.contest.start_time < this.now;
   }
 
   get urlPractice(): string {

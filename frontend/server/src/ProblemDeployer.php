@@ -11,7 +11,7 @@ class ProblemDeployer {
     const UPDATE_STATEMENTS = 2;
     const CREATE = 3;
     const ZIP_MAX_SIZE = 100 * 1024 * 1024;  // 100 MiB
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     private $log;
 
     /** @var string */
@@ -65,7 +65,7 @@ class ProblemDeployer {
         bool $acceptsSubmissions = true,
         bool $updatePublished = true
     ) {
-        $this->log = \Logger::getLogger('ProblemDeployer');
+        $this->log = \Monolog\Registry::omegaup()->withName('ProblemDeployer');
         $this->alias = $alias;
 
         if (
@@ -185,7 +185,7 @@ class ProblemDeployer {
         /** @var null|array{interactive?: array{module_name: string, language: string}, cases: array<string, mixed>} */
         $distribSettings = json_decode(
             $problemArtifacts->get('settings.distrib.json'),
-            /*assoc=*/true
+            associative: true
         );
         if (empty($distribSettings['interactive'])) {
             // oops, this was not an interactive problem.
@@ -307,6 +307,7 @@ class ProblemDeployer {
         ];
 
         $cmd = join(' ', array_map('escapeshellarg', $args));
+        $pipes = [];
         $proc = proc_open(
             $cmd,
             $descriptorspec,
@@ -452,7 +453,7 @@ class ProblemDeployer {
             $context = null;
             if (!empty($result['output'])) {
                 /** @var null|array{error: string} */
-                $output = json_decode($result['output'], /*assoc=*/true);
+                $output = json_decode($result['output'], associative: true);
                 if (is_null($output)) {
                     $context = $result['output'];
                 } else {
@@ -479,7 +480,7 @@ class ProblemDeployer {
         }
 
         /** @var array{status: string, error?: string, updated_refs?: array{name: string, from: string, to: string, from_tree: string, to_tree: string}[], updated_files: array{path: string, type: string}[]} */
-        return json_decode($result['output'], /*assoc=*/true);
+        return json_decode($result['output'], associative: true);
     }
 
     /**
@@ -570,7 +571,7 @@ class ProblemDeployer {
         if ($retval != 0) {
             $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
                 'problemDeployerInternalError',
-                /*$context=*/null
+                context: null
             );
             $this->log->error(
                 "rename problem failed: HTTP/{$statusCode}: {$error}"

@@ -8,7 +8,7 @@ namespace OmegaUp;
  *
  */
 class ApiCaller {
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     public static $log;
 
     /**
@@ -152,7 +152,7 @@ class ApiCaller {
         $jsonResult = json_encode($response, $jsonEncodeFlags);
 
         if ($jsonResult === false) {
-            self::$log->warn(
+            self::$log->warning(
                 'json_encode failed for: ' . print_r(
                     $response,
                     true
@@ -357,4 +357,4 @@ class ApiCaller {
     }
 }
 
-\OmegaUp\ApiCaller::$log = \Logger::getLogger('ApiCaller');
+\OmegaUp\ApiCaller::$log = \Monolog\Registry::omegaup()->withName('ApiCaller');

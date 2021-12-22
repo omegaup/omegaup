@@ -60,9 +60,9 @@ class Clarification extends \OmegaUp\Controllers\Controller {
         $username = $r->ensureOptionalString('username');
 
         $contestAlias = $r->ensureOptionalString(
-            'contest_alias',
-            false,
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            key: 'contest_alias',
+            required: false,
+            validator: fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
         $contest = null;
@@ -288,14 +288,14 @@ class Clarification extends \OmegaUp\Controllers\Controller {
 
         $public = $r->ensureOptionalBool('public');
         $answer = $r->ensureOptionalString(
-            'answer',
-            /*$required=*/false,
-            fn (string $answer) => !empty($answer)
+            key: 'answer',
+            required: false,
+            validator: fn (string $answer) => !empty($answer)
         );
         $message = $r->ensureOptionalString(
-            'message',
-            /*$required=*/false,
-            fn (string $message) => !empty($message)
+            key: 'message',
+            required: false,
+            validator: fn (string $message) => !empty($message)
         );
 
         // Check that clarification exists
@@ -474,7 +474,10 @@ class Clarification extends \OmegaUp\Controllers\Controller {
                 }
             }
         } catch (\Exception $e) {
-            self::$log->error('Failed to broadcast clarification', $e);
+            self::$log->error(
+                'Failed to broadcast clarification',
+                ['exception' => $e],
+            );
             return;
         }
         self::getBroadcasterInstance()->broadcastClarification(

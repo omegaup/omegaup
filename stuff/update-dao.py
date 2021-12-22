@@ -23,7 +23,7 @@ def _main() -> None:
     )
     args = parser.parse_args()
 
-    for dao in dao_utils.generate_dao(args.script.read()):  # type: ignore
+    for dao in dao_utils.generate_dao(args.script.read()):
         if dao.file_type == 'dao':
             filename = os.path.join(
                 _OMEGAUP_ROOT, 'frontend/server/src/DAO/Base', dao.filename)

@@ -35,15 +35,10 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             INNER JOIN
                 Problemsets ps ON ps.problemset_id = cl.problemset_id
             LEFT JOIN
-                Contests con ON (
-                    con.contest_id = ps.contest_id AND
-                    con.problemset_id = ps.problemset_id
-                )
-            LEFT JOIN
                 Assignments a ON a.problemset_id = cl.problemset_id
             WHERE
                 (
-                    con.contest_id = ? OR
+                    ps.contest_id = ? OR
                     a.course_id = ?
                 )';
 
@@ -146,8 +141,6 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 Identities r ON r.identity_id = c.receiver_id
             INNER JOIN
                 Problems p ON p.problem_id = c.problem_id
-            INNER JOIN
-                Problemsets ps ON ps.problemset_id = c.problemset_id
             WHERE
                 c.problemset_id = ?
                 AND p.problem_id = ?

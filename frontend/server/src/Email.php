@@ -3,7 +3,7 @@
 namespace OmegaUp;
 
 class Email {
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     public static $log;
 
     /** @var null|\OmegaUp\EmailSender */
@@ -34,12 +34,9 @@ class Email {
             return;
         }
 
-        require_once 'libs/third_party/phpmailer/class.phpmailer.php';
-        require_once 'libs/third_party/phpmailer/class.smtp.php';
-
         self::$log->debug('Sending email to ' . join(',', $emails));
 
-        $mail = new \PHPMailer();
+        $mail = new \PHPMailer\PHPMailer\PHPMailer();
         $mail->IsSMTP();
         $mail->Host = OMEGAUP_EMAIL_SMTP_HOST;
         $mail->CharSet = 'utf-8';
@@ -71,4 +68,4 @@ class Email {
     }
 }
 
-Email::$log = \Logger::getLogger('email');
+Email::$log = \Monolog\Registry::omegaup()->withName('email');

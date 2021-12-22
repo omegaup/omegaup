@@ -12,7 +12,7 @@ function getJavaScriptDeps(string $entrypoint): array {
         );
     }
     /** @var array{css: list<string>, js: list<string>} */
-    $jsonContents = json_decode($textContents, /*assoc=*/true);
+    $jsonContents = json_decode($textContents, associative: true);
     return $jsonContents['js'];
 }
 

@@ -6,7 +6,7 @@ namespace OmegaUp\Controllers;
  * Controllers parent class
  */
 class Controller {
-    /** @var \Logger */
+    /** @var \Monolog\Logger */
     public static $log;
 
     /**
@@ -82,8 +82,10 @@ class Controller {
 
         $username = $r->ensureOptionalString(
             'username',
-            /*$required=*/ false,
-            fn (string $name) => \OmegaUp\Validators::normalUsername($name)
+            required: false,
+            validator: fn (string $name) => \OmegaUp\Validators::normalUsername(
+                $name
+            )
         );
 
         if (!is_null($username)) {
@@ -166,8 +168,8 @@ class Controller {
                 $value = $transform($value);
             }
             // Important property, so check if it changes.
-            if ($important) {
-                $importantChange |= ($value != $object->$fieldName);
+            if ($important && !$importantChange) {
+                $importantChange = ($value != $object->$fieldName);
             }
             $object->$fieldName = $value;
         }
@@ -182,4 +184,6 @@ class Controller {
     }
 }
 
-\OmegaUp\Controllers\Controller::$log = \Logger::getLogger('controller');
+\OmegaUp\Controllers\Controller::$log = \Monolog\Registry::omegaup()->withName(
+    'controller'
+);

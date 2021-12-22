@@ -146,8 +146,8 @@ class Run {
             $problemData,
             $courseAssignmentData['assignment'],
             $participant,
-            /*$login=*/ null,
-            $language
+            login: null,
+            language: $language,
         );
 
         // Call API
@@ -208,9 +208,9 @@ class Run {
                 $assignmentAlias,
                 intval($course->course_id)
             ),
-            $participant,
-            /*$login=*/ null,
-            $language
+            participant: $participant,
+            login: null,
+            language: $language,
         );
 
         // Call API
@@ -327,7 +327,7 @@ class Run {
      * @param ?string $outputFilesContent The content to compress in files.zip.
      */
     public static function gradeRun(
-        ?array $runData,
+        ?array $runData = null,
         float $points = 1,
         string $verdict = 'AC',
         ?int $submitDelay = null,

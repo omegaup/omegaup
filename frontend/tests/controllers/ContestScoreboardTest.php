@@ -1096,11 +1096,11 @@ class ContestScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             ],
         ];
         $testData = $this->prepareContestScoreboardData(
-            /*$nUsers=*/            3,
-            $runMap,
-            /*$runForAdmin=*/ true,
-            /*$runForDirector=*/ true,
-            /*$admissionMode=*/ 'private'
+            nUsers: 3,
+            runMap: $runMap,
+            runForAdmin: true,
+            runForDirector: true,
+            admissionMode: 'private'
         );
 
         // Create request

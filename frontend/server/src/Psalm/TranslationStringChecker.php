@@ -343,9 +343,9 @@ class TranslationStringChecker implements
             ) . '/tests/runfiles/translation_strings';
             if (!is_dir(self::$translationStringsDirname)) {
                 mkdir(
-                    self::$translationStringsDirname, /*$mode=*/
-                    0755, /*$recursive=*/
-                    true
+                    self::$translationStringsDirname,
+                    permissions: 0755,
+                    recursive: true,
                 );
             }
         }
