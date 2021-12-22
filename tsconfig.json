@@ -5,7 +5,7 @@
     "target": "es6",
     "downlevelIteration": true,
     "strict": true,
-    "lib": ["DOM", "ES5", "ScriptHost", "ES2020.Promise"],
+    "lib": ["DOM", "ES5", "ScriptHost", "ES2020.Promise", "dom.iterable"],
     "types": [
       "cypress",
       "cypress-wait-until",

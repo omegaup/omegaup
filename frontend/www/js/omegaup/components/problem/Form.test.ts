@@ -1,4 +1,4 @@
-import { mount, shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import { types } from '../../api_types';
 
 import T from '../../lang';
@@ -50,7 +50,21 @@ const props: types.ProblemFormPayload = {
   },
 };
 
+// TODO: Add tests that simulates user interaction
 describe('Settings.vue', () => {
+  it('Should call the function that opens collapsed panels', async () => {
+    // We need to use any here because `.options.methods` is not inside the public API, yet that's the only way
+    // to access the method in order to spy on it and check whether or not it has been called.
+    const openCollapsed = jest.spyOn(
+      (Form as any).options.methods,
+      'openCollapsedIfRequired',
+    );
+    const wrapper = shallowMount(Form, { propsData: { data: props } });
+    wrapper.find('[type="submit"]').trigger('click');
+    await wrapper.vm.$nextTick();
+    expect(openCollapsed).toBeCalled();
+  });
+
   it('Should handle problem settings', () => {
     const wrapper = shallowMount(Form, { propsData: { data: props } });
 
@@ -66,15 +80,5 @@ describe('Settings.vue', () => {
       }
     });
     expect(props.validLanguages).toEqual(optionsObject);
-  });
-
-  it('Should show a collapsed group', async () => {
-    const wrapper = mount(Form, { propsData: { data: props } });
-
-    expect(wrapper.find('.limits').classes()).not.toContain('show');
-    await wrapper.find('button[type="submit"]').trigger('click');
-    setTimeout(() => {
-      expect(wrapper.find('.limits').classes()).not.toContain('show');
-    }, 3000);
   });
 });
