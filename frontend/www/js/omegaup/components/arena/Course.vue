@@ -12,11 +12,20 @@
     </template>
     <template #clock>
       <div v-if="!deadline" class="clock">{{ INF }}</div>
-      <omegaup-countdown
-        v-else
-        class="clock"
-        :target-time="deadline"
-      ></omegaup-countdown>
+      <template v-else>
+        <omegaup-countdown
+          v-show="currentAssignment.start_time > now"
+          :target-time="currentAssignment.start_time"
+          :countdown-format="omegaup.CountdownFormat.AssignmentHasNotStarted"
+          @finish="now = new Date()"
+        ></omegaup-countdown>
+        <omegaup-countdown
+          v-show="currentAssignment.start_time < now"
+          class="clock"
+          :target-time="deadline"
+          @finish="now = new Date()"
+        ></omegaup-countdown>
+      </template>
     </template>
     <template #arena-problems>
       <div data-course>
@@ -202,6 +211,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
+import { omegaup } from '../../omegaup';
 import arena_Arena from './Arena.vue';
 import arena_ClarificationList from './ClarificationList.vue';
 import arena_NavbarAssignments from './NavbarAssignments.vue';
@@ -256,6 +266,7 @@ export default class ArenaCourse extends Vue {
   shouldShowFirstAssociatedIdentityRunWarning!: boolean;
 
   T = T;
+  omegaup = omegaup;
   PopupDisplayed = PopupDisplayed;
   isAdmin = this.course.is_admin || this.course.is_curator;
   currentClarifications = this.clarifications;
@@ -263,6 +274,7 @@ export default class ArenaCourse extends Vue {
   currentRunDetailsData = this.runDetailsData;
   currentPopupDisplayed = this.popupDisplayed;
   currentNextSubmissionTimestamp = this.nextSubmissionTimestamp;
+  now = new Date();
   INF = '∞';
 
   get activeProblemAlias(): null | string {
