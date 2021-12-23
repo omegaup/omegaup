@@ -68,7 +68,8 @@ describe('Detailsv2.vue', () => {
       images: {},
       sources: {},
       language: 'es',
-      markdown: '# test',
+      markdown: `# test
+        #include <iostream>`,
     },
     submissions: 5,
     title: '',
@@ -118,6 +119,10 @@ describe('Detailsv2.vue', () => {
     expect(problemTab.text()).toContain(problem.title);
     expect(wrapper.vm.filteredLanguages).toEqual(languages);
     expect(wrapper.findComponent(arena_EphemeralGrader).exists()).toBe(true);
+    expect(wrapper.find('div[data-markdown-statement]').text()).toContain(
+      '#include <iostream>',
+    );
+    expect(wrapper.find('.output-only-download').exists()).toBe(false);
   });
 
   it('Should show the problem languages', () => {
