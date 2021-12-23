@@ -23,12 +23,12 @@
       label-for="case-points"
     >
       <b-form-input
+        v-model="casePoints"
         :disabled="casePointsDefined"
         type="number"
         number
         min="0"
         max="100"
-        v-model="casePoints"
       />
     </b-form-group>
     <b-form-checkbox v-model="casePointsDefined" name="auto-points">{{
