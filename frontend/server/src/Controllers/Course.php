@@ -4025,6 +4025,26 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $isAdmin = (
+            \OmegaUp\Authorization::isCourseAdmin(
+                $currentIdentity,
+                $course
+            ) ||
+            \OmegaUp\Authorization::canCreatePublicCourse(
+                $currentIdentity
+            )
+        );
+
+        if (
+            !$isAdmin &&
+            !\OmegaUp\DAO\GroupRoles::isContestant(
+                intval($currentIdentity->identity_id),
+                $assignment->acl_id
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
         $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             intval($assignment->problemset_id)
         );
@@ -4055,16 +4075,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($director)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-
-        $isAdmin = (
-            \OmegaUp\Authorization::isCourseAdmin(
-                $currentIdentity,
-                $course
-            ) ||
-            \OmegaUp\Authorization::canCreatePublicCourse(
-                $currentIdentity
-            )
-        );
 
         // Get scoreboard;
         $params = \OmegaUp\ScoreboardParams::fromAssignment(
