@@ -3059,7 +3059,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                             $r->identity,
                             $r->user
                         ),
-                        'courseAssignments' => $tokenAuthenticationResult['courseAssignments'],
+                        'courseAssignments' => \OmegaUp\DAO\Courses::getAllAssignments(
+                            $courseAlias,
+                            $tokenAuthenticationResult['courseAdmin']
+                        ),
                         'director' => strval($director->username),
                         'problemsetId' => $tokenAuthenticationResult['assignment']->problemset_id,
                         'admin' => $tokenAuthenticationResult['courseAdmin'],
@@ -4741,7 +4744,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, course: \OmegaUp\DAO\VO\Courses, courseAdmin: bool, courseAssignments: list<CourseAssignment>, hasToken: bool}
+     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, course: \OmegaUp\DAO\VO\Courses, courseAdmin: bool, hasToken: bool}
      */
     private static function authenticateAndValidateToken(
         string $courseAlias,
@@ -4767,10 +4770,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             return [
                 'hasToken' => false,
                 'courseAdmin' => $isAdmin,
-                'courseAssignments' => \OmegaUp\DAO\Courses::getAllAssignments(
-                    strval($course->alias),
-                    $isAdmin
-                ),
                 'assignment' => $assignment,
                 'course' => $course,
             ];
@@ -4809,10 +4808,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         // hasToken is true, it means we do not autenticate request user
         return [
             'courseAdmin' => $courseAdmin,
-            'courseAssignments' => \OmegaUp\DAO\Courses::getAllAssignments(
-                strval($course->alias),
-                $courseAdmin
-            ),
             'hasToken' => true,
             'assignment' => $assignment,
             'course' => $course,
@@ -4954,7 +4949,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $r->identity,
                 $r->user
             ),
-            'courseAssignments' => $tokenAuthenticationResult['courseAssignments'],
+            'courseAssignments' => \OmegaUp\DAO\Courses::getAllAssignments(
+                $courseAlias,
+                $tokenAuthenticationResult['courseAdmin']
+            ),
             'director' => strval($director->username),
             'problemset_id' => $tokenAuthenticationResult['assignment']->problemset_id,
             'admin' => $tokenAuthenticationResult['courseAdmin'],
