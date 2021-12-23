@@ -6,15 +6,10 @@
       label-for="case-name"
       class="mb-4"
     >
-      <b-form-input
-        id="case-name"
-        v-model="caseName"
-        required
-        autocomplete="off"
-      />
+      <b-form-input v-model="caseName" required autocomplete="off" />
     </b-form-group>
     <b-form-group :label="T.problemCreatorGroupName" label-for="case-group">
-      <b-form-select id="case-group" v-model="caseGroup" :options="options" />
+      <b-form-select v-model="caseGroup" :options="options" />
     </b-form-group>
 
     <b-form-group
