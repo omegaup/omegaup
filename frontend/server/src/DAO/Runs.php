@@ -134,40 +134,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ?int $offset = 0,
         ?int $rowCount = 100
     ): array {
-        $sql = '
-            FROM
-                Submissions s
-            INNER JOIN
-                Runs r
-            ON
-                r.run_id = s.current_run_id
-            INNER JOIN
-                Problems p ON p.problem_id = s.problem_id
-            INNER JOIN
-                Identities i ON i.identity_id = s.identity_id
-            LEFT JOIN
-                Contests c ON c.problemset_id = s.problemset_id
-        ';
         $where = [];
         $val = [];
 
         if (!is_null($problemsetId)) {
             $where[] = 's.problemset_id = ?';
             $val[] = $problemsetId;
-        }
-
-        if (!is_null($status)) {
-            $where[] = 'r.status = ?';
-            $val[] = $status;
-        }
-        if (!is_null($verdict)) {
-            if ($verdict === 'NO-AC') {
-                $where[] = 'r.verdict <> ?';
-                $val[] = 'AC';
-            } else {
-                $where[] = 'r.verdict = ?';
-                $val[] = $verdict;
-            }
         }
         if (!is_null($problemId)) {
             $where[] = 's.problem_id = ?';
@@ -181,23 +153,58 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $where[] = 's.identity_id = ?';
             $val[] = $identityId;
         }
-        if (!empty($where)) {
-            $sql .= 'WHERE ' . implode(' AND ', $where) . ' ';
+
+        $hasFilters = !empty($where);
+        $needsRuns = false;
+        if (!is_null($status)) {
+            $needsRuns = true;
+            $where[] = 'r.status = ?';
+            $val[] = $status;
+        }
+        if (!is_null($verdict)) {
+            $needsRuns = true;
+            if ($verdict === 'NO-AC') {
+                $where[] = 'r.verdict <> ?';
+                $val[] = 'AC';
+            } else {
+                $where[] = 'r.verdict = ?';
+                $val[] = $verdict;
+            }
         }
 
-        $sqlCount = "
+        $sqlCount = '
             SELECT
                 COUNT(*) AS total
-            {$sql};
-        ";
+            FROM
+                Submissions s
+        ';
+        $valCount = [];
+        // TODO: We're going to lie for now if we need to add a JOIN with the
+        // Runs table and have no other filters to help us. This query is
+        // completely unusable at the time because the indexes are not helping.
+        // So we'll just return the wrong answer for the time being, which will
+        // stop making the admin runs view cause a micro-incident every time
+        // it's visited.
+        if ($hasFilters || !$needsRuns) {
+            if ($needsRuns) {
+                $sqlCount .= '
+                    INNER JOIN
+                        Runs r ON r.run_id = s.current_run_id
+                ';
+            }
+            if (!empty($where)) {
+                $sqlCount .= 'WHERE ' . implode(' AND ', $where) . ' ';
+            }
+            $valCount = $val;
+        }
 
         /** @var int */
         $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sqlCount,
-            $val
+            $valCount,
         );
 
-        if (is_null($offset)) {
+        if (is_null($offset) || $offset < 0) {
             $offset = 0;
         }
         if (is_null($rowCount)) {
@@ -251,7 +258,21 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                     ),
                     "user-rank-unranked"
                 ) `classname`
-        ' . $sql . '
+            FROM
+                Submissions s
+            INNER JOIN
+                Runs r ON r.run_id = s.current_run_id
+            INNER JOIN
+                Problems p ON p.problem_id = s.problem_id
+            INNER JOIN
+                Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                Contests c ON c.problemset_id = s.problemset_id
+        ';
+        if (!empty($where)) {
+            $sql .= 'WHERE ' . implode(' AND ', $where);
+        }
+        $sql .= '
             ORDER BY s.submission_id DESC
             LIMIT ?, ?;
         ';
