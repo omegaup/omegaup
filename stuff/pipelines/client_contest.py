@@ -10,8 +10,8 @@ import sys
 import json
 from typing import List, Optional, Dict
 import omegaup.api
-import MySQLdb
-import MySQLdb.cursors
+import mysql.connector
+import mysql.connector.cursor
 import pika
 from verification_code import generate_code
 import rabbitmq_connection
@@ -44,10 +44,11 @@ class ClientContest:
 
     def certificate_contests_receive_messages(
             self,
-            cur: MySQLdb.cursors.BaseCursor,
-            dbconn: MySQLdb.connections.Connection,
+            cur: mysql.connector.cursor.MySQLCursorDict,
+            dbconn: mysql.connector.MySQLConnection,
             channel: pika.adapters.blocking_connection.BlockingChannel,
-            args: argparse.Namespace) -> None:
+            api_token: str,
+            url: str) -> None:
         '''Receive contest messages from a queue'''
 
         channel.exchange_declare(exchange=self.exchange,
@@ -61,12 +62,12 @@ class ClientContest:
         logging.info('[*] waiting for the messages')
 
         def certificate_contests_callback(
-                channel: pika.adapters.blocking_connection.BlockingChannel,
+                _channel: pika.adapters.blocking_connection.BlockingChannel,
                 _method: pika.spec.Basic.Deliver,
                 _properties: pika.spec.BasicProperties,
                 body: bytes) -> None:
             data = json.loads(body.decode())
-            client = omegaup.api.Client(api_token=args.api_token, url=args.url)
+            client = omegaup.api.Client(api_token=api_token, url=url)
             scoreboard = client.contest.scoreboard(
                 contest_alias=data['alias'],
                 token=data['scoreboard_url'])
@@ -113,14 +114,15 @@ class ClientContest:
                                         ) for certificate in certificates])
                     dbconn.commit()
                     break
-                except:  # noqa: bare-except
+                except mysql.connector.Error as err:
+                    dbconn.rollback()
+                    if err.errno != 1062:
+                        raise
                     for certificate in certificates:
                         certificate.verification_code = generate_code()
                     logging.exception(
                         'At least one of the verification codes had a conflict'
                     )
-                    dbconn.rollback()
-            channel.close()
         channel.basic_consume(
             queue=self.queue,
             on_message_callback=certificate_contests_callback,
@@ -129,6 +131,14 @@ class ClientContest:
             channel.start_consuming()
         except KeyboardInterrupt:
             channel.stop_consuming()
+
+    def close_channel(
+            self,
+            channel: pika.adapters.blocking_connection.BlockingChannel
+    ) -> None:
+        ''' Function to close channel '''
+        self.message = []
+        channel.close()
 
 
 def main() -> None:
@@ -149,15 +159,17 @@ def main() -> None:
     logging.info('Started')
     dbconn = lib.db.connect(args)
     try:
-        with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur, \
+        with dbconn.cursor(buffered=True, dictionary=True) as cur, \
             rabbitmq_connection.connect(args) as channel:
             client = ClientContest('contest', 'certificates', 'ContestQueue')
             client.certificate_contests_receive_messages(cur,
-                                                         dbconn,
+                                                         dbconn.conn,
                                                          channel,
-                                                         args)
+                                                         args.api_token,
+                                                         args.url)
     finally:
-        dbconn.close()
+        dbconn.conn.close()
+        client.close_channel(channel)
         logging.info('Done')
 
 

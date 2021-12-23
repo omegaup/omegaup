@@ -7,10 +7,11 @@ import os
 import argparse
 import logging
 import sys
-import MySQLdb
-import MySQLdb.cursors
+import mysql.connector
+import mysql.connector.cursor
 import rabbitmq_connection
 import client_contest
+import test_credentials
 
 sys.path.insert(
     0,
@@ -27,15 +28,6 @@ def test_client_contest() -> None:
     lib.logs.configure_parser(parser)
     rabbitmq_connection.configure_parser(parser)
 
-    parser.add_argument('--api-token',
-                        type=str,
-                        help='omegaup api token',
-                        default='xxxx')
-    parser.add_argument('--url',
-                        type=str,
-                        help='omegaup api URL',
-                        default='https://omegaup.com')
-
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
     logging.info('Started')
@@ -44,15 +36,13 @@ def test_client_contest() -> None:
     client = client_contest.ClientContest('contest',
                                           'certificates',
                                           'ContestQueue')
-    with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur, \
+    with dbconn.cursor(buffered=True, dictionary=True) as cur, \
         rabbitmq_connection.connect(args) as channel:
-        client.certificate_contests_receive_messages(cur,
-                                                     dbconn,
-                                                     channel,
-                                                     args)
-        assert client.message == [{
-            'alias': 'prueba',
-            'scoreboard_ur': 'abcde',
-            'contest_id': 1,
-            'certificate_cutoff': 3
-        }]
+        client.certificate_contests_receive_messages(
+            cur,
+            dbconn.conn,
+            channel,
+            test_credentials.API_TOKEN,
+            test_credentials.OMEGAUP_API_ENDPOINT)
+        client.close_channel(channel)
+        assert client.message == []
