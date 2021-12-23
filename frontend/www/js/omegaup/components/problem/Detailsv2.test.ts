@@ -99,6 +99,7 @@ describe('Detailsv2.vue', () => {
   });
 
   it('Should show the problem tab details', () => {
+    const languages = ['py2', 'py3'];
     const wrapper = shallowMount(problem_Details, {
       propsData: {
         problem,
@@ -107,12 +108,13 @@ describe('Detailsv2.vue', () => {
           admin: true,
           reviewer: true,
         },
-        languages: ['py2', 'py3'],
+        languages,
       },
       localVue,
     });
 
     const problemTab = wrapper.findComponent(BTab);
     expect(problemTab.text()).toContain(problem.title);
+    expect(wrapper.vm.filteredLanguages).toEqual(languages);
   });
 });
