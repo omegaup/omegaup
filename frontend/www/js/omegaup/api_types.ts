@@ -1121,22 +1121,19 @@ export namespace types {
     ): types.CourseScoreboardPayload {
       return ((x) => {
         x.assignment = ((x) => {
-          if (x.courseAssignments)
-            x.courseAssignments = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                if (x.finish_time)
-                  x.finish_time = ((x: number) => new Date(x * 1000))(
-                    x.finish_time,
-                  );
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
+          x.courseAssignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
                 );
-                return x;
-              });
-            })(x.courseAssignments);
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.courseAssignments);
           if (x.finishTime)
             x.finishTime = ((x: number) => new Date(x * 1000))(x.finishTime);
           x.startTime = ((x: number) => new Date(x * 1000))(x.startTime);
@@ -2159,7 +2156,7 @@ export namespace types {
     admin: boolean;
     alias: string;
     assignmentType: string;
-    courseAssignments?: types.CourseAssignment[];
+    courseAssignments: types.CourseAssignment[];
     description: string;
     director: string;
     finishTime?: Date;
@@ -4560,7 +4557,7 @@ export namespace messages {
     admin: boolean;
     alias: string;
     assignment_type?: string;
-    courseAssignments?: types.CourseAssignment[];
+    courseAssignments: types.CourseAssignment[];
     description?: string;
     director: string;
     finish_time?: Date;
