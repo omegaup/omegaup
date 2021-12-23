@@ -221,9 +221,13 @@ export default class ProblemDetails extends Vue {
           const extension = os == 'unix' ? '.tar.bz2' : '.zip';
 
           ui.navigateTo(
-            encodeURIComponent(
-              `${window.location.protocol}//${window.location.host}/templates/${alias}/${commit}/${alias}_${os}_${lang}${extension}`,
-            ),
+            `${window.location.protocol}//${
+              window.location.host
+            }/templates/${encodeURIComponent(alias)}/${encodeURIComponent(
+              commit,
+            )}/${encodeURIComponent(alias)}_${encodeURIComponent(
+              os,
+            )}_${encodeURIComponent(lang)}${encodeURIComponent(extension)}`,
           );
         },
       );
