@@ -230,6 +230,21 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         try {
+            \OmegaUp\Controllers\Course::getAssignmentDetails(
+                $student['identity'],
+                null,
+                $courseData['course'],
+                \OmegaUp\DAO\Groups::getByPK(
+                    intval($courseData['course']->group_id)
+                ),
+                $courseData['assignment_alias'],
+            );
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'assignmentNotStarted');
+        }
+
+        try {
             \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
                 new \OmegaUp\Request([
                     'auth_token' => $studentLogin->auth_token,

@@ -4005,7 +4005,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{payload: AssignmentDetailsPayload, fullWidth: bool, title: \OmegaUp\TranslationString}, inContest: bool, entrypoint: string}
      */
-    private static function getAssignmentDetails(
+    public static function getAssignmentDetails(
         \OmegaUp\DAO\VO\Identities $currentIdentity,
         ?\OmegaUp\DAO\VO\Users $currentUser,
         \OmegaUp\DAO\VO\Courses $course,
