@@ -1693,7 +1693,7 @@ const translations: { [key: string]: string; } = {
   wordsSubmissions: "Env\u00edos",
   wordsSubmissionsNotYetReviewed: "Env\u00edos a\u00fan no revisados",
   wordsSummary: "Resumen",
-  wordsTime: "Enviado",
+  wordsTime: "Fecha y hora",
   wordsTimeInSeconds: "Tiempo (Seg)",
   wordsTitle: "T\u00edtulo",
   wordsTotal: "Total",

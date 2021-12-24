@@ -1693,7 +1693,7 @@ const translations: { [key: string]: string; } = {
   wordsSubmissions: "(Submi55i0n5)",
   wordsSubmissionsNotYetReviewed: "(Submi55i0n5 n07 y37 r3vi3w3d)",
   wordsSummary: "(Summary)",
-  wordsTime: "(Submi773d)",
+  wordsTime: "(Da73 and Tim3)",
   wordsTimeInSeconds: "(Tim3 (S3c))",
   wordsTitle: "(Ti713)",
   wordsTotal: "(T07a1)",
