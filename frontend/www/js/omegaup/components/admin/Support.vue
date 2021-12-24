@@ -53,8 +53,11 @@
               </button>
             </form>
           </div>
-          <div class="col-md">
-            <label v-if="lastLogin != null" class="font-weight-bold">
+          <div data-last-login class="col-md">
+            <label
+              v-if="lastLogin != null && myvar instanceof Date"
+              class="font-weight-bold"
+            >
               {{
                 ui.formatString(T.userLastLogin, {
                   lastLogin: time.formatDateTime(lastLogin),
@@ -65,8 +68,11 @@
               {{ T.userNeverLoggedIn }}
             </label>
           </div>
-          <div v-if="birthDate != null" class="col-md">
-            <label class="font-weight-bold">
+          <div data-birth-date class="col-md">
+            <label
+              v-if="birthDate != null && myvar instanceof Date"
+              class="font-weight-bold"
+            >
               {{
                 ui.formatString(T.userBirthDate, {
                   birthDate: time.formatDate(birthDate),
