@@ -155,7 +155,7 @@ export function formatTimestamp(date: Date): string {
   ).padStart(2, '0')}`;
 }
 
-export function formatTimestampSecondLess(date: Date): string {
+export function formatDateLocalHHMM(date: Date): string {
   return `${formatDateLocal(date)} ${String(date.getHours()).padStart(
     2,
     '0',
