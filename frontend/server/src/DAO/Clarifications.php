@@ -85,12 +85,6 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
         $query = $sql . $sqlFrom;
         $countQuery = $sqlCount . $sqlFrom;
 
-        /** @var int */
-        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            $countQuery,
-            $params
-        ) ?? 0;
-
         $sqlLimit = '';
         if (!is_null($offset)) {
             $sqlLimit = 'LIMIT ?, ?';
@@ -105,6 +99,28 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             $query,
             $params
         );
+
+        // If we didn't get an offset, we know the total number of rows
+        // already, no need to query the database for it.
+        $totalRows = count($clarifications);
+        if (!is_null($offset) && $offset != 0) {
+            if ($totalRows != $rowcount) {
+                // If we did get an offset, but the number of rows we got is
+                // less than what we allowed, we've already reached the end
+                // of the list so just bump up the count to account for the
+                // starting position.
+                $totalRows += ($offset - 1) * $rowcount;
+            } else {
+                // If we exhausted the maximum number of rows to fetch it's
+                // possible there are more rows than we know about at this
+                // point, thus we need to actually query the database.
+                /** @var int */
+                $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+                    $countQuery,
+                    $params
+                ) ?? 0;
+            }
+        }
 
         return [
             'totalRows' => $totalRows,
