@@ -11,6 +11,7 @@ describe('Basic Commands Test', () => {
     const username = uuid();
     const password = uuid();
     cy.register({ username, password });
+    cy.get('header .username').should('have.text', username);
   });
 
   it('Should register a user', () => {
@@ -33,6 +34,7 @@ describe('Basic Commands Test', () => {
     const username = 'user';
     const password = 'user';
     cy.login({ username, password });
+    cy.get('header .username').should('have.text', username);
   });
 
   it('Should login a user', () => {
