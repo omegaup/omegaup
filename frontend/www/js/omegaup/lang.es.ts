@@ -839,6 +839,7 @@ const translations: { [key: string]: string; } = {
   problemDeployerTestsBadLayout: "El directorio tests/ tiene una estructura inv\u00e1lida.",
   problemDeployerTooManyObjectsInPackfile: "Hay demasiados objetos en el packfile.",
   problemDeprecated: "El problema est\u00e1 deprecado",
+  problemDetailsSource: "Fuente: %(source)",
   problemEditAccess: "Acceso (opcional)",
   problemEditAddAdmin: "Administradores",
   problemEditAddTags: "Etiquetas",
