@@ -751,42 +751,54 @@
 				"api": "/course/addStudent/",
 				"params": {
 					"usernameOrEmail": "user",
-					"course_alias": "curso-prueba"
+					"course_alias": "curso-prueba",
+					"share_user_information": "true",
+					"accept_teacher": "false"
 				}
 			},
 			{
 				"api": "/course/addStudent/",
 				"params": {
 					"usernameOrEmail": "course_test_user_0",
-					"course_alias": "curso-prueba"
+					"course_alias": "curso-prueba",
+					"share_user_information": "true",
+					"accept_teacher": "false"
 				}
 			},
 			{
 				"api": "/course/addStudent/",
 				"params": {
 					"usernameOrEmail": "course_test_user_1",
-					"course_alias": "curso-prueba"
+					"course_alias": "curso-prueba",
+					"share_user_information": "true",
+					"accept_teacher": "false"
 				}
 			},
 			{
 				"api": "/course/addStudent/",
 				"params": {
 					"usernameOrEmail": "course_test_user_2",
-					"course_alias": "curso-prueba"
+					"course_alias": "curso-prueba",
+					"share_user_information": "true",
+					"accept_teacher": "false"
 				}
 			},
 			{
 				"api": "/course/addStudent/",
 				"params": {
 					"usernameOrEmail": "course_test_user_0",
-					"course_alias": "curso-publico"
+					"course_alias": "curso-publico",
+					"share_user_information": "true",
+					"accept_teacher": "false"
 				}
 			},
 			{
 				"api": "/course/addStudent/",
 				"params": {
 					"usernameOrEmail": "course_test_user_1",
-					"course_alias": "curso-publico"
+					"course_alias": "curso-publico",
+					"share_user_information": "true",
+					"accept_teacher": "false"
 				}
 			}
 		]
