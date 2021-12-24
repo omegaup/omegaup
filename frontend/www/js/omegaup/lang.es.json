@@ -71,6 +71,7 @@
 	"assignmentCardLessons": "%(lessonCount) lecciones",
 	"assignmentCardProblems": "%(problemCount) problemas",
 	"assignmentNotFound": "No se encontr\u00f3 el contenido",
+	"assignmentNotStarted": "La lecci\u00f3n a\u00fan no ha comenzado",
 	"assignmentRemoveAlreadyHasRuns": "No se puede eliminar contenido si ya tiene soluciones revisadas.",
 	"authorRankRangeHeader": "Contribuidores con mayor puntaje (%(lowCount) a %(highCount))",
 	"authorRankUnranked": "Autor no clasificado",

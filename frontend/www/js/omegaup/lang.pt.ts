@@ -72,6 +72,7 @@ const translations: { [key: string]: string; } = {
   assignmentCardLessons: "%(lessonCount) li\u00e7\u00f5es",
   assignmentCardProblems: "%(problemCount) problemas",
   assignmentNotFound: "Conte\u00fado n\u00e3o encontrado",
+  assignmentNotStarted: "A li\u00e7\u00e3o ainda n\u00e3o tem come\u00e7ado",
   assignmentRemoveAlreadyHasRuns: "Conte\u00fado n\u00e3o pode ser removida depois que uma solu\u00e7\u00e3o \u00e9 julgada.",
   authorRankRangeHeader: "Autores com maior score obtido (%(lowCount) a %(highCount))",
   authorRankUnranked: "Autor n\u00e3o classificado",

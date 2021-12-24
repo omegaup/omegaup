@@ -70,6 +70,7 @@ arenaRunSubmitWaitBetweenUploads = "Você deve esperar %(submissionGap) segundos
 assignmentCardLessons = "%(lessonCount) lições"
 assignmentCardProblems = "%(problemCount) problemas"
 assignmentNotFound = "Conteúdo não encontrado"
+assignmentNotStarted = "A lição ainda não tem começado"
 assignmentRemoveAlreadyHasRuns = "Conteúdo não pode ser removida depois que uma solução é julgada."
 authorRankRangeHeader = "Autores com maior score obtido (%(lowCount) a %(highCount))"
 authorRankUnranked = "Autor não classificado"
