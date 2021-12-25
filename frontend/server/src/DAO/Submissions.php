@@ -13,7 +13,9 @@ namespace OmegaUp\DAO;
  */
 class Submissions extends \OmegaUp\DAO\Base\Submissions {
     final public static function getByGuid(string $guid): ?\OmegaUp\DAO\VO\Submissions {
-        $sql = 'SELECT * FROM Submissions WHERE (guid = ?) LIMIT 1;';
+        $sql = 'SELECT ' .
+            join(', ', array_keys(\OmegaUp\DAO\VO\Submissions::FIELD_NAMES)) .
+            ' FROM Submissions WHERE (guid = ?) LIMIT 1;';
         $params = [$guid];
 
         /** @var array{current_run_id: int|null, guid: string, identity_id: int, language: string, problem_id: int, problemset_id: int|null, school_id: int|null, submission_id: int, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string}|null */

@@ -3059,7 +3059,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                             $r->identity,
                             $r->user
                         ),
-                        'courseAssignments' => $tokenAuthenticationResult['courseAssignments'],
+                        'courseAssignments' => \OmegaUp\DAO\Courses::getAllAssignments(
+                            $courseAlias,
+                            $tokenAuthenticationResult['courseAdmin']
+                        ),
                         'director' => strval($director->username),
                         'problemsetId' => $tokenAuthenticationResult['assignment']->problemset_id,
                         'admin' => $tokenAuthenticationResult['courseAdmin'],
@@ -4005,7 +4008,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{payload: AssignmentDetailsPayload, fullWidth: bool, title: \OmegaUp\TranslationString}, inContest: bool, entrypoint: string}
      */
-    private static function getAssignmentDetails(
+    public static function getAssignmentDetails(
         \OmegaUp\DAO\VO\Identities $currentIdentity,
         ?\OmegaUp\DAO\VO\Users $currentUser,
         \OmegaUp\DAO\VO\Courses $course,
@@ -4019,6 +4022,25 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($assignment->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'assignmentNotFound'
+            );
+        }
+
+        $isAdmin = (
+            \OmegaUp\Authorization::isCourseAdmin(
+                $currentIdentity,
+                $course
+            ) ||
+            \OmegaUp\Authorization::canCreatePublicCourse(
+                $currentIdentity
+            )
+        );
+
+        if (
+            $assignment->start_time->time > \OmegaUp\Time::get() &&
+            !$isAdmin
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'assignmentNotStarted'
             );
         }
 
@@ -4052,16 +4074,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($director)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-
-        $isAdmin = (
-            \OmegaUp\Authorization::isCourseAdmin(
-                $currentIdentity,
-                $course
-            ) ||
-            \OmegaUp\Authorization::canCreatePublicCourse(
-                $currentIdentity
-            )
-        );
 
         // Get scoreboard;
         $params = \OmegaUp\ScoreboardParams::fromAssignment(
@@ -4172,6 +4184,25 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
+        $isAdmin = (
+            \OmegaUp\Authorization::isCourseAdmin(
+                $r->identity,
+                $course
+            ) ||
+            \OmegaUp\Authorization::canCreatePublicCourse(
+                $r->identity
+            )
+        );
+
+        if (
+            $assignment->start_time->time > \OmegaUp\Time::get() &&
+            !$isAdmin
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'assignmentNotStarted'
+            );
+        }
+
         $problemsInAssignment = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             intval($assignment->problemset_id)
         );
@@ -4188,16 +4219,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'title' => strval($problem['title']),
             ];
         }
-
-        $isAdmin = (
-            \OmegaUp\Authorization::isCourseAdmin(
-                $r->identity,
-                $course
-            ) ||
-            \OmegaUp\Authorization::canCreatePublicCourse(
-                $r->identity
-            )
-        );
 
         $scoreboard = null;
         if (
@@ -4741,7 +4762,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, course: \OmegaUp\DAO\VO\Courses, courseAdmin: bool, courseAssignments: list<CourseAssignment>, hasToken: bool}
+     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, course: \OmegaUp\DAO\VO\Courses, courseAdmin: bool, hasToken: bool}
      */
     private static function authenticateAndValidateToken(
         string $courseAlias,
@@ -4767,10 +4788,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             return [
                 'hasToken' => false,
                 'courseAdmin' => $isAdmin,
-                'courseAssignments' => \OmegaUp\DAO\Courses::getAllAssignments(
-                    strval($course->alias),
-                    $isAdmin
-                ),
                 'assignment' => $assignment,
                 'course' => $course,
             ];
@@ -4809,10 +4826,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         // hasToken is true, it means we do not autenticate request user
         return [
             'courseAdmin' => $courseAdmin,
-            'courseAssignments' => \OmegaUp\DAO\Courses::getAllAssignments(
-                strval($course->alias),
-                $courseAdmin
-            ),
             'hasToken' => true,
             'assignment' => $assignment,
             'course' => $course,
@@ -4954,7 +4967,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $r->identity,
                 $r->user
             ),
-            'courseAssignments' => $tokenAuthenticationResult['courseAssignments'],
+            'courseAssignments' => \OmegaUp\DAO\Courses::getAllAssignments(
+                $courseAlias,
+                $tokenAuthenticationResult['courseAdmin']
+            ),
             'director' => strval($director->username),
             'problemset_id' => $tokenAuthenticationResult['assignment']->problemset_id,
             'admin' => $tokenAuthenticationResult['courseAdmin'],
