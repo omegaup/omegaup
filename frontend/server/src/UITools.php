@@ -3,7 +3,7 @@
 namespace OmegaUp;
 
 /**
- * @psalm-type CommonPayload=array{associatedIdentities: list<array{default: bool, username: string}>, bootstrap4: bool, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, inContest: bool, isAdmin: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: null|string, userCountry: string, userTypes: list<string>}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<array{default: bool, username: string}>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, inContest: bool, isAdmin: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: null|string, userCountry: string, userTypes: list<string>}
  * @psalm-type AssociatedIdentity=array{username: string, default: bool}
  * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
  */
@@ -172,43 +172,15 @@ class UITools {
         \Smarty $smarty,
         $payload = [],
         bool $inContest = false,
-        bool $supportsBootstrap4 = false,
         string $navbarSection = ''
     ): void {
         $headerPayload = self::getCommonPayload(
             $smarty,
             $inContest,
-            $supportsBootstrap4,
             $navbarSection
         );
         $smarty->assign('payload', $payload + $headerPayload);
         $smarty->assign('headerPayload', $headerPayload);
-    }
-
-    /**
-     * Returns whether Bootstrap 4 will be used. This is only true if either:
-     *
-     * - The user explicitly requests bootstrap4 to be used regardless of
-     *   underlying support by the components by passing the request parameter
-     *   bootstrap4=force.
-     * - The user requests bootstrap4 to be used if the component supports it
-     *   by passing the request parameter bootstrap4=true.
-     */
-    private static function useBootstrap4(
-        bool $supportsBootstrap4
-    ): bool {
-        if (!isset($_REQUEST['bootstrap4'])) {
-            return false;
-        }
-        if ($_REQUEST['bootstrap4'] === 'force') {
-            // User can force the use of bootstrap4, just to see how awful it
-            // would look like.
-            return true;
-        }
-        return (
-            $supportsBootstrap4 &&
-            boolval($_REQUEST['bootstrap4'])
-        );
     }
 
     /**
@@ -217,7 +189,6 @@ class UITools {
     private static function getCommonPayload(
         \Smarty $smarty,
         bool $inContest = false,
-        bool $supportsBootstrap4 = false,
         string $navbarSection = ''
     ) {
         [
@@ -230,7 +201,6 @@ class UITools {
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
         return [
             'omegaUpLockDown' => OMEGAUP_LOCKDOWN,
-            'bootstrap4' => self::useBootstrap4($supportsBootstrap4),
             'inContest' => $inContest,
             'isLoggedIn' => !is_null($identity),
             'isReviewer' => (
@@ -277,16 +247,14 @@ class UITools {
     }
 
     /**
-     * @param callable(\OmegaUp\Request):array{smartyProperties: array{fullWidth?: bool, hideFooterAndHeader?: bool, payload: array<string, mixed>, scripts?: list<string>, title: \OmegaUp\TranslationString}, entrypoint: string, template?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string}|callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, entrypoint?: string, template?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string} $callback
+     * @param callable(\OmegaUp\Request):array{smartyProperties: array{fullWidth?: bool, hideFooterAndHeader?: bool, payload: array<string, mixed>, scripts?: list<string>, title: \OmegaUp\TranslationString}, entrypoint: string, inContest?: bool, navbarSection?: string} $callback
      */
     public static function render(callable $callback): void {
         $smarty = self::getSmartyInstance();
         try {
             $response = $callback(new Request($_REQUEST));
             $smartyProperties = $response['smartyProperties'];
-            $entrypoint = $response['entrypoint'] ?? null;
-            $template = $response['template'] ?? '';
-            $supportsBootstrap4 = $response['supportsBootstrap4'] ?? false;
+            $entrypoint = $response['entrypoint'];
             $inContest = $response['inContest'] ?? false;
             $navbarSection = $response['navbarSection'] ?? '';
             /** @var array<string, mixed> */
@@ -298,31 +266,13 @@ class UITools {
             \OmegaUp\ApiCaller::handleException($e);
         }
 
-        if (!is_null($entrypoint)) {
-            if (
-                isset($smartyProperties['title'])  &&
-                is_object($smartyProperties['title']) &&
-                is_a($smartyProperties['title'], 'OmegaUp\TranslationString')
-            ) {
-                $titleVar = $smartyProperties['title']->message;
-                /** @var string */
-                $translationString = $smarty->getConfigVars($titleVar);
-                $smartyProperties['title'] = \OmegaUp\ApiUtils::formatString(
-                    $translationString,
-                    $smartyProperties['title']->args
-                );
-            } elseif (
-                !isset($smartyProperties['title']) ||
-                !is_string($smartyProperties['title'])
-            ) {
-                $titleVar = (
-                    'omegaupTitle' .
-                    str_replace('_', '', ucwords($entrypoint, '_'))
-                );
-                /** @var string */
-                $smartyProperties['title'] = $smarty->getConfigVars($titleVar);
-            }
-        }
+        $titleVar = $smartyProperties['title']->message;
+        /** @var string */
+        $translationString = $smarty->getConfigVars($titleVar);
+        $smartyProperties['title'] = \OmegaUp\ApiUtils::formatString(
+            $translationString,
+            $smartyProperties['title']->args
+        );
 
         /** @var mixed $value */
         foreach ($smartyProperties as $key => $value) {
@@ -333,31 +283,19 @@ class UITools {
             $smarty,
             $payload,
             $inContest,
-            $supportsBootstrap4,
             $navbarSection
         );
 
-        if (!is_null($entrypoint)) {
-            $smarty->display(
-                sprintf(
-                    (
-                        'extends:file:%s/templates/template.tpl|' .
-                        'string:{block name="entrypoint"}{js_include entrypoint="' .
-                        $entrypoint .
-                        '" async}{/block}'
-                    ),
-                    strval(OMEGAUP_ROOT),
-                    $template
-                )
-            );
-        } else {
-            $smarty->display(
-                sprintf(
-                    '%s/templates/%s',
-                    strval(OMEGAUP_ROOT),
-                    $template
-                )
-            );
-        }
+        $smarty->display(
+            sprintf(
+                (
+                    'extends:file:%s/templates/template.tpl|' .
+                    'string:{block name="entrypoint"}{js_include entrypoint="' .
+                    $entrypoint .
+                    '" async}{/block}'
+                ),
+                strval(OMEGAUP_ROOT),
+            )
+        );
     }
 }

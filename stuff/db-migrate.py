@@ -28,11 +28,11 @@ import logging
 import os.path
 import sys
 import time
-import urllib.error
 from typing import Iterator, List, Optional, Sequence, Tuple
 
+import boto3  # type: ignore
+
 import database_utils
-from lib import aws
 
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
@@ -73,55 +73,33 @@ def _scripts() -> List[Tuple[int, str, str]]:
 
 def _set_aws_rds_timeout(args: argparse.Namespace,
                          auth: Sequence[str],
-                         timeout: Optional[int] = None,
-                         retries: int = 10) -> None:
+                         timeout: Optional[int] = None) -> None:
     '''Set the MySQL through AWS RDS timeouts.'''
     del auth  # unused
-    access_key, secret_key = aws.get_credentials(args.aws_username)
+    rds = boto3.client('rds')
 
-    while True:
-        try:
-            if timeout is None:
-                aws.request(access_key,
-                            secret_key,
-                            region=args.aws_rds_region,
-                            service='rds',
-                            request_parameters={
-                                'Action': 'ResetDBParameterGroup',
-                                'DBParameterGroupName':
-                                args.aws_rds_parameter_group_name,
-                                'Parameters.member.1.ApplyMethod': 'immediate',
-                                'Parameters.member.1.ParameterName':
-                                'wait_timeout',
-                                'Version': '2014-09-01',
-                            })
-            else:
-                aws.request(access_key,
-                            secret_key,
-                            region=args.aws_rds_region,
-                            service='rds',
-                            request_parameters={
-                                'Action': 'ModifyDBParameterGroup',
-                                'DBParameterGroupName':
-                                args.aws_rds_parameter_group_name,
-                                'Parameters.member.1.ApplyMethod': 'immediate',
-                                'Parameters.member.1.ParameterName':
-                                'wait_timeout',
-                                'Parameters.member.1.ParameterValue': '10',
-                                'Version': '2014-09-01',
-                            })
-            return
-        except urllib.error.HTTPError as e:
-            body = e.read()
-            logging.error('Request failed. headers=%r, body=%s',
-                          tuple(e.headers.items()), body)
-            if (e.code != 400
-                    or b'<Code>InvalidDBParameterGroupState</Code>' not in body
-                    or retries == 0):
-                raise e
-            logging.info('Retrying, %d tries left...', retries)
-            retries -= 1
-            time.sleep(10)
+    if timeout is None:
+        rds.reset_db_parameter_group(
+            DBParameterGroupName=args.aws_rds_parameter_group_name,
+            ResetAllParameters=False,
+            Parameters=[
+                {
+                    'ApplyMethod': 'immediate',
+                    'ParameterName': 'wait_timeout',
+                },
+            ],
+        )
+    else:
+        rds.reset_db_parameter_group(
+            DBParameterGroupName=args.aws_rds_parameter_group_name,
+            Parameters=[
+                {
+                    'ApplyMethod': 'immediate',
+                    'ParameterName': 'wait_timeout',
+                    'ParameterValue': '10',
+                },
+            ],
+        )
 
 
 def _set_mysql_timeout(args: argparse.Namespace,
@@ -387,14 +365,6 @@ def main() -> None:
         '--username', default='root', help='MySQL root username')
     parser.add_argument('--password', default='omegaup', help='MySQL password')
     parser.add_argument('--verbose', action='store_true')
-    parser.add_argument(
-        '--aws-username',
-        default='omegaup-rds-deploy',
-        help='The name of the AWS user to change the RDS timeout')
-    parser.add_argument(
-        '--aws-rds-region',
-        default='us-east-1',
-        help='The region of the RDS database')
     parser.add_argument(
         '--aws-rds-parameter-group-name',
         default='omegaup-frontend',
