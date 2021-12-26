@@ -1245,7 +1245,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $qualitynomination_id
      */
@@ -1258,7 +1258,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $qualityNominationId = $r->ensureInt('qualitynomination_id');
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => \OmegaUp\Controllers\QualityNomination::getDetails(
                     $r->identity,
                     $qualityNominationId
@@ -1275,7 +1275,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * Gets the details for the quality nomination's list
      * with pagination
      *
-     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: array{page: int, length: int, myView: bool}, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
@@ -1296,7 +1296,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'page' => $page,
                     'length' => $length,
@@ -1314,7 +1314,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * Gets the details for the quality nomination's list
      * with pagination for a certain user
      *
-     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: array{page: int, length: int, myView: bool}, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
@@ -1334,7 +1334,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'page' => $page,
                     'length' => $length,

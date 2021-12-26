@@ -1,5 +1,5 @@
 <?php
-require_once('../server/bootstrap_smarty.php');
+require_once('../server/bootstrap.php');
 
 if (
     empty($_SERVER['CONTENT_TYPE']) ||
