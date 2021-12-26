@@ -2867,7 +2867,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload|AssignmentDetailsPayload, title: \OmegaUp\TranslationString|string}}
+     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload|AssignmentDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $assignment_alias
      * @omegaup-request-param string $course_alias
@@ -3082,7 +3082,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{title: \OmegaUp\TranslationString, payload: array<string, mixed>}}
      */
     public static function getCoursesHomepageForTypeScript(\OmegaUp\Request $r): array {
         return [
@@ -3090,6 +3090,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCourses'
                 ),
+                'payload' => [],
             ],
             'entrypoint' => 'course_homepage',
         ];
@@ -3759,7 +3760,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ActivityFeedPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: ActivityFeedPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $course
      * @omegaup-request-param int|null $length
