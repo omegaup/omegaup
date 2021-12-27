@@ -188,7 +188,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEmpty($studentPayload['currentAssignment']['runs']);
     }
 
-    public function testAssignmentForbidenAccess() {
+    public function testAssignmentForbiddenAccess() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             startTimeDelay: 60
         );
