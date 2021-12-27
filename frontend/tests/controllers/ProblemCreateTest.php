@@ -638,7 +638,7 @@ if __name__ == \'__main__\':
         $total = 0;
         $response = \OmegaUp\Controllers\Problem::getProblemCollectionDetailsForTypeScript(
             new \OmegaUp\Request([])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
         foreach ($response['problemCount'] as $levelTag) {
             $problemsCount[] = $levelTag['problems_per_tag'];
             $total += $levelTag['problems_per_tag'];

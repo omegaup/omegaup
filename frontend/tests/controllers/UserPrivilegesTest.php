@@ -43,7 +43,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         foreach ($payload['userSystemRoles'] as $userRole) {
             $this->assertEquals(
@@ -75,7 +75,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         foreach ($payload['userSystemRoles'] as $userRole) {
             $this->assertEquals(
@@ -120,7 +120,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'username' => $username,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEqualsCanonicalizing(['Admin', 'Mentor'], $systemRoles);
     }
@@ -205,7 +205,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         foreach ($payload['userSystemGroups'] as $userGroup) {
             $this->assertEquals(
@@ -234,7 +234,7 @@ class UserPrivilegesTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         foreach ($payload['userSystemGroups'] as $userGroup) {
             $this->assertEquals(

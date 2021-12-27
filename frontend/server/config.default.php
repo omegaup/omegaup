@@ -155,9 +155,9 @@ try_define('REDIS_PORT', 6379);
 try_define('REDIS_PASS', 'redis');
 
 # #########################
-# SMARTY
+# TEMPLATES
 # #########################
-try_define('SMARTY_CACHE_DIR', '/var/tmp');
+try_define('TEMPLATE_CACHE_DIR', '/var/lib/omegaup/templates');
 
 # #########################
 # CONTEST CONSTANTS

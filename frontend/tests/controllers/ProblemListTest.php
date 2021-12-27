@@ -1225,7 +1225,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                     'rowcount' => 1000,
                     'page' => $i,
                 ] + $requestParams)
-            )['smartyProperties']['payload'];
+            )['templateProperties']['payload'];
             foreach ($response['problems'] as $problem) {
                 $this->assertArrayHasKey(
                     'problem_id',
@@ -1330,7 +1330,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         foreach ($result as $problem) {
             $this->assertEquals(
@@ -1344,7 +1344,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicKarel',
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertEquals(
             $result[0]['tags'][0]['name'],
