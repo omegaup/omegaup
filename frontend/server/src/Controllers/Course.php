@@ -4040,7 +4040,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             !$isAdmin &&
             !\OmegaUp\DAO\GroupRoles::isContestant(
                 intval($currentIdentity->identity_id),
-                $assignment->acl_id
+                intval($assignment->acl_id)
             )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -4209,7 +4209,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             !$isAdmin &&
             !\OmegaUp\DAO\GroupRoles::isContestant(
                 intval($r->identity->identity_id),
-                $assignment->acl_id
+                intval($assignment->acl_id)
             )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
