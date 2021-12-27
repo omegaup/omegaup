@@ -17,10 +17,10 @@ OmegaUp.on('ready', async () => {
     render: function (createElement) {
       return createElement('omegaup-arena-course', {
         props: {
-          course: payload.course,
           assignment: payload.assignment,
-          problems: payload.problems,
+          course: payload.course,
           currentProblem: payload.currentProblem,
+          problems: payload.problems,
           selectedTab: activeTab,
           scoreboard: payload.scoreboard,
           user: {
