@@ -262,6 +262,35 @@ def update_user_rank_cutoffs(cur: mysql.connector.cursor.MySQLCursorDict,
                      cutoff.percentile, cutoff.classname))
 
 
+def update_user_rank_classname(
+        cur: mysql.connector.cursor.MySQLCursorDict
+) -> None:
+    '''Updates the user ranking classname.
+
+    This requires having updated both user scores and rank cutoffs.'''
+    cur.execute('''
+    UPDATE User_Rank ur
+    SET classname = (
+        SELECT
+                IFNULL(
+                    (
+                        SELECT
+                            urc.classname
+                        FROM
+                            User_Rank_Cutoffs urc
+                        WHERE
+                            urc.score <= ur.score
+                        ORDER BY
+                            urc.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    'user-rank-unranked'
+                )
+        );
+    ''')
+
+
 def update_schools_solved_problems(
         cur: mysql.connector.cursor.MySQLCursorDict,
 ) -> None:
@@ -691,6 +720,7 @@ def update_users_stats(
         try:
             scores = update_user_rank(cur)
             update_user_rank_cutoffs(cur, scores)
+            update_user_rank_classname(cur)
         except:  # noqa: bare-except
             logging.exception('Failed to update user ranking')
             raise
