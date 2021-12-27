@@ -162,7 +162,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
             'assignment_alias' => $courseData['assignment']->alias,
-        ]))['smartyProperties']['payload'];
+        ]))['templateProperties']['payload'];
 
         $this->assertEquals(
             $courseData['course']->name,
@@ -182,7 +182,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
             'assignment_alias' => $courseData['assignment']->alias,
-        ]))['smartyProperties']['payload'];
+        ]))['templateProperties']['payload'];
 
         // The student should not see the runs
         $this->assertEmpty($studentPayload['currentAssignment']['runs']);
@@ -204,7 +204,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
             'assignment_alias' => $courseData['assignment']->alias,
-        ]))['smartyProperties']['payload'];
+        ]))['templateProperties']['payload'];
 
         // Admin should not have problems even when the assignment has not started yet
         $this->assertEquals(
@@ -282,7 +282,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment']->alias,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
         $this->assertEquals(
             $courseData['course']->name,
             $payload['course']['name']
@@ -309,7 +309,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'assignment_alias' => $courseData['assignment']->alias,
                 'problem_alias' => $problemsData[0]['problem']->alias,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
         $this->assertEquals(
             $courseData['course']->name,
             $payload['course']['name']

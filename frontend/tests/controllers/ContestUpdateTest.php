@@ -1241,7 +1241,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertTrue($response['details']['contest_for_teams']);
         $this->assertEquals([
@@ -1262,7 +1262,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertTrue($response['details']['contest_for_teams']);
         $this->assertEquals([

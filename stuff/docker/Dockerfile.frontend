@@ -45,6 +45,7 @@ ENV BRANCH=$BRANCH
 RUN git clone --branch=${BRANCH} --depth=1 --recurse-submodules --shallow-submodules https://github.com/omegaup/omegaup .
 RUN yarn install && yarn build
 RUN composer install --no-dev --classmap-authoritative
+RUN php frontend/server/cmd/CompileTemplatesCmd.php
 
 FROM alpine:latest AS frontend
 RUN apk add rsync
