@@ -39,24 +39,28 @@
       class="table table-bordered mx-auto w-75 mb-0"
     >
       <tr>
-        <th scope="row">{{ T.wordsPoints }}</th>
-        <td>{{ problem.points }}</td>
-        <th scope="row">{{ T.arenaCommonMemoryLimit }}</th>
-        <td data-memory-limit>{{ memoryLimit }}</td>
+        <th class="align-middle" scope="row">{{ T.wordsPoints }}</th>
+        <td class="align-middle">{{ problem.points }}</td>
+        <th class="align-middle" scope="row">{{ T.arenaCommonMemoryLimit }}</th>
+        <td class="align-middle" data-memory-limit>{{ memoryLimit }}</td>
       </tr>
       <tr>
-        <th scope="row">{{ T.arenaCommonTimeLimit }}</th>
-        <td>{{ timeLimit }}</td>
-        <th scope="row">{{ T.arenaCommonOverallWallTimeLimit }}</th>
-        <td>{{ overallWallTimeLimit }}</td>
+        <th class="align-middle" scope="row">{{ T.arenaCommonTimeLimit }}</th>
+        <td class="align-middle">{{ timeLimit }}</td>
+        <th class="align-middle" scope="row">
+          {{ T.arenaCommonOverallWallTimeLimit }}
+        </th>
+        <td class="align-middle">{{ overallWallTimeLimit }}</td>
       </tr>
       <tr>
         <template v-if="!showVisibilityIndicators">
-          <th scope="row">{{ T.wordsInOut }}</th>
-          <td>{{ T.wordsConsole }}</td>
+          <th class="align-middle" scope="row">{{ T.wordsInOut }}</th>
+          <td class="align-middle">{{ T.wordsConsole }}</td>
         </template>
-        <th scope="row">{{ T.problemEditFormInputLimit }}</th>
-        <td>{{ inputLimit }}</td>
+        <th class="align-middle" scope="row">
+          {{ T.problemEditFormInputLimit }}
+        </th>
+        <td class="align-middle">{{ inputLimit }}</td>
       </tr>
     </table>
   </div>
