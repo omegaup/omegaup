@@ -32,8 +32,7 @@ if [[ -d /proc ]] && grep -q pids:/docker /proc/1/cgroup; then
 	exit 1
 fi
 DOCKER_PATH="$(which docker)"
-if [[ !"${DOCKER_PATH}" || -z "${DOCKER_PATH}" ]]; then
-	# Validate `which` error code and empty path.
+if [[ $? != 0 || -z "${DOCKER_PATH}" ]]; then
 	echo "Docker binary not found." 1>&2
 	echo "Please install docker or run this command outside the container." 1>&2
 	exit 1
