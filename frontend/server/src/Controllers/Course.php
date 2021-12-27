@@ -4206,6 +4206,16 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         if (
+            !$isAdmin &&
+            !\OmegaUp\DAO\GroupRoles::isContestant(
+                intval($r->identity->identity_id),
+                $assignment->acl_id
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        if (
             $assignment->start_time->time > \OmegaUp\Time::get() &&
             !$isAdmin
         ) {
