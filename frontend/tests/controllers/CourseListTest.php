@@ -50,7 +50,7 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
             ])
-        )['smartyProperties']['payload']['courses']['admin']['filteredCourses']['archived']['courses'];
+        )['templateProperties']['payload']['courses']['admin']['filteredCourses']['archived']['courses'];
         $this->assertCount(1, $archivedCourses);
         $this->assertEquals(
             $this->courseAliases[3],

@@ -121,7 +121,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $response = $result['smartyProperties']['payload'];
+        $response = $result['templateProperties']['payload'];
 
         // Virtual contests have information of the original contest
         $this->assertArrayHasKey('original', $response);

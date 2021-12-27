@@ -3583,7 +3583,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: StatsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: StatsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $problem_alias
      */
@@ -3601,7 +3601,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => array_merge(
                     [
                         'alias' => $problemAlias,
@@ -4432,7 +4432,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $query
      *
-     * @return array{smartyProperties: array{payload: ProblemsMineInfoPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: ProblemsMineInfoPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getProblemsMineInfoForTypeScript(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -4460,7 +4460,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'promoted' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
         ];
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'isSysadmin' => \OmegaUp\Authorization::isSystemAdmin(
                         $r->identity
@@ -4478,7 +4478,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: ProblemDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: ProblemDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $contest_alias
      * @omegaup-request-param null|string $lang
@@ -4548,7 +4548,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         $response = [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'solvers' => \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
                         intval($problem->problem_id)
@@ -4629,7 +4629,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
 
-        $response['smartyProperties']['payload']['user'] = [
+        $response['templateProperties']['payload']['user'] = [
             'loggedIn' => true,
             'admin' => $isAdmin,
             'reviewer' => $isQualityReviewer,
@@ -4670,8 +4670,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             identityId: intval($r->identity->identity_id)
         );
 
-        $response['smartyProperties']['payload'] = array_merge(
-            $response['smartyProperties']['payload'],
+        $response['templateProperties']['payload'] = array_merge(
+            $response['templateProperties']['payload'],
             [
                 'nominationStatus' => $nominationPayload,
                 'runs' => $runsPayload,
@@ -4701,24 +4701,24 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $lastRunTime
         );
 
-        $response['smartyProperties']['payload']['problem']['nextSubmissionTimestamp'] = $nextSubmissionTimestamp;
+        $response['templateProperties']['payload']['problem']['nextSubmissionTimestamp'] = $nextSubmissionTimestamp;
 
         if ($isAdmin) {
             [
                 'runs' => $runs,
             ] = self::getAllRuns($problem->problem_id);
-            $response['smartyProperties']['payload']['allRuns'] = $runs;
-            $response['smartyProperties']['payload']['problemLevel'] = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
+            $response['templateProperties']['payload']['allRuns'] = $runs;
+            $response['templateProperties']['payload']['problemLevel'] = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
                 $problem
             );
-            $response['smartyProperties']['payload']['publicTags'] = \OmegaUp\Controllers\Tag::getPublicTags();
-            $response['smartyProperties']['payload']['levelTags'] = \OmegaUp\Controllers\Tag::getLevelTags();
-            $response['smartyProperties']['payload']['allowUserAddTags'] = $problem->allow_user_add_tags;
-            $response['smartyProperties']['payload']['selectedPublicTags'] = \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
+            $response['templateProperties']['payload']['publicTags'] = \OmegaUp\Controllers\Tag::getPublicTags();
+            $response['templateProperties']['payload']['levelTags'] = \OmegaUp\Controllers\Tag::getLevelTags();
+            $response['templateProperties']['payload']['allowUserAddTags'] = $problem->allow_user_add_tags;
+            $response['templateProperties']['payload']['selectedPublicTags'] = \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
                 $problem,
                 public: true
             );
-            $response['smartyProperties']['payload']['selectedPrivateTags'] = (\OmegaUp\Authorization::canEditProblem(
+            $response['templateProperties']['payload']['selectedPrivateTags'] = (\OmegaUp\Authorization::canEditProblem(
                 $r->identity,
                 $problem
             ) ?
@@ -4732,7 +4732,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ProblemListPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
+     * @return array{templateProperties: array{payload: ProblemListPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
      *
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param mixed $language
@@ -4807,7 +4807,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'problems' => $result['problems'],
                     'loggedIn' => !is_null($r->identity),
@@ -4833,7 +4833,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ProblemListCollectionPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: ProblemListCollectionPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getProblemCollectionDetailsForTypeScript(
         \OmegaUp\Request $r
@@ -4848,7 +4848,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $tags[] = ['name' => $tag->name];
         }
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                     'problemCount' => \OmegaUp\DAO\Problems::getQualityProblemsPerTagCount(),
@@ -4928,7 +4928,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: ProblemEditPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: ProblemEditPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param bool|null $allow_user_add_tags
      * @omegaup-request-param string $contents
@@ -5026,7 +5026,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ];
 
         $result = [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => array_merge(
                     $details,
                     self::getCommonPayloadForTypeScript(),
@@ -5039,7 +5039,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'problem_edit',
         ];
         if (isset($details['problemsetter'])) {
-            $result['smartyProperties']['payload']['problemsetter'] = $details['problemsetter'];
+            $result['templateProperties']['payload']['problemsetter'] = $details['problemsetter'];
         }
         if (!isset($r['request'])) {
             return $result;
@@ -5060,13 +5060,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     boolval($r['redirect'])
                 );
                 $details = self::getProblemEditDetails($problem, $r->identity);
-                $result['smartyProperties']['payload'] = array_merge(
+                $result['templateProperties']['payload'] = array_merge(
                     $details,
                     self::getCommonPayloadForTypeScript()
                 );
-                $result['smartyProperties']['payload'] = array_merge(
+                $result['templateProperties']['payload'] = array_merge(
                     $extraInfo,
-                    $result['smartyProperties']['payload']
+                    $result['templateProperties']['payload']
                 );
             } catch (\OmegaUp\Exceptions\ApiException $e) {
                 \OmegaUp\ApiCaller::logException($e);
@@ -5077,7 +5077,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 } else {
                     $statusError = $response['error'];
                 }
-                $result['smartyProperties']['payload']['statusError'] = $statusError;
+                $result['templateProperties']['payload']['statusError'] = $statusError;
                 return $result;
             }
         } elseif ($r['request'] === 'markdown') {
@@ -5119,9 +5119,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
             $details = self::getProblemEditDetails($problem, $r->identity);
-            $result['smartyProperties']['payload']['statement'] = $details['statement'];
+            $result['templateProperties']['payload']['statement'] = $details['statement'];
         }
-        $result['smartyProperties']['payload']['statusSuccess'] = true;
+        $result['templateProperties']['payload']['statusSuccess'] = true;
         return $result;
     }
 
@@ -5191,13 +5191,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-    * @return array{smartyProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString}, entrypoint: string}
+    * @return array{templateProperties: array{payload: array<empty, empty>, title: \OmegaUp\TranslationString}, entrypoint: string}
     */
     public static function getCreatorForTypescript(
         \OmegaUp\Request $r
     ): array {
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblemCreator'
@@ -5207,7 +5207,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ];
     }
     /**
-     * @return array{smartyProperties: array{payload: ProblemFormPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: ProblemFormPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param bool|null $allow_user_add_tags
      * @omegaup-request-param bool|null $email_clarifications
@@ -5283,7 +5283,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     )
                 );
                 return [
-                    'smartyProperties' => [
+                    'templateProperties' => [
                         'payload' => array_merge(
                             [
                                 'title' => $r->ensureOptionalString(
@@ -5357,7 +5357,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         sort($sortedLanguages);
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => array_merge(
                     [
                         'title' => '',
@@ -5749,7 +5749,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: LibinteractiveGenPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: LibinteractiveGenPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $idl
      * @omegaup-request-param 'c'|'cpp'|'java' $language
@@ -5760,7 +5760,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r
     ): array {
         $response = [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'error' => null,
                     'language' => 'c',
@@ -5783,14 +5783,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $os = $r->ensureOptionalEnum('os', ['unix', 'windows']);
         $name = $r->ensureOptionalString('name');
         $idl = $r->ensureOptionalString('idl');
-        $response['smartyProperties']['payload'] =  [
+        $response['templateProperties']['payload'] =  [
             'language' => $language,
             'os' => $os,
             'name' => $name,
             'idl' => $idl,
         ];
         if (empty($language)) {
-            $response['smartyProperties']['payload']['error'] = [
+            $response['templateProperties']['payload']['error'] = [
                 'description' => \OmegaUp\Translations::getInstance()->get(
                     'parameterInvalid'
                 ),
@@ -5799,7 +5799,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             return $response;
         }
         if (empty($os)) {
-            $response['smartyProperties']['payload']['error'] = [
+            $response['templateProperties']['payload']['error'] = [
                 'description' => \OmegaUp\Translations::getInstance()->get(
                     'parameterInvalid'
                 ),
@@ -5808,7 +5808,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             return $response;
         }
         if (empty($name)) {
-            $response['smartyProperties']['payload']['error'] = [
+            $response['templateProperties']['payload']['error'] = [
                 'description' => \OmegaUp\Translations::getInstance()->get(
                     'parameterInvalid'
                 ),
@@ -5817,7 +5817,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             return $response;
         }
         if (!\OmegaUp\Validators::alias($name)) {
-            $response['smartyProperties']['payload']['error'] = [
+            $response['templateProperties']['payload']['error'] = [
                 'description' => \OmegaUp\Translations::getInstance()->get(
                     'parameterInvalidAlias'
                 ),
@@ -5826,7 +5826,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             return $response;
         }
         if (empty($idl)) {
-            $response['smartyProperties']['payload']['error'] = [
+            $response['templateProperties']['payload']['error'] = [
                 'description' => \OmegaUp\Translations::getInstance()->get(
                     'parameterInvalid'
                 ),
@@ -5867,7 +5867,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
             if (!is_resource($proc)) {
                 $lastError = error_get_last();
-                $response['smartyProperties']['payload']['error'] = [
+                $response['templateProperties']['payload']['error'] = [
                     'description' => $lastError['message'] ?? \OmegaUp\Translations::getInstance()->get(
                         'parameterInvalid'
                     ),
@@ -5883,7 +5883,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $retval = proc_close($proc);
 
             if ($retval != 0) {
-                $response['smartyProperties']['payload']['error'] = [
+                $response['templateProperties']['payload']['error'] = [
                     'description' => "{$output}{$err}",
                     'field' => 'idl',
                 ];
@@ -5931,7 +5931,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } catch (\OmegaUp\Exceptions\ExitException $e) {
             throw $e;
         } catch (\Exception $e) {
-            $response['smartyProperties']['payload']['error'] = [
+            $response['templateProperties']['payload']['error'] = [
                 'description' => strval($e),
                 'field' => 'idl',
             ];
@@ -5943,7 +5943,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      *
-     * @return array{smartyProperties: array{payload: CollectionDetailsByLevelPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
+     * @return array{templateProperties: array{payload: CollectionDetailsByLevelPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
      *
      * @omegaup-request-param string $level
      * @omegaup-request-param null|string $difficulty
@@ -6031,7 +6031,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'publicTags' => $publicTags,
                     'frequentTags' => $frequentTags,
@@ -6183,7 +6183,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      *
-     * @return array{smartyProperties: array{payload: CollectionDetailsByAuthorPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
+     * @return array{templateProperties: array{payload: CollectionDetailsByAuthorPayload, title: \OmegaUp\TranslationString, fullWidth: bool}, entrypoint: string}
      *
      * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
@@ -6264,7 +6264,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'authorsRanking' => $authorsRanking,
                     'problems' => $result['problems'],
@@ -6293,7 +6293,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: ProblemPrintDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: ProblemPrintDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $problem_alias
      * @omegaup-request-param null|string $lang
@@ -6345,7 +6345,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'details' => $details,
                 ],

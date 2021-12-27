@@ -93,7 +93,7 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment_alias']
             ])
-        )['smartyProperties']['payload']['scoreboard'];
+        )['templateProperties']['payload']['scoreboard'];
 
         $expectedPlace = 0;
         $lastScore = 0;

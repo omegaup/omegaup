@@ -423,7 +423,7 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: GroupEditPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: GroupEditPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $group
      */
@@ -461,7 +461,7 @@ class Group extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'groupAlias' => $groupAlias,
                     'groupName' => $group->name,
@@ -488,14 +488,14 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: GroupListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: GroupListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getGroupListForTypeScript(\OmegaUp\Request $r): array {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'groups' => \OmegaUp\DAO\Groups::getAllGroupsAdminedByUser(
                         $r->user->user_id,
@@ -514,7 +514,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $group
      * @omegaup-request-param string $scoreboard
      *
-     * @return array{smartyProperties: array{payload: GroupScoreboardContestsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: GroupScoreboardContestsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getGroupScoreboardEditForTypeScript(
         \OmegaUp\Request $r
@@ -539,7 +539,7 @@ class Group extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'availableContests' => \OmegaUp\Controllers\Contest::getContestList(
                         $r->identity,

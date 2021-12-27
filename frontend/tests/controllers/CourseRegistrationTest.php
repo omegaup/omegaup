@@ -370,7 +370,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $invitedLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertArrayHasKey(
             'gitObjectId',
@@ -394,7 +394,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $invitedLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertArrayNotHasKey('statements', $response);
 

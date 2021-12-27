@@ -720,7 +720,7 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'group' => $groupData['request']['alias'],
                 'scoreboard' => $scoreboardData['request']['alias'],
             ])
-        )['smartyProperties']['payload']['details'];
+        )['templateProperties']['payload']['details'];
 
         $this->assertCount($numberOfContests, $response['contests']);
         $this->assertEquals(
