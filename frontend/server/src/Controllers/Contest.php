@@ -2031,7 +2031,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ActivityFeedPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: ActivityFeedPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $contest
      * @omegaup-request-param int|null $length
