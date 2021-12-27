@@ -142,6 +142,15 @@ export namespace types {
               })(x.solvers);
             return x;
           })(x.currentProblem);
+        x.runs = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.runs);
         if (x.scoreboard)
           x.scoreboard = ((x) => {
             if (x.finish_time)
@@ -2102,6 +2111,7 @@ export namespace types {
     course: types.ArenaCourseDetails;
     currentProblem?: types.ProblemDetails;
     problems: types.ArenaCourseProblem[];
+    runs: types.Run[];
     scoreboard?: types.Scoreboard;
   }
 

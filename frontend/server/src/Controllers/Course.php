@@ -79,7 +79,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ArenaCourseDetails=array{alias: string, name: string, languages: list<string>|null}
  * @psalm-type ArenaCourseAssignment=array{alias: string, name: string, description: string}
  * @psalm-type ArenaCourseProblem=array{alias: string, letter: string, title: string}
- * @psalm-type ArenaCoursePayload=array{course: ArenaCourseDetails, assignment: ArenaCourseAssignment, problems: list<ArenaCourseProblem>, currentProblem: null|ProblemDetails, scoreboard: null|Scoreboard}
+ * @psalm-type ArenaCoursePayload=array{course: ArenaCourseDetails, assignment: ArenaCourseAssignment, problems: list<ArenaCourseProblem>, currentProblem: null|ProblemDetails, runs: list<Run>, scoreboard: null|Scoreboard}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -4263,6 +4263,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'description' => strval($assignment->description),
                     ],
                     'problems' => $problemsResponseArray,
+                    'runs' => [],
                     'currentProblem' => null,
                     'scoreboard' => $scoreboard,
                 ],
@@ -4325,6 +4326,24 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         $response['templateProperties']['payload']['currentProblem'] = $problemDetails;
+
+        [
+            'runs' => $response['templateProperties']['payload']['runs'],
+        ] = $isAdmin ?
+            self::getAllRuns(
+                problemsetId: $assignment->problemset_id,
+                status: null,
+                verdict: null,
+                problemId: intval($problem->problem_id),
+            ) :
+            self::getAllRuns(
+                problemsetId: $assignment->problemset_id,
+                status: null,
+                verdict: null,
+                problemId: intval($problem->problem_id),
+                language: null,
+                identityId: $r->identity->identity_id,
+            );
 
         return $response;
     }
