@@ -172,7 +172,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Testing filters via API and Smarty
+     * Testing filters via API and TypeScript.
      */
     public function testUserRankFiltered() {
         // Create a school
@@ -195,7 +195,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload']['availableFilters'];
+        )['templateProperties']['payload']['availableFilters'];
         $this->assertArrayNotHasKey('country', $availableFilters);
         $this->assertArrayNotHasKey('state', $availableFilters);
         $this->assertArrayNotHasKey('school', $availableFilters);
@@ -230,7 +230,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload']['availableFilters'];
+        )['templateProperties']['payload']['availableFilters'];
 
         // Call API
         $identity = \OmegaUp\DAO\Identities::getByPK(

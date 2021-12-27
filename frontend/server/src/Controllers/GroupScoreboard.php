@@ -324,7 +324,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: GroupScoreboardDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: GroupScoreboardDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $group
      * @omegaup-request-param string $scoreboard
@@ -343,7 +343,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'groupAlias' => $groupAlias,
                     'scoreboardAlias' => $scoreboardAlias,

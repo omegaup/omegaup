@@ -16,7 +16,7 @@ if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
             $scripts[] = 'https://apis.google.com/js/platform.js?onload=init';
         }
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'scripts' => $scripts,
                 'payload' => [],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogout'),

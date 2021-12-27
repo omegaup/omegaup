@@ -124,7 +124,7 @@ class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload']['adminPayload'];
+        )['templateProperties']['payload']['adminPayload'];
 
         // Assert
         $this->assertCount(5, $response['allRuns']);

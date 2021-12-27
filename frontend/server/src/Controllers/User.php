@@ -540,7 +540,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $id
      */
@@ -548,7 +548,7 @@ class User extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r
     ): array {
         $response = [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
                     'verifyEmailSuccessfully' => \OmegaUp\Translations::getInstance()->get(
@@ -570,7 +570,7 @@ class User extends \OmegaUp\Controllers\Controller {
             self::verifyEmail($user);
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             \OmegaUp\ApiCaller::logException($e);
-            $response['smartyProperties']['payload'] = [
+            $response['templateProperties']['payload'] = [
                 'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
                 'statusError' => $e->getErrorMessage(),
             ];
@@ -2712,9 +2712,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * Prepare all the properties to be sent to the
-     * author rank table view via smarty.
+     * author rank table view via TypeScript.
      *
-     * @return array{smartyProperties: array{payload: AuthorRankTablePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: AuthorRankTablePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
@@ -2728,7 +2728,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $length
         );
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'page' => $page,
                     'length' => $length,
@@ -3087,7 +3087,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: UserRolesPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: UserRolesPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getUserRolesForTypeScript(\OmegaUp\Request $r) {
         if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
@@ -3120,7 +3120,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'userSystemRoles' => $userSystemRoles,
                     'userSystemGroups' => $userSystemGroups,
@@ -3394,7 +3394,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: PrivacyPolicyDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: PrivacyPolicyDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $username
      */
@@ -3422,7 +3422,7 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'policy_markdown' => file_get_contents(
                         sprintf(
@@ -3685,9 +3685,9 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Prepare all the properties to be sent to the rank table view via smarty
+     * Prepare all the properties to be sent to the rank table view via TypeScript
      *
-     * @return array{smartyProperties: array{payload: UserRankTablePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: UserRankTablePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param mixed $filter
      * @omegaup-request-param int $length
@@ -3715,7 +3715,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $length
         );
         $response = [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'page' => $page,
                     'length' => $length,
@@ -3747,7 +3747,7 @@ class User extends \OmegaUp\Controllers\Controller {
             return $response;
         }
 
-        $response['smartyProperties']['payload']['isLogged'] = true;
+        $response['templateProperties']['payload']['isLogged'] = true;
         if (!is_null($r->identity->country_id)) {
             $availableFilters['country'] =
                 \OmegaUp\Translations::getInstance()->get(
@@ -3776,8 +3776,8 @@ class User extends \OmegaUp\Controllers\Controller {
                     'wordsFilterBySchool'
                 );
         }
-        $response['smartyProperties']['payload']['availableFilters'] = $availableFilters;
-        $response['smartyProperties']['payload']['ranking'] = self::getRankByProblemsSolved(
+        $response['templateProperties']['payload']['availableFilters'] = $availableFilters;
+        $response['templateProperties']['payload']['ranking'] = self::getRankByProblemsSolved(
             $r->identity,
             $filter,
             $page,
@@ -3790,7 +3790,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $category
      * @omegaup-request-param null|string $date
      *
-     * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: IndexPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{fullWidth: bool, payload: IndexPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getIndexDetailsForTypeScript(\OmegaUp\Request $r) {
         try {
@@ -3819,7 +3819,7 @@ class User extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'coderOfTheMonthData' => [
                         'all' => self::getCoderOfTheMonth(
@@ -3855,11 +3855,11 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Prepare all the properties to be sent to the rank table view via smarty
+     * Prepare all the properties to be sent to the rank table view via TypeScript
      *
      * @omegaup-request-param mixed $category
      *
-     * @return array{smartyProperties: array{payload: CoderOfTheMonthPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: CoderOfTheMonthPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getCoderOfTheMonthDetailsForTypeScript(
         \OmegaUp\Request $r
@@ -3919,7 +3919,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         if (!$isMentor) {
             return [
-                'smartyProperties' => [
+                'templateProperties' => [
                     'payload' => $response,
                     'title' => (
                         (strval($category) === 'female') ?
@@ -3950,7 +3950,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
         ];
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => $response,
                 'title' => (
                     (strval($category) === 'female') ?
@@ -3967,7 +3967,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: UserProfileDetailsPayload, title: \OmegaUp\TranslationString, fullWidth: bool}}
+     * @return array{entrypoint: string, templateProperties: array{payload: UserProfileDetailsPayload, title: \OmegaUp\TranslationString, fullWidth: bool}}
      *
      * @omegaup-request-param null|string $username
      */
@@ -4002,7 +4002,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $targetUser = \OmegaUp\DAO\Users::getByPK($targetIdentity->user_id);
         }
         $response = [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'countries' => \OmegaUp\DAO\Countries::getAll(
                         null,
@@ -4029,7 +4029,7 @@ class User extends \OmegaUp\Controllers\Controller {
             )
         ) {
             // Only construct a private profile if it's actually needed.
-            $response['smartyProperties']['payload']['profile'] = self::getPrivateUserProfile(
+            $response['templateProperties']['payload']['profile'] = self::getPrivateUserProfile(
                 $targetIdentity
             );
             return $response;
@@ -4083,8 +4083,8 @@ class User extends \OmegaUp\Controllers\Controller {
                 $targetUser
             );
         }
-        $response['smartyProperties']['payload'] = array_merge(
-            $response['smartyProperties']['payload'],
+        $response['templateProperties']['payload'] = array_merge(
+            $response['templateProperties']['payload'],
             [
                 'profile' => $profile,
                 'extraProfileDetails' => array_merge(
@@ -4102,7 +4102,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: UserDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: UserDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $username
      */
@@ -4167,7 +4167,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'emails' => $emailsList,
                     'experiments' => $userExperimentsList,
@@ -4188,7 +4188,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param null|string $username
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: EmailEditDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: EmailEditDetailsPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getEmailEditDetailsForTypeScript(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
@@ -4222,7 +4222,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'email' => \OmegaUp\DAO\Emails::getMainMailByUserId(
                         $targetIdentity->user_id
@@ -4335,7 +4335,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $third_party_login
      */
@@ -4346,7 +4346,7 @@ class User extends \OmegaUp\Controllers\Controller {
         }
 
         $response = [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
                     'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
@@ -4364,7 +4364,7 @@ class User extends \OmegaUp\Controllers\Controller {
             }
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             \OmegaUp\ApiCaller::logException($e);
-            $response['smartyProperties']['payload']['statusError'] = $e->getErrorMessage();
+            $response['templateProperties']['payload']['statusError'] = $e->getErrorMessage();
             return $response;
         }
         return $response;

@@ -76,14 +76,14 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: TeamsGroupListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: TeamsGroupListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getGroupListForTypeScript(\OmegaUp\Request $r): array {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'teamsGroups' => \OmegaUp\DAO\TeamGroups::getAllTeamsGroupsAdminedByUser(
                         $r->user->user_id
@@ -98,7 +98,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: TeamGroupNewPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: TeamGroupNewPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getTeamGroupNewDetailsForTypeScript(
         \OmegaUp\Request $r
@@ -107,7 +107,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'numberOfContestants' => self::NUMBER_OF_CONTESTANTS,
                     'maxNumberOfContestants' => self::MAX_NUMBER_OF_CONTESTANTS,
@@ -121,7 +121,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: TeamGroupEditPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: TeamGroupEditPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $team_group_alias
      */
@@ -147,7 +147,7 @@ class TeamsGroup extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'teamGroup' => [
                         'alias' => $teamGroupAlias,
