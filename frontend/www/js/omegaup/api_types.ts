@@ -87,7 +87,7 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           });
         })(x.events);
@@ -103,57 +103,65 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ArenaCoursePayload {
       return ((x) => {
-        if (x.currentProblem !== null)
+        if (
+          typeof x.currentProblem !== 'undefined' &&
+          x.currentProblem !== null
+        )
           x.currentProblem = ((x) => {
-            x.creation_date = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.creation_date = ((x: number) => new Date(x * 1000))(
               x.creation_date,
             );
-            if (x.nextSubmissionTimestamp !== null)
-              x.nextSubmissionTimestamp = ((x: number) =>
-                new Date(x + 6 * 60 * 60 * 1000))(x.nextSubmissionTimestamp);
-            if (x.problemsetter !== null)
+            if (
+              typeof x.nextSubmissionTimestamp !== 'undefined' &&
+              x.nextSubmissionTimestamp !== null
+            )
+              x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
+                x.nextSubmissionTimestamp,
+              );
+            if (
+              typeof x.problemsetter !== 'undefined' &&
+              x.problemsetter !== null
+            )
               x.problemsetter = ((x) => {
-                if (x.creation_date !== null)
-                  x.creation_date = ((x: number) =>
-                    new Date(x + 6 * 60 * 60 * 1000))(x.creation_date);
+                if (
+                  typeof x.creation_date !== 'undefined' &&
+                  x.creation_date !== null
+                )
+                  x.creation_date = ((x: number) => new Date(x * 1000))(
+                    x.creation_date,
+                  );
                 return x;
               })(x.problemsetter);
-            if (x.runs !== null)
+            if (typeof x.runs !== 'undefined' && x.runs !== null)
               x.runs = ((x) => {
                 if (!Array.isArray(x)) {
                   return x;
                 }
                 return x.map((x) => {
-                  x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                    x.time,
-                  );
+                  x.time = ((x: number) => new Date(x * 1000))(x.time);
                   return x;
                 });
               })(x.runs);
-            if (x.solvers !== null)
+            if (typeof x.solvers !== 'undefined' && x.solvers !== null)
               x.solvers = ((x) => {
                 if (!Array.isArray(x)) {
                   return x;
                 }
                 return x.map((x) => {
-                  x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                    x.time,
-                  );
+                  x.time = ((x: number) => new Date(x * 1000))(x.time);
                   return x;
                 });
               })(x.solvers);
             return x;
           })(x.currentProblem);
-        if (x.scoreboard !== null)
+        if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
           x.scoreboard = ((x) => {
-            if (x.finish_time !== null)
-              x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
-            x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.start_time,
-            );
-            x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           })(x.scoreboard);
         return x;
@@ -174,12 +182,14 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time !== null)
-                x.finish_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-              x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.start_time,
-              );
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
               return x;
             });
           })(x.assignments);
@@ -188,51 +198,35 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.courseDetails);
         x.currentAssignment = ((x) => {
-          if (x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.runs = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
             return x.map((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
           })(x.runs);
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.currentAssignment);
         x.scoreboard = ((x) => {
-          if (x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
-          x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
           return x;
         })(x.scoreboard);
         return x;
@@ -256,12 +250,20 @@ export namespace types {
     ): types.BadgeDetailsPayload {
       return ((x) => {
         x.badge = ((x) => {
-          if (x.assignation_time !== null)
-            x.assignation_time = ((x: number) =>
-              new Date(x + 6 * 60 * 60 * 1000))(x.assignation_time);
-          if (x.first_assignation !== null)
-            x.first_assignation = ((x: number) =>
-              new Date(x + 6 * 60 * 60 * 1000))(x.first_assignation);
+          if (
+            typeof x.assignation_time !== 'undefined' &&
+            x.assignation_time !== null
+          )
+            x.assignation_time = ((x: number) => new Date(x * 1000))(
+              x.assignation_time,
+            );
+          if (
+            typeof x.first_assignation !== 'undefined' &&
+            x.first_assignation !== null
+          )
+            x.first_assignation = ((x: number) => new Date(x * 1000))(
+              x.first_assignation,
+            );
           return x;
         })(x.badge);
         return x;
@@ -281,12 +283,20 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            if (x.assignation_time !== null)
-              x.assignation_time = ((x: number) =>
-                new Date(x + 6 * 60 * 60 * 1000))(x.assignation_time);
-            if (x.first_assignation !== null)
-              x.first_assignation = ((x: number) =>
-                new Date(x + 6 * 60 * 60 * 1000))(x.first_assignation);
+            if (
+              typeof x.assignation_time !== 'undefined' &&
+              x.assignation_time !== null
+            )
+              x.assignation_time = ((x: number) => new Date(x * 1000))(
+                x.assignation_time,
+              );
+            if (
+              typeof x.first_assignation !== 'undefined' &&
+              x.first_assignation !== null
+            )
+              x.first_assignation = ((x: number) => new Date(x * 1000))(
+                x.first_assignation,
+              );
             return x;
           });
         })(x.ownedBadges);
@@ -342,16 +352,14 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ContestDetailsPayload {
       return ((x) => {
-        if (x.adminPayload !== null)
+        if (typeof x.adminPayload !== 'undefined' && x.adminPayload !== null)
           x.adminPayload = ((x) => {
             x.allRuns = ((x) => {
               if (!Array.isArray(x)) {
                 return x;
               }
               return x.map((x) => {
-                x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                  x.time,
-                );
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
                 return x;
               });
             })(x.allRuns);
@@ -360,12 +368,15 @@ export namespace types {
                 return x;
               }
               return x.map((x) => {
-                if (x.access_time !== null)
-                  x.access_time = ((x: number) =>
-                    new Date(x + 6 * 60 * 60 * 1000))(x.access_time);
-                if (x.end_time !== null)
-                  x.end_time = ((x: number) =>
-                    new Date(x + 6 * 60 * 60 * 1000))(x.end_time);
+                if (
+                  typeof x.access_time !== 'undefined' &&
+                  x.access_time !== null
+                )
+                  x.access_time = ((x: number) => new Date(x * 1000))(
+                    x.access_time,
+                  );
+                if (typeof x.end_time !== 'undefined' && x.end_time !== null)
+                  x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
                 return x;
               });
             })(x.users);
@@ -376,49 +387,48 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           });
         })(x.clarifications);
         x.contest = ((x) => {
-          x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.finish_time,
-          );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
-        if (x.original !== null)
+        if (typeof x.original !== 'undefined' && x.original !== null)
           x.original = ((x) => {
-            if (x.scoreboard !== null)
+            if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
               x.scoreboard = ((x) => {
-                if (x.finish_time !== null)
-                  x.finish_time = ((x: number) =>
-                    new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-                x.start_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.start_time);
-                x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                  x.time,
+                if (
+                  typeof x.finish_time !== 'undefined' &&
+                  x.finish_time !== null
+                )
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
                 );
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
                 return x;
               })(x.scoreboard);
             return x;
           })(x.original);
         x.scoreboard = ((x) => {
-          if (x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
-          x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
           return x;
         })(x.scoreboard);
-        if (x.submissionDeadline !== null)
-          x.submissionDeadline = ((x: number) =>
-            new Date(x + 6 * 60 * 60 * 1000))(x.submissionDeadline);
+        if (
+          typeof x.submissionDeadline !== 'undefined' &&
+          x.submissionDeadline !== null
+        )
+          x.submissionDeadline = ((x: number) => new Date(x * 1000))(
+            x.submissionDeadline,
+          );
         return x;
       })(
         JSON.parse(
@@ -432,15 +442,15 @@ export namespace types {
     ): types.ContestEditPayload {
       return ((x) => {
         x.details = ((x) => {
-          x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.finish_time,
-          );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
-          if (x.submission_deadline !== null)
-            x.submission_deadline = ((x: number) =>
-              new Date(x + 6 * 60 * 60 * 1000))(x.submission_deadline);
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          if (
+            typeof x.submission_deadline !== 'undefined' &&
+            x.submission_deadline !== null
+          )
+            x.submission_deadline = ((x: number) => new Date(x * 1000))(
+              x.submission_deadline,
+            );
           return x;
         })(x.details);
         x.problems = ((x) => {
@@ -455,15 +465,11 @@ export namespace types {
                 }
                 return x.map((x) => {
                   x.author = ((x) => {
-                    x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                      x.time,
-                    );
+                    x.time = ((x: number) => new Date(x * 1000))(x.time);
                     return x;
                   })(x.author);
                   x.committer = ((x) => {
-                    x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                      x.time,
-                    );
+                    x.time = ((x: number) => new Date(x * 1000))(x.time);
                     return x;
                   })(x.committer);
                   return x;
@@ -479,11 +485,11 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            if (x.last_update !== null)
-              x.last_update = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            if (typeof x.last_update !== 'undefined' && x.last_update !== null)
+              x.last_update = ((x: number) => new Date(x * 1000))(
                 x.last_update,
               );
-            x.request_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.request_time = ((x: number) => new Date(x * 1000))(
               x.request_time,
             );
             return x;
@@ -494,14 +500,12 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            if (x.access_time !== null)
-              x.access_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            if (typeof x.access_time !== 'undefined' && x.access_time !== null)
+              x.access_time = ((x: number) => new Date(x * 1000))(
                 x.access_time,
               );
-            if (x.end_time !== null)
-              x.end_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.end_time,
-              );
+            if (typeof x.end_time !== 'undefined' && x.end_time !== null)
+              x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
             return x;
           });
         })(x.users);
@@ -518,12 +522,8 @@ export namespace types {
     ): types.ContestIntroPayload {
       return ((x) => {
         x.contest = ((x) => {
-          x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.finish_time,
-          );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
         return x;
@@ -543,18 +543,18 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-            x.last_updated = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
               x.last_updated,
             );
-            if (x.original_finish_time !== null)
-              x.original_finish_time = ((x: number) =>
-                new Date(x + 6 * 60 * 60 * 1000))(x.original_finish_time);
-            x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.start_time,
-            );
+            if (
+              typeof x.original_finish_time !== 'undefined' &&
+              x.original_finish_time !== null
+            )
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
             return x;
           });
         })(x.contests);
@@ -579,14 +579,17 @@ export namespace types {
                     return x;
                   }
                   return x.map((x) => {
-                    x.finish_time = ((x: number) =>
-                      new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-                    x.last_updated = ((x: number) =>
-                      new Date(x + 6 * 60 * 60 * 1000))(x.last_updated);
+                    x.finish_time = ((x: number) => new Date(x * 1000))(
+                      x.finish_time,
+                    );
+                    x.last_updated = ((x: number) => new Date(x * 1000))(
+                      x.last_updated,
+                    );
                     x.original_finish_time = ((x: number) =>
-                      new Date(x + 6 * 60 * 60 * 1000))(x.original_finish_time);
-                    x.start_time = ((x: number) =>
-                      new Date(x + 6 * 60 * 60 * 1000))(x.start_time);
+                      new Date(x * 1000))(x.original_finish_time);
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
                     return x;
                   });
                 })(x[y])),
@@ -612,16 +615,16 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+              x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
-              x.last_updated = ((x: number) =>
-                new Date(x + 6 * 60 * 60 * 1000))(x.last_updated);
-              x.original_finish_time = ((x: number) =>
-                new Date(x + 6 * 60 * 60 * 1000))(x.original_finish_time);
-              x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.start_time,
+              x.last_updated = ((x: number) => new Date(x * 1000))(
+                x.last_updated,
               );
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
               return x;
             });
           })(x.current);
@@ -630,16 +633,16 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+              x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
-              x.last_updated = ((x: number) =>
-                new Date(x + 6 * 60 * 60 * 1000))(x.last_updated);
-              x.original_finish_time = ((x: number) =>
-                new Date(x + 6 * 60 * 60 * 1000))(x.original_finish_time);
-              x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.start_time,
+              x.last_updated = ((x: number) => new Date(x * 1000))(
+                x.last_updated,
               );
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
               return x;
             });
           })(x.future);
@@ -648,16 +651,16 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+              x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
-              x.last_updated = ((x: number) =>
-                new Date(x + 6 * 60 * 60 * 1000))(x.last_updated);
-              x.original_finish_time = ((x: number) =>
-                new Date(x + 6 * 60 * 60 * 1000))(x.original_finish_time);
-              x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.start_time,
+              x.last_updated = ((x: number) => new Date(x * 1000))(
+                x.last_updated,
               );
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
               return x;
             });
           })(x.past);
@@ -683,16 +686,14 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ContestPracticeDetailsPayload {
       return ((x) => {
-        if (x.adminPayload !== null)
+        if (typeof x.adminPayload !== 'undefined' && x.adminPayload !== null)
           x.adminPayload = ((x) => {
             x.allRuns = ((x) => {
               if (!Array.isArray(x)) {
                 return x;
               }
               return x.map((x) => {
-                x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                  x.time,
-                );
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
                 return x;
               });
             })(x.allRuns);
@@ -701,12 +702,15 @@ export namespace types {
                 return x;
               }
               return x.map((x) => {
-                if (x.access_time !== null)
-                  x.access_time = ((x: number) =>
-                    new Date(x + 6 * 60 * 60 * 1000))(x.access_time);
-                if (x.end_time !== null)
-                  x.end_time = ((x: number) =>
-                    new Date(x + 6 * 60 * 60 * 1000))(x.end_time);
+                if (
+                  typeof x.access_time !== 'undefined' &&
+                  x.access_time !== null
+                )
+                  x.access_time = ((x: number) => new Date(x * 1000))(
+                    x.access_time,
+                  );
+                if (typeof x.end_time !== 'undefined' && x.end_time !== null)
+                  x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
                 return x;
               });
             })(x.users);
@@ -717,38 +721,41 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           });
         })(x.clarifications);
         x.contest = ((x) => {
-          x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.finish_time,
-          );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
-        if (x.original !== null)
+        if (typeof x.original !== 'undefined' && x.original !== null)
           x.original = ((x) => {
-            if (x.scoreboard !== null)
+            if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
               x.scoreboard = ((x) => {
-                if (x.finish_time !== null)
-                  x.finish_time = ((x: number) =>
-                    new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-                x.start_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.start_time);
-                x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                  x.time,
+                if (
+                  typeof x.finish_time !== 'undefined' &&
+                  x.finish_time !== null
+                )
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
                 );
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
                 return x;
               })(x.scoreboard);
             return x;
           })(x.original);
-        if (x.submissionDeadline !== null)
-          x.submissionDeadline = ((x: number) =>
-            new Date(x + 6 * 60 * 60 * 1000))(x.submissionDeadline);
+        if (
+          typeof x.submissionDeadline !== 'undefined' &&
+          x.submissionDeadline !== null
+        )
+          x.submissionDeadline = ((x: number) => new Date(x * 1000))(
+            x.submissionDeadline,
+          );
         return x;
       })(
         JSON.parse(
@@ -766,39 +773,46 @@ export namespace types {
             Object.keys(x).forEach(
               (y) =>
                 (x[y] = ((x) => {
-                  x.creation_date = ((x: number) =>
-                    new Date(x + 6 * 60 * 60 * 1000))(x.creation_date);
-                  if (x.nextSubmissionTimestamp !== null)
+                  x.creation_date = ((x: number) => new Date(x * 1000))(
+                    x.creation_date,
+                  );
+                  if (
+                    typeof x.nextSubmissionTimestamp !== 'undefined' &&
+                    x.nextSubmissionTimestamp !== null
+                  )
                     x.nextSubmissionTimestamp = ((x: number) =>
-                      new Date(x + 6 * 60 * 60 * 1000))(
-                      x.nextSubmissionTimestamp,
-                    );
-                  if (x.problemsetter !== null)
+                      new Date(x * 1000))(x.nextSubmissionTimestamp);
+                  if (
+                    typeof x.problemsetter !== 'undefined' &&
+                    x.problemsetter !== null
+                  )
                     x.problemsetter = ((x) => {
-                      if (x.creation_date !== null)
-                        x.creation_date = ((x: number) =>
-                          new Date(x + 6 * 60 * 60 * 1000))(x.creation_date);
+                      if (
+                        typeof x.creation_date !== 'undefined' &&
+                        x.creation_date !== null
+                      )
+                        x.creation_date = ((x: number) => new Date(x * 1000))(
+                          x.creation_date,
+                        );
                       return x;
                     })(x.problemsetter);
-                  if (x.runs !== null)
+                  if (typeof x.runs !== 'undefined' && x.runs !== null)
                     x.runs = ((x) => {
                       if (!Array.isArray(x)) {
                         return x;
                       }
                       return x.map((x) => {
-                        x.time = ((x: number) =>
-                          new Date(x + 6 * 60 * 60 * 1000))(x.time);
+                        x.time = ((x: number) => new Date(x * 1000))(x.time);
                         return x;
                       });
                     })(x.runs);
-                  if (x.solvers !== null)
+                  if (typeof x.solvers !== 'undefined' && x.solvers !== null)
                     x.solvers = ((x) => {
                       if (!Array.isArray(x)) {
                         return x;
                       }
                       return x.map((x) => {
-                        x.time = ((x: number) =>
-                          new Date(x + 6 * 60 * 60 * 1000))(x.time);
+                        x.time = ((x: number) => new Date(x * 1000))(x.time);
                         return x;
                       });
                     })(x.solvers);
@@ -829,26 +843,22 @@ export namespace types {
     ): types.ContestScoreboardPayload {
       return ((x) => {
         x.contest = ((x) => {
-          x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.finish_time,
-          );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
-          if (x.submission_deadline !== null)
-            x.submission_deadline = ((x: number) =>
-              new Date(x + 6 * 60 * 60 * 1000))(x.submission_deadline);
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          if (
+            typeof x.submission_deadline !== 'undefined' &&
+            x.submission_deadline !== null
+          )
+            x.submission_deadline = ((x: number) => new Date(x * 1000))(
+              x.submission_deadline,
+            );
           return x;
         })(x.contest);
         x.scoreboard = ((x) => {
-          if (x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
-          x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
           return x;
         })(x.scoreboard);
         return x;
@@ -864,12 +874,8 @@ export namespace types {
     ): types.ContestVirtualDetailsPayload {
       return ((x) => {
         x.contest = ((x) => {
-          x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.finish_time,
-          );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.contest);
         return x;
@@ -889,7 +895,7 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           });
         })(x.clarifications);
@@ -911,12 +917,14 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time !== null)
-                x.finish_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-              x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.start_time,
-              );
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
               return x;
             });
           })(x.assignments);
@@ -925,19 +933,13 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.details);
         return x;
@@ -958,12 +960,14 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time !== null)
-                x.finish_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-              x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.start_time,
-              );
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
               return x;
             });
           })(x.assignments);
@@ -972,19 +976,13 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.details);
         return x;
@@ -1005,12 +1003,14 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time !== null)
-                x.finish_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-              x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.start_time,
-              );
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
               return x;
             });
           })(x.assignments);
@@ -1019,19 +1019,13 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.course);
         x.identityRequests = ((x) => {
@@ -1039,25 +1033,26 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            if (x.last_update !== null)
-              x.last_update = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            if (typeof x.last_update !== 'undefined' && x.last_update !== null)
+              x.last_update = ((x: number) => new Date(x * 1000))(
                 x.last_update,
               );
-            x.request_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.request_time = ((x: number) => new Date(x * 1000))(
               x.request_time,
             );
             return x;
           });
         })(x.identityRequests);
-        if (x.selectedAssignment !== null)
+        if (
+          typeof x.selectedAssignment !== 'undefined' &&
+          x.selectedAssignment !== null
+        )
           x.selectedAssignment = ((x) => {
-            if (x.finish_time !== null)
-              x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
-            x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.start_time,
-            );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
             return x;
           })(x.selectedAssignment);
         return x;
@@ -1086,19 +1081,29 @@ export namespace types {
                         return x;
                       }
                       return x.map((x) => {
-                        if (x.finish_time !== null)
-                          x.finish_time = ((x: number) =>
-                            new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-                        x.start_time = ((x: number) =>
-                          new Date(x + 6 * 60 * 60 * 1000))(x.start_time);
+                        if (
+                          typeof x.finish_time !== 'undefined' &&
+                          x.finish_time !== null
+                        )
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
                         return x;
                       });
                     })(x.assignments);
-                    if (x.finish_time !== null)
-                      x.finish_time = ((x: number) =>
-                        new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-                    x.start_time = ((x: number) =>
-                      new Date(x + 6 * 60 * 60 * 1000))(x.start_time);
+                    if (
+                      typeof x.finish_time !== 'undefined' &&
+                      x.finish_time !== null
+                    )
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
                     return x;
                   });
                 })(x.courses);
@@ -1115,19 +1120,29 @@ export namespace types {
                         return x;
                       }
                       return x.map((x) => {
-                        if (x.finish_time !== null)
-                          x.finish_time = ((x: number) =>
-                            new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-                        x.start_time = ((x: number) =>
-                          new Date(x + 6 * 60 * 60 * 1000))(x.start_time);
+                        if (
+                          typeof x.finish_time !== 'undefined' &&
+                          x.finish_time !== null
+                        )
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
                         return x;
                       });
                     })(x.assignments);
-                    if (x.finish_time !== null)
-                      x.finish_time = ((x: number) =>
-                        new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-                    x.start_time = ((x: number) =>
-                      new Date(x + 6 * 60 * 60 * 1000))(x.start_time);
+                    if (
+                      typeof x.finish_time !== 'undefined' &&
+                      x.finish_time !== null
+                    )
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
                     return x;
                   });
                 })(x.courses);
@@ -1144,19 +1159,29 @@ export namespace types {
                         return x;
                       }
                       return x.map((x) => {
-                        if (x.finish_time !== null)
-                          x.finish_time = ((x: number) =>
-                            new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-                        x.start_time = ((x: number) =>
-                          new Date(x + 6 * 60 * 60 * 1000))(x.start_time);
+                        if (
+                          typeof x.finish_time !== 'undefined' &&
+                          x.finish_time !== null
+                        )
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
                         return x;
                       });
                     })(x.assignments);
-                    if (x.finish_time !== null)
-                      x.finish_time = ((x: number) =>
-                        new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-                    x.start_time = ((x: number) =>
-                      new Date(x + 6 * 60 * 60 * 1000))(x.start_time);
+                    if (
+                      typeof x.finish_time !== 'undefined' &&
+                      x.finish_time !== null
+                    )
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
                     return x;
                   });
                 })(x.courses);
@@ -1194,33 +1219,27 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time !== null)
-                x.finish_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-              x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.start_time,
-              );
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
               return x;
             });
           })(x.courseAssignments);
-          if (x.finishTime !== null)
-            x.finishTime = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finishTime,
-            );
-          x.startTime = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.startTime,
-          );
+          if (typeof x.finishTime !== 'undefined' && x.finishTime !== null)
+            x.finishTime = ((x: number) => new Date(x * 1000))(x.finishTime);
+          x.startTime = ((x: number) => new Date(x * 1000))(x.startTime);
           return x;
         })(x.assignment);
         x.scoreboard = ((x) => {
-          if (x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
-          x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
           return x;
         })(x.scoreboard);
         return x;
@@ -1241,12 +1260,14 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time !== null)
-                x.finish_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-              x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.start_time,
-              );
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
               return x;
             });
           })(x.assignments);
@@ -1255,19 +1276,13 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.course);
         return x;
@@ -1298,15 +1313,17 @@ export namespace types {
       elementId: string = 'payload',
     ): types.EmailEditDetailsPayload {
       return ((x) => {
-        if (x.profile !== null)
+        if (typeof x.profile !== 'undefined' && x.profile !== null)
           x.profile = ((x) => {
-            if (x.birth_date !== null)
-              x.birth_date = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.birth_date,
+            if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+              x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+            if (
+              typeof x.graduation_date !== 'undefined' &&
+              x.graduation_date !== null
+            )
+              x.graduation_date = ((x: number) => new Date(x * 1000))(
+                x.graduation_date,
               );
-            if (x.graduation_date !== null)
-              x.graduation_date = ((x: number) =>
-                new Date(x + 6 * 60 * 60 * 1000))(x.graduation_date);
             return x;
           })(x.profile);
         return x;
@@ -1334,9 +1351,7 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            x.create_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.create_time,
-            );
+            x.create_time = ((x: number) => new Date(x * 1000))(x.create_time);
             return x;
           });
         })(x.groups);
@@ -1357,17 +1372,14 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-            x.last_updated = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
               x.last_updated,
             );
-            x.original_finish_time = ((x: number) =>
-              new Date(x + 6 * 60 * 60 * 1000))(x.original_finish_time);
-            x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.start_time,
+            x.original_finish_time = ((x: number) => new Date(x * 1000))(
+              x.original_finish_time,
             );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
             return x;
           });
         })(x.availableContests);
@@ -1376,12 +1388,8 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-            x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.start_time,
-            );
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
             return x;
           });
         })(x.contests);
@@ -1403,12 +1411,10 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+              x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
-              x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.start_time,
-              );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
               return x;
             });
           })(x.contests);
@@ -1427,24 +1433,34 @@ export namespace types {
     ): types.IndexPayload {
       return ((x) => {
         x.coderOfTheMonthData = ((x) => {
-          if (x.all !== null)
+          if (typeof x.all !== 'undefined' && x.all !== null)
             x.all = ((x) => {
-              if (x.birth_date !== null)
-                x.birth_date = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.birth_date);
-              if (x.graduation_date !== null)
-                x.graduation_date = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.graduation_date);
+              if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+                x.birth_date = ((x: number) => new Date(x * 1000))(
+                  x.birth_date,
+                );
+              if (
+                typeof x.graduation_date !== 'undefined' &&
+                x.graduation_date !== null
+              )
+                x.graduation_date = ((x: number) => new Date(x * 1000))(
+                  x.graduation_date,
+                );
               return x;
             })(x.all);
-          if (x.female !== null)
+          if (typeof x.female !== 'undefined' && x.female !== null)
             x.female = ((x) => {
-              if (x.birth_date !== null)
-                x.birth_date = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.birth_date);
-              if (x.graduation_date !== null)
-                x.graduation_date = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.graduation_date);
+              if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+                x.birth_date = ((x: number) => new Date(x * 1000))(
+                  x.birth_date,
+                );
+              if (
+                typeof x.graduation_date !== 'undefined' &&
+                x.graduation_date !== null
+              )
+                x.graduation_date = ((x: number) => new Date(x * 1000))(
+                  x.graduation_date,
+                );
               return x;
             })(x.female);
           return x;
@@ -1467,12 +1483,14 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time !== null)
-                x.finish_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-              x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.start_time,
-              );
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
               return x;
             });
           })(x.assignments);
@@ -1481,19 +1499,13 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.course);
         return x;
@@ -1532,52 +1544,60 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ProblemDetailsPayload {
       return ((x) => {
-        if (x.allRuns !== null)
+        if (typeof x.allRuns !== 'undefined' && x.allRuns !== null)
           x.allRuns = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
             return x.map((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
           })(x.allRuns);
-        if (x.clarifications !== null)
+        if (
+          typeof x.clarifications !== 'undefined' &&
+          x.clarifications !== null
+        )
           x.clarifications = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
             return x.map((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
           })(x.clarifications);
         x.problem = ((x) => {
-          if (x.nextSubmissionTimestamp !== null)
-            x.nextSubmissionTimestamp = ((x: number) =>
-              new Date(x + 6 * 60 * 60 * 1000))(x.nextSubmissionTimestamp);
-          if (x.problemsetter !== null)
+          if (
+            typeof x.nextSubmissionTimestamp !== 'undefined' &&
+            x.nextSubmissionTimestamp !== null
+          )
+            x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
+              x.nextSubmissionTimestamp,
+            );
+          if (
+            typeof x.problemsetter !== 'undefined' &&
+            x.problemsetter !== null
+          )
             x.problemsetter = ((x) => {
-              if (x.creation_date !== null)
-                x.creation_date = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.creation_date);
+              if (
+                typeof x.creation_date !== 'undefined' &&
+                x.creation_date !== null
+              )
+                x.creation_date = ((x: number) => new Date(x * 1000))(
+                  x.creation_date,
+                );
               return x;
             })(x.problemsetter);
           return x;
         })(x.problem);
-        if (x.runs !== null)
+        if (typeof x.runs !== 'undefined' && x.runs !== null)
           x.runs = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
             return x.map((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
           })(x.runs);
@@ -1586,7 +1606,7 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           });
         })(x.solvers);
@@ -1608,39 +1628,38 @@ export namespace types {
           }
           return x.map((x) => {
             x.author = ((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             })(x.author);
             x.committer = ((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             })(x.committer);
             return x;
           });
         })(x.log);
-        if (x.problemsetter !== null)
+        if (typeof x.problemsetter !== 'undefined' && x.problemsetter !== null)
           x.problemsetter = ((x) => {
-            if (x.creation_date !== null)
-              x.creation_date = ((x: number) =>
-                new Date(x + 6 * 60 * 60 * 1000))(x.creation_date);
+            if (
+              typeof x.creation_date !== 'undefined' &&
+              x.creation_date !== null
+            )
+              x.creation_date = ((x: number) => new Date(x * 1000))(
+                x.creation_date,
+              );
             return x;
           })(x.problemsetter);
-        if (x.publishedRevision !== null)
+        if (
+          typeof x.publishedRevision !== 'undefined' &&
+          x.publishedRevision !== null
+        )
           x.publishedRevision = ((x) => {
             x.author = ((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             })(x.author);
             x.committer = ((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             })(x.committer);
             return x;
@@ -1682,40 +1701,47 @@ export namespace types {
     ): types.ProblemPrintDetailsPayload {
       return ((x) => {
         x.details = ((x) => {
-          x.creation_date = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.creation_date = ((x: number) => new Date(x * 1000))(
             x.creation_date,
           );
-          if (x.nextSubmissionTimestamp !== null)
-            x.nextSubmissionTimestamp = ((x: number) =>
-              new Date(x + 6 * 60 * 60 * 1000))(x.nextSubmissionTimestamp);
-          if (x.problemsetter !== null)
+          if (
+            typeof x.nextSubmissionTimestamp !== 'undefined' &&
+            x.nextSubmissionTimestamp !== null
+          )
+            x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
+              x.nextSubmissionTimestamp,
+            );
+          if (
+            typeof x.problemsetter !== 'undefined' &&
+            x.problemsetter !== null
+          )
             x.problemsetter = ((x) => {
-              if (x.creation_date !== null)
-                x.creation_date = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.creation_date);
+              if (
+                typeof x.creation_date !== 'undefined' &&
+                x.creation_date !== null
+              )
+                x.creation_date = ((x: number) => new Date(x * 1000))(
+                  x.creation_date,
+                );
               return x;
             })(x.problemsetter);
-          if (x.runs !== null)
+          if (typeof x.runs !== 'undefined' && x.runs !== null)
             x.runs = ((x) => {
               if (!Array.isArray(x)) {
                 return x;
               }
               return x.map((x) => {
-                x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                  x.time,
-                );
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
                 return x;
               });
             })(x.runs);
-          if (x.solvers !== null)
+          if (typeof x.solvers !== 'undefined' && x.solvers !== null)
             x.solvers = ((x) => {
               if (!Array.isArray(x)) {
                 return x;
               }
               return x.map((x) => {
-                x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                  x.time,
-                );
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
                 return x;
               });
             })(x.solvers);
@@ -1778,17 +1804,14 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-            x.last_updated = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
               x.last_updated,
             );
-            x.original_finish_time = ((x: number) =>
-              new Date(x + 6 * 60 * 60 * 1000))(x.original_finish_time);
-            x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.start_time,
+            x.original_finish_time = ((x: number) => new Date(x * 1000))(
+              x.original_finish_time,
             );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
             return x;
           });
         })(x.contests);
@@ -1804,8 +1827,8 @@ export namespace types {
       elementId: string = 'payload',
     ): types.StatsPayload {
       return ((x) => {
-        if (x.max_wait_time !== null)
-          x.max_wait_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        if (typeof x.max_wait_time !== 'undefined' && x.max_wait_time !== null)
+          x.max_wait_time = ((x: number) => new Date(x * 1000))(
             x.max_wait_time,
           );
         return x;
@@ -1826,12 +1849,14 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time !== null)
-                x.finish_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-              x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.start_time,
-              );
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
               return x;
             });
           })(x.assignments);
@@ -1840,19 +1865,13 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.course);
         x.problems = ((x) => {
@@ -1865,16 +1884,12 @@ export namespace types {
                 return x;
               }
               return x.map((x) => {
-                if (x.feedback !== null)
+                if (typeof x.feedback !== 'undefined' && x.feedback !== null)
                   x.feedback = ((x) => {
-                    x.date = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                      x.date,
-                    );
+                    x.date = ((x: number) => new Date(x * 1000))(x.date);
                     return x;
                   })(x.feedback);
-                x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                  x.time,
-                );
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
                 return x;
               });
             })(x.runs);
@@ -1899,12 +1914,14 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time !== null)
-                x.finish_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-              x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.start_time,
-              );
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
               return x;
             });
           })(x.assignments);
@@ -1913,19 +1930,13 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.course);
         return x;
@@ -1946,12 +1957,14 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              if (x.finish_time !== null)
-                x.finish_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-              x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.start_time,
-              );
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
               return x;
             });
           })(x.assignments);
@@ -1960,19 +1973,13 @@ export namespace types {
               return x;
             }
             return x.map((x) => {
-              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-                x.time,
-              );
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
           })(x.clarifications);
-          if (x.finish_time !== null)
-            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.finish_time,
-            );
-          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-            x.start_time,
-          );
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.course);
         return x;
@@ -1992,7 +1999,7 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           });
         })(x.submissions);
@@ -2029,9 +2036,7 @@ export namespace types {
             return x;
           }
           return x.map((x) => {
-            x.create_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.create_time,
-            );
+            x.create_time = ((x: number) => new Date(x * 1000))(x.create_time);
             return x;
           });
         })(x.teamsGroups);
@@ -2055,7 +2060,10 @@ export namespace types {
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
       return ((x) => {
-        if (x.extraProfileDetails !== null)
+        if (
+          typeof x.extraProfileDetails !== 'undefined' &&
+          x.extraProfileDetails !== null
+        )
           x.extraProfileDetails = ((x) => {
             x.contests = ((x) => {
               if (x instanceof Object) {
@@ -2063,12 +2071,15 @@ export namespace types {
                   (y) =>
                     (x[y] = ((x) => {
                       x.data = ((x) => {
-                        x.finish_time = ((x: number) =>
-                          new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-                        x.last_updated = ((x: number) =>
-                          new Date(x + 6 * 60 * 60 * 1000))(x.last_updated);
-                        x.start_time = ((x: number) =>
-                          new Date(x + 6 * 60 * 60 * 1000))(x.start_time);
+                        x.finish_time = ((x: number) => new Date(x * 1000))(
+                          x.finish_time,
+                        );
+                        x.last_updated = ((x: number) => new Date(x * 1000))(
+                          x.last_updated,
+                        );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
                         return x;
                       })(x.data);
                       return x;
@@ -2082,15 +2093,22 @@ export namespace types {
                 return x;
               }
               return x.map((x) => {
-                x.finish_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-                x.last_updated = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.last_updated);
-                if (x.original_finish_time !== null)
-                  x.original_finish_time = ((x: number) =>
-                    new Date(x + 6 * 60 * 60 * 1000))(x.original_finish_time);
-                x.start_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.start_time);
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+                x.last_updated = ((x: number) => new Date(x * 1000))(
+                  x.last_updated,
+                );
+                if (
+                  typeof x.original_finish_time !== 'undefined' &&
+                  x.original_finish_time !== null
+                )
+                  x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                    x.original_finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
                 return x;
               });
             })(x.createdContests);
@@ -2099,11 +2117,16 @@ export namespace types {
                 return x;
               }
               return x.map((x) => {
-                if (x.finish_time !== null)
-                  x.finish_time = ((x: number) =>
-                    new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
-                x.start_time = ((x: number) =>
-                  new Date(x + 6 * 60 * 60 * 1000))(x.start_time);
+                if (
+                  typeof x.finish_time !== 'undefined' &&
+                  x.finish_time !== null
+                )
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
                 return x;
               });
             })(x.createdCourses);
@@ -2112,25 +2135,35 @@ export namespace types {
                 return x;
               }
               return x.map((x) => {
-                if (x.assignation_time !== null)
-                  x.assignation_time = ((x: number) =>
-                    new Date(x + 6 * 60 * 60 * 1000))(x.assignation_time);
-                if (x.first_assignation !== null)
-                  x.first_assignation = ((x: number) =>
-                    new Date(x + 6 * 60 * 60 * 1000))(x.first_assignation);
+                if (
+                  typeof x.assignation_time !== 'undefined' &&
+                  x.assignation_time !== null
+                )
+                  x.assignation_time = ((x: number) => new Date(x * 1000))(
+                    x.assignation_time,
+                  );
+                if (
+                  typeof x.first_assignation !== 'undefined' &&
+                  x.first_assignation !== null
+                )
+                  x.first_assignation = ((x: number) => new Date(x * 1000))(
+                    x.first_assignation,
+                  );
                 return x;
               });
             })(x.ownedBadges);
             return x;
           })(x.extraProfileDetails);
         x.profile = ((x) => {
-          if (x.birth_date !== null)
-            x.birth_date = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
-              x.birth_date,
+          if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
+            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+          if (
+            typeof x.graduation_date !== 'undefined' &&
+            x.graduation_date !== null
+          )
+            x.graduation_date = ((x: number) => new Date(x * 1000))(
+              x.graduation_date,
             );
-          if (x.graduation_date !== null)
-            x.graduation_date = ((x: number) =>
-              new Date(x + 6 * 60 * 60 * 1000))(x.graduation_date);
           return x;
         })(x.profile);
         return x;
