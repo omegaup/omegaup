@@ -16,7 +16,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEquals(
             $response['teamGroup'],
@@ -300,7 +300,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertCount(5, $identities);
 
@@ -383,7 +383,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertCount(5, $identities);
 
@@ -607,7 +607,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertCount($numberOfGroups, $response['teamsGroups']);
     }
@@ -775,7 +775,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertCount(5, $teamIdentities);
 
@@ -788,7 +788,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'team_group_alias' => $teamGroup->alias,
                     'auth_token' => $creatorLogin->auth_token,
                 ])
-            )['smartyProperties']['payload'];
+            )['templateProperties']['payload'];
 
             $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
                 $teamIdentity['username']
@@ -849,7 +849,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertCount(5, $teamIdentities);
 
@@ -862,7 +862,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                     'team_group_alias' => $teamGroup->alias,
                     'auth_token' => $creatorLogin->auth_token,
                 ])
-            )['smartyProperties']['payload'];
+            )['templateProperties']['payload'];
 
             $this->assertCount(5 - $i, $teamIdentities);
 
@@ -880,7 +880,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEmpty($teamIdentities);
     }
@@ -1512,7 +1512,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertCount(5, $identities);
 
@@ -1559,7 +1559,7 @@ class TeamGroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'team_group_alias' => $teamGroup->alias,
                 'auth_token' => $creatorLogin->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         // The number of identities per group reamin the same
         $this->assertCount(5, $identities);

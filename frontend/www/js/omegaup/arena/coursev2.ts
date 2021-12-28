@@ -6,6 +6,7 @@ import arena_Course, { Tabs } from '../components/arena/Coursev2.vue';
 
 OmegaUp.on('ready', async () => {
   const payload = types.payloadParsers.ArenaCoursePayload();
+  const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
   const activeTab = getSelectedValidTab(locationHash[0]);
   new Vue({
@@ -22,6 +23,11 @@ OmegaUp.on('ready', async () => {
           currentProblem: payload.currentProblem,
           selectedTab: activeTab,
           scoreboard: payload.scoreboard,
+          user: {
+            admin: commonPayload.isAdmin,
+            loggedIn: commonPayload.isLoggedIn,
+            reviewer: commonPayload.isReviewer,
+          },
         },
       });
     },

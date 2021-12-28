@@ -3,13 +3,16 @@
 namespace OmegaUp;
 
 /**
- * @psalm-type CommonPayload=array{associatedIdentities: list<array{default: bool, username: string}>, bootstrap4: bool, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, inContest: bool, isAdmin: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: null|string, userCountry: string, userTypes: list<string>}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<array{default: bool, username: string}>, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, inContest: bool, isAdmin: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: null|string, userCountry: string, userTypes: list<string>}
  * @psalm-type AssociatedIdentity=array{username: string, default: bool}
  * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
  */
 class UITools {
-    /** @var ?\Smarty */
-    private static $smarty = null;
+    /** @var ?\Twig\Environment */
+    private static $twig = null;
+
+    /** @var array<string, mixed> */
+    private static $twigContext = [];
 
     /**
      * If user is not logged in, redirect to login page
@@ -42,120 +45,62 @@ class UITools {
     }
 
     /**
-     * @return \Smarty
+     * @return array{twig: \Twig\Environment, twigContext: array<string, mixed>}
      */
-    public static function getSmartyInstance() {
-        if (!is_null(self::$smarty)) {
-            return self::$smarty;
+    public static function getTwigInstance() {
+        if (!is_null(self::$twig)) {
+            return [
+                'twig' => self::$twig,
+                'twigContext' => self::$twigContext,
+            ];
         }
 
-        $smarty = new \Smarty();
-        $smarty->setTemplateDir(dirname(__DIR__, 2) . '/templates/');
-
-        $smarty->assign('CURRENT_USER_IS_ADMIN', 0);
-        if (defined('SMARTY_CACHE_DIR')) {
-            $smarty->setCacheDir(
-                SMARTY_CACHE_DIR
-            )->setCompileDir(
-                SMARTY_CACHE_DIR
-            );
-        }
-
-        $smarty->assign('GOOGLECLIENTID', OMEGAUP_GOOGLE_CLIENTID);
-        $smarty->assign(
-            'ENABLE_SOCIAL_MEDIA_RESOURCES',
-            OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES
-        );
-        $smarty->assign('LOGGED_IN', '0');
-
-        /** @psalm-suppress RedundantCondition OMEGAUP_GA_TRACK may be defined differently. */
-        if (defined('OMEGAUP_GA_TRACK')  && OMEGAUP_GA_TRACK) {
-            $smarty->assign('OMEGAUP_GA_TRACK', 1);
-            $smarty->assign('OMEGAUP_GA_ID', OMEGAUP_GA_ID);
-        } else {
-            $smarty->assign('OMEGAUP_GA_TRACK', 0);
-        }
-
-        // Not sure why this makes Psalm complain, but no other invocation of
-        // getCurrentSession() does so.
-        /** @var CurrentSession */
-        [
-            'email' => $email,
-            'identity' => $identity,
-            'user' => $user,
-            'is_admin' => $isAdmin,
-        ] = \OmegaUp\Controllers\Session::getCurrentSession();
-        if (!is_null($identity) && !is_null($identity->username)) {
-            $smarty->assign('LOGGED_IN', '1');
-
-            $smarty->assign(
-                'CURRENT_USER_USERNAME',
-                $identity->username
-            );
-            $smarty->assign('CURRENT_USER_EMAIL', $email);
-            $smarty->assign(
-                'CURRENT_USER_IS_EMAIL_VERIFIED',
-                empty($user) || $user->verified
-            );
-            $smarty->assign('CURRENT_USER_IS_ADMIN', $isAdmin);
-            $smarty->assign(
-                'CURRENT_USER_IS_REVIEWER',
-                \OmegaUp\Authorization::isQualityReviewer($identity)
-            );
-            if (is_null($email)) {
-                $email = '';
-            }
-            $smarty->assign(
-                'CURRENT_USER_GRAVATAR_URL_128',
-                \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '128')
-            );
-            $smarty->assign(
-                'CURRENT_USER_GRAVATAR_URL_16',
-                \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '16')
-            );
-            $smarty->assign(
-                'CURRENT_USER_GRAVATAR_URL_32',
-                \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '32')
-            );
-            $smarty->assign(
-                'CURRENT_USER_GRAVATAR_URL_51',
-                \OmegaUp\UITools::getFormattedGravatarURL(md5($email), '51')
-            );
-        } else {
-            $smarty->assign(
-                'CURRENT_USER_GRAVATAR_URL_128',
-                '/media/avatar_92.png'
-            );
-            $smarty->assign(
-                'CURRENT_USER_GRAVATAR_URL_16',
-                '/media/avatar_16.png'
-            );
-        }
-
-        /** @psalm-suppress TypeDoesNotContainType OMEGAUP_ENVIRONMENT is a configurable value. */
+        $loader = new \OmegaUp\Template\Loader();
+        $twigOptions = [
+            'cache' => TEMPLATE_CACHE_DIR,
+        ];
+        /** @psalm-suppress TypeDoesNotContainType this can change depending on environment */
         if (
             defined('OMEGAUP_ENVIRONMENT') &&
             OMEGAUP_ENVIRONMENT === 'development'
         ) {
-            $smarty->force_compile = true;
-        } else {
-            $smarty->compile_check = \Smarty::COMPILECHECK_OFF;
+            $twigOptions['debug'] = true;
         }
+        $twig = new \Twig\Environment($loader, $twigOptions);
+        $twig->addTokenParser(new \OmegaUp\Template\VersionHashParser());
+        $twig->addTokenParser(new \OmegaUp\Template\JsIncludeParser());
 
-        /** @var string */
-        $_lang = \OmegaUp\Controllers\Identity::getPreferredLanguage($identity);
-        $smarty->configLoad(dirname(__DIR__, 2) . "/templates/{$_lang}.lang");
-        $smarty->addPluginsDir(dirname(__DIR__, 2) . '/smarty_plugins/');
+        /** @var array<string, mixed> */
+        $twigContext = [
+            'GOOGLECLIENTID' => OMEGAUP_GOOGLE_CLIENTID,
+            'NEW_RELIC_SCRIPT' => NEW_RELIC_SCRIPT,
+            'ENABLE_SOCIAL_MEDIA_RESOURCES' => OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES,
+            'ENABLED_EXPERIMENTS' => \OmegaUp\Experiments::getInstance()->getEnabledExperiments(),
+            'OMEGAUP_GA_TRACK' => (defined(
+                'OMEGAUP_GA_TRACK'
+            )  && OMEGAUP_GA_TRACK),
+            'OMEGAUP_LOCKDOWN' => (defined(
+                'OMEGAUP_LOCKDOWN'
+            )  && OMEGAUP_LOCKDOWN),
+            'OMEGAUP_MAINTENANCE' => (defined(
+                'OMEGAUP_MAINTENANCE'
+            )  && OMEGAUP_MAINTENANCE),
+        ] + \OmegaUp\UITools::getNavbarHeaderContext();
 
-        // TODO: It should be removed when all templates call render function
-        \OmegaUp\UITools::assignSmartyNavbarHeader($smarty);
+        [
+            'identity' => $identity,
+        ] = \OmegaUp\Controllers\Session::getCurrentSession();
 
-        $smarty->assign(
-            'ENABLED_EXPERIMENTS',
-            \OmegaUp\Experiments::getInstance()->getEnabledExperiments()
+        $twigContext['LOCALE'] = \OmegaUp\Controllers\Identity::getPreferredLanguage(
+            $identity
         );
-        self::$smarty = $smarty;
-        return $smarty;
+
+        self::$twig = $twig;
+        self::$twigContext = $twigContext;
+        return [
+            'twig' => self::$twig,
+            'twigContext' => self::$twigContext,
+        ];
     }
 
     public static function getFormattedGravatarURL(
@@ -167,57 +112,28 @@ class UITools {
 
     /**
      * @param array<string, mixed> $payload
+     * @return array<string, mixed>
      */
-    private static function assignSmartyNavbarHeader(
-        \Smarty $smarty,
+    private static function getNavbarHeaderContext(
         $payload = [],
         bool $inContest = false,
-        bool $supportsBootstrap4 = false,
         string $navbarSection = ''
-    ): void {
+    ): array {
         $headerPayload = self::getCommonPayload(
-            $smarty,
             $inContest,
-            $supportsBootstrap4,
             $navbarSection
         );
-        $smarty->assign('payload', $payload + $headerPayload);
-        $smarty->assign('headerPayload', $headerPayload);
-    }
-
-    /**
-     * Returns whether Bootstrap 4 will be used. This is only true if either:
-     *
-     * - The user explicitly requests bootstrap4 to be used regardless of
-     *   underlying support by the components by passing the request parameter
-     *   bootstrap4=force.
-     * - The user requests bootstrap4 to be used if the component supports it
-     *   by passing the request parameter bootstrap4=true.
-     */
-    private static function useBootstrap4(
-        bool $supportsBootstrap4
-    ): bool {
-        if (!isset($_REQUEST['bootstrap4'])) {
-            return false;
-        }
-        if ($_REQUEST['bootstrap4'] === 'force') {
-            // User can force the use of bootstrap4, just to see how awful it
-            // would look like.
-            return true;
-        }
-        return (
-            $supportsBootstrap4 &&
-            boolval($_REQUEST['bootstrap4'])
-        );
+        return [
+            'payload' => $payload + $headerPayload,
+            'headerPayload' => $headerPayload,
+        ];
     }
 
     /**
      * @return CommonPayload
      */
     private static function getCommonPayload(
-        \Smarty $smarty,
         bool $inContest = false,
-        bool $supportsBootstrap4 = false,
         string $navbarSection = ''
     ) {
         [
@@ -230,7 +146,6 @@ class UITools {
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
         return [
             'omegaUpLockDown' => OMEGAUP_LOCKDOWN,
-            'bootstrap4' => self::useBootstrap4($supportsBootstrap4),
             'inContest' => $inContest,
             'isLoggedIn' => !is_null($identity),
             'isReviewer' => (
@@ -277,20 +192,21 @@ class UITools {
     }
 
     /**
-     * @param callable(\OmegaUp\Request):array{smartyProperties: array{fullWidth?: bool, hideFooterAndHeader?: bool, payload: array<string, mixed>, scripts?: list<string>, title: \OmegaUp\TranslationString}, entrypoint: string, template?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string}|callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, entrypoint?: string, template?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string} $callback
+     * @param callable(\OmegaUp\Request):array{templateProperties: array{fullWidth?: bool, hideFooterAndHeader?: bool, payload: array<string, mixed>, scripts?: list<string>, title: \OmegaUp\TranslationString}, entrypoint: string, inContest?: bool, navbarSection?: string} $callback
      */
     public static function render(callable $callback): void {
-        $smarty = self::getSmartyInstance();
+        [
+            'twig' => $twig,
+            'twigContext' => $twigContext,
+        ] = self::getTwigInstance();
         try {
             $response = $callback(new Request($_REQUEST));
-            $smartyProperties = $response['smartyProperties'];
-            $entrypoint = $response['entrypoint'] ?? null;
-            $template = $response['template'] ?? '';
-            $supportsBootstrap4 = $response['supportsBootstrap4'] ?? false;
+            $twigProperties = $response['templateProperties'];
+            $entrypoint = $response['entrypoint'];
             $inContest = $response['inContest'] ?? false;
             $navbarSection = $response['navbarSection'] ?? '';
             /** @var array<string, mixed> */
-            $payload = $smartyProperties['payload'] ?? [];
+            $payload = $twigProperties['payload'] ?? [];
         } catch (\OmegaUp\Exceptions\ExitException $e) {
             // The callback explicitly requested to exit.
             exit;
@@ -298,66 +214,27 @@ class UITools {
             \OmegaUp\ApiCaller::handleException($e);
         }
 
-        if (!is_null($entrypoint)) {
-            if (
-                isset($smartyProperties['title'])  &&
-                is_object($smartyProperties['title']) &&
-                is_a($smartyProperties['title'], 'OmegaUp\TranslationString')
-            ) {
-                $titleVar = $smartyProperties['title']->message;
-                /** @var string */
-                $translationString = $smarty->getConfigVars($titleVar);
-                $smartyProperties['title'] = \OmegaUp\ApiUtils::formatString(
-                    $translationString,
-                    $smartyProperties['title']->args
-                );
-            } elseif (
-                !isset($smartyProperties['title']) ||
-                !is_string($smartyProperties['title'])
-            ) {
-                $titleVar = (
-                    'omegaupTitle' .
-                    str_replace('_', '', ucwords($entrypoint, '_'))
-                );
-                /** @var string */
-                $smartyProperties['title'] = $smarty->getConfigVars($titleVar);
-            }
-        }
-
-        /** @var mixed $value */
-        foreach ($smartyProperties as $key => $value) {
-            $smarty->assign($key, $value);
-        }
-
-        \OmegaUp\UITools::assignSmartyNavbarHeader(
-            $smarty,
-            $payload,
-            $inContest,
-            $supportsBootstrap4,
-            $navbarSection
+        $titleVar = $twigProperties['title']->message;
+        /**
+         * @psalm-suppress TranslationStringNotALiteralString this is being
+         * checked from the constructor of the exception
+         */
+        $localizedText = \OmegaUp\Translations::getInstance()->get($titleVar);
+        $twigProperties['title'] = \OmegaUp\ApiUtils::formatString(
+            $localizedText,
+            $twigProperties['title']->args
         );
 
-        if (!is_null($entrypoint)) {
-            $smarty->display(
-                sprintf(
-                    (
-                        'extends:file:%s/templates/template.tpl|' .
-                        'string:{block name="entrypoint"}{js_include entrypoint="' .
-                        $entrypoint .
-                        '" async}{/block}'
-                    ),
-                    strval(OMEGAUP_ROOT),
-                    $template
-                )
-            );
-        } else {
-            $smarty->display(
-                sprintf(
-                    '%s/templates/%s',
-                    strval(OMEGAUP_ROOT),
-                    $template
-                )
-            );
-        }
+        $twigContext = array_merge(
+            $twigContext,
+            $twigProperties,
+            \OmegaUp\UITools::getNavbarHeaderContext(
+                $payload,
+                $inContest,
+                $navbarSection
+            ),
+        );
+
+        $twig->display($entrypoint, $twigContext);
     }
 }

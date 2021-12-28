@@ -17,7 +17,7 @@
         <BIconCheckCircle class="mr-1" />
         <span name="tab"> {{ T.problemCreatorTestCases }}</span>
       </template>
-      <cases-main-window />
+      <cases-tab />
     </b-tab>
     <b-tab>
       <template #title>
@@ -30,10 +30,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import cases_MainWindow from './cases/MainWindow.vue';
+import cases_Tab from './cases/CasesTab.vue';
 import T from '../../../lang';
 @Component({
-  components: { 'cases-main-window': cases_MainWindow },
+  components: { 'cases-tab': cases_Tab },
 })
 export default class Tabs extends Vue {
   T = T;

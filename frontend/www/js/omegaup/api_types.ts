@@ -2542,7 +2542,6 @@ export namespace types {
 
   export interface CommonPayload {
     associatedIdentities: types.AssociatedIdentity[];
-    bootstrap4: boolean;
     currentEmail: string;
     currentName?: string;
     currentUsername: string;

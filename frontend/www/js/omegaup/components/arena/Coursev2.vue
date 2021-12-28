@@ -72,6 +72,8 @@
         <omegaup-problem-details
           v-if="currentSelectedTab === null && currentProblem"
           :problem="currentProblem"
+          :user="user"
+          :languages="course.languages"
         ></omegaup-problem-details>
       </b-col>
     </b-row>
@@ -107,6 +109,7 @@ export enum Tabs {
 })
 export default class ArenaCourse extends Vue {
   @Prop() course!: types.ArenaCourseDetails;
+  @Prop() user!: types.UserInfoForProblem;
   @Prop() assignment!: types.ArenaCourseAssignment;
   @Prop() problems!: types.ArenaCourseProblem[];
   @Prop() currentProblem!: types.ProblemDetails;

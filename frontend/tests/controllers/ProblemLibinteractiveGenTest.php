@@ -53,7 +53,7 @@ class ProblemLibinteractiveGenTest extends \OmegaUp\Test\ControllerTestCase {
         }
         $response = \OmegaUp\Controllers\Problem::getLibinteractiveGenForTypeScript(
             new \OmegaUp\Request($parameters)
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         if ($isEmptyRequest) {
             $defaultValuesParameters['name'] = null;
