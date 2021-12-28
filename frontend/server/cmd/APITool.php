@@ -341,7 +341,7 @@ class TypeMapper {
                             );
                             if ($isNullable) {
                                 $conversionStatement = (
-                                    "if (x.{$propertyName}) {$conversionStatement}"
+                                    "if (x.{$propertyName} !== null) {$conversionStatement}"
                                 );
                             }
                             $convertedProperties[] = $conversionStatement;
@@ -441,7 +441,7 @@ class TypeMapper {
                     // This is automatically cast into a JavaScript Date.
                     $typeNames[] = 'Date';
                     $requiresConversion = true;
-                    $conversionFunction[] = '(x: number) => new Date(x * 1000)';
+                    $conversionFunction[] = '(x: number) => new Date(x + 6 * 60 * 60 * 1000)';
                     continue;
                 }
                 if (isset($this->typeAliases[$type->value])) {

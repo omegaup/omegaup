@@ -110,12 +110,12 @@ export const Badge = {
     messages._BadgeBadgeDetailsServerResponse,
     messages.BadgeBadgeDetailsResponse
   >('/api/badge/badgeDetails/', (x) => {
-    if (x.assignation_time)
-      x.assignation_time = ((x: number) => new Date(x * 1000))(
+    if (x.assignation_time !== null)
+      x.assignation_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
         x.assignation_time,
       );
-    if (x.first_assignation)
-      x.first_assignation = ((x: number) => new Date(x * 1000))(
+    if (x.first_assignation !== null)
+      x.first_assignation = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
         x.first_assignation,
       );
     return x;
@@ -128,8 +128,8 @@ export const Badge = {
     messages._BadgeMyBadgeAssignationTimeServerResponse,
     messages.BadgeMyBadgeAssignationTimeResponse
   >('/api/badge/myBadgeAssignationTime/', (x) => {
-    if (x.assignation_time)
-      x.assignation_time = ((x: number) => new Date(x * 1000))(
+    if (x.assignation_time !== null)
+      x.assignation_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
         x.assignation_time,
       );
     return x;
@@ -144,14 +144,12 @@ export const Badge = {
         return x;
       }
       return x.map((x) => {
-        if (x.assignation_time)
-          x.assignation_time = ((x: number) => new Date(x * 1000))(
-            x.assignation_time,
-          );
-        if (x.first_assignation)
-          x.first_assignation = ((x: number) => new Date(x * 1000))(
-            x.first_assignation,
-          );
+        if (x.assignation_time !== null)
+          x.assignation_time = ((x: number) =>
+            new Date(x + 6 * 60 * 60 * 1000))(x.assignation_time);
+        if (x.first_assignation !== null)
+          x.first_assignation = ((x: number) =>
+            new Date(x + 6 * 60 * 60 * 1000))(x.first_assignation);
         return x;
       });
     })(x.badges);
@@ -167,14 +165,12 @@ export const Badge = {
         return x;
       }
       return x.map((x) => {
-        if (x.assignation_time)
-          x.assignation_time = ((x: number) => new Date(x * 1000))(
-            x.assignation_time,
-          );
-        if (x.first_assignation)
-          x.first_assignation = ((x: number) => new Date(x * 1000))(
-            x.first_assignation,
-          );
+        if (x.assignation_time !== null)
+          x.assignation_time = ((x: number) =>
+            new Date(x + 6 * 60 * 60 * 1000))(x.assignation_time);
+        if (x.first_assignation !== null)
+          x.first_assignation = ((x: number) =>
+            new Date(x + 6 * 60 * 60 * 1000))(x.first_assignation);
         return x;
       });
     })(x.badges);
@@ -188,7 +184,7 @@ export const Clarification = {
     messages._ClarificationCreateServerResponse,
     messages.ClarificationCreateResponse
   >('/api/clarification/create/', (x) => {
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
     return x;
   }),
   details: apiCall<
@@ -196,7 +192,7 @@ export const Clarification = {
     messages._ClarificationDetailsServerResponse,
     messages.ClarificationDetailsResponse
   >('/api/clarification/details/', (x) => {
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
     return x;
   }),
   update: apiCall<
@@ -216,7 +212,7 @@ export const Contest = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         return x;
       });
     })(x.events);
@@ -247,10 +243,14 @@ export const Contest = {
     messages._ContestAdminDetailsServerResponse,
     messages.ContestAdminDetailsResponse
   >('/api/contest/adminDetails/', (x) => {
-    x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    if (x.submission_deadline)
-      x.submission_deadline = ((x: number) => new Date(x * 1000))(
+    x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+      x.finish_time,
+    );
+    x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+      x.start_time,
+    );
+    if (x.submission_deadline !== null)
+      x.submission_deadline = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
         x.submission_deadline,
       );
     return x;
@@ -265,13 +265,18 @@ export const Contest = {
         return x;
       }
       return x.map((x) => {
-        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-        if (x.original_finish_time)
-          x.original_finish_time = ((x: number) => new Date(x * 1000))(
-            x.original_finish_time,
-          );
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.finish_time,
+        );
+        x.last_updated = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.last_updated,
+        );
+        if (x.original_finish_time !== null)
+          x.original_finish_time = ((x: number) =>
+            new Date(x + 6 * 60 * 60 * 1000))(x.original_finish_time);
+        x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.start_time,
+        );
         return x;
       });
     })(x.contests);
@@ -299,7 +304,7 @@ export const Contest = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         return x;
       });
     })(x.clarifications);
@@ -325,10 +330,14 @@ export const Contest = {
     messages._ContestDetailsServerResponse,
     messages.ContestDetailsResponse
   >('/api/contest/details/', (x) => {
-    x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    if (x.submission_deadline)
-      x.submission_deadline = ((x: number) => new Date(x * 1000))(
+    x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+      x.finish_time,
+    );
+    x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+      x.start_time,
+    );
+    if (x.submission_deadline !== null)
+      x.submission_deadline = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
         x.submission_deadline,
       );
     return x;
@@ -343,12 +352,17 @@ export const Contest = {
         return x;
       }
       return x.map((x) => {
-        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-        x.original_finish_time = ((x: number) => new Date(x * 1000))(
-          x.original_finish_time,
+        x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.finish_time,
         );
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        x.last_updated = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.last_updated,
+        );
+        x.original_finish_time = ((x: number) =>
+          new Date(x + 6 * 60 * 60 * 1000))(x.original_finish_time);
+        x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.start_time,
+        );
         return x;
       });
     })(x.results);
@@ -364,13 +378,18 @@ export const Contest = {
         return x;
       }
       return x.map((x) => {
-        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-        if (x.original_finish_time)
-          x.original_finish_time = ((x: number) => new Date(x * 1000))(
-            x.original_finish_time,
-          );
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.finish_time,
+        );
+        x.last_updated = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.last_updated,
+        );
+        if (x.original_finish_time !== null)
+          x.original_finish_time = ((x: number) =>
+            new Date(x + 6 * 60 * 60 * 1000))(x.original_finish_time);
+        x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.start_time,
+        );
         return x;
       });
     })(x.contests);
@@ -386,13 +405,18 @@ export const Contest = {
         return x;
       }
       return x.map((x) => {
-        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-        if (x.original_finish_time)
-          x.original_finish_time = ((x: number) => new Date(x * 1000))(
-            x.original_finish_time,
-          );
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.finish_time,
+        );
+        x.last_updated = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.last_updated,
+        );
+        if (x.original_finish_time !== null)
+          x.original_finish_time = ((x: number) =>
+            new Date(x + 6 * 60 * 60 * 1000))(x.original_finish_time);
+        x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.start_time,
+        );
         return x;
       });
     })(x.contests);
@@ -411,7 +435,7 @@ export const Contest = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         return x;
       });
     })(x.clarifications);
@@ -434,11 +458,15 @@ export const Contest = {
             }
             return x.map((x) => {
               x.author = ((x) => {
-                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+                  x.time,
+                );
                 return x;
               })(x.author);
               x.committer = ((x) => {
-                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+                  x.time,
+                );
                 return x;
               })(x.committer);
               return x;
@@ -456,8 +484,12 @@ export const Contest = {
     messages._ContestPublicDetailsServerResponse,
     messages.ContestPublicDetailsResponse
   >('/api/contest/publicDetails/', (x) => {
-    x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+      x.finish_time,
+    );
+    x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+      x.start_time,
+    );
     return x;
   }),
   registerForContest: apiCall<
@@ -493,10 +525,14 @@ export const Contest = {
     messages._ContestReportServerResponse,
     messages.ContestReportResponse
   >('/api/contest/report/', (x) => {
-    if (x.finish_time)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    if (x.finish_time !== null)
+      x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        x.finish_time,
+      );
+    x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+      x.start_time,
+    );
+    x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
     return x;
   }),
   requests: apiCall<
@@ -509,9 +545,13 @@ export const Contest = {
         return x;
       }
       return x.map((x) => {
-        if (x.last_update)
-          x.last_update = ((x: number) => new Date(x * 1000))(x.last_update);
-        x.request_time = ((x: number) => new Date(x * 1000))(x.request_time);
+        if (x.last_update !== null)
+          x.last_update = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.last_update,
+          );
+        x.request_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.request_time,
+        );
         return x;
       });
     })(x.users);
@@ -530,7 +570,7 @@ export const Contest = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         return x;
       });
     })(x.runs);
@@ -545,10 +585,14 @@ export const Contest = {
     messages._ContestScoreboardServerResponse,
     messages.ContestScoreboardResponse
   >('/api/contest/scoreboard/', (x) => {
-    if (x.finish_time)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    if (x.finish_time !== null)
+      x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        x.finish_time,
+      );
+    x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+      x.start_time,
+    );
+    x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
     return x;
   }),
   scoreboardEvents: apiCall<
@@ -572,8 +616,10 @@ export const Contest = {
     messages._ContestStatsServerResponse,
     messages.ContestStatsResponse
   >('/api/contest/stats/', (x) => {
-    if (x.max_wait_time)
-      x.max_wait_time = ((x: number) => new Date(x * 1000))(x.max_wait_time);
+    if (x.max_wait_time !== null)
+      x.max_wait_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        x.max_wait_time,
+      );
     return x;
   }),
   update: apiCall<
@@ -594,10 +640,14 @@ export const Contest = {
         return x;
       }
       return x.map((x) => {
-        if (x.access_time)
-          x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
-        if (x.end_time)
-          x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+        if (x.access_time !== null)
+          x.access_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.access_time,
+          );
+        if (x.end_time !== null)
+          x.end_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.end_time,
+          );
         return x;
       });
     })(x.users);
@@ -616,7 +666,7 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         return x;
       });
     })(x.events);
@@ -648,9 +698,13 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        if (x.finish_time)
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        if (x.finish_time !== null)
+          x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.finish_time,
+          );
+        x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.start_time,
+        );
         return x;
       });
     })(x.assignments);
@@ -659,13 +713,17 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         return x;
       });
     })(x.clarifications);
-    if (x.finish_time)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    if (x.finish_time !== null)
+      x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        x.finish_time,
+      );
+    x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+      x.start_time,
+    );
     return x;
   }),
   admins: apiCall<messages.CourseAdminsRequest, messages.CourseAdminsResponse>(
@@ -689,15 +747,23 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        if (x.finish_time)
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        if (x.finish_time !== null)
+          x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.finish_time,
+          );
+        x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.start_time,
+        );
         return x;
       });
     })(x.courseAssignments);
-    if (x.finish_time)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    if (x.finish_time !== null)
+      x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        x.finish_time,
+      );
+    x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+      x.start_time,
+    );
     return x;
   }),
   assignmentScoreboard: apiCall<
@@ -705,10 +771,14 @@ export const Course = {
     messages._CourseAssignmentScoreboardServerResponse,
     messages.CourseAssignmentScoreboardResponse
   >('/api/course/assignmentScoreboard/', (x) => {
-    if (x.finish_time)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    if (x.finish_time !== null)
+      x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        x.finish_time,
+      );
+    x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+      x.start_time,
+    );
+    x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
     return x;
   }),
   assignmentScoreboardEvents: apiCall<
@@ -725,7 +795,7 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         return x;
       });
     })(x.clarifications);
@@ -751,9 +821,13 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        if (x.finish_time)
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        if (x.finish_time !== null)
+          x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.finish_time,
+          );
+        x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.start_time,
+        );
         return x;
       });
     })(x.assignments);
@@ -762,13 +836,17 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         return x;
       });
     })(x.clarifications);
-    if (x.finish_time)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    if (x.finish_time !== null)
+      x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        x.finish_time,
+      );
+    x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+      x.start_time,
+    );
     return x;
   }),
   generateTokenForCloneCourse: apiCall<
@@ -790,9 +868,13 @@ export const Course = {
           return x;
         }
         return x.map((x) => {
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          if (x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+              x.finish_time,
+            );
+          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.start_time,
+          );
           return x;
         });
       })(x.assignments);
@@ -801,13 +883,17 @@ export const Course = {
           return x;
         }
         return x.map((x) => {
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
           return x;
         });
       })(x.clarifications);
-      if (x.finish_time)
-        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-      x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+      if (x.finish_time !== null)
+        x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.finish_time,
+        );
+      x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        x.start_time,
+      );
       return x;
     })(x.course);
     return x;
@@ -822,9 +908,13 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        if (x.finish_time)
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        if (x.finish_time !== null)
+          x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.finish_time,
+          );
+        x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.start_time,
+        );
         return x;
       });
     })(x.assignments);
@@ -856,7 +946,7 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         return x;
       });
     })(x.clarifications);
@@ -896,9 +986,13 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        if (x.last_update)
-          x.last_update = ((x: number) => new Date(x * 1000))(x.last_update);
-        x.request_time = ((x: number) => new Date(x * 1000))(x.request_time);
+        if (x.last_update !== null)
+          x.last_update = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.last_update,
+          );
+        x.request_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.request_time,
+        );
         return x;
       });
     })(x.users);
@@ -914,7 +1008,7 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         return x;
       });
     })(x.runs);
@@ -935,12 +1029,14 @@ export const Course = {
             return x;
           }
           return x.map((x) => {
-            if (x.feedback)
+            if (x.feedback !== null)
               x.feedback = ((x) => {
-                x.date = ((x: number) => new Date(x * 1000))(x.date);
+                x.date = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+                  x.date,
+                );
                 return x;
               })(x.feedback);
-            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
             return x;
           });
         })(x.runs);
@@ -1006,7 +1102,9 @@ export const Group = {
         return x;
       }
       return x.map((x) => {
-        x.create_time = ((x: number) => new Date(x * 1000))(x.create_time);
+        x.create_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.create_time,
+        );
         return x;
       });
     })(x.groups);
@@ -1036,8 +1134,12 @@ export const GroupScoreboard = {
         return x;
       }
       return x.map((x) => {
-        x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.finish_time,
+        );
+        x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.start_time,
+        );
         return x;
       });
     })(x.contests);
@@ -1095,7 +1197,9 @@ export const Notification = {
         return x;
       }
       return x.map((x) => {
-        x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+        x.timestamp = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.timestamp,
+        );
         return x;
       });
     })(x.notifications);
@@ -1142,7 +1246,7 @@ export const Problem = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         return x;
       });
     })(x.clarifications);
@@ -1161,36 +1265,37 @@ export const Problem = {
     messages._ProblemDetailsServerResponse,
     messages.ProblemDetailsResponse
   >('/api/problem/details/', (x) => {
-    x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date);
-    if (x.nextSubmissionTimestamp)
-      x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
-        x.nextSubmissionTimestamp,
-      );
-    if (x.problemsetter)
+    x.creation_date = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+      x.creation_date,
+    );
+    if (x.nextSubmissionTimestamp !== null)
+      x.nextSubmissionTimestamp = ((x: number) =>
+        new Date(x + 6 * 60 * 60 * 1000))(x.nextSubmissionTimestamp);
+    if (x.problemsetter !== null)
       x.problemsetter = ((x) => {
-        if (x.creation_date)
-          x.creation_date = ((x: number) => new Date(x * 1000))(
+        if (x.creation_date !== null)
+          x.creation_date = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
             x.creation_date,
           );
         return x;
       })(x.problemsetter);
-    if (x.runs)
+    if (x.runs !== null)
       x.runs = ((x) => {
         if (!Array.isArray(x)) {
           return x;
         }
         return x.map((x) => {
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
           return x;
         });
       })(x.runs);
-    if (x.solvers)
+    if (x.solvers !== null)
       x.solvers = ((x) => {
         if (!Array.isArray(x)) {
           return x;
         }
         return x.map((x) => {
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
           return x;
         });
       })(x.solvers);
@@ -1237,7 +1342,7 @@ export const Problem = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         return x;
       });
     })(x.runs);
@@ -1288,11 +1393,11 @@ export const Problem = {
       }
       return x.map((x) => {
         x.author = ((x) => {
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
           return x;
         })(x.author);
         x.committer = ((x) => {
-          x.time = ((x: number) => new Date(x * 1000))(x.time);
+          x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
           return x;
         })(x.committer);
         return x;
@@ -1315,34 +1420,44 @@ export const Problemset = {
     messages._ProblemsetDetailsServerResponse,
     messages.ProblemsetDetailsResponse
   >('/api/problemset/details/', (x) => {
-    if (x.courseAssignments)
+    if (x.courseAssignments !== null)
       x.courseAssignments = ((x) => {
         if (!Array.isArray(x)) {
           return x;
         }
         return x.map((x) => {
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          if (x.finish_time !== null)
+            x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+              x.finish_time,
+            );
+          x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.start_time,
+          );
           return x;
         });
       })(x.courseAssignments);
-    if (x.finish_time)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    if (x.start_time)
-      x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    if (x.submission_deadline)
-      x.submission_deadline = ((x: number) => new Date(x * 1000))(
+    if (x.finish_time !== null)
+      x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        x.finish_time,
+      );
+    if (x.start_time !== null)
+      x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        x.start_time,
+      );
+    if (x.submission_deadline !== null)
+      x.submission_deadline = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
         x.submission_deadline,
       );
-    if (x.users)
+    if (x.users !== null)
       x.users = ((x) => {
         if (!Array.isArray(x)) {
           return x;
         }
         return x.map((x) => {
-          if (x.access_time)
-            x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
+          if (x.access_time !== null)
+            x.access_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+              x.access_time,
+            );
           return x;
         });
       })(x.users);
@@ -1353,10 +1468,14 @@ export const Problemset = {
     messages._ProblemsetScoreboardServerResponse,
     messages.ProblemsetScoreboardResponse
   >('/api/problemset/scoreboard/', (x) => {
-    if (x.finish_time)
-      x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    if (x.finish_time !== null)
+      x.finish_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        x.finish_time,
+      );
+    x.start_time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+      x.start_time,
+    );
+    x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
     return x;
   }),
   scoreboardEvents: apiCall<
@@ -1375,13 +1494,14 @@ export const QualityNomination = {
     messages._QualityNominationDetailsServerResponse,
     messages.QualityNominationDetailsResponse
   >('/api/qualityNomination/details/', (x) => {
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
     x.votes = ((x) => {
       if (!Array.isArray(x)) {
         return x;
       }
       return x.map((x) => {
-        if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+        if (x.time !== null)
+          x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         return x;
       });
     })(x.votes);
@@ -1397,13 +1517,16 @@ export const QualityNomination = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         x.votes = ((x) => {
           if (!Array.isArray(x)) {
             return x;
           }
           return x.map((x) => {
-            if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+            if (x.time !== null)
+              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+                x.time,
+              );
             return x;
           });
         })(x.votes);
@@ -1422,13 +1545,16 @@ export const QualityNomination = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         x.votes = ((x) => {
           if (!Array.isArray(x)) {
             return x;
           }
           return x.map((x) => {
-            if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+            if (x.time !== null)
+              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+                x.time,
+              );
             return x;
           });
         })(x.votes);
@@ -1447,13 +1573,16 @@ export const QualityNomination = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         x.votes = ((x) => {
           if (!Array.isArray(x)) {
             return x;
           }
           return x.map((x) => {
-            if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+            if (x.time !== null)
+              x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+                x.time,
+              );
             return x;
           });
         })(x.votes);
@@ -1490,10 +1619,9 @@ export const Run = {
     messages._RunCreateServerResponse,
     messages.RunCreateResponse
   >('/api/run/create/', (x) => {
-    x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
-      x.nextSubmissionTimestamp,
-    );
-    x.submission_deadline = ((x: number) => new Date(x * 1000))(
+    x.nextSubmissionTimestamp = ((x: number) =>
+      new Date(x + 6 * 60 * 60 * 1000))(x.nextSubmissionTimestamp);
+    x.submission_deadline = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
       x.submission_deadline,
     );
     return x;
@@ -1503,9 +1631,9 @@ export const Run = {
     messages._RunDetailsServerResponse,
     messages.RunDetailsResponse
   >('/api/run/details/', (x) => {
-    if (x.feedback)
+    if (x.feedback !== null)
       x.feedback = ((x) => {
-        x.date = ((x: number) => new Date(x * 1000))(x.date);
+        x.date = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.date);
         return x;
       })(x.feedback);
     return x;
@@ -1524,7 +1652,7 @@ export const Run = {
         return x;
       }
       return x.map((x) => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
+        x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
         return x;
       });
     })(x.runs);
@@ -1541,7 +1669,7 @@ export const Run = {
     messages._RunStatusServerResponse,
     messages.RunStatusResponse
   >('/api/run/status/', (x) => {
-    x.time = ((x: number) => new Date(x * 1000))(x.time);
+    x.time = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.time);
     return x;
   }),
 };
@@ -1668,12 +1796,14 @@ export const User = {
     messages._UserCoderOfTheMonthServerResponse,
     messages.UserCoderOfTheMonthResponse
   >('/api/user/coderOfTheMonth/', (x) => {
-    if (x.coderinfo)
+    if (x.coderinfo !== null)
       x.coderinfo = ((x) => {
-        if (x.birth_date)
-          x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-        if (x.graduation_date)
-          x.graduation_date = ((x: number) => new Date(x * 1000))(
+        if (x.birth_date !== null)
+          x.birth_date = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+            x.birth_date,
+          );
+        if (x.graduation_date !== null)
+          x.graduation_date = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
             x.graduation_date,
           );
         return x;
@@ -1695,15 +1825,12 @@ export const User = {
           (y) =>
             (x[y] = ((x) => {
               x.data = ((x) => {
-                x.finish_time = ((x: number) => new Date(x * 1000))(
-                  x.finish_time,
-                );
-                x.last_updated = ((x: number) => new Date(x * 1000))(
-                  x.last_updated,
-                );
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
-                );
+                x.finish_time = ((x: number) =>
+                  new Date(x + 6 * 60 * 60 * 1000))(x.finish_time);
+                x.last_updated = ((x: number) =>
+                  new Date(x + 6 * 60 * 60 * 1000))(x.last_updated);
+                x.start_time = ((x: number) =>
+                  new Date(x + 6 * 60 * 60 * 1000))(x.start_time);
                 return x;
               })(x.data);
               return x;
@@ -1726,10 +1853,14 @@ export const User = {
     messages._UserExtraInformationServerResponse,
     messages.UserExtraInformationResponse
   >('/api/user/extraInformation/', (x) => {
-    if (x.birth_date)
-      x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-    if (x.last_login)
-      x.last_login = ((x: number) => new Date(x * 1000))(x.last_login);
+    if (x.birth_date !== null)
+      x.birth_date = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        x.birth_date,
+      );
+    if (x.last_login !== null)
+      x.last_login = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        x.last_login,
+      );
     return x;
   }),
   generateGitToken: apiCall<
@@ -1757,12 +1888,16 @@ export const User = {
         return x;
       }
       return x.map((x) => {
-        x.last_used = ((x: number) => new Date(x * 1000))(x.last_used);
+        x.last_used = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.last_used,
+        );
         x.rate_limit = ((x) => {
-          x.reset = ((x: number) => new Date(x * 1000))(x.reset);
+          x.reset = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(x.reset);
           return x;
         })(x.rate_limit);
-        x.timestamp = ((x: number) => new Date(x * 1000))(x.timestamp);
+        x.timestamp = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+          x.timestamp,
+        );
         return x;
       });
     })(x.tokens);
@@ -1796,10 +1931,12 @@ export const User = {
     messages._UserProfileServerResponse,
     messages.UserProfileResponse
   >('/api/user/profile/', (x) => {
-    if (x.birth_date)
-      x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-    if (x.graduation_date)
-      x.graduation_date = ((x: number) => new Date(x * 1000))(
+    if (x.birth_date !== null)
+      x.birth_date = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
+        x.birth_date,
+      );
+    if (x.graduation_date !== null)
+      x.graduation_date = ((x: number) => new Date(x + 6 * 60 * 60 * 1000))(
         x.graduation_date,
       );
     return x;

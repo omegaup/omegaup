@@ -54,10 +54,7 @@
             </form>
           </div>
           <div data-last-login class="col-md">
-            <label
-              v-if="lastLogin != null && myvar instanceof Date"
-              class="font-weight-bold"
-            >
+            <label v-if="lastLogin != null" class="font-weight-bold">
               {{
                 ui.formatString(T.userLastLogin, {
                   lastLogin: time.formatDateTime(lastLogin),
@@ -69,10 +66,7 @@
             </label>
           </div>
           <div data-birth-date class="col-md">
-            <label
-              v-if="birthDate != null && myvar instanceof Date"
-              class="font-weight-bold"
-            >
+            <label v-if="birthDate != null" class="font-weight-bold">
               {{
                 ui.formatString(T.userBirthDate, {
                   birthDate: time.formatDate(birthDate),
