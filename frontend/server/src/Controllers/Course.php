@@ -4037,8 +4037,18 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         if (
-            $assignment->start_time->time > \OmegaUp\Time::get() &&
-            !$isAdmin
+            !$isAdmin &&
+            !\OmegaUp\DAO\GroupRoles::isContestant(
+                intval($currentIdentity->identity_id),
+                intval($assignment->acl_id)
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        if (
+            !$isAdmin &&
+            $assignment->start_time->time > \OmegaUp\Time::get()
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'assignmentNotStarted'
@@ -4194,6 +4204,16 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $r->identity
             )
         );
+
+        if (
+            !$isAdmin &&
+            !\OmegaUp\DAO\GroupRoles::isContestant(
+                intval($r->identity->identity_id),
+                intval($assignment->acl_id)
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
 
         if (
             $assignment->start_time->time > \OmegaUp\Time::get() &&
