@@ -207,10 +207,11 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     ur.user_id = ?;';
         $params = [$userId];
         /** @var null|string */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+        $className = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             $params
-        ) ?? 'user-rank-unranked';
+        );
+        return $className ?? 'user-rank-unranked';
     }
 
     final public static function getByVerification(
