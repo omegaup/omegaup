@@ -283,30 +283,13 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     u.`hide_problem_tags`,
                     u.`verified`,
                     i.`gender`,
-                    IFNULL(
-                        (
-                            SELECT urc.classname FROM
-                                User_Rank_Cutoffs urc
-                            WHERE
-                                urc.score <= (
-                                        SELECT
-                                            ur.score
-                                        FROM
-                                            User_Rank ur
-                                        WHERE
-                                            ur.user_id = i.user_id
-                                    )
-                            ORDER BY
-                                urc.percentile ASC
-                            LIMIT
-                                1
-                        ),
-                        \'user-rank-unranked\'
-                    ) AS classname
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
                 FROM
                     Identities i
                 LEFT JOIN
                     Users u ON u.user_id = i.user_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
                 LEFT JOIN
                     Emails e ON u.main_email_id = e.email_id
                 LEFT JOIN
@@ -555,40 +538,17 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     ) {
         $sql = 'SELECT
                     ti.*,
-                    IFNULL(
-                        (
-                            SELECT urc.classname FROM
-                                User_Rank_Cutoffs urc
-                            WHERE
-                                urc.score <= (
-                                        SELECT
-                                            ur.score
-                                        FROM
-                                            User_Rank ur
-                                        WHERE
-                                            ur.user_id = i.user_id
-                                    )
-                            ORDER BY
-                                urc.percentile ASC
-                            LIMIT
-                                1
-                        ),
-                        \'user-rank-unranked\'
-                    ) AS classname
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
                 FROM
                     Identities i
                 INNER JOIN
-                    Team_Users tu
-                ON
-                    tu.identity_id = i.identity_id
+                    Team_Users tu ON tu.identity_id = i.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
                 INNER JOIN
-                    Teams t
-                ON
-                    t.team_id = tu.team_id
+                    Teams t ON t.team_id = tu.team_id
                 INNER JOIN
-                    Identities ti
-                ON
-                    ti.identity_id = t.identity_id
+                    Identities ti ON ti.identity_id = t.identity_id
                 WHERE
                     i.identity_id = ?
                 LIMIT 1;';
