@@ -4,7 +4,7 @@ import T from '../../lang';
 import admin_Support from './Support.vue';
 
 describe('Support.vue', () => {
-  it('Should handle support page for an specific user', () => {
+  it('Should handle support page for users without a birth date', () => {
     const wrapper = shallowMount(admin_Support, {
       propsData: {
         username: 'omegaUp',
