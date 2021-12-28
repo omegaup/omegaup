@@ -4356,8 +4356,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             'runs' => $response['templateProperties']['payload']['runs'],
         ] = self::getAllRuns(
             problemsetId: $assignment->problemset_id,
+            status: null,
+            verdict: null,
             problemId: intval($problem->problem_id),
-            identityId: $identityId,
+            language: null,
+            identityId: $identityId
         );
 
         return $response;
