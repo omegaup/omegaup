@@ -49,6 +49,7 @@ RUN php frontend/server/cmd/CompileTemplatesCmd.php
 
 FROM alpine:latest AS frontend
 RUN apk add rsync
+RUN mkdir -p /var/lib/omegaup /opt/omegaup
 COPY --from=build /opt/omegaup /opt/omegaup
 COPY --from=build /var/lib/omegaup /var/lib/omegaup
 

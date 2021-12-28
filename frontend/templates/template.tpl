@@ -64,7 +64,7 @@
       {% endif %}
 
       <script type="text/json" id="payload">{{ payload|json_encode|raw }}</script>
-      {% block entrypoint %}{% endblock %}
+      {% entrypoint %}
       <div id="main-container"></div>
     </main>
     {% if OMEGAUP_GA_TRACK == 1 %}

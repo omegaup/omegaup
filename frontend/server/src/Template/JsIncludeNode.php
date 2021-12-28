@@ -30,14 +30,31 @@ class JsIncludeNode extends \Twig\Node\Node {
         /** @var \Twig\Source */
         $sourceContext = $this->getSourceContext();
         $source = $sourceContext->getName();
-        if (!array_key_exists($source, self::$_includedScripts)) {
-            self::$_includedScripts[$source] = [];
-        }
-        $compiler->addDebugInfo($this);
         /** @var string */
         $entrypoint = $this->getAttribute('entrypoint');
         /** @var string[] */
         $options = $this->getAttribute('options');
+        $compiler->addDebugInfo($this);
+        foreach (self::getScriptTags($source, $entrypoint, $options) as $tag) {
+            $compiler
+                ->raw('echo ')
+                ->repr($tag)
+                ->raw(";\n");
+        }
+    }
+
+    /**
+     * @var string[] $options
+     * @return string[]
+     */
+    public static function getScriptTags(
+        string $sourceName,
+        string $entrypoint,
+        array $options,
+    ): array {
+        if (!array_key_exists($sourceName, self::$_includedScripts)) {
+            self::$_includedScripts[$sourceName] = [];
+        }
         /** @var string[] */
         $omitScripts = [];
         if (in_array('omitRuntime', $options)) {
@@ -45,8 +62,15 @@ class JsIncludeNode extends \Twig\Node\Node {
                 $omitScripts[] = $filename;
             }
         }
+        /** @var string[] */
+        $result = [];
         foreach (self::getJavaScriptDeps($entrypoint) as $filename) {
-            if (array_key_exists($filename, self::$_includedScripts[$source])) {
+            if (
+                array_key_exists(
+                    $filename,
+                    self::$_includedScripts[$sourceName]
+                )
+            ) {
                 // Avoid including files that have already been included
                 // before.
                 continue;
@@ -56,18 +80,14 @@ class JsIncludeNode extends \Twig\Node\Node {
                 // runtime.
                 continue;
             }
-            self::$_includedScripts[$source][$filename] = true;
+            self::$_includedScripts[$sourceName][$filename] = true;
             // Append a hash to ensure that the cache is invalidated
             // if the content changes.
             $generatedPath = dirname(__DIR__, 3) . "/www/{$filename}";
             $hash = substr(sha1(file_get_contents($generatedPath)), 0, 6);
-            $compiler
-                ->raw('echo ')
-                ->repr(
-                    "<script src=\"{$filename}?ver={$hash}\" type=\"text/javascript\" defer></script>\n"
-                )
-                ->raw(";\n");
+            $result[] = "<script src=\"{$filename}?ver={$hash}\" type=\"text/javascript\" defer></script>\n";
         }
+        return $result;
     }
 
     /**
