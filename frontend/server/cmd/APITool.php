@@ -341,7 +341,7 @@ class TypeMapper {
                             );
                             if ($isNullable) {
                                 $conversionStatement = (
-                                    "if (x.{$propertyName}) {$conversionStatement}"
+                                    "if (typeof x.{$propertyName} !== 'undefined' &&  x.{$propertyName} !== null) {$conversionStatement}"
                                 );
                             }
                             $convertedProperties[] = $conversionStatement;
