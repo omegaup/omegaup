@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
     {% if NEW_RELIC_SCRIPT %}
-      {{ NEW_RELIC_SCRIPT }}
+      {{ NEW_RELIC_SCRIPT|raw }}
     {% endif %}
 
     {% if GOOGLECLIENTID %}
@@ -59,7 +59,7 @@
       </div>
       {% if OMEGAUP_MAINTENANCE %}
         <div id="announcement" class="alert alert-info mt-0">
-          {{ OMEGAUP_MAINTENANCE }}
+          {{ OMEGAUP_MAINTENANCE|raw }}
         </div>
       {% endif %}
 
