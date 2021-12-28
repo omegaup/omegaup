@@ -51,9 +51,9 @@
     "cross-env": "^6.0.3",
     "css-loader": "^3.6",
     "cypress": "^9.1.1",
-    "date-fns": "^2.27.0",
     "cypress-file-upload": "^5.0.8",
     "cypress-wait-until": "^1.7.2",
+    "date-fns": "^2.27.0",
     "eslint": "^7.24",
     "eslint-config-prettier": "^6.12.0",
     "eslint-plugin-jest-dom": "^3.6.5",
@@ -135,5 +135,8 @@
     "build-development-frontend": "cross-env webpack --config-name=frontend --mode=development",
     "refactor": "cross-env ./stuff/refactor.js"
   },
-  "dependencies": {}
+  "dependencies": {
+    "golden-layout": "1.5.9",
+    "vue-golden-layout": "^2.1.1"
+  }
 }

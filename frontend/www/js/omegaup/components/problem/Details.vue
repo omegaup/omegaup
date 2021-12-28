@@ -296,7 +296,7 @@ import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
-import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
+import arena_EphemeralGrader from '../arena/EphemeralGraderv2.vue';
 import arena_Runs from '../arena/Runs.vue';
 import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
 import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';

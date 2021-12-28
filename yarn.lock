@@ -3888,6 +3888,11 @@ cross-spawn@^7.0.2:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
+css-element-queries@^1.0.2:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/css-element-queries/-/css-element-queries-1.2.3.tgz#e14940b1fcd4bf0da60ea4145d05742d7172e516"
+  integrity sha512-QK9uovYmKTsV2GXWQiMOByVNrLn2qz6m3P7vWpOR4IdD6I3iXoDw5qtgJEN3Xq7gIbdHVKvzHjdAtcl+4Arc4Q==
+
 css-loader@^3.6:
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-3.6.0.tgz#2e4b2c7e6e2d27f8c8f28f61bffcd2e6c91ef645"
@@ -5251,6 +5256,13 @@ globjoin@^0.1.4:
   resolved "https://registry.yarnpkg.com/globjoin/-/globjoin-0.1.4.tgz#2f4494ac8919e3767c5cbb691e9f463324285d43"
   integrity sha1-L0SUrIkZ43Z8XLtpHp9GMyQoXUM=
 
+golden-layout@1.5.9:
+  version "1.5.9"
+  resolved "https://registry.yarnpkg.com/golden-layout/-/golden-layout-1.5.9.tgz#a39bc1f6a67e6f886b797c016dd924e9426ba77f"
+  integrity sha1-o5vB9qZ+b4hreXwBbdkk6UJrp38=
+  dependencies:
+    jquery "*"
+
 gonzales-pe@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/gonzales-pe/-/gonzales-pe-4.3.0.tgz#fe9dec5f3c557eead09ff868c65826be54d067b3"
@@ -5608,6 +5620,11 @@ interpret@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-2.2.0.tgz#1a78a0b5965c40a5416d007ad6f50ad27c417df9"
   integrity sha512-Ju0Bz/cEia55xDwUWEa8+olFpCiQoypjnQySseKtmjNrnps3P+xfpUmGr90T7yjlVJmOtybRvPXhKMbHr+fWnw==
+
+intersection-observer@^0.5.0:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/intersection-observer/-/intersection-observer-0.5.1.tgz#e340fc56ce74290fe2b2394d1ce88c4353ac6dfa"
+  integrity sha512-Zd7Plneq82kiXFixs7bX62YnuZ0BMRci9br7io88LwDyF3V43cQMI+G5IiTlTNTt+LsDUppl19J/M2Fp9UkH6g==
 
 invariant@^2.2.2:
   version "2.2.4"
@@ -6397,6 +6414,11 @@ jest@^26.6.3:
     "@jest/core" "^26.6.3"
     import-local "^3.0.2"
     jest-cli "^26.6.3"
+
+jquery@*, jquery@^3.5.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.0.tgz#c72a09f15c1bdce142f49dbf1170bdf8adac2470"
+  integrity sha512-JVzAR/AjBvVt2BmYhxRCSYysDsPcssdmTFnzyLEts9qNwmjmu4JTAMYubEfwVOSwpQ1I1sKKFcxhZCI2buerfw==
 
 jquery@^3.5.1:
   version "3.5.1"
@@ -9789,6 +9811,14 @@ vue-gapi@^0.3.1:
   resolved "https://registry.yarnpkg.com/vue-gapi/-/vue-gapi-0.3.1.tgz#24b8359d17b573b4bf2480c9b5fd5d95687e858b"
   integrity sha512-ihmWPU8U7AD8kgsU1PvYe1cqJxd0JBkJ5OIxKDGj7hTchQ2iWIciKG2AIJUwUUdJaw8eZ9tSJe/60J0KvkTlrA==
 
+vue-golden-layout@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/vue-golden-layout/-/vue-golden-layout-2.1.1.tgz#dc80e00854592deb7135cb8a2171f00940be7513"
+  integrity sha512-S7XeMUYHuRXROU3j2xf8oPN7J4B+V0MegnJcxYlmevJU6fX02QYtkDBP+B6mFKhdtslo/i/k+AzFIP3Dz7nHqw==
+  dependencies:
+    jquery "^3.5.0"
+    vue-resize-directive "^1.2.0"
+
 vue-google-oauth2@^1.5.5:
   version "1.5.5"
   resolved "https://registry.yarnpkg.com/vue-google-oauth2/-/vue-google-oauth2-1.5.5.tgz#5d26a57c07679142f9299a0f9177aa9f9cc95879"
@@ -9853,6 +9883,15 @@ vue-recaptcha@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/vue-recaptcha/-/vue-recaptcha-1.3.0.tgz#e668e54f798c6333057ef38b4425a72f451ce478"
   integrity sha512-9Qf1niyHq4QbEUhsvdUkS8BoOyhYwpp8v+imUSj67ffDo9RQ6h8Ekq8EGnw/GKViXCwWalp7EEY/n/fOtU0FyA==
+
+vue-resize-directive@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/vue-resize-directive/-/vue-resize-directive-1.2.0.tgz#4214ca8a80a425529b036ea868cad54a38f613e4"
+  integrity sha512-LmpFexQcl1XYyz3DQrTrq3Efgj50MKEON60nR9MMAq1D2ZtXFg1WDcy1wy1T0SeduNtIu9hos2aLTsJUplvjlQ==
+  dependencies:
+    css-element-queries "^1.0.2"
+    intersection-observer "^0.5.0"
+    lodash.debounce "^4.0.8"
 
 vue-resize@^1.0.0:
   version "1.0.1"
