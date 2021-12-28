@@ -206,7 +206,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 WHERE
                     ur.user_id = ?;';
         $params = [$userId];
-        /** @var string */
+        /** @var null|string */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             $params
