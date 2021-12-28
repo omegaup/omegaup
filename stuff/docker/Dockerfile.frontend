@@ -49,7 +49,9 @@ RUN php frontend/server/cmd/CompileTemplatesCmd.php
 
 FROM alpine:latest AS frontend
 RUN apk add rsync
+RUN mkdir -p /var/lib/omegaup /opt/omegaup
 COPY --from=build /opt/omegaup /opt/omegaup
+COPY --from=build /var/lib/omegaup /var/lib/omegaup
 
 FROM ubuntu:focal AS nginx
 
@@ -65,7 +67,6 @@ RUN useradd --create-home --shell=/bin/bash ubuntu
 RUN mkdir -p /etc/omegaup/frontend
 RUN mkdir -p /var/log/omegaup && chown -R ubuntu /var/log/omegaup
 
-RUN mkdir /opt/omegaup && chown -R ubuntu /opt/omegaup
 USER ubuntu
 WORKDIR /opt/omegaup
 

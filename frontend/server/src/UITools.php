@@ -67,6 +67,7 @@ class UITools {
             $twigOptions['debug'] = true;
         }
         $twig = new \Twig\Environment($loader, $twigOptions);
+        $twig->addTokenParser(new \OmegaUp\Template\EntrypointParser());
         $twig->addTokenParser(new \OmegaUp\Template\VersionHashParser());
         $twig->addTokenParser(new \OmegaUp\Template\JsIncludeParser());
 

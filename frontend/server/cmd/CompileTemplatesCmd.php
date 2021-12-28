@@ -17,4 +17,3 @@ if ($handle = opendir($dirname)) {
     }
     closedir($handle);
 }
-$twig->load('template.tpl');
