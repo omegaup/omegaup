@@ -163,9 +163,9 @@ export namespace types {
             return x;
           });
         })(x.runs);
-        if (x.scoreboard)
+        if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
           x.scoreboard = ((x) => {
-            if (x.finish_time)
+            if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
               x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
