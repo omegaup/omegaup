@@ -4347,23 +4347,18 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $response['templateProperties']['payload']['currentProblem'] = $problemDetails;
 
+        $identityId = null;
+        if (!$isAdmin) {
+            $identityId = $r->identity->identity_id;
+        }
+
         [
             'runs' => $response['templateProperties']['payload']['runs'],
-        ] = $isAdmin ?
-            self::getAllRuns(
-                problemsetId: $assignment->problemset_id,
-                status: null,
-                verdict: null,
-                problemId: intval($problem->problem_id),
-            ) :
-            self::getAllRuns(
-                problemsetId: $assignment->problemset_id,
-                status: null,
-                verdict: null,
-                problemId: intval($problem->problem_id),
-                language: null,
-                identityId: $r->identity->identity_id,
-            );
+        ] = self::getAllRuns(
+            problemsetId: $assignment->problemset_id,
+            problemId: intval($problem->problem_id),
+            identityId: $identityId,
+        );
 
         return $response;
     }
