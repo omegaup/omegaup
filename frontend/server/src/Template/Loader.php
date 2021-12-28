@@ -16,22 +16,15 @@ class Loader implements \Twig\Loader\LoaderInterface {
     }
 
     public function getSourceContext(string $name): \Twig\Source {
-        if ($name === 'template.tpl') {
-            return $this->_loader->getSourceContext($name);
-        }
+        $originalSource = $this->_loader->getSourceContext('template.tpl');
         return new \Twig\Source(
-            '{% extends "template.tpl" %}' .
-            '{% block entrypoint %}' .
-            "{% jsInclude \"{$name}\" omitRuntime %}" .
-            '{% endblock %}',
+            $originalSource->getCode(),
             $name,
+            $originalSource->getPath(),
         );
     }
 
     public function getCacheKey(string $name): string {
-        if ($name === 'template.tpl') {
-            return $this->_loader->getCacheKey($name);
-        }
         return $name;
     }
 
