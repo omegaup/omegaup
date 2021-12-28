@@ -110,9 +110,8 @@ RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.27
 
 RUN useradd --create-home --shell=/bin/bash ubuntu && \
     mkdir -p /etc/omegaup/frontend && \
-    mkdir -p /var/log/omegaup && chown -R ubuntu /var/log/omegaup && \
-    mkdir /opt/omegaup && \
-    chown -R ubuntu /opt/omegaup
+    mkdir -p /var/log/omegaup /var/lib/omegaup /opt/omegaup && \
+    chown -R ubuntu /var/log/omegaup /var/lib/omegaup /opt/omegaup
 
 RUN rm -rf /etc/php/8.0/fpm/pool.d/
 
