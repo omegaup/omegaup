@@ -119,7 +119,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
         $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
             new \OmegaUp\Request()
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contestListPayloadAliases = $this->extractAliases(
             $contestListPayload['contests']
@@ -154,7 +154,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contestListPayloadAliases = $this->extractAliases(
             $contestListPayload['contests']
@@ -194,7 +194,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contestListPayloadAliases = $this->extractAliases(
             $contestListPayload['contests']
@@ -231,7 +231,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contestListPayloadAliases = $this->extractAliases(
             $contestListPayload['contests']
@@ -316,7 +316,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
         $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
             new \OmegaUp\Request()
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contests = $contestListPayload['contests']['current'];
         $contestContestants = [];
@@ -351,7 +351,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contests = $contestListPayload['contests']['current'];
         $contestContestants = [];
@@ -376,7 +376,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contests = $contestListPayload['contests']['current'];
         $contestContestants = [];
@@ -408,7 +408,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contests = $contestListPayload['contests']['current'];
         $contestContestants = [];
@@ -443,7 +443,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contests = $contestListPayload['contests']['current'];
         $contestContestants = [];
@@ -482,7 +482,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
         $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
             new \OmegaUp\Request()
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contest = $contestListPayload['contests']['current'][0];
 
@@ -516,7 +516,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contest = $contestListPayload['contests']['current'][0];
 
@@ -558,7 +558,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contest = $contestListPayload['contests']['current'][0];
 
@@ -595,7 +595,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contest = $contestListPayload['contests']['current'][0];
 
@@ -611,7 +611,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
 
         $contestListPayload = \OmegaUp\Controllers\Contest::getContestListDetailsv2ForTypeScript(
             new \OmegaUp\Request()
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contest = $contestListPayload['contests']['current'][0];
 
@@ -642,7 +642,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contest = $contestListPayload['contests']['current'][0];
 
@@ -667,7 +667,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contest = $contestListPayload['contests']['current'][0];
 
@@ -713,7 +713,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contest = $contestListPayload['contests']['current'][0];
 
@@ -738,7 +738,7 @@ class ContestListv2Test extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $contest = $contestListPayload['contests']['current'][0];
 

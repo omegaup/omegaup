@@ -17,7 +17,7 @@ export class Experiments {
   // Current frontend-available experiments:
 
   // The list of all enabled experiments for a particular request should have
-  // been injected into the DOM by Smarty.
+  // been injected into the DOM through the template.
   static loadGlobal(): Experiments {
     const experimentsNode = document?.getElementById(
       'omegaup-enabled-experiments',
@@ -79,6 +79,7 @@ export namespace omegaup {
   }
 
   export enum CountdownFormat {
+    AssignmentHasNotStarted,
     ContestHasNotStarted,
     EventCountdown,
     WaitBetweenUploadsSeconds,

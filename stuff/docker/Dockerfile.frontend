@@ -37,7 +37,7 @@ RUN curl -sL https://getcomposer.org/download/2.1.14/composer.phar -o /usr/bin/c
     chmod +x /usr/bin/composer
 
 RUN useradd --create-home --shell=/bin/bash ubuntu
-RUN mkdir /opt/omegaup && chown -R ubuntu /opt/omegaup
+RUN mkdir -p /opt/omegaup /var/lib/omegaup && chown -R ubuntu /opt/omegaup /var/lib/omegaup
 USER ubuntu
 WORKDIR /opt/omegaup
 ARG BRANCH=release
@@ -45,10 +45,16 @@ ENV BRANCH=$BRANCH
 RUN git clone --branch=${BRANCH} --depth=1 --recurse-submodules --shallow-submodules https://github.com/omegaup/omegaup .
 RUN yarn install && yarn build
 RUN composer install --no-dev --classmap-authoritative
+RUN printf "<?php\n\
+define('OMEGAUP_ENVIRONMENT', 'production');\n\
+define('TEMPLATE_CACHE_DIR', '/var/lib/omegaup/templates');\n" > frontend/server/config.php
+RUN php frontend/server/cmd/CompileTemplatesCmd.php
 
 FROM alpine:latest AS frontend
 RUN apk add rsync
+RUN mkdir -p /var/lib/omegaup /opt/omegaup
 COPY --from=build /opt/omegaup /opt/omegaup
+COPY --from=build /var/lib/omegaup /var/lib/omegaup
 
 FROM ubuntu:focal AS nginx
 
@@ -64,7 +70,6 @@ RUN useradd --create-home --shell=/bin/bash ubuntu
 RUN mkdir -p /etc/omegaup/frontend
 RUN mkdir -p /var/log/omegaup && chown -R ubuntu /var/log/omegaup
 
-RUN mkdir /opt/omegaup && chown -R ubuntu /opt/omegaup
 USER ubuntu
 WORKDIR /opt/omegaup
 
@@ -109,9 +114,8 @@ RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.27
 
 RUN useradd --create-home --shell=/bin/bash ubuntu && \
     mkdir -p /etc/omegaup/frontend && \
-    mkdir -p /var/log/omegaup && chown -R ubuntu /var/log/omegaup && \
-    mkdir /opt/omegaup && \
-    chown -R ubuntu /opt/omegaup
+    mkdir -p /var/log/omegaup /var/lib/omegaup /opt/omegaup && \
+    chown -R ubuntu /var/log/omegaup /var/lib/omegaup /opt/omegaup
 
 RUN rm -rf /etc/php/8.0/fpm/pool.d/
 

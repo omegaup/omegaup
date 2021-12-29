@@ -55,7 +55,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: SchoolProfileDetailsPayload, title: \OmegaUp\TranslationString}}
+     * @return array{entrypoint: string, templateProperties: array{payload: SchoolProfileDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param int $school_id
      */
@@ -109,7 +109,7 @@ class School extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => $payload,
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleSchoolProfile'
@@ -265,7 +265,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details for historical rank of schools with pagination
      *
-     * @return array{smartyProperties: array{payload: SchoolRankPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: SchoolRankPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
@@ -285,7 +285,7 @@ class School extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'page' => $page,
                     'length' => $length,
@@ -310,9 +310,9 @@ class School extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Gets all the information to be sent to smarty for the tabs
+     * Gets all the information to be sent to TypeScript for the tabs
      * of School of the Month
-     * @return array{smartyProperties: array{payload: SchoolOfTheMonthPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: SchoolOfTheMonthPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getSchoolOfTheMonthDetailsForTypeScript(\OmegaUp\Request $r): array {
         try {
@@ -332,7 +332,7 @@ class School extends \OmegaUp\Controllers\Controller {
         $currentDate = date('Y-m-d', $currentTimestamp);
 
         $response = [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'schoolsOfPreviousMonths' => \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfTheMonth(),
                     'schoolsOfPreviousMonth' => \OmegaUp\DAO\SchoolOfTheMonth::getMonthlyList(
@@ -356,7 +356,7 @@ class School extends \OmegaUp\Controllers\Controller {
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
-        $response['smartyProperties']['payload']['options'] = [
+        $response['templateProperties']['payload']['options'] = [
             'canChooseSchool' =>
                 \OmegaUp\Authorization::canChooseCoderOrSchool(
                     $currentTimestamp

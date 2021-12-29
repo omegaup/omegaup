@@ -148,14 +148,14 @@ class Badge extends \OmegaUp\Controllers\Controller {
         ];
     }
     /**
-     * @return array{smartyProperties: array{payload: BadgeListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: BadgeListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getBadgeListForTypeScript(\OmegaUp\Request $r) {
         $r->ensureIdentity();
         $badges = self::apiList($r);
         $ownedBadges = self::apiMyList($r);
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'badges' => $badges,
                     'ownedBadges' => $ownedBadges['badges']
@@ -167,7 +167,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: BadgeDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{templateProperties: array{payload: BadgeDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $badge_alias
      */
@@ -191,7 +191,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
             );
         }
         return [
-            'smartyProperties' => [
+            'templateProperties' => [
                 'payload' => [
                     'badge' => $details,
                 ],

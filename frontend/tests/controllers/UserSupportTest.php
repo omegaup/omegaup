@@ -89,7 +89,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'id' => $user->verification_id,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertArrayHasKey('verifyEmailSuccessfully', $payload);
         $this->assertArrayNotHasKey('statusError', $payload);
@@ -116,7 +116,7 @@ class UserSupportTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'id' => 'wrong_verification_id',
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertArrayNotHasKey('verifyEmailSuccessfully', $payload);
         $this->assertArrayHasKey('statusError', $payload);
