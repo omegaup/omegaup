@@ -31,7 +31,7 @@
     >
       <b-form-checkbox
         :checked="!casePoints"
-        @change.native="casePoints = casePoints === null ? 0 : null"
+        @change="casePoints = casePoints === null ? 0 : null"
         name="auto-points"
       >
       </b-form-checkbox>
