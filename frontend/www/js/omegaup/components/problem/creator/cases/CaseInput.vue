@@ -30,8 +30,8 @@
       :description="T.problemCreatorAutomaticPointsHelper"
     >
       <b-form-checkbox
-        :checked="casePoints === null"
-        @change.native="casePoints = casePoints !== null ? null : 0"
+        :checked="!casePoints"
+        @change.native="casePoints = casePoints === null ? 0 : null"
         name="auto-points"
       >
       </b-form-checkbox>
