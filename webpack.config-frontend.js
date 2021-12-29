@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
@@ -66,6 +67,7 @@ module.exports = {
     course_submissions_list:
       './frontend/www/js/omegaup/course/submissions_list.ts',
     course_tabs: './frontend/www/js/omegaup/course/tabs.ts',
+    grader_ephemeral: './frontend/www/js/omegaup/grader/ephemeral.js',
     group_edit: './frontend/www/js/omegaup/group/edit.ts',
     group_list: './frontend/www/js/omegaup/group/list.ts',
     group_new: './frontend/www/js/omegaup/group/new.ts',
@@ -141,6 +143,7 @@ module.exports = {
       ],
     }),
     new VueLoaderPlugin(),
+    new MonacoWebpackPlugin(),
     new ForkTsCheckerWebpackPlugin({
       typescript: {
         extensions: {
@@ -255,6 +258,10 @@ module.exports = {
       jszip: 'jszip/dist/jszip.js',
       pako: 'pako/dist/pako.min.js',
       '@': path.resolve(__dirname, './frontend/www/'),
+    },
+    fallback: {
+      buffer: require.resolve('buffer/'),
+      stream: require.resolve('stream-browserify'),
     },
   },
 };
