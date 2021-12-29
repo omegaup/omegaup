@@ -4,6 +4,7 @@
       <div class="form-group">
         <label class="font-weight-bold">{{ T.wordsPublicTags }}</label>
         <vue-typeahead-bootstrap
+          data-tags-input
           v-if="canAddNewTags"
           :data="publicTags"
           :serializer="publicTagsSerializer"
