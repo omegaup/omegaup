@@ -13,7 +13,7 @@
     </b-form-group>
 
     <b-form-group
-      v-show="!caseCalculatePointsAutomatically"
+      v-show="casePoints !== null"
       :label="T.problemCreatorPoints"
       label-for="case-points"
     >
@@ -30,7 +30,8 @@
       :description="T.problemCreatorAutomaticPointsHelper"
     >
       <b-form-checkbox
-        v-model="caseCalculatePointsAutomatically"
+        :checked="casePoints === null"
+        @change.native="casePoints = casePoints !== null ? null : 0"
         name="auto-points"
       >
       </b-form-checkbox>
@@ -48,12 +49,10 @@ export default class CaseInput extends Vue {
   @Prop({ default: '' }) name!: string;
   @Prop({ default: NIL }) group!: string;
   @Prop({ default: null }) points!: number | null;
-  @Prop({ default: true }) calulatePointsAutomatically!: boolean;
 
   caseName = this.name;
   caseGroup = this.group;
   casePoints: number | null = this.points;
-  caseCalculatePointsAutomatically = this.calulatePointsAutomatically;
 
   T = T;
 }
