@@ -154,6 +154,15 @@ export namespace types {
               })(x.solvers);
             return x;
           })(x.currentProblem);
+        x.runs = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.runs);
         if (typeof x.scoreboard !== 'undefined' && x.scoreboard !== null)
           x.scoreboard = ((x) => {
             if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
@@ -2267,6 +2276,7 @@ export namespace types {
     course: types.ArenaCourseDetails;
     currentProblem?: types.ProblemDetails;
     problems: types.ArenaCourseProblem[];
+    runs: types.Run[];
     scoreboard?: types.Scoreboard;
   }
 

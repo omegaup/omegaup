@@ -345,6 +345,23 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertNull($payload['currentProblem']);
 
+        $students = [];
+        for ($i = 0; $i < 3; $i++) {
+            $students[] = \OmegaUp\Test\Factories\User::createUser();
+            \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData,
+                $students[$i]['identity']
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+                    $problemsData[0],
+                    $courseData,
+                    $students[$i]['identity']
+                )
+            );
+        }
+
+        $adminLogin = self::login($courseData['admin']);
         $payload = \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
@@ -374,5 +391,38 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             $problemsData[0]['problem']->alias,
             $payload['currentProblem']['alias']
         );
+        $this->assertCount(3, $payload['runs']);
+
+        $studentLogin = self::login($students[0]['identity']);
+        $payload = \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment']->alias,
+                'problem_alias' => $problemsData[0]['problem']->alias,
+            ])
+        )['templateProperties']['payload'];
+        $this->assertEquals(
+            $courseData['course']->name,
+            $payload['course']['name']
+        );
+        $this->assertEquals(
+            $courseData['assignment']->alias,
+            $payload['assignment']['alias']
+        );
+        $this->assertCount(2, $payload['problems']);
+        $this->assertEquals(
+            $problemsData[0]['problem']->alias,
+            $payload['problems'][0]['alias']
+        );
+        $this->assertEquals(
+            $problemsData[1]['problem']->alias,
+            $payload['problems'][1]['alias']
+        );
+        $this->assertEquals(
+            $problemsData[0]['problem']->alias,
+            $payload['currentProblem']['alias']
+        );
+        $this->assertCount(1, $payload['runs']);
     }
 }
