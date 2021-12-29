@@ -287,7 +287,7 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'update-search-result-users': (query: string) => {
-            api.User.list({ query })
+            api.User.list({ query, rowcount: 10 })
               .then(({ results }) => {
                 this.searchResultUsers = results.map(
                   ({ key, value }: types.ListItem) => ({

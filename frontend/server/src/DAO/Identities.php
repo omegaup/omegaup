@@ -56,19 +56,26 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return list<\OmegaUp\DAO\VO\Identities>
+     * @return list<array{key: string, value: string}>
      */
-    public static function findByUsernameOrName(string $usernameOrName) {
+    public static function findByUsernameOrName(
+        string $usernameOrName,
+        int $rowcount = 100
+    ) {
         $sql = "
             SELECT
-                i.*
+                i.name,
+                i.username,
+                MATCH(name, username) AGAINST (? IN BOOLEAN MODE) AS relevance
             FROM
                 Identities i
             WHERE
-                i.username = ? OR i.name = ?
+                MATCH(name, username) AGAINST (? IN BOOLEAN MODE)
             UNION DISTINCT
             SELECT DISTINCT
-                i.*
+                i.name,
+                i.username,
+                0 AS relevance
             FROM
                 Identities i
             WHERE
@@ -77,14 +84,43 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     i.name LIKE CONCAT('%', ?, '%')
                 ) AND
                 i.username NOT REGEXP 'teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+'
-            LIMIT 100";
-        $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
+            LIMIT ?;";
+        $args = [
+            $usernameOrName,
+            $usernameOrName,
+            $usernameOrName,
+            $usernameOrName,
+            $rowcount,
+        ];
 
-        /** @var list<array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}> $rs */
+        /** @var list<array{name: null|string, relevance: float, username: string}> $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
+        usort(
+            $rs,
+            /**
+             * @param array{name: null|string, relevance: float, username: string} $a
+             * @param array{name: null|string, relevance: float, username: string} $b
+             */
+            fn (array $a, array $b) => $a['relevance'] == $b['relevance'] ? 0 : ($a['relevance'] < $b['relevance'] ? -1 : 1)
+        );
         $result = [];
         foreach ($rs as $identityData) {
-            $result[] = new \OmegaUp\DAO\VO\Identities($identityData);
+            if (
+                array_search(
+                    $identityData['username'],
+                    array_column(
+                        $result,
+                        'username'
+                    )
+                ) !== false
+            ) {
+                continue;
+            }
+            $username = strval($identityData['username']);
+            $result[] = [
+                'key' => $username,
+                'value' => $identityData['name'] ? strval($identityData['username']) : $username,
+            ];
         }
         return $result;
     }

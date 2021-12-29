@@ -422,6 +422,7 @@ CREATE TABLE `Identities` (
   `current_identity_school_id` int DEFAULT NULL,
   PRIMARY KEY (`identity_id`),
   UNIQUE KEY `username` (`username`),
+  FULLTEXT `ft_user_username` (`username`, `name`),
   KEY `country_id` (`country_id`),
   KEY `state_id` (`state_id`),
   KEY `user_id` (`user_id`),
