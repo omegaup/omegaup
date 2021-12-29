@@ -19,9 +19,8 @@ describe('AddPanel.vue', () => {
       T.problemCreatorCaseName,
       T.problemCreatorGroupName,
       T.problemCreatorPoints,
+      T.problemCreatorAutomaticPoints,
     ];
-
-    const expectedCheckboxText = T.problemCreatorAutoPoints;
 
     await Vue.nextTick();
 
@@ -32,9 +31,5 @@ describe('AddPanel.vue', () => {
     inputElements.wrappers.forEach((element, index) => {
       expect(element.attributes('label')).toBe(expectedTextInputText[index]); // We need to make it like this because that's how Vue-Bootstrap input element works
     });
-
-    // Check if the checkbox is there
-    const checkbox = wrapper.find('[name="auto-points"]');
-    expect(checkbox.text()).toBe(expectedCheckboxText);
   });
 });

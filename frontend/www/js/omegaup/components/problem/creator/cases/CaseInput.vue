@@ -13,22 +13,27 @@
     </b-form-group>
 
     <b-form-group
+      v-show="!casePointsDefined"
       :label="T.problemCreatorPoints"
-      :description="casePointsDefined ? 'T.problemCreatorAutoPointsHelper' : ''"
       label-for="case-points"
     >
       <b-form-input
         v-model="casePoints"
-        :disabled="casePointsDefined"
         type="number"
         number
         min="0"
         max="100"
       />
     </b-form-group>
-    <b-form-checkbox v-model="casePointsDefined" name="auto-points">{{
-      T.problemCreatorAutoPoints
-    }}</b-form-checkbox>
+    <b-form-group
+      :label="T.problemCreatorAutomaticPoints"
+      :description="
+        casePointsDefined ? T.problemCreatorAutomaticPointsHelper : ''
+      "
+    >
+      <b-form-checkbox v-model="casePointsDefined" name="auto-points">
+      </b-form-checkbox>
+    </b-form-group>
   </div>
 </template>
 
@@ -41,21 +46,14 @@ import T from '../../../../lang';
 export default class CaseInput extends Vue {
   @Prop({ default: '' }) name!: string;
   @Prop({ default: NIL }) group!: string;
-  @Prop({ default: '' }) points!: number | '';
-  @Prop({ default: false }) pointsDefined!: boolean;
+  @Prop({ default: 0 }) points!: number;
+  @Prop({ default: true }) pointsDefined!: boolean;
 
-  caseName = '';
-  caseGroup = '';
-  casePoints: '' | number = '';
-  casePointsDefined = false;
+  caseName = this.name;
+  caseGroup = this.group;
+  casePoints: number = this.points;
+  casePointsDefined = this.pointsDefined;
 
   T = T;
-
-  mounted() {
-    this.caseName = this.name;
-    this.caseGroup = this.group;
-    this.casePoints = this.points;
-    this.casePointsDefined = this.pointsDefined;
-  }
 }
 </script>

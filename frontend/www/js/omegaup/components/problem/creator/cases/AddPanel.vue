@@ -31,11 +31,11 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import T from '../../../../lang';
-import case_Input from './CaseInput.vue';
+import cases_CaseInput from './CaseInput.vue';
 
 @Component({
   components: {
-    'case-input': case_Input,
+    'case-input': cases_CaseInput,
   },
 })
 export default class AddPanel extends Vue {
