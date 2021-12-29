@@ -195,7 +195,7 @@
         </tfoot>
         <tbody>
           <tr v-for="run in filteredRuns" :key="run.guid">
-            <td>{{ time.formatTimestamp(run.time) }}</td>
+            <td>{{ time.formatDateLocalHHMM(run.time) }}</td>
             <td>
               <acronym :title="run.guid" data-run-guid>
                 <tt>{{ run.guid.substring(0, 8) }}</tt>

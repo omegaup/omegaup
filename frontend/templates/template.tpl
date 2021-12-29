@@ -1,97 +1,80 @@
 <!DOCTYPE html>
-<html lang="{#locale#}" class="h-100">
-  <head data-locale="{#locale#}">
+<html lang="{{ LOCALE }}" class="h-100">
+  <head data-locale="{{ LOCALE }}">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-    {if !is_null($smarty.const.NEW_RELIC_SCRIPT)}
-      {$smarty.const.NEW_RELIC_SCRIPT}
-    {/if}
+    {% if NEW_RELIC_SCRIPT %}
+      {{ NEW_RELIC_SCRIPT|raw }}
+    {% endif %}
 
-    {if isset($GOOGLECLIENTID) && !empty($GOOGLECLIENTID)}
-      <meta name="google-signin-client_id" content="{$GOOGLECLIENTID}" />
-    {/if}
+    {% if GOOGLECLIENTID %}
+      <meta name="google-signin-client_id" content="{{ GOOGLECLIENTID }}" />
+    {% endif %}
 
-    <script type="text/javascript" src="{version_hash src="/js/error_handler.js"}"></script>
-    <title>{$title} &ndash; omegaUp</title>
-    <script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.5.1.min.js"}"></script>
-    <script type="text/javascript" src="{version_hash src="/js/jquery_error_handler.js"}"></script>
-    <script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js" defer}" defer></script>
-    <script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js" defer}"></script>
-    {js_include entrypoint="omegaup" runtime}
+    <script type="text/javascript" src="{% versionHash '/js/error_handler.js' %}"></script>
+    <title>{{ title }} &ndash; omegaUp</title>
+    <script type="text/javascript" src="{% versionHash '/third_party/js/jquery-3.5.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% versionHash '/js/jquery_error_handler.js' %}"></script>
+    <script type="text/javascript" src="{% versionHash '/third_party/js/highstock.js' %}" defer></script>
+    <script type="text/javascript" src="{% versionHash '/third_party/js/sugar.js' %}"></script>
+    {% jsInclude 'omegaup' %}
 
-    {if isset($jsfile)}
-      <script type="text/javascript" src="{$jsfile}" defer></script>
-    {/if}
+    {% if jsfile %}
+      <script type="text/javascript" src="{{ jsfile }}" defer></script>
+    {% endif %}
 
-    {if isset($scripts)}
-      {foreach from=$scripts item=$script}
-        <script type="text/javascript" src="{$script}" defer async></script>
-      {/foreach}
-    {/if}
+    {% if scripts %}
+      {% for script in scripts %}
+        <script type="text/javascript" src="{{ script }}" defer async></script>
+      {% endfor %}
+    {% endif %}
 
-    <script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}" defer></script>
+    <script type="text/javascript" src="{% versionHash '/js/head.sugar_locale.js' %}" defer></script>
 
     <!-- Bootstrap 4 -->
     <link rel="stylesheet" href="/third_party/bootstrap-4.5.0/css/bootstrap.min.css"/>
     <script src="/third_party/bootstrap-4.5.0/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="{version_hash src="/css/dist/omegaup_styles.css"}">
+    <link rel="stylesheet" type="text/css" href="{% versionHash '/css/dist/omegaup_styles.css' %}">
     <link rel="shortcut icon" href="/favicon.ico" />
 
-    {if !empty($ENABLED_EXPERIMENTS)}
-        <script type="text/plain" id="omegaup-enabled-experiments">{','|implode:$ENABLED_EXPERIMENTS}</script>
-    {/if}
+    {% if ENABLED_EXPERIMENTS %}
+        <script type="text/plain" id="omegaup-enabled-experiments">{{ ENABLED_EXPERIMENTS|join(',') }}</script>
+    {% endif %}
 
-    {if isset($recaptchaFile)}
-        <script type="text/javascript" src="{$recaptchaFile}"></script>
-    {/if}
+    {% if recaptchaFile %}
+        <script type="text/javascript" src="{{ recaptchaFile }}"></script>
+    {% endif %}
   </head>
 
-  <body class="d-flex flex-column h-100{if $smarty.const.OMEGAUP_LOCKDOWN} lockdown{/if}">
-    <script type="text/json" id="header-payload">{$headerPayload|json_encode}</script>
-    {if !isset($hideFooterAndHeader) || !$hideFooterAndHeader}
+  <body class="d-flex flex-column h-100{% if OMEGAUP_LOCKDOWN %} lockdown{% endif %}">
+    <script type="text/json" id="header-payload">{{ headerPayload|json_encode|raw }}</script>
+    {% if not hideFooterAndHeader %}
       <div id="common-navbar"></div>
-      {js_include entrypoint="common_navbar"}
-    {/if}
-	  <main role="main" {if (!isset($fullWidth) || !$fullWidth)}class="container-lg p-5"{/if}>
-      {if isset($ERROR_MESSAGE)}
-        <div class="alert alert-danger">
-          {$ERROR_MESSAGE}
-        </div>
-      {/if}
-      {if isset($STATUS_ERROR) && $STATUS_ERROR !== ''}
-        <div class="alert alert-danger mt-0" id="status">
-          <button type="button" class="close" id="alert-close">&times;</button>
-          <span class="message">{$STATUS_ERROR}</span>
-        </div>
-      {else if isset($STATUS_SUCCESS) && $STATUS_SUCCESS !== ''}
-        <div class="alert alert-success mt-0" id="status">
-          <button type="button" class="close" id="alert-close">&times;</button>
-          <span class="message">{$STATUS_SUCCESS}</span>
-        </div>
-      {else}
-        <div class="alert mt-0" id="status" style="display: none;">
-          <button type="button" class="close" id="alert-close">&times;</button>
-          <span class="message"></span>
-        </div>
-      {/if}
-      {if $smarty.const.OMEGAUP_MAINTENANCE}
+      {% jsInclude 'common_navbar' omitRuntime %}
+    {% endif %}
+    <main role="main" {% if not fullWidth %}class="container-lg p-5"{% endif %}>
+      <div class="alert mt-0" id="status" style="display: none;">
+        <button type="button" class="close" id="alert-close">&times;</button>
+        <span class="message"></span>
+      </div>
+      {% if OMEGAUP_MAINTENANCE %}
         <div id="announcement" class="alert alert-info mt-0">
-          {$smarty.const.OMEGAUP_MAINTENANCE}
+          {{ OMEGAUP_MAINTENANCE|raw }}
         </div>
-      {/if}
+      {% endif %}
 
-      <script type="text/json" id="payload">{$payload|json_encode}</script>
-      {block name="entrypoint"}{/block}
+      <script type="text/json" id="payload">{{ payload|json_encode|raw }}</script>
+      {% entrypoint %}
       <div id="main-container"></div>
     </main>
-    {if $OMEGAUP_GA_TRACK eq 1}
-      <script type="text/javascript" src="{version_hash src="/js/analytics.js"}"></script>
-    {/if}
-    {if $headerPayload.inContest eq false && (!isset($hideFooterAndHeader) || !$hideFooterAndHeader)}
+    {% if OMEGAUP_GA_TRACK == 1 %}
+      <script type="text/javascript" src="{% versionHash '/js/analytics.js' %}"></script>
+    {% endif %}
+    {% if not headerPayload.inContest and not hideFooterAndHeader %}
     <div id="common-footer"></div>
-    {js_include entrypoint="common_footer"}
-    {/if}
+    {% jsInclude 'common_footer' omitRuntime %}
+    {% endif %}
 
   </body>
-  <script type="text/javascript" src="{version_hash src="/js/status.dismiss.js"}" defer></script>
+  <script type="text/javascript" src="{% versionHash '/js/status.dismiss.js' %}" defer></script>
 </html>

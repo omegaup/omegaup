@@ -996,6 +996,8 @@ CREATE TABLE `Submissions` (
   `guid` char(32) NOT NULL,
   `language` enum('c','c11-gcc','c11-clang','cpp','cpp11','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py','py2','py3','rb','pl','cs','pas','kp','kj','cat','hs','lua') NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` enum('new','waiting','compiling','running','ready','uploading') NOT NULL DEFAULT 'new',
+  `verdict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE','VE') NOT NULL,
   `submit_delay` int NOT NULL DEFAULT '0',
   `type` enum('normal','test','disqualified') DEFAULT 'normal',
   `school_id` int DEFAULT NULL,

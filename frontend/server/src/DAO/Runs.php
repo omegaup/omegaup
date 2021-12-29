@@ -26,35 +26,18 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 r.runtime,
                 r.memory,
                 s.`time`,
-                IFNULL(
-                    (
-                        SELECT `urc`.`classname` FROM
-                            `User_Rank_Cutoffs` `urc`
-                        WHERE
-                            `urc`.`score` <= (
-                                    SELECT
-                                        `ur`.`score`
-                                    FROM
-                                        `User_Rank` `ur`
-                                    WHERE
-                                        `ur`.`user_id` = `i`.`user_id`
-                                )
-                        ORDER BY
-                            `urc`.`percentile` ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) `classname`,
+                IFNULL(ur.classname, "user-rank-unranked") `classname`,
                 ROW_NUMBER() OVER(
                     PARTITION BY i.identity_id ORDER BY r.runtime ASC, s.submission_id ASC
                 ) AS per_identity_rank
             FROM
                 Submissions s
             INNER JOIN
-            Runs r ON r.run_id = s.current_run_id
+                Runs r ON r.run_id = s.current_run_id
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
             WHERE
                 s.problem_id = ? AND
                 r.status = "ready" AND
@@ -238,26 +221,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `p`.`alias`,
                 IFNULL(`i`.`country_id`, "xx") `country`,
                 `c`.`alias` AS `contest_alias`,
-                IFNULL(
-                    (
-                        SELECT `urc`.`classname` FROM
-                            `User_Rank_Cutoffs` `urc`
-                        WHERE
-                            `urc`.`score` <= (
-                                    SELECT
-                                        `ur`.`score`
-                                    FROM
-                                        `User_Rank` `ur`
-                                    WHERE
-                                        `ur`.`user_id` = `i`.`user_id`
-                                )
-                        ORDER BY
-                            `urc`.`percentile` ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) `classname`
+                IFNULL(ur.classname, "user-rank-unranked") `classname`
             FROM
                 Submissions s
             INNER JOIN
@@ -266,6 +230,8 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 Problems p ON p.problem_id = s.problem_id
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
             LEFT JOIN
                 Contests c ON c.problemset_id = s.problemset_id
         ';
@@ -454,20 +420,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $classNameQuery = '
             IFNULL(
                 (
-                    SELECT urc.classname
-                    FROM User_Rank_Cutoffs urc
+                    SELECT
+                        ur.classname
+                    FROM
+                        User_Rank ur
                     WHERE
-                        urc.score <= (
-                            SELECT
-                                ur.score
-                            FROM
-                                User_Rank ur
-                            WHERE
-                                ur.user_id = i.user_id
-                        )
-                    ORDER BY
-                        urc.percentile ASC
-                    LIMIT 1
+                        ur.user_id = i.user_id
                 ),
                 "user-rank-unranked"
             ) AS classname';
@@ -917,25 +875,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.submit_delay,
                 i.username, IFNULL(i.country_id, "xx") AS country,
                 c.alias AS contest_alias, IFNULL(s.`type`, "normal") AS `type`,
-                IFNULL(
-                    (
-                        SELECT urc.classname
-                        FROM User_Rank_Cutoffs urc
-                        WHERE
-                            urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = i.user_id
-                            )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT 1
-                    ),
-                    "user-rank-unranked"
-                ) AS classname
+                IFNULL(ur.classname, "user-rank-unranked") AS classname
             FROM
                 Submissions s
             INNER JOIN
@@ -946,6 +886,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 Identities i
             ON
                 i.identity_id = s.identity_id
+            LEFT JOIN
+                User_Rank ur
+            ON
+                ur.user_id = i.user_id
             INNER JOIN
                 Problems p
             ON
@@ -1004,20 +948,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 c.alias AS contest_alias, IFNULL(s.`type`, "normal") AS `type`,
                 IFNULL(
                     (
-                        SELECT urc.classname
-                        FROM User_Rank_Cutoffs urc
+                        SELECT
+                            ur.classname
+                        FROM
+                            User_Rank ur
                         WHERE
-                            urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = i.user_id
-                            )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT 1
+                            ur.user_id = i.user_id
                     ),
                     "user-rank-unranked"
                 ) AS classname,
@@ -1025,20 +961,12 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 ii.username as feedback_author,
                 IFNULL(
                     (
-                        SELECT urc.classname
-                        FROM User_Rank_Cutoffs urc
+                        SELECT
+                            ur.classname
+                        FROM
+                            User_Rank ur
                         WHERE
-                            urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = ii.user_id
-                            )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT 1
+                            ur.user_id = ii.user_id
                     ),
                     "user-rank-unranked"
                 ) AS feedback_author_classname,

@@ -454,7 +454,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         // Test coder of the month details when user is not logged
         $response = \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForTypeScript(
             new \OmegaUp\Request(['category' => $category])
-        )['smartyProperties'];
+        )['templateProperties'];
         $this->assertArrayHasKey('payload', $response);
         $this->assertArrayHasKey('codersOfCurrentMonth', $response['payload']);
         $this->assertArrayHasKey('codersOfPreviousMonth', $response['payload']);
@@ -473,7 +473,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'category' => $category,
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
         $this->assertArrayHasKey('payload', $response);
         $this->assertArrayHasKey('codersOfCurrentMonth', $response['payload']);
         $this->assertArrayHasKey('codersOfPreviousMonth', $response['payload']);
@@ -491,7 +491,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'category' => $category,
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
         $this->assertTrue($response['payload']['isMentor']);
         $this->assertArrayHasKey('payload', $response);
         $this->assertArrayHasKey('options', $response['payload']);
