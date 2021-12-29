@@ -27,9 +27,7 @@
     </b-form-group>
     <b-form-group
       :label="T.problemCreatorAutomaticPoints"
-      :description="
-        casePointsDefined ? T.problemCreatorAutomaticPointsHelper : ''
-      "
+      :description="T.problemCreatorAutomaticPointsHelper"
     >
       <b-form-checkbox v-model="casePointsDefined" name="auto-points">
       </b-form-checkbox>
@@ -46,12 +44,12 @@ import T from '../../../../lang';
 export default class CaseInput extends Vue {
   @Prop({ default: '' }) name!: string;
   @Prop({ default: NIL }) group!: string;
-  @Prop({ default: 0 }) points!: number;
+  @Prop({ default: null }) points!: number | null;
   @Prop({ default: true }) pointsDefined!: boolean;
 
   caseName = this.name;
   caseGroup = this.group;
-  casePoints: number = this.points;
+  casePoints: number | null = this.points;
   casePointsDefined = this.pointsDefined;
 
   T = T;
