@@ -69,6 +69,7 @@ const translations: { [key: string]: string; } = {
   arenaRunSubmitPaste: "Cole o c\u00f3digo do seu programa aqui",
   arenaRunSubmitUpload: "Ou fa\u00e7a upload de um arquivo",
   arenaRunSubmitWaitBetweenUploads: "Voc\u00ea deve esperar %(submissionGap) segundos entre  cada solu\u00e7\u00e3o apresentada",
+  assignmentCardGoToContent: "Ir ao conte\u00fado",
   assignmentCardLessons: "%(lessonCount) li\u00e7\u00f5es",
   assignmentCardProblems: "%(problemCount) problemas",
   assignmentNotFound: "Conte\u00fado n\u00e3o encontrado",
