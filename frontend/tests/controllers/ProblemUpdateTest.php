@@ -2090,7 +2090,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'problem' => $problemData['request']['problem_alias'],
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
 
         $this->assertArrayHasKey('statement', $response['payload']);
 
@@ -2116,7 +2116,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'directory' => 'statements',
                 'contents' => $contents,
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
 
         // Getting problem details for preferred user language('es')
         $response = \OmegaUp\Controllers\Problem::apiDetails(

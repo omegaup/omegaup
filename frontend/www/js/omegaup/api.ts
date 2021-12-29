@@ -110,11 +110,17 @@ export const Badge = {
     messages._BadgeBadgeDetailsServerResponse,
     messages.BadgeBadgeDetailsResponse
   >('/api/badge/badgeDetails/', (x) => {
-    if (x.assignation_time)
+    if (
+      typeof x.assignation_time !== 'undefined' &&
+      x.assignation_time !== null
+    )
       x.assignation_time = ((x: number) => new Date(x * 1000))(
         x.assignation_time,
       );
-    if (x.first_assignation)
+    if (
+      typeof x.first_assignation !== 'undefined' &&
+      x.first_assignation !== null
+    )
       x.first_assignation = ((x: number) => new Date(x * 1000))(
         x.first_assignation,
       );
@@ -128,7 +134,10 @@ export const Badge = {
     messages._BadgeMyBadgeAssignationTimeServerResponse,
     messages.BadgeMyBadgeAssignationTimeResponse
   >('/api/badge/myBadgeAssignationTime/', (x) => {
-    if (x.assignation_time)
+    if (
+      typeof x.assignation_time !== 'undefined' &&
+      x.assignation_time !== null
+    )
       x.assignation_time = ((x: number) => new Date(x * 1000))(
         x.assignation_time,
       );
@@ -144,11 +153,17 @@ export const Badge = {
         return x;
       }
       return x.map((x) => {
-        if (x.assignation_time)
+        if (
+          typeof x.assignation_time !== 'undefined' &&
+          x.assignation_time !== null
+        )
           x.assignation_time = ((x: number) => new Date(x * 1000))(
             x.assignation_time,
           );
-        if (x.first_assignation)
+        if (
+          typeof x.first_assignation !== 'undefined' &&
+          x.first_assignation !== null
+        )
           x.first_assignation = ((x: number) => new Date(x * 1000))(
             x.first_assignation,
           );
@@ -167,11 +182,17 @@ export const Badge = {
         return x;
       }
       return x.map((x) => {
-        if (x.assignation_time)
+        if (
+          typeof x.assignation_time !== 'undefined' &&
+          x.assignation_time !== null
+        )
           x.assignation_time = ((x: number) => new Date(x * 1000))(
             x.assignation_time,
           );
-        if (x.first_assignation)
+        if (
+          typeof x.first_assignation !== 'undefined' &&
+          x.first_assignation !== null
+        )
           x.first_assignation = ((x: number) => new Date(x * 1000))(
             x.first_assignation,
           );
@@ -249,7 +270,10 @@ export const Contest = {
   >('/api/contest/adminDetails/', (x) => {
     x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    if (x.submission_deadline)
+    if (
+      typeof x.submission_deadline !== 'undefined' &&
+      x.submission_deadline !== null
+    )
       x.submission_deadline = ((x: number) => new Date(x * 1000))(
         x.submission_deadline,
       );
@@ -267,7 +291,10 @@ export const Contest = {
       return x.map((x) => {
         x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
         x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-        if (x.original_finish_time)
+        if (
+          typeof x.original_finish_time !== 'undefined' &&
+          x.original_finish_time !== null
+        )
           x.original_finish_time = ((x: number) => new Date(x * 1000))(
             x.original_finish_time,
           );
@@ -327,7 +354,10 @@ export const Contest = {
   >('/api/contest/details/', (x) => {
     x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    if (x.submission_deadline)
+    if (
+      typeof x.submission_deadline !== 'undefined' &&
+      x.submission_deadline !== null
+    )
       x.submission_deadline = ((x: number) => new Date(x * 1000))(
         x.submission_deadline,
       );
@@ -366,7 +396,10 @@ export const Contest = {
       return x.map((x) => {
         x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
         x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-        if (x.original_finish_time)
+        if (
+          typeof x.original_finish_time !== 'undefined' &&
+          x.original_finish_time !== null
+        )
           x.original_finish_time = ((x: number) => new Date(x * 1000))(
             x.original_finish_time,
           );
@@ -388,7 +421,10 @@ export const Contest = {
       return x.map((x) => {
         x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
         x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
-        if (x.original_finish_time)
+        if (
+          typeof x.original_finish_time !== 'undefined' &&
+          x.original_finish_time !== null
+        )
           x.original_finish_time = ((x: number) => new Date(x * 1000))(
             x.original_finish_time,
           );
@@ -493,7 +529,7 @@ export const Contest = {
     messages._ContestReportServerResponse,
     messages.ContestReportResponse
   >('/api/contest/report/', (x) => {
-    if (x.finish_time)
+    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
     x.time = ((x: number) => new Date(x * 1000))(x.time);
@@ -509,7 +545,7 @@ export const Contest = {
         return x;
       }
       return x.map((x) => {
-        if (x.last_update)
+        if (typeof x.last_update !== 'undefined' && x.last_update !== null)
           x.last_update = ((x: number) => new Date(x * 1000))(x.last_update);
         x.request_time = ((x: number) => new Date(x * 1000))(x.request_time);
         return x;
@@ -545,7 +581,7 @@ export const Contest = {
     messages._ContestScoreboardServerResponse,
     messages.ContestScoreboardResponse
   >('/api/contest/scoreboard/', (x) => {
-    if (x.finish_time)
+    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
     x.time = ((x: number) => new Date(x * 1000))(x.time);
@@ -572,7 +608,7 @@ export const Contest = {
     messages._ContestStatsServerResponse,
     messages.ContestStatsResponse
   >('/api/contest/stats/', (x) => {
-    if (x.max_wait_time)
+    if (typeof x.max_wait_time !== 'undefined' && x.max_wait_time !== null)
       x.max_wait_time = ((x: number) => new Date(x * 1000))(x.max_wait_time);
     return x;
   }),
@@ -594,9 +630,9 @@ export const Contest = {
         return x;
       }
       return x.map((x) => {
-        if (x.access_time)
+        if (typeof x.access_time !== 'undefined' && x.access_time !== null)
           x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
-        if (x.end_time)
+        if (typeof x.end_time !== 'undefined' && x.end_time !== null)
           x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
         return x;
       });
@@ -648,7 +684,7 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        if (x.finish_time)
+        if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
           x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
         x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         return x;
@@ -663,7 +699,7 @@ export const Course = {
         return x;
       });
     })(x.clarifications);
-    if (x.finish_time)
+    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
     return x;
@@ -689,13 +725,13 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        if (x.finish_time)
+        if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
           x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
         x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         return x;
       });
     })(x.courseAssignments);
-    if (x.finish_time)
+    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
     return x;
@@ -705,7 +741,7 @@ export const Course = {
     messages._CourseAssignmentScoreboardServerResponse,
     messages.CourseAssignmentScoreboardResponse
   >('/api/course/assignmentScoreboard/', (x) => {
-    if (x.finish_time)
+    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
     x.time = ((x: number) => new Date(x * 1000))(x.time);
@@ -751,7 +787,7 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        if (x.finish_time)
+        if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
           x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
         x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         return x;
@@ -766,7 +802,7 @@ export const Course = {
         return x;
       });
     })(x.clarifications);
-    if (x.finish_time)
+    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
     return x;
@@ -790,7 +826,7 @@ export const Course = {
           return x;
         }
         return x.map((x) => {
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
@@ -805,7 +841,7 @@ export const Course = {
           return x;
         });
       })(x.clarifications);
-      if (x.finish_time)
+      if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
         x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
       x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
       return x;
@@ -822,7 +858,7 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        if (x.finish_time)
+        if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
           x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
         x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         return x;
@@ -896,7 +932,7 @@ export const Course = {
         return x;
       }
       return x.map((x) => {
-        if (x.last_update)
+        if (typeof x.last_update !== 'undefined' && x.last_update !== null)
           x.last_update = ((x: number) => new Date(x * 1000))(x.last_update);
         x.request_time = ((x: number) => new Date(x * 1000))(x.request_time);
         return x;
@@ -935,7 +971,7 @@ export const Course = {
             return x;
           }
           return x.map((x) => {
-            if (x.feedback)
+            if (typeof x.feedback !== 'undefined' && x.feedback !== null)
               x.feedback = ((x) => {
                 x.date = ((x: number) => new Date(x * 1000))(x.date);
                 return x;
@@ -1162,19 +1198,22 @@ export const Problem = {
     messages.ProblemDetailsResponse
   >('/api/problem/details/', (x) => {
     x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date);
-    if (x.nextSubmissionTimestamp)
+    if (
+      typeof x.nextSubmissionTimestamp !== 'undefined' &&
+      x.nextSubmissionTimestamp !== null
+    )
       x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
         x.nextSubmissionTimestamp,
       );
-    if (x.problemsetter)
+    if (typeof x.problemsetter !== 'undefined' && x.problemsetter !== null)
       x.problemsetter = ((x) => {
-        if (x.creation_date)
+        if (typeof x.creation_date !== 'undefined' && x.creation_date !== null)
           x.creation_date = ((x: number) => new Date(x * 1000))(
             x.creation_date,
           );
         return x;
       })(x.problemsetter);
-    if (x.runs)
+    if (typeof x.runs !== 'undefined' && x.runs !== null)
       x.runs = ((x) => {
         if (!Array.isArray(x)) {
           return x;
@@ -1184,7 +1223,7 @@ export const Problem = {
           return x;
         });
       })(x.runs);
-    if (x.solvers)
+    if (typeof x.solvers !== 'undefined' && x.solvers !== null)
       x.solvers = ((x) => {
         if (!Array.isArray(x)) {
           return x;
@@ -1315,33 +1354,39 @@ export const Problemset = {
     messages._ProblemsetDetailsServerResponse,
     messages.ProblemsetDetailsResponse
   >('/api/problemset/details/', (x) => {
-    if (x.courseAssignments)
+    if (
+      typeof x.courseAssignments !== 'undefined' &&
+      x.courseAssignments !== null
+    )
       x.courseAssignments = ((x) => {
         if (!Array.isArray(x)) {
           return x;
         }
         return x.map((x) => {
-          if (x.finish_time)
+          if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         });
       })(x.courseAssignments);
-    if (x.finish_time)
+    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    if (x.start_time)
+    if (typeof x.start_time !== 'undefined' && x.start_time !== null)
       x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    if (x.submission_deadline)
+    if (
+      typeof x.submission_deadline !== 'undefined' &&
+      x.submission_deadline !== null
+    )
       x.submission_deadline = ((x: number) => new Date(x * 1000))(
         x.submission_deadline,
       );
-    if (x.users)
+    if (typeof x.users !== 'undefined' && x.users !== null)
       x.users = ((x) => {
         if (!Array.isArray(x)) {
           return x;
         }
         return x.map((x) => {
-          if (x.access_time)
+          if (typeof x.access_time !== 'undefined' && x.access_time !== null)
             x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
           return x;
         });
@@ -1353,7 +1398,7 @@ export const Problemset = {
     messages._ProblemsetScoreboardServerResponse,
     messages.ProblemsetScoreboardResponse
   >('/api/problemset/scoreboard/', (x) => {
-    if (x.finish_time)
+    if (typeof x.finish_time !== 'undefined' && x.finish_time !== null)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
     x.time = ((x: number) => new Date(x * 1000))(x.time);
@@ -1381,7 +1426,8 @@ export const QualityNomination = {
         return x;
       }
       return x.map((x) => {
-        if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+        if (typeof x.time !== 'undefined' && x.time !== null)
+          x.time = ((x: number) => new Date(x * 1000))(x.time);
         return x;
       });
     })(x.votes);
@@ -1403,7 +1449,8 @@ export const QualityNomination = {
             return x;
           }
           return x.map((x) => {
-            if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+            if (typeof x.time !== 'undefined' && x.time !== null)
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           });
         })(x.votes);
@@ -1428,7 +1475,8 @@ export const QualityNomination = {
             return x;
           }
           return x.map((x) => {
-            if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+            if (typeof x.time !== 'undefined' && x.time !== null)
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           });
         })(x.votes);
@@ -1453,7 +1501,8 @@ export const QualityNomination = {
             return x;
           }
           return x.map((x) => {
-            if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+            if (typeof x.time !== 'undefined' && x.time !== null)
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           });
         })(x.votes);
@@ -1503,7 +1552,7 @@ export const Run = {
     messages._RunDetailsServerResponse,
     messages.RunDetailsResponse
   >('/api/run/details/', (x) => {
-    if (x.feedback)
+    if (typeof x.feedback !== 'undefined' && x.feedback !== null)
       x.feedback = ((x) => {
         x.date = ((x: number) => new Date(x * 1000))(x.date);
         return x;
@@ -1668,11 +1717,14 @@ export const User = {
     messages._UserCoderOfTheMonthServerResponse,
     messages.UserCoderOfTheMonthResponse
   >('/api/user/coderOfTheMonth/', (x) => {
-    if (x.coderinfo)
+    if (typeof x.coderinfo !== 'undefined' && x.coderinfo !== null)
       x.coderinfo = ((x) => {
-        if (x.birth_date)
+        if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
           x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-        if (x.graduation_date)
+        if (
+          typeof x.graduation_date !== 'undefined' &&
+          x.graduation_date !== null
+        )
           x.graduation_date = ((x: number) => new Date(x * 1000))(
             x.graduation_date,
           );
@@ -1726,9 +1778,9 @@ export const User = {
     messages._UserExtraInformationServerResponse,
     messages.UserExtraInformationResponse
   >('/api/user/extraInformation/', (x) => {
-    if (x.birth_date)
+    if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
       x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-    if (x.last_login)
+    if (typeof x.last_login !== 'undefined' && x.last_login !== null)
       x.last_login = ((x: number) => new Date(x * 1000))(x.last_login);
     return x;
   }),
@@ -1796,9 +1848,9 @@ export const User = {
     messages._UserProfileServerResponse,
     messages.UserProfileResponse
   >('/api/user/profile/', (x) => {
-    if (x.birth_date)
+    if (typeof x.birth_date !== 'undefined' && x.birth_date !== null)
       x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-    if (x.graduation_date)
+    if (typeof x.graduation_date !== 'undefined' && x.graduation_date !== null)
       x.graduation_date = ((x: number) => new Date(x * 1000))(
         x.graduation_date,
       );
