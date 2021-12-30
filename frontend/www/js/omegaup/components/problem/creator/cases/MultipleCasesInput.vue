@@ -27,10 +27,10 @@
       label-for="case-points"
     >
       <b-form-input
+        v-model="multipleCasesCount"
         type="number"
         number
         :min="0"
-        v-model="multipleCasesCount"
       />
     </b-form-group>
     <b-form-group :label="T.problemCreatorGroupName" label-for="case-group">
