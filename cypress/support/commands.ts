@@ -1,7 +1,7 @@
 // https://on.cypress.io/custom-commands
 import 'cypress-wait-until';
 import 'cypress-file-upload';
-import { buildURLQuery } from '../../frontend/www/js/omegaup/ui';
+import { buildURLQuery } from '@/js/omegaup/ui';
 
 // Logins the user given a username and password
 Cypress.Commands.add('login', ({ username, password }) => {
