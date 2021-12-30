@@ -98,6 +98,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contests = [];
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('page_size');
+        $r->ensureOptionalInt('tab');
         \OmegaUp\Validators::validateOptionalNumber($r['active'], 'active');
         \OmegaUp\Validators::validateOptionalNumber(
             $r['recommended'],
@@ -110,9 +111,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 20);
-        $activeContests = isset($r['active'])
+        if (isset($r['tab'])) {
+            if ($r['tab'] == 0) {
+                $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE;
+            } elseif ($r['tab'] == 1) {
+                $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::FUTURE;
+            } elseif ($r['tab'] == 2) {
+                $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::PAST;
+            }
+        } else {
+            $activeContests = isset($r['active'])
             ? \OmegaUp\DAO\Enum\ActiveStatus::getIntValue(intval($r['active']))
             : \OmegaUp\DAO\Enum\ActiveStatus::ALL;
+        }
         // If the parameter was not set, the default should be ALL which is
         // a number and should pass this check.
         \OmegaUp\Validators::validateNumber($activeContests, 'active');

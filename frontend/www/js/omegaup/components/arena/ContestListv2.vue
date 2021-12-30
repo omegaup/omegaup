@@ -151,6 +151,8 @@
         <b-tab
           ref="currentContestTab"
           v-infinite-scroll="loadMoreContests"
+          infinite-scroll-disabled="busy"
+          infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListCurrent"
           :title-link-class="titleLinkClass(ContestTab.Current)"
@@ -188,6 +190,8 @@
         <b-tab
           ref="futureContestTab"
           v-infinite-scroll="loadMoreContests"
+          infinite-scroll-disabled="busy"
+          infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListFuture"
           :title-link-class="titleLinkClass(ContestTab.Future)"
@@ -228,6 +232,8 @@
         <b-tab
           ref="pastContestTab"
           v-infinite-scroll="loadMoreContests"
+          infinite-scroll-disabled="busy"
+          infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListPast"
           :title-link-class="titleLinkClass(ContestTab.Past)"
@@ -334,7 +340,7 @@ export default class ArenaContestList extends Vue {
   currentOrder: ContestOrder = ContestOrder.None;
   currentFilterBySignedUp: boolean = false;
   currentFilterByRecommended: boolean = false;
-  currentPageSize: number = 10;
+  busy: boolean = false;
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
@@ -349,8 +355,10 @@ export default class ArenaContestList extends Vue {
   }
 
   loadMoreContests() {
-    this.$emit('get-chunk', 1, this.currentPageSize, this.query);
-    this.currentPageSize += 10;
+    this.busy = true;
+    let currentPageSize: number = this.filteredContestList.length + 10;
+    this.$emit('get-chunk', 1, currentPageSize, this.query, this.currentTab);
+    this.busy = false;
   }
 
   finishContestDate(contest: types.ContestListItem): string {

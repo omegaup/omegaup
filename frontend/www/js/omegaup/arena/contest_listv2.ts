@@ -29,29 +29,33 @@ OmegaUp.on('ready', () => {
           tab,
         },
         on: {
-          'get-chunk': (page: number, pageSize: number, query: string) => {
+          'get-chunk': (
+            page: number,
+            pageSize: number,
+            query: string,
+            tab: ContestTab,
+          ) => {
             api.Contest.list({
               page: page,
               page_size: pageSize,
               query: query,
+              tab: tab,
             })
               .then((data) => {
-                const newChunk: types.ContestList = {
-                  future: [],
-                  past: [],
-                  current: [],
-                };
-                const today = new Date();
-                data.results.forEach((contest) => {
-                  if (today < contest.start_time) {
-                    newChunk.future.push(contest);
-                  } else if (today > contest.finish_time) {
-                    newChunk.past.push(contest);
-                  } else {
-                    newChunk.current.push(contest);
-                  }
-                });
-                this.contests = newChunk;
+                if (!data.number_of_results) {
+                  return;
+                }
+                switch (tab) {
+                  case ContestTab.Current:
+                    this.contests.current = data.results.slice();
+                    break;
+                  case ContestTab.Past:
+                    this.contests.past = data.results.slice();
+                    break;
+                  case ContestTab.Future:
+                    this.contests.future = data.results.slice();
+                    break;
+                }
               })
               .catch(ui.apiError);
           },
