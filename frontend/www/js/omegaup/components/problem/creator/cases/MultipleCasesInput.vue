@@ -17,11 +17,7 @@
           label-for="suffix"
           class="mb-4"
         >
-          <b-form-input
-            id="suffix"
-            v-model="multipleCasesSuffix"
-            autocomplete="off"
-          />
+          <b-form-input v-model="multipleCasesSuffix" autocomplete="off" />
         </b-form-group>
       </b-col>
     </b-row>
@@ -34,7 +30,6 @@
         type="number"
         number
         :min="0"
-        id="case-num"
         v-model="multipleCasesCount"
       />
     </b-form-group>
