@@ -119,7 +119,9 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             $username = strval($identityData['username']);
             $result[] = [
                 'key' => $username,
-                'value' => $identityData['name'] ? strval($identityData['username']) : $username,
+                'value' => $identityData['name'] ? strval(
+                    $identityData['username']
+                ) : $username,
             ];
         }
         return $result;
