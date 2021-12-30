@@ -27,7 +27,6 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
         'school_id' => true,
         'author_score' => true,
         'author_ranking' => true,
-        'classname' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -94,11 +93,6 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
             $this->author_ranking = intval(
                 $data['author_ranking']
             );
-        }
-        if (isset($data['classname'])) {
-            $this->classname = is_scalar(
-                $data['classname']
-            ) ? strval($data['classname']) : '';
         }
     }
 
@@ -179,11 +173,4 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $author_ranking = null;
-
-    /**
-     * Almacena la clase precalculada para no tener que determinarla en tiempo de ejecucion.
-     *
-     * @var string|null
-     */
-    public $classname = null;
 }
