@@ -688,13 +688,6 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problemsData[1]['problem']->alias,
               ],
               [
-                'verdict' => 'CE',
-                'runs' => 2,
-                'assignment_alias' => $assignmentAlias,
-                'problem_id' => $problemsData[1]['problem']->problem_id,
-                'problem_alias' => $problemsData[1]['problem']->alias,
-              ],
-              [
                 'verdict' => 'AC',
                 'runs' => 1,
                 'assignment_alias' => $assignmentAlias,
@@ -704,6 +697,13 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
               [
                 'verdict' => 'TLE',
                 'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[1]['problem']->problem_id,
+                'problem_alias' => $problemsData[1]['problem']->alias,
+              ],
+              [
+                'verdict' => 'CE',
+                'runs' => 2,
                 'assignment_alias' => $assignmentAlias,
                 'problem_id' => $problemsData[1]['problem']->problem_id,
                 'problem_alias' => $problemsData[1]['problem']->alias,
