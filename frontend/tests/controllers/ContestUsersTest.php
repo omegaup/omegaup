@@ -136,7 +136,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEquals(
             $contestDetails['contest']['start_time']->time,
@@ -166,7 +166,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
@@ -183,7 +183,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         // adminPayload object should not exist
         $this->assertArrayNotHasKey('adminPayload', $contestDetails);
@@ -223,7 +223,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEquals(
             $contestData['director']->username,
@@ -335,7 +335,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertTrue($contestDetails['needsBasicInformation']);
     }
@@ -369,7 +369,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEquals(
             $contestData['director']->username,
@@ -399,7 +399,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEquals(
             $contestData['director']->username,
@@ -442,7 +442,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         // Users should be able to see all the problems
         foreach ($contestDetails['problems'] as $problem) {

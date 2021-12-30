@@ -137,7 +137,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
             ])
-        )['smartyProperties']['payload']['details'];
+        )['templateProperties']['payload']['details'];
 
         // Assert data
         $this->assertStringContainsString(
