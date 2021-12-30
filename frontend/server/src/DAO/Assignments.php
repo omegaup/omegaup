@@ -12,7 +12,7 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  *
- * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, opened: bool, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  */
 class Assignments extends \OmegaUp\DAO\Base\Assignments {
     public static function getProblemset(
@@ -323,7 +323,8 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 COUNT(`psp`.`problem_id`) AS `problem_count`,
                 COUNT(`s`.`submission_id`) AS `has_runs`,
                `ps`.`scoreboard_url`,
-               `ps`.`scoreboard_url_admin`
+               `ps`.`scoreboard_url_admin`,
+                false AS opened
             FROM
                 `Assignments` `a`
             INNER JOIN
@@ -348,7 +349,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 `a`.`assignment_id` ASC;
         ';
 
-        /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problem_count: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, opened: bool, order: int, problem_count: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId]

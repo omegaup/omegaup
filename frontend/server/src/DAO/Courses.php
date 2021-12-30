@@ -11,7 +11,7 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  *
- * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, opened: bool, order: int, problemCount: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, description: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseCardEnrolled=array{alias: string, name: string, progress: float, school_name: null|string}
  * @psalm-type CourseCardFinished=array{alias: string, name: string}
@@ -51,18 +51,38 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      */
     public static function getAllAssignments(
         string $alias,
-        bool $isAdmin
+        bool $isAdmin,
+        ?\OmegaUp\DAO\VO\Identities $identity = null
     ): array {
         // Non-admins should not be able to see assignments that have not
         // started.
         $timeCondition = $isAdmin ? '' : 'AND a.start_time <= CURRENT_TIMESTAMP';
+
+        $openedCondition = 'false AS opened';
+        $args = [];
+        if (!is_null($identity)) {
+            $openedCondition = '
+                EXISTS(
+                    SELECT
+                        1
+                    FROM
+                        `Problemset_Problem_Opened` AS ppo
+                    WHERE
+                        ppo.`problemset_id` = a.assignment_id
+                        AND ppo.`identity_id` = ?
+                ) AS opened
+            ';
+            $args[] = $identity->identity_id;
+        }
+
         $sql = "
             SELECT
                 a.*,
                 EXISTS(SELECT * FROM Submissions s WHERE s.problemset_id = a.problemset_id) AS has_runs,
                 COUNT(psp.problem_id) AS problem_count,
                 ps.scoreboard_url,
-                ps.scoreboard_url_admin
+                ps.scoreboard_url_admin,
+                $openedCondition
             FROM
                 Courses c
             INNER JOIN
@@ -83,9 +103,13 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 a.assignment_id, ps.problemset_id, psp.problemset_id
             ORDER BY
                 a.`order`, a.start_time;";
+        $args[] = $alias;
 
-        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problem_count: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);
+        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, opened: int, order: int, problem_count: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            $args
+        );
 
         $ar = [];
         foreach ($rs as $row) {
@@ -94,6 +118,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             unset($row['course_id']);
             $row['has_runs'] = $row['has_runs'] > 0;
             $row['problemCount'] = $row['problem_count'];
+            $row['opened'] = boolval($row['opened']);
             unset($row['problem_count']);
             $ar[] = $row;
         }
