@@ -87,7 +87,7 @@ export default class UserMainInfo extends Vue {
     return this.edit ? T.userEditViewProfile : T.profileEdit;
   }
   get buttonUrl(): string {
-    return this.edit ? '/profile/' : '/profile/edit/';
+    return this.edit ? '/profile/' : '/profile/#edit-basic-information';
   }
   get solvedProblems(): Problem[] {
     if (!this.data?.solvedProblems) return [];

@@ -162,7 +162,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
             'assignment_alias' => $courseData['assignment']->alias,
-        ]))['smartyProperties']['payload'];
+        ]))['templateProperties']['payload'];
 
         $this->assertEquals(
             $courseData['course']->name,
@@ -182,10 +182,123 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $studentLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
             'assignment_alias' => $courseData['assignment']->alias,
-        ]))['smartyProperties']['payload'];
+        ]))['templateProperties']['payload'];
 
         // The student should not see the runs
         $this->assertEmpty($studentPayload['currentAssignment']['runs']);
+    }
+
+    public function testAssignmentForbiddenAccess() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            startTimeDelay: 60
+        );
+
+        $student = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student['identity']
+        );
+
+        $adminLogin = self::login($courseData['admin']);
+        $adminPayload = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias'],
+            'assignment_alias' => $courseData['assignment']->alias,
+        ]))['templateProperties']['payload'];
+
+        // Admin should not have problems even when the assignment has not started yet
+        $this->assertEquals(
+            $courseData['course']->name,
+            $adminPayload['courseDetails']['name']
+        );
+        $this->assertEquals(
+            $courseData['assignment']->alias,
+            $adminPayload['currentAssignment']['alias']
+        );
+
+        // Student should throw an exception as the assignment has not started yet
+        $studentLogin = self::login($student['identity']);
+        try {
+            \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment']->alias,
+            ]));
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'assignmentNotStarted');
+        }
+
+        try {
+            \OmegaUp\Controllers\Course::getAssignmentDetails(
+                $student['identity'],
+                null,
+                $courseData['course'],
+                \OmegaUp\DAO\Groups::getByPK(
+                    intval($courseData['course']->group_id)
+                ),
+                $courseData['assignment_alias'],
+            );
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'assignmentNotStarted');
+        }
+
+        try {
+            \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $studentLogin->auth_token,
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $courseData['assignment']->alias,
+                ])
+            );
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('assignmentNotStarted', $e->getMessage());
+        }
+
+        // User not registered in course should throw an exception
+        $extraStudent = \OmegaUp\Test\Factories\User::createUser();
+        $extraStudentLogin = self::login($extraStudent['identity']);
+
+        try {
+            \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(new \OmegaUp\Request([
+                'auth_token' => $extraStudentLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment']->alias,
+            ]));
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+        }
+
+        try {
+            \OmegaUp\Controllers\Course::getAssignmentDetails(
+                $extraStudent['identity'],
+                null,
+                $courseData['course'],
+                \OmegaUp\DAO\Groups::getByPK(
+                    intval($courseData['course']->group_id)
+                ),
+                $courseData['assignment_alias'],
+            );
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+        }
+
+        try {
+            \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
+                new \OmegaUp\Request([
+                    'auth_token' => $extraStudentLogin->auth_token,
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $courseData['assignment']->alias,
+                ])
+            );
+            $this->fail('Should have thrown a ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'userNotAllowed');
+        }
     }
 
     public function testGetArenaCourseDetails() {
@@ -212,7 +325,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'course_alias' => $courseData['course_alias'],
                 'assignment_alias' => $courseData['assignment']->alias,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
         $this->assertEquals(
             $courseData['course']->name,
             $payload['course']['name']
@@ -232,6 +345,23 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertNull($payload['currentProblem']);
 
+        $students = [];
+        for ($i = 0; $i < 3; $i++) {
+            $students[] = \OmegaUp\Test\Factories\User::createUser();
+            \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData,
+                $students[$i]['identity']
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+                    $problemsData[0],
+                    $courseData,
+                    $students[$i]['identity']
+                )
+            );
+        }
+
+        $adminLogin = self::login($courseData['admin']);
         $payload = \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
             new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
@@ -239,7 +369,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'assignment_alias' => $courseData['assignment']->alias,
                 'problem_alias' => $problemsData[0]['problem']->alias,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
         $this->assertEquals(
             $courseData['course']->name,
             $payload['course']['name']
@@ -261,5 +391,38 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             $problemsData[0]['problem']->alias,
             $payload['currentProblem']['alias']
         );
+        $this->assertCount(3, $payload['runs']);
+
+        $studentLogin = self::login($students[0]['identity']);
+        $payload = \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment']->alias,
+                'problem_alias' => $problemsData[0]['problem']->alias,
+            ])
+        )['templateProperties']['payload'];
+        $this->assertEquals(
+            $courseData['course']->name,
+            $payload['course']['name']
+        );
+        $this->assertEquals(
+            $courseData['assignment']->alias,
+            $payload['assignment']['alias']
+        );
+        $this->assertCount(2, $payload['problems']);
+        $this->assertEquals(
+            $problemsData[0]['problem']->alias,
+            $payload['problems'][0]['alias']
+        );
+        $this->assertEquals(
+            $problemsData[1]['problem']->alias,
+            $payload['problems'][1]['alias']
+        );
+        $this->assertEquals(
+            $problemsData[0]['problem']->alias,
+            $payload['currentProblem']['alias']
+        );
+        $this->assertCount(1, $payload['runs']);
     }
 }

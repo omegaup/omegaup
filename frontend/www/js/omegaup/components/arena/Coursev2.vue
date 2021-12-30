@@ -71,7 +71,17 @@
         </omegaup-arena-scoreboard>
         <omegaup-problem-details
           v-if="currentSelectedTab === null && currentProblem"
+          :all-runs="allRuns"
+          :in-contest-or-course="true"
+          :languages="course.languages"
           :problem="currentProblem"
+          :user="user"
+          :user-runs="userRuns"
+          @submit-run="
+            (run) => {
+              $emit('submit-run', run);
+            }
+          "
         ></omegaup-problem-details>
       </b-col>
     </b-row>
@@ -106,12 +116,15 @@ export enum Tabs {
   },
 })
 export default class ArenaCourse extends Vue {
-  @Prop() course!: types.ArenaCourseDetails;
+  @Prop() allRuns!: types.Run[];
   @Prop() assignment!: types.ArenaCourseAssignment;
-  @Prop() problems!: types.ArenaCourseProblem[];
+  @Prop() course!: types.ArenaCourseDetails;
   @Prop() currentProblem!: types.ProblemDetails;
-  @Prop({ default: Tabs.Summary }) selectedTab!: string | null;
+  @Prop() problems!: types.ArenaCourseProblem[];
   @Prop() scoreboard!: types.Scoreboard;
+  @Prop({ default: Tabs.Summary }) selectedTab!: string | null;
+  @Prop() user!: types.UserInfoForProblem;
+  @Prop() userRuns!: types.Run[];
 
   T = T;
   ui = ui;

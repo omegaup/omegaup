@@ -70,8 +70,12 @@ describe('MainInfo.vue', () => {
     const wrapper = shallowMount(user_MainInfo, {
       propsData,
     });
-    expect(wrapper.find('a[href="/profile/edit/"]').exists()).toBe(true);
-    expect(wrapper.find('a[href="/profile/edit/"]').text()).toBe(T.profileEdit);
+    expect(
+      wrapper.find('a[href="/profile/#edit-basic-information"]').exists(),
+    ).toBe(true);
+    expect(
+      wrapper.find('a[href="/profile/#edit-basic-information"]').text(),
+    ).toBe(T.profileEdit);
   });
 
   it('Should display profile see button', () => {

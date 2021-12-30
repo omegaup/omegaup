@@ -298,7 +298,7 @@
       </div>
     </nav>
     <omegaup-user-objectives-questions
-      v-if="fromLogin && userTypes.length === 0"
+      v-if="fromLogin && isLoggedIn && userTypes.length === 0"
       @submit="(objectives) => $emit('update-user-objectives', objectives)"
     ></omegaup-user-objectives-questions>
   </header>

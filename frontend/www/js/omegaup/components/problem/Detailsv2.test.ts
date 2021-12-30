@@ -1,7 +1,10 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+jest.mock('../../../../third_party/js/diff_match_patch.js');
+
+import { mount, shallowMount, createLocalVue } from '@vue/test-utils';
 import { types } from '../../api_types';
 import T from '../../lang';
-import problem_Details from './Detailsv2.vue';
+import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
+import problem_Details, { PopupDisplayed } from './Detailsv2.vue';
 
 import BootstrapVue, { BTab } from 'bootstrap-vue';
 
@@ -67,7 +70,8 @@ describe('Detailsv2.vue', () => {
       images: {},
       sources: {},
       language: 'es',
-      markdown: '# test',
+      markdown: `# test
+        #include <iostream>`,
     },
     submissions: 5,
     title: '',
@@ -76,10 +80,37 @@ describe('Detailsv2.vue', () => {
     visits: 5,
   };
 
+  const runs: types.Run[] = [
+    {
+      alias: 'Hello',
+      classname: 'user-rank-unranked',
+      country: 'xx',
+      guid: 'abcdefg',
+      language: 'py3',
+      memory: 0,
+      penalty: 0,
+      runtime: 0,
+      score: 1,
+      status: 'ready',
+      submit_delay: 0,
+      time: new Date(),
+      username: 'omegaUp',
+      verdict: 'AC',
+    },
+  ];
+
   it('Should show the tabs', () => {
     const wrapper = shallowMount(problem_Details, {
       propsData: {
+        allRuns: runs,
         problem,
+        user: {
+          loggedIn: true,
+          admin: true,
+          reviewer: true,
+        },
+        languages: ['py2', 'py3'],
+        userRuns: runs,
       },
       localVue,
     });
@@ -90,5 +121,93 @@ describe('Detailsv2.vue', () => {
     for (let i = 0; i < expectedTabs.length; i++) {
       expect(tabs.at(i).attributes('title')).toBe(expectedTabs[i]);
     }
+  });
+
+  it('Should show the problem tab details', () => {
+    const languages = ['py2', 'py3'];
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        allRuns: runs,
+        problem,
+        user: {
+          loggedIn: true,
+          admin: true,
+          reviewer: true,
+        },
+        languages,
+        userRuns: runs,
+      },
+      localVue,
+    });
+
+    const problemTab = wrapper.findComponent(BTab);
+    expect(problemTab.text()).toContain(problem.title);
+    expect(wrapper.vm.filteredLanguages).toEqual(languages);
+    expect(wrapper.findComponent(arena_EphemeralGrader).exists()).toBe(true);
+    expect(wrapper.find('div[data-markdown-statement]').text()).toContain(
+      '#include <iostream>',
+    );
+    expect(wrapper.find('.output-only-download').exists()).toBe(false);
+  });
+
+  it('Should show the problem languages', () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        allRuns: runs,
+        problem,
+        user: {
+          loggedIn: true,
+          admin: true,
+          reviewer: true,
+        },
+        userRuns: runs,
+      },
+      localVue,
+    });
+
+    const problemTab = wrapper.findComponent(BTab);
+    expect(problemTab.text()).toContain(problem.title);
+    expect(wrapper.vm.filteredLanguages).toEqual(problem.languages);
+  });
+
+  it('Should show the problem languages', () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        allRuns: runs,
+        problem,
+        user: {
+          loggedIn: true,
+          admin: true,
+          reviewer: true,
+        },
+        userRuns: runs,
+      },
+      localVue,
+    });
+
+    const problemTab = wrapper.findComponent(BTab);
+    expect(problemTab.text()).toContain(problem.title);
+    expect(wrapper.vm.filteredLanguages).toEqual(problem.languages);
+  });
+
+  it('Should handle the user runs', async () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        allRuns: runs,
+        problem,
+        user: {
+          loggedIn: true,
+          admin: true,
+          reviewer: true,
+        },
+        userRuns: runs,
+      },
+      localVue,
+    });
+
+    expect(wrapper.find('table.runs tbody').text()).toContain(runs[0].guid);
+
+    await wrapper.find('table.runs tfoot button').trigger('click');
+    expect(wrapper.vm.currentPopupDisplayed).toBe(PopupDisplayed.RunSubmit);
   });
 });

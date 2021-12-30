@@ -325,30 +325,11 @@ def create_problem(
                 (By.CSS_SELECTOR,
                  'a[data-nav-problems-create]'))).click()
     driver.screenshot()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'button[data-target=".access"]'))
+    ).click()
 
-    # open all collapsed panels
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//button[@data-target=".tags"]'))).click()
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//button[@data-target=".limits"]'))).click()
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//button[@data-target=".validation"]'))).click()
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//button[@data-target=".access"]'))).click()
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//button[@data-target=".evaluation"]'))).click()
-
-    driver.screenshot()
     with assert_js_errors(
             driver,
             expected_messages=('/api/problem/details/',)
@@ -361,12 +342,7 @@ def create_problem(
             EC.visibility_of_element_located(
                 (By.XPATH,
                  '//input[@name = "title"]'))).send_keys(problem_alias)
-    input_limit = driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//input[@name = "input_limit"]')))
-    input_limit.clear()
-    input_limit.send_keys('1024')
+
     # Alias should be set automatically
     driver.browser.find_element_by_name('source').send_keys('test')
 

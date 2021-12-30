@@ -155,6 +155,13 @@ export function formatTimestamp(date: Date): string {
   ).padStart(2, '0')}`;
 }
 
+export function formatDateLocalHHMM(date: Date): string {
+  return `${formatDateLocal(date)} ${String(date.getHours()).padStart(
+    2,
+    '0',
+  )}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
 export function parseDuration(str: string): number | null {
   let duration: number = 0;
   const durationRegexp = new RegExp(

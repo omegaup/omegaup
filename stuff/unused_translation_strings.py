@@ -24,8 +24,8 @@ def _get_expected_strings() -> Set[str]:
     """Obtains all translation strings from the frontend."""
     expected_strings: Set[str] = set()
 
-    # First consider the strings found in Smarty, JavaScript, TypeScript, and
-    # Vue.
+    # First consider the strings found in templates, JavaScript, TypeScript,
+    # and Vue.
     for root, _, filenames in os.walk('frontend'):
         for filename in filenames:
             path = os.path.join(root, filename)
