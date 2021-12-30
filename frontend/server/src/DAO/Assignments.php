@@ -95,9 +95,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 FROM
                     `Assignments` AS `a`
                 INNER JOIN
-                    `Problemsets` AS `ps` ON `a`.`problemset_id` = `ps`.`problemset_id`
-                INNER JOIN
-                    `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `ps`.`problemset_id`
+                    `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `a`.`problemset_id`
                 INNER JOIN
                     `Problems` AS `p` ON `p`.`problem_id` = `psp`.`problem_id`
                 WHERE
@@ -106,20 +104,18 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 GROUP BY
                     `a`.`assignment_id`, `p`.`problem_id`
                 ) AS pr
-            INNER JOIN
-                `Identities` AS `i` ON `i`.`identity_id` = `gi`.`identity_id`
             LEFT JOIN
                 `Submissions` AS `s`
             ON
                 `s`.`problem_id` = `pr`.`problem_id`
-                AND `s`.`identity_id` = `i`.`identity_id`
+                AND `s`.`identity_id` = `gi`.`identity_id`
                 AND `s`.`problemset_id` = `pr`.`problemset_id`
             LEFT JOIN
                 `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
             WHERE
                 `gi`.`group_id` = ?
             GROUP BY
-                `i`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`
+                `gi`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`
         ) AS bpr
         GROUP BY
             bpr.problem_alias, bpr.assignment_alias
@@ -165,9 +161,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             FROM
                 `Assignments` AS `a`
             INNER JOIN
-                `Problemsets` AS `ps` ON `a`.`problemset_id` = `ps`.`problemset_id`
-            INNER JOIN
-                `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `ps`.`problemset_id`
+                `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `a`.`problemset_id`
             INNER JOIN
                 `Problems` AS `p` ON `p`.`problem_id` = `psp`.`problem_id`
             WHERE
@@ -176,22 +170,20 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             GROUP BY
                 `a`.`assignment_id`, `p`.`problem_id`
             ) AS pr
-        INNER JOIN
-            `Identities` AS `i` ON `i`.`identity_id` = `gi`.`identity_id`
         LEFT JOIN
             `Submissions` AS `s`
         ON
             `s`.`problem_id` = `pr`.`problem_id`
-            AND `s`.`identity_id` = `i`.`identity_id`
+            AND `s`.`identity_id` = `gi`.`identity_id`
             AND `s`.`problemset_id` = `pr`.`problemset_id`
         LEFT JOIN
             `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
         WHERE
             `gi`.`group_id` = ? AND `r`.`status` = "ready" AND `s`.`type` = "normal"
         GROUP BY
-            `i`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`, verdict
+            `gi`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`, verdict
         ORDER BY
-            pr.order, pr.problem_id, `pr`.`assignment_id`, `i`.`username`, verdict;
+            pr.order, pr.problem_id, `pr`.`assignment_id`, verdict;
         ';
 
         /** @var list<array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: null|string}> */
@@ -328,7 +320,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                `a`.`max_points`,
                `a`.`publish_time_delay`,
                `a`.`order`,
-                COUNT(`p`.`problem_id`) AS `problem_count`,
+                COUNT(`psp`.`problem_id`) AS `problem_count`,
                 COUNT(`s`.`submission_id`) AS `has_runs`,
                `ps`.`scoreboard_url`,
                `ps`.`scoreboard_url_admin`
@@ -342,10 +334,6 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 `Problemset_Problems` `psp`
             ON
                 `psp`.`problemset_id` = `ps`.`problemset_id`
-            LEFT JOIN
-                `Problems` `p`
-            ON
-                `p`.`problem_id` = `psp`.`problem_id`
             LEFT JOIN
                 `Submissions` `s`
             ON
