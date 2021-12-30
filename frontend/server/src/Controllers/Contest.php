@@ -80,6 +80,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
+     * @omegaup-request-param int $tab
      * @omegaup-request-param int|null $participating
      * @omegaup-request-param string $query
      * @omegaup-request-param int|null $recommended
