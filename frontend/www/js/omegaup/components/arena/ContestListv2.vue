@@ -151,7 +151,7 @@
         <b-tab
           ref="currentContestTab"
           v-infinite-scroll="loadMoreContests"
-          infinite-scroll-disabled="busy"
+          infinite-scroll-disabled="refreshing"
           infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListCurrent"
@@ -190,7 +190,7 @@
         <b-tab
           ref="futureContestTab"
           v-infinite-scroll="loadMoreContests"
-          infinite-scroll-disabled="busy"
+          infinite-scroll-disabled="refreshing"
           infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListFuture"
@@ -232,7 +232,7 @@
         <b-tab
           ref="pastContestTab"
           v-infinite-scroll="loadMoreContests"
-          infinite-scroll-disabled="busy"
+          infinite-scroll-disabled="refreshing"
           infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListPast"
@@ -340,7 +340,7 @@ export default class ArenaContestList extends Vue {
   currentOrder: ContestOrder = ContestOrder.None;
   currentFilterBySignedUp: boolean = false;
   currentFilterByRecommended: boolean = false;
-  busy: boolean = false;
+  refreshing: boolean = false;
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
@@ -355,10 +355,10 @@ export default class ArenaContestList extends Vue {
   }
 
   loadMoreContests() {
-    this.busy = true;
+    this.refreshing = true;
     let currentPageSize: number = this.filteredContestList.length + 10;
     this.$emit('get-chunk', 1, currentPageSize, this.query, this.currentTab);
-    this.busy = false;
+    this.refreshing = false;
   }
 
   finishContestDate(contest: types.ContestListItem): string {
