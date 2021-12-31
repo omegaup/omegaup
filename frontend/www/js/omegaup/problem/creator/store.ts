@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import Vuex, { Module } from 'vuex';
-import { StoreState, RootState } from './types';
+import Vuex from 'vuex';
+import { StoreState } from './types';
 import { casesStore } from './modules/cases';
 import T from '../../lang';
 
