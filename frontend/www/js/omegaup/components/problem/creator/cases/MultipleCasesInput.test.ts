@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount, Wrapper } from '@vue/test-utils';
+import { createLocalVue, shallowMount } from '@vue/test-utils';
 
 import MultipleCasesInput from './MultipleCasesInput.vue';
 import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
