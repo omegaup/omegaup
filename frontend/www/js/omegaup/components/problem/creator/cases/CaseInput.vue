@@ -6,7 +6,12 @@
       label-for="case-name"
       class="mb-4"
     >
-      <b-form-input v-model="caseName" required autocomplete="off" />
+      <b-form-input
+        v-model="caseName"
+        :formatter="formatter"
+        required
+        autocomplete="off"
+      />
     </b-form-group>
     <b-form-group :label="T.problemCreatorGroupName" label-for="case-group">
       <b-form-select v-model="caseGroup" :options="options" />
@@ -19,6 +24,7 @@
     >
       <b-form-input
         v-model="casePoints"
+        :formatter="pointsFormatter"
         type="number"
         number
         min="0"
@@ -30,7 +36,7 @@
       :description="T.problemCreatorAutomaticPointsHelper"
     >
       <b-form-checkbox
-        :checked="!casePoints"
+        :checked="casePoints === null"
         name="auto-points"
         @change="casePoints = casePoints === null ? 0 : null"
       >
@@ -55,5 +61,16 @@ export default class CaseInput extends Vue {
   casePoints: number | null = this.points;
 
   T = T;
+
+  formatter(text: string) {
+    return text.toLowerCase().replace(/[^a-z0-9_\-\t]/g, '');
+  }
+
+  pointsFormatter(points: number | null) {
+    if (points === null) {
+      return null;
+    }
+    return Math.max(points, 0);
+  }
 }
 </script>
