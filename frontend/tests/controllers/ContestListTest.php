@@ -780,4 +780,71 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals($apiListOrder, $modifiedOrderContest);
     }
+
+    /**
+     * Basic test. Check that only the first contest is on the list depending on selected tab
+     */
+    public function testShowAllContests() {
+        $r = new \OmegaUp\Request();
+
+        // Create 3 contests, the second one will occur in to the future and the third one will occur in to the past.
+        $currentContestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['admissionMode' => 'public']
+            )
+        );
+        $futureContestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams(
+            [
+                'admissionMode' => 'public',
+                'finishTime' => ($currentContestData['request']['start_time'] + (60 * 60 * 49)),
+                'startTime' => ($currentContestData['request']['start_time'] + (60 * 60 * 48)),
+            ]
+        ));
+        $pastContestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams(
+            [
+                'admissionMode' => 'public',
+                'finishTime' => ($currentContestData['request']['start_time'] - (60 * 60 * 48)),
+                'startTime' => ($currentContestData['request']['start_time'] - (60 * 60 * 49)),
+            ]
+        ));
+
+        // Check current contests
+        $r = new \OmegaUp\Request([
+            'page' => 1,
+            'page_size' => 1,
+            'tab' => 0,
+        ]);
+        $response = \OmegaUp\Controllers\Contest::apiList($r);
+        $this->assertArrayContainsInKey(
+            $response['results'],
+            'contest_id',
+            $currentContestData['contest']->contest_id
+        );
+
+        // Check future contests
+        $r = new \OmegaUp\Request([
+            'page' => 1,
+            'page_size' => 1,
+            'tab' => 1,
+        ]);
+        $response = \OmegaUp\Controllers\Contest::apiList($r);
+        $this->assertArrayContainsInKey(
+            $response['results'],
+            'contest_id',
+            $futureContestData['contest']->contest_id
+        );
+
+        // Check past contests
+        $r = new \OmegaUp\Request([
+            'page' => 1,
+            'page_size' => 1,
+            'tab' => 2,
+        ]);
+        $response = \OmegaUp\Controllers\Contest::apiList($r);
+        $this->assertArrayContainsInKey(
+            $response['results'],
+            'contest_id',
+            $pastContestData['contest']->contest_id
+        );
+    }
 }
