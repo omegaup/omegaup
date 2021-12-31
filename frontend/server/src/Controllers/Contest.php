@@ -80,7 +80,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
-     * @omegaup-request-param int $tab
+     * @omegaup-request-param string $tab
      * @omegaup-request-param int|null $participating
      * @omegaup-request-param string $query
      * @omegaup-request-param int|null $recommended
@@ -99,7 +99,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contests = [];
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('page_size');
-        $r->ensureOptionalInt('tab');
+        \OmegaUp\Validators::validateStringOfLengthInRange(
+            $r['tab'],
+            'tab',
+            minLength: null,
+            maxLength: 255,
+            required: false,
+        );
+        $tab = $r['tab'];
         \OmegaUp\Validators::validateOptionalNumber($r['active'], 'active');
         \OmegaUp\Validators::validateOptionalNumber(
             $r['recommended'],
@@ -115,12 +122,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $activeContests = isset($r['active'])
             ? \OmegaUp\DAO\Enum\ActiveStatus::getIntValue(intval($r['active']))
             : \OmegaUp\DAO\Enum\ActiveStatus::ALL;
-        if (isset($r['tab'])) {
-            if ($r['tab'] == 0) {
+        if (!is_null($tab)) {
+            if ($tab == '0') {
                 $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE;
-            } elseif ($r['tab'] == 1) {
+            } elseif ($tab == '1') {
                 $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::FUTURE;
-            } elseif ($r['tab'] == 2) {
+            } elseif ($tab == '2') {
                 $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::PAST;
             }
         }
