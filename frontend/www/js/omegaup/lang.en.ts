@@ -807,7 +807,7 @@ const translations: { [key: string]: string; } = {
   problemCollectionSearchProblem: "Problem Finder",
   problemCreatorAdd: "Add",
   problemCreatorAutomaticPoints: "Automatically calculate points",
-  problemCreatorAutomaticPointsHelper: "The program will calculate the points of this case with the next formula: (100 - (sum of cases that have explicitly defined the points)) / (sum of cases that have not explicitly defined the points)",
+  problemCreatorAutomaticPointsHelper: "The program will calculate the points of this case with the next formula: (100 - (sum of cases that have explicitly defined points)) / (number of cases that do not have explicitly defined points)",
   problemCreatorCase: "Case",
   problemCreatorCaseGroupNameHelper: "Lowercase and without whitespaces",
   problemCreatorCaseName: "Case Name",
