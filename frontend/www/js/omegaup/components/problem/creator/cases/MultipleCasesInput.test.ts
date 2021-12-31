@@ -1,4 +1,4 @@
-import { createLocalVue, shallowMount } from '@vue/test-utils';
+import { createLocalVue, shallowMount, Wrapper } from '@vue/test-utils';
 
 import MultipleCasesInput from './MultipleCasesInput.vue';
 import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
@@ -41,5 +41,20 @@ describe('MultipleCasesInput.vue', () => {
     expect(wrapper.find('[description]').attributes('description')).toContain(
       'case#',
     ); // Again, the description is stored inside the attribute
+  });
+
+  it('Should handle autoformatting', () => {
+    const wrapper = shallowMount(MultipleCasesInput, {
+      localVue,
+    });
+
+    // These any are neccesary since wrapper.vm doesn't load the component's methods to typescript, even if they exist
+    const invalidString = 'INVALID STRING234 !@#!@#';
+    const result = (wrapper.vm as any).formatter(invalidString);
+    expect(result).toBe('invalidstring234');
+
+    const invalidNumber = -2;
+    const numberResult = (wrapper.vm as any).numberFormatter(invalidNumber);
+    expect(numberResult).toBe(1);
   });
 });
