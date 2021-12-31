@@ -10,11 +10,9 @@ const state: StoreState = {
   problemName: T.problemCreatorNewProblem,
 } as StoreState;
 
-const store: Module<StoreState, RootState> = {
+export default new Vuex.Store({
   state,
   modules: {
     casesStore,
   },
-};
-
-export default new Vuex.Store(store);
+});

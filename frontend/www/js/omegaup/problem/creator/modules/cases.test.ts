@@ -1,4 +1,4 @@
-import store from '@/js/omegaup/problem/creator/store';
+import store from '../store';
 import { NIL as UUID_NIL, v4 as uuid } from 'uuid';
 import { generateCase, generateGroup } from '../modules/cases';
 import { CaseLine, CaseRequest, MultipleCaseAddRequest } from '../types';
