@@ -110,7 +110,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     $identityData['username'],
                     array_column(
                         $result,
-                        'username'
+                        'key'
                     )
                 ) !== false
             ) {
@@ -120,7 +120,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             $result[] = [
                 'key' => $username,
                 'value' => $identityData['name'] ? strval(
-                    $identityData['username']
+                    $identityData['name']
                 ) : $username,
             ];
         }
