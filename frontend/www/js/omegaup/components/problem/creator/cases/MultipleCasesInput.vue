@@ -69,7 +69,7 @@ export default class MultipleCasesInput extends Vue {
 
   // Ensure that the prefix and suffix always contain alpha-numeric characters in addition to _ and -
   formatter(text: string) {
-    return text.toLowerCase().replace(/[^a-z0-9_\-\t]/g, '');
+    return text.toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '');
   }
 
   // Ensures the numebr is always above 1

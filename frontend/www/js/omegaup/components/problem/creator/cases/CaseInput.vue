@@ -63,7 +63,7 @@ export default class CaseInput extends Vue {
   T = T;
 
   formatter(text: string) {
-    return text.toLowerCase().replace(/[^a-z0-9_\-\t]/g, '');
+    return text.toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '');
   }
 
   pointsFormatter(points: number | null) {
