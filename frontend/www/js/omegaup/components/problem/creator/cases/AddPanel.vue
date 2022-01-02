@@ -6,6 +6,7 @@
           <case-input />
         </b-tab>
         <b-tab :title="T.problemCreatorMultipleCases" name="modal-form">
+          <multiple-cases-input />
         </b-tab>
         <b-tab :title="T.problemCreatorGroup" name="modal-form"> </b-tab>
       </b-tabs>
@@ -32,10 +33,12 @@
 import { Component, Vue } from 'vue-property-decorator';
 import T from '../../../../lang';
 import cases_CaseInput from './CaseInput.vue';
+import cases_MultipleCasesInput from './MultipleCasesInput.vue';
 
 @Component({
   components: {
     'case-input': cases_CaseInput,
+    'multiple-cases-input': cases_MultipleCasesInput,
   },
 })
 export default class AddPanel extends Vue {
