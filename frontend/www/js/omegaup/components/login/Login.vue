@@ -25,6 +25,7 @@
               <label for="user">{{ T.loginEmailUsername }}</label>
               <input
                 v-model="usernameOrEmail"
+                data-login-username
                 name="login_username"
                 type="text"
                 class="form-control"
@@ -42,6 +43,7 @@
               >
               <input
                 v-model="password"
+                data-login-password
                 name="login_password"
                 type="password"
                 class="form-control"
@@ -52,6 +54,7 @@
 
             <div class="form-group">
               <button
+                data-login-submit
                 class="btn btn-primary form-control"
                 name="login"
                 @click.prevent="$emit('login', usernameOrEmail, password)"
