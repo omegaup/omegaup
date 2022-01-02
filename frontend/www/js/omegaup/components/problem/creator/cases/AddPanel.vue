@@ -2,8 +2,11 @@
   <b-card :title="T.problemCreatorAdd">
     <div class="h-100">
       <b-tabs v-model="tabIndex" small pills>
-        <b-tab :title="T.problemCreatorCase" name="modal-form"></b-tab>
+        <b-tab :title="T.problemCreatorCase" name="modal-form">
+          <case-input />
+        </b-tab>
         <b-tab :title="T.problemCreatorMultipleCases" name="modal-form">
+          <multiple-cases-input />
         </b-tab>
         <b-tab :title="T.problemCreatorGroup" name="modal-form"> </b-tab>
       </b-tabs>
@@ -29,8 +32,15 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import T from '../../../../lang';
+import cases_CaseInput from './CaseInput.vue';
+import cases_MultipleCasesInput from './MultipleCasesInput.vue';
 
-@Component
+@Component({
+  components: {
+    'case-input': cases_CaseInput,
+    'multiple-cases-input': cases_MultipleCasesInput,
+  },
+})
 export default class AddPanel extends Vue {
   tabIndex = 0;
 

@@ -201,6 +201,8 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 Submissions s
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
             INNER JOIN
                 Problems p ON p.problem_id = s.problem_id
             INNER JOIN
@@ -253,25 +255,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 r.verdict,
                 r.runtime,
                 r.memory,
-                IFNULL(
-                    (
-                        SELECT urc.classname
-                        FROM User_Rank_Cutoffs urc
-                        WHERE
-                            urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = i.user_id
-                            )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT 1
-                    ),
-                    "user-rank-unranked"
-                ) AS classname
+                IFNULL(ur.classname, "user-rank-unranked") AS classname
         ';
 
         $sqlLimit = 'LIMIT ?, ?;';
@@ -374,25 +358,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         $sql = '
             SELECT
                 i.username as author,
-                IFNULL(
-                    (
-                        SELECT urc.classname
-                        FROM User_Rank_Cutoffs urc
-                        WHERE
-                            urc.score <= (
-                                SELECT
-                                    ur.score
-                                FROM
-                                    User_Rank ur
-                                WHERE
-                                    ur.user_id = i.user_id
-                            )
-                        ORDER BY
-                            urc.percentile ASC
-                        LIMIT 1
-                    ),
-                    "user-rank-unranked"
-                ) AS author_classname,
+                IFNULL(ur.classname, "user-rank-unranked") AS author_classname,
                 sf.feedback,
                 sf.date
             FROM
@@ -401,6 +367,8 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                 Submission_Feedback sf ON sf.submission_id = s.submission_id
             INNER JOIN
                 Identities i ON i.identity_id = sf.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
             WHERE
                 s.submission_id = ?
         ';

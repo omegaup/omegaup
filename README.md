@@ -15,7 +15,7 @@ Directorios que se utilizan activamente en el desarrollo.
 | [frontend/server/src/Controllers](https://github.com/omegaup/omegaup/tree/main/frontend/server/src/Controllers) | Lógica de negocio que implementa la API de omegaUp. |
 | [frontend/server/libs](https://github.com/omegaup/omegaup/tree/main/frontend/server/libs) | Bibliotecas y utilerías. |
 | [frontend/server/src/DAO](https://github.com/omegaup/omegaup/tree/main/frontend/server/src/DAO) | Los Data Access Objects [DAO] y Value Objects [VO]. Clases utilizadas para representar los esquemas de la base de datos y facilitar su consumo por los controladores. |
-| [frontend/templates](https://github.com/omegaup/omegaup/tree/main/frontend/templates) | Plantillas de Smarty utilizadas para generar el HTML que se despliega a los usuarios. También aquí están los archivos de internacionalización para inglés, español y portugués. |
+| [frontend/templates](https://github.com/omegaup/omegaup/tree/main/frontend/templates) | Plantillas utilizadas para generar el HTML que se despliega a los usuarios. También aquí están los archivos de internacionalización para inglés, español y portugués. |
 | [frontend/www](https://github.com/omegaup/omegaup/tree/main/frontend/www) |  Los contenidos completos de la página de internet. |
 
 El resto del código está en otros repositorios

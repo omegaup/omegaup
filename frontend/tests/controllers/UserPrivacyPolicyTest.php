@@ -42,7 +42,7 @@ class UserPrivacyPolicyTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $response = \OmegaUp\Controllers\User::apiAcceptPrivacyPolicy(
             new \OmegaUp\Request([
@@ -80,7 +80,7 @@ class UserPrivacyPolicyTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $response = \OmegaUp\Controllers\User::apiAcceptPrivacyPolicy(
             new \OmegaUp\Request([
@@ -122,7 +122,7 @@ class UserPrivacyPolicyTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $response = \OmegaUp\Controllers\User::apiLastPrivacyPolicyAccepted(
             new \OmegaUp\Request([
