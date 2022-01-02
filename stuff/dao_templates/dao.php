@@ -196,6 +196,39 @@ abstract class {{ table.class_name }} {
     }
 
     /**
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\{{ table.class_name }}} por llave primaria.
+     *
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\{{ table.class_name }}}
+     * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
+     *
+     * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
+     * los campos.
+     *
+     * @return bool Si existe o no tal registro.
+     */
+    final public static function existsByPK(
+        {{ table.columns|selectattr('primary_key')|listformat('{0.php_type} ${0.name}')|join(',\n        ') }}
+    ): bool {
+  {%- if table.columns|selectattr('primary_key')|rejectattr('not_null')|list|length %}
+        if ({{ table.columns|selectattr('primary_key')|rejectattr('not_null')|listformat('is_null(${.name})')|join(' || ') }}) {
+            return false;
+        }
+  {%- endif %}
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `{{ table.name }}`
+            WHERE
+                (
+                    {{ table.columns|selectattr('primary_key')|listformat('`{.name}` = ?')|join(' AND\n                    ') }}
+                );';
+        $params = [{{ table.columns|selectattr('primary_key')|listformat('${.name}')|join(', ') }}];
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
+    }
+
+    /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
