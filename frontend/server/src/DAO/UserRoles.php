@@ -124,9 +124,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             FROM
                 User_Roles ur
             INNER JOIN
-                Users u ON u.user_id = ur.user_id
-            INNER JOIN
-                Identities i ON u.user_id = i.user_id
+                Identities i ON ur.user_id = i.user_id
             WHERE
                 i.identity_id = ? AND ur.role_id = ? AND ur.acl_id IN (?, ?);';
         $params = [
