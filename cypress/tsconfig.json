@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": "../node_modules",
+    "target": "es6",
+    "lib": ["ES5", "DOM"],
+    "types": ["cypress", "cypress-wait-until", "cypress-file-upload"],
+    "moduleResolution": "node",
+    "paths": {
+      "@/*": ["../frontend/www/*"]
+    }
+  },
+  "include": ["./**/*.ts"]
+}

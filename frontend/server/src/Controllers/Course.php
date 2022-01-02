@@ -77,7 +77,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemStatement=array{images: array<string, string>, sources: array<string, string>, language: string, markdown: string}
  * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: SettingLimits, nextSubmissionTimestamp?: \OmegaUp\Timestamp, nominationStatus: NominationStatus, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettingsDistrib, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type ArenaCourseDetails=array{alias: string, name: string, languages: list<string>|null}
- * @psalm-type ArenaCourseAssignment=array{alias: string, name: string, description: string}
+ * @psalm-type ArenaCourseAssignment=array{alias: string, name: string, description: string, problemset_id: int}
  * @psalm-type ArenaCourseProblem=array{alias: string, letter: string, title: string}
  * @psalm-type ArenaCoursePayload=array{course: ArenaCourseDetails, assignment: ArenaCourseAssignment, problems: list<ArenaCourseProblem>, currentProblem: null|ProblemDetails, runs: list<Run>, scoreboard: null|Scoreboard}
  */
@@ -4281,6 +4281,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'alias' => strval($assignment->alias),
                         'name' => strval($assignment->name),
                         'description' => strval($assignment->description),
+                        'problemset_id' => intval($assignment->problemset_id),
                     ],
                     'problems' => $problemsResponseArray,
                     'runs' => [],
