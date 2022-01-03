@@ -93,13 +93,13 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
             $rowcount,
         ];
 
-        /** @var list<array{name: null|string, relevance: float, username: string}> $rs */
+        /** @var list<array{name: null|string, relevance: float|null, username: string}> $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         usort(
             $rs,
             /**
-             * @param array{name: null|string, relevance: float, username: string} $a
-             * @param array{name: null|string, relevance: float, username: string} $b
+             * @param array{name: null|string, relevance: float|null, username: string} $a
+             * @param array{name: null|string, relevance: float|null, username: string} $b
              */
             fn (array $a, array $b) => $a['relevance'] == $b['relevance'] ? 0 : ($a['relevance'] < $b['relevance'] ? -1 : 1)
         );
