@@ -468,6 +468,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             'guid' => md5(uniqid(strval(rand()), true)),
             'language' => $r['language'],
             'time' => \OmegaUp\Time::get(),
+            'status' => 'uploading',
+            'verdict' => 'JE',
             'submit_delay' => $submitDelay, /* based on penalty_type */
             'type' => $type,
         ]);
