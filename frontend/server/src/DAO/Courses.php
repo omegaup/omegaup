@@ -68,7 +68,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     FROM
                         `Problemset_Problem_Opened` AS ppo
                     WHERE
-                        ppo.`problemset_id` = a.assignment_id
+                        ppo.`problemset_id` = a.`problemset_id`
                         AND ppo.`identity_id` = ?
                 ) AS opened
             ';
