@@ -24,6 +24,8 @@ class Submissions extends \OmegaUp\DAO\VO\VO {
         'guid' => true,
         'language' => true,
         'time' => true,
+        'status' => true,
+        'verdict' => true,
         'submit_delay' => true,
         'type' => true,
         'school_id' => true,
@@ -88,6 +90,16 @@ class Submissions extends \OmegaUp\DAO\VO\VO {
             $this->time = new \OmegaUp\Timestamp(
                 \OmegaUp\Time::get()
             );
+        }
+        if (isset($data['status'])) {
+            $this->status = is_scalar(
+                $data['status']
+            ) ? strval($data['status']) : '';
+        }
+        if (isset($data['verdict'])) {
+            $this->verdict = is_scalar(
+                $data['verdict']
+            ) ? strval($data['verdict']) : '';
         }
         if (isset($data['submit_delay'])) {
             $this->submit_delay = intval(
@@ -163,6 +175,20 @@ class Submissions extends \OmegaUp\DAO\VO\VO {
      * @var \OmegaUp\Timestamp
      */
     public $time;  // CURRENT_TIMESTAMP
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var string
+     */
+    public $status = 'new';
+
+    /**
+     * [Campo no documentado]
+     *
+     * @var string|null
+     */
+    public $verdict = null;
 
     /**
      * [Campo no documentado]
