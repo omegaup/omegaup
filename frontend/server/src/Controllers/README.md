@@ -807,11 +807,11 @@ Returns a list of contests
 | `page`           | `int`       |             |
 | `page_size`      | `int`       |             |
 | `query`          | `string`    |             |
-| `tab_name`       | `string`    |             |
 | `active`         | `int\|null` |             |
 | `admission_mode` | `mixed`     |             |
 | `participating`  | `int\|null` |             |
 | `recommended`    | `int\|null` |             |
+| `tab_name`       | `mixed`     |             |
 
 ### Returns
 
