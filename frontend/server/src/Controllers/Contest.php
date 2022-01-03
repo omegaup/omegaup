@@ -80,7 +80,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
-     * @omegaup-request-param mixed $tab_name
+     * @omegaup-request-param string $tab_name
      * @omegaup-request-param int|null $participating
      * @omegaup-request-param string $query
      * @omegaup-request-param int|null $recommended
@@ -122,11 +122,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ? \OmegaUp\DAO\Enum\ActiveStatus::getIntValue(intval($r['active']))
             : \OmegaUp\DAO\Enum\ActiveStatus::ALL;
         if (!is_null($tabName)) {
-            if ($tabName == 'current') {
+            if (strcmp($tabName, 'current')  == 0) {
                 $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE;
-            } elseif ($tabName == 'future') {
+            } elseif (strcmp($tabName, 'future') == 0) {
                 $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::FUTURE;
-            } elseif ($tabName == 'past') {
+            } elseif (strcmp($tabName, 'past') == 0) {
                 $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::PAST;
             }
         }
