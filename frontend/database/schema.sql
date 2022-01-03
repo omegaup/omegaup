@@ -428,6 +428,7 @@ CREATE TABLE `Identities` (
   KEY `fk_is_state_id` (`country_id`,`state_id`),
   KEY `language_id` (`language_id`),
   KEY `current_identity_school_id` (`current_identity_school_id`),
+  FULLTEXT KEY `ft_user_username` (`username`,`name`),
   CONSTRAINT `fk_ic_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_iis_current_identity_school_id` FOREIGN KEY (`current_identity_school_id`) REFERENCES `Identities_Schools` (`identity_school_id`),
   CONSTRAINT `fk_il_language_id` FOREIGN KEY (`language_id`) REFERENCES `Languages` (`language_id`),
