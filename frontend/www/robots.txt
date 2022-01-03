@@ -1,5 +1,5 @@
 User-agent: *
 Disallow: /admin/
-Disallow: /api/
 Disallow: /install/
 Disallow: /login/
+Noindex: /api/
