@@ -1,5 +1,6 @@
 User-agent: *
+Allow: /api/session/currentSession/
 Disallow: /admin/
+Disallow: /api/
 Disallow: /install/
 Disallow: /login/
-Noindex: /api/
