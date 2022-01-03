@@ -80,7 +80,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
-     * @omegaup-request-param string $tab
+     * @omegaup-request-param string $tab_name
      * @omegaup-request-param int|null $participating
      * @omegaup-request-param string $query
      * @omegaup-request-param int|null $recommended
@@ -99,14 +99,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contests = [];
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('page_size');
-        \OmegaUp\Validators::validateStringOfLengthInRange(
-            $r['tab'],
-            'tab',
-            minLength: null,
-            maxLength: 255,
-            required: false,
-        );
-        $tab = $r['tab'];
         \OmegaUp\Validators::validateOptionalNumber($r['active'], 'active');
         \OmegaUp\Validators::validateOptionalNumber(
             $r['recommended'],
@@ -116,18 +108,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r['participating'],
             'participating'
         );
-
+        $tabName = \OmegaUp\Validators::validateOptionalInEnum(
+            $r['tab_name'],
+            'tab_name',
+            [
+                'current',
+                'future',
+                'past',
+            ]
+        );
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 20);
         $activeContests = isset($r['active'])
             ? \OmegaUp\DAO\Enum\ActiveStatus::getIntValue(intval($r['active']))
             : \OmegaUp\DAO\Enum\ActiveStatus::ALL;
-        if (!is_null($tab)) {
-            if ($tab == '0') {
+        if (!is_null($tabName)) {
+            if ($tabName == 'current') {
                 $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE;
-            } elseif ($tab == '1') {
+            } elseif ($tabName == 'future') {
                 $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::FUTURE;
-            } elseif ($tab == '2') {
+            } elseif ($tabName == 'past') {
                 $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::PAST;
             }
         }

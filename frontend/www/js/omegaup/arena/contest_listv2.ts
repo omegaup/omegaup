@@ -12,7 +12,7 @@ OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestListv2Payload();
   const tab: ContestTab = window.location.hash
-    ? parseInt(window.location.hash.substr(1))
+    ? window.location.hash.slice(1)
     : ContestTab.Current;
   new Vue({
     el: '#main-container',
@@ -39,7 +39,7 @@ OmegaUp.on('ready', () => {
               page: page,
               page_size: pageSize,
               query: query,
-              tab: tab,
+              tab_name: tab,
             })
               .then((data) => {
                 if (!data.number_of_results) {

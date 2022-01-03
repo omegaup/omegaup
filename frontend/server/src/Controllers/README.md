@@ -807,7 +807,7 @@ Returns a list of contests
 | `page`           | `int`       |             |
 | `page_size`      | `int`       |             |
 | `query`          | `string`    |             |
-| `tab`            | `string`    |             |
+| `tab_name`       | `string`    |             |
 | `active`         | `int\|null` |             |
 | `admission_mode` | `mixed`     |             |
 | `participating`  | `int\|null` |             |
