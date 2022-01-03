@@ -108,8 +108,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r['participating'],
             'participating'
         );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['tab_name'],
+        $tabName = $r->ensureOptionalEnum(
             'tab_name',
             [
                 'current',
@@ -122,7 +121,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $activeContests = isset($r['active'])
             ? \OmegaUp\DAO\Enum\ActiveStatus::getIntValue(intval($r['active']))
             : \OmegaUp\DAO\Enum\ActiveStatus::ALL;
-        $tabName = (isset($r['tab_name']) ? strval($r['tab_name']) : null);
         if (!is_null($tabName)) {
             if ($tabName == 'current') {
                 $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE;
