@@ -2931,6 +2931,7 @@ export namespace types {
     has_runs: boolean;
     max_points: number;
     name: string;
+    opened: boolean;
     order: number;
     problemCount: number;
     problemset_id: number;
