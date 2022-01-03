@@ -14,6 +14,7 @@ describe('Coursev2.vue', () => {
     alias: 'test-assignment',
     name: 'Test Assignment',
     description: 'Test assignment description',
+    problemset_id: 1,
   };
   const problems: types.ArenaCourseProblem[] = [
     {
@@ -73,14 +74,35 @@ describe('Coursev2.vue', () => {
     title: 'omegaUp',
   };
 
+  const runs: types.Run[] = [
+    {
+      alias: 'Hello',
+      classname: 'user-rank-unranked',
+      country: 'xx',
+      guid: 'abcdefg',
+      language: 'py3',
+      memory: 0,
+      penalty: 0,
+      runtime: 0,
+      score: 1,
+      status: 'ready',
+      submit_delay: 0,
+      time: new Date(),
+      username: 'omegaUp',
+      verdict: 'AC',
+    },
+  ];
+
   it('Should show the course summary', () => {
     const wrapper = shallowMount(arena_Course, {
       propsData: {
+        allRuns: runs,
         course,
         assignment,
         problems,
         currentProblem: null,
         scoreboard,
+        userRuns: runs,
       },
     });
 
@@ -94,12 +116,14 @@ describe('Coursev2.vue', () => {
   it('Should show the course scoreboard', () => {
     const wrapper = mount(arena_Course, {
       propsData: {
+        allRuns: runs,
         course,
         assignment,
         problems,
         currentProblem: null,
         selectedTab: 'ranking',
         scoreboard,
+        userRuns: runs,
       },
     });
 
@@ -110,12 +134,14 @@ describe('Coursev2.vue', () => {
   it('Should hide the course scoreboard tab when scoreboard is null', () => {
     const wrapper = mount(arena_Course, {
       propsData: {
+        allRuns: runs,
         course,
         assignment,
         problems,
         currentProblem: null,
         selectedTab: 'ranking',
         scoreboard: null,
+        userRuns: runs,
       },
     });
 

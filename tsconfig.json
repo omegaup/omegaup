@@ -7,9 +7,6 @@
     "strict": true,
     "lib": ["DOM", "ES5", "ScriptHost", "ES2020.Promise", "dom.iterable"],
     "types": [
-      "cypress",
-      "cypress-wait-until",
-      "cypress-file-upload",
       "gapi",
       "gapi.auth2",
       "bootstrap-datepicker",
@@ -26,10 +23,6 @@
       "@/*": ["frontend/www/*"]
     }
   },
-  "include": [
-    "./frontend/www/js/omegaup/**/*.vue",
-    "./frontend/www/**/*.ts",
-    "./cypress"
-  ],
-  "exclude": ["./node_modules"]
+  "include": ["./frontend/www/js/omegaup/**/*.vue", "./frontend/www/**/*.ts"],
+  "exclude": ["./node_modules", "./cypress"]
 }

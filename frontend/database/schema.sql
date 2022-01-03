@@ -428,6 +428,7 @@ CREATE TABLE `Identities` (
   KEY `fk_is_state_id` (`country_id`,`state_id`),
   KEY `language_id` (`language_id`),
   KEY `current_identity_school_id` (`current_identity_school_id`),
+  FULLTEXT KEY `ft_user_username` (`username`,`name`),
   CONSTRAINT `fk_ic_country_id` FOREIGN KEY (`country_id`) REFERENCES `Countries` (`country_id`),
   CONSTRAINT `fk_iis_current_identity_school_id` FOREIGN KEY (`current_identity_school_id`) REFERENCES `Identities_Schools` (`identity_school_id`),
   CONSTRAINT `fk_il_language_id` FOREIGN KEY (`language_id`) REFERENCES `Languages` (`language_id`),
@@ -609,6 +610,7 @@ CREATE TABLE `Problems` (
   UNIQUE KEY `problems_alias` (`alias`),
   KEY `acl_id` (`acl_id`),
   KEY `idx_problems_visibility` (`visibility`),
+  KEY `idx_quality_seal` (`quality_seal`),
   CONSTRAINT `fk_pa_acl_id` FOREIGN KEY (`acl_id`) REFERENCES `ACLs` (`acl_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Se crea un registro por cada prob externo.';
 /*!40101 SET character_set_client = @saved_cs_client */;
