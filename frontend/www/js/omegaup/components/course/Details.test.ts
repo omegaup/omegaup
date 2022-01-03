@@ -97,6 +97,7 @@ describe('Details.vue', () => {
               description: '',
               finish_time: undefined,
               name: 'Test',
+              opened: false,
               order: 1,
               scoreboard_url: '',
               scoreboard_url_admin: '',

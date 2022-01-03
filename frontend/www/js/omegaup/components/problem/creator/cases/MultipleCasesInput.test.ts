@@ -1,6 +1,6 @@
 import { createLocalVue, shallowMount } from '@vue/test-utils';
 
-import CaseInput from './CaseInput.vue';
+import MultipleCasesInput from './MultipleCasesInput.vue';
 import BootstrapVue, { IconsPlugin } from 'bootstrap-vue';
 import T from '../../../../lang';
 import Vue from 'vue';
@@ -9,17 +9,17 @@ const localVue = createLocalVue();
 localVue.use(BootstrapVue);
 localVue.use(IconsPlugin);
 
-describe('AddPanel.vue', () => {
+describe('MultipleCasesInput.vue', () => {
   it('Should contain all 4 inputs', async () => {
-    const wrapper = shallowMount(CaseInput, {
+    const wrapper = shallowMount(MultipleCasesInput, {
       localVue,
     });
 
     const expectedTextInputText = [
-      T.problemCreatorCaseName,
+      T.problemCreatorPrefix,
+      T.problemCreatorSuffix,
+      T.problemCreatorNumberOfCases,
       T.problemCreatorGroupName,
-      T.problemCreatorPoints,
-      T.problemCreatorAutomaticPoints,
     ];
 
     await Vue.nextTick();
@@ -31,9 +31,20 @@ describe('AddPanel.vue', () => {
     inputElements.wrappers.forEach((element, index) => {
       expect(element.attributes('label')).toBe(expectedTextInputText[index]); // We need to make it like this because that's how Vue-Bootstrap input element works
     });
+
+    // Check if the name is being generated correctly
+
+    await wrapper.setData({ multipleCasesPrefix: 'case#' });
+
+    await Vue.nextTick();
+
+    expect(wrapper.find('[description]').attributes('description')).toContain(
+      'case#',
+    ); // Again, the description is stored inside the attribute
   });
+
   it('Should handle autoformatting', () => {
-    const wrapper = shallowMount(CaseInput, {
+    const wrapper = shallowMount(MultipleCasesInput, {
       localVue,
     });
 
@@ -43,7 +54,7 @@ describe('AddPanel.vue', () => {
     expect(result).toBe('invalidstring234');
 
     const invalidNumber = -2;
-    const numberResult = (wrapper.vm as any).pointsFormatter(invalidNumber);
-    expect(numberResult).toBe(0);
+    const numberResult = (wrapper.vm as any).numberFormatter(invalidNumber);
+    expect(numberResult).toBe(1);
   });
 });

@@ -84,9 +84,36 @@
             :can-submit="false"
             :accepted-languages="filteredLanguages"
           ></omegaup-arena-ephemeral-grader>
+          <omegaup-arena-runs
+            :problem-alias="problem.alias"
+            :runs="userRuns"
+            :show-details="true"
+            :problemset-problems="[]"
+            :is-contest-finished="false"
+            :use-new-submission-button="true"
+            @new-submission="onNewSubmission"
+          >
+            <template #title><div></div></template>
+            <template #runs><div></div></template>
+          </omegaup-arena-runs>
         </template>
       </b-tab>
-      <b-tab :title="T.wordsRuns">a</b-tab>
+      <b-tab v-if="user.admin" :title="T.wordsRuns" data-runs-tab>
+        <omegaup-arena-runs
+          :runs="allRuns"
+          :show-all-runs="true"
+          :show-problem="false"
+          :show-details="true"
+          :show-disqualify="true"
+          :show-pager="true"
+          :show-rejudge="true"
+          :show-user="true"
+          :problemset-problems="[]"
+        >
+          <template #title><div></div></template>
+          <template #runs><div></div></template>
+        </omegaup-arena-runs>
+      </b-tab>
       <b-tab :title="T.wordsClarifications">a</b-tab>
     </b-tabs>
   </b-container>
@@ -101,6 +128,7 @@ import * as time from '../../time';
 
 import arena_EphemeralGrader from '../arena/EphemeralGrader.vue';
 import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
+import arena_Runs from '../arena/Runs.vue';
 import problem_SettingsSummary from './SettingsSummary.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
@@ -129,6 +157,7 @@ export enum PopupDisplayed {
   components: {
     'omegaup-arena-ephemeral-grader': arena_EphemeralGrader,
     'omegaup-arena-runsubmit-popup': arena_RunSubmitPopup,
+    'omegaup-arena-runs': arena_Runs,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-overlay': omegaup_Overlay,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
@@ -136,9 +165,11 @@ export enum PopupDisplayed {
   },
 })
 export default class ProblemDetails extends Vue {
+  @Prop() allRuns!: types.Run[];
+  @Prop({ default: null }) languages!: null | string[];
   @Prop() problem!: types.ProblemDetails;
   @Prop() user!: types.UserInfoForProblem;
-  @Prop({ default: null }) languages!: null | string[];
+  @Prop() userRuns!: types.Run[];
 
   @Ref('statement-markdown') readonly statementMarkdown!: omegaup_Markdown;
 
@@ -159,14 +190,28 @@ export default class ProblemDetails extends Vue {
     );
   }
 
-  onRunSubmitted(run: { code: string; language: string }): void {
-    this.$emit('submit-run', run);
+  onRunSubmitted(code: string, language: string): void {
+    this.$emit('submit-run', {
+      code,
+      language,
+    });
+    this.onPopupDismissed();
   }
 
   onPopupDismissed(): void {
     this.currentPopupDisplayed = PopupDisplayed.None;
     // TODO: Update the active tab.
   }
+
+  onNewSubmission(): void {
+    if (!this.user.loggedIn) {
+      // TODO: Redirect to login
+      return;
+    }
+    this.currentPopupDisplayed = PopupDisplayed.RunSubmit;
+  }
+
+  // TODO: handle onRunDetails
 
   onProblemRendered(): void {
     // TODO: We should probably refactor how the Markdown component is handled,

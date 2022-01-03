@@ -43,12 +43,12 @@
           :readonly="false"
         ></omegaup-arena-code-view>
       </div>
-      <div class="form-group row mt-3">
+      <div class="form-group row mt-3 align-items-center">
         <label class="col-sm-3 col-form-label">
           {{ T.arenaRunSubmitUpload }}
         </label>
         <div class="col-sm-7">
-          <input ref="inputFile" type="file" name="file" />
+          <input ref="inputFile" class="w-100" type="file" name="file" />
         </div>
       </div>
       <div class="form-group row">

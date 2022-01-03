@@ -425,4 +425,60 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertCount(1, $payload['runs']);
     }
+
+    public function testAssignmentOpened() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+
+        $problemsData = [
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+            \OmegaUp\Test\Factories\Problem::createProblem(),
+        ];
+
+        $adminLogin = self::login($courseData['admin']);
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $adminLogin,
+            $courseData['course_alias'],
+            $courseData['assignment_alias'],
+            [$problemsData[0], $problemsData[1]]
+        );
+
+        // The assignment must not be opened yet
+        $assignments = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        )['templateProperties']['payload']['details']['assignments'];
+        $this->assertCount(1, $assignments);
+        $this->assertFalse($assignments[0]['opened']);
+
+        $student = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $student['identity']
+        );
+
+        // Now, as a student open the assignment through getArenaCourseDetailsForTypeScript
+        $studentLogin = self::login($student['identity']);
+        \OmegaUp\Controllers\Course::getArenaCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment']->alias,
+                'problem_alias' => $problemsData[0]['problem']->alias,
+            ])
+        );
+
+        // Now check the assignment must be opened
+        $assignments = \OmegaUp\Controllers\Course::getCourseDetailsForTypeScript(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        )['templateProperties']['payload']['course']['assignments'];
+        $this->assertCount(1, $assignments);
+        $this->assertTrue($assignments[0]['opened']);
+    }
 }

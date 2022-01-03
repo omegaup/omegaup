@@ -26,7 +26,7 @@
         <a
           :href="`/course/${courseAlias}/assignment/${assignment.alias}`"
           class="btn btn-primary d-inline-block text-white"
-          >{{ T.courseCardCourseResume }}</a
+          >{{ T.assignmentCardGoToContent }}</a
         >
       </div>
     </div>
