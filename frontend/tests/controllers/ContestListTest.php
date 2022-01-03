@@ -812,7 +812,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         $r = new \OmegaUp\Request([
             'page' => 1,
             'page_size' => 1,
-            'tab' => 'current',
+            'tab_name' => 'current',
         ]);
         $response = \OmegaUp\Controllers\Contest::apiList($r);
         $this->assertArrayContainsInKey(
@@ -825,7 +825,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         $r = new \OmegaUp\Request([
             'page' => 1,
             'page_size' => 1,
-            'tab' => 'future',
+            'tab_name' => 'future',
         ]);
         $response = \OmegaUp\Controllers\Contest::apiList($r);
         $this->assertArrayContainsInKey(
@@ -838,7 +838,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         $r = new \OmegaUp\Request([
             'page' => 1,
             'page_size' => 1,
-            'tab' => 'past',
+            'tab_name' => 'past',
         ]);
         $response = \OmegaUp\Controllers\Contest::apiList($r);
         $this->assertArrayContainsInKey(
