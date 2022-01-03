@@ -11,9 +11,22 @@ import arena_ContestList, {
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
   const payload = types.payloadParsers.ContestListv2Payload();
-  const tab: ContestTab = window.location.hash
-    ? window.location.hash.slice(1)
-    : ContestTab.Current;
+  let tab: ContestTab = ContestTab.Current;
+  const hash = window.location.hash ? window.location.hash.slice(1) : '';
+  if (hash !== '') {
+    switch (hash) {
+      case 'future':
+        tab = ContestTab.Future;
+        break;
+      case 'past':
+        tab = ContestTab.Past;
+        break;
+      default:
+        tab = ContestTab.Current;
+        break;
+    }
+  }
+
   new Vue({
     el: '#main-container',
     components: { 'omegaup-arena-contestlist': arena_ContestList },
