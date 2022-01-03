@@ -18,6 +18,7 @@ describe('AssignmentCard.vue', () => {
     start_time: new Date(),
     has_runs: false,
     max_points: 0,
+    opened: false,
     problemset_id: 0,
     problemCount: 0,
   };
