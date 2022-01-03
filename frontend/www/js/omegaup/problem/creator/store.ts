@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import Vuex, { Module } from 'vuex';
-import { StoreState, RootState } from './types';
+import Vuex from 'vuex';
+import { StoreState } from './types';
 import { casesStore } from './modules/cases';
 import T from '../../lang';
 
@@ -10,11 +10,9 @@ const state: StoreState = {
   problemName: T.problemCreatorNewProblem,
 } as StoreState;
 
-const store: Module<StoreState, RootState> = {
+export default new Vuex.Store({
   state,
   modules: {
     casesStore,
   },
-};
-
-export default new Vuex.Store(store);
+});

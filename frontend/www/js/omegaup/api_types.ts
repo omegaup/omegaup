@@ -2263,6 +2263,7 @@ export namespace types {
     alias: string;
     description: string;
     name: string;
+    problemset_id: number;
   }
 
   export interface ArenaCourseDetails {
@@ -2930,6 +2931,7 @@ export namespace types {
     has_runs: boolean;
     max_points: number;
     name: string;
+    opened: boolean;
     order: number;
     problemCount: number;
     problemset_id: number;

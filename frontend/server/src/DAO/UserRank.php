@@ -35,20 +35,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
                 `ur`.`username`,
                 `ur`.`name`,
                 `ur`.`country_id`,
-                IFNULL(
-                    (
-                        SELECT
-                            `urc`.`classname`
-                        FROM
-                            `User_Rank_Cutoffs` `urc`
-                        WHERE
-                            `urc`.`score` <= `ur`.`score`
-                        ORDER BY
-                            `urc`.`percentile` ASC
-                        LIMIT 1
-                    ),
-                    "user-rank-unranked"
-                ) as `classname`';
+                IFNULL(`ur`.`classname`, "user-rank-unranked") AS classname';
         $sqlCount = '
               SELECT
                 COUNT(1)';
@@ -114,21 +101,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
                 `ur`.`username`,
                 `ur`.`country_id`,
                 `ur`.`name`,
-                `ur`.`country_id`,
-                IFNULL(
-                    (
-                        SELECT
-                            `urc`.`classname`
-                        FROM
-                            `User_Rank_Cutoffs` `urc`
-                        WHERE
-                            `urc`.`score` <= `ur`.`score`
-                        ORDER BY
-                            `urc`.`percentile` ASC
-                        LIMIT 1
-                    ),
-                    "user-rank-unranked"
-                ) as `classname`
+                IFNULL(`ur`.`classname`, "user-rank-unranked") AS classname
         ';
         $sqlCount = '
             SELECT
@@ -153,7 +126,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
             []
         ) ?? 0;
 
-        /** @var list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, country_id: null|string, name: null|string, username: string}> */
+        /** @var list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}> */
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$sqlSelect}{$sqlFrom}{$sqlOrderBy}{$sqlLimit}",
             [
@@ -181,20 +154,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
                 `ur`.`country_id`,
                 `ur`.`username`,
                 `ur`.`name`,
-                IFNULL(
-                    (
-                        SELECT
-                            `urc`.`classname`
-                        FROM
-                            `User_Rank_Cutoffs` `urc`
-                        WHERE
-                            `urc`.`score` <= `ur`.`score`
-                        ORDER BY
-                            `urc`.`percentile` ASC
-                        LIMIT 1
-                    ),
-                    "user-rank-unranked"
-                ) as `classname`
+                IFNULL(`ur`.`classname`, "user-rank-unranked") AS classname
         ';
         $sqlFrom = '
             FROM

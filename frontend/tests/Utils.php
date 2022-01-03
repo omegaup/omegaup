@@ -71,13 +71,15 @@ class Utils {
         $run->contest_score = $points * $problemsetPoints;
         $run->status = 'ready';
         $run->judged_by = 'J1';
+        $submission->status = $run->status;
+        $submission->verdict = $run->verdict;
 
         if (!is_null($submitDelay)) {
             $submission->submit_delay = $submitDelay;
-            \OmegaUp\DAO\Submissions::update($submission);
             $run->penalty = $submitDelay;
         }
 
+        \OmegaUp\DAO\Submissions::update($submission);
         \OmegaUp\DAO\Runs::update($run);
 
         \OmegaUp\Grader::getInstance()->setGraderResourceForTesting(
