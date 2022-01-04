@@ -126,7 +126,6 @@ Vue.use(LayoutPlugin);
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { ContestTab } from './ContestListv2.vue';
 library.add(fas);
 
 @Component({
@@ -136,11 +135,9 @@ library.add(fas);
 })
 export default class ContestCard extends Vue {
   @Prop() contest!: types.ContestListItem;
-  @Prop() contestTab!: ContestTab;
 
   T = T;
   ui = ui;
-  ContestTab = ContestTab;
 
   get contestDuration(): string {
     return time.formatContestDuration(

@@ -80,6 +80,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
+     * @omegaup-request-param string $tab_name
      * @omegaup-request-param int|null $participating
      * @omegaup-request-param string $query
      * @omegaup-request-param int|null $recommended
@@ -107,12 +108,28 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r['participating'],
             'participating'
         );
-
+        $tabName = $r->ensureOptionalEnum(
+            'tab_name',
+            [
+                'current',
+                'future',
+                'past',
+            ]
+        );
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 20);
         $activeContests = isset($r['active'])
             ? \OmegaUp\DAO\Enum\ActiveStatus::getIntValue(intval($r['active']))
             : \OmegaUp\DAO\Enum\ActiveStatus::ALL;
+        if (!is_null($tabName)) {
+            if ($tabName === 'current') {
+                $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE;
+            } elseif ($tabName === 'future') {
+                $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::FUTURE;
+            } else {
+                $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::PAST;
+            }
+        }
         // If the parameter was not set, the default should be ALL which is
         // a number and should pass this check.
         \OmegaUp\Validators::validateNumber($activeContests, 'active');
@@ -1745,19 +1762,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
                         'contestNotFound'
                     );
                 }
-                $acl = \OmegaUp\DAO\ACLs::getByPK($contest->acl_id);
-                if (is_null($acl) || is_null($acl->owner_id)) {
-                    throw new \OmegaUp\Exceptions\NotFoundException();
-                }
-                $director = \OmegaUp\DAO\Identities::findByUserId(
-                    $acl->owner_id
+                $director = \OmegaUp\DAO\UserRoles::getOwner(
+                    $contest->acl_id
                 );
-                if (is_null($director) || is_null($director->username)) {
+                if (is_null($director)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
                         'userNotExist'
                     );
                 }
-                $result['director'] = $director->username;
+                $result['director'] = $director;
 
                 $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
                     $contest->problemset_id
