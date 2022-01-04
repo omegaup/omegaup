@@ -56,8 +56,10 @@ abstract class UserRank {
                     `state_id`,
                     `school_id`,
                     `author_score`,
-                    `author_ranking`
+                    `author_ranking`,
+                    `classname`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -94,6 +96,7 @@ abstract class UserRank {
                 intval($User_Rank->author_ranking) :
                 null
             ),
+            $User_Rank->classname,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -122,7 +125,8 @@ abstract class UserRank {
                 `state_id` = ?,
                 `school_id` = ?,
                 `author_score` = ?,
-                `author_ranking` = ?
+                `author_ranking` = ?,
+                `classname` = ?
             WHERE
                 (
                     `user_id` = ?
@@ -150,6 +154,7 @@ abstract class UserRank {
                 null :
                 intval($User_Rank->author_ranking)
             ),
+            $User_Rank->classname,
             (
                 is_null($User_Rank->user_id) ?
                 null :
@@ -185,7 +190,8 @@ abstract class UserRank {
                 `User_Rank`.`state_id`,
                 `User_Rank`.`school_id`,
                 `User_Rank`.`author_score`,
-                `User_Rank`.`author_ranking`
+                `User_Rank`.`author_ranking`,
+                `User_Rank`.`classname`
             FROM
                 `User_Rank`
             WHERE
@@ -306,7 +312,8 @@ abstract class UserRank {
                 `User_Rank`.`state_id`,
                 `User_Rank`.`school_id`,
                 `User_Rank`.`author_score`,
-                `User_Rank`.`author_ranking`
+                `User_Rank`.`author_ranking`,
+                `User_Rank`.`classname`
             FROM
                 `User_Rank`
         ';
@@ -367,8 +374,10 @@ abstract class UserRank {
                     `state_id`,
                     `school_id`,
                     `author_score`,
-                    `author_ranking`
+                    `author_ranking`,
+                    `classname`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -409,6 +418,7 @@ abstract class UserRank {
                 null :
                 intval($User_Rank->author_ranking)
             ),
+            $User_Rank->classname,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

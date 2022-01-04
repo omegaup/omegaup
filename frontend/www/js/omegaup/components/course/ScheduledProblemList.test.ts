@@ -21,6 +21,7 @@ describe('ScheduledProblemLists.vue', () => {
           max_points: 0,
           start_time: new Date(),
           finish_time: new Date(),
+          opened: false,
           order: 1,
           problems: [],
           scoreboard_url: '',

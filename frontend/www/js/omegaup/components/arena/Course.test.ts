@@ -34,6 +34,7 @@ describe('Course.vue', () => {
         start_time: new Date(),
         has_runs: false,
         max_points: 100,
+        opened: false,
         order: 1,
         scoreboard_url: 'scoreboard_url',
         scoreboard_url_admin: 'scoreboard_url_admin',

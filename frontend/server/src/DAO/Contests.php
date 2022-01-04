@@ -1293,26 +1293,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 NULL AS alias,
                 pal.ip,
                 pal.`time`,
-                IFNULL(
-                    (
-                        SELECT `urc`.classname FROM
-                            `User_Rank_Cutoffs` urc
-                        WHERE
-                            `urc`.score <= (
-                                    SELECT
-                                        `ur`.`score`
-                                    FROM
-                                        `User_Rank` `ur`
-                                    WHERE
-                                        `ur`.user_id = `i`.`user_id`
-                                )
-                        ORDER BY
-                            `urc`.percentile ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) `classname`,
+                IFNULL(ur.classname, "user-rank-unranked") AS classname,
                 "open" AS event_type,
                 NULL AS clone_result,
                 NULL AS clone_token_payload,
@@ -1320,9 +1301,9 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             FROM
                 Problemset_Access_Log pal
             INNER JOIN
-                Identities i
-            ON
-                i.identity_id = pal.identity_id
+                Identities i ON i.identity_id = pal.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
             WHERE
                 pal.problemset_id = ?
         ) UNION (
@@ -1331,26 +1312,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                 p.alias,
                 sl.ip,
                 sl.`time`,
-                IFNULL(
-                    (
-                        SELECT `urc`.classname FROM
-                            `User_Rank_Cutoffs` urc
-                        WHERE
-                            `urc`.score <= (
-                                    SELECT
-                                        `ur`.`score`
-                                    FROM
-                                        `User_Rank` `ur`
-                                    WHERE
-                                        `ur`.user_id = `i`.`user_id`
-                                )
-                        ORDER BY
-                            `urc`.percentile ASC
-                        LIMIT
-                            1
-                    ),
-                    "user-rank-unranked"
-                ) `classname`,
+                IFNULL(ur.classname, "user-rank-unranked") AS classname,
                 "submit" AS event_type,
                 NULL AS clone_result,
                 NULL AS clone_token_payload,
@@ -1358,17 +1320,13 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             FROM
                 Submission_Log sl
             INNER JOIN
-                Identities i
-            ON
-                i.identity_id = sl.identity_id
+                Identities i ON i.identity_id = sl.identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
             INNER JOIN
-                Submissions s
-            ON
-                s.submission_id = sl.submission_id
+                Submissions s ON s.submission_id = sl.submission_id
             INNER JOIN
-                Problems p
-            ON
-                p.problem_id = s.problem_id
+                Problems p ON p.problem_id = s.problem_id
             WHERE
                 sl.problemset_id = ?
         ) ORDER BY

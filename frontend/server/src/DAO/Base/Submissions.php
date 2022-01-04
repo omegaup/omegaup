@@ -39,6 +39,8 @@ abstract class Submissions {
                 `guid` = ?,
                 `language` = ?,
                 `time` = ?,
+                `status` = ?,
+                `verdict` = ?,
                 `submit_delay` = ?,
                 `type` = ?,
                 `school_id` = ?
@@ -72,6 +74,8 @@ abstract class Submissions {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Submissions->time
             ),
+            $Submissions->status,
+            $Submissions->verdict,
             intval($Submissions->submit_delay),
             $Submissions->type,
             (
@@ -108,6 +112,8 @@ abstract class Submissions {
                 `Submissions`.`guid`,
                 `Submissions`.`language`,
                 `Submissions`.`time`,
+                `Submissions`.`status`,
+                `Submissions`.`verdict`,
                 `Submissions`.`submit_delay`,
                 `Submissions`.`type`,
                 `Submissions`.`school_id`
@@ -229,6 +235,8 @@ abstract class Submissions {
                 `Submissions`.`guid`,
                 `Submissions`.`language`,
                 `Submissions`.`time`,
+                `Submissions`.`status`,
+                `Submissions`.`verdict`,
                 `Submissions`.`submit_delay`,
                 `Submissions`.`type`,
                 `Submissions`.`school_id`
@@ -289,10 +297,14 @@ abstract class Submissions {
                     `guid`,
                     `language`,
                     `time`,
+                    `status`,
+                    `verdict`,
                     `submit_delay`,
                     `type`,
                     `school_id`
                 ) VALUES (
+                    ?,
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -330,6 +342,8 @@ abstract class Submissions {
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Submissions->time
             ),
+            $Submissions->status,
+            $Submissions->verdict,
             intval($Submissions->submit_delay),
             $Submissions->type,
             (

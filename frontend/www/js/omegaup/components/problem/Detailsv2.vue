@@ -98,7 +98,22 @@
           </omegaup-arena-runs>
         </template>
       </b-tab>
-      <b-tab :title="T.wordsRuns">a</b-tab>
+      <b-tab v-if="user.admin" :title="T.wordsRuns" data-runs-tab>
+        <omegaup-arena-runs
+          :runs="allRuns"
+          :show-all-runs="true"
+          :show-problem="false"
+          :show-details="true"
+          :show-disqualify="true"
+          :show-pager="true"
+          :show-rejudge="true"
+          :show-user="true"
+          :problemset-problems="[]"
+        >
+          <template #title><div></div></template>
+          <template #runs><div></div></template>
+        </omegaup-arena-runs>
+      </b-tab>
       <b-tab :title="T.wordsClarifications">a</b-tab>
     </b-tabs>
   </b-container>
