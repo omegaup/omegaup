@@ -3,7 +3,7 @@
     <div class="card-body">
       <form class="form" @submit.prevent="$emit('add-admin', username)">
         <div class="form-group mb-0">
-          <label
+          <label class="font-weight-bold w-100"
             >{{ T.wordsAdmin }}
             <font-awesome-icon
               :title="T.courseEditAddAdminsTooltip"
@@ -41,12 +41,12 @@
     </div>
     <table v-else class="table table-striped mb-0">
       <thead>
-        <tr>
-          <th class="text-center">
+        <tr class="text-center">
+          <th>
             {{ T.contestEditRegisteredAdminUsername }}
           </th>
-          <th class="text-center">{{ T.contestEditRegisteredAdminRole }}</th>
-          <th class="text-center">{{ T.contestEditRegisteredAdminDelete }}</th>
+          <th>{{ T.contestEditRegisteredAdminRole }}</th>
+          <th>{{ T.contestEditRegisteredAdminDelete }}</th>
         </tr>
       </thead>
       <tbody>
@@ -54,6 +54,7 @@
           <tr
             v-if="admin.role !== 'site-admin' || showSiteAdmins"
             :key="admin.username"
+            class="text-center"
           >
             <td>
               <omegaup-user-username
@@ -61,15 +62,15 @@
                 :username="admin.username"
               ></omegaup-user-username>
             </td>
-            <td class="text-center">{{ admin.role }}</td>
-            <td class="text-center">
+            <td>{{ admin.role }}</td>
+            <td>
               <button
                 v-if="admin.role === 'admin'"
                 type="button"
                 class="close float-none"
                 @click="$emit('remove-admin', admin.username)"
               >
-                ×
+                <font-awesome-icon :icon="['fas', 'times']" />
               </button>
             </td>
           </tr>
@@ -104,7 +105,7 @@ library.add(fas);
     'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
-export default class Admins extends Vue {
+export default class Adminsv2 extends Vue {
   @Prop() admins!: types.ContestAdmin[];
   @Prop() searchResultUsers!: types.ListItem[];
 

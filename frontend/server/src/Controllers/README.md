@@ -4419,10 +4419,11 @@ Gets a list of users.
 
 ### Parameters
 
-| Name    | Type           | Description |
-| ------- | -------------- | ----------- |
-| `query` | `null\|string` |             |
-| `term`  | `null\|string` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `query`    | `null\|string` |             |
+| `rowcount` | `null\|int`    |             |
+| `term`     | `null\|string` |             |
 
 ### Returns
 
