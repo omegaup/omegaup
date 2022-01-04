@@ -42,15 +42,13 @@
 </template>
 
 <script lang="ts">
-import { NIL } from 'uuid';
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import T from '../../../../lang';
 
 @Component
 export default class GroupInput extends Vue {
   @Prop({ default: '' }) name!: string;
-  @Prop({ default: NIL }) group!: string;
-  @Prop({ default: null }) points!: number | null;
+  @Prop({ default: 0 }) points!: number | null;
 
   groupName = this.name;
   groupPoints: number | null = this.points;

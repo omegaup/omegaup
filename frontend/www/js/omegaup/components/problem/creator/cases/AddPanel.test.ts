@@ -18,8 +18,8 @@ describe('AddPanel.vue', () => {
 
     const expectedText = [
       T.problemCreatorCase,
-      T.problemCreatorMultipleCases,
       T.problemCreatorGroup,
+      T.problemCreatorMultipleCases,
     ];
 
     await Vue.nextTick();

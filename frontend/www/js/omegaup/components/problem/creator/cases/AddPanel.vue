@@ -5,11 +5,11 @@
         <b-tab :title="T.problemCreatorCase" name="modal-form">
           <case-input />
         </b-tab>
-        <b-tab :title="T.problemCreatorMultipleCases" name="modal-form">
-          <multiple-cases-input />
-        </b-tab>
         <b-tab :title="T.problemCreatorGroup" name="modal-form">
           <group-input />
+        </b-tab>
+        <b-tab :title="T.problemCreatorMultipleCases" name="modal-form">
+          <multiple-cases-input />
         </b-tab>
       </b-tabs>
     </div>
