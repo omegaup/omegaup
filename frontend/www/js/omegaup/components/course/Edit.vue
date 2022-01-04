@@ -321,6 +321,7 @@ const emptyAssignment: types.CourseAssignment = {
   max_points: 0,
   start_time: defaultStartTime,
   finish_time: defaultFinishTime,
+  opened: false,
   order: 1,
   scoreboard_url: '',
   scoreboard_url_admin: '',
