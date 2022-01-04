@@ -72,7 +72,7 @@ describe('Basic Commands Test', () => {
     // Tags panel
     cy.waitUntil(() =>
       cy
-        .get('[data-tags-input] a:first')
+        .get('[data-tags-input] .vbt-autcomplete-list a.vbst-item:first')
         .should('have.text', tag) // Maybe theres another way to avoid to hardcode this
         .click(),
     );
