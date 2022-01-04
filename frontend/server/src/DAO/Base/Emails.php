@@ -108,6 +108,7 @@ abstract class Emails {
                     `email_id` = ?
                 );';
         $params = [$email_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

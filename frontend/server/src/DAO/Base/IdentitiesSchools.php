@@ -125,6 +125,7 @@ abstract class IdentitiesSchools {
                     `identity_school_id` = ?
                 );';
         $params = [$identity_school_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

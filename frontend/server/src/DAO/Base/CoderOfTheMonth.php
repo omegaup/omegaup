@@ -144,6 +144,7 @@ abstract class CoderOfTheMonth {
                     `coder_of_the_month_id` = ?
                 );';
         $params = [$coder_of_the_month_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

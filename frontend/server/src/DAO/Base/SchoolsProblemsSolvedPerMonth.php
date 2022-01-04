@@ -115,6 +115,7 @@ abstract class SchoolsProblemsSolvedPerMonth {
                     `school_pspm_id` = ?
                 );';
         $params = [$school_pspm_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

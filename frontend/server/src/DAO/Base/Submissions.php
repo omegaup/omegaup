@@ -150,6 +150,7 @@ abstract class Submissions {
                     `submission_id` = ?
                 );';
         $params = [$submission_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

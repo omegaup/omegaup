@@ -189,6 +189,7 @@ abstract class AuthTokens {
                     `token` = ?
                 );';
         $params = [$token];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

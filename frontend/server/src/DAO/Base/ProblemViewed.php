@@ -166,6 +166,7 @@ abstract class ProblemViewed {
                     `identity_id` = ?
                 );';
         $params = [$problem_id, $identity_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

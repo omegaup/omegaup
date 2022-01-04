@@ -78,6 +78,7 @@ abstract class ProblemsLanguages {
                     `language_id` = ?
                 );';
         $params = [$problem_id, $language_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

@@ -120,6 +120,7 @@ abstract class SubmissionFeedback {
                     `submission_feedback_id` = ?
                 );';
         $params = [$submission_feedback_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

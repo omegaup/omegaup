@@ -137,6 +137,7 @@ abstract class Identities {
                     `identity_id` = ?
                 );';
         $params = [$identity_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

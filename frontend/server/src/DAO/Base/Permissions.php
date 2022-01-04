@@ -104,6 +104,7 @@ abstract class Permissions {
                     `permission_id` = ?
                 );';
         $params = [$permission_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

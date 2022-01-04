@@ -224,6 +224,7 @@ abstract class {{ table.class_name }} {
                     {{ table.columns|selectattr('primary_key')|listformat('`{.name}` = ?')|join(' AND\n                    ') }}
                 );';
         $params = [{{ table.columns|selectattr('primary_key')|listformat('${.name}')|join(', ') }}];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

@@ -154,6 +154,7 @@ abstract class States {
                     `state_id` = ?
                 );';
         $params = [$country_id, $state_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

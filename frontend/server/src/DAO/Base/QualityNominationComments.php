@@ -127,6 +127,7 @@ abstract class QualityNominationComments {
                     `qualitynomination_comment_id` = ?
                 );';
         $params = [$qualitynomination_comment_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

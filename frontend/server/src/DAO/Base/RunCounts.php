@@ -149,6 +149,7 @@ abstract class RunCounts {
                     `date` = ?
                 );';
         $params = [$date];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

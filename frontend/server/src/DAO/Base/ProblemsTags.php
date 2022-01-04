@@ -162,6 +162,7 @@ abstract class ProblemsTags {
                     `tag_id` = ?
                 );';
         $params = [$problem_id, $tag_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

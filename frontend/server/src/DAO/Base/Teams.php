@@ -112,6 +112,7 @@ abstract class Teams {
                     `team_id` = ?
                 );';
         $params = [$team_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

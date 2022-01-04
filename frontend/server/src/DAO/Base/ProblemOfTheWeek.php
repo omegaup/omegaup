@@ -111,6 +111,7 @@ abstract class ProblemOfTheWeek {
                     `problem_of_the_week_id` = ?
                 );';
         $params = [$problem_of_the_week_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

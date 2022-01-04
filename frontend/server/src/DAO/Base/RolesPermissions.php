@@ -78,6 +78,7 @@ abstract class RolesPermissions {
                     `permission_id` = ?
                 );';
         $params = [$role_id, $permission_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

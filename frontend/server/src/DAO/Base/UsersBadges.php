@@ -113,6 +113,7 @@ abstract class UsersBadges {
                     `user_badge_id` = ?
                 );';
         $params = [$user_badge_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

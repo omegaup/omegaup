@@ -222,6 +222,7 @@ abstract class ProblemsetIdentities {
                     `problemset_id` = ?
                 );';
         $params = [$identity_id, $problemset_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

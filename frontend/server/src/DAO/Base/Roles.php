@@ -104,6 +104,7 @@ abstract class Roles {
                     `role_id` = ?
                 );';
         $params = [$role_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

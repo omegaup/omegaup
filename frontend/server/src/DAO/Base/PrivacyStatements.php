@@ -104,6 +104,7 @@ abstract class PrivacyStatements {
                     `privacystatement_id` = ?
                 );';
         $params = [$privacystatement_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

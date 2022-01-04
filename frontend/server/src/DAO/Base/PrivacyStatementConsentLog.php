@@ -117,6 +117,7 @@ abstract class PrivacyStatementConsentLog {
                     `privacystatement_consent_id` = ?
                 );';
         $params = [$privacystatement_consent_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

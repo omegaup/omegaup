@@ -224,6 +224,7 @@ abstract class CourseIdentityRequest {
                     `course_id` = ?
                 );';
         $params = [$identity_id, $course_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

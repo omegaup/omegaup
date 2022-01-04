@@ -119,6 +119,7 @@ abstract class GroupsScoreboards {
                     `group_scoreboard_id` = ?
                 );';
         $params = [$group_scoreboard_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

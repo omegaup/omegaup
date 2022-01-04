@@ -169,6 +169,7 @@ abstract class Courses {
                     `course_id` = ?
                 );';
         $params = [$course_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }

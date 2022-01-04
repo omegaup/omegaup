@@ -125,6 +125,7 @@ abstract class SchoolOfTheMonth {
                     `school_of_the_month_id` = ?
                 );';
         $params = [$school_of_the_month_id];
+        /** @var int */
         $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
         return $count > 0;
     }
