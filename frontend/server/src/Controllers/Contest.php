@@ -1745,19 +1745,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
                         'contestNotFound'
                     );
                 }
-                $acl = \OmegaUp\DAO\ACLs::getByPK($contest->acl_id);
-                if (is_null($acl) || is_null($acl->owner_id)) {
-                    throw new \OmegaUp\Exceptions\NotFoundException();
-                }
-                $director = \OmegaUp\DAO\Identities::findByUserId(
-                    $acl->owner_id
+                $director = \OmegaUp\DAO\UserRoles::getOwner(
+                    $contest->acl_id
                 );
-                if (is_null($director) || is_null($director->username)) {
+                if (is_null($director)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
                         'userNotExist'
                     );
                 }
-                $result['director'] = $director->username;
+                $result['director'] = $director;
 
                 $problemsInContest = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
                     $contest->problemset_id
