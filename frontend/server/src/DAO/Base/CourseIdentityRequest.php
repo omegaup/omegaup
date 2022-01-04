@@ -199,6 +199,36 @@ abstract class CourseIdentityRequest {
     }
 
     /**
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\CourseIdentityRequest} por llave primaria.
+     *
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\CourseIdentityRequest}
+     * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
+     *
+     * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
+     * los campos.
+     *
+     * @return bool Si existe o no tal registro.
+     */
+    final public static function existsByPK(
+        ?int $identity_id,
+        ?int $course_id
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `Course_Identity_Request`
+            WHERE
+                (
+                    `identity_id` = ? AND
+                    `course_id` = ?
+                );';
+        $params = [$identity_id, $course_id];
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
+    }
+
+    /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en

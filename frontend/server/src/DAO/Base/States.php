@@ -129,6 +129,36 @@ abstract class States {
     }
 
     /**
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\States} por llave primaria.
+     *
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\States}
+     * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
+     *
+     * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
+     * los campos.
+     *
+     * @return bool Si existe o no tal registro.
+     */
+    final public static function existsByPK(
+        ?string $country_id,
+        ?string $state_id
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `States`
+            WHERE
+                (
+                    `country_id` = ? AND
+                    `state_id` = ?
+                );';
+        $params = [$country_id, $state_id];
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
+    }
+
+    /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en

@@ -166,6 +166,34 @@ abstract class AuthTokens {
     }
 
     /**
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\AuthTokens} por llave primaria.
+     *
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\AuthTokens}
+     * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
+     *
+     * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
+     * los campos.
+     *
+     * @return bool Si existe o no tal registro.
+     */
+    final public static function existsByPK(
+        ?string $token
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `Auth_Tokens`
+            WHERE
+                (
+                    `token` = ?
+                );';
+        $params = [$token];
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
+    }
+
+    /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
