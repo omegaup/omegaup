@@ -62,29 +62,39 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         string $usernameOrName,
         int $rowcount = 100
     ) {
-        $sql = "
-            SELECT
-                i.name,
-                i.username,
-                MATCH(name, username) AGAINST (? IN BOOLEAN MODE) AS relevance
-            FROM
-                Identities i
-            WHERE
-                MATCH(name, username) AGAINST (? IN BOOLEAN MODE)
-            UNION DISTINCT
-            SELECT DISTINCT
-                i.name,
-                i.username,
-                0 AS relevance
-            FROM
-                Identities i
-            WHERE
-                (
-                    i.username LIKE CONCAT('%', ?, '%') OR
-                    i.name LIKE CONCAT('%', ?, '%')
-                ) AND
-                i.username NOT REGEXP 'teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+'
-            LIMIT ?;";
+        $sql = "SELECT
+                    sq.name,
+                    sq.username,
+                    SUM(sq.relevance) AS relevance
+                FROM (
+                    SELECT
+                        i.name,
+                        i.username,
+                        IFNULL(MATCH(name, username) AGAINST (? IN BOOLEAN MODE), 0) AS relevance
+                    FROM
+                        Identities i
+                    WHERE
+                        MATCH(name, username) AGAINST (? IN BOOLEAN MODE)
+                    UNION DISTINCT
+                    SELECT DISTINCT
+                        i.name,
+                        i.username,
+                        0 AS relevance
+                    FROM
+                        Identities i
+                    WHERE
+                        (
+                            i.username LIKE CONCAT('%', ?, '%') OR
+                            i.name LIKE CONCAT('%', ?, '%')
+                        ) AND
+                        i.username NOT REGEXP 'teams:[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+'
+                ) AS sq
+            GROUP BY
+                username, name
+            ORDER BY
+                relevance DESC
+            LIMIT
+                ?;";
         $args = [
             $usernameOrName,
             $usernameOrName,
@@ -95,33 +105,12 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
 
         /** @var list<array{name: null|string, relevance: float|null, username: string}> $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
-        usort(
-            $rs,
-            /**
-             * @param array{name: null|string, relevance: float|null, username: string} $a
-             * @param array{name: null|string, relevance: float|null, username: string} $b
-             */
-            fn (array $a, array $b) => $a['relevance'] == $b['relevance'] ? 0 : ($a['relevance'] < $b['relevance'] ? -1 : 1)
-        );
         $result = [];
-        foreach ($rs as $identityData) {
-            if (
-                array_search(
-                    $identityData['username'],
-                    array_column(
-                        $result,
-                        'key'
-                    )
-                ) !== false
-            ) {
-                continue;
-            }
-            $username = strval($identityData['username']);
+        foreach ($rs as $user) {
+            $username = strval($user['username']);
             $result[] = [
                 'key' => $username,
-                'value' => $identityData['name'] ? strval(
-                    $identityData['name']
-                ) : $username,
+                'value' => $user['name'] ? strval($user['name']) : $username,
             ];
         }
         return $result;
