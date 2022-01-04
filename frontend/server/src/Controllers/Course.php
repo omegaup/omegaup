@@ -2987,16 +2987,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $acl = \OmegaUp\DAO\ACLs::getByPK(
+        $director = \OmegaUp\DAO\UserRoles::getOwner(
             $tokenAuthenticationResult['course']->acl_id
-        );
-        if (is_null($acl) || is_null($acl->owner_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException();
-        }
-        $director = \OmegaUp\DAO\Identities::findByUserId(
-            intval(
-                $acl->owner_id
-            )
         );
         if (is_null($director)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -3063,7 +3055,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                             $courseAlias,
                             $tokenAuthenticationResult['courseAdmin']
                         ),
-                        'director' => strval($director->username),
+                        'director' => $director,
                         'problemsetId' => $tokenAuthenticationResult['assignment']->problemset_id,
                         'admin' => $tokenAuthenticationResult['courseAdmin'],
                     ],
@@ -4966,16 +4958,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $acl = \OmegaUp\DAO\ACLs::getByPK(
+        $director = \OmegaUp\DAO\UserRoles::getOwner(
             $tokenAuthenticationResult['course']->acl_id
-        );
-        if (is_null($acl) || is_null($acl->owner_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException();
-        }
-        $director = \OmegaUp\DAO\Identities::findByUserId(
-            intval(
-                $acl->owner_id
-            )
         );
         if (is_null($director)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
@@ -5011,7 +4995,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $courseAlias,
                 $tokenAuthenticationResult['courseAdmin']
             ),
-            'director' => strval($director->username),
+            'director' => $director,
             'problemset_id' => $tokenAuthenticationResult['assignment']->problemset_id,
             'admin' => $tokenAuthenticationResult['courseAdmin'],
         ];
