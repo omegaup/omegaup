@@ -806,7 +806,7 @@ const translations: { [key: string]: string; } = {
   problemCollectionRandomLanguageProblem: "problema aleat\u00f3rio",
   problemCollectionSearchProblem: "Localizador de Problemas",
   problemCreatorAdd: "Adicionar",
-  problemCreatorAutomaticPoints: "Pontua\u00e7\u00e3o autom\u00e1tica",
+  problemCreatorAutomaticPoints: "Pontua\u00e7\u00e3o autom\u00e1tica (avan\u00e7ado)",
   problemCreatorAutomaticPointsHelperCase: "O programa calcular\u00e1 o valor deste caso usando esta f\u00f3rmula: (pontua\u00e7\u00e3o do grupo - (soma dos casos dentro do grupo que t\u00eam uma pontua\u00e7\u00e3o expl\u00edcita)) / (n\u00famero de casos dentro do grupo sem uma pontua\u00e7\u00e3o expl\u00edcita)",
   problemCreatorAutomaticPointsHelperGroup: "O programa calcular\u00e1 o valor deste grupo usando esta f\u00f3rmula: (100 - (soma dos grupos que t\u00eam uma pontua\u00e7\u00e3o expl\u00edcita) / (n\u00famero de grupos sem uma pontua\u00e7\u00e3o expl\u00edcita))",
   problemCreatorCase: "Caso",
