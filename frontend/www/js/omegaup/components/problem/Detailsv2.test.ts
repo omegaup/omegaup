@@ -210,4 +210,27 @@ describe('Detailsv2.vue', () => {
     await wrapper.find('table.runs tfoot button').trigger('click');
     expect(wrapper.vm.currentPopupDisplayed).toBe(PopupDisplayed.RunSubmit);
   });
+
+  it('Should handle the runs tab', async () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        allRuns: runs,
+        problem,
+        user: {
+          loggedIn: true,
+          admin: true,
+          reviewer: true,
+        },
+        userRuns: runs,
+      },
+      localVue,
+    });
+
+    const tabsItems = wrapper.findAllComponents(BTab);
+    const runsTab = tabsItems.at(1);
+    expect(runsTab.text()).toContain(T.wordsSubmissions);
+    expect(runsTab.text()).toContain(T.wordsVerdict);
+    expect(runsTab.text()).toContain(T.wordsStatus);
+    expect(runsTab.text()).toContain(T.wordsLanguage);
+  });
 });

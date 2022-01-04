@@ -103,6 +103,25 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ArenaCoursePayload {
       return ((x) => {
+        x.course = ((x) => {
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (
+                typeof x.finish_time !== 'undefined' &&
+                x.finish_time !== null
+              )
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          return x;
+        })(x.course);
         if (
           typeof x.currentProblem !== 'undefined' &&
           x.currentProblem !== null
@@ -2268,6 +2287,7 @@ export namespace types {
 
   export interface ArenaCourseDetails {
     alias: string;
+    assignments: types.CourseAssignment[];
     languages?: string[];
     name: string;
   }
@@ -2931,6 +2951,7 @@ export namespace types {
     has_runs: boolean;
     max_points: number;
     name: string;
+    opened: boolean;
     order: number;
     problemCount: number;
     problemset_id: number;
