@@ -97,7 +97,7 @@ class JsIncludeNode extends \Twig\Node\Node {
         $jsonPath = dirname(
             __DIR__,
             3
-        ) . "/www/js/dist/{$entrypoint}.deps.json";
+        ) . "/www/js/dist/js/dist/{$entrypoint}.deps.json";
         $textContents = @file_get_contents($jsonPath);
         if ($textContents === false) {
             die(
