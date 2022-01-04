@@ -2,28 +2,24 @@
   <div class="mt-3">
     <b-form-group
       :description="T.problemCreatorCaseGroupNameHelper"
-      :label="T.problemCreatorCaseName"
+      :label="T.problemCreatorGroupName"
       label-for="case-name"
       class="mb-4"
     >
       <b-form-input
-        v-model="caseName"
+        v-model="groupName"
         :formatter="formatter"
         required
         autocomplete="off"
       />
     </b-form-group>
-    <b-form-group :label="T.problemCreatorGroupName" label-for="case-group">
-      <b-form-select v-model="caseGroup" :options="options" />
-    </b-form-group>
-
     <b-form-group
-      v-show="casePoints !== null"
+      v-show="groupPoints !== null"
       :label="T.problemCreatorPoints"
       label-for="case-points"
     >
       <b-form-input
-        v-model="casePoints"
+        v-model="groupPoints"
         :formatter="pointsFormatter"
         type="number"
         number
@@ -33,12 +29,12 @@
     </b-form-group>
     <b-form-group
       :label="T.problemCreatorAutomaticPoints"
-      :description="T.problemCreatorAutomaticPointsHelperCase"
+      :description="T.problemCreatorAutomaticPointsHelperGroup"
     >
       <b-form-checkbox
-        :checked="casePoints === null"
+        :checked="groupPoints === null"
         name="auto-points"
-        @change="casePoints = casePoints === null ? 0 : null"
+        @change="groupPoints = groupPoints === null ? 0 : null"
       >
       </b-form-checkbox>
     </b-form-group>
@@ -51,14 +47,13 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 import T from '../../../../lang';
 
 @Component
-export default class CaseInput extends Vue {
+export default class GroupInput extends Vue {
   @Prop({ default: '' }) name!: string;
   @Prop({ default: NIL }) group!: string;
   @Prop({ default: null }) points!: number | null;
 
-  caseName = this.name;
-  caseGroup = this.group;
-  casePoints: number | null = this.points;
+  groupName = this.name;
+  groupPoints: number | null = this.points;
 
   T = T;
 
