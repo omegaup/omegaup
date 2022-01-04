@@ -107,10 +107,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         $result = [];
         foreach ($rs as $user) {
-            $username = strval($user['username']);
+            $username = $user['username'];
             $result[] = [
                 'key' => $username,
-                'value' => $user['name'] ? strval($user['name']) : $username,
+                'value' => $user['name'] ?? $username,
             ];
         }
         return $result;
