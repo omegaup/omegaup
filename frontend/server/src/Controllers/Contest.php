@@ -122,11 +122,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             ? \OmegaUp\DAO\Enum\ActiveStatus::getIntValue(intval($r['active']))
             : \OmegaUp\DAO\Enum\ActiveStatus::ALL;
         if (!is_null($tabName)) {
-            if (strcmp($tabName, 'current')  == 0) {
+            if ($tabName === 'current') {
                 $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::ACTIVE;
-            } elseif (strcmp($tabName, 'future') == 0) {
+            } elseif ($tabName === 'future') {
                 $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::FUTURE;
-            } elseif (strcmp($tabName, 'past') == 0) {
+            } else {
                 $activeContests = \OmegaUp\DAO\Enum\ActiveStatus::PAST;
             }
         }
