@@ -34,111 +34,101 @@ class Certificate:
     username: str
 
 
-class ClientContest:
-    '''Client Contest class'''
-    def __init__(self, queue: str, exchange: str, routing_key: str) -> None:
-        self.message: List[Dict[str, object]] = []
-        self.queue = queue
-        self.exchange = exchange
-        self.routing_key = routing_key
+def certificate_contests_receive_messages(
+        cur: mysql.connector.cursor.MySQLCursorDict,
+        dbconn: mysql.connector.MySQLConnection,
+        channel: pika.adapters.blocking_connection.BlockingChannel,
+        api_token: str,
+        url: str) -> None:
+    '''Receive contest messages from a queue'''
 
-    def certificate_contests_receive_messages(
-            self,
-            cur: mysql.connector.cursor.MySQLCursorDict,
-            dbconn: mysql.connector.MySQLConnection,
-            channel: pika.adapters.blocking_connection.BlockingChannel,
-            api_token: str,
-            url: str) -> None:
-        '''Receive contest messages from a queue'''
+    channel.exchange_declare(exchange='certificates',
+                                durable=True,
+                                exchange_type='direct')
+    channel.queue_declare(queue='contest', durable=True, exclusive=False)
+    channel.queue_bind(
+        exchange='certificates',
+        queue='contest',
+        routing_key='ContestQueue')
+    logging.info('[*] waiting for the messages')
 
-        channel.exchange_declare(exchange=self.exchange,
-                                 durable=True,
-                                 exchange_type='direct')
-        channel.queue_declare(queue=self.queue, durable=True, exclusive=False)
-        channel.queue_bind(
-            exchange=self.exchange,
-            queue=self.queue,
-            routing_key=self.routing_key)
-        logging.info('[*] waiting for the messages')
+    def certificate_contests_callback(
+            _channel: pika.adapters.blocking_connection.BlockingChannel,
+            _method: pika.spec.Basic.Deliver,
+            _properties: pika.spec.BasicProperties,
+            body: bytes) -> None:
+        data = json.loads(body.decode())
+        client = omegaup.api.Client(api_token=api_token, url=url)
+        scoreboard = client.contest.scoreboard(
+            contest_alias=data['alias'],
+            token=data['scoreboard_url'])
+        ranking = scoreboard['ranking']
+        certificates: List[Certificate] = []
 
-        def certificate_contests_callback(
-                _channel: pika.adapters.blocking_connection.BlockingChannel,
-                _method: pika.spec.Basic.Deliver,
-                _properties: pika.spec.BasicProperties,
-                body: bytes) -> None:
-            data = json.loads(body.decode())
-            client = omegaup.api.Client(api_token=api_token, url=url)
-            scoreboard = client.contest.scoreboard(
-                contest_alias=data['alias'],
-                token=data['scoreboard_url'])
-            ranking = scoreboard['ranking']
-            certificates: List[Certificate] = []
-
-            for user in ranking:
-                contest_place: Optional[int] = None
-                if (data['certificate_cutoff']
-                        and user['place'] <= data['certificate_cutoff']):
-                    contest_place = user['place']
-                verification_code = generate_code()
-                certificates.append(Certificate(
-                    certificate_type='contest',
-                    contest_id=int(data['contest_id']),
-                    verification_code=verification_code,
-                    contest_place=contest_place,
-                    username=str(user['username'])
-                ))
-            while True:
-                try:
-                    cur.executemany('''
-                        INSERT INTO
-                            `Certificates` (
-                                `identity_id`,
-                                `certificate_type`,
-                                `contest_id`,
-                                `verification_code`,
-                                `contest_place`)
-                        SELECT
+        for user in ranking:
+            contest_place: Optional[int] = None
+            if (data['certificate_cutoff']
+                    and user['place'] <= data['certificate_cutoff']):
+                contest_place = user['place']
+            verification_code = generate_code()
+            certificates.append(Certificate(
+                certificate_type='contest',
+                contest_id=int(data['contest_id']),
+                verification_code=verification_code,
+                contest_place=contest_place,
+                username=str(user['username'])
+            ))
+        while True:
+            try:
+                cur.executemany('''
+                    INSERT INTO
+                        `Certificates` (
                             `identity_id`,
-                            %s,
-                            %s,
-                            %s,
-                            %s
-                        FROM
-                            `Identities`
-                        WHERE
-                            `username` = %s;
-                        ''',
-                                    [
-                                        dataclasses.astuple(
-                                            certificate
-                                        ) for certificate in certificates])
-                    dbconn.commit()
-                    break
-                except mysql.connector.Error as err:
-                    dbconn.rollback()
-                    if err.errno != 1062:
-                        raise
-                    for certificate in certificates:
-                        certificate.verification_code = generate_code()
-                    logging.exception(
-                        'At least one of the verification codes had a conflict'
-                    )
-        channel.basic_consume(
-            queue=self.queue,
-            on_message_callback=certificate_contests_callback,
-            auto_ack=True)
-        try:
-            channel.start_consuming()
-        except KeyboardInterrupt:
-            channel.stop_consuming()
+                            `certificate_type`,
+                            `contest_id`,
+                            `verification_code`,
+                            `contest_place`)
+                    SELECT
+                        `identity_id`,
+                        %s,
+                        %s,
+                        %s,
+                        %s
+                    FROM
+                        `Identities`
+                    WHERE
+                        `username` = %s;
+                    ''',
+                                [
+                                    dataclasses.astuple(
+                                        certificate
+                                    ) for certificate in certificates])
+                dbconn.commit()
+                break
+            except mysql.connector.Error as err:
+                dbconn.rollback()
+                if err.errno != 1062:
+                    raise
+                for certificate in certificates:
+                    certificate.verification_code = generate_code()
+                logging.exception(
+                    'At least one of the verification codes had a conflict'
+                )
+    channel.basic_consume(
+        queue='contest',
+        on_message_callback=certificate_contests_callback,
+        auto_ack=True)
+    try:
+        channel.start_consuming()
+    except KeyboardInterrupt:
+        channel.stop_consuming()
 
-    def close_channel(
-            self,
-            channel: pika.adapters.blocking_connection.BlockingChannel
-    ) -> None:
-        ''' Function to close channel '''
-        self.message = []
-        channel.close()
+
+def close_channel(
+        channel: pika.adapters.blocking_connection.BlockingChannel
+) -> None:
+    ''' Function to close channel '''
+    channel.close()
 
 
 def main() -> None:
@@ -161,15 +151,14 @@ def main() -> None:
     try:
         with dbconn.cursor(buffered=True, dictionary=True) as cur, \
             rabbitmq_connection.connect(args) as channel:
-            client = ClientContest('contest', 'certificates', 'ContestQueue')
-            client.certificate_contests_receive_messages(cur,
-                                                         dbconn.conn,
-                                                         channel,
-                                                         args.api_token,
-                                                         args.url)
+            certificate_contests_receive_messages(cur,
+                                                  dbconn.conn,
+                                                  channel,
+                                                  args.api_token,
+                                                  args.url)
     finally:
         dbconn.conn.close()
-        client.close_channel(channel)
+        close_channel(channel)
         logging.info('Done')
 
 

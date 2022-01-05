@@ -33,16 +33,12 @@ def test_client_contest() -> None:
     logging.info('Started')
     dbconn = lib.db.connect(args)
     os.system('python3 send_messages_contest_queue.py')
-    client = client_contest.ClientContest('contest',
-                                          'certificates',
-                                          'ContestQueue')
     with dbconn.cursor(buffered=True, dictionary=True) as cur, \
         rabbitmq_connection.connect(args) as channel:
-        client.certificate_contests_receive_messages(
+        client_contest.certificate_contests_receive_messages(
             cur,
             dbconn.conn,
             channel,
             test_credentials.API_TOKEN,
             test_credentials.OMEGAUP_API_ENDPOINT)
-        client.close_channel(channel)
-        assert client.message == []
+        client_contest.close_channel(channel)
