@@ -341,12 +341,14 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
             )
         );
 
-        $smartyResult = \OmegaUp\Controllers\Badge::getDetailsForTypeScript(new \OmegaUp\Request([
+        [
+            'templateProperties' => $templateProperties,
+        ] = \OmegaUp\Controllers\Badge::getDetailsForTypeScript(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'badge_alias' => 'problemSetter'
         ]));
         $this->assertNotNull(
-            $smartyResult['smartyProperties']['payload']['badge']['assignation_time']
+            $templateProperties['payload']['badge']['assignation_time']
         );
 
         $contestManagerResult = \OmegaUp\Controllers\Badge::apiMyBadgeAssignationTime(new \OmegaUp\Request([

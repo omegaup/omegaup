@@ -191,7 +191,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
             ])
-        )['smartyProperties']['payload']['frequentTags'];
+        )['templateProperties']['payload']['frequentTags'];
 
         $this->assertEquals('problemTagMatrices', $result[0]['name']);
         $this->assertCount(6, $result);
@@ -212,7 +212,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload']['authorsRanking']['ranking'];
+        )['templateProperties']['payload']['authorsRanking']['ranking'];
 
         foreach ($result as $key) {
             $this->assertArrayHasKey('author_ranking', $key);
@@ -298,7 +298,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'difficulty' => 'easy'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(2, $result);
 
@@ -309,7 +309,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'difficulty' => 'medium'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(1, $result);
 
@@ -320,7 +320,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'difficulty' => 'hard'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(1, $result);
 
@@ -331,7 +331,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'difficulty' => 'all'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(4, $result);
 
@@ -341,7 +341,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(4, $result);
 
@@ -351,7 +351,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'difficulty' => 'easy'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(2, $result);
 
@@ -361,7 +361,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'difficulty' => 'medium'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(1, $result);
 
@@ -371,7 +371,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'difficulty' => 'hard'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(1, $result);
 
@@ -381,7 +381,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'difficulty' => 'all'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(4, $result);
 
@@ -390,7 +390,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(4, $result);
     }
@@ -451,7 +451,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'sort_order' => 'asc'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(4, $result);
         $this->assertEquals('problem_0', $result[0]['alias']);
@@ -468,7 +468,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'page' => '1',
                 'sort_order' => 'asc'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(2, $result);
         $this->assertEquals('problem_0', $result[0]['alias']);
@@ -483,7 +483,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'page' => '2',
                 'sort_order' => 'asc'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(2, $result);
         $this->assertEquals('problem_2', $result[0]['alias']);
@@ -505,7 +505,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(8, $result);
 
@@ -515,7 +515,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'author' => 'author_0'
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(2, $result);
 
@@ -528,7 +528,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'rowcount' => 1,
                 'page' => 2
             ])
-        )['smartyProperties']['payload']['problems'];
+        )['templateProperties']['payload']['problems'];
 
         $this->assertCount(1, $result);
     }

@@ -25,36 +25,19 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
         int $rowCount = 100
     ): array {
         $sql = "SELECT
-            `c`.*,
-            `i`.`username`,
-            IFNULL(`i`.country_id, 'xx') AS country_id,
-            IFNULL(
-              (
-                SELECT
-                  `urc`.classname
-                FROM
-                  `User_Rank_Cutoffs` AS `urc`
-                WHERE
-                  `urc`.`score` <= (
-                    SELECT
-                      `ur`.score
-                    FROM
-                      `User_Rank` AS `ur`
-                    WHERE
-                      `ur`.`user_id` = `c`.`user_id`
-                  )
-                ORDER BY
-                  `urc`.`percentile` ASC LIMIT 1
-              ),
-              'user-rank-unranked'
-            ) AS classname
+            cm.*,
+            i.username,
+            IFNULL(i.country_id, 'xx') AS country_id,
+            IFNULL(ur.classname, 'user-rank-unranked') AS classname
           FROM
-            `Coder_Of_The_Month` AS `c`
+            Coder_Of_The_Month AS cm
           INNER JOIN
-            `Identities` AS `i` ON `i`.`user_id` = `c`.`user_id`
+            Identities AS i ON i.user_id = cm.user_id
+          LEFT JOIN
+            User_Rank ur ON ur.user_id = cm.user_id
           WHERE
             `time` = ? AND
-            `category` = ?
+            category = ?
           LIMIT ?;
         ";
 
@@ -126,25 +109,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             SELECT DISTINCT
               cm.time,
               i.username,
-              IFNULL(
-                (
-                  SELECT urc.classname
-                  FROM User_Rank_Cutoffs urc
-                  WHERE
-                      urc.score <= (
-                          SELECT
-                              ur.score
-                          FROM
-                              User_Rank ur
-                          WHERE
-                              ur.user_id = i.user_id
-                      )
-                  ORDER BY
-                      urc.percentile ASC
-                  LIMIT 1
-                ),
-                'user-rank-unranked'
-              ) AS classname
+              IFNULL(ur.classname, 'user-rank-unranked') AS classname
             FROM
               Coder_Of_The_Month cm
             INNER JOIN
@@ -152,7 +117,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
             INNER JOIN
               Identities i ON i.identity_id = u.main_identity_id
             LEFT JOIN
-              Emails e ON e.user_id = u.user_id
+              User_Rank ur ON ur.user_id = cm.user_id
             WHERE
               (cm.`ranking` = 1 OR cm.selected_by IS NOT NULL) AND
               cm.school_id = ? AND

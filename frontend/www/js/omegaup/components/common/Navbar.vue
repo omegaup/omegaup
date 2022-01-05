@@ -97,9 +97,12 @@
           <!-- in lockdown or contest mode there is no left navbar -->
           <ul v-if="!isLoggedIn" class="navbar-nav navbar-right">
             <li class="nav-item">
-              <a class="nav-link px-2" :href="formattedLoginURL">{{
-                T.navLogIn
-              }}</a>
+              <a
+                class="nav-link px-2"
+                :href="formattedLoginURL"
+                data-login-button
+                >{{ T.navLogIn }}</a
+              >
             </li>
           </ul>
           <ul v-else class="navbar-nav navbar-right">
@@ -295,7 +298,7 @@
       </div>
     </nav>
     <omegaup-user-objectives-questions
-      v-if="fromLogin && userTypes.length === 0"
+      v-if="fromLogin && isLoggedIn && userTypes.length === 0"
       @submit="(objectives) => $emit('update-user-objectives', objectives)"
     ></omegaup-user-objectives-questions>
   </header>

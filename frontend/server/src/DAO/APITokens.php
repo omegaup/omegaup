@@ -28,36 +28,15 @@ class APITokens extends \OmegaUp\DAO\Base\APITokens {
                 at.apitoken_id,
                 1 as is_main_identity,
                 i.*,
-                IFNULL(
-                    (
-                        SELECT `urc`.`classname` FROM
-                            `User_Rank_Cutoffs` `urc`
-                        WHERE
-                            `urc`.`score` <= (
-                                    SELECT
-                                        `ur`.`score`
-                                    FROM
-                                        `User_Rank` `ur`
-                                    WHERE
-                                        `ur`.`user_id` = `i`.`user_id`
-                                )
-                        ORDER BY
-                            `urc`.`percentile` ASC
-                        LIMIT
-                            1
-                    ),
-                    'user-rank-unranked'
-                ) `classname`
+                IFNULL(ur.classname, 'user-rank-unranked') AS classname
             FROM
                 `API_Tokens` at
             INNER JOIN
-                `Users` u
-            ON
-                u.user_id = at.user_id
+                `Users` u ON u.user_id = at.user_id
             INNER JOIN
-                `Identities` i
-            ON
-                i.identity_id = u.main_identity_id
+                `Identities` i ON i.identity_id = u.main_identity_id
+            LEFT JOIN
+                User_Rank ur ON ur.user_id = i.user_id
             WHERE
                 at.token = ?
         ";
@@ -69,32 +48,13 @@ class APITokens extends \OmegaUp\DAO\Base\APITokens {
                     at.apitoken_id,
                     0 as is_main_identity,
                     i.*,
-                    IFNULL(
-                        (
-                            SELECT `urc`.`classname` FROM
-                                `User_Rank_Cutoffs` `urc`
-                            WHERE
-                                `urc`.`score` <= (
-                                        SELECT
-                                            `ur`.`score`
-                                        FROM
-                                            `User_Rank` `ur`
-                                        WHERE
-                                            `ur`.`user_id` = `i`.`user_id`
-                                    )
-                            ORDER BY
-                                `urc`.`percentile` ASC
-                            LIMIT
-                                1
-                        ),
-                        'user-rank-unranked'
-                    ) `classname`
+                    IFNULL(ur.classname, 'user-rank-unranked') AS classname
                 FROM
                     `API_Tokens` at
                 INNER JOIN
-                    `Identities` i
-                ON
-                    i.user_id = at.user_id
+                    `Identities` i ON i.user_id = at.user_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
                 WHERE
                     at.token = ? AND i.username = ?
             ";

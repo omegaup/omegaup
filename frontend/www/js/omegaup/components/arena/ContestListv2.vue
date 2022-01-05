@@ -5,7 +5,6 @@
     </div>
     <b-card no-body>
       <b-tabs
-        v-model="currentTab"
         class="sidebar"
         pills
         card
@@ -151,9 +150,13 @@
         <b-tab
           ref="currentContestTab"
           v-infinite-scroll="loadMoreContests"
+          infinite-scroll-disabled="refreshing"
+          infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListCurrent"
           :title-link-class="titleLinkClass(ContestTab.Current)"
+          :active="currentTab === ContestTab.Current"
+          @click="currentTab = ContestTab.Current"
         >
           <div v-if="filteredContestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
@@ -163,7 +166,6 @@
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
-            :contest-tab="currentTab"
           >
             <template #contest-button-scoreboard>
               <div></div>
@@ -188,9 +190,13 @@
         <b-tab
           ref="futureContestTab"
           v-infinite-scroll="loadMoreContests"
+          infinite-scroll-disabled="refreshing"
+          infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListFuture"
           :title-link-class="titleLinkClass(ContestTab.Future)"
+          :active="currentTab === ContestTab.Future"
+          @click="currentTab = ContestTab.Future"
         >
           <div v-if="filteredContestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
@@ -200,7 +206,6 @@
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
-            :contest-tab="currentTab"
           >
             <template #contest-button-scoreboard>
               <div></div>
@@ -228,9 +233,13 @@
         <b-tab
           ref="pastContestTab"
           v-infinite-scroll="loadMoreContests"
+          infinite-scroll-disabled="refreshing"
+          infinite-scroll-immediate-check="false"
           class="scroll-content"
           :title="T.contestListPast"
           :title-link-class="titleLinkClass(ContestTab.Past)"
+          :active="currentTab === ContestTab.Past"
+          @click="currentTab = ContestTab.Past"
         >
           <div v-if="filteredContestList.length === 0">
             <div class="empty-category">{{ T.contestListEmpty }}</div>
@@ -240,7 +249,6 @@
             v-else
             :key="contestItem.contest_id"
             :contest="contestItem"
-            :contest-tab="currentTab"
           >
             <template #contest-enroll-status>
               <div></div>
@@ -300,19 +308,19 @@ Vue.use(infiniteScroll);
 library.add(fas);
 
 export enum ContestTab {
-  Current = 0,
-  Future = 1,
-  Past = 2,
+  Current = 'current',
+  Future = 'future',
+  Past = 'past',
 }
 
 export enum ContestOrder {
-  None = -1,
-  Title = 0,
-  Ends = 1,
-  Duration = 2,
-  Organizer = 3,
-  Contestants = 4,
-  SignedUp = 5,
+  None = 'none',
+  Title = 'title',
+  Ends = 'ends',
+  Duration = 'duration',
+  Organizer = 'organizer',
+  Contestants = 'contestants',
+  SignedUp = 'signedup',
 }
 
 @Component({
@@ -334,7 +342,7 @@ export default class ArenaContestList extends Vue {
   currentOrder: ContestOrder = ContestOrder.None;
   currentFilterBySignedUp: boolean = false;
   currentFilterByRecommended: boolean = false;
-  currentPageSize: number = 10;
+  refreshing: boolean = false;
 
   titleLinkClass(tab: ContestTab) {
     if (this.currentTab === tab) {
@@ -349,8 +357,10 @@ export default class ArenaContestList extends Vue {
   }
 
   loadMoreContests() {
-    this.$emit('get-chunk', 1, this.currentPageSize, this.query);
-    this.currentPageSize += 10;
+    this.refreshing = true;
+    let currentPageSize: number = this.filteredContestList.length + 10;
+    this.$emit('get-chunk', 1, currentPageSize, this.query, this.currentTab);
+    this.refreshing = false;
   }
 
   finishContestDate(contest: types.ContestListItem): string {

@@ -26,15 +26,37 @@ import argparse
 import contextlib
 import logging
 import os.path
+import subprocess
 import sys
 import time
-import urllib.error
 from typing import Iterator, List, Optional, Sequence, Tuple
 
+import boto3  # type: ignore
+
 import database_utils
-from lib import aws
 
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
+
+sys.path.insert(
+    0,
+    os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), "."))
+
+import lib.logs  # pylint: disable=wrong-import-position
+
+
+_BLOCKING_PROCESSES_QUERY = '''
+SELECT DISTINCT
+    PROCESSLIST_ID
+FROM
+    performance_schema.metadata_locks
+INNER JOIN
+    performance_schema.threads ON THREAD_ID = OWNER_THREAD_ID
+WHERE
+    PROCESSLIST_ID <> CONNECTION_ID() AND
+    OBJECT_TYPE = 'TABLE' AND
+    OBJECT_SCHEMA IN (%s);
+'''
 
 
 def _revision(args: argparse.Namespace, auth: Sequence[str]) -> int:
@@ -73,55 +95,33 @@ def _scripts() -> List[Tuple[int, str, str]]:
 
 def _set_aws_rds_timeout(args: argparse.Namespace,
                          auth: Sequence[str],
-                         timeout: Optional[int] = None,
-                         retries: int = 10) -> None:
+                         timeout: Optional[int] = None) -> None:
     '''Set the MySQL through AWS RDS timeouts.'''
     del auth  # unused
-    access_key, secret_key = aws.get_credentials(args.aws_username)
+    rds = boto3.client('rds')
 
-    while True:
-        try:
-            if timeout is None:
-                aws.request(access_key,
-                            secret_key,
-                            region=args.aws_rds_region,
-                            service='rds',
-                            request_parameters={
-                                'Action': 'ResetDBParameterGroup',
-                                'DBParameterGroupName':
-                                args.aws_rds_parameter_group_name,
-                                'Parameters.member.1.ApplyMethod': 'immediate',
-                                'Parameters.member.1.ParameterName':
-                                'wait_timeout',
-                                'Version': '2014-09-01',
-                            })
-            else:
-                aws.request(access_key,
-                            secret_key,
-                            region=args.aws_rds_region,
-                            service='rds',
-                            request_parameters={
-                                'Action': 'ModifyDBParameterGroup',
-                                'DBParameterGroupName':
-                                args.aws_rds_parameter_group_name,
-                                'Parameters.member.1.ApplyMethod': 'immediate',
-                                'Parameters.member.1.ParameterName':
-                                'wait_timeout',
-                                'Parameters.member.1.ParameterValue': '10',
-                                'Version': '2014-09-01',
-                            })
-            return
-        except urllib.error.HTTPError as e:
-            body = e.read()
-            logging.error('Request failed. headers=%r, body=%s',
-                          tuple(e.headers.items()), body)
-            if (e.code != 400
-                    or b'<Code>InvalidDBParameterGroupState</Code>' not in body
-                    or retries == 0):
-                raise e
-            logging.info('Retrying, %d tries left...', retries)
-            retries -= 1
-            time.sleep(10)
+    if timeout is None:
+        rds.reset_db_parameter_group(
+            DBParameterGroupName=args.aws_rds_parameter_group_name,
+            ResetAllParameters=False,
+            Parameters=[
+                {
+                    'ApplyMethod': 'immediate',
+                    'ParameterName': 'wait_timeout',
+                },
+            ],
+        )
+    else:
+        rds.reset_db_parameter_group(
+            DBParameterGroupName=args.aws_rds_parameter_group_name,
+            Parameters=[
+                {
+                    'ApplyMethod': 'immediate',
+                    'ParameterName': 'wait_timeout',
+                    'ParameterValue': '10',
+                },
+            ],
+        )
 
 
 def _set_mysql_timeout(args: argparse.Namespace,
@@ -142,11 +142,13 @@ def _set_mysql_timeout(args: argparse.Namespace,
 
 
 @contextlib.contextmanager
-def _connection_timeout_wrapper(
+def _connection_timeout_wrapper(  # pylint: disable=too-many-arguments
         args: argparse.Namespace,
         auth: Sequence[str],
-        lower_timeout: str = 'no',
-        kill_other_connections: bool = False) -> Iterator[None]:
+        databases: Sequence[str],
+        aws: bool,
+        lower_timeout: bool,
+        kill_blocking_connections: bool = False) -> Iterator[None]:
     '''A context manager that temporarily lowers the wait timeout.
 
     This can also also optionally kill any existing connections to the
@@ -154,28 +156,38 @@ def _connection_timeout_wrapper(
     lowered wait timeout, which in turn should make this script be able to grab
     any locks within ~10s.
     '''
+    def _set_timeout(timeout: Optional[int]) -> None:
+        if aws:
+            _set_aws_rds_timeout(args, auth, timeout)
+        else:
+            _set_mysql_timeout(args, auth, timeout)
     try:
-        if lower_timeout == 'mysql':
+        if lower_timeout:
             logging.info('Lowering MySQL timeout...')
-            _set_mysql_timeout(args, auth, 10)
-        elif lower_timeout == 'aws':
-            logging.info('Lowering MySQL timeout...')
-            _set_aws_rds_timeout(args, auth, 10)
+            _set_timeout(10)
 
-        if kill_other_connections:
+        if kill_blocking_connections:
             logging.info('Killing all other MySQL connections...')
             for line in database_utils.mysql(
-                    'SHOW FULL PROCESSLIST;', dbname='mysql',
+                    (_BLOCKING_PROCESSES_QUERY %
+                     (', '.join(f'"{dbname}"' for dbname in databases))),
+                    dbname='mysql',
                     auth=auth).strip().split('\n'):
+                if not line.strip():
+                    continue
                 try:
-                    database_utils.mysql(
-                        'KILL %s;' % line.split()[0],
-                        dbname='mysql',
-                        auth=auth)
-                except:  # noqa: bare-except
-                    # The command already logged the error. There is one
-                    # unkillable system thread and one dead thread (the one
-                    # that issued the `SHOW FULL PROCESSLIST;` query.
+                    if aws:
+                        database_utils.mysql(
+                            'CALL mysql.rds_kill(%s);' % line.split()[0],
+                            dbname='mysql',
+                            auth=auth)
+                    else:
+                        database_utils.mysql(
+                            'KILL %s;' % line.split()[0],
+                            dbname='mysql',
+                            auth=auth)
+                except subprocess.CalledProcessError:
+                    # The command already logged the error.
                     pass
         else:
             # If we are not killing connections, at least sleep on it.
@@ -183,12 +195,9 @@ def _connection_timeout_wrapper(
 
         yield
     finally:
-        if lower_timeout == 'mysql':
+        if lower_timeout:
             logging.info('Restoring MySQL timeout...')
-            _set_mysql_timeout(args, auth, None)
-        elif lower_timeout == 'aws':
-            logging.info('Restoring MySQL timeout...')
-            _set_aws_rds_timeout(args, auth, None)
+            _set_timeout(None)
 
 
 def exists(args: argparse.Namespace, auth: Sequence[str]) -> None:
@@ -235,11 +244,14 @@ def migrate(args: argparse.Namespace,
         # touch the connection timeout.
         return
 
+    databases = args.databases.split(',')
     with _connection_timeout_wrapper(
             args,
             auth,
+            databases=databases,
+            aws=args.aws,
             lower_timeout=args.lower_timeout,
-            kill_other_connections=args.kill_other_connections):
+            kill_blocking_connections=args.kill_blocking_connections):
         for revision, name, path in scripts:
             if latest_revision >= revision:
                 continue
@@ -253,7 +265,7 @@ def migrate(args: argparse.Namespace,
             if name.startswith('test_') and not args.development_environment:
                 comment = "skipped"
             else:
-                for dbname in args.databases.split(','):
+                for dbname in databases:
                     database_utils.mysql(
                         'source %s;' % database_utils.quote(path),
                         dbname=dbname,
@@ -336,12 +348,15 @@ def purge(args: argparse.Namespace, auth: Sequence[str]) -> None:
     Drops & re-creates databases including the metadata. Note that purge will
     not re-apply the schema.
     '''
+    databases = args.databases.split(',')
     with _connection_timeout_wrapper(
             args,
             auth,
+            databases=databases,
+            aws=args.aws,
             lower_timeout=args.lower_timeout,
-            kill_other_connections=args.kill_other_connections):
-        for dbname in args.databases.split(','):
+            kill_blocking_connections=args.kill_blocking_connections):
+        for dbname in databases:
             logging.info('Dropping database %s', dbname)
             database_utils.mysql(
                 'DROP DATABASE IF EXISTS `%s`;' % dbname, auth=auth)
@@ -386,28 +401,21 @@ def main() -> None:
     parser.add_argument(
         '--username', default='root', help='MySQL root username')
     parser.add_argument('--password', default='omegaup', help='MySQL password')
-    parser.add_argument('--verbose', action='store_true')
+    parser.add_argument('--aws-rds-parameter-group-name',
+                        default='omegaup-frontend',
+                        help=('The name of the Parameter Group name. '
+                              'Required with --lower-timeout and --aws.'))
+    parser.add_argument('--lower-timeout',
+                        action='store_true',
+                        help='Temporarily lower the wait timeout.')
     parser.add_argument(
-        '--aws-username',
-        default='omegaup-rds-deploy',
-        help='The name of the AWS user to change the RDS timeout')
-    parser.add_argument(
-        '--aws-rds-region',
-        default='us-east-1',
-        help='The region of the RDS database')
-    parser.add_argument(
-        '--aws-rds-parameter-group-name',
-        default='omegaup-frontend',
-        help='The name of the Parameter Group name')
-    parser.add_argument(
-        '--lower-timeout',
-        default='mysql',
-        choices=('no', 'mysql', 'aws'),
-        help='Temporarily lower the wait timeout.')
-    parser.add_argument(
-        '--kill-other-connections',
+        '--kill-blocking-connections',
         action='store_true',
-        help='Kill all connections to MySQL.')
+        help='Kill all connections that hold a lock.')
+    parser.add_argument(
+        '--aws',
+        action='store_true',
+        help='Use AWS-specific commands.')
     subparsers = parser.add_subparsers(dest='command')
     subparsers.required = True
 
@@ -476,10 +484,10 @@ def main() -> None:
         '--limit', type=int, help='Last revision to include')
     parser_schema.set_defaults(func=schema)
 
-    args = parser.parse_args()
+    lib.logs.configure_parser(parser)
 
-    if args.verbose:
-        logging.getLogger().setLevel('DEBUG')
+    args = parser.parse_args()
+    lib.logs.init(parser.prog, args)
 
     auth = database_utils.authentication(
         config_file=args.mysql_config_file,

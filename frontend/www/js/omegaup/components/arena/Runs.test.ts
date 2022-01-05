@@ -220,4 +220,18 @@ describe('Runs.vue', () => {
       [{ filter: 'problem', value: 'other_problem' }],
     ]);
   });
+
+  it('Should handle the new submission button', async () => {
+    const wrapper = shallowMount(arena_Runs, {
+      propsData: {
+        problemAlias: 'alias',
+        runs,
+        showDetails: true,
+        isContestFinished: false,
+        useNewSubmissionButton: true,
+      },
+    });
+
+    expect(wrapper.find('tfoot button').text()).toBe(T.wordsNewSubmissions);
+  });
 });

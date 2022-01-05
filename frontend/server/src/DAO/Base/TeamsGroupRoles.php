@@ -56,6 +56,39 @@ abstract class TeamsGroupRoles {
     }
 
     /**
+     * Verificar si existe un {@link \OmegaUp\DAO\VO\TeamsGroupRoles} por llave primaria.
+     *
+     * Este método verifica la existencia de un objeto {@link \OmegaUp\DAO\VO\TeamsGroupRoles}
+     * de la base de datos usando sus llaves primarias **sin necesidad de cargar sus campos**.
+     *
+     * Este método es más eficiente que una llamada a getByPK cuando no se van a utilizar
+     * los campos.
+     *
+     * @return bool Si existe o no tal registro.
+     */
+    final public static function existsByPK(
+        ?int $team_group_id,
+        ?int $role_id,
+        ?int $acl_id
+    ): bool {
+        $sql = '
+            SELECT
+                COUNT(*)
+            FROM
+                `Teams_Group_Roles`
+            WHERE
+                (
+                    `team_group_id` = ? AND
+                    `role_id` = ? AND
+                    `acl_id` = ?
+                );';
+        $params = [$team_group_id, $role_id, $acl_id];
+        /** @var int */
+        $count = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        return $count > 0;
+    }
+
+    /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en

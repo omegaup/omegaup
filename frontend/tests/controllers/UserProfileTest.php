@@ -668,7 +668,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
 
         $response = \OmegaUp\Controllers\User::getProfileDetailsForTypeScript(
             new \OmegaUp\Request($requestParams)
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
         $profile = $response['profile'];
 
         // User's name is hidden when private profile is set

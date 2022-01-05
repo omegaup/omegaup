@@ -597,7 +597,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEquals($payload['email'], $userInformation['email']);
         $this->assertEquals(
@@ -664,7 +664,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'username' => $identityToGetInformation->username,
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEquals($payload['email'], $userToGetInformation['email']);
         $this->assertEquals(

@@ -757,7 +757,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                     'auth_token' => $login->auth_token,
                     'contest_alias' => $contestData['request']['alias'],
                 ])
-            )['smartyProperties']['payload']['contestReport'];
+            )['templateProperties']['payload']['contestReport'];
             unset($login);
 
             foreach ($identities as $contestant) {
@@ -964,7 +964,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEquals([
             'alias' => $teamGroup->alias,
@@ -984,7 +984,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties']['payload'];
+        )['templateProperties']['payload'];
 
         $this->assertEquals([
             'alias' => $otherTeamGroup->alias,
@@ -1167,7 +1167,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'alias' => $contestData['request']['alias'],
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties'];
+        )['templateProperties'];
         $problems = $response['payload']['problems'];
 
         $this->assertTrue($response['hideFooterAndHeader']);

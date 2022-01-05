@@ -338,21 +338,21 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
         // The studen only get 90 points in the first problem,
         // so 90% of progress is expected
         $this->assertEquals(
-            $response['smartyProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[0]['problem']->alias],
+            $response['templateProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[0]['problem']->alias],
             90
         );
 
         // The studen got AC points in the second problem,
         // so 100% of progress is expected
         $this->assertEquals(
-            $response['smartyProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[1]['problem']->alias],
+            $response['templateProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[1]['problem']->alias],
             100
         );
 
         // The studen didn't try third problem,
         // so 0% of progress is expected
         $this->assertEquals(
-            $response['smartyProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[2]['problem']->alias],
+            $response['templateProperties']['payload']['students'][0]['progress'][$assignmentAlias][$problemsData[2]['problem']->alias],
             0
         );
     }
