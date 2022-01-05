@@ -1314,7 +1314,6 @@ const translations: { [key: string]: string; } = {
   submissionSendFeedback: "Enviar feedback",
   submissionUpdateFeedback: "Atualizar feedback",
   submissionsListTitle: "Submiss\u00f5es realizadas nas \u00faltimas 24 horas",
-  submissionsRangeHeader: "\u00daltimas submiss\u00f5es da %(lowCount) \u00e0 %(highCount)",
   tagAdded: "Tag adicionado com sucesso!",
   tagNotFound: "Etiqueta n\u00e3o encontrada",
   tagPrefixRestricted: "O prefixo 'problemTag' n\u00e3o pode ser usado para tags adicionados manualmente.",

@@ -1313,7 +1313,6 @@
 	"submissionSendFeedback": "Send feedback",
 	"submissionUpdateFeedback": "Update feedback",
 	"submissionsListTitle": "Submissions on the last 24 hours",
-	"submissionsRangeHeader": "Latest submissions from %(lowCount) to %(highCount)",
 	"tagAdded": "Tag successfully added!",
 	"tagNotFound": "Tag not found",
 	"tagPrefixRestricted": "The 'problemTag' prefix can't be used for tags added manually.",

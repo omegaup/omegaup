@@ -1314,7 +1314,6 @@ const translations: { [key: string]: string; } = {
   submissionSendFeedback: "Enviar retroalimentaci\u00f3n",
   submissionUpdateFeedback: "Actualizar retroalimentaci\u00f3n",
   submissionsListTitle: "Env\u00edos realizados en las \u00faltimas 24 horas",
-  submissionsRangeHeader: "\u00daltimos env\u00edos del %(lowCount) al %(highCount)",
   tagAdded: "Tag agregado exitosamente.",
   tagNotFound: "Etiqueta no encontrada",
   tagPrefixRestricted: "El prefijo 'problemTag' no puede ser usado para las etiquetas agregadas manualmente.",
