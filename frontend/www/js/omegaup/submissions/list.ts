@@ -19,12 +19,8 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-submissions-list', {
         props: {
-          page: payload.page,
-          length: payload.length,
-          pagerItems: payload.pagerItems,
           includeUser: payload.includeUser,
           submissions: payload.submissions,
-          totalRows: payload.totalRows,
           searchResultUsers: this.searchResultUsers,
         },
         on: {

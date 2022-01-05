@@ -186,19 +186,26 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     }
 
     /**
-     * @return array{submissions: list<array{alias: string, classname: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}>, totalRows: int}
+     * @return list<array{alias: string, classname: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}>
      */
     public static function getLatestSubmissions(
-        int $page,
-        int $rowcount,
         int $identityId = null,
-        int $seconds = 3600 * 24
     ): array {
-        $offset = ($page - 1) * $rowcount;
-
-        $sqlFrom = '
+        $sql = '
+            SELECT
+                s.`time`,
+                i.username,
+                s.school_id,
+                sc.name as school_name,
+                p.alias,
+                p.title,
+                s.language,
+                r.verdict,
+                r.runtime,
+                r.memory,
+                IFNULL(ur.classname, "user-rank-unranked") AS classname
             FROM
-                Submissions s
+                Submissions s USE INDEX(PRIMARY)
             INNER JOIN
                 Identities i ON i.identity_id = s.identity_id
             LEFT JOIN
@@ -216,7 +223,7 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
             LEFT JOIN
                 Contests c ON c.contest_id = ps.contest_id
             WHERE
-                TIMESTAMPDIFF(SECOND, s.time, NOW()) <= ?
+                TIMESTAMPDIFF(SECOND, s.time, NOW()) <= 24 * 3600
                 AND u.is_private = 0
                 AND p.visibility >= ?
                 AND (
@@ -228,73 +235,28 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                     OR c.finish_time < s.time
                 )
         ';
-
-        $filterByUser = '
-                AND i.identity_id = ?
-        ';
-
-        $sqlOrderBy = '
-            ORDER BY
-                s.time DESC
-        ';
-
-        $sqlCount = '
-            SELECT
-                COUNT(*)
-        ';
-
-        $sql = '
-            SELECT
-                s.`time`,
-                i.username,
-                s.school_id,
-                sc.name as school_name,
-                p.alias,
-                p.title,
-                s.language,
-                r.verdict,
-                r.runtime,
-                r.memory,
-                IFNULL(ur.classname, "user-rank-unranked") AS classname
-        ';
-
-        $sqlLimit = 'LIMIT ?, ?;';
-
-        $query = $sql . $sqlFrom;
-        $countQuery = $sqlCount . $sqlFrom;
-
         $params = [
-            $seconds,
             \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
         ];
 
         if (!is_null($identityId)) {
-            $countQuery .= $filterByUser;
-            $query .= $filterByUser;
+            $sql .= '
+                    AND i.identity_id = ?
+            ';
             $params[] = $identityId;
         }
 
-        /** @var int */
-        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
-            $countQuery,
-            $params
-        ) ?? 0;
-
-        $params[] = $offset;
-        $params[] = $rowcount;
-
-        $query .=  $sqlOrderBy . $sqlLimit;
+        $sql .= '
+            ORDER BY
+                s.submission_id DESC
+            LIMIT 0, 100;
+        ';
 
         /** @var list<array{alias: string, classname: string, language: string, memory: int, runtime: int, school_id: int|null, school_name: null|string, time: \OmegaUp\Timestamp, title: string, username: string, verdict: string}> */
-        $submissions = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $query,
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
             $params
         );
-
-        return [
-            'totalRows' => $totalRows,
-            'submissions' => $submissions,
-        ];
     }
 
     /**
