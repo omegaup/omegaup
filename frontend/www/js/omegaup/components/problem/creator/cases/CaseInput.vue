@@ -32,7 +32,7 @@
       />
     </b-form-group>
     <b-form-group
-      :label="T.problemCreatorAutomaticPoints"
+      :label="T.problemCreatorAutomaticPointsRecommended"
       :description="T.problemCreatorAutomaticPointsHelperCase"
     >
       <b-form-checkbox
