@@ -186,6 +186,8 @@
               <div></div>
             </template>
           </omegaup-contest-card>
+          <b-overlay :show="refreshing" rounded="sm" variant="dark" no-wrap>
+          </b-overlay>
         </b-tab>
         <b-tab
           ref="futureContestTab"
@@ -229,6 +231,8 @@
               <div></div>
             </template>
           </omegaup-contest-card>
+          <b-overlay :show="refreshing" rounded="sm" variant="dark" no-wrap>
+          </b-overlay>
         </b-tab>
         <b-tab
           ref="pastContestTab"
@@ -272,6 +276,8 @@
               <div></div>
             </template>
           </omegaup-contest-card>
+          <b-overlay :show="refreshing" rounded="sm" variant="dark" no-wrap>
+          </b-overlay>
         </b-tab>
       </b-tabs>
     </b-card>
@@ -298,12 +304,14 @@ import {
   CardPlugin,
   DropdownPlugin,
   LayoutPlugin,
+  OverlayPlugin,
 } from 'bootstrap-vue';
 import ContestCard from './ContestCard.vue';
 Vue.use(TabsPlugin);
 Vue.use(CardPlugin);
 Vue.use(DropdownPlugin);
 Vue.use(LayoutPlugin);
+Vue.use(OverlayPlugin);
 Vue.use(infiniteScroll);
 library.add(fas);
 
