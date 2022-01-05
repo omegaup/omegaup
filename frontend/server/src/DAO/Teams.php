@@ -75,32 +75,15 @@ class Teams extends \OmegaUp\DAO\Base\Teams {
                     s.state_id,
                     sc.name AS school,
                     sc.school_id AS school_id,
-                    IFNULL(
-                        (
-                            SELECT `urc`.classname FROM
-                                `User_Rank_Cutoffs` urc
-                            WHERE
-                                `urc`.score <= (
-                                        SELECT
-                                            `ur`.`score`
-                                        FROM
-                                            `User_Rank` `ur`
-                                        WHERE
-                                            `ur`.`user_id` = `i`.`user_id`
-                                    )
-                            ORDER BY
-                                `urc`.percentile ASC
-                            LIMIT
-                                1
-                        ),
-                        "user-rank-unranked"
-                    ) `classname`
+                    IFNULL(ur.classname, "user-rank-unranked") AS classname
                 FROM
                     Teams t
                 INNER JOIN
                     Team_Groups tg ON tg.team_group_id = t.team_group_id
                 INNER JOIN
                     Identities i ON i.identity_id = t.identity_id
+                LEFT JOIN
+                    User_Rank ur ON ur.user_id = i.user_id
                 LEFT JOIN
                     States s ON s.state_id = i.state_id AND s.country_id = i.country_id
                 LEFT JOIN

@@ -137,20 +137,16 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $val[] = $identityId;
         }
 
-        $hasFilters = !empty($where);
-        $needsRuns = false;
         if (!is_null($status)) {
-            $needsRuns = true;
-            $where[] = 'r.status = ?';
+            $where[] = 's.status = ?';
             $val[] = $status;
         }
         if (!is_null($verdict)) {
-            $needsRuns = true;
             if ($verdict === 'NO-AC') {
-                $where[] = 'r.verdict <> ?';
+                $where[] = 's.verdict <> ?';
                 $val[] = 'AC';
             } else {
-                $where[] = 'r.verdict = ?';
+                $where[] = 's.verdict = ?';
                 $val[] = $verdict;
             }
         }
@@ -161,30 +157,14 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             FROM
                 Submissions s
         ';
-        $valCount = [];
-        // TODO: We're going to lie for now if we need to add a JOIN with the
-        // Runs table and have no other filters to help us. This query is
-        // completely unusable at the time because the indexes are not helping.
-        // So we'll just return the wrong answer for the time being, which will
-        // stop making the admin runs view cause a micro-incident every time
-        // it's visited.
-        if ($hasFilters || !$needsRuns) {
-            if ($needsRuns) {
-                $sqlCount .= '
-                    INNER JOIN
-                        Runs r ON r.run_id = s.current_run_id
-                ';
-            }
-            if (!empty($where)) {
-                $sqlCount .= 'WHERE ' . implode(' AND ', $where) . ' ';
-            }
-            $valCount = $val;
+        if (!empty($where)) {
+            $sqlCount .= 'WHERE ' . implode(' AND ', $where) . ' ';
         }
 
         /** @var int */
         $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sqlCount,
-            $valCount,
+            $val,
         );
 
         if (is_null($offset) || $offset < 0) {

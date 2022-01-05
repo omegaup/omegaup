@@ -7,6 +7,20 @@ declare namespace Cypress {
   }
 
   interface Chainable {
-    login(username: string, password: string): void;
+    login(loginInfo: LoginInfo): void;
+    register(loginInfo: LoginInfo): void;
+    createProblem(problemInfo: ProblemInfo): void;
   }
+}
+
+interface LoginInfo {
+  username: string;
+  password: string;
+}
+
+interface ProblemInfo {
+  problemAlias: string;
+  tag: string;
+  autoCompleteTextTag: string;
+  problemLevelIndex: number;
 }

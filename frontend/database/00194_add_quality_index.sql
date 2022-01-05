@@ -1,0 +1,1 @@
+ALTER TABLE `Problems` ADD KEY `idx_quality_seal` (`quality_seal`);

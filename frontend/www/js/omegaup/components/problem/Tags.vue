@@ -5,6 +5,7 @@
         <label class="font-weight-bold">{{ T.wordsPublicTags }}</label>
         <vue-typeahead-bootstrap
           v-if="canAddNewTags"
+          data-tags-input
           :data="publicTags"
           :serializer="publicTagsSerializer"
           :auto-close="true"

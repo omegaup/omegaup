@@ -10,7 +10,7 @@ for (const entryname of Object.keys(frontendConfig.entry)) {
     new HtmlWebpackPlugin({
       inject: false,
       chunks: [entryname],
-      filename: `js/dist/${entryname}.deps.json`,
+      filename: `${entryname}.deps.json`,
       template: path.resolve(__dirname, './stuff/webpack/deps.ejs'),
     }),
   );

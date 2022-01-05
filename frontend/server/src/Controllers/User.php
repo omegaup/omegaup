@@ -2095,6 +2095,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * Gets a list of users.
      *
      * @omegaup-request-param null|string $query
+     * @omegaup-request-param null|int $rowcount
      * @omegaup-request-param null|string $term
      *
      * @return array{results: list<ListItem>}
@@ -2114,6 +2115,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 $query
             )
         );
+        $rowcount = $r->ensureOptionalInt('rowcount') ?? 100;
         if (is_null($term) && is_null($query)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
@@ -2128,17 +2130,11 @@ class User extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $identities = \OmegaUp\DAO\Identities::findByUsernameOrName($param);
-        $response = [];
-        foreach ($identities as $identity) {
-            $username = strval($identity->username);
-            $response[] = [
-                'key' => $username,
-                'value' => $identity->name ?: $username,
-            ];
-        }
         return [
-            'results' => $response,
+            'results' => \OmegaUp\DAO\Identities::findByUsernameOrName(
+                $param,
+                $rowcount
+            ),
         ];
     }
 

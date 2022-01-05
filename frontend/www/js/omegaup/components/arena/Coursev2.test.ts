@@ -9,11 +9,46 @@ describe('Coursev2.vue', () => {
   const course: types.ArenaCourseDetails = {
     alias: 'test-course',
     name: 'Test Course',
+    assignments: [
+      {
+        alias: 'test-assignment-A',
+        assignment_type: 'homework',
+        description: 'Test assignment description',
+        finish_time: undefined,
+        name: 'Test Assignment A',
+        order: 1,
+        scoreboard_url: '',
+        scoreboard_url_admin: '',
+        start_time: new Date(),
+        has_runs: false,
+        max_points: 0,
+        opened: false,
+        problemset_id: 0,
+        problemCount: 0,
+      },
+      {
+        alias: 'test-assignment-B',
+        assignment_type: 'homework',
+        description: 'Test assignment description',
+        finish_time: undefined,
+        name: 'Test Assignment B',
+        order: 2,
+        scoreboard_url: '',
+        scoreboard_url_admin: '',
+        start_time: new Date(),
+        has_runs: false,
+        max_points: 0,
+        opened: false,
+        problemset_id: 0,
+        problemCount: 0,
+      },
+    ],
   };
   const assignment: types.ArenaCourseAssignment = {
-    alias: 'test-assignment',
-    name: 'Test Assignment',
+    alias: 'test-assignment-A',
+    name: 'Test Assignment A',
     description: 'Test assignment description',
+    problemset_id: 1,
   };
   const problems: types.ArenaCourseProblem[] = [
     {
@@ -73,14 +108,35 @@ describe('Coursev2.vue', () => {
     title: 'omegaUp',
   };
 
+  const runs: types.Run[] = [
+    {
+      alias: 'Hello',
+      classname: 'user-rank-unranked',
+      country: 'xx',
+      guid: 'abcdefg',
+      language: 'py3',
+      memory: 0,
+      penalty: 0,
+      runtime: 0,
+      score: 1,
+      status: 'ready',
+      submit_delay: 0,
+      time: new Date(),
+      username: 'omegaUp',
+      verdict: 'AC',
+    },
+  ];
+
   it('Should show the course summary', () => {
     const wrapper = shallowMount(arena_Course, {
       propsData: {
+        allRuns: runs,
         course,
         assignment,
         problems,
         currentProblem: null,
         scoreboard,
+        userRuns: runs,
       },
     });
 
@@ -94,12 +150,14 @@ describe('Coursev2.vue', () => {
   it('Should show the course scoreboard', () => {
     const wrapper = mount(arena_Course, {
       propsData: {
+        allRuns: runs,
         course,
         assignment,
         problems,
         currentProblem: null,
         selectedTab: 'ranking',
         scoreboard,
+        userRuns: runs,
       },
     });
 
@@ -110,12 +168,14 @@ describe('Coursev2.vue', () => {
   it('Should hide the course scoreboard tab when scoreboard is null', () => {
     const wrapper = mount(arena_Course, {
       propsData: {
+        allRuns: runs,
         course,
         assignment,
         problems,
         currentProblem: null,
         selectedTab: 'ranking',
         scoreboard: null,
+        userRuns: runs,
       },
     });
 

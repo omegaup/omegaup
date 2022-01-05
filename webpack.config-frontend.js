@@ -111,9 +111,9 @@ module.exports = {
   },
 
   output: {
-    path: path.resolve(__dirname, './frontend/www/'),
-    publicPath: '/',
-    filename: 'js/dist/[name].js',
+    path: path.resolve(__dirname, './frontend/www/js/dist/'),
+    publicPath: '/js/dist/',
+    filename: '[name].js',
     library: '[name]',
     libraryTarget: 'umd',
 
