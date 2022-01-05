@@ -63,5 +63,11 @@ describe('Basic Commands Test', () => {
       autoCompleteTextTag,
       problemLevelIndex,
     });
+
+    // Assert problem has been created
+    cy.location('href').should('include', problemAlias); // Url
+    cy.get('[name="title"]').should('have.value', problemAlias); // Title
+    cy.get('[name="problem_alias"]').should('have.value', problemAlias);
+    cy.get('[name="source"]').should('have.value', problemAlias);
   });
 });

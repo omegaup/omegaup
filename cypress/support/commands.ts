@@ -52,11 +52,5 @@ Cypress.Commands.add(
     cy.get('[name="problem-level"]').select(problemLevelIndex); // How can we assert this with the real text?
 
     cy.get('button[type="submit"]').click(); // Submit
-
-    // Assert problem has been created
-    cy.location('href').should('include', problemAlias); // Url
-    cy.get('[name="title"]').should('have.value', problemAlias); // Title
-    cy.get('[name="problem_alias"]').should('have.value', problemAlias);
-    cy.get('[name="source"]').should('have.value', problemAlias);
   },
 );
