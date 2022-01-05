@@ -70,7 +70,8 @@ a {
 }
 
 a[role='button'],
-a.btn {
+a.btn.btn-primary,
+a.btn.btn-info {
   color: $omegaup-white;
 }
 

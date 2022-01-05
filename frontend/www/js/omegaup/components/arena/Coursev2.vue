@@ -55,7 +55,9 @@
               v-if="previousAssignment"
               block
               variant="info"
-              :href="`/course/${course.alias}/arena/${previousAssignment.alias}/`"
+              :href="`/course/${encodeURIComponent(
+                course.alias,
+              )}/arena/${encodeURIComponent(previousAssignment.alias)}/`"
               ><b-icon-arrow-left-circle-fill></b-icon-arrow-left-circle-fill>
               {{ previousAssignment.name }}
             </b-button>
@@ -63,7 +65,9 @@
               v-if="nextAssignment"
               block
               variant="info"
-              :href="`/course/${course.alias}/arena/${nextAssignment.alias}/`"
+              :href="`/course/${encodeURIComponent(
+                course.alias,
+              )}/arena/${encodeURIComponent(nextAssignment.alias)}/`"
               >{{ nextAssignment.name }}
               <b-icon-arrow-right-circle-fill></b-icon-arrow-right-circle-fill>
             </b-button>
