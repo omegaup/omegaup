@@ -468,10 +468,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
         if ($contest->admission_mode === 'private') {
             if (
-                !is_null(\OmegaUp\DAO\ProblemsetIdentities::getByPK(
+                \OmegaUp\DAO\ProblemsetIdentities::existsByPK(
                     $identity->identity_id,
                     $contest->problemset_id
-                ))
+                )
             ) {
                 return true;
             }
@@ -582,10 +582,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             return false;
         }
         return self::isPublic($contest->admission_mode) ||
-            !is_null(\OmegaUp\DAO\ProblemsetIdentities::getByPK(
+            \OmegaUp\DAO\ProblemsetIdentities::existsByPK(
                 $identity->identity_id,
                 $contest->problemset_id
-            ));
+            );
     }
 
     /**

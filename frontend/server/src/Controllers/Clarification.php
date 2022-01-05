@@ -95,10 +95,10 @@ class Clarification extends \OmegaUp\Controllers\Controller {
                     $r->identity,
                     $course
                 ) &&
-                is_null(\OmegaUp\DAO\GroupsIdentities::getByPK(
+                !\OmegaUp\DAO\GroupsIdentities::existsByPK(
                     $course->group_id,
                     $r->identity->identity_id
-                ))
+                )
             ) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'courseStudentNotInCourse'
