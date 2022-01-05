@@ -16,7 +16,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         int $identityId,
         int $problemsetId
     ): bool {
-        return !is_null(self::getByPK($identityId, $problemsetId));
+        return self::existsByPK($identityId, $problemsetId);
     }
 
     /**
