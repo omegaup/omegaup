@@ -54,3 +54,54 @@ Cypress.Commands.add(
     cy.get('button[type="submit"]').click(); // Submit
   },
 );
+
+Cypress.Commands.add(
+  'createCourse',
+  ({
+    courseAlias,
+    showScoreboard = false,
+    startDate = new Date(),
+    unlimitedDuration = true,
+    endDate = new Date(),
+    school = 'omegaup',
+    basicInformation = false,
+    requestParticipantInformation = 'no',
+    problemLevel = 'introductory',
+    description = 'This is the description',
+    objective = 'This is an objective',
+  }) => {
+    cy.get('[data-nav-courses]').click();
+    cy.get('[data-nav-courses-create]').click();
+    cy.get('[data-course-new-name]').type(courseAlias);
+    cy.get('[data-course-new-alias]').type(courseAlias);
+    cy.get('[name="show-scoreboard"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
+      .eq(showScoreboard ? 0 : 1)
+      .click();
+    cy.get('[name="start-date"]').type(parseDateToCypressString(startDate));
+    cy.get('[name="unlimited-duration"]')
+      .eq(unlimitedDuration ? 0 : 1)
+      .click();
+    // only if unlimited duration is false we should change the end date
+    if (!unlimitedDuration) {
+      cy.get('[name="end-date"]').type(parseDateToCypressString(endDate));
+    } else {
+      // the end date input should be disabled
+      cy.get('[name="end-date"]').should('be.disabled');
+    }
+    cy.get('.tt-input').first().type(school); // If we use the data attribute, the autocomplete makes multiple elements
+    cy.get('[name="basic-information"]') // Currently the two radios are named equally, thus we need to use the eq, to get the correct index and click it
+      .eq(basicInformation ? 0 : 1)
+      .click();
+    cy.get('[data-course-participant-information]').select(
+      requestParticipantInformation,
+    );
+    cy.get('[data-course-problem-level]').select(problemLevel);
+    cy.get('[data-course-objective]').type(objective);
+    cy.get('[data-course-new-description]').type(description);
+    cy.get('button[type="submit"]').click();
+  },
+);
+
+export const parseDateToCypressString = (date: Date) => {
+  return date.toISOString().split('T')[0];
+};

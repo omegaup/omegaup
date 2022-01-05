@@ -3,9 +3,11 @@
     <div class="page-header">
       <h1>
         {{ T.wordsEditCourse }}
-        <span :class="{ 'text-secondary': data.course.archived }">{{
-          data.course.name
-        }}</span>
+        <span
+          data-course-name
+          :class="{ 'text-secondary': data.course.archived }"
+          >{{ data.course.name }}</span
+        >
         <small>
           &ndash;
           <a :href="courseURL">
