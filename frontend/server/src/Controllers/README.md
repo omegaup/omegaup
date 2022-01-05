@@ -807,6 +807,7 @@ Returns a list of contests
 | `page`           | `int`       |             |
 | `page_size`      | `int`       |             |
 | `query`          | `string`    |             |
+| `tab_name`       | `string`    |             |
 | `active`         | `int\|null` |             |
 | `admission_mode` | `mixed`     |             |
 | `participating`  | `int\|null` |             |
@@ -4418,10 +4419,11 @@ Gets a list of users.
 
 ### Parameters
 
-| Name    | Type           | Description |
-| ------- | -------------- | ----------- |
-| `query` | `null\|string` |             |
-| `term`  | `null\|string` |             |
+| Name       | Type           | Description |
+| ---------- | -------------- | ----------- |
+| `query`    | `null\|string` |             |
+| `rowcount` | `null\|int`    |             |
+| `term`     | `null\|string` |             |
 
 ### Returns
 

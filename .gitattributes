@@ -23,3 +23,9 @@
 *.txt text eol=lf
 *.xml text eol=lf
 *.yml text eol=lf
+
+# Auto-generated files
+/yarn.lock linguist-generated=true
+/frontend/www/js/omegaup/lang* linguist-generated=true
+/frontend/server/src/DAO/Base/*.php linguist-generated=true
+/frontend/server/src/DAO/VO/*.php linguist-generated=true
