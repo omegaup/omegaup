@@ -182,18 +182,6 @@ export default class Runs extends Vue {
     }
   }
 
-  penalty(run: types.Run): string {
-    if (
-      run.status == 'ready' &&
-      run.verdict != 'JE' &&
-      run.verdict != 'VE' &&
-      run.verdict != 'CE'
-    ) {
-      return run.penalty.toFixed(2);
-    }
-    return '—';
-  }
-
   percentage(run: types.Run): string {
     if (
       run.status == 'ready' &&
@@ -202,19 +190,6 @@ export default class Runs extends Vue {
       run.verdict != 'CE'
     ) {
       return `${(run.score * 100).toFixed(2)}%`;
-    }
-    return '—';
-  }
-
-  points(run: types.Run): string {
-    if (
-      run.status == 'ready' &&
-      run.verdict != 'JE' &&
-      run.verdict != 'VE' &&
-      run.verdict != 'CE' &&
-      typeof run.contest_score !== 'undefined'
-    ) {
-      return run.contest_score.toFixed(2);
     }
     return '—';
   }

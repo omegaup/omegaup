@@ -22,7 +22,7 @@ describe('Runsv2.vue', () => {
     submit_delay: 0,
     type: 'normal',
     username: 'username',
-    verdict: 'WA',
+    verdict: 'AC',
     guid: '119555',
     time: new Date('1/1/2020, 12:30:00 AM'),
   };
@@ -71,8 +71,12 @@ describe('Runsv2.vue', () => {
     const tableComponent = wrapper.findComponent(BTable);
     expect(tableComponent.exists()).toBe(true);
     expect(tableComponent.findAll('table tbody tr').length).toBe(runs.length);
+    expect(tableComponent.find('td.table-success').exists()).toBe(true);
     for (const run of runs) {
       expect(tableComponent.text()).toContain(run.guid);
+      expect(tableComponent.text()).toContain(
+        `${(run.score * 100).toFixed(2)}%`,
+      );
     }
   });
 });
