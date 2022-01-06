@@ -68,7 +68,7 @@ const carouselConfig: {
     },
   },
   {
-    image: '/media/homepage/carousel_slide_3.svg',
+    image: '/media/homepage/carousel_slide_4.svg',
     title: {
       en: 'Solve a new problem every week',
       es: 'Resuelve un problema nuevo cada semana',
